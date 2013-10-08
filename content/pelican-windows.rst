@@ -44,7 +44,7 @@ contain all your pelican sites, along with extra themes and plugins like this::
     ├── spapas.github.io
     └── other-sites
 
-After creating the pelican directory just go in it with a command line and run the pelican-quickstart command.
+After creating the pelican directory just go in it with a command line and run the ``pelican-quickstart`` command.
 It will ask you a number of questions, take a look at how I did answer these:
     
 .. code:: 
@@ -79,22 +79,25 @@ After that, you will have a pelican/spapas.github.io folder that will contain th
     └── publishconf.py
  
 The content folder will contain your content (rst or markdown), the output will contain the generated html after you run pelican for your site.
-The pelicanconf.py will have a number of options for the generation of the development version of your site while the publishconf will override some of the options
-of pelicanconf.py before generating the production version of your site that will actually be uploaded to github pages.
+The ``pelicanconf.py`` will have a number of options for the generation of the development version of your site while the ``publishconf.py`` will override some of the options
+of ``pelicanconf.py`` before generating the production version of your site that will actually be uploaded to github pages.
 
 Modifying pelican tools for windows
 -----------------------------------
 
-Pelican uses a Makefile and a unix shell script to do some useful work. Because I prefer to use windows, I answered no to the questions of generating these when pelican-quickstarte asked me.
+Pelican uses a Makefile and a unix shell script to generate the static html files and start an http server for development. 
+Because I prefer to use windows, I answered no to the questions of generating these when pelican-quickstarte asked me.
 Instead I have included the following files inside the spapas.github.io directory:
 
-* **pelrun.bat**, to generate the content for your debug site in the output directory:
+* ``pelrun.bat``, to generate the content for your debug site in the output directory:
 
 .. code:: 
 
-  pelican --debug --autoreload -r content -o output -s pelicanconf.py
+  pelican content --debug --autoreload  --output output --settings pelicanconf.py
 
-* **pelserve.bat**, to localy serve the generated debug site:
+  
+
+* ``pelserve.bat``, to localy serve the generated debug site:
 
 .. code:: 
 
@@ -102,11 +105,11 @@ Instead I have included the following files inside the spapas.github.io director
   python -m pelican.server 
   popd
 
-* **pelpub.bat**, to generate the production site in the output directory:
+* ``pelpub.bat``, to generate the production site in the output directory:
 
 .. code:: 
 
-  pelican content -o output -s publishconf.py   
+  pelican content --output output --settings publishconf.py   
 
 Now, when you want to develop your site locally, enter:
 
@@ -120,7 +123,7 @@ If everything was ok until now, you can visit http://127.0.0.1:8000 and will get
 .. image:: /static/images/site1.png 
   :width: 780 px
 
-Because of the -r option that is used in pelrun.bat whenever you do a change (for instance when you add an rst file in the content directory)
+Because of the -r option that is used in ``pelrun.bat`` whenever you do a change (for instance when you add an rst file in the content directory)
 it will be discovered and the output will be changed immediately!
   
 Configuration of your skeleton site
@@ -130,71 +133,10 @@ Settings
 ~~~~~~~~
 
 There is a number of settings that you may configure in your site. The pelican settings reference can be found here: http://docs.getpelican.com/en/latest/settings.html.
-I am including my pelicanconf.py here:
+The pelicanconf.py and publishconf.py for this site can be found here:
 
-.. code-block:: python
-
- # -*- coding: utf-8 -*- #
- from __future__ import unicode_literals
-
- AUTHOR = u'Serafeim Papastefanos'
- SITENAME = u'My Pelican Blog'
- SITESUBTITLE =u'Hello, world'
- SITEURL = 'http://spapas.github.io'
- TIMEZONE = 'Europe/Athens'
- DEFAULT_LANG = u'en'
-
- # Feed generation is usually not desired when developing
- FEED_ALL_RSS = None
- CATEGORY_FEED_RSS = None
- FEED_ALL_ATOM = None
- CATEGORY_FEED_ATOM = None
- TRANSLATION_FEED_ATOM = None
- ARTICLE_URL = '{date:%Y}/{date:%m}/{date:%d}/{slug}/'
- ARTICLE_SAVE_AS = '{date:%Y}\\{date:%m}\\{date:%d}\\{slug}\\index.html'
-
- # Blogroll
- LINKS =  (('Pelican', 'http://getpelican.com/'),
-           ('Python.org', 'http://python.org/'),
-          ('reStructuredText', 'http://docutils.sourceforge.net/rst.html'),
- )
-
- MENUITEMS = LINKS
-
- # Social widget
- SOCIAL = (
-    #('You can add links in your config file', '#'),
-    #('Another social link', '#'),
- )
-
- DEFAULT_PAGINATION = 5
- STATIC_PATHS  = ['images',]
-
- # Uncomment following line if you want document-relative URLs when developing
- RELATIVE_URLS = True
- TYPOGRIFY  = True
- THEME = "../pelican-octopress-theme"
- TWITTER_USERNAME='spapas'
-
-
-And my publishconf.py that will override the pelicanconf for the production site:
-
-.. code-block:: python 
- 
- # -*- coding: utf-8 -*- #
- from __future__ import unicode_literals
-
- import os
- import sys
- sys.path.append(os.curdir)
- from pelicanconf import *
-
- RELATIVE_URLS = False
- SITEURL = 'http://spapas.github.io'
- FEED_ALL_RSS = 'feeds/all.rss.xml'
- CATEGORY_FEED_RSS = 'feeds/%s.rss.xml'
- FEED_ALL_ATOM = 'feeds/all.atom.xml'
- CATEGORY_FEED_ATOM = 'feeds/%s.atom.xml'
+https://github.com/spapas/spapas.github.io/blob/source/pelicanconf.py
+https://github.com/spapas/spapas.github.io/blob/source/publishconf.py
  
 The most important difference is the RELATIVE_URLS directive which must be True to the debug and False to the production.
 
@@ -251,11 +193,36 @@ Finally, go to your output directory, create a git repository, add everything an
  spapas.github.io\output>git init
  spapas.github.io\output>git add .
  spapas.github.io\output>git commit -m Initial
- spapas.github.io\output>git push https://github.com/spapas/spapas.github.io master --force
+ spapas.github.io\output>git remote add origin https://github.com/spapas/spapas.github.io.git
+ spapas.github.io\output>git push master --force
  
-The --force is to overwrite any previous versions - you don't want version control on your output (but you want it on your source). 
+The --force is to overwrite any previous versions - you don't care about version control on your output (but you want it on your source). 
 
 You can now visit http://username.github.io and see your statically generated site ! 
+
+Don't forget to add your source to the version control! To do that, add a .gitignore file in your pelican/username.github.io direcory
+containing the following:
+
+.. code::
+ 
+ output
+ 
+The above file will ignore the contents of the output directory from version control. After that, do the following:
+
+.. code::
+
+ spapas.github.io>git init
+ spapas.github.io>git add .
+ spapas.github.io>git commit -m Initial
+ spapas.github.io>git branch -m master source
+ spapas.github.io>git remote add origin https://github.com/spapas/spapas.github.io.git
+ spapas.github.io>git push origin source 
+ 
+The above will rename the master branch to source, will attach the origin remote to https://github.com/spapas/spapas.github.io.git and will push the source
+branch to it. Now you will have two branches in your username.github.io repository. One
+named origin/master that will be your actual site and will be displayed through http://username.github.io and one named origin/source that will contain the source of your site.
+
+To learn more about branches and remotes you may check out `the git branches article <|filename|git-branches.rst>`_.
 
 .. _Pelican: http://docs.getpelican.com/en/3.3.0/
 .. _`github pages`: http://pages.github.com/

@@ -40,3 +40,6 @@ RELATIVE_URLS = True
 TYPOGRIFY  = True
 THEME = "../pelican-octopress-theme"
 TWITTER_USERNAME='spapas'
+GOOGLE_ANALYTICS='UA-44750952-1'
+
+

@@ -16,7 +16,7 @@ Introduction
 One very useful component of the spring_ java framework is spring-security_ since it allows consistent usage of various security providers for
 authentication and authorization. Although I've found a great number of basic spring-security tutorials on the internet, I wasn't able to find a complete solution for my own requirements:
 
- Logging in with LDAP but configuring the authorities [*]_ of the logged in user with the help of a custom method and not through LDAP. 
+Logging in with LDAP but configuring the authorities [*]_ of the logged in user with the help of a custom method and not through LDAP. 
 
 I think that the above is a common requirement in many organizations: There is a central LDAP repository in which the usernames and passwords of the users are stored, but the groups of the users are not stored there. Or maybe the groups that are actually stored in the LDAP cannot be transformed easily to application specific groups for each application.
 

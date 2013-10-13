@@ -158,7 +158,7 @@ This actually solves another question I had concerning the following error:
  No bean named 'org.springframework.security.authenticationManager' is defined: Did you forget to add a gobal <authentication-manager> element to your configuration (with child <authentication-provider>  elements)? Alternatively you can use the authentication-manager-ref attribute on your <http> and <global-method-security> elements.
 
 What happens is that when spring-security-configuration encounters an ``<authentication-manager>`` it will instantiate a bean named ``o.s.s.authenticationManager``  having the class 
-``o.s.s.authentication.ProviderManager`` and will create and pass to it a ``providers`` list with all the authentication providers that are defined inside the ``<authentication-manager>`` element with ``<authentication-provider>`` nodes. So, if you encounter the above error, the problem is that for some reason your ``<authentication-manager>`` is not configured correctly, so no ``o.s.s.authenticatioManager`` bean is created!
+``o.s.s.authentication.ProviderManager`` and will create and pass to it a ``providers`` list with all the authentication providers that are defined inside the ``<authentication-manager>`` element with ``<authentication-provider>`` nodes. So, if you encounter the above error, the problem is that for some reason your <authentication-manager>`` is not configured correctly, so no ``o.s.s.authenticatioManager`` bean is created!
 
 userSearch
 ~~~~~~~~~~

@@ -39,7 +39,7 @@ STATIC_PATHS  = ['images',]
 RELATIVE_URLS = True
 TYPOGRIFY  = True
 THEME = "../pelican-octopress-theme"
-TWITTER_USERNAME='spapas'
+TWITTER_USERNAME='_serafeim_'
 GOOGLE_ANALYTICS='UA-44750952-1'
 
 

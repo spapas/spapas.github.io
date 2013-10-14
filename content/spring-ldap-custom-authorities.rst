@@ -1,7 +1,7 @@
 Using custom authorities with spring-security LDAP authentication
 #################################################################
 
-:date: 2013-10-13 13:20
+:date: 2013-10-14 08:55
 :tags: spring, spring-security, java, ldap, authentication
 :category: spring
 :slug: spring-ldap-custom-authorities

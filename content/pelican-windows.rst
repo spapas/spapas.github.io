@@ -121,6 +121,7 @@ Now, when you want to develop your site locally, enter:
 If everything was ok until now, you can visit http://127.0.0.1:8000 and will get the following output:
 
 .. image:: /static/images/site1.png 
+  :alt: all ok!
   :width: 780 px
 
 Because of the -r option that is used in ``pelrun.bat`` whenever you do a change (for instance when you add an rst file in the content directory)

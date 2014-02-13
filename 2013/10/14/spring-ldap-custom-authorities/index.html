@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>/var/</title>
+  <meta name="author" content="Serafeim Papastefanos">
+
+
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link href="http://spapas.github.io/favicon.png" rel="icon">
+  <link href="http://spapas.github.io/theme/css/main.css" media="screen, projection"
+        rel="stylesheet" type="text/css">
+  <script src="http://spapas.github.io/theme/js/modernizr-2.0.js"></script>
+  <script src="http://spapas.github.io/theme/js/ender.js"></script>
+  <script src="http://spapas.github.io/theme/js/octopress.js" type="text/javascript"></script>
+
+  <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic"
+        rel="stylesheet" type="text/css">
+  <link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic"
+        rel="stylesheet" type="text/css">
+</head><body>
+  <header role="banner"><hgroup>
+  <h1><a href="http://spapas.github.io/">/var/</a></h1>
+    <h2>Various programming stuff</h2>
+</hgroup></header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="http://spapas.github.io/" rel="subscribe-rss">RSS</a></li>
+</ul>
+
+<!-- TODO: add search here
+<form action="" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:http://spapas.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+-->
+
+<ul class="main-navigation">
+    <!-- TODO: add categories here? -->
+</ul></nav>
+  <div id="main">
+    <div id="content">
+<div>
+  <article class="hentry" role="article">
+<header>
+      <h1 class="entry-title">Using custom authorities with spring-security LDAP authentication</h1>
+      <p class="meta"><time datetime="2013-10-14T08:55:00" pubdate>Δευ 14 Οκτώβριος 2013</time></p>
+</header>
+
+        <a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="_serafeim_">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+    <div class="entry-content"><div class="contents topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#introduction" id="id3">Introduction</a></li>
+<li><a class="reference internal" href="#a-basic-spring-security-setup" id="id4">A basic spring security&nbsp;setup</a></li>
+<li><a class="reference internal" href="#spring-security-ldap-with-custom-authorities" id="id5">Spring security <span class="caps">LDAP</span> with custom authorities</a><ul>
+<li><a class="reference internal" href="#contextsource" id="id6">contextSource</a></li>
+<li><a class="reference internal" href="#usersearch" id="id7">userSearch</a></li>
+<li><a class="reference internal" href="#ldapauthprovider" id="id8">ldapAuthProvider</a></li>
+<li><a class="reference internal" href="#customldapauthoritiespopulator" id="id9">CustomLdapAuthoritiesPopulator</a></li>
+<li><a class="reference internal" href="#example" id="id10">Example</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#conclusion" id="id11">Conclusion</a></li>
+</ul>
+</div>
+<div class="section" id="introduction">
+<h2><a class="toc-backref" href="#id3">Introduction</a></h2>
+<p>One very useful component of the <a class="reference external" href="http://spring.io/">spring</a> java framework is <a class="reference external" href="http://projects.spring.io/spring-security/">spring-security</a> since it allows consistent usage of various security providers for
+authentication and authorization. Although I&#8217;ve found a great number of basic spring-security tutorials on the internet, I wasn&#8217;t able to find a complete solution for my own&nbsp;requirements:</p>
+<p>Logging in with <span class="caps">LDAP</span> but configuring the authorities <a class="footnote-reference" href="#id2" id="id1">[*]</a> of the logged in user with the help of a custom method and not through&nbsp;<span class="caps">LDAP</span>.</p>
+<p>I think that the above is a common requirement in many organizations: There is a central <span class="caps">LDAP</span> repository in which the usernames and passwords of the users are stored, but the groups of the users are not stored there. Or maybe the groups that are actually stored in the <span class="caps">LDAP</span> cannot be transformed easily to application specific groups for each&nbsp;application.</p>
+<p>You may find the working spring project that uses ldap and a custom groups populator here: <a class="reference external" href="https://github.com/spapas/SpringLdapCustomAuthorities/">https://github.com/spapas/SpringLdapCustomAuthorities/</a></p>
+</div>
+<div class="section" id="a-basic-spring-security-setup">
+<h2><a class="toc-backref" href="#id4">A basic spring security&nbsp;setup</a></h2>
+<p>I&#8217;ve created a very basic setup for spring-security for a spring-mvc project. Please take a look here for a more thorough explanation of a simple spring-security project <a class="reference external" href="http://www.mkyong.com/spring-security/spring-security-hello-world-example/">http://www.mkyong.com/spring-security/spring-security-hello-world-example/</a> and here <a class="reference external" href="http://www.codeproject.com/Articles/253901/Getting-Started-Spring-Security">http://www.codeproject.com/Articles/253901/Getting-Started-Spring-Security</a> for a great explanation of the various spring-security&nbsp;classes.</p>
+<p>In my setup there is a controller that defines two mappings, the &quot;/&quot; which is the homepage that has a link to the &quot;/enter&quot; and the &quot;/enter&quot; which is an internal page in which only authorized users have access. When the user clicks on &quot;enter&quot; he will be represented with a login form first. If the use logs in successfully, the enter.jsp will list the username and the authorities of the logged in user through the following spring-security&nbsp;tags:</p>
+<div class="highlight"><pre><span class="k">&lt;%@</span> <span class="n">taglib</span> <span class="n">prefix</span><span class="o">=</span><span class="s">&quot;sec&quot;</span> <span class="n">uri</span><span class="o">=</span><span class="s">&quot;http://www.springframework.org/security/tags&quot;</span> <span class="k">%&gt;</span>
+[...]
+Username: <span class="nt">&lt;sec:authentication</span> <span class="na">property=</span><span class="s">&quot;principal.username&quot;</span> <span class="nt">/&gt;&lt;br</span> <span class="nt">/&gt;</span>
+Authorities: <span class="nt">&lt;sec:authentication</span> <span class="na">property=</span><span class="s">&quot;principal.authorities&quot;</span><span class="nt">/&gt;&lt;br</span> <span class="nt">/&gt;</span>
+</pre></div>
+<p>The authentication provider is an in memory service in which the username, password and authorities of each user are defined in the <span class="caps">XML</span>. So this is a simple spring-security example that can be found in a number of places on the internet. The security rules, login form and the authentication provider are configured with the following <tt class="docutils literal"><span class="pre">security-config.xml</span></tt>:</p>
+<div class="highlight"><pre><span class="nt">&lt;beans:beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/security&quot;</span>
+   <span class="na">xmlns:beans=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
+   <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+   <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://www.springframework.org/schema/beans</span>
+<span class="s">                   http://www.springframework.org/schema/beans/spring-beans-3.1.xsd</span>
+<span class="s">                   http://www.springframework.org/schema/security</span>
+<span class="s">                   http://www.springframework.org/schema/security/spring-security-3.1.xsd&quot;</span><span class="nt">&gt;</span>
+
+   <span class="nt">&lt;http</span> <span class="na">pattern=</span><span class="s">&quot;/static/**&quot;</span> <span class="na">security=</span><span class="s">&quot;none&quot;</span> <span class="nt">/&gt;</span>
+
+   <span class="nt">&lt;http</span> <span class="na">use-expressions=</span><span class="s">&quot;true&quot;</span><span class="nt">&gt;</span>
+       <span class="nt">&lt;intercept-url</span> <span class="na">pattern=</span><span class="s">&quot;/&quot;</span> <span class="na">access=</span><span class="s">&quot;permitAll&quot;</span> <span class="nt">/&gt;</span>
+       <span class="nt">&lt;intercept-url</span> <span class="na">pattern=</span><span class="s">&quot;/enter&quot;</span> <span class="na">access=</span><span class="s">&quot;hasRole(&#39;user&#39;)&quot;</span> <span class="nt">/&gt;</span>
+       <span class="nt">&lt;intercept-url</span> <span class="na">pattern=</span><span class="s">&quot;/**&quot;</span> <span class="na">access=</span><span class="s">&quot;denyAll&quot;</span> <span class="nt">/&gt;</span>
+       <span class="nt">&lt;form-login</span> <span class="na">default-target-url=</span><span class="s">&quot;/&quot;</span> <span class="nt">/&gt;</span>
+       <span class="nt">&lt;logout</span>  <span class="na">logout-success-url=</span><span class="s">&quot;/&quot;</span> <span class="nt">/&gt;</span>
+   <span class="nt">&lt;/http&gt;</span>
+
+   <span class="nt">&lt;authentication-manager&gt;</span>
+       <span class="nt">&lt;authentication-provider&gt;</span>
+           <span class="nt">&lt;user-service&gt;</span>
+               <span class="nt">&lt;user</span> <span class="na">name=</span><span class="s">&quot;spapas&quot;</span> <span class="na">password=</span><span class="s">&quot;123&quot;</span> <span class="na">authorities=</span><span class="s">&quot;admin, user, nonldap&quot;</span> <span class="nt">/&gt;</span>
+               <span class="nt">&lt;user</span> <span class="na">name=</span><span class="s">&quot;serafeim&quot;</span> <span class="na">password=</span><span class="s">&quot;123&quot;</span> <span class="na">authorities=</span><span class="s">&quot;user&quot;</span> <span class="nt">/&gt;</span>
+           <span class="nt">&lt;/user-service&gt;</span>
+       <span class="nt">&lt;/authentication-provider&gt;</span>
+   <span class="nt">&lt;/authentication-manager&gt;</span>
+
+<span class="nt">&lt;/beans:beans&gt;</span>
+</pre></div>
+<p>When we run this application and go to the /enter, we will get the following&nbsp;output:</p>
+<blockquote>
+<p>Username:&nbsp;spapas</p>
+<p>Authorities: [admin, nonldap,&nbsp;user]</p>
+</blockquote>
+</div>
+<div class="section" id="spring-security-ldap-with-custom-authorities">
+<h2><a class="toc-backref" href="#id5">Spring security <span class="caps">LDAP</span> with custom&nbsp;authorities</a></h2>
+<p>The previous application can be modified to login through <span class="caps">LDAP</span> and get the authorities from a custom class. The main differences are in the <tt class="docutils literal">pom.xml</tt> which adsd the <tt class="docutils literal"><span class="pre">spring-security-ldap</span></tt> dependency, the addition of a <tt class="docutils literal">CustomLdapAuthoritiesPopulator.java</tt> which does the actual mapping of username to authority and various changes to the <tt class="docutils literal"><span class="pre">security-config.xml</span></tt>.</p>
+<p>As you will see we had to define our security beans mainly using spring beans and not using the various elements from security namespace like <tt class="docutils literal"><span class="pre">&lt;ldap-server&gt;</span></tt> and <tt class="docutils literal"><span class="pre">&lt;ldap-authentication-provder&gt;</span></tt>. For a good tutorial on using these elements and ldap in spring security in general check these out: <a class="reference external" href="http://docs.spring.io/spring-security/site/docs/3.1.x/reference/ldap.html">http://docs.spring.io/spring-security/site/docs/3.1.x/reference/ldap.html</a> and <a class="reference external" href="http://krams915.blogspot.gr/2011/01/spring-security-mvc-using-ldap.html">http://krams915.blogspot.gr/2011/01/spring-security-mvc-using-ldap.html</a>.</p>
+<div class="highlight"><pre><span class="nt">&lt;beans:beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/security&quot;</span>
+   <span class="na">xmlns:beans=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
+   <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+   <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://www.springframework.org/schema/beans</span>
+<span class="s">                   http://www.springframework.org/schema/beans/spring-beans-3.1.xsd</span>
+<span class="s">                   http://www.springframework.org/schema/security</span>
+<span class="s">                   http://www.springframework.org/schema/security/spring-security-3.1.xsd&quot;</span><span class="nt">&gt;</span>
+
+   <span class="nt">&lt;http</span> <span class="na">pattern=</span><span class="s">&quot;/static/**&quot;</span> <span class="na">security=</span><span class="s">&quot;none&quot;</span> <span class="nt">/&gt;</span>
+
+   <span class="nt">&lt;http</span> <span class="na">use-expressions=</span><span class="s">&quot;true&quot;</span> <span class="nt">&gt;</span>
+     <span class="nt">&lt;intercept-url</span> <span class="na">pattern=</span><span class="s">&quot;/&quot;</span> <span class="na">access=</span><span class="s">&quot;permitAll&quot;</span> <span class="nt">/&gt;</span>
+     <span class="nt">&lt;intercept-url</span> <span class="na">pattern=</span><span class="s">&quot;/enter&quot;</span> <span class="na">access=</span><span class="s">&quot;hasRole(&#39;user&#39;)&quot;</span> <span class="nt">/&gt;</span>
+     <span class="nt">&lt;intercept-url</span> <span class="na">pattern=</span><span class="s">&quot;/**&quot;</span> <span class="na">access=</span><span class="s">&quot;denyAll&quot;</span> <span class="nt">/&gt;</span>
+     <span class="nt">&lt;form-login</span> <span class="na">default-target-url=</span><span class="s">&quot;/&quot;</span> <span class="nt">/&gt;</span>
+     <span class="nt">&lt;logout</span>  <span class="na">logout-success-url=</span><span class="s">&quot;/&quot;</span> <span class="nt">/&gt;</span>
+   <span class="nt">&lt;/http&gt;</span>
+
+   <span class="nt">&lt;beans:bean</span> <span class="na">id=</span><span class="s">&quot;contextSource&quot;</span>
+         <span class="na">class=</span><span class="s">&quot;org.springframework.security.ldap.DefaultSpringSecurityContextSource&quot;</span><span class="nt">&gt;</span>
+     <span class="nt">&lt;beans:constructor-arg</span> <span class="na">value=</span><span class="s">&quot;ldap://login.serafeim.gr:389/dc=serafeim,dc=gr&quot;</span><span class="nt">/&gt;</span>
+     <span class="nt">&lt;beans:property</span> <span class="na">name=</span><span class="s">&quot;anonymousReadOnly&quot;</span> <span class="na">value=</span><span class="s">&quot;true&quot;</span><span class="nt">/&gt;</span>
+   <span class="nt">&lt;/beans:bean&gt;</span>
+
+   <span class="nt">&lt;beans:bean</span>
+         <span class="na">id=</span><span class="s">&quot;userSearch&quot;</span>
+         <span class="na">class=</span><span class="s">&quot;org.springframework.security.ldap.search.FilterBasedLdapUserSearch&quot;</span><span class="nt">&gt;</span>
+     <span class="nt">&lt;beans:constructor-arg</span> <span class="na">index=</span><span class="s">&quot;0&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span><span class="nt">/&gt;</span>
+     <span class="nt">&lt;beans:constructor-arg</span> <span class="na">index=</span><span class="s">&quot;1&quot;</span> <span class="na">value=</span><span class="s">&quot;(uid={0})&quot;</span><span class="nt">/&gt;</span>
+     <span class="nt">&lt;beans:constructor-arg</span> <span class="na">index=</span><span class="s">&quot;2&quot;</span> <span class="na">ref=</span><span class="s">&quot;contextSource&quot;</span> <span class="nt">/&gt;</span>
+   <span class="nt">&lt;/beans:bean&gt;</span>
+
+   <span class="nt">&lt;beans:bean</span>
+         <span class="na">id=</span><span class="s">&quot;ldapAuthProvider&quot;</span>
+         <span class="na">class=</span><span class="s">&quot;org.springframework.security.ldap.authentication.LdapAuthenticationProvider&quot;</span><span class="nt">&gt;</span>
+     <span class="nt">&lt;beans:constructor-arg&gt;</span>
+       <span class="nt">&lt;beans:bean</span> <span class="na">class=</span><span class="s">&quot;org.springframework.security.ldap.authentication.BindAuthenticator&quot;</span><span class="nt">&gt;</span>
+         <span class="nt">&lt;beans:constructor-arg</span> <span class="na">ref=</span><span class="s">&quot;contextSource&quot;</span><span class="nt">/&gt;</span>
+         <span class="nt">&lt;beans:property</span> <span class="na">name=</span><span class="s">&quot;userSearch&quot;</span> <span class="na">ref=</span><span class="s">&quot;userSearch&quot;</span> <span class="nt">/&gt;</span>
+         <span class="c">&lt;!--</span>
+<span class="c">         &lt;beans:property name=&quot;userDnPatterns&quot;&gt;</span>
+<span class="c">           &lt;beans:list&gt;&lt;beans:value&gt;uid={0},ou=People&lt;/beans:value&gt;&lt;/beans:list&gt;</span>
+<span class="c">         &lt;/beans:property&gt;</span>
+<span class="c">         --&gt;</span>
+       <span class="nt">&lt;/beans:bean&gt;</span>
+     <span class="nt">&lt;/beans:constructor-arg&gt;</span>
+     <span class="nt">&lt;beans:constructor-arg&gt;</span>
+       <span class="nt">&lt;beans:bean</span> <span class="na">class=</span><span class="s">&quot;gr.serafeim.springldapcustom.CustomLdapAuthoritiesPopulator&quot;</span> <span class="nt">/&gt;</span>
+     <span class="nt">&lt;/beans:constructor-arg&gt;</span>
+   <span class="nt">&lt;/beans:bean&gt;</span>
+
+   <span class="nt">&lt;authentication-manager&gt;</span>
+     <span class="nt">&lt;authentication-provider</span> <span class="na">ref=</span><span class="s">&quot;ldapAuthProvider&quot;</span> <span class="nt">/&gt;</span>
+   <span class="nt">&lt;/authentication-manager&gt;</span>
+
+<span class="nt">&lt;/beans:beans&gt;</span>
+</pre></div>
+<p>So, in the above configuration we&#8217;ve defined three spring beans: <tt class="docutils literal">contextSource</tt>, <tt class="docutils literal">userSearch</tt> and <tt class="docutils literal">ldapAuthProvider</tt>. The <tt class="docutils literal"><span class="pre">&lt;authentication-manager&gt;</span></tt> element uses the <tt class="docutils literal">ldapAuthProvider</tt> as an authentication provider. Below we will explain these&nbsp;beans:</p>
+<div class="section" id="contextsource">
+<h3><a class="toc-backref" href="#id6">contextSource</a></h3>
+<p>The contextSource bean defines the actual <span class="caps">LDAP</span> server that we are going to connect to. It has the class <tt class="docutils literal">o.s.s.ldap.DefaultSpringSecurityContextSource</tt>. This will need to be passed to other beans that would need to connect to the server for a number of operations. We pass to it the url of our <span class="caps">LDAP</span> server and set its <tt class="docutils literal">anonymousReadOnly</tt> property to true. The <tt class="docutils literal">anonymousReadOnly</tt> defines if we can anonymously connect to our <span class="caps">LDAP</span> server in order to perform the search operation below. If we cannot connect anonymously then we have to set its <tt class="docutils literal">userDn</tt> and <tt class="docutils literal">password</tt> properties.</p>
+<p>A very interesting question is if the <tt class="docutils literal"><span class="pre">&lt;ldap-server&gt;</span></tt> element of the spring security namespace is related to <tt class="docutils literal">the o.s.s.ldap.DefaultSpringSecurityContextSource</tt> like our <tt class="docutils literal">contextSource</tt>. To find out, we need to check the <tt class="docutils literal">o.s.s.config.SecurityNamespaceHandler</tt> class of the <tt class="docutils literal"><span class="pre">spring-security-config.jar</span></tt>. In there we see the <tt class="docutils literal">loadParsers</tt> method which has the line: <tt class="docutils literal">parsers.put(Elements.LDAP_SERVER, new <span class="pre">LdapServerBeanDefinitionParser());</span></tt>. The constant <tt class="docutils literal">o.s.s.config.Elements.LDAP_SERVER</tt> has the value of <tt class="docutils literal"><span class="pre">&quot;ldap-server&quot;</span></tt> as expected, so we need to see what does the class <tt class="docutils literal">o.s.s.config.ldap.LdapServerBeanDefinitionParser</tt> do. This class has a parse() method that receives the xml that was used to instantiate the <tt class="docutils literal"><span class="pre">&lt;ldap-server&gt;</span></tt> element and, depending an on the actualy configuration, instantiates a bean of the class <tt class="docutils literal">o.s.s.ldap.DefaultSpringSecurityContextSource</tt> with an id of <tt class="docutils literal">o.s.s.securityContextSource</tt> that will be used by the other elements in the security namespace&nbsp;!</p>
+<p>This actually solves another question I had concerning the following&nbsp;error:</p>
+<blockquote>
+No bean named &#8216;org.springframework.security.authenticationManager&#8217; is defined: Did you forget to add a gobal &lt;authentication-manager&gt; element to your configuration (with child &lt;authentication-provider&gt;  elements)? Alternatively you can use the authentication-manager-ref attribute on your &lt;http&gt; and &lt;global-method-security&gt; elements.</blockquote>
+<p>What happens is that when spring-security-configuration encounters an <tt class="docutils literal"><span class="pre">&lt;authentication-manager&gt;</span></tt> it will instantiate a bean named <tt class="docutils literal">o.s.s.authenticationManager</tt>  having the class
+<tt class="docutils literal">o.s.s.authentication.ProviderManager</tt> and will create and pass to it a <tt class="docutils literal">providers</tt> list with all the authentication providers that are defined inside the <tt class="docutils literal"><span class="pre">&lt;authentication-manager&gt;</span></tt> element with <tt class="docutils literal"><span class="pre">&lt;authentication-provider&gt;</span></tt> nodes. So, if you encounter the above error, the problem is that for some reason your <tt class="docutils literal"><span class="pre">&lt;authentication-manager&gt;</span></tt> is not configured correctly, so no <tt class="docutils literal">o.s.s.authenticatioManager</tt> bean is&nbsp;created!</p>
+</div>
+<div class="section" id="usersearch">
+<h3><a class="toc-backref" href="#id7">userSearch</a></h3>
+<p>The <tt class="docutils literal">userSearch</tt> bean is needed if we don&#8217;t know exactly where our users are stored in the <span class="caps">LDAP</span> directory so we will use this bean as a search filter. If we do know our user tree then we won&#8217;t need this bean at all as will be explained later. It has the class <tt class="docutils literal">o.s.s.ldap.search.FilterBasedLdapUserSearch</tt> and gets three constructor parameters: <tt class="docutils literal">searchBase</tt>, <tt class="docutils literal">searchFilter</tt> and <tt class="docutils literal">contextSource</tt>. The <tt class="docutils literal">searchBase</tt> is from where in the <span class="caps">LDAP</span> tree to start searching (empty in our case), the <tt class="docutils literal">searchFilter</tt> defines where is the username (uid in our case) and the <tt class="docutils literal">contextSource</tt> has been defined&nbsp;before.</p>
+</div>
+<div class="section" id="ldapauthprovider">
+<h3><a class="toc-backref" href="#id8">ldapAuthProvider</a></h3>
+<p>This is the actual <tt class="docutils literal"><span class="pre">authentication-provider</span></tt> that the spring-security <tt class="docutils literal"><span class="pre">authentication-manager</span></tt> is going to use. It is an instance of class <tt class="docutils literal">o.s.s.ldap.authentication.LdapAuthenticationProvider</tt> which has two main properties: An <tt class="docutils literal">o.s.s.ldap.authentication.LdapAuthenticator</tt> implementation and an <tt class="docutils literal">o.s.s.ldap.userdetails.LdapAuthoritiesPopulator</tt> implementation. The first interface defines an <tt class="docutils literal">authenticate</tt> method and is used to actually authenticate the user with the <span class="caps">LDAP</span> server. The second interface defines a <tt class="docutils literal">getGrantedAuthorities</tt> which returns the roles for the authenticated user. The LdapAuthoritiesPopulator parameter is actually optional (so we can use <span class="caps">LDAP</span> to authenticate only the users) and we can provide our own implementation to have custom authorities for our application. That is exactly what we&#8217;ve done&nbsp;here.</p>
+<p>The two arguments used to initialize the ldapAuthProvoder are one instance of <tt class="docutils literal">o.s.s.ldap.authentication.BindAuthenticator</tt> which is a simple authenticator that tries to bind with the given credentials to the <span class="caps">LDAP</span> server to check the credentials and one instance of a custom class named <tt class="docutils literal">g.s.s.CustomLdapAuthoritiesPopulator</tt> which is the actual implementation of the custom roles provider. The <tt class="docutils literal">BindAuthenticator</tt> gets the <tt class="docutils literal">contextSource</tt> as a constructor parameter and its <tt class="docutils literal">userSearch</tt> property is set with the <tt class="docutils literal">userSearch</tt> bean defined previously. If we instead knew the actual place of the users, we could use the commented out <tt class="docutils literal">userDnPatterns</tt> property which takes a list of possible places in the <span class="caps">LDAP</span> catalog which will be checked for the&nbsp;username.</p>
+</div>
+<div class="section" id="customldapauthoritiespopulator">
+<h3><a class="toc-backref" href="#id9">CustomLdapAuthoritiesPopulator</a></h3>
+<p>The <tt class="docutils literal">CustomLdapAuthoritiesPopulator</tt> just needs to implement the <tt class="docutils literal">LdapAuthoritiesPopulator</tt> interface. Here&#8217;s our&nbsp;implmentation:</p>
+<div class="highlight"><pre><span class="kn">package</span> <span class="n">gr</span><span class="o">.</span><span class="na">serafeim</span><span class="o">.</span><span class="na">springldapcustom</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.util.Collection</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.HashSet</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.ldap.core.DirContextOperations</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.security.core.GrantedAuthority</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.security.core.authority.SimpleGrantedAuthority</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.stereotype.Component</span><span class="o">;</span>
+
+<span class="nd">@Component</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">CustomLdapAuthoritiesPopulator</span> <span class="kd">implements</span> <span class="n">LdapAuthoritiesPopulator</span> <span class="o">{</span>
+       <span class="nd">@Override</span>
+       <span class="kd">public</span> <span class="n">Collection</span><span class="o">&lt;?</span> <span class="kd">extends</span> <span class="n">GrantedAuthority</span><span class="o">&gt;</span> <span class="n">getGrantedAuthorities</span><span class="o">(</span>
+                       <span class="n">DirContextOperations</span> <span class="n">userData</span><span class="o">,</span> <span class="n">String</span> <span class="n">username</span><span class="o">)</span> <span class="o">{</span>
+               <span class="n">Collection</span><span class="o">&lt;</span><span class="n">GrantedAuthority</span><span class="o">&gt;</span> <span class="n">gas</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashSet</span><span class="o">&lt;</span><span class="n">GrantedAuthority</span><span class="o">&gt;();</span>
+               <span class="k">if</span><span class="o">(</span><span class="n">username</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="s">&quot;spapas&quot;</span><span class="o">))</span> <span class="o">{</span>
+                       <span class="n">gas</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="k">new</span> <span class="n">SimpleGrantedAuthority</span><span class="o">(</span><span class="s">&quot;admin&quot;</span><span class="o">));</span>
+               <span class="o">}</span>
+               <span class="n">gas</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="k">new</span> <span class="n">SimpleGrantedAuthority</span><span class="o">(</span><span class="s">&quot;user&quot;</span><span class="o">));</span>
+               <span class="k">return</span> <span class="n">gas</span><span class="o">;</span>
+       <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+<p>The <tt class="docutils literal">getGrantedAuthorities</tt> just checks the username and add another role if it is a specific one. Of course here we would autowire our user roles repository and query the database to get the roles of the user, however I&#8217;m not going to do that for the case of&nbsp;simplicity.</p>
+</div>
+<div class="section" id="example">
+<h3><a class="toc-backref" href="#id10">Example</a></h3>
+<p>When we run this application and go to the /enter, after logging in with our <span class="caps">LDAP</span> credentials as spapas, we will get the following&nbsp;output:</p>
+<blockquote>
+<p>Username:&nbsp;spapas</p>
+<p>Authorities: [admin,&nbsp;user]</p>
+</blockquote>
+</div>
+</div>
+<div class="section" id="conclusion">
+<h2><a class="toc-backref" href="#id11">Conclusion</a></h2>
+<p>In the previous a complete example of configuring a custom authorities populator was represented. Using this configuration we can login through the <span class="caps">LDAP</span> server of our organization but use application specific roles for our logged-in&nbsp;users.</p>
+<!-- font-size: 0.5em;
+vertical-align: top; -->
+<table class="docutils footnote" frame="void" id="id2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[*]</a></td><td>Which is how spring calls the groups/roles the user belongs to</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+    <footer>
+<p class="meta">
+  <span class="byline author vcard">
+    Posted by <span class="fn">Serafeim Papastefanos</span>
+  </span>
+<time datetime="2013-10-14T08:55:00" pubdate>Δευ 14 Οκτώβριος 2013</time>  <span class="categories">
+    <a class="category" href="http://spapas.github.io/tag/spring.html">spring</a>
+    <a class="category" href="http://spapas.github.io/tag/spring-security.html">spring-security</a>
+    <a class="category" href="http://spapas.github.io/tag/java.html">java</a>
+    <a class="category" href="http://spapas.github.io/tag/ldap.html">ldap</a>
+    <a class="category" href="http://spapas.github.io/tag/authentication.html">authentication</a>
+  </span>
+</p>    </footer>
+  </article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript></div>
+  </section>
+</div>
+<aside class="sidebar">
+  <section>
+    <h1>Recent Posts</h1>
+    <ul id="recent_posts">
+      <li class="post">
+          <a href="http://spapas.github.io/2014/02/13/wagtail-tutorial/">A Wagtail tutorial</a>
+      </li>
+      <li class="post">
+          <a href="http://spapas.github.io/2013/12/24/django-dynamic-forms/">Django dynamic forms</a>
+      </li>
+      <li class="post">
+          <a href="http://spapas.github.io/2013/11/05/django-authoritiy-data/">Django authority data</a>
+      </li>
+      <li class="post">
+          <a href="http://spapas.github.io/2013/10/14/spring-ldap-custom-authorities/">Using custom authorities with spring-security LDAP authentication</a>
+      </li>
+      <li class="post">
+          <a href="http://spapas.github.io/2013/10/08/git-branches/">git branches</a>
+      </li>
+    </ul>
+  </section>
+  <section>
+      
+    <h1>Categories</h1>
+    <ul id="recent_posts">
+        <li><a href="http://spapas.github.io/category/django.html">django</a></li>
+        <li><a href="http://spapas.github.io/category/git.html">git</a></li>
+        <li><a href="http://spapas.github.io/category/pelican.html">pelican</a></li>
+        <li><a href="http://spapas.github.io/category/spring.html">spring</a></li>
+        <li><a href="http://spapas.github.io/category/wagtail.html">wagtail</a></li>
+    </ul>
+  </section>
+ 
+
+  <section>
+  <h1>Tags</h1>
+    <a href="http://spapas.github.io/tag/branching.html">branching</a>,    <a href="http://spapas.github.io/tag/git.html">git</a>,    <a href="http://spapas.github.io/tag/java.html">java</a>,    <a href="http://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="http://spapas.github.io/tag/python.html">python</a>,    <a href="http://spapas.github.io/tag/spring.html">spring</a>,    <a href="http://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="http://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="http://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="http://spapas.github.io/tag/django.html">django</a>,    <a href="http://spapas.github.io/tag/forms.html">forms</a>,    <a href="http://spapas.github.io/tag/windows.html">windows</a>,    <a href="http://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="http://spapas.github.io/tag/github.html">github</a>,    <a href="http://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="http://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="http://spapas.github.io/tag/rst.html">rst</a>,    <a href="http://spapas.github.io/tag/security.html">security</a>,    <a href="http://spapas.github.io/tag/spring-security.html">spring-security</a>  </section>
+
+
+</aside>    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - Serafeim Papastefanos -
+  <span class="credit">Powered by <a href="http://getpelican.com">Pelican</a></span>
+</p></footer>
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-44750952-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+	<script type="text/javascript">
+	  var disqus_shortname = 'spapas-github-io';
+	  (function() {
+	    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+	    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+	    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+	   })();
+	</script>
+</body>
+</html>

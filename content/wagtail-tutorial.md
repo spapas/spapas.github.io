@@ -11,6 +11,8 @@ Summary: This is a from scratch tutorial for creating a wagtail based Blog.
 
 To follow this tutorial you will need to have [Python] 2.7 installed with a working version of [pip] and [virtualenv].
 
+**Update**: The result of this tutorial has been deployed to [Heroku]: http://gentle-refuge-2590.herokuapp.com/ - you may visit the [admin site] and login with root / 123 to play with Wagtail! Please don't do anything naughty !!!
+
 Installing the wagtail dependencies
 -----------------------------------
 
@@ -512,3 +514,5 @@ no complete documentation yet however you can
 [django-compressor]:https://github.com/django-compressor/django-compressor
 [django-taggit]:https://github.com/alex/django-taggit
 [django-modelcluster]:https://github.com/torchbox/django-modelcluster/
+[Heroku]:https://www.heroku.com/
+[admin site]:http://gentle-refuge-2590.herokuapp.com/admin/

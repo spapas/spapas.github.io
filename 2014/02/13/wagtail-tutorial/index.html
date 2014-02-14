@@ -368,7 +368,15 @@ python manage.py migrate
 <p>Now, if you visit again the /admin and click on the &#8220;Add Child Page&#8221; action of &#8220;Welcome to your new Wagtail Site!&#8221; you will see the &#8220;Blog Page&#8221; page and after you click it you will be able to see a form with the Fields you defined <em>and</em> title(title, body, date). The title is a field inherited from Page, along with the fields  in the Promote&nbsp;tab. </p>
 <p>In our declaration of BlogPage we added three <code>FieldPanel</code>s on its content_panes. A <code>FieldPanel</code> is a special edit handler for each Field. That is why when you try to edit the body you will see a rich text toolbar that enables you to not only format text but also embed images, documents and even oembed links. If you hadn&#8217;t included the <code>FieldPanel('body', classname="full")</code> then you wouldn&#8217;t see the rich text&nbsp;editor.</p>
 <p><img alt="Editing pages in Wagtail" src="http://spapas.github.io/images/wagtail-edit-page.png" /></p>
-<p>So now we can add as many posts as we like! However, there should also be an Index page collecting our&nbsp;posts. </p>
+<p>So now we can add as many posts as we&nbsp;like! </p>
+<p>The time has come to take a look at our fine blog post: After we publish our page we click to the view live action&nbsp;and&#8230; </p>
+<blockquote>
+<p>TemplateDoesNotExist at&nbsp;/hello-world/</p>
+<p>tutorial/blog_page.html</p>
+</blockquote>
+<p>:(</p>
+<p>A template seems to be missing &#8212; actually we have totally forgotten about the presentation of our blog &#8212; we&#8217;ll talk about this in the next section&nbsp;!</p>
+<p>However, before going there we should also create an Index page type collecting our&nbsp;posts. </p>
 <p>For this, we will change our <code>models.py</code> to&nbsp;this:</p>
 <div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
 
@@ -433,13 +441,7 @@ python manage.py migrate
 
 
 <p>The above adds a way to put <code>related_links</code> to a <code>BlogIndexPage</code> &#8212; these related_links are the <code>BlogPage</code>s that actually belong to the blog - so now, we can add a blog index page and add all our blog posts to&nbsp;it!</p>
-<p>The time has come to take a look at our fine blog: After we publish our blog index we click to the view live action&nbsp;and&#8230; </p>
-<blockquote>
-<p>TemplateDoesNotExist at&nbsp;/my-blog-index/</p>
-<p>tutorial/blog_index_page.html</p>
-</blockquote>
-<p>:(</p>
-<p>A template seems to be missing &#8212; actually we have totally forgoten about the presentation of our&nbsp;blog.</p>
+<p>Now that we&#8217;ve created the BlogPage and BlogIndexPage pages it&#8217;s time to take a look at how we will actually display our&nbsp;blog&#8230;</p>
 <h2>Creating templates for <em>Page</em>s</h2>
 <p>A normal Django template can be used to display each page type. Wagtail either generates automatically (by seperating underscors with capital letters in camelcase for instance BlogIndexPage -&gt; blog_index_page) or you can use the template class attribute. Let&#8217;s add a <code>templates</code> foler within the <code>tutorial</code> foler and add another folder named <code>tutorial</code> inside <code>templates</code> and ten add a file named <code>blog_index_page.html</code> to <code>templates</code> with the following content (you must have the following hierarchy <code>wagtailtutorial/tutorial/templates/tutorial/blog_index_page.html</code>):</p>
 <div class="highlight"><pre><span class="nt">&lt;html&gt;</span>
@@ -456,8 +458,8 @@ python manage.py migrate
 
 
 <p>So self is the context name of the  BlogPageIndex instance that is used to render this page. Beyond that, it&#8217;s normal&nbsp;django.</p>
-<p>Now you can view your Blog Index &#8212; however before clicking on a link to also view your posts add the template for your <code>BlogPost</code>:</p>
 <p><img alt="Rendering the Blog Index" src="http://spapas.github.io/images/wagtail-index-template.png" /></p>
+<p>Now you can view your Blog Index &#8212; however before clicking on a link to also view your posts add the template for your <code>BlogPost</code>:</p>
 <div class="highlight"><pre>{% load rich_text %}
 <span class="nt">&lt;html&gt;</span>
 <span class="nt">&lt;body&gt;</span>

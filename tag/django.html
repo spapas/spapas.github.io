@@ -288,7 +288,7 @@
 </pre></div>
 
 
-<p>The most important thing to notice is that  the <code>INSTALLED_APPS</code> contains the usual apps from django.*, <a href="http://south.aeracode.org/">south</a> for database migrations, <a href="https://github.com/django-compressor/django-compressor">django-compressor</a> to support compressing static files (and automatic translating from less to css), <a href="https://github.com/alex/django-taggit">django-taggit</a> to add support for tags, and <a href="https://github.com/torchbox/django-modelcluster/">django-modelcluster</a> which adds support from clusters (groups) of models. It also contains the wagtail.* applications and the tutorial application which is where we will create our blog. Also there are two Wagtail related middleware (one to add a site attribute to each request and one to hand redirects), configuring django-compressor to use the <code>lessc</code> binary to compile <code>less</code> files (more on this later), and some other, not so important Wagtail&nbsp;settings.</p>
+<p>The most important thing to notice is that  the <code>INSTALLED_APPS</code> contains the usual apps from django.*, <a href="http://south.aeracode.org/">south</a> for database migrations, <a href="https://github.com/django-compressor/django-compressor">django-compressor</a> to support compressing static files (and automatic translating from less to css), <a href="https://github.com/alex/django-taggit">django-taggit</a> to add support for tags, and <a href="https://github.com/torchbox/django-modelcluster/">django-modelcluster</a> which adds support from clusters (groups) of models. It also contains the wagtail.* applications and the tutorial application which is where we will create our blog. Also there are two Wagtail related middleware (one to add a site attribute to each request and one to hand redirects), configuring django-compressor to use the <code>lessc</code> and <code>coffee</code> commands to compile <code>less</code> and <code>coffee</code> files (more on this later), and some other, not so important Wagtail&nbsp;settings.</p>
 <p>So let&#8217;s create the tutorial application by&nbsp;issuing</p>
 <div class="highlight"><pre>python manage.py startapp tutorial
 </pre></div>
@@ -317,13 +317,9 @@ python manage.py migrate
 <p>Welcome to your new Wagtail&nbsp;site!</p>
 </blockquote>
 <p>page &#8212; congratulations&nbsp;!</p>
-<p>Before going to the /admin and actually see what editing your site with Wagtail looks like you need to install <a href="http://lesscss.org/">less</a>. To install lessc you have to install node.js and npm and then do an <code>npm install lessc -g</code>. In Unix you will then have the <code>lessc</code> executable, however, in Windows it needs a little more effort: Create a file named <code>lessc.bat</code> which you will put in your path with the following&nbsp;content:</p>
-<div class="highlight"><pre>node C:<span class="se">\U</span>sers<span class="se">\u</span>sername<span class="se">\A</span>ppData<span class="se">\R</span>oaming<span class="se">\n</span>pm<span class="se">\n</span>ode_modules<span class="se">\l</span>ess<span class="se">\b</span>in<span class="se">\l</span>essc  %*
-</pre></div>
-
-
-<p>where username is the name of the user under which you did the <code>npm install less -g</code>.</p>
-<p>In any case, after successfully installing less you will be able to navigate to http://127.0.0.1:8000/admin and from there, login to Wagtail admin with the superuser you created earlier. If you are able to login to the /admin then you are ready to start developing with&nbsp;Wagtail. </p>
+<p>Before going to the /admin and actually see what editing your site with Wagtail looks like you need to install <a href="http://lesscss.org/">less</a> and <a href="http://coffeescript.org/">coffee-script</a>. These are <a href="http://nodejs.org/">node.js</a> packages so to install them you have to install node.js and <a href="https://www.npmjs.org">npm</a> and then do an <code>npm install less -g</code> and an <code>npm install coffee-script -g</code>. In Unix you will then have the <code>lessc</code> and <code>coffee</code> executables in your path. In Windows, the lessc.cmd and coffee.cmd executables have to be created in the path <code>c:\Users\user\AppData\Roaming\npm</code>.</p>
+<p>where username is the name of the user under which you installed <code>less</code> and <code>coffee-script</code>.</p>
+<p>In any case, after successfully installing less and coffee-script you will be able to navigate to http://127.0.0.1:8000/admin and from there, login to Wagtail admin with the superuser you created earlier. If you are able to login to the /admin then you are ready to start developing with&nbsp;Wagtail. </p>
 <p><img alt="Wagtail admin index" src="http://spapas.github.io/images/wagtail-index.png" /></p>
 <h2>Exploring Wagtail&nbsp;admin</h2>
 <p>When you login to Wagtail admin you will see a menu at the left with the&nbsp;options:</p>

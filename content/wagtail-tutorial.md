@@ -247,7 +247,7 @@ WAGTAILSEARCH_RESULTS_TEMPLATE_AJAX = 'tutorial/includes/search_listing.html'
 
 WAGTAILSEARCH_ES_INDEX = 'wagtailtutorial'
 ```
-The most important thing to notice is that  the ``INSTALLED_APPS`` contains the usual apps from django.\*, [south] for database migrations, [django-compressor] to support compressing static files (and automatic translating from less to css), [django-taggit] to add support fom tags, and [django-modelcluster] which adds support from clusters (groups) of models. It also contains the wagtail.\* applications and the tutorial application which is where we will create our blog. Also there are two Wagtail related middleware (one to add a site attribute to each request and one to hand redirects), configuring django-compressor to use the ``lessc`` binary to compile ``less`` files (more on this later), and some other, not so important Wagtail settings.
+The most important thing to notice is that  the ``INSTALLED_APPS`` contains the usual apps from django.\*, [south] for database migrations, [django-compressor] to support compressing static files (and automatic translating from less to css), [django-taggit] to add support for tags, and [django-modelcluster] which adds support from clusters (groups) of models. It also contains the wagtail.\* applications and the tutorial application which is where we will create our blog. Also there are two Wagtail related middleware (one to add a site attribute to each request and one to hand redirects), configuring django-compressor to use the ``lessc`` binary to compile ``less`` files (more on this later), and some other, not so important Wagtail settings.
 
 So let's create the tutorial application by issuing
 
@@ -487,7 +487,7 @@ Wagtail uses the concept of *sites* to define groups of pages hosted in the *sam
 Where to go from here
 ---------------------
 
-You are now ready to start adding more pages to your blog, adding functionality to it (don't forget that everything is just Django modes and templates so you can
+You are now ready to start adding more pages to your blog, adding functionality to it (don't forget that everything is just Django models and templates so you can
 change it at will), or even creating a completely different kind of site by adding other Page types. For a more complete site with lots of examples please check 
 [wagtaildemo]. There is
 no complete documentation yet however you can 

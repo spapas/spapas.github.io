@@ -247,7 +247,7 @@ WAGTAILSEARCH_RESULTS_TEMPLATE_AJAX = 'tutorial/includes/search_listing.html'
 
 WAGTAILSEARCH_ES_INDEX = 'wagtailtutorial'
 ```
-The most important thing to notice is that  the ``INSTALLED_APPS`` contains the usual apps from django.\*, [south] for database migrations, [django-compressor] to support compressing static files (and automatic translating from less to css), [django-taggit] to add support for tags, and [django-modelcluster] which adds support from clusters (groups) of models. It also contains the wagtail.\* applications and the tutorial application which is where we will create our blog. Also there are two Wagtail related middleware (one to add a site attribute to each request and one to hand redirects), configuring django-compressor to use the ``lessc`` binary to compile ``less`` files (more on this later), and some other, not so important Wagtail settings.
+The most important thing to notice is that  the ``INSTALLED_APPS`` contains the usual apps from django.\*, [south] for database migrations, [django-compressor] to support compressing static files (and automatic translating from less to css), [django-taggit] to add support for tags, and [django-modelcluster] which adds support from clusters (groups) of models. It also contains the wagtail.\* applications and the tutorial application which is where we will create our blog. Also there are two Wagtail related middleware (one to add a site attribute to each request and one to hand redirects), configuring django-compressor to use the ``lessc`` and ``coffee`` commands to compile ``less`` and ``coffee`` files (more on this later), and some other, not so important Wagtail settings.
 
 So let's create the tutorial application by issuing
 
@@ -282,15 +282,11 @@ and visit ``http://127.0.0.1:8000``. If everything worked fine you will get a
 
 page -- congratulations !
 
-Before going to the /admin and actually see what editing your site with Wagtail looks like you need to install [less]. To install lessc you have to install node.js and npm and then do an ``npm install lessc -g``. In Unix you will then have the ``lessc`` executable, however, in Windows it needs a little more effort: Create a file named ``lessc.bat`` which you will put in your path with the following content:
+Before going to the /admin and actually see what editing your site with Wagtail looks like you need to install [less] and [coffee-script]. These are [node.js] packages so to install them you have to install node.js and [npm] and then do an ``npm install less -g`` and an ``npm install coffee-script -g``. In Unix you will then have the ``lessc`` and ``coffee`` executables in your path. In Windows, the lessc.cmd and coffee.cmd executables have to be created in the path ``c:\Users\user\AppData\Roaming\npm``.
 
-```sh
-node C:\Users\username\AppData\Roaming\npm\node_modules\less\bin\lessc  %*
-```
+where username is the name of the user under which you installed ``less`` and ``coffee-script``.
 
-where username is the name of the user under which you did the ``npm install less -g``.
-
-In any case, after successfully installing less you will be able to navigate to http://127.0.0.1:8000/admin and from there, login to Wagtail admin with the superuser you created earlier. If you are able to login to the /admin then you are ready to start developing with Wagtail. 
+In any case, after successfully installing less and coffee-script you will be able to navigate to http://127.0.0.1:8000/admin and from there, login to Wagtail admin with the superuser you created earlier. If you are able to login to the /admin then you are ready to start developing with Wagtail. 
 
 ![Wagtail admin index]({filename}images/wagtail-index.png)
 
@@ -505,6 +501,9 @@ no complete documentation yet however you can
 [pip]:https://pypi.python.org/pypi/pip
 [virtualenv]:https://pypi.python.org/pypi/virtualenv
 [less]:http://lesscss.org/
+[node.js]:http://nodejs.org/
+[npm]:https://www.npmjs.org
+[coffee-script]:http://coffeescript.org/
 [south]:http://south.aeracode.org/
 [django-compressor]:https://github.com/django-compressor/django-compressor
 [django-taggit]:https://github.com/alex/django-taggit

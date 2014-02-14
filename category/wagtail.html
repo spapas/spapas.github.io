@@ -288,7 +288,7 @@
 </pre></div>
 
 
-<p>The most important thing to notice is that  the <code>INSTALLED_APPS</code> contains the usual apps from django.*, <a href="http://south.aeracode.org/">south</a> for database migrations, <a href="https://github.com/django-compressor/django-compressor">django-compressor</a> to support compressing static files (and automatic translating from less to css), <a href="https://github.com/alex/django-taggit">django-taggit</a> to add support fom tags, and <a href="https://github.com/torchbox/django-modelcluster/">django-modelcluster</a> which adds support from clusters (groups) of models. It also contains the wagtail.* applications and the tutorial application which is where we will create our blog. Also there are two Wagtail related middleware (one to add a site attribute to each request and one to hand redirects), configuring django-compressor to use the <code>lessc</code> binary to compile <code>less</code> files (more on this later), and some other, not so important Wagtail&nbsp;settings.</p>
+<p>The most important thing to notice is that  the <code>INSTALLED_APPS</code> contains the usual apps from django.*, <a href="http://south.aeracode.org/">south</a> for database migrations, <a href="https://github.com/django-compressor/django-compressor">django-compressor</a> to support compressing static files (and automatic translating from less to css), <a href="https://github.com/alex/django-taggit">django-taggit</a> to add support for tags, and <a href="https://github.com/torchbox/django-modelcluster/">django-modelcluster</a> which adds support from clusters (groups) of models. It also contains the wagtail.* applications and the tutorial application which is where we will create our blog. Also there are two Wagtail related middleware (one to add a site attribute to each request and one to hand redirects), configuring django-compressor to use the <code>lessc</code> binary to compile <code>less</code> files (more on this later), and some other, not so important Wagtail&nbsp;settings.</p>
 <p>So let&#8217;s create the tutorial application by&nbsp;issuing</p>
 <div class="highlight"><pre>python manage.py startapp tutorial
 </pre></div>
@@ -483,7 +483,7 @@ python manage.py migrate
 <h2>Changing your home&nbsp;page</h2>
 <p>Wagtail uses the concept of <em>sites</em> to define groups of pages hosted in the <em>same</em> server. To make more clear what site is, you have to use the good old django admin which can be found at <code>http://127.0.0.1:8000/django-admin/</code>. Check the localhost[default] site entry: You will see that each site has a name, a root page (currently the &#8220;Welcome to your new Wagtail site!&#8221;) and an is_default check. So,  change the root page of the localhost site to your BlogIndexPage and go to <code>http://127.0.0.1:8000/</code> &#8230; Yes ! The blog is alive&nbsp;:)</p>
 <h2>Where to go from&nbsp;here</h2>
-<p>You are now ready to start adding more pages to your blog, adding functionality to it (don&#8217;t forget that everything is just Django modes and templates so you can
+<p>You are now ready to start adding more pages to your blog, adding functionality to it (don&#8217;t forget that everything is just Django models and templates so you can
 change it at will), or even creating a completely different kind of site by adding other Page types. For a more complete site with lots of examples please check 
 <a href="https://github.com/torchbox/wagtaildemo">wagtaildemo</a>. There is
 no complete documentation yet however you&nbsp;can </p>

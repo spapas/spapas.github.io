@@ -351,7 +351,19 @@ In our declaration of BlogPage we added three ``FieldPanel``s on its content_pan
 
 ![Editing pages in Wagtail]({filename}images/wagtail-edit-page.png)
 
-So now we can add as many posts as we like! However, there should also be an Index page collecting our posts. 
+So now we can add as many posts as we like! 
+
+The time has come to take a look at our fine blog post: After we publish our page we click to the view live action and... 
+
+> TemplateDoesNotExist at /hello-world/
+
+> tutorial/blog_page.html
+
+:(
+
+A template seems to be missing -- actually we have totally forgotten about the presentation of our blog -- we'll talk about this in the next section !
+
+However, before going there we should also create an Index page type collecting our posts. 
 
 For this, we will change our ``models.py`` to this:
 
@@ -420,15 +432,7 @@ BlogIndexPage.content_panels = [
 
 The above adds a way to put ``related_links`` to a ``BlogIndexPage`` -- these related_links are the ``BlogPage``s that actually belong to the blog - so now, we can add a blog index page and add all our blog posts to it!
 
-The time has come to take a look at our fine blog: After we publish our blog index we click to the view live action and... 
-
-> TemplateDoesNotExist at /my-blog-index/
-
-> tutorial/blog_index_page.html
-
-:(
-
-A template seems to be missing -- actually we have totally forgoten about the presentation of our blog.
+Now that we've created the BlogPage and BlogIndexPage pages it's time to take a look at how we will actually display our blog...
 
 Creating templates for *Page*s
 ------------------------------
@@ -449,9 +453,9 @@ A normal Django template can be used to display each page type. Wagtail either g
 
 So self is the context name of the  BlogPageIndex instance that is used to render this page. Beyond that, it's normal django.
 
-Now you can view your Blog Index -- however before clicking on a link to also view your posts add the template for your ``BlogPost``:
-
 ![Rendering the Blog Index]({filename}images/wagtail-index-template.png)
+
+Now you can view your Blog Index -- however before clicking on a link to also view your posts add the template for your ``BlogPost``:
 
 ```html
 {% load rich_text %}

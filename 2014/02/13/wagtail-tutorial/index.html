@@ -78,6 +78,11 @@
 </pre></div>
 
 
+<p>If you use Unix you can just run <code>django-admin.py</code> etc however if you try to do the same in windows you
+will find out that windows tries to run the .py file with the python executable that is assigned through
+explorer (which of course is your main python installation) and <em>not</em> through your path! That&#8217;s why
+all our commands will be in the form <code>python script.py</code> to make sure that Windows picks the python
+executable from your path (which, if you&#8217;re inside the virtual enviroment will be the correct&nbsp;one).</p>
 <p>Inside the <code>wagtailtutorial</code> folder you will see a file named <code>manage.py</code> and another folder named <code>wagtailtutorial</code>. Inside this <code>wagtailtutorial</code> folder you will find <code>settings.py</code> and <code>urls.py</code> which need to be&nbsp;changed.</p>
 <p>Starting with <code>urls.py</code>, remove everything and change it like&nbsp;this:</p>
 <div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.conf.urls</span> <span class="kn">import</span> <span class="n">patterns</span><span class="p">,</span> <span class="n">include</span><span class="p">,</span> <span class="n">url</span>
@@ -109,8 +114,6 @@
 <span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span>
     <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^django-admin/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">urls</span><span class="p">)),</span>
 
-    <span class="c"># <span class="caps">TODO</span>: some way of getting wagtailimages to register itself within wagtailadmin so that we</span>
-    <span class="c"># don&#39;t have to define it separately here</span>
     <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^admin/images/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">wagtailimages_urls</span><span class="p">)),</span>
     <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^admin/embeds/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">wagtailembeds_urls</span><span class="p">)),</span>
     <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^admin/documents/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">wagtaildocs_admin_urls</span><span class="p">)),</span>
@@ -120,7 +123,6 @@
     <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^admin/redirects/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">wagtailredirects_urls</span><span class="p">)),</span>
     <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^admin/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">wagtailadmin_urls</span><span class="p">)),</span>
     <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^search/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">wagtailsearch_frontend_urls</span><span class="p">)),</span>
-
     <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^documents/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">wagtaildocs_urls</span><span class="p">)),</span>
 
     <span class="c"># For anything not caught by a more specific rule above, hand over to</span>
@@ -134,13 +136,10 @@
 
     <span class="n">urlpatterns</span> <span class="o">+=</span> <span class="n">staticfiles_urlpatterns</span><span class="p">()</span> <span class="c"># tell gunicorn where static files are in dev mode</span>
     <span class="n">urlpatterns</span> <span class="o">+=</span> <span class="n">static</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">MEDIA_URL</span> <span class="o">+</span> <span class="s">&#39;images/&#39;</span><span class="p">,</span> <span class="n">document_root</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">MEDIA_ROOT</span><span class="p">,</span> <span class="s">&#39;images&#39;</span><span class="p">))</span>
-    <span class="n">urlpatterns</span> <span class="o">+=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span>
-        <span class="p">(</span><span class="s">r&#39;^favicon\.ico$&#39;</span><span class="p">,</span> <span class="n">RedirectView</span><span class="o">.</span><span class="n">as_view</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">STATIC_URL</span> <span class="o">+</span> <span class="s">&#39;demo/images/favicon.ico&#39;</span><span class="p">))</span>
-    <span class="p">)</span>
 </pre></div>
 
 
-<p>You can se that there is a signal handler when a searchable thing is added or changed to handle indexing for search, normal django admin is mapped under /django-admin since /admin is use for Wagtail (of course you may map Wagtail wherever you&#8217;d like), inclusion of various wagtail related urls and finally a Wagtail handling everything&nbsp;else.</p>
+<p>You can se that there is a signal handler when a searchable thing is added or changed to handle indexing for search, normal django admin is mapped under /django-admin since /admin is use for Wagtail (of course you may map Wagtail wherever you&#8217;d like), inclusion of various wagtail related urls and finally a Wagtail handling everything else. Finally there are some handlers for media and static&nbsp;files.</p>
 <p>After that please change your <code>settings.py</code> like&nbsp;this:</p>
 <div class="highlight"><pre><span class="c"># Django settings for wagtaildemo project.</span>
 
@@ -239,7 +238,7 @@
     <span class="s">&#39;tutorial&#39;</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="n">EMAIL_SUBJECT_PREFIX</span> <span class="o">=</span> <span class="s">&#39;[wagtaildemo] &#39;</span>
+<span class="n">EMAIL_SUBJECT_PREFIX</span> <span class="o">=</span> <span class="s">&#39;[wagtailtutorial] &#39;</span>
 
 <span class="n">INTERNAL_IPS</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="s">&#39;10.0.2.2&#39;</span><span class="p">)</span>
 
@@ -289,19 +288,19 @@
 
 
 <p>The most important thing to notice is that  the <code>INSTALLED_APPS</code> contains the usual apps from django.*, <a href="http://south.aeracode.org/">south</a> for database migrations, <a href="https://github.com/django-compressor/django-compressor">django-compressor</a> to support compressing static files (and automatic translating from less to css), <a href="https://github.com/alex/django-taggit">django-taggit</a> to add support for tags, and <a href="https://github.com/torchbox/django-modelcluster/">django-modelcluster</a> which adds support from clusters (groups) of models. It also contains the wagtail.* applications and the tutorial application which is where we will create our blog. Also there are two Wagtail related middleware (one to add a site attribute to each request and one to hand redirects), configuring django-compressor to use the <code>lessc</code> and <code>coffee</code> commands to compile <code>less</code> and <code>coffee</code> files (more on this later), and some other, not so important Wagtail&nbsp;settings.</p>
-<p>So let&#8217;s create the tutorial application by&nbsp;issuing</p>
+<p>So let&#8217;s create the missing tutorial application by&nbsp;issuing:</p>
 <div class="highlight"><pre>python manage.py startapp tutorial
 </pre></div>
 
 
-<p>Now we&#8217;ll have a <code>tutorial</code> folder waiting to define our blog inside our <code>wagtailtutorial</code> one!</p>
+<p>Now we&#8217;ll have a <code>tutorial</code> folder waiting to define our blog structure inside the <code>wagtailtutorial</code> folder!</p>
 <h2>Checking to see if everything&nbsp;works</h2>
 <p>Before continuing with our blog creation let&#8217;s make sure that everything works, first of all by generating the database&nbsp;schema:</p>
 <div class="highlight"><pre>python manage.py syncdb
 </pre></div>
 
 
-<p>In the superuser question answer yes and add a superuser. Then you can run the migrations - however because there are some problems with the way SQlite3 runs migrations it is recommended to run the migrations in two&nbsp;steps:</p>
+<p>In the superuser question answer yes and add a superuser. Then you can run the migrations - however because there are some problems with the way SQLite3 runs migrations it is recommended to run the migrations in two&nbsp;steps:</p>
 <div class="highlight"><pre>python manage.py migrate 0001 --all
 python manage.py migrate
 </pre></div>

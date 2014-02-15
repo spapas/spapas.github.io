@@ -21,6 +21,11 @@
 &lt;/pre&gt;&lt;/div&gt;
 
 
+&lt;p&gt;If you use Unix you can just run &lt;code&gt;django-admin.py&lt;/code&gt; etc however if you try to do the same in windows you
+will find out that windows tries to run the .py file with the python executable that is assigned through
+explorer (which of course is your main python installation) and &lt;em&gt;not&lt;/em&gt; through your path! That&amp;#8217;s why
+all our commands will be in the form &lt;code&gt;python script.py&lt;/code&gt; to make sure that Windows picks the python
+executable from your path (which, if you&amp;#8217;re inside the virtual enviroment will be the correct&amp;nbsp;one).&lt;/p&gt;
 &lt;p&gt;Inside the &lt;code&gt;wagtailtutorial&lt;/code&gt; folder you will see a file named &lt;code&gt;manage.py&lt;/code&gt; and another folder named &lt;code&gt;wagtailtutorial&lt;/code&gt;. Inside this &lt;code&gt;wagtailtutorial&lt;/code&gt; folder you will find &lt;code&gt;settings.py&lt;/code&gt; and &lt;code&gt;urls.py&lt;/code&gt; which need to be&amp;nbsp;changed.&lt;/p&gt;
 &lt;p&gt;Starting with &lt;code&gt;urls.py&lt;/code&gt;, remove everything and change it like&amp;nbsp;this:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;django.conf.urls&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;patterns&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;include&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;url&lt;/span&gt;
@@ -52,8 +57,6 @@
 &lt;span class="n"&gt;urlpatterns&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;patterns&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
     &lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;r&amp;#39;^django-admin/&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;include&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;admin&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;site&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;urls&lt;/span&gt;&lt;span class="p"&gt;)),&lt;/span&gt;
 
-    &lt;span class="c"&gt;# &lt;span class="caps"&gt;TODO&lt;/span&gt;: some way of getting wagtailimages to register itself within wagtailadmin so that we&lt;/span&gt;
-    &lt;span class="c"&gt;# don&amp;#39;t have to define it separately here&lt;/span&gt;
     &lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;r&amp;#39;^admin/images/&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;include&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;wagtailimages_urls&lt;/span&gt;&lt;span class="p"&gt;)),&lt;/span&gt;
     &lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;r&amp;#39;^admin/embeds/&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;include&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;wagtailembeds_urls&lt;/span&gt;&lt;span class="p"&gt;)),&lt;/span&gt;
     &lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;r&amp;#39;^admin/documents/&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;include&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;wagtaildocs_admin_urls&lt;/span&gt;&lt;span class="p"&gt;)),&lt;/span&gt;
@@ -63,7 +66,6 @@
     &lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;r&amp;#39;^admin/redirects/&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;include&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;wagtailredirects_urls&lt;/span&gt;&lt;span class="p"&gt;)),&lt;/span&gt;
     &lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;r&amp;#39;^admin/&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;include&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;wagtailadmin_urls&lt;/span&gt;&lt;span class="p"&gt;)),&lt;/span&gt;
     &lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;r&amp;#39;^search/&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;include&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;wagtailsearch_frontend_urls&lt;/span&gt;&lt;span class="p"&gt;)),&lt;/span&gt;
-
     &lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;r&amp;#39;^documents/&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;include&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;wagtaildocs_urls&lt;/span&gt;&lt;span class="p"&gt;)),&lt;/span&gt;
 
     &lt;span class="c"&gt;# For anything not caught by a more specific rule above, hand over to&lt;/span&gt;
@@ -77,13 +79,10 @@
 
     &lt;span class="n"&gt;urlpatterns&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;staticfiles_urlpatterns&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="c"&gt;# tell gunicorn where static files are in dev mode&lt;/span&gt;
     &lt;span class="n"&gt;urlpatterns&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;static&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;settings&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;MEDIA_URL&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;images/&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;document_root&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;os&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;join&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;settings&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;MEDIA_ROOT&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;images&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
-    &lt;span class="n"&gt;urlpatterns&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;patterns&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-        &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;r&amp;#39;^favicon\.ico$&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;RedirectView&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;as_view&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;settings&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;STATIC_URL&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;demo/images/favicon.ico&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
-    &lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;You can se that there is a signal handler when a searchable thing is added or changed to handle indexing for search, normal django admin is mapped under /django-admin since /admin is use for Wagtail (of course you may map Wagtail wherever you&amp;#8217;d like), inclusion of various wagtail related urls and finally a Wagtail handling everything&amp;nbsp;else.&lt;/p&gt;
+&lt;p&gt;You can se that there is a signal handler when a searchable thing is added or changed to handle indexing for search, normal django admin is mapped under /django-admin since /admin is use for Wagtail (of course you may map Wagtail wherever you&amp;#8217;d like), inclusion of various wagtail related urls and finally a Wagtail handling everything else. Finally there are some handlers for media and static&amp;nbsp;files.&lt;/p&gt;
 &lt;p&gt;After that please change your &lt;code&gt;settings.py&lt;/code&gt; like&amp;nbsp;this:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;# Django settings for wagtaildemo project.&lt;/span&gt;
 
@@ -182,7 +181,7 @@
     &lt;span class="s"&gt;&amp;#39;tutorial&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
 &lt;span class="p"&gt;)&lt;/span&gt;
 
-&lt;span class="n"&gt;EMAIL_SUBJECT_PREFIX&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;[wagtaildemo] &amp;#39;&lt;/span&gt;
+&lt;span class="n"&gt;EMAIL_SUBJECT_PREFIX&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;[wagtailtutorial] &amp;#39;&lt;/span&gt;
 
 &lt;span class="n"&gt;INTERNAL_IPS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;127.0.0.1&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;10.0.2.2&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 
@@ -232,19 +231,19 @@
 
 
 &lt;p&gt;The most important thing to notice is that  the &lt;code&gt;INSTALLED_APPS&lt;/code&gt; contains the usual apps from django.*, &lt;a href="http://south.aeracode.org/"&gt;south&lt;/a&gt; for database migrations, &lt;a href="https://github.com/django-compressor/django-compressor"&gt;django-compressor&lt;/a&gt; to support compressing static files (and automatic translating from less to css), &lt;a href="https://github.com/alex/django-taggit"&gt;django-taggit&lt;/a&gt; to add support for tags, and &lt;a href="https://github.com/torchbox/django-modelcluster/"&gt;django-modelcluster&lt;/a&gt; which adds support from clusters (groups) of models. It also contains the wagtail.* applications and the tutorial application which is where we will create our blog. Also there are two Wagtail related middleware (one to add a site attribute to each request and one to hand redirects), configuring django-compressor to use the &lt;code&gt;lessc&lt;/code&gt; and &lt;code&gt;coffee&lt;/code&gt; commands to compile &lt;code&gt;less&lt;/code&gt; and &lt;code&gt;coffee&lt;/code&gt; files (more on this later), and some other, not so important Wagtail&amp;nbsp;settings.&lt;/p&gt;
-&lt;p&gt;So let&amp;#8217;s create the tutorial application by&amp;nbsp;issuing&lt;/p&gt;
+&lt;p&gt;So let&amp;#8217;s create the missing tutorial application by&amp;nbsp;issuing:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;python manage.py startapp tutorial
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;Now we&amp;#8217;ll have a &lt;code&gt;tutorial&lt;/code&gt; folder waiting to define our blog inside our &lt;code&gt;wagtailtutorial&lt;/code&gt; one!&lt;/p&gt;
+&lt;p&gt;Now we&amp;#8217;ll have a &lt;code&gt;tutorial&lt;/code&gt; folder waiting to define our blog structure inside the &lt;code&gt;wagtailtutorial&lt;/code&gt; folder!&lt;/p&gt;
 &lt;h2&gt;Checking to see if everything&amp;nbsp;works&lt;/h2&gt;
 &lt;p&gt;Before continuing with our blog creation let&amp;#8217;s make sure that everything works, first of all by generating the database&amp;nbsp;schema:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;python manage.py syncdb
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;In the superuser question answer yes and add a superuser. Then you can run the migrations - however because there are some problems with the way SQlite3 runs migrations it is recommended to run the migrations in two&amp;nbsp;steps:&lt;/p&gt;
+&lt;p&gt;In the superuser question answer yes and add a superuser. Then you can run the migrations - however because there are some problems with the way SQLite3 runs migrations it is recommended to run the migrations in two&amp;nbsp;steps:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;python manage.py migrate 0001 --all
 python manage.py migrate
 &lt;/pre&gt;&lt;/div&gt;

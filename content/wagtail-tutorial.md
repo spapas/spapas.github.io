@@ -37,6 +37,12 @@ Wagtail has to "live" inside a normal Django project so you now may create a new
 python <PATH_OF_YOUR_VIRTUAL_ENV>/scripts/django-admin.py startproject wagtailtutorial
 ```
 
+If you use Unix you can just run ``django-admin.py`` etc however if you try to do the same in windows you
+will find out that windows tries to run the .py file with the python executable that is assigned through
+explorer (which of course is your main python installation) and *not* through your path! That's why
+all our commands will be in the form ``python script.py`` to make sure that Windows picks the python
+executable from your path (which, if you're inside the virtual enviroment will be the correct one).
+
 Inside the ``wagtailtutorial`` folder you will see a file named ``manage.py`` and another folder named ``wagtailtutorial``. Inside this ``wagtailtutorial`` folder you will find ``settings.py`` and ``urls.py`` which need to be changed.
 
 Starting with ``urls.py``, remove everything and change it like this:
@@ -71,8 +77,6 @@ wagtailsearch_register_signal_handlers()
 urlpatterns = patterns('',
     url(r'^django-admin/', include(admin.site.urls)),
 
-    # TODO: some way of getting wagtailimages to register itself within wagtailadmin so that we
-    # don't have to define it separately here
     url(r'^admin/images/', include(wagtailimages_urls)),
     url(r'^admin/embeds/', include(wagtailembeds_urls)),
     url(r'^admin/documents/', include(wagtaildocs_admin_urls)),
@@ -82,7 +86,6 @@ urlpatterns = patterns('',
     url(r'^admin/redirects/', include(wagtailredirects_urls)),
     url(r'^admin/', include(wagtailadmin_urls)),
     url(r'^search/', include(wagtailsearch_frontend_urls)),
-
     url(r'^documents/', include(wagtaildocs_urls)),
 
     # For anything not caught by a more specific rule above, hand over to
@@ -96,11 +99,9 @@ if settings.DEBUG:
 
     urlpatterns += staticfiles_urlpatterns() # tell gunicorn where static files are in dev mode
     urlpatterns += static(settings.MEDIA_URL + 'images/', document_root=os.path.join(settings.MEDIA_ROOT, 'images'))
-    urlpatterns += patterns('',
-        (r'^favicon\.ico$', RedirectView.as_view(url=settings.STATIC_URL + 'demo/images/favicon.ico'))
-    )
+
 ```
-You can se that there is a signal handler when a searchable thing is added or changed to handle indexing for search, normal django admin is mapped under /django-admin since /admin is use for Wagtail (of course you may map Wagtail wherever you'd like), inclusion of various wagtail related urls and finally a Wagtail handling everything else.
+You can se that there is a signal handler when a searchable thing is added or changed to handle indexing for search, normal django admin is mapped under /django-admin since /admin is use for Wagtail (of course you may map Wagtail wherever you'd like), inclusion of various wagtail related urls and finally a Wagtail handling everything else. Finally there are some handlers for media and static files.
 
 After that please change your ``settings.py`` like this:
 
@@ -202,7 +203,7 @@ INSTALLED_APPS = (
     'tutorial',
 )
 
-EMAIL_SUBJECT_PREFIX = '[wagtaildemo] '
+EMAIL_SUBJECT_PREFIX = '[wagtailtutorial] '
 
 INTERNAL_IPS = ('127.0.0.1', '10.0.2.2')
 
@@ -249,15 +250,16 @@ WAGTAILSEARCH_RESULTS_TEMPLATE_AJAX = 'tutorial/includes/search_listing.html'
 
 WAGTAILSEARCH_ES_INDEX = 'wagtailtutorial'
 ```
+
 The most important thing to notice is that  the ``INSTALLED_APPS`` contains the usual apps from django.\*, [south] for database migrations, [django-compressor] to support compressing static files (and automatic translating from less to css), [django-taggit] to add support for tags, and [django-modelcluster] which adds support from clusters (groups) of models. It also contains the wagtail.\* applications and the tutorial application which is where we will create our blog. Also there are two Wagtail related middleware (one to add a site attribute to each request and one to hand redirects), configuring django-compressor to use the ``lessc`` and ``coffee`` commands to compile ``less`` and ``coffee`` files (more on this later), and some other, not so important Wagtail settings.
 
-So let's create the tutorial application by issuing
+So let's create the missing tutorial application by issuing:
 
 ```sh
 python manage.py startapp tutorial
 ```
 
-Now we'll have a ``tutorial`` folder waiting to define our blog inside our ``wagtailtutorial`` one!
+Now we'll have a ``tutorial`` folder waiting to define our blog structure inside the ``wagtailtutorial`` folder!
 
 Checking to see if everything works
 -----------------------------------
@@ -268,7 +270,7 @@ Before continuing with our blog creation let's make sure that everything works, 
 python manage.py syncdb
 ```
 
-In the superuser question answer yes and add a superuser. Then you can run the migrations - however because there are some problems with the way SQlite3 runs migrations it is recommended to run the migrations in two steps:
+In the superuser question answer yes and add a superuser. Then you can run the migrations - however because there are some problems with the way SQLite3 runs migrations it is recommended to run the migrations in two steps:
 
 ```sh
 python manage.py migrate 0001 --all

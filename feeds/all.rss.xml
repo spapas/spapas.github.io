@@ -14,7 +14,7 @@
 
 
 &lt;p&gt;and run
-&lt;code&gt;pip install -r requirements.txt&lt;/code&gt;.  If you use Microsoft Windows you &lt;em&gt;will&lt;/em&gt; experience problems with Pillow and lxml. Please download the installation executables from https://pypi.python.org/pypi/Pillow/2.3.0 and https://pypi.python.org/pypi/lxml/3.3.1, install them using &lt;code&gt;Pillow-2.3.0.x-py2.7.exe&lt;/code&gt; and &lt;code&gt;easy_install lxml-3.3.1.x-py2.7.exe&lt;/code&gt; and then install the other&amp;nbsp;requirements.&lt;/p&gt;
+&lt;code&gt;pip install -r requirements.txt&lt;/code&gt;.  If you use Microsoft Windows you &lt;em&gt;will&lt;/em&gt; experience problems with Pillow and lxml. Please download the installation executables from https://pypi.python.org/pypi/Pillow/2.3.0 and https://pypi.python.org/pypi/lxml/3.3.1, install them using &lt;code&gt;Pillow-2.3.0.x-py2.7.exe&lt;/code&gt; and &lt;code&gt;easy_install lxml-3.3.1.x-py2.7.exe&lt;/code&gt; and then install the other requirements. Also please use the latest version of Wagtail (hosted on github) because it has some changes from the pypi (so &lt;em&gt;don&amp;#8217;t&lt;/em&gt; do a &lt;code&gt;pip install wagtail&lt;/code&gt;).&lt;/p&gt;
 &lt;h2&gt;Creating and configuring your&amp;nbsp;project&lt;/h2&gt;
 &lt;p&gt;Wagtail has to &amp;#8220;live&amp;#8221; inside a normal Django project so you now may create a new Django project by&amp;nbsp;issuing:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;python &amp;lt;PATH_OF_YOUR_VIRTUAL_ENV&amp;gt;/scripts/django-admin.py startproject wagtailtutorial

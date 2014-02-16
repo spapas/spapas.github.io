@@ -27,7 +27,7 @@ django-modelcluster==0.1
 django-taggit==0.11.2
 ```
 and run
-``pip install -r requirements.txt``.  If you use Microsoft Windows you *will* experience problems with Pillow and lxml. Please download the installation executables from https://pypi.python.org/pypi/Pillow/2.3.0 and https://pypi.python.org/pypi/lxml/3.3.1, install them using ``Pillow-2.3.0.x-py2.7.exe`` and ``easy_install lxml-3.3.1.x-py2.7.exe`` and then install the other requirements.
+``pip install -r requirements.txt``.  If you use Microsoft Windows you *will* experience problems with Pillow and lxml. Please download the installation executables from https://pypi.python.org/pypi/Pillow/2.3.0 and https://pypi.python.org/pypi/lxml/3.3.1, install them using ``Pillow-2.3.0.x-py2.7.exe`` and ``easy_install lxml-3.3.1.x-py2.7.exe`` and then install the other requirements. Also please use the latest version of Wagtail (hosted on github) because it has some changes from the pypi (so *don't* do a ``pip install wagtail``).
 
 Creating and configuring your project
 -------------------------------------
@@ -435,6 +435,8 @@ BlogIndexPage.content_panels = [
 ```
 
 The above adds a way to put ``related_links`` to a ``BlogIndexPage`` -- these related_links are the ``BlogPage``s that actually belong to the blog - so now, we can add a blog index page and add all our blog posts to it!
+
+
 
 Now that we've created the BlogPage and BlogIndexPage pages it's time to take a look at how we will actually display our blog...
 

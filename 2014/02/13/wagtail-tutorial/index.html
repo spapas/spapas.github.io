@@ -61,17 +61,24 @@
 <p><strong>Update</strong>: The result of this tutorial has been deployed to <a href="https://www.heroku.com/">Heroku</a>: <a href="http://gentle-refuge-2590.herokuapp.com/">http://gentle-refuge-2590.herokuapp.com/</a> - you may visit the <a href="http://gentle-refuge-2590.herokuapp.com/admin/">admin site</a> and login with root / 123 to play with Wagtail! Please don&#8217;t do anything naughty !!! Also, notice that <a href="https://devcenter.heroku.com/articles/dynos#isolation-and-security">because of how Heroku works</a> you won&#8217;t be able to upload&nbsp;anything.</p>
 <h2>Installing the wagtail&nbsp;dependencies</h2>
 <p>It is recomended to create a new virtual environment that will host the wagtail tutorial. After you have changed to the virtual environment you will need to installl the Wagtail requirements. Create a file named <code>requirements.txt</code> containing the&nbsp;following:</p>
-<div class="highlight"><pre><span class="n">Django</span><span class="o">==</span><span class="mf">1.6.1</span>
+<div class="highlight"><pre><span class="n">Django</span><span class="o">==</span><span class="mf">1.6.2</span>
 <span class="n">South</span><span class="o">==</span><span class="mf">0.8.4</span>
 <span class="n">django</span><span class="o">-</span><span class="n">compressor</span><span class="o">==</span><span class="mf">1.3</span>
 <span class="n">django</span><span class="o">-</span><span class="n">modelcluster</span><span class="o">==</span><span class="mf">0.1</span>
 <span class="o">-</span><span class="n">e</span> <span class="n">git</span><span class="o">:</span><span class="c1">//github.com/torchbox/wagtail.git#egg=wagtail</span>
 <span class="n">django</span><span class="o">-</span><span class="n">taggit</span><span class="o">==</span><span class="mf">0.11.2</span>
+<span class="n">django</span><span class="o">-</span><span class="n">libsass</span><span class="o">==</span><span class="mf">0.1</span>
 </pre></div>
 
 
 <p>and run
-<code>pip install -r requirements.txt</code>.  If you use Microsoft Windows you <em>will</em> experience problems with Pillow and lxml. Please download the installation executables from https://pypi.python.org/pypi/Pillow/2.3.0 and https://pypi.python.org/pypi/lxml/3.3.1, install them using <code>easy_install Pillow-2.3.0.x-py2.7.exe</code> and <code>easy_install lxml-3.3.1.x-py2.7.exe</code> (from inside your virtual environment) and then install the other requirements. Also please use the latest version of Wagtail (hosted on github) because it has some changes from the pypi (so <em>don&#8217;t</em> do a <code>pip install wagtail</code>).</p>
+<code>pip install -r requirements.txt</code>.  If you use Microsoft Windows you <em>will</em> experience problems with Pillow and lxml. Please download the 
+installation executables from https://pypi.python.org/pypi/Pillow/2.3.0 and https://pypi.python.org/pypi/lxml/3.3.1, install 
+them using <code>easy_install Pillow-2.3.0.x-py2.7.exe</code> and <code>easy_install lxml-3.3.1.x-py2.7.exe</code> (from inside your virtual environment) 
+and then install the other requirements. Also please use the latest version of Wagtail (hosted on github) because it has some changes from 
+the pypi (so <em>don&#8217;t</em> do a <code>pip install wagtail</code>).</p>
+<p><strong>Warning:</strong> Unfortuanately, no binaries for libsass (which is a django-libsass requirement) are (yet) available for Windows. Until this is
+fixed Windows users are recommended to install Wagtail with the help of a Vagrant&nbsp;box.</p>
 <h2>Creating and configuring your&nbsp;project</h2>
 <p>Wagtail has to &#8220;live&#8221; inside a normal Django project so you now may create a new Django project by&nbsp;issuing:</p>
 <div class="highlight"><pre>python &lt;PATH_OF_YOUR_VIRTUAL_ENV&gt;/scripts/django-admin.py startproject wagtailtutorial
@@ -141,7 +148,7 @@ executable from your path (which, if you&#8217;re inside the virtual enviroment 
 
 <p>You can se that there is a signal handler when a searchable thing is added or changed to handle indexing for search, normal django admin is mapped under /django-admin since /admin is use for Wagtail (of course you may map Wagtail wherever you&#8217;d like), inclusion of various wagtail related urls and finally a Wagtail handling everything else. Finally there are some handlers for media and static&nbsp;files.</p>
 <p>After that please change your <code>settings.py</code> like&nbsp;this:</p>
-<div class="highlight"><pre><span class="c"># Django settings for wagtaildemo project.</span>
+<div class="highlight"><pre><span class="c"># Django settings for wagtailtutorial project.</span>
 
 <span class="kn">import</span> <span class="nn">os</span>
 
@@ -243,8 +250,7 @@ executable from your path (which, if you&#8217;re inside the virtual enviroment 
 <span class="n">INTERNAL_IPS</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="s">&#39;10.0.2.2&#39;</span><span class="p">)</span>
 
 <span class="n">COMPRESS_PRECOMPILERS</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="p">(</span><span class="s">&#39;text/coffeescript&#39;</span><span class="p">,</span> <span class="s">&#39;coffee --compile --stdio&#39;</span><span class="p">),</span>
-    <span class="p">(</span><span class="s">&#39;text/less&#39;</span><span class="p">,</span> <span class="s">&#39;lessc {infile} {outfile}&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">&#39;text/x-scss&#39;</span><span class="p">,</span> <span class="s">&#39;django_libsass.SassCompiler&#39;</span><span class="p">),</span>
 <span class="p">)</span>
 
 <span class="c"># Auth settings</span>
@@ -287,7 +293,7 @@ executable from your path (which, if you&#8217;re inside the virtual enviroment 
 </pre></div>
 
 
-<p>The most important thing to notice is that  the <code>INSTALLED_APPS</code> contains the usual apps from django.*, <a href="http://south.aeracode.org/">south</a> for database migrations, <a href="https://github.com/django-compressor/django-compressor">django-compressor</a> to support compressing static files (and automatic translating from less to css), <a href="https://github.com/alex/django-taggit">django-taggit</a> to add support for tags, and <a href="https://github.com/torchbox/django-modelcluster/">django-modelcluster</a> which adds support from clusters (groups) of models. It also contains the wagtail.* applications and the tutorial application which is where we will create our blog. Also there are two Wagtail related middleware (one to add a site attribute to each request and one to hand redirects), configuring django-compressor to use the <code>lessc</code> and <code>coffee</code> commands to compile <code>less</code> and <code>coffee</code> files (more on this later), and some other, not so important Wagtail&nbsp;settings.</p>
+<p>The most important thing to notice is that  the <code>INSTALLED_APPS</code> contains the usual apps from django.*, <a href="http://south.aeracode.org/">south</a> for database migrations, <a href="https://github.com/django-compressor/django-compressor">django-compressor</a> to support compressing static files (and automatic translating from less to css), <a href="https://github.com/alex/django-taggit">django-taggit</a> to add support for tags, and <a href="https://github.com/torchbox/django-modelcluster/">django-modelcluster</a> which adds support from clusters (groups) of models. It also contains the wagtail.* applications and the tutorial application which is where we will create our blog. Also there are two Wagtail related middleware (one to add a site attribute to each request and one to hand redirects), configuring django-compressor to use <code>django_libsass</code> to compile <code>less</code> files, and some other, not so important Wagtail&nbsp;settings.</p>
 <p>So let&#8217;s create the missing tutorial application by&nbsp;issuing:</p>
 <div class="highlight"><pre>python manage.py startapp tutorial
 </pre></div>
@@ -316,9 +322,8 @@ python manage.py migrate
 <p>Welcome to your new Wagtail&nbsp;site!</p>
 </blockquote>
 <p>page &#8212; congratulations&nbsp;!</p>
-<p>Before going to the /admin and actually see what editing your site with Wagtail looks like you need to install <a href="http://lesscss.org/">less</a> and <a href="http://coffeescript.org/">coffee-script</a>. These are <a href="http://nodejs.org/">node.js</a> packages so to install them you have to install node.js and <a href="https://www.npmjs.org">npm</a> and then do an <code>npm install less -g</code> and an <code>npm install coffee-script -g</code>. In Unix you will then have the <code>lessc</code> and <code>coffee</code> executables in your path. In Windows, the lessc.cmd and coffee.cmd executables have to be created in the path <code>c:\Users\user\AppData\Roaming\npm</code>.</p>
-<p>where username is the name of the user under which you installed <code>less</code> and <code>coffee-script</code>.</p>
-<p>In any case, after successfully installing less and coffee-script you will be able to navigate to http://127.0.0.1:8000/admin and from there, login to Wagtail admin with the superuser you created earlier. If you are able to login to the /admin then you are ready to start developing with&nbsp;Wagtail. </p>
+<p>The homepage is rather simple (for now!) but you may already navigate to http://127.0.0.1:8000/admin and from there, login to Wagtail admin with the superuser you created earlier. 
+Now you may start experiencing Wagtail&nbsp;! </p>
 <p><img alt="Wagtail admin index" src="http://spapas.github.io/images/wagtail-index.png" /></p>
 <h2>Exploring Wagtail&nbsp;admin</h2>
 <p>When you login to Wagtail admin you will see a menu at the left with the&nbsp;options:</p>
@@ -459,7 +464,7 @@ python manage.py migrate
 
 <p>So self is the context name of the  BlogPageIndex instance that is used to render this page. Beyond that, it&#8217;s normal&nbsp;django.</p>
 <p><img alt="Rendering the Blog Index" src="http://spapas.github.io/images/wagtail-index-template.png" /></p>
-<p>Now you can view your Blog Index &#8212; however before clicking on a link to also view your posts add the template for your <code>BlogPost</code>:</p>
+<p>Now you can view your Blog Index &#8212; however before clicking on a link to also view your posts add the template for your <code>BlogPost</code> (<code>tutorial/blog_page.html</code>):</p>
 <div class="highlight"><pre>{% load rich_text %}
 <span class="nt">&lt;html&gt;</span>
 <span class="nt">&lt;body&gt;</span>

@@ -19,15 +19,23 @@ Installing the wagtail dependencies
 It is recomended to create a new virtual environment that will host the wagtail tutorial. After you have changed to the virtual environment you will need to installl the Wagtail requirements. Create a file named ``requirements.txt`` containing the following:
 
 ```
-Django==1.6.1
+Django==1.6.2
 South==0.8.4
 django-compressor==1.3
 django-modelcluster==0.1
 -e git://github.com/torchbox/wagtail.git#egg=wagtail
 django-taggit==0.11.2
+django-libsass==0.1
 ```
 and run
-``pip install -r requirements.txt``.  If you use Microsoft Windows you *will* experience problems with Pillow and lxml. Please download the installation executables from https://pypi.python.org/pypi/Pillow/2.3.0 and https://pypi.python.org/pypi/lxml/3.3.1, install them using ``Pillow-2.3.0.x-py2.7.exe`` and ``easy_install lxml-3.3.1.x-py2.7.exe`` and then install the other requirements. Also please use the latest version of Wagtail (hosted on github) because it has some changes from the pypi (so *don't* do a ``pip install wagtail``).
+``pip install -r requirements.txt``.  If you use Microsoft Windows you *will* experience problems with Pillow and lxml. Please download the 
+installation executables from https://pypi.python.org/pypi/Pillow/2.3.0 and https://pypi.python.org/pypi/lxml/3.3.1, install 
+them using ``easy_install Pillow-2.3.0.x-py2.7.exe`` and ``easy_install lxml-3.3.1.x-py2.7.exe`` (from inside your virtual environment) 
+and then install the other requirements. Also please use the latest version of Wagtail (hosted on github) because it has some changes from 
+the pypi (so *don't* do a ``pip install wagtail``).
+
+**Warning:** Unfortuanately, no binaries for libsass (which is a django-libsass requirement) are (yet) available for Windows. Until this is
+fixed Windows users are recommended to install Wagtail with the help of a Vagrant box.
 
 Creating and configuring your project
 -------------------------------------
@@ -106,7 +114,7 @@ You can se that there is a signal handler when a searchable thing is added or ch
 After that please change your ``settings.py`` like this:
 
 ```python
-# Django settings for wagtaildemo project.
+# Django settings for wagtailtutorial project.
 
 import os
 
@@ -208,8 +216,7 @@ EMAIL_SUBJECT_PREFIX = '[wagtailtutorial] '
 INTERNAL_IPS = ('127.0.0.1', '10.0.2.2')
 
 COMPRESS_PRECOMPILERS = (
-    ('text/coffeescript', 'coffee --compile --stdio'),
-    ('text/less', 'lessc {infile} {outfile}'),
+    ('text/x-scss', 'django_libsass.SassCompiler'),
 )
 
 # Auth settings
@@ -251,7 +258,7 @@ WAGTAILSEARCH_RESULTS_TEMPLATE_AJAX = 'tutorial/includes/search_listing.html'
 WAGTAILSEARCH_ES_INDEX = 'wagtailtutorial'
 ```
 
-The most important thing to notice is that  the ``INSTALLED_APPS`` contains the usual apps from django.\*, [south] for database migrations, [django-compressor] to support compressing static files (and automatic translating from less to css), [django-taggit] to add support for tags, and [django-modelcluster] which adds support from clusters (groups) of models. It also contains the wagtail.\* applications and the tutorial application which is where we will create our blog. Also there are two Wagtail related middleware (one to add a site attribute to each request and one to hand redirects), configuring django-compressor to use the ``lessc`` and ``coffee`` commands to compile ``less`` and ``coffee`` files (more on this later), and some other, not so important Wagtail settings.
+The most important thing to notice is that  the ``INSTALLED_APPS`` contains the usual apps from django.\*, [south] for database migrations, [django-compressor] to support compressing static files (and automatic translating from less to css), [django-taggit] to add support for tags, and [django-modelcluster] which adds support from clusters (groups) of models. It also contains the wagtail.\* applications and the tutorial application which is where we will create our blog. Also there are two Wagtail related middleware (one to add a site attribute to each request and one to hand redirects), configuring django-compressor to use ``django_libsass`` to compile ``less`` files, and some other, not so important Wagtail settings.
 
 So let's create the missing tutorial application by issuing:
 
@@ -286,11 +293,9 @@ and visit ``http://127.0.0.1:8000``. If everything worked fine you will get a
 
 page -- congratulations !
 
-Before going to the /admin and actually see what editing your site with Wagtail looks like you need to install [less] and [coffee-script]. These are [node.js] packages so to install them you have to install node.js and [npm] and then do an ``npm install less -g`` and an ``npm install coffee-script -g``. In Unix you will then have the ``lessc`` and ``coffee`` executables in your path. In Windows, the lessc.cmd and coffee.cmd executables have to be created in the path ``c:\Users\user\AppData\Roaming\npm``.
 
-where username is the name of the user under which you installed ``less`` and ``coffee-script``.
-
-In any case, after successfully installing less and coffee-script you will be able to navigate to http://127.0.0.1:8000/admin and from there, login to Wagtail admin with the superuser you created earlier. If you are able to login to the /admin then you are ready to start developing with Wagtail. 
+The homepage is rather simple (for now!) but you may already navigate to http://127.0.0.1:8000/admin and from there, login to Wagtail admin with the superuser you created earlier. 
+Now you may start experiencing Wagtail ! 
 
 ![Wagtail admin index]({filename}images/wagtail-index.png)
 
@@ -461,7 +466,7 @@ So self is the context name of the  BlogPageIndex instance that is used to rende
 
 ![Rendering the Blog Index]({filename}images/wagtail-index-template.png)
 
-Now you can view your Blog Index -- however before clicking on a link to also view your posts add the template for your ``BlogPost``:
+Now you can view your Blog Index -- however before clicking on a link to also view your posts add the template for your ``BlogPost`` (``tutorial/blog_page.html``):
 
 ```html
 {% load rich_text %}

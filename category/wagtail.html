@@ -78,8 +78,12 @@ installation executables from https://pypi.python.org/pypi/Pillow/2.3.0 and http
 them using <code>easy_install Pillow-2.3.0.x-py2.7.exe</code> and <code>easy_install lxml-3.3.1.x-py2.7.exe</code> (from inside your virtual environment) 
 and then install the other requirements. Also please use the latest version of Wagtail (hosted on github) because it has some changes from 
 the pypi (so <em>don&#8217;t</em> do a <code>pip install wagtail</code>).</p>
-<p><strong>Warning:</strong> Unfortuanately, no binaries for libsass (which is a django-libsass requirement) are (yet) available for Windows. Until this is
-fixed Windows users are recommended to install Wagtail with the help of a Vagrant&nbsp;box.</p>
+<p><strong>Warning:</strong> Unfortuanately, no official binaries for libsass (which is a django-libsass requirement) are (yet) available for Windows. I
+have compiled a version for win32 and python 2.7 (which I use) using the <a href="http://www.confusedbycode.com/articles/compiling-python-modules.html">instructions found here</a>. You can download this version 
+<a href="http://spapas.github.io/images/libsass-0.3.0-cp27-none-win32.whl">as a wheel package</a>.
+<em>Please use it at your own risk&nbsp;!!!</em></p>
+<p>To install <a href="http://pythonwheels.com/">wheels</a> you have to use a version of pip &gt;= 1.4 (so do an <code>easy_install -U pip</code> from your
+virtual environment if you have a previous version) and then you can just do a normal <code>pip install libsass-0.3.0-cp27-none-win32.whl</code>.</p>
 <h2>Creating and configuring your&nbsp;project</h2>
 <p>Wagtail has to &#8220;live&#8221; inside a normal Django project so you now may create a new Django project by&nbsp;issuing:</p>
 <div class="highlight"><pre>python &lt;PATH_OF_YOUR_VIRTUAL_ENV&gt;/scripts/django-admin.py startproject wagtailtutorial

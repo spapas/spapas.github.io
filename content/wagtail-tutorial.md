@@ -34,8 +34,15 @@ them using ``easy_install Pillow-2.3.0.x-py2.7.exe`` and ``easy_install lxml-3.3
 and then install the other requirements. Also please use the latest version of Wagtail (hosted on github) because it has some changes from 
 the pypi (so *don't* do a ``pip install wagtail``).
 
-**Warning:** Unfortuanately, no binaries for libsass (which is a django-libsass requirement) are (yet) available for Windows. Until this is
-fixed Windows users are recommended to install Wagtail with the help of a Vagrant box.
+**Warning:** Unfortuanately, no official binaries for libsass (which is a django-libsass requirement) are (yet) available for Windows. I
+have compiled a version for win32 and python 2.7 (which I use) using the [instructions found here]. You can download this version 
+[as a wheel package]({filename}images/libsass-0.3.0-cp27-none-win32.whl).
+*Please use it at your own risk !!!*
+
+To install [wheels] you have to use a version of pip >= 1.4 (so do an ``easy_install -U pip`` from your
+virtual environment if you have a previous version) and then you can just do a normal ``pip install libsass-0.3.0-cp27-none-win32.whl``.
+
+
 
 Creating and configuring your project
 -------------------------------------
@@ -527,3 +534,5 @@ no complete documentation yet however you can
 [admin site]:http://gentle-refuge-2590.herokuapp.com/admin/
 [http://gentle-refuge-2590.herokuapp.com/]:http://gentle-refuge-2590.herokuapp.com/
 [because of how Heroku works]:https://devcenter.heroku.com/articles/dynos#isolation-and-security
+[instructions found here]:http://www.confusedbycode.com/articles/compiling-python-modules.html
+[wheels]:http://pythonwheels.com/

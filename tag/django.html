@@ -85,7 +85,10 @@ have compiled a version for win32 and python 2.7 (which I use) using the <a href
 <p>To install <a href="http://pythonwheels.com/">wheels</a> you have to use a version of pip &gt;= 1.4 (so do an <code>easy_install -U pip</code> from your
 virtual environment if you have a previous version) and then you can just do a normal <code>pip install libsass-0.3.0-cp27-none-win32.whl</code>.</p>
 <p><strong>Warning no2:</strong> More unfortuanately, there seem to be <a href="https://github.com/torchbox/wagtail/issues/133">a number of issues</a> with how libsass handles <code>@import</code> statements
-in Windows. Until this is fixed, Windows users should use Vagrant to install&nbsp;Wagtail.</p>
+in Windows. Until this is fixed, Windows users are recommened to use the command line (Ruby) sass compiler. To use it, please
+install Ruby in your system and then install sass with <code>gem install sass -v "&gt;=3.3.0alpha" --pre</code>. After that, in the <code>COMPRESS_PRECOMPILERS</code> 
+setting of your <code>settings.py</code> (discussed in the next section), change the line <code>('text/x-scss', 'django_libsass.SassCompiler'),</code> to 
+<code>('text/x-scss', 'sass --scss  {infile} {outfile}'),</code>.</p>
 <h2>Creating and configuring your&nbsp;project</h2>
 <p>Wagtail has to &#8220;live&#8221; inside a normal Django project so you now may create a new Django project by&nbsp;issuing:</p>
 <div class="highlight"><pre>python &lt;PATH_OF_YOUR_VIRTUAL_ENV&gt;/scripts/django-admin.py startproject wagtailtutorial

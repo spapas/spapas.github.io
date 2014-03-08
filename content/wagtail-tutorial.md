@@ -42,6 +42,8 @@ have compiled a version for win32 and python 2.7 (which I use) using the [instru
 To install [wheels] you have to use a version of pip >= 1.4 (so do an ``easy_install -U pip`` from your
 virtual environment if you have a previous version) and then you can just do a normal ``pip install libsass-0.3.0-cp27-none-win32.whl``.
 
+**Warning no2:** More unfortuanately, there seem to be [a number of issues] with how libsass handles ``@import`` statements
+in Windows. Until this is fixed, Windows users should use Vagrant to install Wagtail.
 
 
 Creating and configuring your project
@@ -536,3 +538,4 @@ no complete documentation yet however you can
 [because of how Heroku works]:https://devcenter.heroku.com/articles/dynos#isolation-and-security
 [instructions found here]:http://www.confusedbycode.com/articles/compiling-python-modules.html
 [wheels]:http://pythonwheels.com/
+[a number of issues]:https://github.com/torchbox/wagtail/issues/133

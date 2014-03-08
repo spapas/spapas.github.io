@@ -43,7 +43,10 @@ To install [wheels] you have to use a version of pip >= 1.4 (so do an ``easy_ins
 virtual environment if you have a previous version) and then you can just do a normal ``pip install libsass-0.3.0-cp27-none-win32.whl``.
 
 **Warning no2:** More unfortuanately, there seem to be [a number of issues] with how libsass handles ``@import`` statements
-in Windows. Until this is fixed, Windows users should use Vagrant to install Wagtail.
+in Windows. Until this is fixed, Windows users are recommened to use the command line (Ruby) sass compiler. To use it, please
+install Ruby in your system and then install sass with ``gem install sass -v ">=3.3.0alpha" --pre``. After that, in the ``COMPRESS_PRECOMPILERS`` 
+setting of your ``settings.py`` (discussed in the next section), change the line ``('text/x-scss', 'django_libsass.SassCompiler'),`` to 
+``('text/x-scss', 'sass --scss  {infile} {outfile}'),``.
 
 
 Creating and configuring your project

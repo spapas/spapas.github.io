@@ -36,11 +36,13 @@ the pypi (so *don't* do a ``pip install wagtail``).
 
 **Warning:** Unfortuanately, no official binaries for libsass (which is a django-libsass requirement) are (yet) available for Windows. I
 have compiled a version for win32 and python 2.7 (which I use) using the [instructions found here]. You can download this version 
-[as a wheel package]({filename}images/libsass-0.3.0-cp27-none-win32.whl).
+[as a wheel package]({filename}images/libsass-0.3.0-cp27-none-win32.whl). Notice that because libsass was compiled with VC Express 2013
+you should also install the [Visual C++ 2013 redistributable] package from Microsoft.
+
 *Please use it at your own risk !!!*
 
 To install [wheels] you have to use a version of pip >= 1.4 (so do an ``easy_install -U pip`` from your
-virtual environment if you have a previous version) and then you can just do a normal ``pip install libsass-0.3.0-cp27-none-win32.whl``.
+virtual environment if you have a previous version) and then you can just do a normal ``pip install libsass-0.3.0-cp27-none-win32.whl``. 
 
 **Warning no2:** More unfortuanately, there seem to be [a number of issues] with how libsass handles ``@import`` statements
 in Windows. Until this is fixed, Windows users are recommened to use the command line (Ruby) sass compiler. To use it, please
@@ -542,3 +544,4 @@ no complete documentation yet however you can
 [instructions found here]:http://www.confusedbycode.com/articles/compiling-python-modules.html
 [wheels]:http://pythonwheels.com/
 [a number of issues]:https://github.com/torchbox/wagtail/issues/133
+[Visual C++ 2013 redistributable]:http://www.microsoft.com/en-us/download/details.aspx?id=40784

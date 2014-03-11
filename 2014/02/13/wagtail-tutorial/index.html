@@ -79,10 +79,11 @@ and then install the other requirements. Also please use the latest version of W
 the pypi (so <em>don&#8217;t</em> do a <code>pip install wagtail</code>).</p>
 <p><strong>Warning:</strong> Unfortuanately, no official binaries for libsass (which is a django-libsass requirement) are (yet) available for Windows. I
 have compiled a version for win32 and python 2.7 (which I use) using the <a href="http://www.confusedbycode.com/articles/compiling-python-modules.html">instructions found here</a>. You can download this version 
-<a href="http://spapas.github.io/images/libsass-0.3.0-cp27-none-win32.whl">as a wheel package</a>.
-<em>Please use it at your own risk&nbsp;!!!</em></p>
+<a href="http://spapas.github.io/images/libsass-0.3.0-cp27-none-win32.whl">as a wheel package</a>. Notice that because libsass was compiled with <span class="caps">VC</span> Express 2013
+you should also install the <a href="http://www.microsoft.com/en-us/download/details.aspx?id=40784">Visual C++ 2013 redistributable</a> package from&nbsp;Microsoft.</p>
+<p><em>Please use it at your own risk&nbsp;!!!</em></p>
 <p>To install <a href="http://pythonwheels.com/">wheels</a> you have to use a version of pip &gt;= 1.4 (so do an <code>easy_install -U pip</code> from your
-virtual environment if you have a previous version) and then you can just do a normal <code>pip install libsass-0.3.0-cp27-none-win32.whl</code>.</p>
+virtual environment if you have a previous version) and then you can just do a normal <code>pip install libsass-0.3.0-cp27-none-win32.whl</code>. </p>
 <p><strong>Warning no2:</strong> More unfortuanately, there seem to be <a href="https://github.com/torchbox/wagtail/issues/133">a number of issues</a> with how libsass handles <code>@import</code> statements
 in Windows. Until this is fixed, Windows users are recommened to use the command line (Ruby) sass compiler. To use it, please
 install Ruby in your system and then install sass with <code>gem install sass -v "&gt;=3.3.0alpha" --pre</code>. After that, in the <code>COMPRESS_PRECOMPILERS</code> 

@@ -22,10 +22,11 @@ and then install the other requirements. Also please use the latest version of W
 the pypi (so &lt;em&gt;don&amp;#8217;t&lt;/em&gt; do a &lt;code&gt;pip install wagtail&lt;/code&gt;).&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;Warning:&lt;/strong&gt; Unfortuanately, no official binaries for libsass (which is a django-libsass requirement) are (yet) available for Windows. I
 have compiled a version for win32 and python 2.7 (which I use) using the &lt;a href="http://www.confusedbycode.com/articles/compiling-python-modules.html"&gt;instructions found here&lt;/a&gt;. You can download this version 
-&lt;a href="http://spapas.github.io/images/libsass-0.3.0-cp27-none-win32.whl"&gt;as a wheel package&lt;/a&gt;.
-&lt;em&gt;Please use it at your own risk&amp;nbsp;!!!&lt;/em&gt;&lt;/p&gt;
+&lt;a href="http://spapas.github.io/images/libsass-0.3.0-cp27-none-win32.whl"&gt;as a wheel package&lt;/a&gt;. Notice that because libsass was compiled with &lt;span class="caps"&gt;VC&lt;/span&gt; Express 2013
+you should also install the &lt;a href="http://www.microsoft.com/en-us/download/details.aspx?id=40784"&gt;Visual C++ 2013 redistributable&lt;/a&gt; package from&amp;nbsp;Microsoft.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Please use it at your own risk&amp;nbsp;!!!&lt;/em&gt;&lt;/p&gt;
 &lt;p&gt;To install &lt;a href="http://pythonwheels.com/"&gt;wheels&lt;/a&gt; you have to use a version of pip &amp;gt;= 1.4 (so do an &lt;code&gt;easy_install -U pip&lt;/code&gt; from your
-virtual environment if you have a previous version) and then you can just do a normal &lt;code&gt;pip install libsass-0.3.0-cp27-none-win32.whl&lt;/code&gt;.&lt;/p&gt;
+virtual environment if you have a previous version) and then you can just do a normal &lt;code&gt;pip install libsass-0.3.0-cp27-none-win32.whl&lt;/code&gt;. &lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;Warning no2:&lt;/strong&gt; More unfortuanately, there seem to be &lt;a href="https://github.com/torchbox/wagtail/issues/133"&gt;a number of issues&lt;/a&gt; with how libsass handles &lt;code&gt;@import&lt;/code&gt; statements
 in Windows. Until this is fixed, Windows users are recommened to use the command line (Ruby) sass compiler. To use it, please
 install Ruby in your system and then install sass with &lt;code&gt;gem install sass -v "&amp;gt;=3.3.0alpha" --pre&lt;/code&gt;. After that, in the &lt;code&gt;COMPRESS_PRECOMPILERS&lt;/code&gt; 

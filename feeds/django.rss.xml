@@ -1,9 +1,155 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>/var/</title><link>http://spapas.github.io/</link><description>Various programming stuff</description><atom:link href="http://spapas.github.io/feeds/django.rss.xml" rel="self"></atom:link><lastBuildDate>Tue, 24 Dec 2013 14:20:00 +0200</lastBuildDate><item><title>Django dynamic forms</title><link>http://spapas.github.io/2013/12/24/django-dynamic-forms/</link><description>&lt;div class="contents topic" id="contents"&gt;
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>/var/</title><link>http://spapas.github.io/</link><description>Various programming stuff</description><atom:link href="http://spapas.github.io/feeds/django.rss.xml" rel="self"></atom:link><lastBuildDate>Fri, 11 Apr 2014 10:23:00 +0300</lastBuildDate><item><title>Django generic FormViews for objects</title><link>http://spapas.github.io/2014/04/11/django-generic-formviews-for-objects/</link><description>&lt;div class="contents topic" id="contents"&gt;
 &lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
 &lt;ul class="simple"&gt;
 &lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id1"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#describing-a-django-form-in-json" id="id2"&gt;Describing a django form in&amp;nbsp;&lt;span class="caps"&gt;JSON&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#a-quick-introduction-to-the-formview" id="id2"&gt;A quick introduction to the &lt;tt class="docutils literal"&gt;FormView&lt;/tt&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#a-quick-introduction-to-the-singleobjectmixin" id="id3"&gt;A quick introduction to the &lt;tt class="docutils literal"&gt;SingleObjectMixin&lt;/tt&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#being-generic-and-dry" id="id4"&gt;Being generic and &lt;span class="caps"&gt;DRY&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#being-more-generic-and-dry" id="id5"&gt;Being more generic and &lt;span class="caps"&gt;DRY&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#other-options" id="id6"&gt;Other&amp;nbsp;options&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="introduction"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id1"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;We recently needed to create a number of views for changing the status of an Application model instance for our organization.
+An Application model instance can be filled and then cancelled, submitted, acceptted etc - for each of these status changes a form should be
+presented to the user. When the user submits the form the status of the Application will be&amp;nbsp;changed.&lt;/p&gt;
+&lt;p&gt;To implement the above requirement we created a generic FormView that acts on the specific model instance. This
+used two basic &lt;span class="caps"&gt;CBV&lt;/span&gt; components: The &lt;tt class="docutils literal"&gt;FormView&lt;/tt&gt; for the form manipulation and the &lt;tt class="docutils literal"&gt;SingleObjectMixing&lt;/tt&gt; for the
+object&amp;nbsp;handling.&lt;/p&gt;
+&lt;p&gt;Django &lt;a class="reference external" href="https://docs.djangoproject.com/en/1.6/topics/class-based-views/"&gt;Class Based Views&lt;/a&gt; (CBVs) can be used to create reusable Views using normal class inheritance. Most
+people use the well-known &lt;tt class="docutils literal"&gt;CreateView&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;UpdateView&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;DetailView&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;ListView&lt;/tt&gt;, however, as we
+will see below, the &lt;tt class="docutils literal"&gt;FormView&lt;/tt&gt; will help us write &lt;span class="caps"&gt;DRY&lt;/span&gt;&amp;nbsp;code.&lt;/p&gt;
+&lt;p&gt;I have to notice here that an invaluable tool to help you understanding CBVs is the &lt;a class="reference external" href="http://ccbv.co.uk/"&gt;&lt;span class="caps"&gt;CBV&lt;/span&gt; inspector&lt;/a&gt; which
+has a nice web interface for browsing the &lt;span class="caps"&gt;CBV&lt;/span&gt; hierarchies, attributes and&amp;nbsp;methods.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="a-quick-introduction-to-the-formview"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id2"&gt;A quick introduction to the &lt;tt class="docutils literal"&gt;FormView&lt;/tt&gt;&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;A simple &lt;tt class="docutils literal"&gt;FormView&lt;/tt&gt; can be defined like this (&lt;a class="reference external" href="http://ccbv.co.uk/projects/Django/1.6/django.views.generic.edit/FormView/"&gt;&lt;span class="caps"&gt;CBV&lt;/span&gt; FormView&lt;/a&gt;):&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class MyFormView(FormView):
+  form_class = forms.MyFormView
+  template_name = 'my_template.html'
+&lt;/pre&gt;
+&lt;p&gt;The above can be used in urls.py like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+urlpatterns = patterns('',
+  url(r'^my_formview/$', views.MyFormView.as_view() , name='my_formview' ),
+&lt;/pre&gt;
+&lt;p&gt;This will present a form to the user when he visits the &lt;tt class="docutils literal"&gt;my_formview&lt;/tt&gt;  url &amp;#8212; however this form won&amp;#8217;t do anything. To allow
+the form to actually do something when it&amp;#8217;s been submitted we need to override the &lt;tt class="docutils literal"&gt;form_valid&lt;/tt&gt; method.&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+def form_valid(self, form):
+    value = form.cleaned_data['value']
+    messages.info(self.request, &amp;quot;MyForm submitted with value {0}!&amp;quot;.format(value) )
+    return HttpResponseRedirect( reverse('my_formview') )
+&lt;/pre&gt;
+&lt;p&gt;As you can see the submitted form is passed in the method and can be used to receive its &lt;tt class="docutils literal"&gt;cleaned_data&lt;/tt&gt;. The &lt;tt class="docutils literal"&gt;FormView&lt;/tt&gt;
+has various other options for instance a &lt;tt class="docutils literal"&gt;form_invalid&lt;/tt&gt; method, an &lt;tt class="docutils literal"&gt;initial&lt;/tt&gt; attribute to set the initial values for the form&amp;nbsp;etc.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="a-quick-introduction-to-the-singleobjectmixin"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id3"&gt;A quick introduction to the &lt;tt class="docutils literal"&gt;SingleObjectMixin&lt;/tt&gt;&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;A &lt;tt class="docutils literal"&gt;SingleObjectMixin&lt;/tt&gt; adds a number of attributes &lt;span class="amp"&gt;&amp;amp;&lt;/span&gt; methods to a view that can be used for object manipulation. The
+most important ones is the &lt;tt class="docutils literal"&gt;model&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;queryset&lt;/tt&gt; attributes and the &lt;tt class="docutils literal"&gt;get_queryset&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;get_object()&lt;/tt&gt;. To use
+the &lt;tt class="docutils literal"&gt;SingleObjectMixin&lt;/tt&gt; in your &lt;span class="caps"&gt;CBV&lt;/span&gt; just add it to the list of the classes to inherit from and define either the
+&lt;tt class="docutils literal"&gt;model&lt;/tt&gt; or the &lt;tt class="docutils literal"&gt;queryset&lt;/tt&gt; attribute. After that you may pass a &lt;tt class="docutils literal"&gt;pk&lt;/tt&gt; parameter to your view and you will get an
+&lt;tt class="docutils literal"&gt;object&lt;/tt&gt; context variable in the template with the selected&amp;nbsp;object!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="being-generic-and-dry"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id4"&gt;Being generic and &lt;span class="caps"&gt;DRY&lt;/span&gt;&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;We can more or less now understand how we should use &lt;tt class="docutils literal"&gt;FormView&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;SingleObjectMixin&lt;/tt&gt; to generate our
+generic &lt;tt class="docutils literal"&gt;FormView&lt;/tt&gt; for acting on objects: Our &lt;tt class="docutils literal"&gt;FormView&lt;/tt&gt; should &lt;em&gt;get&lt;/em&gt; the object using the &lt;tt class="docutils literal"&gt;SingleObjectMixin&lt;/tt&gt;
+and change it when the form is submitted using the values from the form. A first implementation would be the&amp;nbsp;following:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class GenericObjectFormView1(FormView, SingleObjectMixin):
+
+    def form_valid(self, form):
+        obj = self.get_object()
+        obj.change_status(form)
+        return HttpResponseRedirect( obj.get_absolute_url() )
+&lt;/pre&gt;
+&lt;p&gt;So our &lt;tt class="docutils literal"&gt;GenericObjectFormView1&lt;/tt&gt; class inherits from &lt;tt class="docutils literal"&gt;FormView&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;SingleObjectMixin&lt;/tt&gt;. The only thing that we have
+to assure is that the Model we want to act on needs to implement a &lt;tt class="docutils literal"&gt;change_status&lt;/tt&gt; method which gets the &lt;tt class="docutils literal"&gt;form&lt;/tt&gt; and
+changes the status of that object based on its value. For instance, two implementations can be the&amp;nbsp;following:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class CancelObjectFormView(GenericObjectFormView1):
+    template_name = 'cancel.html'
+    form_class = forms.CancelForm
+    model = models.Application
+
+class SubmitObjectFormView(GenericObjectFormView1):
+    template_name = 'submit.html'
+    form_class = forms.SubmitForm
+    model = models.Application
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="being-more-generic-and-dry"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt;Being more generic and &lt;span class="caps"&gt;DRY&lt;/span&gt;&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The previous implementation has two&amp;nbsp;problems:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;What happens if the status of the object should not be changed even if the form &lt;em&gt;is&lt;/em&gt;&amp;nbsp;valid?&lt;/li&gt;
+&lt;li&gt;We shouldn&amp;#8217;t need to create a new template for every new &lt;tt class="docutils literal"&gt;GenericObjectFormView&lt;/tt&gt; since all these templates will just output the object information, ask a question for the status change and output the&amp;nbsp;form.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Let&amp;#8217;s write a new version of our GenericObjectFormView that actually resolves&amp;nbsp;these:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class GenericObjectFormView2(FormView, SingleObjectMixin):
+    template_name = 'generic_formview.html'
+    ok_message = ''
+    not_ok_message = ''
+    title = ''
+    question =''
+
+    def form_valid(self, form):
+        obj = self.get_object()
+        r = obj.change_status(form)
+        if r:
+            messages.info(self.request, self.yes_message)
+        else:
+            messages.info(self.request, self.not_ok_message)
+        return HttpResponseRedirect( obj.get_absolute_url() )
+
+    def get_context_data(self, **kwargs):
+        context = super(GenericYesNoFormView, self).get_context_data(**kwargs)
+        context['title'] = self.title
+        context['question'] = self.question
+        return context
+&lt;/pre&gt;
+&lt;p&gt;The above adds an ok and not ok message which will be outputed if the status can or cannot be changed. To accomplish this,
+the &lt;tt class="docutils literal"&gt;change_status&lt;/tt&gt; method should now return a boolean value to mark if the action was ok or not. Also, a generic template
+will now be used. This template has two placeholders: One for the title of the page (&lt;tt class="docutils literal"&gt;title&lt;/tt&gt; attribute) and one for the
+question asked to the user (&lt;tt class="docutils literal"&gt;question&lt;/tt&gt; attribute). Now we can use it like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class CancelObjectFormView(GenericObjectFormView2):
+    form_class = forms.CancelForm
+    model = models.Application
+    ok_message = 'Cancel success!'
+    not_ok_message = 'Not able to cancel!'
+    title = 'Cancel an object'
+    question = 'Do you want to cancel this object?'
+
+class SubmitObjectFormView(GenericObjectFormView2):
+    form_class = forms.SubmitForm
+    model = models.Application
+    ok_message = 'Submit  ok'
+    not_ok_message = 'Cannot submit!'
+    title = 'Submit an object'
+    question ='Do you want to submit this object?'
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="other-options"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id6"&gt;Other&amp;nbsp;options&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;We&amp;#8217;ve just got a glimpse of how we can use CBVs to increase the DRYness of our Django applications. There are various
+extra things that we can add to our &lt;tt class="docutils literal"&gt;GenericObjectFormView2&lt;/tt&gt; as attributes which will be defined by inheriting
+classes. Some ideas is to check if the current user actually has access to modify the object (hint: override the
+&lt;tt class="docutils literal"&gt;get_object&lt;/tt&gt; method of &lt;tt class="docutils literal"&gt;SingleObjectMixin&lt;/tt&gt;) or render the form diffirently depending on the current user (hint:
+override the &lt;tt class="docutils literal"&gt;get_form_kwargs&lt;/tt&gt; method of &lt;tt class="docutils literal"&gt;FormView&lt;/tt&gt;).&lt;/p&gt;
+&lt;/div&gt;
+</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Serafeim Papastefanos</dc:creator><pubDate>Fri, 11 Apr 2014 10:23:00 +0300</pubDate><guid>tag:spapas.github.io,2014-04-11:2014/04/11/django-generic-formviews-for-objects/</guid><category>django</category><category>python</category><category>cbv</category></item><item><title>Django dynamic forms</title><link>http://spapas.github.io/2013/12/24/django-dynamic-forms/</link><description>&lt;div class="contents topic" id="contents"&gt;
+&lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id1"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#describing-a-django-form-in-json" id="id2"&gt;Describing a django form in &lt;span class="caps"&gt;JSON&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a class="reference internal" href="#creating-the-form-fields" id="id3"&gt;Creating the form&amp;nbsp;fields&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a class="reference internal" href="#creating-the-actual-form" id="id4"&gt;Creating the actual&amp;nbsp;form&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a class="reference internal" href="#using-the-dynamic-form" id="id5"&gt;Using the dynamic&amp;nbsp;form&lt;/a&gt;&lt;/li&gt;
@@ -29,7 +175,7 @@ to submit information for each service, a dynamic django form would be generated
 from this &lt;span class="caps"&gt;JSON&lt;/span&gt; and the answers would be saved to no-&lt;span class="caps"&gt;SQL&lt;/span&gt; database like&amp;nbsp;MongoDB.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="describing-a-django-form-in-json"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id2"&gt;Describing a django form in&amp;nbsp;&lt;span class="caps"&gt;JSON&lt;/span&gt;&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id2"&gt;Describing a django form in &lt;span class="caps"&gt;JSON&lt;/span&gt;&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;A &lt;span class="caps"&gt;JSON&lt;/span&gt; described django form is just an array of field &lt;span class="caps"&gt;JSON&lt;/span&gt; objects. Each field
 object  has three required attributes: name which is the keyword of the field, label which is
 how the label of the field and type which is the type of the input of that field. The
@@ -219,7 +365,7 @@ read from the form to the view for&amp;nbsp;presentation.&lt;/p&gt;
 &lt;li&gt;&lt;a class="reference internal" href="#using-groups" id="id3"&gt;Using&amp;nbsp;groups&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a class="reference internal" href="#by-storing-the-authority-to-the-session" id="id4"&gt;By storing the authority to the&amp;nbsp;session&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a class="reference internal" href="#by-using-a-custom-user-profile" id="id5"&gt;By using a Custom User&amp;nbsp;Profile&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#getting-the-authority-of-the-user-has-to-be-dry" id="id6"&gt;Getting the authority of the user has to be&amp;nbsp;&lt;span class="caps"&gt;DRY&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#getting-the-authority-of-the-user-has-to-be-dry" id="id6"&gt;Getting the authority of the user has to be &lt;span class="caps"&gt;DRY&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;li&gt;&lt;a class="reference internal" href="#adding-authority-data" id="id7"&gt;Adding authority&amp;nbsp;data&lt;/a&gt;&lt;/li&gt;
@@ -281,14 +427,14 @@ class Authority(models.Model):
 &lt;p&gt;You can get the authority of the user through &lt;tt class="docutils literal"&gt;request.user.profile.authority&lt;/tt&gt;.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="getting-the-authority-of-the-user-has-to-be-dry"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id6"&gt;Getting the authority of the user has to be&amp;nbsp;&lt;span class="caps"&gt;DRY&lt;/span&gt;&lt;/a&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id6"&gt;Getting the authority of the user has to be &lt;span class="caps"&gt;DRY&lt;/span&gt;&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;Whatever method you use to define the authorities of your users you have to remember that it is very
 important to define somewhere a function that will return the authority (or authorities) of a
 user. You need to define a function even in the simple case in which your function would just return &lt;tt class="docutils literal"&gt;request.user.profile.authority&lt;/tt&gt;.
 This will greatly help you when you wish to add some logic to this, for instance &amp;quot;quickly disable users belonging to Authority X
 or temporary move users from Authority Y to authority&amp;nbsp;Z&amp;quot;.&lt;/p&gt;
 &lt;p&gt;Let us suppose that you have defined a &lt;tt class="docutils literal"&gt;get_user_authority&lt;/tt&gt; function. Also, you need to define a &lt;tt class="docutils literal"&gt;has_access&lt;/tt&gt; function
-that would decide if a users/request has access to a particular object. This also needs to be&amp;nbsp;&lt;span class="caps"&gt;DRY&lt;/span&gt;.&lt;/p&gt;
+that would decide if a users/request has access to a particular object. This also needs to be &lt;span class="caps"&gt;DRY&lt;/span&gt;.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="section" id="adding-authority-data"&gt;

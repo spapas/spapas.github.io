@@ -52,6 +52,167 @@
   		<article>
 <header>
       <h1 class="entry-title">
+        <a href="http://spapas.github.io/2014/04/11/django-generic-formviews-for-objects/">Django generic FormViews for objects</a>
+      </h1>
+      <p class="meta"><time datetime="2014-04-11T10:23:00" pubdate>Παρ 11 Απρίλιος 2014</time></p>
+</header>
+
+  <div class="entry-content"><div class="contents topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#introduction" id="id1">Introduction</a></li>
+<li><a class="reference internal" href="#a-quick-introduction-to-the-formview" id="id2">A quick introduction to the <tt class="docutils literal">FormView</tt></a></li>
+<li><a class="reference internal" href="#a-quick-introduction-to-the-singleobjectmixin" id="id3">A quick introduction to the <tt class="docutils literal">SingleObjectMixin</tt></a></li>
+<li><a class="reference internal" href="#being-generic-and-dry" id="id4">Being generic and <span class="caps">DRY</span></a></li>
+<li><a class="reference internal" href="#being-more-generic-and-dry" id="id5">Being more generic and <span class="caps">DRY</span></a></li>
+<li><a class="reference internal" href="#other-options" id="id6">Other&nbsp;options</a></li>
+</ul>
+</div>
+<div class="section" id="introduction">
+<h2><a class="toc-backref" href="#id1">Introduction</a></h2>
+<p>We recently needed to create a number of views for changing the status of an Application model instance for our organization.
+An Application model instance can be filled and then cancelled, submitted, acceptted etc - for each of these status changes a form should be
+presented to the user. When the user submits the form the status of the Application will be&nbsp;changed.</p>
+<p>To implement the above requirement we created a generic FormView that acts on the specific model instance. This
+used two basic <span class="caps">CBV</span> components: The <tt class="docutils literal">FormView</tt> for the form manipulation and the <tt class="docutils literal">SingleObjectMixing</tt> for the
+object&nbsp;handling.</p>
+<p>Django <a class="reference external" href="https://docs.djangoproject.com/en/1.6/topics/class-based-views/">Class Based Views</a> (CBVs) can be used to create reusable Views using normal class inheritance. Most
+people use the well-known <tt class="docutils literal">CreateView</tt>, <tt class="docutils literal">UpdateView</tt>, <tt class="docutils literal">DetailView</tt> and <tt class="docutils literal">ListView</tt>, however, as we
+will see below, the <tt class="docutils literal">FormView</tt> will help us write <span class="caps">DRY</span>&nbsp;code.</p>
+<p>I have to notice here that an invaluable tool to help you understanding CBVs is the <a class="reference external" href="http://ccbv.co.uk/"><span class="caps">CBV</span> inspector</a> which
+has a nice web interface for browsing the <span class="caps">CBV</span> hierarchies, attributes and&nbsp;methods.</p>
+</div>
+<div class="section" id="a-quick-introduction-to-the-formview">
+<h2><a class="toc-backref" href="#id2">A quick introduction to the <tt class="docutils literal">FormView</tt></a></h2>
+<p>A simple <tt class="docutils literal">FormView</tt> can be defined like this (<a class="reference external" href="http://ccbv.co.uk/projects/Django/1.6/django.views.generic.edit/FormView/"><span class="caps">CBV</span> FormView</a>):</p>
+<pre class="code literal-block">
+class MyFormView(FormView):
+  form_class = forms.MyFormView
+  template_name = 'my_template.html'
+</pre>
+<p>The above can be used in urls.py like&nbsp;this:</p>
+<pre class="code literal-block">
+urlpatterns = patterns('',
+  url(r'^my_formview/$', views.MyFormView.as_view() , name='my_formview' ),
+</pre>
+<p>This will present a form to the user when he visits the <tt class="docutils literal">my_formview</tt>  url &#8212; however this form won&#8217;t do anything. To allow
+the form to actually do something when it&#8217;s been submitted we need to override the <tt class="docutils literal">form_valid</tt> method.</p>
+<pre class="code literal-block">
+def form_valid(self, form):
+    value = form.cleaned_data['value']
+    messages.info(self.request, &quot;MyForm submitted with value {0}!&quot;.format(value) )
+    return HttpResponseRedirect( reverse('my_formview') )
+</pre>
+<p>As you can see the submitted form is passed in the method and can be used to receive its <tt class="docutils literal">cleaned_data</tt>. The <tt class="docutils literal">FormView</tt>
+has various other options for instance a <tt class="docutils literal">form_invalid</tt> method, an <tt class="docutils literal">initial</tt> attribute to set the initial values for the form&nbsp;etc.</p>
+</div>
+<div class="section" id="a-quick-introduction-to-the-singleobjectmixin">
+<h2><a class="toc-backref" href="#id3">A quick introduction to the <tt class="docutils literal">SingleObjectMixin</tt></a></h2>
+<p>A <tt class="docutils literal">SingleObjectMixin</tt> adds a number of attributes <span class="amp">&amp;</span> methods to a view that can be used for object manipulation. The
+most important ones is the <tt class="docutils literal">model</tt> and <tt class="docutils literal">queryset</tt> attributes and the <tt class="docutils literal">get_queryset</tt> and <tt class="docutils literal">get_object()</tt>. To use
+the <tt class="docutils literal">SingleObjectMixin</tt> in your <span class="caps">CBV</span> just add it to the list of the classes to inherit from and define either the
+<tt class="docutils literal">model</tt> or the <tt class="docutils literal">queryset</tt> attribute. After that you may pass a <tt class="docutils literal">pk</tt> parameter to your view and you will get an
+<tt class="docutils literal">object</tt> context variable in the template with the selected&nbsp;object!</p>
+</div>
+<div class="section" id="being-generic-and-dry">
+<h2><a class="toc-backref" href="#id4">Being generic and <span class="caps">DRY</span></a></h2>
+<p>We can more or less now understand how we should use <tt class="docutils literal">FormView</tt> and <tt class="docutils literal">SingleObjectMixin</tt> to generate our
+generic <tt class="docutils literal">FormView</tt> for acting on objects: Our <tt class="docutils literal">FormView</tt> should <em>get</em> the object using the <tt class="docutils literal">SingleObjectMixin</tt>
+and change it when the form is submitted using the values from the form. A first implementation would be the&nbsp;following:</p>
+<pre class="code literal-block">
+class GenericObjectFormView1(FormView, SingleObjectMixin):
+
+    def form_valid(self, form):
+        obj = self.get_object()
+        obj.change_status(form)
+        return HttpResponseRedirect( obj.get_absolute_url() )
+</pre>
+<p>So our <tt class="docutils literal">GenericObjectFormView1</tt> class inherits from <tt class="docutils literal">FormView</tt> and <tt class="docutils literal">SingleObjectMixin</tt>. The only thing that we have
+to assure is that the Model we want to act on needs to implement a <tt class="docutils literal">change_status</tt> method which gets the <tt class="docutils literal">form</tt> and
+changes the status of that object based on its value. For instance, two implementations can be the&nbsp;following:</p>
+<pre class="code literal-block">
+class CancelObjectFormView(GenericObjectFormView1):
+    template_name = 'cancel.html'
+    form_class = forms.CancelForm
+    model = models.Application
+
+class SubmitObjectFormView(GenericObjectFormView1):
+    template_name = 'submit.html'
+    form_class = forms.SubmitForm
+    model = models.Application
+</pre>
+</div>
+<div class="section" id="being-more-generic-and-dry">
+<h2><a class="toc-backref" href="#id5">Being more generic and <span class="caps">DRY</span></a></h2>
+<p>The previous implementation has two&nbsp;problems:</p>
+<ul class="simple">
+<li>What happens if the status of the object should not be changed even if the form <em>is</em>&nbsp;valid?</li>
+<li>We shouldn&#8217;t need to create a new template for every new <tt class="docutils literal">GenericObjectFormView</tt> since all these templates will just output the object information, ask a question for the status change and output the&nbsp;form.</li>
+</ul>
+<p>Let&#8217;s write a new version of our GenericObjectFormView that actually resolves&nbsp;these:</p>
+<pre class="code literal-block">
+class GenericObjectFormView2(FormView, SingleObjectMixin):
+    template_name = 'generic_formview.html'
+    ok_message = ''
+    not_ok_message = ''
+    title = ''
+    question =''
+
+    def form_valid(self, form):
+        obj = self.get_object()
+        r = obj.change_status(form)
+        if r:
+            messages.info(self.request, self.yes_message)
+        else:
+            messages.info(self.request, self.not_ok_message)
+        return HttpResponseRedirect( obj.get_absolute_url() )
+
+    def get_context_data(self, **kwargs):
+        context = super(GenericYesNoFormView, self).get_context_data(**kwargs)
+        context['title'] = self.title
+        context['question'] = self.question
+        return context
+</pre>
+<p>The above adds an ok and not ok message which will be outputed if the status can or cannot be changed. To accomplish this,
+the <tt class="docutils literal">change_status</tt> method should now return a boolean value to mark if the action was ok or not. Also, a generic template
+will now be used. This template has two placeholders: One for the title of the page (<tt class="docutils literal">title</tt> attribute) and one for the
+question asked to the user (<tt class="docutils literal">question</tt> attribute). Now we can use it like&nbsp;this:</p>
+<pre class="code literal-block">
+class CancelObjectFormView(GenericObjectFormView2):
+    form_class = forms.CancelForm
+    model = models.Application
+    ok_message = 'Cancel success!'
+    not_ok_message = 'Not able to cancel!'
+    title = 'Cancel an object'
+    question = 'Do you want to cancel this object?'
+
+class SubmitObjectFormView(GenericObjectFormView2):
+    form_class = forms.SubmitForm
+    model = models.Application
+    ok_message = 'Submit  ok'
+    not_ok_message = 'Cannot submit!'
+    title = 'Submit an object'
+    question ='Do you want to submit this object?'
+</pre>
+</div>
+<div class="section" id="other-options">
+<h2><a class="toc-backref" href="#id6">Other&nbsp;options</a></h2>
+<p>We&#8217;ve just got a glimpse of how we can use CBVs to increase the DRYness of our Django applications. There are various
+extra things that we can add to our <tt class="docutils literal">GenericObjectFormView2</tt> as attributes which will be defined by inheriting
+classes. Some ideas is to check if the current user actually has access to modify the object (hint: override the
+<tt class="docutils literal">get_object</tt> method of <tt class="docutils literal">SingleObjectMixin</tt>) or render the form diffirently depending on the current user (hint:
+override the <tt class="docutils literal">get_form_kwargs</tt> method of <tt class="docutils literal">FormView</tt>).</p>
+</div>
+</div>
+  <!--
+  <footer>
+    <a rel="full-article" href="http://spapas.github.io/2014/04/11/django-generic-formviews-for-objects/">Read On &crarr;</a>
+  </footer>
+  -->
+  		</article>
+  		<article>
+<header>
+      <h1 class="entry-title">
         <a href="http://spapas.github.io/2014/02/13/wagtail-tutorial/">A Wagtail tutorial</a>
       </h1>
       <p class="meta"><time datetime="2014-02-13T21:20:00" pubdate>Πεμ 13 Φεβρουάριος 2014</time></p>
@@ -149,7 +310,7 @@ executable from your path (which, if you&#8217;re inside the virtual enviroment 
 <span class="p">)</span>
 
 
-<span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n"><span class="caps">DEBUG</span></span><span class="p">:</span>
+<span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">django.contrib.staticfiles.urls</span> <span class="kn">import</span> <span class="n">staticfiles_urlpatterns</span>
 
     <span class="n">urlpatterns</span> <span class="o">+=</span> <span class="n">staticfiles_urlpatterns</span><span class="p">()</span> <span class="c"># tell gunicorn where static files are in dev mode</span>
@@ -165,20 +326,20 @@ executable from your path (which, if you&#8217;re inside the virtual enviroment 
 
 <span class="n">PROJECT_ROOT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s">&#39;..&#39;</span><span class="p">,</span> <span class="s">&#39;..&#39;</span><span class="p">)</span>
 
-<span class="n"><span class="caps">DEBUG</span></span> <span class="o">=</span> <span class="bp">True</span>
-<span class="n">TEMPLATE_DEBUG</span> <span class="o">=</span> <span class="n"><span class="caps">DEBUG</span></span>
+<span class="n">DEBUG</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="n">TEMPLATE_DEBUG</span> <span class="o">=</span> <span class="n">DEBUG</span>
 
-<span class="n"><span class="caps">ADMINS</span></span> <span class="o">=</span> <span class="p">()</span>
-<span class="n"><span class="caps">MANAGERS</span></span> <span class="o">=</span> <span class="n"><span class="caps">ADMINS</span></span>
+<span class="n">ADMINS</span> <span class="o">=</span> <span class="p">()</span>
+<span class="n">MANAGERS</span> <span class="o">=</span> <span class="n">ADMINS</span>
 
-<span class="n"><span class="caps">DATABASES</span></span> <span class="o">=</span> <span class="p">{</span>
+<span class="n">DATABASES</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s">&#39;<span class="caps">ENGINE</span>&#39;</span><span class="p">:</span> <span class="s">&#39;django.db.backends.sqlite3&#39;</span><span class="p">,</span>
-        <span class="s">&#39;<span class="caps">NAME</span>&#39;</span><span class="p">:</span> <span class="n">PROJECT_ROOT</span><span class="o">+</span><span class="s">&#39;/wagtailtutorial.db&#39;</span><span class="p">,</span>
-        <span class="s">&#39;<span class="caps">USER</span>&#39;</span><span class="p">:</span> <span class="s">&#39;&#39;</span><span class="p">,</span>
-        <span class="s">&#39;<span class="caps">PASSWORD</span>&#39;</span><span class="p">:</span> <span class="s">&#39;&#39;</span><span class="p">,</span>
-        <span class="s">&#39;<span class="caps">HOST</span>&#39;</span><span class="p">:</span> <span class="s">&#39;&#39;</span><span class="p">,</span>  <span class="c"># Set to empty string for localhost.</span>
-        <span class="s">&#39;<span class="caps">PORT</span>&#39;</span><span class="p">:</span> <span class="s">&#39;&#39;</span><span class="p">,</span>  <span class="c"># Set to empty string for default.</span>
+        <span class="s">&#39;ENGINE&#39;</span><span class="p">:</span> <span class="s">&#39;django.db.backends.sqlite3&#39;</span><span class="p">,</span>
+        <span class="s">&#39;NAME&#39;</span><span class="p">:</span> <span class="n">PROJECT_ROOT</span><span class="o">+</span><span class="s">&#39;/wagtailtutorial.db&#39;</span><span class="p">,</span>
+        <span class="s">&#39;USER&#39;</span><span class="p">:</span> <span class="s">&#39;&#39;</span><span class="p">,</span>
+        <span class="s">&#39;PASSWORD&#39;</span><span class="p">:</span> <span class="s">&#39;&#39;</span><span class="p">,</span>
+        <span class="s">&#39;HOST&#39;</span><span class="p">:</span> <span class="s">&#39;&#39;</span><span class="p">,</span>  <span class="c"># Set to empty string for localhost.</span>
+        <span class="s">&#39;PORT&#39;</span><span class="p">:</span> <span class="s">&#39;&#39;</span><span class="p">,</span>  <span class="c"># Set to empty string for default.</span>
     <span class="p">}</span>
 <span class="p">}</span>
 
@@ -268,7 +429,7 @@ executable from your path (which, if you&#8217;re inside the virtual enviroment 
 <span class="n">LOGIN_URL</span> <span class="o">=</span> <span class="s">&#39;django.contrib.auth.views.login&#39;</span>
 <span class="n">LOGIN_REDIRECT_URL</span> <span class="o">=</span> <span class="s">&#39;wagtailadmin_home&#39;</span>
 
-<span class="n"><span class="caps">LOGGING</span></span> <span class="o">=</span> <span class="p">{</span>
+<span class="n">LOGGING</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s">&#39;version&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
     <span class="s">&#39;disable_existing_loggers&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
     <span class="s">&#39;filters&#39;</span><span class="p">:</span> <span class="p">{</span>
@@ -278,7 +439,7 @@ executable from your path (which, if you&#8217;re inside the virtual enviroment 
     <span class="p">},</span>
     <span class="s">&#39;handlers&#39;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s">&#39;mail_admins&#39;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s">&#39;level&#39;</span><span class="p">:</span> <span class="s">&#39;<span class="caps">ERROR</span>&#39;</span><span class="p">,</span>
+            <span class="s">&#39;level&#39;</span><span class="p">:</span> <span class="s">&#39;ERROR&#39;</span><span class="p">,</span>
             <span class="s">&#39;filters&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;require_debug_false&#39;</span><span class="p">],</span>
             <span class="s">&#39;class&#39;</span><span class="p">:</span> <span class="s">&#39;django.utils.log.AdminEmailHandler&#39;</span>
         <span class="p">}</span>
@@ -286,14 +447,14 @@ executable from your path (which, if you&#8217;re inside the virtual enviroment 
     <span class="s">&#39;loggers&#39;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s">&#39;django.request&#39;</span><span class="p">:</span> <span class="p">{</span>
             <span class="s">&#39;handlers&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;mail_admins&#39;</span><span class="p">],</span>
-            <span class="s">&#39;level&#39;</span><span class="p">:</span> <span class="s">&#39;<span class="caps">ERROR</span>&#39;</span><span class="p">,</span>
+            <span class="s">&#39;level&#39;</span><span class="p">:</span> <span class="s">&#39;ERROR&#39;</span><span class="p">,</span>
             <span class="s">&#39;propagate&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
         <span class="p">},</span>
     <span class="p">}</span>
 <span class="p">}</span>
 
 
-<span class="c"># <span class="caps">WAGTAIL</span> <span class="caps">SETTINGS</span></span>
+<span class="c"># WAGTAIL SETTINGS</span>
 <span class="n">WAGTAIL_SITE_NAME</span> <span class="o">=</span> <span class="s">&#39;wagtailtutorial&#39;</span>
 
 <span class="c"># Override the search results template for wagtailsearch</span>
@@ -521,7 +682,7 @@ no complete documentation yet however you&nbsp;can </p>
 <p class="topic-title first">Contents</p>
 <ul class="simple">
 <li><a class="reference internal" href="#introduction" id="id1">Introduction</a></li>
-<li><a class="reference internal" href="#describing-a-django-form-in-json" id="id2">Describing a django form in&nbsp;<span class="caps">JSON</span></a></li>
+<li><a class="reference internal" href="#describing-a-django-form-in-json" id="id2">Describing a django form in <span class="caps">JSON</span></a></li>
 <li><a class="reference internal" href="#creating-the-form-fields" id="id3">Creating the form&nbsp;fields</a></li>
 <li><a class="reference internal" href="#creating-the-actual-form" id="id4">Creating the actual&nbsp;form</a></li>
 <li><a class="reference internal" href="#using-the-dynamic-form" id="id5">Using the dynamic&nbsp;form</a></li>
@@ -547,7 +708,7 @@ to submit information for each service, a dynamic django form would be generated
 from this <span class="caps">JSON</span> and the answers would be saved to no-<span class="caps">SQL</span> database like&nbsp;MongoDB.</p>
 </div>
 <div class="section" id="describing-a-django-form-in-json">
-<h2><a class="toc-backref" href="#id2">Describing a django form in&nbsp;<span class="caps">JSON</span></a></h2>
+<h2><a class="toc-backref" href="#id2">Describing a django form in <span class="caps">JSON</span></a></h2>
 <p>A <span class="caps">JSON</span> described django form is just an array of field <span class="caps">JSON</span> objects. Each field
 object  has three required attributes: name which is the keyword of the field, label which is
 how the label of the field and type which is the type of the input of that field. The
@@ -752,7 +913,7 @@ read from the form to the view for&nbsp;presentation.</p>
 <li><a class="reference internal" href="#using-groups" id="id3">Using&nbsp;groups</a></li>
 <li><a class="reference internal" href="#by-storing-the-authority-to-the-session" id="id4">By storing the authority to the&nbsp;session</a></li>
 <li><a class="reference internal" href="#by-using-a-custom-user-profile" id="id5">By using a Custom User&nbsp;Profile</a></li>
-<li><a class="reference internal" href="#getting-the-authority-of-the-user-has-to-be-dry" id="id6">Getting the authority of the user has to be&nbsp;<span class="caps">DRY</span></a></li>
+<li><a class="reference internal" href="#getting-the-authority-of-the-user-has-to-be-dry" id="id6">Getting the authority of the user has to be <span class="caps">DRY</span></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#adding-authority-data" id="id7">Adding authority&nbsp;data</a></li>
@@ -814,14 +975,14 @@ class Authority(models.Model):
 <p>You can get the authority of the user through <tt class="docutils literal">request.user.profile.authority</tt>.</p>
 </div>
 <div class="section" id="getting-the-authority-of-the-user-has-to-be-dry">
-<h3><a class="toc-backref" href="#id6">Getting the authority of the user has to be&nbsp;<span class="caps">DRY</span></a></h3>
+<h3><a class="toc-backref" href="#id6">Getting the authority of the user has to be <span class="caps">DRY</span></a></h3>
 <p>Whatever method you use to define the authorities of your users you have to remember that it is very
 important to define somewhere a function that will return the authority (or authorities) of a
 user. You need to define a function even in the simple case in which your function would just return <tt class="docutils literal">request.user.profile.authority</tt>.
 This will greatly help you when you wish to add some logic to this, for instance &quot;quickly disable users belonging to Authority X
 or temporary move users from Authority Y to authority&nbsp;Z&quot;.</p>
 <p>Let us suppose that you have defined a <tt class="docutils literal">get_user_authority</tt> function. Also, you need to define a <tt class="docutils literal">has_access</tt> function
-that would decide if a users/request has access to a particular object. This also needs to be&nbsp;<span class="caps">DRY</span>.</p>
+that would decide if a users/request has access to a particular object. This also needs to be <span class="caps">DRY</span>.</p>
 </div>
 </div>
 <div class="section" id="adding-authority-data">
@@ -936,7 +1097,7 @@ to define all the above as <a class="reference external" href="https://docs.djan
 <h2><a class="toc-backref" href="#id3">Introduction</a></h2>
 <p>One very useful component of the <a class="reference external" href="http://spring.io/">spring</a> java framework is <a class="reference external" href="http://projects.spring.io/spring-security/">spring-security</a> since it allows consistent usage of various security providers for
 authentication and authorization. Although I&#8217;ve found a great number of basic spring-security tutorials on the internet, I wasn&#8217;t able to find a complete solution for my own&nbsp;requirements:</p>
-<p>Logging in with <span class="caps">LDAP</span> but configuring the authorities <a class="footnote-reference" href="#id2" id="id1">[*]</a> of the logged in user with the help of a custom method and not through&nbsp;<span class="caps">LDAP</span>.</p>
+<p>Logging in with <span class="caps">LDAP</span> but configuring the authorities <a class="footnote-reference" href="#id2" id="id1">[*]</a> of the logged in user with the help of a custom method and not through <span class="caps">LDAP</span>.</p>
 <p>I think that the above is a common requirement in many organizations: There is a central <span class="caps">LDAP</span> repository in which the usernames and passwords of the users are stored, but the groups of the users are not stored there. Or maybe the groups that are actually stored in the <span class="caps">LDAP</span> cannot be transformed easily to application specific groups for each&nbsp;application.</p>
 <p>You may find the working spring project that uses ldap and a custom groups populator here: <a class="reference external" href="https://github.com/spapas/SpringLdapCustomAuthorities/">https://github.com/spapas/SpringLdapCustomAuthorities/</a></p>
 </div>
@@ -1123,326 +1284,6 @@ vertical-align: top; -->
   </footer>
   -->
   		</article>
-  		<article>
-<header>
-      <h1 class="entry-title">
-        <a href="http://spapas.github.io/2013/10/08/git-branches/">git branches</a>
-      </h1>
-      <p class="meta"><time datetime="2013-10-08T13:20:00" pubdate>Τρι 08 Οκτώβριος 2013</time></p>
-</header>
-
-  <div class="entry-content"><div class="contents topic" id="contents">
-<p class="topic-title first">Contents</p>
-<ul class="simple">
-<li><a class="reference internal" href="#introduction" id="id1">Introduction</a></li>
-<li><a class="reference internal" href="#creating-a-new-git-repository" id="id2">Creating a new git&nbsp;repository</a></li>
-<li><a class="reference internal" href="#branching" id="id3">Branching</a></li>
-<li><a class="reference internal" href="#remote-branches" id="id4">Remote&nbsp;branches</a></li>
-</ul>
-</div>
-<div class="section" id="introduction">
-<h2><a class="toc-backref" href="#id1">Introduction</a></h2>
-<p>A <a class="reference external" href="http://git-scm.com/book/en/Git-Branching-What-a-Branch-Is">branch</a> is a very interesting git feature. With this you may have more than one <em>branches</em> in the same repository. The main
-usage of this feature would be to create different versions of your source code to parallel test development of different features.
-When the development of each of these features has been finished then the different versions would need to be combined (or merged) to a
-single version. Of course, merging is not always the result of branching - some branches may exist indefinitely or other may just  be
-deleted without&nbsp;merging.</p>
-<p>I will try to experiment with it and comment on the&nbsp;results.</p>
-</div>
-<div class="section" id="creating-a-new-git-repository">
-<h2><a class="toc-backref" href="#id2">Creating a new git&nbsp;repository</a></h2>
-<p>Let&#8217;s start by creating a new git&nbsp;repository:</p>
-<pre class="code literal-block">
-D:\&gt;mkdir testgit
-D:\&gt;cd testgit
-D:\testgit&gt;echo contents 11 &gt; file1.txt
-D:\testgit&gt;echo contents 222 &gt; file2.txt
-D:\testgit&gt;echo 3333 &gt; file2.txt
-D:\testgit&gt;copy con file3.txt
-line 1 of file 3
-
-line 3 of file 3
-
-test
-
-line 7 of file 3
-^Z
-       1 files copied.
-
-D:\testgit&gt;git init
-Initialized empty Git repository in D:/testgit/.git/
-D:\testgit&gt;git add .
-D:\testgit&gt;git commit -m Initial
-[master (root-commit) 96ca9af] Initial
- 3 files changed, 9 insertions(+)
- create mode 100644 file1.txt
- create mode 100644 file2.txt
- create mode 100644 file3.txt
-</pre>
-<p>To see the branch we are in we can use the <tt class="docutils literal">git branch</tt> command. Also <tt class="docutils literal">git status</tt> outputs the current&nbsp;branch:</p>
-<pre class="code literal-block">
-D:\testgit&gt;git status
-# On branch master
-nothing to commit, working directory clean
-D:\testgit&gt;git branch
-* master
-</pre>
-<p>So, it seems that when we create a new repository, a &quot;master&quot; branch is&nbsp;created.</p>
-</div>
-<div class="section" id="branching">
-<h2><a class="toc-backref" href="#id3">Branching</a></h2>
-<p>Lets create a new branch and change our working branch to&nbsp;it:</p>
-<pre class="code literal-block">
-D:\testgit&gt;git branch slave
-D:\testgit&gt;git branch
-* master
-  slave
-D:\testgit&gt;git checkout slave
-Switched to branch 'slave'
-D:\testgit&gt;git branch
-  master
-* slave
-</pre>
-<p>We can see that now the slave branch is the current one. Let&#8217;s do some changes and add commit them to the slave&nbsp;branch:</p>
-<pre class="code literal-block">
-D:\testgit&gt;git branch
-  master
-* slave
-D:\testgit&gt;echo new file1 contents &gt; file1.txt
-D:\testgit&gt;git commit -m &quot;Slave modification&quot;
-[slave b6083ad] Slave modification
- 1 file changed, 1 insertion(+), 1 deletion(-)
-D:\testgit&gt;git checkout master
-Switched to branch 'master'
-D:\testgit&gt;more file1.txt
-contents 11
-D:\testgit&gt;git checkout slave
-Switched to branch 'slave'
-D:\testgit&gt;more file1.txt
-new file1 contents
-</pre>
-<p>So the contents of file1.txt in the branch master is <tt class="docutils literal">contents 11</tt> while the contents of the same file
-in the branch slave is <tt class="docutils literal">new file1 contents</tt>.</p>
-<p>An interested behaviour is what happens with uncommit changes when changing branches. Let&#8217;s try deleting a&nbsp;file:</p>
-<pre class="code literal-block">
-D:\testgit&gt;del file2.txt
-D:\testgit&gt;git status
-# On branch master
-# Changes not staged for commit:
-#   (use &quot;git add/rm &lt;file&gt;...&quot; to update what will be committed)
-#   (use &quot;git checkout -- &lt;file&gt;...&quot; to discard changes in working directory)
-#
-#       deleted:    file2.txt
-#
-no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&quot;)
-D:\testgit&gt;git checkout slave
-D       file2.txt
-Switched to branch 'slave'
-D:\testgit&gt;git status
-# On branch slave
-# Changes not staged for commit:
-#   (use &quot;git add/rm &lt;file&gt;...&quot; to update what will be committed)
-#   (use &quot;git checkout -- &lt;file&gt;...&quot; to discard changes in working directory)
-#
-#       deleted:    file2.txt
-#
-no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&quot;)
-D:\testgit&gt;git add -A
-D:\testgit&gt;git status
-# On branch slave
-# Changes to be committed:
-#   (use &quot;git reset HEAD &lt;file&gt;...&quot; to unstage)
-#
-#       deleted:    file2.txt
-#
-D:\testgit&gt;git checkout master
-D       file2.txt
-Switched to branch 'master'
-D:\testgit&gt;git status
-# On branch master
-# Changes to be committed:
-#   (use &quot;git reset HEAD &lt;file&gt;...&quot; to unstage)
-#
-#       deleted:    file2.txt
-#
-</pre>
-<p>So, our changes are not correlated with a branch until we commit them! Let&#8217;s commit them to the master repository and confirm&nbsp;that:</p>
-<pre class="code literal-block">
-D:\testgit&gt;git commit -m &quot;Deleted file2.txt&quot;
-[master 6f8749d] Deleted file2.txt
- 1 file changed, 1 deletion(-)
- delete mode 100644 file2.txt
-D:\testgit&gt;git status
-# On branch master
-nothing to commit, working directory clean
-D:\testgit&gt;dir file2.txt
-[...]
-File not found
-D:\testgit&gt;git checkout slave
-Switched to branch 'slave'
-D:\testgit&gt;git status
-# On branch slave
-nothing to commit, working directory clean
-D:\testgit&gt;dir file2.txt
-[...]
-08/10/2013  05:59 pm                15 file2.txt
-</pre>
-<p>This is interesting&#8230; Let&#8217;s try modifying the file2.txt (which does not exist to the master&nbsp;branch):</p>
-<pre class="code literal-block">
-D:\testgit&gt;git branch
-  master
-* slave
-D:\testgit&gt;echo new file2 contents &gt; file2.txt
-D:\testgit&gt;git add .
-D:\testgit&gt;git status
-# On branch slave
-# Changes to be committed:
-#   (use &quot;git reset HEAD &lt;file&gt;...&quot; to unstage)
-#
-#       modified:   file2.txt
-#
-D:\testgit&gt;git checkout master
-error: Your local changes to the following files would be overwritten by checkout:
-       file2.txt
-Please, commit your changes or stash them before you can switch branches.
-Aborting
-</pre>
-<p>We won&#8217;t be able to change the current branch until we commit the conflicting&nbsp;change:</p>
-<pre class="code literal-block">
-D:\testgit&gt;git commit -m &quot;Modified file2&quot;
-[slave b5af832] Modified file2
- 1 file changed, 1 insertion(+), 1 deletion(-)
-D:\testgit&gt;git checkout master
-Switched to branch 'master'
-</pre>
-</div>
-<div class="section" id="remote-branches">
-<h2><a class="toc-backref" href="#id4">Remote&nbsp;branches</a></h2>
-<p>For each local repository you can define a number of remote repositories, or <a class="reference external" href="http://git-scm.com/book/en/Git-Basics-Working-with-Remotes">remotes</a> as git calls them.
-When you clone a repository from github.com, your local repository will have one remote, named origin. We will
-try to add the same remote by hand. Let&#8217;s suppose that we have created a repository in github.com named
-testgit. After that we wil&nbsp;issue:</p>
-<pre class="code literal-block">
-D:\testgit&gt;git remote
-D:\testgit&gt;git remote add origin https://github.com/spapas/testgit.git
-D:\testgit&gt;git remote
-origin
-</pre>
-<p>So no we have one remote named origin that is linked with <a class="reference external" href="https://github.com/spapas/testgit.git">https://github.com/spapas/testgit.git</a>. Let&#8217;s try to push our master
-branch to the origin&nbsp;remote:</p>
-<pre class="code literal-block">
-D:\testgit&gt;git push origin master
-Username for 'https://github.com': spapas
-Password for 'https://spapas&#64;github.com':
-Counting objects: 7, done.
-Delta compression using up to 4 threads.
-Compressing objects: 100% (5/5), done.
-Writing objects: 100% (7/7), 531 bytes, done.
-Total 7 (delta 1), reused 0 (delta 0)
-To https://github.com/spapas/testgit.git
- * [new branch]      master -&gt; master
-D:\testgit&gt;git branch -r
-  master
-* slave
-  remote/origin/master
-</pre>
-<p>We see now that we have <em>three</em> branches. Two local (master slave) and one remote (origin/master).  We will also add the slave remote&nbsp;(origin/slave):</p>
-<pre class="code literal-block">
-D:\testgit&gt;git branch -r
-  origin/master
-  origin/slave
-</pre>
-<p>Let&#8217;s do a change to our local repository and then push them to the&nbsp;remote:</p>
-<pre class="code literal-block">
-D:\testgit&gt;notepad file3.txt
-D:\testgit&gt;git add .
-D:\testgit&gt;git status
-# On branch slave
-# Changes to be committed:
-#   (use &quot;git reset HEAD &lt;file&gt;...&quot; to unstage)
-#
-#       modified:   file3.txt
-#
-D:\testgit&gt;git commit -m &quot;Changed file3.txt&quot;
-[slave ce3b7b9] Changed file3.txt
- 1 file changed, 1 insertion(+), 1 deletion(-)
-D:\testgit&gt;git push origin slave
-Username for 'https://github.com': spapas
-Password for 'https://spapas&#64;github.com':
-Counting objects: 5, done.
-Delta compression using up to 4 threads.
-Compressing objects: 100% (3/3), done.
-Writing objects: 100% (3/3), 299 bytes, done.
-Total 3 (delta 1), reused 0 (delta 0)
-To https://github.com/spapas/testgit.git
-   b5af832..ce3b7b9  slave -&gt; slave
-</pre>
-<p>Everything works as expected. The final thing to test is to try checking out a remote&nbsp;branch:</p>
-<pre class="code literal-block">
-D:\testgit&gt;git checkout master
-Switched to branch 'master'
-D:\testgit&gt;echo new new file1 &gt; file1.txt
-D:\testgit&gt;more file1.txt
- new new file1
-D:\testgit&gt;git checkout origin/master
-M       file1.txt
-Note: checking out 'origin/master'.
-
-You are in 'detached HEAD' state. You can look around, make experimental
-changes and commit them, and you can discard any commits you make in this
-state without impacting any branches by performing another checkout.
-
-If you want to create a new branch to retain commits you create, you may
-do so (now or later) by using -b with the checkout command again. Example:
-
-  git checkout -b new_branch_name
-
-HEAD is now at 6f8749d... Deleted file2.txt
-D:\testgit&gt;git status
-# Not currently on any branch.
-# Changes not staged for commit:
-#   (use &quot;git add &lt;file&gt;...&quot; to update what will be committed)
-#   (use &quot;git checkout -- &lt;file&gt;...&quot; to discard changes in working directory)
-#
-#       modified:   file1.txt
-#
-no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&quot;)
-D:\testgit&gt;more file1.txt
-new new file1
-</pre>
-<p>So, it seems that  when we check out the remote branch, we won&#8217;t have any local branches, however the change we did to the file1.txt
-is transfered just like when switching from one local repository to another. We can then add the changes and&nbsp;commit:</p>
-<pre class="code literal-block">
-D:\testgit&gt;git add .
-D:\testgit&gt;git commit
-[detached HEAD 506674c] foo
- 1 file changed, 1 insertion(+), 1 deletion(-)
- D:\testgit&gt;git status
-# Not currently on any branch.
-nothing to commit, working directory clean
-D:\testgit&gt;git branch
-* (no branch)
-  master
-  slave
-</pre>
-<p>So we are working with an unnamed branch! We have to name it to be able to work without&nbsp;problems:</p>
-<pre class="code literal-block">
-D:\testgit&gt;git checkout -b named_branch
-Switched to a new branch 'named_branch'
-D:\testgit&gt;git branch
-  master
-* named_branch
-  slave
-</pre>
-<p>Finally we may push again the named_branch to our remote&nbsp;origin.</p>
-</div>
-</div>
-  <!--
-  <footer>
-    <a rel="full-article" href="http://spapas.github.io/2013/10/08/git-branches/">Read On &crarr;</a>
-  </footer>
-  -->
-  		</article>
 <div class="pagination">
     <a class="prev" href="http://spapas.github.io/author/serafeim-papastefanos2.html">&larr; Older</a>
 
@@ -1452,6 +1293,9 @@ D:\testgit&gt;git branch
   <section>
     <h1>Recent Posts</h1>
     <ul id="recent_posts">
+      <li class="post">
+          <a href="http://spapas.github.io/2014/04/11/django-generic-formviews-for-objects/">Django generic FormViews for objects</a>
+      </li>
       <li class="post">
           <a href="http://spapas.github.io/2014/02/13/wagtail-tutorial/">A Wagtail tutorial</a>
       </li>
@@ -1463,9 +1307,6 @@ D:\testgit&gt;git branch
       </li>
       <li class="post">
           <a href="http://spapas.github.io/2013/10/14/spring-ldap-custom-authorities/">Using custom authorities with spring-security LDAP authentication</a>
-      </li>
-      <li class="post">
-          <a href="http://spapas.github.io/2013/10/08/git-branches/">git branches</a>
       </li>
     </ul>
   </section>
@@ -1484,7 +1325,7 @@ D:\testgit&gt;git branch
 
   <section>
   <h1>Tags</h1>
-    <a href="http://spapas.github.io/tag/branching.html">branching</a>,    <a href="http://spapas.github.io/tag/git.html">git</a>,    <a href="http://spapas.github.io/tag/java.html">java</a>,    <a href="http://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="http://spapas.github.io/tag/python.html">python</a>,    <a href="http://spapas.github.io/tag/spring.html">spring</a>,    <a href="http://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="http://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="http://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="http://spapas.github.io/tag/django.html">django</a>,    <a href="http://spapas.github.io/tag/forms.html">forms</a>,    <a href="http://spapas.github.io/tag/windows.html">windows</a>,    <a href="http://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="http://spapas.github.io/tag/github.html">github</a>,    <a href="http://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="http://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="http://spapas.github.io/tag/rst.html">rst</a>,    <a href="http://spapas.github.io/tag/security.html">security</a>,    <a href="http://spapas.github.io/tag/spring-security.html">spring-security</a>  </section>
+    <a href="http://spapas.github.io/tag/branching.html">branching</a>,    <a href="http://spapas.github.io/tag/git.html">git</a>,    <a href="http://spapas.github.io/tag/java.html">java</a>,    <a href="http://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="http://spapas.github.io/tag/python.html">python</a>,    <a href="http://spapas.github.io/tag/spring.html">spring</a>,    <a href="http://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="http://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="http://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="http://spapas.github.io/tag/django.html">django</a>,    <a href="http://spapas.github.io/tag/forms.html">forms</a>,    <a href="http://spapas.github.io/tag/windows.html">windows</a>,    <a href="http://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="http://spapas.github.io/tag/github.html">github</a>,    <a href="http://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="http://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="http://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="http://spapas.github.io/tag/rst.html">rst</a>,    <a href="http://spapas.github.io/tag/security.html">security</a>,    <a href="http://spapas.github.io/tag/spring-security.html">spring-security</a>  </section>
 
 
 </aside>    </div>

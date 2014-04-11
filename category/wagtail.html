@@ -149,7 +149,7 @@ executable from your path (which, if you&#8217;re inside the virtual enviroment 
 <span class="p">)</span>
 
 
-<span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n"><span class="caps">DEBUG</span></span><span class="p">:</span>
+<span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">django.contrib.staticfiles.urls</span> <span class="kn">import</span> <span class="n">staticfiles_urlpatterns</span>
 
     <span class="n">urlpatterns</span> <span class="o">+=</span> <span class="n">staticfiles_urlpatterns</span><span class="p">()</span> <span class="c"># tell gunicorn where static files are in dev mode</span>
@@ -165,20 +165,20 @@ executable from your path (which, if you&#8217;re inside the virtual enviroment 
 
 <span class="n">PROJECT_ROOT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s">&#39;..&#39;</span><span class="p">,</span> <span class="s">&#39;..&#39;</span><span class="p">)</span>
 
-<span class="n"><span class="caps">DEBUG</span></span> <span class="o">=</span> <span class="bp">True</span>
-<span class="n">TEMPLATE_DEBUG</span> <span class="o">=</span> <span class="n"><span class="caps">DEBUG</span></span>
+<span class="n">DEBUG</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="n">TEMPLATE_DEBUG</span> <span class="o">=</span> <span class="n">DEBUG</span>
 
-<span class="n"><span class="caps">ADMINS</span></span> <span class="o">=</span> <span class="p">()</span>
-<span class="n"><span class="caps">MANAGERS</span></span> <span class="o">=</span> <span class="n"><span class="caps">ADMINS</span></span>
+<span class="n">ADMINS</span> <span class="o">=</span> <span class="p">()</span>
+<span class="n">MANAGERS</span> <span class="o">=</span> <span class="n">ADMINS</span>
 
-<span class="n"><span class="caps">DATABASES</span></span> <span class="o">=</span> <span class="p">{</span>
+<span class="n">DATABASES</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s">&#39;<span class="caps">ENGINE</span>&#39;</span><span class="p">:</span> <span class="s">&#39;django.db.backends.sqlite3&#39;</span><span class="p">,</span>
-        <span class="s">&#39;<span class="caps">NAME</span>&#39;</span><span class="p">:</span> <span class="n">PROJECT_ROOT</span><span class="o">+</span><span class="s">&#39;/wagtailtutorial.db&#39;</span><span class="p">,</span>
-        <span class="s">&#39;<span class="caps">USER</span>&#39;</span><span class="p">:</span> <span class="s">&#39;&#39;</span><span class="p">,</span>
-        <span class="s">&#39;<span class="caps">PASSWORD</span>&#39;</span><span class="p">:</span> <span class="s">&#39;&#39;</span><span class="p">,</span>
-        <span class="s">&#39;<span class="caps">HOST</span>&#39;</span><span class="p">:</span> <span class="s">&#39;&#39;</span><span class="p">,</span>  <span class="c"># Set to empty string for localhost.</span>
-        <span class="s">&#39;<span class="caps">PORT</span>&#39;</span><span class="p">:</span> <span class="s">&#39;&#39;</span><span class="p">,</span>  <span class="c"># Set to empty string for default.</span>
+        <span class="s">&#39;ENGINE&#39;</span><span class="p">:</span> <span class="s">&#39;django.db.backends.sqlite3&#39;</span><span class="p">,</span>
+        <span class="s">&#39;NAME&#39;</span><span class="p">:</span> <span class="n">PROJECT_ROOT</span><span class="o">+</span><span class="s">&#39;/wagtailtutorial.db&#39;</span><span class="p">,</span>
+        <span class="s">&#39;USER&#39;</span><span class="p">:</span> <span class="s">&#39;&#39;</span><span class="p">,</span>
+        <span class="s">&#39;PASSWORD&#39;</span><span class="p">:</span> <span class="s">&#39;&#39;</span><span class="p">,</span>
+        <span class="s">&#39;HOST&#39;</span><span class="p">:</span> <span class="s">&#39;&#39;</span><span class="p">,</span>  <span class="c"># Set to empty string for localhost.</span>
+        <span class="s">&#39;PORT&#39;</span><span class="p">:</span> <span class="s">&#39;&#39;</span><span class="p">,</span>  <span class="c"># Set to empty string for default.</span>
     <span class="p">}</span>
 <span class="p">}</span>
 
@@ -268,7 +268,7 @@ executable from your path (which, if you&#8217;re inside the virtual enviroment 
 <span class="n">LOGIN_URL</span> <span class="o">=</span> <span class="s">&#39;django.contrib.auth.views.login&#39;</span>
 <span class="n">LOGIN_REDIRECT_URL</span> <span class="o">=</span> <span class="s">&#39;wagtailadmin_home&#39;</span>
 
-<span class="n"><span class="caps">LOGGING</span></span> <span class="o">=</span> <span class="p">{</span>
+<span class="n">LOGGING</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s">&#39;version&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
     <span class="s">&#39;disable_existing_loggers&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
     <span class="s">&#39;filters&#39;</span><span class="p">:</span> <span class="p">{</span>
@@ -278,7 +278,7 @@ executable from your path (which, if you&#8217;re inside the virtual enviroment 
     <span class="p">},</span>
     <span class="s">&#39;handlers&#39;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s">&#39;mail_admins&#39;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s">&#39;level&#39;</span><span class="p">:</span> <span class="s">&#39;<span class="caps">ERROR</span>&#39;</span><span class="p">,</span>
+            <span class="s">&#39;level&#39;</span><span class="p">:</span> <span class="s">&#39;ERROR&#39;</span><span class="p">,</span>
             <span class="s">&#39;filters&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;require_debug_false&#39;</span><span class="p">],</span>
             <span class="s">&#39;class&#39;</span><span class="p">:</span> <span class="s">&#39;django.utils.log.AdminEmailHandler&#39;</span>
         <span class="p">}</span>
@@ -286,14 +286,14 @@ executable from your path (which, if you&#8217;re inside the virtual enviroment 
     <span class="s">&#39;loggers&#39;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s">&#39;django.request&#39;</span><span class="p">:</span> <span class="p">{</span>
             <span class="s">&#39;handlers&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;mail_admins&#39;</span><span class="p">],</span>
-            <span class="s">&#39;level&#39;</span><span class="p">:</span> <span class="s">&#39;<span class="caps">ERROR</span>&#39;</span><span class="p">,</span>
+            <span class="s">&#39;level&#39;</span><span class="p">:</span> <span class="s">&#39;ERROR&#39;</span><span class="p">,</span>
             <span class="s">&#39;propagate&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
         <span class="p">},</span>
     <span class="p">}</span>
 <span class="p">}</span>
 
 
-<span class="c"># <span class="caps">WAGTAIL</span> <span class="caps">SETTINGS</span></span>
+<span class="c"># WAGTAIL SETTINGS</span>
 <span class="n">WAGTAIL_SITE_NAME</span> <span class="o">=</span> <span class="s">&#39;wagtailtutorial&#39;</span>
 
 <span class="c"># Override the search results template for wagtailsearch</span>
@@ -537,7 +537,7 @@ no complete documentation yet however you&nbsp;can </p>
 
   <section>
   <h1>Tags</h1>
-    <a href="http://spapas.github.io/tag/branching.html">branching</a>,    <a href="http://spapas.github.io/tag/git.html">git</a>,    <a href="http://spapas.github.io/tag/java.html">java</a>,    <a href="http://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="http://spapas.github.io/tag/python.html">python</a>,    <a href="http://spapas.github.io/tag/spring.html">spring</a>,    <a href="http://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="http://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="http://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="http://spapas.github.io/tag/django.html">django</a>,    <a href="http://spapas.github.io/tag/forms.html">forms</a>,    <a href="http://spapas.github.io/tag/windows.html">windows</a>,    <a href="http://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="http://spapas.github.io/tag/github.html">github</a>,    <a href="http://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="http://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="http://spapas.github.io/tag/rst.html">rst</a>,    <a href="http://spapas.github.io/tag/security.html">security</a>,    <a href="http://spapas.github.io/tag/spring-security.html">spring-security</a>  </section>
+    <a href="http://spapas.github.io/tag/branching.html">branching</a>,    <a href="http://spapas.github.io/tag/git.html">git</a>,    <a href="http://spapas.github.io/tag/java.html">java</a>,    <a href="http://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="http://spapas.github.io/tag/python.html">python</a>,    <a href="http://spapas.github.io/tag/spring.html">spring</a>,    <a href="http://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="http://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="http://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="http://spapas.github.io/tag/django.html">django</a>,    <a href="http://spapas.github.io/tag/forms.html">forms</a>,    <a href="http://spapas.github.io/tag/windows.html">windows</a>,    <a href="http://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="http://spapas.github.io/tag/github.html">github</a>,    <a href="http://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="http://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="http://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="http://spapas.github.io/tag/rst.html">rst</a>,    <a href="http://spapas.github.io/tag/security.html">security</a>,    <a href="http://spapas.github.io/tag/spring-security.html">spring-security</a>  </section>
 
 
 </aside>    </div>

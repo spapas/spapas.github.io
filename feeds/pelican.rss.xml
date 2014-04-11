@@ -62,7 +62,7 @@ needed by Pelican.
 &amp;gt; Do you want to enable article pagination? (Y/n)
 &amp;gt; How many articles per page do you want? [10]
 &amp;gt; Do you want to generate a Makefile to easily manage your website? (Y/n) n
-&amp;gt; Do you want an auto-reload &lt;span class="amp"&gt;&amp;amp;&lt;/span&gt; simpleHTTP script to assist with theme and site development? (Y/n) n
+&amp;gt; Do you want an auto-reload &amp;amp; simpleHTTP script to assist with theme and site development? (Y/n) n
 Done. Your new project is available at C:\progr\py\pelican\spapas.github.io
 &lt;/pre&gt;
 &lt;p&gt;After that, you will have a pelican/spapas.github.io folder that will contain the following&amp;nbsp;content:&lt;/p&gt;

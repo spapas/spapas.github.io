@@ -204,7 +204,7 @@ heroku ps:scale web=1
 heroku ps
 heroku open
 &lt;/pre&gt;
-&lt;p&gt;If everything was ok you should see&amp;nbsp;an&lt;/p&gt;
+&lt;p&gt;If everything was ok you should see an statu &lt;span class="caps"&gt;OK&lt;/span&gt; &lt;span class="caps"&gt;JSON&lt;/span&gt;&amp;nbsp;!&lt;/p&gt;
 &lt;/div&gt;
 </description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Serafeim Papastefanos</dc:creator><pubDate>Mon, 30 Jun 2014 15:23:00 +0300</pubDate><guid>tag:spapas.github.io,2014-06-30:2014/06/30/rest-flask-mongodb-heroku/</guid><category>flask</category><category>mongodb</category><category>heroku</category><category>python</category><category>rest</category></item><item><title>Django generic FormViews for objects</title><link>http://spapas.github.io/2014/04/11/django-generic-formviews-for-objects/</link><description>&lt;div class="contents topic" id="contents"&gt;
 &lt;p class="topic-title first"&gt;Contents&lt;/p&gt;

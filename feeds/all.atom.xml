@@ -204,7 +204,7 @@ heroku ps:scale web=1
 heroku ps
 heroku open
 &lt;/pre&gt;
-&lt;p&gt;If everything was ok you should see&amp;nbsp;an&lt;/p&gt;
+&lt;p&gt;If everything was ok you should see an statu &lt;span class="caps"&gt;OK&lt;/span&gt; &lt;span class="caps"&gt;JSON&lt;/span&gt;&amp;nbsp;!&lt;/p&gt;
 &lt;/div&gt;
 </summary><category term="flask"></category><category term="mongodb"></category><category term="heroku"></category><category term="python"></category><category term="rest"></category></entry><entry><title>Django generic FormViews for objects</title><link href="http://spapas.github.io/2014/04/11/django-generic-formviews-for-objects/" rel="alternate"></link><updated>2014-04-11T10:23:00+03:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2014-04-11:2014/04/11/django-generic-formviews-for-objects/</id><summary type="html">&lt;div class="contents topic" id="contents"&gt;
 &lt;p class="topic-title first"&gt;Contents&lt;/p&gt;

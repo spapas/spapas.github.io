@@ -204,6 +204,6 @@ heroku ps:scale web=1
 heroku ps
 heroku open
 &lt;/pre&gt;
-&lt;p&gt;If everything was ok you should see an statu &lt;span class="caps"&gt;OK&lt;/span&gt; &lt;span class="caps"&gt;JSON&lt;/span&gt;&amp;nbsp;!&lt;/p&gt;
+&lt;p&gt;If everything was ok you should see an status-&lt;span class="caps"&gt;OK&lt;/span&gt; &lt;span class="caps"&gt;JSON&lt;/span&gt;&amp;nbsp;!&lt;/p&gt;
 &lt;/div&gt;
 </summary><category term="flask"></category><category term="mongodb"></category><category term="heroku"></category><category term="python"></category><category term="rest"></category></entry></feed>

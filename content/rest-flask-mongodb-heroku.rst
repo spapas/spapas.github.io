@@ -237,7 +237,7 @@ If everything went ok you should be able to start a worker for your application,
      heroku ps
      heroku open
 
-If everything was ok you should see an      
+If everything was ok you should see an statu OK JSON !   
      
     
 .. _Flask: http://flask.pocoo.org/

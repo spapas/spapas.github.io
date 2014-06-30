@@ -1,7 +1,7 @@
 Implementing a simple, Heroku-hosted REST service using Flask and mongoDB
 #########################################################################
 
-:date: 2014-05-30 10:23
+:date: 2014-06-30 15:23
 :tags: flask, mongodb, heroku, python, rest
 :category: flask
 :slug: rest-flask-mongodb-heroku

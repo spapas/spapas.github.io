@@ -20,12 +20,12 @@ It is recomended to create a new virtual environment that will host the wagtail 
 
 ```
 Django==1.6.2
-South==0.8.4
-django-compressor==1.3
-django-modelcluster==0.1
+South==1.0.0
+django-compressor==1.4
+django-modelcluster==0.3
 -e git://github.com/torchbox/wagtail.git#egg=wagtail
 django-taggit==0.11.2
-django-libsass==0.1
+django-libsass==0.2
 ```
 and run
 ``pip install -r requirements.txt``.  If you use Microsoft Windows you *will* experience problems with Pillow and lxml. Please download the 

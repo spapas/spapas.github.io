@@ -5,12 +5,12 @@
 &lt;h2&gt;Installing the wagtail&amp;nbsp;dependencies&lt;/h2&gt;
 &lt;p&gt;It is recomended to create a new virtual environment that will host the wagtail tutorial. After you have changed to the virtual environment you will need to installl the Wagtail requirements. Create a file named &lt;code&gt;requirements.txt&lt;/code&gt; containing the&amp;nbsp;following:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;Django&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="mf"&gt;1.6.2&lt;/span&gt;
-&lt;span class="n"&gt;South&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="mf"&gt;0.8.4&lt;/span&gt;
-&lt;span class="n"&gt;django&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;compressor&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="mf"&gt;1.3&lt;/span&gt;
-&lt;span class="n"&gt;django&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;modelcluster&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="mf"&gt;0.1&lt;/span&gt;
+&lt;span class="n"&gt;South&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="mf"&gt;1.0.0&lt;/span&gt;
+&lt;span class="n"&gt;django&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;compressor&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="mf"&gt;1.4&lt;/span&gt;
+&lt;span class="n"&gt;django&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;modelcluster&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="mf"&gt;0.3&lt;/span&gt;
 &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;e&lt;/span&gt; &lt;span class="n"&gt;git&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="c1"&gt;//github.com/torchbox/wagtail.git#egg=wagtail&lt;/span&gt;
 &lt;span class="n"&gt;django&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;taggit&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="mf"&gt;0.11.2&lt;/span&gt;
-&lt;span class="n"&gt;django&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;libsass&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="mf"&gt;0.1&lt;/span&gt;
+&lt;span class="n"&gt;django&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;libsass&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="mf"&gt;0.2&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 

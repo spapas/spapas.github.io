@@ -1,5 +1,208 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>/var/</title><link href="http://spapas.github.io/" rel="alternate"></link><link href="http://spapas.github.io/feeds/django.atom.xml" rel="self"></link><id>http://spapas.github.io/</id><updated>2014-04-11T10:23:00+03:00</updated><entry><title>Django generic FormViews for objects</title><link href="http://spapas.github.io/2014/04/11/django-generic-formviews-for-objects/" rel="alternate"></link><updated>2014-04-11T10:23:00+03:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2014-04-11:2014/04/11/django-generic-formviews-for-objects/</id><summary type="html">&lt;div class="contents topic" id="contents"&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>/var/</title><link href="http://spapas.github.io/" rel="alternate"></link><link href="http://spapas.github.io/feeds/django.atom.xml" rel="self"></link><id>http://spapas.github.io/</id><updated>2014-09-15T14:20:00+03:00</updated><entry><title>Django non-HTML responses</title><link href="http://spapas.github.io/2014/09/15/django-non-html-responses/" rel="alternate"></link><updated>2014-09-15T14:20:00+03:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2014-09-15:2014/09/15/django-non-html-responses/</id><summary type="html">&lt;div class="contents topic" id="contents"&gt;
+&lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id1"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#how-are-cbvs-rendered" id="id2"&gt;How are CBVs&amp;nbsp;rendered&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#rendering-to-non-html" id="id3"&gt;Rendering to non-&lt;span class="caps"&gt;HTML&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#a-non-html-mixin" id="id4"&gt;A non-&lt;span class="caps"&gt;HTML&lt;/span&gt;&amp;nbsp;mixin&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#a-more-complex-example" id="id5"&gt;A more complex&amp;nbsp;example&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#conclusion" id="id6"&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="introduction"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id1"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;I have already written about the many advantages (&lt;span class="caps"&gt;DRY&lt;/span&gt;!) of using &lt;a class="reference external" href="http://spapas.github.io/2014/04/11/django-generic-formviews-for-objects/"&gt;CBVs in a previous article.&lt;/a&gt;
+In this article I will present the correct (pythonic) way to allow a normal &lt;span class="caps"&gt;CBV&lt;/span&gt; to return non-&lt;span class="caps"&gt;HTML&lt;/span&gt; responses, like &lt;span class="caps"&gt;PDF&lt;/span&gt;, &lt;span class="caps"&gt;CSV&lt;/span&gt;, &lt;span class="caps"&gt;XSL&lt;/span&gt;&amp;nbsp;etc.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="how-are-cbvs-rendered"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id2"&gt;How are CBVs&amp;nbsp;rendered&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Before proceeding, we need to understand how CBVs are rendered. By walking through the
+class hierarchy in the &lt;a class="reference external" href="http://ccbv.co.uk/"&gt;&lt;span class="caps"&gt;CBV&lt;/span&gt; inspector&lt;/a&gt;, we can see that
+all the normal Django CBVs (DetailView, CreateView, TemplateView etc) are using a mixin
+named &lt;a class="reference external" href="http://ccbv.co.uk/projects/Django/1.7/django.views.generic.base/TemplateResponseMixin/"&gt;TemplateResponseMixin&lt;/a&gt; which defines a method named &lt;tt class="docutils literal"&gt;render_to_response&lt;/tt&gt;. This
+is the method that is used for rendering the output of the Views. Let&amp;#8217;s take a look at
+&lt;a class="reference external" href="http://ccbv.co.uk/projects/Django/1.7/django.views.generic.base/TemplateResponseMixin/"&gt;how it is defined&lt;/a&gt; (I&amp;#8217;ll remove the&amp;nbsp;comments):&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;TemplateResponseMixin&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;object&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+  &lt;span class="n"&gt;template_name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;None&lt;/span&gt;
+  &lt;span class="n"&gt;response_class&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;TemplateResponse&lt;/span&gt;
+  &lt;span class="n"&gt;content_type&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;None&lt;/span&gt;
+
+  &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;render_to_response&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;context&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;response_kwargs&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+      &lt;span class="n"&gt;response_kwargs&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;setdefault&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;content_type&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;content_type&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+      &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;response_class&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+          &lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+          &lt;span class="n"&gt;template&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get_template_names&lt;/span&gt;&lt;span class="p"&gt;(),&lt;/span&gt;
+          &lt;span class="n"&gt;context&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;context&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+          &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;response_kwargs&lt;/span&gt;
+      &lt;span class="p"&gt;)&lt;/span&gt;
+
+  &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;get_template_names&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+      &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;template_name&lt;/span&gt; &lt;span class="ow"&gt;is&lt;/span&gt; &lt;span class="bp"&gt;None&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+          &lt;span class="k"&gt;raise&lt;/span&gt; &lt;span class="n"&gt;ImproperlyConfigured&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+              &lt;span class="s"&gt;&amp;quot;TemplateResponseMixin requires either a definition of &amp;quot;&lt;/span&gt;
+              &lt;span class="s"&gt;&amp;quot;&amp;#39;template_name&amp;#39; or an implementation of &amp;#39;get_template_names()&amp;#39;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+      &lt;span class="k"&gt;else&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+          &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;template_name&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;This method will try to find out which html template should be used to render the View
+(using the  &lt;tt class="docutils literal"&gt;get_template_names&lt;/tt&gt; method and template_name attribute of the mixin) and
+then render this view by instantiating an instance of the &lt;tt class="docutils literal"&gt;TemplateResponse&lt;/tt&gt; class
+(as defined in the &lt;tt class="docutils literal"&gt;response_class&lt;/tt&gt; attribute)
+and passing the request, template, context and other response_args to&amp;nbsp;it.&lt;/p&gt;
+&lt;p&gt;The &lt;a class="reference external" href="https://github.com/django/django/blob/master/django/template/response.py"&gt;TemplateResponse&lt;/a&gt; class which is instantiated in the &lt;tt class="docutils literal"&gt;render_to_response&lt;/tt&gt; method
+inherits from a normal &lt;tt class="docutils literal"&gt;HttpResponse&lt;/tt&gt; and is used to render
+the template passed to it as a&amp;nbsp;parameter.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="rendering-to-non-html"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id3"&gt;Rendering to non-&lt;span class="caps"&gt;HTML&lt;/span&gt;&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;From the previous discussion we can conclude that if your non-&lt;span class="caps"&gt;HTML&lt;/span&gt; response &lt;em&gt;needs&lt;/em&gt;
+a template then you just need to create a subclass of &lt;tt class="docutils literal"&gt;TemplateResponse&lt;/tt&gt; and
+assign it to the &lt;tt class="docutils literal"&gt;response_class&lt;/tt&gt; attribute (and also change the &lt;tt class="docutils literal"&gt;content_type&lt;/tt&gt;
+attribute). On the other hand, if your non-&lt;span class="caps"&gt;HTML&lt;/span&gt; respond does not need a template
+to be rendered then you have to override &lt;tt class="docutils literal"&gt;render_to_response&lt;/tt&gt; completely
+(since the template parameter does not need to be passed now) and either define
+a subclass of HttpResponse or do the rendering in the&amp;nbsp;render_to_response.&lt;/p&gt;
+&lt;p&gt;Since almost always you won&amp;#8217;t need a template to create a non-&lt;span class="caps"&gt;HTML&lt;/span&gt; view and because
+I believe that the solution is &lt;span class="caps"&gt;DRY&lt;/span&gt;-enough by implementing the rendering code to
+the &lt;tt class="docutils literal"&gt;render_to_response&lt;/tt&gt; method (&lt;em&gt;without&lt;/em&gt; subclassing &lt;tt class="docutils literal"&gt;HttpResponse&lt;/tt&gt;) I will
+implement a mixin that does exactly&amp;nbsp;that.&lt;/p&gt;
+&lt;p&gt;Subclassing &lt;tt class="docutils literal"&gt;HttpResponse&lt;/tt&gt; will not make our design more &lt;span class="caps"&gt;DRY&lt;/span&gt; because for every
+subclass of &lt;tt class="docutils literal"&gt;HttpResponse&lt;/tt&gt; the &lt;tt class="docutils literal"&gt;render_to_response&lt;/tt&gt; method would also need to
+be modified (by subclassing &lt;tt class="docutils literal"&gt;TemplateResponseMixin) to instantiate the subclass of ``HttpResponse&lt;/tt&gt; with the correct parameters.
+For instance, the existing &lt;tt class="docutils literal"&gt;TemplateResponseMixin&lt;/tt&gt; cannot be used if the subclass
+of &lt;tt class="docutils literal"&gt;HttpResponse&lt;/tt&gt; does not take a template as a parameter (solutions like
+passing None to the template parameter are signals of bad&amp;nbsp;design).&lt;/p&gt;
+&lt;p&gt;In any case, changing just the &lt;tt class="docutils literal"&gt;render_to_response&lt;/tt&gt; method using a Mixin is in my opinion the best solution
+to the above problem.
+A &lt;a class="reference external" href="http://stackoverflow.com/questions/533631/what-is-a-mixin-and-why-are-they-useful"&gt;Mixin&lt;/a&gt; is a simple class that can be used to extend other classes either by overriding functionality of the base class or
+by adding extra features. Django CBVs use various &lt;a class="reference external" href="https://docs.djangoproject.com/en/dev/topics/class-based-views/mixins/"&gt;mixins&lt;/a&gt; to extend the base Views and add&amp;nbsp;functionality.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="a-non-html-mixin"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id4"&gt;A non-&lt;span class="caps"&gt;HTML&lt;/span&gt;&amp;nbsp;mixin&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;So, a basic skeleton for our mixin would be something like&amp;nbsp;this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;NonHtmlResponseMixin&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;object&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;render_to_response&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;context&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;response_kwargs&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="n"&gt;response&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;HttpResponse&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;content_type&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;text/plain&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;response&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Hello, world&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;response&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;The previous mixin overrides the render_to_response method to just return the text &amp;quot;Hello, world&amp;quot;. For instance
+we could define the following&amp;nbsp;class:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;DummyTextResponseView&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;NonHtmlResponseMixin&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;TemplateView&lt;/span&gt;&lt;span class="p"&gt;,):&lt;/span&gt;
+  &lt;span class="k"&gt;pass&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;which can be added as a route to &lt;tt class="docutils literal"&gt;urls.py&lt;/tt&gt; (using the &lt;tt class="docutils literal"&gt;as_view&lt;/tt&gt; method) and will always return the &amp;quot;Hello, world&amp;quot;&amp;nbsp;text.&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s something more complicated: A Mixin that can be used along with a DetailView and will output the properties of the
+object as&amp;nbsp;text:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;TextPropertiesResponseMixin&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;object&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+  &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;render_to_response&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;context&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;response_kwargs&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+      &lt;span class="n"&gt;response&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;HttpResponse&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;content_type&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;text/plain; charset=utf-8&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+      &lt;span class="n"&gt;o&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get_object&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+      &lt;span class="n"&gt;o&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;_meta&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fields&lt;/span&gt;
+      &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;o&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;_meta&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fields&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+          &lt;span class="n"&gt;response&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;u&amp;#39;{0}: {1}&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;  &lt;span class="nb"&gt;unicode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;o&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;__dict__&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;)&lt;/span&gt;
+      &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;response&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;and can be used like&amp;nbsp;this&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;TextPropertiesDetailView&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;TextPropertiesResponseMixin&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;FooDetailView&lt;/span&gt;&lt;span class="p"&gt;,):&lt;/span&gt;
+  &lt;span class="k"&gt;pass&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;The above mixin will use the get_object() method of the DetailView to get the object and then output
+it as text. We can create similar mixins that will integrate with other types of CBVs, for instance
+to export a ListView as an &lt;span class="caps"&gt;CSV&lt;/span&gt; or generate an png from a DetailView of an Image&amp;nbsp;file.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="a-more-complex-example"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt;A more complex&amp;nbsp;example&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The previous examples all built upon an existing view (either a TemplateView, a DetailView or a ListView).
+However, an existing view that will fit our requirements won&amp;#8217;t always be available. For instance,
+sometimes I want to export data from my database using a raw &lt;span class="caps"&gt;SQL&lt;/span&gt; query. Also I&amp;#8217;d like to be able to easily
+export this data as csv or&amp;nbsp;excel.&lt;/p&gt;
+&lt;p&gt;First of all, we need to define a view that will inherit from &lt;tt class="docutils literal"&gt;View&lt;/tt&gt; and export the data as a &lt;span class="caps"&gt;CSV&lt;/span&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;unicodecsv&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;django.db&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;connection&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;django.views.generic&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;View&lt;/span&gt;
+
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;CsvRawSqlExportView&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;View&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;):&lt;/span&gt;
+  &lt;span class="n"&gt;sql&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;select 1+1&amp;#39;&lt;/span&gt;
+  &lt;span class="n"&gt;headers&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;res&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+  &lt;span class="n"&gt;params&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[]&lt;/span&gt;
+
+  &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+      &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;generate_data&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;cursor&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+          &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;row&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;cursor&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fetchall&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
+              &lt;span class="k"&gt;yield&lt;/span&gt; &lt;span class="n"&gt;row&lt;/span&gt;
+
+      &lt;span class="n"&gt;cursor&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;connection&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;cursor&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+      &lt;span class="n"&gt;cursor&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;execute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sql&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;params&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+      &lt;span class="n"&gt;generator&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;generate_data&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;cursor&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+      &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;render_to_response&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;generator&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+  &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;render_to_response&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;generator&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;response_kwargs&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+      &lt;span class="n"&gt;response&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;HttpResponse&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;content_type&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;text/plain; charset=utf-8&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+      &lt;span class="n"&gt;response&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;Content-Disposition&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;attachment; filename=export.csv&amp;#39;&lt;/span&gt;
+      &lt;span class="n"&gt;w&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;unicodecsv&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;writer&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;response&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;encoding&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;utf-8&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+      &lt;span class="n"&gt;w&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;writerow&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;headers&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+      &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;row&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;generator&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+          &lt;span class="n"&gt;w&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;writerow&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;row&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+      &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;response&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;The above View has three attributes:
+* sql, which is a string with the raw sql that will be executed
+* headers, which is an array with the names of each header of the resulting data
+* params, which is an array with parameters that may need to be passed to the&amp;nbsp;query&lt;/p&gt;
+&lt;p&gt;The &lt;tt class="docutils literal"&gt;get&lt;/tt&gt; method executes the query and passes the result to &lt;tt class="docutils literal"&gt;render_to_response&lt;/tt&gt;
+using a generator.  The &lt;tt class="docutils literal"&gt;render_to_response&lt;/tt&gt; method instantiates an HttpResponse
+object with the correct attributes and writes the &lt;span class="caps"&gt;CSV&lt;/span&gt; to the response object using&amp;nbsp;unicodecsv.&lt;/p&gt;
+&lt;p&gt;We can now quickly create a route that will export data from the users&amp;nbsp;table:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="s"&gt;r&amp;#39;^raw_export_users/$&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;views&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;CsvRawSqlExportView&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;as_view&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+        &lt;span class="n"&gt;sql&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;select id, username from auth_user&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="n"&gt;headers&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;id&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;username&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+    &lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;raw_export_users&amp;#39;&lt;/span&gt;
+&lt;span class="p"&gt;),&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;If instead of &lt;span class="caps"&gt;CSV&lt;/span&gt; we wanted to export to &lt;span class="caps"&gt;XLS&lt;/span&gt; (using xlwt), we&amp;#8217;d just need to create a&amp;nbsp;Mixin:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;XlsRawSqlResponseMixin&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;object&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+  &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;render_to_response&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;generator&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;response_kwargs&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+      &lt;span class="n"&gt;response&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;HttpResponse&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;content_type&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;application/ms-excel&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+      &lt;span class="n"&gt;response&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;Content-Disposition&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;attachment; filename=export.xls&amp;#39;&lt;/span&gt;
+      &lt;span class="n"&gt;wb&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;xlwt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Workbook&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;encoding&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;utf-8&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+      &lt;span class="n"&gt;ws&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;wb&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;add_sheet&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;data&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+      &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;j&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;enumerate&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;headers&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+              &lt;span class="n"&gt;ws&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;j&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+      &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;row&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;enumerate&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;generator&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+          &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;j&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;enumerate&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;row&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+              &lt;span class="n"&gt;ws&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;j&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+      &lt;span class="n"&gt;wb&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;save&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;response&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+      &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;response&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;and create a View that inherits from &lt;tt class="docutils literal"&gt;CsvRawSqlExportView&lt;/tt&gt; and uses the above&amp;nbsp;mixin:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;XlsRawSqlExportView&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="n"&gt;XlsRawSqlResponseMixin&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;CsvRawSqlExportView&lt;/span&gt; &lt;span class="p"&gt;):&lt;/span&gt;
+  &lt;span class="k"&gt;pass&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;and route to that view to get the &lt;span class="caps"&gt;XLS&lt;/span&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="s"&gt;r&amp;#39;^raw_export_users/$&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;views&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;XlsRawSqlExportView&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;as_view&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+        &lt;span class="n"&gt;sql&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;select id, username from auth_user&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="n"&gt;headers&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;id&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;username&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]),&lt;/span&gt;
+    &lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;raw_export_users&amp;#39;&lt;/span&gt;
+&lt;span class="p"&gt;),&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="conclusion"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id6"&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Using the above techniques we can define CBVs that will output their content in various content types
+beyond &lt;span class="caps"&gt;HTML&lt;/span&gt;. This will help us write write clean and &lt;span class="caps"&gt;DRY&lt;/span&gt;&amp;nbsp;code.&lt;/p&gt;
+&lt;/div&gt;
+</summary><category term="django"></category><category term="python"></category><category term="cbv"></category><category term="class-based-views"></category></entry><entry><title>Django generic FormViews for objects</title><link href="http://spapas.github.io/2014/04/11/django-generic-formviews-for-objects/" rel="alternate"></link><updated>2014-04-11T10:23:00+03:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2014-04-11:2014/04/11/django-generic-formviews-for-objects/</id><summary type="html">&lt;div class="contents topic" id="contents"&gt;
 &lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
 &lt;ul class="simple"&gt;
 &lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id1"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
@@ -145,7 +348,7 @@ classes. Some ideas is to check if the current user actually has access to modif
 &lt;tt class="docutils literal"&gt;get_object&lt;/tt&gt; method of &lt;tt class="docutils literal"&gt;SingleObjectMixin&lt;/tt&gt;) or render the form diffirently depending on the current user (hint:
 override the &lt;tt class="docutils literal"&gt;get_form_kwargs&lt;/tt&gt; method of &lt;tt class="docutils literal"&gt;FormView&lt;/tt&gt;).&lt;/p&gt;
 &lt;/div&gt;
-</summary><category term="django"></category><category term="python"></category><category term="cbv"></category></entry><entry><title>Django dynamic forms</title><link href="http://spapas.github.io/2013/12/24/django-dynamic-forms/" rel="alternate"></link><updated>2013-12-24T14:20:00+02:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2013-12-24:2013/12/24/django-dynamic-forms/</id><summary type="html">&lt;div class="contents topic" id="contents"&gt;
+</summary><category term="django"></category><category term="python"></category><category term="cbv"></category><category term="class-based-views"></category></entry><entry><title>Django dynamic forms</title><link href="http://spapas.github.io/2013/12/24/django-dynamic-forms/" rel="alternate"></link><updated>2013-12-24T14:20:00+02:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2013-12-24:2013/12/24/django-dynamic-forms/</id><summary type="html">&lt;div class="contents topic" id="contents"&gt;
 &lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
 &lt;ul class="simple"&gt;
 &lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id1"&gt;Introduction&lt;/a&gt;&lt;/li&gt;

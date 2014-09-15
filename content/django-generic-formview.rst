@@ -2,7 +2,7 @@ Django generic FormViews for objects
 ####################################
 
 :date: 2014-04-11 10:23
-:tags: django, python, cbv
+:tags: django, python, cbv, class-based-views
 :category: django
 :slug: django-generic-formviews-for-objects
 :author: Serafeim Papastefanos

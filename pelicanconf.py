@@ -43,4 +43,20 @@ TWITTER_USERNAME='_serafeim_'
 #GOOGLE_ANALYTICS='UA-44750952-1'
 GOOGLE_UNIVERSAL_ANALYTICS='UA-44750952-1'
 
+PLUGIN_PATHS = ['../pelican-plugins']
+PLUGINS=['sitemap',]
+
+SITEMAP = {
+    'format': 'xml',
+    'priorities': {
+        'articles': 0.5,
+        'indexes': 0.5,
+        'pages': 0.5
+    },
+    'changefreqs': {
+        'articles': 'monthly',
+        'indexes': 'weekly',
+        'pages': 'monthly'
+    }
+}
 

@@ -11,7 +11,7 @@ Anti-virus warning - 1 attachment contains a virus or blocked file. Downloading 
 &lt;p&gt;Now what&amp;nbsp;?&lt;/p&gt;
 &lt;p&gt;After searching the internet and not founding any solutions, I tried the options that gmail gives for each email. One
 particular one cought my interest: &lt;em&gt;Show&amp;nbsp;original&lt;/em&gt;&lt;/p&gt;
-&lt;img alt="Here it is!" src="/static/images/show_original.png" style="width: 780px;" /&gt;
+&lt;img alt="Here it is!" src="/images/show_original.png" style="width: 780px;" /&gt;
 &lt;p&gt;Clicking this option opened a text file with the original, &lt;span class="caps"&gt;MIME&lt;/span&gt; encoded message. The interesting thing of course&amp;nbsp;was&lt;/p&gt;
 &lt;pre class="code literal-block"&gt;
 ------=_NextPart_000_004F_01CA0AED.E63C2A30

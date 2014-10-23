@@ -108,7 +108,7 @@ spapas.github.io&amp;gt;start pelrun.bat
 spapas.github.io&amp;gt;start pelserv.bat
 &lt;/pre&gt;
 &lt;p&gt;If everything was ok until now, you can visit &lt;a class="reference external" href="http://127.0.0.1:8000"&gt;http://127.0.0.1:8000&lt;/a&gt; and will get the following&amp;nbsp;output:&lt;/p&gt;
-&lt;img alt="all ok!" src="/static/images/site1.png" style="width: 780px;" /&gt;
+&lt;img alt="all ok!" src="/images/site1.png" style="width: 780px;" /&gt;
 &lt;p&gt;Because of the -r option that is used in &lt;tt class="docutils literal"&gt;pelrun.bat&lt;/tt&gt; whenever you do a change (for instance when you add an rst file in the content directory)
 it will be discovered and the output will be changed&amp;nbsp;immediately!&lt;/p&gt;
 &lt;/div&gt;

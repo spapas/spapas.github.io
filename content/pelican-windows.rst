@@ -120,7 +120,7 @@ Now, when you want to develop your site locally, enter:
 
 If everything was ok until now, you can visit http://127.0.0.1:8000 and will get the following output:
 
-.. image:: /static/images/site1.png 
+.. image:: /images/site1.png 
   :alt: all ok!
   :width: 780 px
 

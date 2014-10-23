@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>/var/</title><link href="http://spapas.github.io/" rel="alternate"></link><link href="http://spapas.github.io/feeds/python.atom.xml" rel="self"></link><id>http://spapas.github.io/</id><updated>2014-10-23T14:20:00+03:00</updated><entry><title>Retrieving Gmail blocked attachments</title><link href="http://spapas.github.io/2014/10/23/retrieve-gmail-blocked-attachments/" rel="alternate"></link><updated>2014-10-23T14:20:00+03:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2014-10-23:2014/10/23/retrieve-gmail-blocked-attachments/</id><summary type="html">&lt;p&gt;Before services like Dropbox were widely available, some people (including me) were using
+their Gmail account as a primitive backup solution: Compress your directory and send it to
+your gmail. There. Backup&amp;nbsp;complete.&lt;/p&gt;
+&lt;p&gt;However, nothing is so&amp;nbsp;easy&amp;#8230;&lt;/p&gt;
+&lt;p&gt;Recently, I wanted to retrieve one of these backups, a .rar containing the complete
+source code (since it was written in TeX) of my PhD thesis. The problem was that Gmail blocked the access to these attachments&amp;nbsp;saying&lt;/p&gt;
+&lt;blockquote&gt;
+Anti-virus warning - 1 attachment contains a virus or blocked file. Downloading this attachment is disabled.&lt;/blockquote&gt;
+&lt;p&gt;probably because I had a number of .bat files inside that .rar archive to automate my work&amp;nbsp;:(&lt;/p&gt;
+&lt;p&gt;Now what&amp;nbsp;?&lt;/p&gt;
+&lt;p&gt;After searching the internet and not founding any solutions, I tried the options that gmail gives for each email. One
+particular one cought my interest: &lt;em&gt;Show&amp;nbsp;original&lt;/em&gt;&lt;/p&gt;
+&lt;img alt="Here it is!" src="/static/images/show_original.png" style="width: 780px;" /&gt;
+&lt;p&gt;Clicking this option opened a text file with the original, &lt;span class="caps"&gt;MIME&lt;/span&gt; encoded message. The interesting thing of course&amp;nbsp;was&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+------=_NextPart_000_004F_01CA0AED.E63C2A30
+Content-Type: application/octet-stream;
+      name=&amp;quot;phdstuff.rar&amp;quot;
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+      filename=&amp;quot;phdstuff.rar&amp;quot;
+
+UmFyIRoHAM+QcwAADQAAAAAAAAB0f3TAgCwANAMAAFQEAAACRbXCx8lr9TodMwwAIAAAAG5ld2Zp
+bmFsLnR4dA3dEQzM082BF7sB+D3q6QPUNEfwG7vHQgNkiQDTkGvfhOE4mNltIJJlBFMOCQPzPeKD
+...
+&lt;/pre&gt;
+&lt;p&gt;So the whole attachment was contained in that text file, encoded in base64! Now I just
+needed to extract it from the email and convert it back to&amp;nbsp;binary.&lt;/p&gt;
+&lt;p&gt;This was very easy to do using Python - some people &lt;a class="reference external" href="http://stackoverflow.com/questions/4067937/getting-mail-attachment-to-python-file-object"&gt;had already asked the same thing on &lt;span class="caps"&gt;SO&lt;/span&gt;&lt;/a&gt;.
+So here&amp;#8217;s a simple program that gets an email in text/mime format as input and dumps all&amp;nbsp;attachments:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;email&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;sys&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;__name__&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;__main__&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;argv&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Please enter a file to extract attachments from&amp;quot;&lt;/span&gt;
+        &lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;exit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+    &lt;span class="n"&gt;msg&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;email&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;message_from_file&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;open&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;argv&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]))&lt;/span&gt;
+    &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;pl&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get_payload&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;pl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get_filename&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt; &lt;span class="c"&gt;# if it is an attachment&lt;/span&gt;
+            &lt;span class="nb"&gt;open&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get_filename&lt;/span&gt;&lt;span class="p"&gt;(),&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;wb&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get_payload&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;decode&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="bp"&gt;True&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Save this to a file named &lt;tt class="docutils literal"&gt;get_attachments.py&lt;/tt&gt; and, after saving the original message to a file
+named &lt;tt class="docutils literal"&gt;0.txt&lt;/tt&gt; run &lt;tt class="docutils literal"&gt;python get_attachments.py 0.txt&lt;/tt&gt; and you&amp;#8217;ll see the attachments of your email in the same&amp;nbsp;folder!&lt;/p&gt;
+&lt;blockquote&gt;
+Disclaimer: I have to warn you that since Gmail claims that an attachment is &lt;em&gt;not safe&lt;/em&gt; it may be &lt;strong&gt;actually not safe&lt;/strong&gt;. So
+you must be 100% sure that you know what you are doing before retrievening your email attachments like this.&lt;/blockquote&gt;
+</summary><category term="gmail"></category><category term="python"></category><category term="security"></category><category term="google"></category></entry></feed>

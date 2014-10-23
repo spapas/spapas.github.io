@@ -5,29 +5,36 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>http://spapas.github.io/index.html</loc>
-<lastmod>2014-09-16T10:01:59-00:00</lastmod>
+<lastmod>2014-10-23T09:28:51-00:00</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://spapas.github.io/archives.html</loc>
-<lastmod>2014-09-16T10:01:59-00:00</lastmod>
+<lastmod>2014-10-23T09:28:51-00:00</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://spapas.github.io/tags.html</loc>
-<lastmod>2014-09-16T10:01:59-00:00</lastmod>
+<lastmod>2014-10-23T09:28:51-00:00</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://spapas.github.io/categories.html</loc>
-<lastmod>2014-09-16T10:01:59-00:00</lastmod>
+<lastmod>2014-10-23T09:28:51-00:00</lastmod>
 <changefreq>weekly</changefreq>
+<priority>0.5</priority>
+</url>
+
+<url>
+<loc>http://spapas.github.io/2014/10/23/retrieve-gmail-blocked-attachments/</loc>
+<lastmod>2014-10-23T14:20:00-00:00</lastmod>
+<changefreq>monthly</changefreq>
 <priority>0.5</priority>
 </url>
 
@@ -123,6 +130,13 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 </url>
 
 <url>
+<loc>http://spapas.github.io/category/python.html</loc>
+<lastmod>2014-10-23T14:20:00:%s</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.5</priority>
+</url>
+
+<url>
 <loc>http://spapas.github.io/category/spring.html</loc>
 <lastmod>2013-10-14T08:55:00:%s</lastmod>
 <changefreq>weekly</changefreq>
@@ -144,6 +158,13 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 </url>
 
 <url>
+<loc>http://spapas.github.io/tag/google.html</loc>
+<lastmod>2014-10-23T14:20:00:%s</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.5</priority>
+</url>
+
+<url>
 <loc>http://spapas.github.io/tag/spring.html</loc>
 <lastmod>2013-10-14T08:55:00:%s</lastmod>
 <changefreq>weekly</changefreq>
@@ -160,6 +181,13 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
 <loc>http://spapas.github.io/tag/cbv.html</loc>
 <lastmod>2014-09-15T14:20:00:%s</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.5</priority>
+</url>
+
+<url>
+<loc>http://spapas.github.io/tag/gmail.html</loc>
+<lastmod>2014-10-23T14:20:00:%s</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.5</priority>
 </url>
@@ -222,7 +250,7 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>http://spapas.github.io/tag/python.html</loc>
-<lastmod>2014-09-15T14:20:00:%s</lastmod>
+<lastmod>2014-10-23T14:20:00:%s</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.5</priority>
 </url>
@@ -306,14 +334,14 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>http://spapas.github.io/tag/security.html</loc>
-<lastmod>2013-11-05T14:20:00:%s</lastmod>
+<lastmod>2014-10-23T14:20:00:%s</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://spapas.github.io/author/serafeim-papastefanos.html</loc>
-<lastmod>2014-09-15T14:20:00:%s</lastmod>
+<lastmod>2014-10-23T14:20:00:%s</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.5</priority>
 </url>

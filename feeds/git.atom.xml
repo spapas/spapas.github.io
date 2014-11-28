@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>/var/</title><link href="http://spapas.github.io/" rel="alternate"></link><link href="http://spapas.github.io/feeds/git.atom.xml" rel="self"></link><id>http://spapas.github.io/</id><updated>2013-10-08T13:20:00+03:00</updated><entry><title>git branches</title><link href="http://spapas.github.io/2013/10/08/git-branches/" rel="alternate"></link><updated>2013-10-08T13:20:00+03:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2013-10-08:2013/10/08/git-branches/</id><summary type="html">&lt;div class="contents topic" id="contents"&gt;
+&lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id1"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#creating-a-new-git-repository" id="id2"&gt;Creating a new git&amp;nbsp;repository&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#branching" id="id3"&gt;Branching&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#remote-branches" id="id4"&gt;Remote&amp;nbsp;branches&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="introduction"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id1"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;A &lt;a class="reference external" href="http://git-scm.com/book/en/Git-Branching-What-a-Branch-Is"&gt;branch&lt;/a&gt; is a very interesting git feature. With this you may have more than one &lt;em&gt;branches&lt;/em&gt; in the same repository. The main
+usage of this feature would be to create different versions of your source code to parallel test development of different features.
+When the development of each of these features has been finished then the different versions would need to be combined (or merged) to a
+single version. Of course, merging is not always the result of branching - some branches may exist indefinitely or other may just  be
+deleted without&amp;nbsp;merging.&lt;/p&gt;
+&lt;p&gt;I will try to experiment with it and comment on the&amp;nbsp;results.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="creating-a-new-git-repository"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id2"&gt;Creating a new git&amp;nbsp;repository&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Let&amp;#8217;s start by creating a new git&amp;nbsp;repository:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+D:\&amp;gt;mkdir testgit
+D:\&amp;gt;cd testgit
+D:\testgit&amp;gt;echo contents 11 &amp;gt; file1.txt
+D:\testgit&amp;gt;echo contents 222 &amp;gt; file2.txt
+D:\testgit&amp;gt;echo 3333 &amp;gt; file2.txt
+D:\testgit&amp;gt;copy con file3.txt
+line 1 of file 3
+
+line 3 of file 3
+
+test
+
+line 7 of file 3
+^Z
+       1 files copied.
+
+D:\testgit&amp;gt;git init
+Initialized empty Git repository in D:/testgit/.git/
+D:\testgit&amp;gt;git add .
+D:\testgit&amp;gt;git commit -m Initial
+[master (root-commit) 96ca9af] Initial
+ 3 files changed, 9 insertions(+)
+ create mode 100644 file1.txt
+ create mode 100644 file2.txt
+ create mode 100644 file3.txt
+&lt;/pre&gt;
+&lt;p&gt;To see the branch we are in we can use the &lt;tt class="docutils literal"&gt;git branch&lt;/tt&gt; command. Also &lt;tt class="docutils literal"&gt;git status&lt;/tt&gt; outputs the current&amp;nbsp;branch:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+D:\testgit&amp;gt;git status
+# On branch master
+nothing to commit, working directory clean
+D:\testgit&amp;gt;git branch
+* master
+&lt;/pre&gt;
+&lt;p&gt;So, it seems that when we create a new repository, a &amp;quot;master&amp;quot; branch is&amp;nbsp;created.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="branching"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id3"&gt;Branching&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Lets create a new branch and change our working branch to&amp;nbsp;it:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+D:\testgit&amp;gt;git branch slave
+D:\testgit&amp;gt;git branch
+* master
+  slave
+D:\testgit&amp;gt;git checkout slave
+Switched to branch 'slave'
+D:\testgit&amp;gt;git branch
+  master
+* slave
+&lt;/pre&gt;
+&lt;p&gt;We can see that now the slave branch is the current one. Let&amp;#8217;s do some changes and add commit them to the slave&amp;nbsp;branch:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+D:\testgit&amp;gt;git branch
+  master
+* slave
+D:\testgit&amp;gt;echo new file1 contents &amp;gt; file1.txt
+D:\testgit&amp;gt;git commit -m &amp;quot;Slave modification&amp;quot;
+[slave b6083ad] Slave modification
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+D:\testgit&amp;gt;git checkout master
+Switched to branch 'master'
+D:\testgit&amp;gt;more file1.txt
+contents 11
+D:\testgit&amp;gt;git checkout slave
+Switched to branch 'slave'
+D:\testgit&amp;gt;more file1.txt
+new file1 contents
+&lt;/pre&gt;
+&lt;p&gt;So the contents of file1.txt in the branch master is &lt;tt class="docutils literal"&gt;contents 11&lt;/tt&gt; while the contents of the same file
+in the branch slave is &lt;tt class="docutils literal"&gt;new file1 contents&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;An interested behaviour is what happens with uncommit changes when changing branches. Let&amp;#8217;s try deleting a&amp;nbsp;file:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+D:\testgit&amp;gt;del file2.txt
+D:\testgit&amp;gt;git status
+# On branch master
+# Changes not staged for commit:
+#   (use &amp;quot;git add/rm &amp;lt;file&amp;gt;...&amp;quot; to update what will be committed)
+#   (use &amp;quot;git checkout -- &amp;lt;file&amp;gt;...&amp;quot; to discard changes in working directory)
+#
+#       deleted:    file2.txt
+#
+no changes added to commit (use &amp;quot;git add&amp;quot; and/or &amp;quot;git commit -a&amp;quot;)
+D:\testgit&amp;gt;git checkout slave
+D       file2.txt
+Switched to branch 'slave'
+D:\testgit&amp;gt;git status
+# On branch slave
+# Changes not staged for commit:
+#   (use &amp;quot;git add/rm &amp;lt;file&amp;gt;...&amp;quot; to update what will be committed)
+#   (use &amp;quot;git checkout -- &amp;lt;file&amp;gt;...&amp;quot; to discard changes in working directory)
+#
+#       deleted:    file2.txt
+#
+no changes added to commit (use &amp;quot;git add&amp;quot; and/or &amp;quot;git commit -a&amp;quot;)
+D:\testgit&amp;gt;git add -A
+D:\testgit&amp;gt;git status
+# On branch slave
+# Changes to be committed:
+#   (use &amp;quot;git reset HEAD &amp;lt;file&amp;gt;...&amp;quot; to unstage)
+#
+#       deleted:    file2.txt
+#
+D:\testgit&amp;gt;git checkout master
+D       file2.txt
+Switched to branch 'master'
+D:\testgit&amp;gt;git status
+# On branch master
+# Changes to be committed:
+#   (use &amp;quot;git reset HEAD &amp;lt;file&amp;gt;...&amp;quot; to unstage)
+#
+#       deleted:    file2.txt
+#
+&lt;/pre&gt;
+&lt;p&gt;So, our changes are not correlated with a branch until we commit them! Let&amp;#8217;s commit them to the master repository and confirm&amp;nbsp;that:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+D:\testgit&amp;gt;git commit -m &amp;quot;Deleted file2.txt&amp;quot;
+[master 6f8749d] Deleted file2.txt
+ 1 file changed, 1 deletion(-)
+ delete mode 100644 file2.txt
+D:\testgit&amp;gt;git status
+# On branch master
+nothing to commit, working directory clean
+D:\testgit&amp;gt;dir file2.txt
+[...]
+File not found
+D:\testgit&amp;gt;git checkout slave
+Switched to branch 'slave'
+D:\testgit&amp;gt;git status
+# On branch slave
+nothing to commit, working directory clean
+D:\testgit&amp;gt;dir file2.txt
+[...]
+08/10/2013  05:59 pm                15 file2.txt
+&lt;/pre&gt;
+&lt;p&gt;This is interesting&amp;#8230; Let&amp;#8217;s try modifying the file2.txt (which does not exist to the master&amp;nbsp;branch):&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+D:\testgit&amp;gt;git branch
+  master
+* slave
+D:\testgit&amp;gt;echo new file2 contents &amp;gt; file2.txt
+D:\testgit&amp;gt;git add .
+D:\testgit&amp;gt;git status
+# On branch slave
+# Changes to be committed:
+#   (use &amp;quot;git reset HEAD &amp;lt;file&amp;gt;...&amp;quot; to unstage)
+#
+#       modified:   file2.txt
+#
+D:\testgit&amp;gt;git checkout master
+error: Your local changes to the following files would be overwritten by checkout:
+       file2.txt
+Please, commit your changes or stash them before you can switch branches.
+Aborting
+&lt;/pre&gt;
+&lt;p&gt;We won&amp;#8217;t be able to change the current branch until we commit the conflicting&amp;nbsp;change:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+D:\testgit&amp;gt;git commit -m &amp;quot;Modified file2&amp;quot;
+[slave b5af832] Modified file2
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+D:\testgit&amp;gt;git checkout master
+Switched to branch 'master'
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="remote-branches"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id4"&gt;Remote&amp;nbsp;branches&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;For each local repository you can define a number of remote repositories, or &lt;a class="reference external" href="http://git-scm.com/book/en/Git-Basics-Working-with-Remotes"&gt;remotes&lt;/a&gt; as git calls them.
+When you clone a repository from github.com, your local repository will have one remote, named origin. We will
+try to add the same remote by hand. Let&amp;#8217;s suppose that we have created a repository in github.com named
+testgit. After that we wil&amp;nbsp;issue:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+D:\testgit&amp;gt;git remote
+D:\testgit&amp;gt;git remote add origin https://github.com/spapas/testgit.git
+D:\testgit&amp;gt;git remote
+origin
+&lt;/pre&gt;
+&lt;p&gt;So no we have one remote named origin that is linked with &lt;a class="reference external" href="https://github.com/spapas/testgit.git"&gt;https://github.com/spapas/testgit.git&lt;/a&gt;. Let&amp;#8217;s try to push our master
+branch to the origin&amp;nbsp;remote:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+D:\testgit&amp;gt;git push origin master
+Username for 'https://github.com': spapas
+Password for 'https://spapas&amp;#64;github.com':
+Counting objects: 7, done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (5/5), done.
+Writing objects: 100% (7/7), 531 bytes, done.
+Total 7 (delta 1), reused 0 (delta 0)
+To https://github.com/spapas/testgit.git
+ * [new branch]      master -&amp;gt; master
+D:\testgit&amp;gt;git branch -r
+  master
+* slave
+  remote/origin/master
+&lt;/pre&gt;
+&lt;p&gt;We see now that we have &lt;em&gt;three&lt;/em&gt; branches. Two local (master slave) and one remote (origin/master).  We will also add the slave remote&amp;nbsp;(origin/slave):&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+D:\testgit&amp;gt;git branch -r
+  origin/master
+  origin/slave
+&lt;/pre&gt;
+&lt;p&gt;Let&amp;#8217;s do a change to our local repository and then push them to the&amp;nbsp;remote:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+D:\testgit&amp;gt;notepad file3.txt
+D:\testgit&amp;gt;git add .
+D:\testgit&amp;gt;git status
+# On branch slave
+# Changes to be committed:
+#   (use &amp;quot;git reset HEAD &amp;lt;file&amp;gt;...&amp;quot; to unstage)
+#
+#       modified:   file3.txt
+#
+D:\testgit&amp;gt;git commit -m &amp;quot;Changed file3.txt&amp;quot;
+[slave ce3b7b9] Changed file3.txt
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+D:\testgit&amp;gt;git push origin slave
+Username for 'https://github.com': spapas
+Password for 'https://spapas&amp;#64;github.com':
+Counting objects: 5, done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (3/3), done.
+Writing objects: 100% (3/3), 299 bytes, done.
+Total 3 (delta 1), reused 0 (delta 0)
+To https://github.com/spapas/testgit.git
+   b5af832..ce3b7b9  slave -&amp;gt; slave
+&lt;/pre&gt;
+&lt;p&gt;Everything works as expected. The final thing to test is to try checking out a remote&amp;nbsp;branch:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+D:\testgit&amp;gt;git checkout master
+Switched to branch 'master'
+D:\testgit&amp;gt;echo new new file1 &amp;gt; file1.txt
+D:\testgit&amp;gt;more file1.txt
+ new new file1
+D:\testgit&amp;gt;git checkout origin/master
+M       file1.txt
+Note: checking out 'origin/master'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by performing another checkout.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -b with the checkout command again. Example:
+
+  git checkout -b new_branch_name
+
+HEAD is now at 6f8749d... Deleted file2.txt
+D:\testgit&amp;gt;git status
+# Not currently on any branch.
+# Changes not staged for commit:
+#   (use &amp;quot;git add &amp;lt;file&amp;gt;...&amp;quot; to update what will be committed)
+#   (use &amp;quot;git checkout -- &amp;lt;file&amp;gt;...&amp;quot; to discard changes in working directory)
+#
+#       modified:   file1.txt
+#
+no changes added to commit (use &amp;quot;git add&amp;quot; and/or &amp;quot;git commit -a&amp;quot;)
+D:\testgit&amp;gt;more file1.txt
+new new file1
+&lt;/pre&gt;
+&lt;p&gt;So, it seems that  when we check out the remote branch, we won&amp;#8217;t have any local branches, however the change we did to the file1.txt
+is transfered just like when switching from one local repository to another. We can then add the changes and&amp;nbsp;commit:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+D:\testgit&amp;gt;git add .
+D:\testgit&amp;gt;git commit
+[detached HEAD 506674c] foo
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+ D:\testgit&amp;gt;git status
+# Not currently on any branch.
+nothing to commit, working directory clean
+D:\testgit&amp;gt;git branch
+* (no branch)
+  master
+  slave
+&lt;/pre&gt;
+&lt;p&gt;So we are working with an unnamed branch! We have to name it to be able to work without&amp;nbsp;problems:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+D:\testgit&amp;gt;git checkout -b named_branch
+Switched to a new branch 'named_branch'
+D:\testgit&amp;gt;git branch
+  master
+* named_branch
+  slave
+&lt;/pre&gt;
+&lt;p&gt;Finally we may push again the named_branch to our remote&amp;nbsp;origin.&lt;/p&gt;
+&lt;/div&gt;
+</summary><category term="git"></category><category term="github"></category><category term="branching"></category></entry></feed>

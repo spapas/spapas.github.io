@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>/var/</title><link>http://spapas.github.io/</link><description>Various programming stuff</description><atom:link href="http://spapas.github.io/feeds/pelican.rss.xml" rel="self"></atom:link><lastBuildDate>Mon, 07 Oct 2013 10:20:00 +0300</lastBuildDate><item><title>Using pelican to generate static sites on windows</title><link>http://spapas.github.io/2013/10/07/pelican-static-windows/</link><description>&lt;div class="contents topic" id="contents"&gt;
+&lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id1"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#installing-pelican-and-generating-a-skeleton-for-your-site" id="id2"&gt;Installing pelican and generating a skeleton for your&amp;nbsp;site&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#modifying-pelican-tools-for-windows" id="id3"&gt;Modifying pelican tools for&amp;nbsp;windows&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#configuration-of-your-skeleton-site" id="id4"&gt;Configuration of your skeleton site&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#settings" id="id5"&gt;Settings&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#themes" id="id6"&gt;Themes&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#plugins" id="id7"&gt;Plugins&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#hosting-in-github-pages" id="id8"&gt;Hosting in github&amp;nbsp;pages&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="introduction"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id1"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://docs.getpelican.com/en/3.3.0/"&gt;Pelican&lt;/a&gt; is a great static site generator. A static site generator is a tool that users a number of input files to
+generate a complete html site. No database or server side scripting is needed for the resulting site, that&amp;#8217;s why
+many such sites are hosted on &lt;a class="reference external" href="http://pages.github.com/"&gt;github pages&lt;/a&gt; (more on this&amp;nbsp;later).&lt;/p&gt;
+&lt;p&gt;The input contains a number of html templates, css styles and the actual content of the site which most of the time is written in a
+&lt;a class="reference external" href="http://en.wikipedia.org/wiki/Lightweight_markup_language"&gt;lightweight markup language&lt;/a&gt; like &lt;a class="reference external" href="http://docutils.sourceforge.net/rst.html"&gt;reStructuredText&lt;/a&gt; or &lt;a class="reference external" href="http://daringfireball.net/projects/markdown/"&gt;Markdown&lt;/a&gt;. The static site generator will generate the static pages by
+inserting the content in the appropriate places in the&amp;nbsp;templates.&lt;/p&gt;
+&lt;p&gt;In the following sections we will describe the installation of pelican on Windows
+and the creation of the spapas.github.io&amp;nbsp;site.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="installing-pelican-and-generating-a-skeleton-for-your-site"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id2"&gt;Installing pelican and generating a skeleton for your&amp;nbsp;site&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The official pelican quickstart can be found in &lt;a class="reference external" href="http://docs.getpelican.com/en/latest/getting_started.html"&gt;http://docs.getpelican.com/en/latest/getting_started.html&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;To install pelican just&amp;nbsp;enter:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;gt;pip install pelican
+&lt;/pre&gt;
+&lt;p&gt;After installing pelican, I propose creating a parent directory that will
+contain all your pelican sites, along with extra themes and plugins like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+pelican/
+  ├── pelican-themes
+  ├── other-pelican-theme
+  ├── spapas.github.io
+  └── other-sites
+&lt;/pre&gt;
+&lt;p&gt;After creating the pelican directory just go in it with a command line and run the &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;pelican-quickstart&lt;/span&gt;&lt;/tt&gt; command.
+It will ask you a number of questions, take a look at how I did answer&amp;nbsp;these:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+pelican&amp;gt;pelican-quickstart
+Welcome to pelican-quickstart v3.2.2.
+
+This script will help you create a new Pelican-based website.
+
+Please answer the following questions so this script can generate the files
+needed by Pelican.
+
+
+&amp;gt; Where do you want to create your new web site? [.] spapas.github.io
+&amp;gt; What will be the title of this web site? Test github.io
+&amp;gt; Who will be the author of this web site? Serafeim
+&amp;gt; What will be the default language of this web site? [en]
+&amp;gt; Do you want to specify a URL prefix? e.g., http://example.com   (Y/n)
+&amp;gt; What is your URL prefix? (see above example; no trailing slash) http://spapas.github.io
+&amp;gt; Do you want to enable article pagination? (Y/n)
+&amp;gt; How many articles per page do you want? [10]
+&amp;gt; Do you want to generate a Makefile to easily manage your website? (Y/n) n
+&amp;gt; Do you want an auto-reload &amp;amp; simpleHTTP script to assist with theme and site development? (Y/n) n
+Done. Your new project is available at C:\progr\py\pelican\spapas.github.io
+&lt;/pre&gt;
+&lt;p&gt;After that, you will have a pelican/spapas.github.io folder that will contain the following&amp;nbsp;content:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+spapas.github.io/
+  ├── content
+  ├── output
+  ├── pelicanconf.py
+  └── publishconf.py
+&lt;/pre&gt;
+&lt;p&gt;The content folder will contain your content (rst or markdown), the output will contain the generated html after you run pelican for your site.
+The &lt;tt class="docutils literal"&gt;pelicanconf.py&lt;/tt&gt; will have a number of options for the generation of the development version of your site while the &lt;tt class="docutils literal"&gt;publishconf.py&lt;/tt&gt; will override some of the options
+of &lt;tt class="docutils literal"&gt;pelicanconf.py&lt;/tt&gt; before generating the production version of your site that will actually be uploaded to github&amp;nbsp;pages.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="modifying-pelican-tools-for-windows"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id3"&gt;Modifying pelican tools for&amp;nbsp;windows&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Pelican uses a Makefile and a unix shell script to generate the static html files and start an http server for development.
+Because I prefer to use windows, I answered no to the questions of generating these when pelican-quickstarte asked me.
+Instead I have included the following files inside the spapas.github.io&amp;nbsp;directory:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;pelrun.bat&lt;/tt&gt;, to generate the content for your debug site in the output&amp;nbsp;directory:&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre class="code literal-block"&gt;
+pelican content --debug --autoreload  --output output --settings pelicanconf.py
+&lt;/pre&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;pelserve.bat&lt;/tt&gt;, to localy serve the generated debug&amp;nbsp;site:&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre class="code literal-block"&gt;
+pushd output
+python -m pelican.server
+popd
+&lt;/pre&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;pelpub.bat&lt;/tt&gt;, to generate the production site in the output&amp;nbsp;directory:&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre class="code literal-block"&gt;
+pelican content --output output --settings publishconf.py
+&lt;/pre&gt;
+&lt;p&gt;Now, when you want to develop your site locally,&amp;nbsp;enter:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+spapas.github.io&amp;gt;start pelrun.bat
+spapas.github.io&amp;gt;start pelserv.bat
+&lt;/pre&gt;
+&lt;p&gt;If everything was ok until now, you can visit &lt;a class="reference external" href="http://127.0.0.1:8000"&gt;http://127.0.0.1:8000&lt;/a&gt; and will get the following&amp;nbsp;output:&lt;/p&gt;
+&lt;img alt="all ok!" src="/images/site1.png" style="width: 780px;" /&gt;
+&lt;p&gt;Because of the -r option that is used in &lt;tt class="docutils literal"&gt;pelrun.bat&lt;/tt&gt; whenever you do a change (for instance when you add an rst file in the content directory)
+it will be discovered and the output will be changed&amp;nbsp;immediately!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="configuration-of-your-skeleton-site"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id4"&gt;Configuration of your skeleton&amp;nbsp;site&lt;/a&gt;&lt;/h2&gt;
+&lt;div class="section" id="settings"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id5"&gt;Settings&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;There is a number of settings that you may configure in your site. The pelican settings reference can be found here: &lt;a class="reference external" href="http://docs.getpelican.com/en/latest/settings.html"&gt;http://docs.getpelican.com/en/latest/settings.html&lt;/a&gt;.
+The pelicanconf.py and publishconf.py for this site can be found&amp;nbsp;here:&lt;/p&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://github.com/spapas/spapas.github.io/blob/source/pelicanconf.py"&gt;https://github.com/spapas/spapas.github.io/blob/source/pelicanconf.py&lt;/a&gt;
+&lt;a class="reference external" href="https://github.com/spapas/spapas.github.io/blob/source/publishconf.py"&gt;https://github.com/spapas/spapas.github.io/blob/source/publishconf.py&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;The most important difference is the RELATIVE_URLS directive which must be True to the debug and False to the&amp;nbsp;production.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="themes"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id6"&gt;Themes&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Beyond the default pelican theme, you can use configure pelican to use various other themes. To enable them, go to your pelican parent directory and clone the pelican-themes github&amp;nbsp;repository:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+pelican&amp;gt;git clone https://github.com/getpelican/pelican-themes.git
+&lt;/pre&gt;
+&lt;p&gt;After that, you may select your theme from&amp;nbsp;pelicanconf.py:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+THEME = &amp;quot;../pelican-themes/theme-name&amp;quot;
+&lt;/pre&gt;
+&lt;p&gt;In my configuration, I am using the Octopress Theme for Pelican, which you may get from here &lt;a class="reference external" href="https://github.com/duilio/pelican-octopress-theme"&gt;https://github.com/duilio/pelican-octopress-theme&lt;/a&gt;. Just clone it to your
+pelican directory and refer to it as&amp;nbsp;above.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="plugins"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id7"&gt;Plugins&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Pelican has a number of plugins. To enable them, go to your pelican parent directory and clone the pelican-plugins github&amp;nbsp;repository:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+pelican&amp;gt;git clone https://github.com/getpelican/pelican-plugins.git
+&lt;/pre&gt;
+&lt;p&gt;After that, you may add the following two lines to your&amp;nbsp;pelicanconf.py:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+PLUGIN_PATH = '../pelican-plugins'
+PLUGINS = ['a-plugin']
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="hosting-in-github-pages"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id8"&gt;Hosting in github&amp;nbsp;pages&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;To host your static site in github pages you must first of all create a repository named
+username.github.io (for instance spapas.github.io) from&amp;nbsp;github.&lt;/p&gt;
+&lt;p&gt;Then, generate your production&amp;nbsp;output:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+spapas.github.io&amp;gt;pelpub.bat
+&lt;/pre&gt;
+&lt;p&gt;Finally, go to your output directory, create a git repository, add everything and push it to your&amp;nbsp;repository:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+spapas.github.io\output&amp;gt;git init
+spapas.github.io\output&amp;gt;git add .
+spapas.github.io\output&amp;gt;git commit -m Initial
+spapas.github.io\output&amp;gt;git remote add origin https://github.com/spapas/spapas.github.io.git
+spapas.github.io\output&amp;gt;git push master --force
+&lt;/pre&gt;
+&lt;p&gt;The &amp;#8212;force is to overwrite any previous versions - you don&amp;#8217;t care about version control on your output (but you want it on your&amp;nbsp;source).&lt;/p&gt;
+&lt;p&gt;You can now visit &lt;a class="reference external" href="http://username.github.io"&gt;http://username.github.io&lt;/a&gt; and see your statically generated site&amp;nbsp;!&lt;/p&gt;
+&lt;p&gt;Don&amp;#8217;t forget to add your source to the version control! To do that, add a .gitignore file in your pelican/username.github.io direcory
+containing the&amp;nbsp;following:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+output
+&lt;/pre&gt;
+&lt;p&gt;The above file will ignore the contents of the output directory from version control. After that, do the&amp;nbsp;following:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+spapas.github.io&amp;gt;git init
+spapas.github.io&amp;gt;git add .
+spapas.github.io&amp;gt;git commit -m Initial
+spapas.github.io&amp;gt;git branch -m master source
+spapas.github.io&amp;gt;git remote add origin https://github.com/spapas/spapas.github.io.git
+spapas.github.io&amp;gt;git push origin source
+&lt;/pre&gt;
+&lt;p&gt;The above will rename the master branch to source, will attach the origin remote to &lt;a class="reference external" href="https://github.com/spapas/spapas.github.io.git"&gt;https://github.com/spapas/spapas.github.io.git&lt;/a&gt; and will push the source
+branch to it. Now you will have two branches in your username.github.io repository. One
+named origin/master that will be your actual site and will be displayed through &lt;a class="reference external" href="http://username.github.io"&gt;http://username.github.io&lt;/a&gt; and one named origin/source that will contain the source of your&amp;nbsp;site.&lt;/p&gt;
+&lt;p&gt;To learn more about branches and remotes you may check out &lt;a class="reference external" href="http://spapas.github.io/2013/10/08/git-branches/"&gt;the git branches article&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Serafeim Papastefanos</dc:creator><pubDate>Mon, 07 Oct 2013 10:20:00 +0300</pubDate><guid>tag:spapas.github.io,2013-10-07:2013/10/07/pelican-static-windows/</guid><category>static-html</category><category>github.io</category><category>github</category><category>pelican</category><category>windows</category><category>python</category><category>github-pages</category><category>rst</category></item></channel></rss>

@@ -1,0 +1,720 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>/var/</title><link>http://spapas.github.io/</link><description>Various programming stuff</description><atom:link href="http://spapas.github.io/feeds/django.rss.xml" rel="self"></atom:link><lastBuildDate>Mon, 15 Sep 2014 14:20:00 +0300</lastBuildDate><item><title>Django non-HTML responses</title><link>http://spapas.github.io/2014/09/15/django-non-html-responses/</link><description>&lt;div class="contents topic" id="contents"&gt;
+&lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id1"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#how-are-cbvs-rendered" id="id2"&gt;How are CBVs&amp;nbsp;rendered&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#rendering-to-non-html" id="id3"&gt;Rendering to non-&lt;span class="caps"&gt;HTML&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#a-non-html-mixin" id="id4"&gt;A non-&lt;span class="caps"&gt;HTML&lt;/span&gt;&amp;nbsp;mixin&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#a-more-complex-example" id="id5"&gt;A more complex&amp;nbsp;example&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#conclusion" id="id6"&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="introduction"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id1"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;I have already written about the many advantages (&lt;span class="caps"&gt;DRY&lt;/span&gt;!) of using &lt;a class="reference external" href="http://spapas.github.io/2014/04/11/django-generic-formviews-for-objects/"&gt;CBVs in a previous article.&lt;/a&gt;
+In this article I will present the correct (pythonic) way to allow a normal &lt;span class="caps"&gt;CBV&lt;/span&gt; to return non-&lt;span class="caps"&gt;HTML&lt;/span&gt; responses, like &lt;span class="caps"&gt;PDF&lt;/span&gt;, &lt;span class="caps"&gt;CSV&lt;/span&gt;, &lt;span class="caps"&gt;XSL&lt;/span&gt;&amp;nbsp;etc.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="how-are-cbvs-rendered"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id2"&gt;How are CBVs&amp;nbsp;rendered&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Before proceeding, we need to understand how CBVs are rendered. By walking through the
+class hierarchy in the &lt;a class="reference external" href="http://ccbv.co.uk/"&gt;&lt;span class="caps"&gt;CBV&lt;/span&gt; inspector&lt;/a&gt;, we can see that
+all the normal Django CBVs (DetailView, CreateView, TemplateView etc) are using a mixin
+named &lt;a class="reference external" href="http://ccbv.co.uk/projects/Django/1.7/django.views.generic.base/TemplateResponseMixin/"&gt;TemplateResponseMixin&lt;/a&gt; which defines a method named &lt;tt class="docutils literal"&gt;render_to_response&lt;/tt&gt;. This
+is the method that is used for rendering the output of the Views. Let&amp;#8217;s take a look at
+&lt;a class="reference external" href="http://ccbv.co.uk/projects/Django/1.7/django.views.generic.base/TemplateResponseMixin/"&gt;how it is defined&lt;/a&gt; (I&amp;#8217;ll remove the&amp;nbsp;comments):&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;TemplateResponseMixin&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;object&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+  &lt;span class="n"&gt;template_name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;None&lt;/span&gt;
+  &lt;span class="n"&gt;response_class&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;TemplateResponse&lt;/span&gt;
+  &lt;span class="n"&gt;content_type&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;None&lt;/span&gt;
+
+  &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;render_to_response&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;context&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;response_kwargs&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+      &lt;span class="n"&gt;response_kwargs&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;setdefault&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;content_type&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;content_type&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+      &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;response_class&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+          &lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+          &lt;span class="n"&gt;template&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get_template_names&lt;/span&gt;&lt;span class="p"&gt;(),&lt;/span&gt;
+          &lt;span class="n"&gt;context&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;context&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+          &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;response_kwargs&lt;/span&gt;
+      &lt;span class="p"&gt;)&lt;/span&gt;
+
+  &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;get_template_names&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+      &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;template_name&lt;/span&gt; &lt;span class="ow"&gt;is&lt;/span&gt; &lt;span class="bp"&gt;None&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+          &lt;span class="k"&gt;raise&lt;/span&gt; &lt;span class="n"&gt;ImproperlyConfigured&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+              &lt;span class="s"&gt;&amp;quot;TemplateResponseMixin requires either a definition of &amp;quot;&lt;/span&gt;
+              &lt;span class="s"&gt;&amp;quot;&amp;#39;template_name&amp;#39; or an implementation of &amp;#39;get_template_names()&amp;#39;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+      &lt;span class="k"&gt;else&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+          &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;template_name&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;This method will try to find out which html template should be used to render the View
+(using the  &lt;tt class="docutils literal"&gt;get_template_names&lt;/tt&gt; method and template_name attribute of the mixin) and
+then render this view by instantiating an instance of the &lt;tt class="docutils literal"&gt;TemplateResponse&lt;/tt&gt; class
+(as defined in the &lt;tt class="docutils literal"&gt;response_class&lt;/tt&gt; attribute)
+and passing the request, template, context and other response_args to&amp;nbsp;it.&lt;/p&gt;
+&lt;p&gt;The &lt;a class="reference external" href="https://github.com/django/django/blob/master/django/template/response.py"&gt;TemplateResponse&lt;/a&gt; class which is instantiated in the &lt;tt class="docutils literal"&gt;render_to_response&lt;/tt&gt; method
+inherits from a normal &lt;tt class="docutils literal"&gt;HttpResponse&lt;/tt&gt; and is used to render
+the template passed to it as a&amp;nbsp;parameter.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="rendering-to-non-html"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id3"&gt;Rendering to non-&lt;span class="caps"&gt;HTML&lt;/span&gt;&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;From the previous discussion we can conclude that if your non-&lt;span class="caps"&gt;HTML&lt;/span&gt; response &lt;em&gt;needs&lt;/em&gt;
+a template then you just need to create a subclass of &lt;tt class="docutils literal"&gt;TemplateResponse&lt;/tt&gt; and
+assign it to the &lt;tt class="docutils literal"&gt;response_class&lt;/tt&gt; attribute (and also change the &lt;tt class="docutils literal"&gt;content_type&lt;/tt&gt;
+attribute). On the other hand, if your non-&lt;span class="caps"&gt;HTML&lt;/span&gt; respond does not need a template
+to be rendered then you have to override &lt;tt class="docutils literal"&gt;render_to_response&lt;/tt&gt; completely
+(since the template parameter does not need to be passed now) and either define
+a subclass of HttpResponse or do the rendering in the&amp;nbsp;render_to_response.&lt;/p&gt;
+&lt;p&gt;Since almost always you won&amp;#8217;t need a template to create a non-&lt;span class="caps"&gt;HTML&lt;/span&gt; view and because
+I believe that the solution is &lt;span class="caps"&gt;DRY&lt;/span&gt;-enough by implementing the rendering code to
+the &lt;tt class="docutils literal"&gt;render_to_response&lt;/tt&gt; method (&lt;em&gt;without&lt;/em&gt; subclassing &lt;tt class="docutils literal"&gt;HttpResponse&lt;/tt&gt;) I will
+implement a mixin that does exactly&amp;nbsp;that.&lt;/p&gt;
+&lt;p&gt;Subclassing &lt;tt class="docutils literal"&gt;HttpResponse&lt;/tt&gt; will not make our design more &lt;span class="caps"&gt;DRY&lt;/span&gt; because for every
+subclass of &lt;tt class="docutils literal"&gt;HttpResponse&lt;/tt&gt; the &lt;tt class="docutils literal"&gt;render_to_response&lt;/tt&gt; method would also need to
+be modified (by subclassing &lt;tt class="docutils literal"&gt;TemplateResponseMixin) to instantiate the subclass of ``HttpResponse&lt;/tt&gt; with the correct parameters.
+For instance, the existing &lt;tt class="docutils literal"&gt;TemplateResponseMixin&lt;/tt&gt; cannot be used if the subclass
+of &lt;tt class="docutils literal"&gt;HttpResponse&lt;/tt&gt; does not take a template as a parameter (solutions like
+passing None to the template parameter are signals of bad&amp;nbsp;design).&lt;/p&gt;
+&lt;p&gt;In any case, changing just the &lt;tt class="docutils literal"&gt;render_to_response&lt;/tt&gt; method using a Mixin is in my opinion the best solution
+to the above problem.
+A &lt;a class="reference external" href="http://stackoverflow.com/questions/533631/what-is-a-mixin-and-why-are-they-useful"&gt;Mixin&lt;/a&gt; is a simple class that can be used to extend other classes either by overriding functionality of the base class or
+by adding extra features. Django CBVs use various &lt;a class="reference external" href="https://docs.djangoproject.com/en/dev/topics/class-based-views/mixins/"&gt;mixins&lt;/a&gt; to extend the base Views and add&amp;nbsp;functionality.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="a-non-html-mixin"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id4"&gt;A non-&lt;span class="caps"&gt;HTML&lt;/span&gt;&amp;nbsp;mixin&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;So, a basic skeleton for our mixin would be something like&amp;nbsp;this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;NonHtmlResponseMixin&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;object&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;render_to_response&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;context&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;response_kwargs&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="n"&gt;response&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;HttpResponse&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;content_type&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;text/plain&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;response&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Hello, world&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;response&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;The previous mixin overrides the render_to_response method to just return the text &amp;quot;Hello, world&amp;quot;. For instance
+we could define the following&amp;nbsp;class:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;DummyTextResponseView&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;NonHtmlResponseMixin&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;TemplateView&lt;/span&gt;&lt;span class="p"&gt;,):&lt;/span&gt;
+  &lt;span class="k"&gt;pass&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;which can be added as a route to &lt;tt class="docutils literal"&gt;urls.py&lt;/tt&gt; (using the &lt;tt class="docutils literal"&gt;as_view&lt;/tt&gt; method) and will always return the &amp;quot;Hello, world&amp;quot;&amp;nbsp;text.&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s something more complicated: A Mixin that can be used along with a DetailView and will output the properties of the
+object as&amp;nbsp;text:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;TextPropertiesResponseMixin&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;object&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+  &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;render_to_response&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;context&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;response_kwargs&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+      &lt;span class="n"&gt;response&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;HttpResponse&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;content_type&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;text/plain; charset=utf-8&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+      &lt;span class="n"&gt;o&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get_object&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+      &lt;span class="n"&gt;o&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;_meta&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fields&lt;/span&gt;
+      &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;o&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;_meta&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fields&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+          &lt;span class="n"&gt;response&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;u&amp;#39;{0}: {1}&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;  &lt;span class="nb"&gt;unicode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;o&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;__dict__&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;)&lt;/span&gt;
+      &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;response&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;and can be used like&amp;nbsp;this&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;TextPropertiesDetailView&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;TextPropertiesResponseMixin&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;FooDetailView&lt;/span&gt;&lt;span class="p"&gt;,):&lt;/span&gt;
+  &lt;span class="k"&gt;pass&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;The above mixin will use the get_object() method of the DetailView to get the object and then output
+it as text. We can create similar mixins that will integrate with other types of CBVs, for instance
+to export a ListView as an &lt;span class="caps"&gt;CSV&lt;/span&gt; or generate an png from a DetailView of an Image&amp;nbsp;file.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="a-more-complex-example"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt;A more complex&amp;nbsp;example&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The previous examples all built upon an existing view (either a TemplateView, a DetailView or a ListView).
+However, an existing view that will fit our requirements won&amp;#8217;t always be available. For instance,
+sometimes I want to export data from my database using a raw &lt;span class="caps"&gt;SQL&lt;/span&gt; query. Also I&amp;#8217;d like to be able to easily
+export this data as csv or&amp;nbsp;excel.&lt;/p&gt;
+&lt;p&gt;First of all, we need to define a view that will inherit from &lt;tt class="docutils literal"&gt;View&lt;/tt&gt; and export the data as a &lt;span class="caps"&gt;CSV&lt;/span&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;unicodecsv&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;django.db&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;connection&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;django.views.generic&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;View&lt;/span&gt;
+
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;CsvRawSqlExportView&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;View&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;):&lt;/span&gt;
+  &lt;span class="n"&gt;sql&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;select 1+1&amp;#39;&lt;/span&gt;
+  &lt;span class="n"&gt;headers&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;res&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+  &lt;span class="n"&gt;params&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[]&lt;/span&gt;
+
+  &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+      &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;generate_data&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;cursor&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+          &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;row&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;cursor&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fetchall&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
+              &lt;span class="k"&gt;yield&lt;/span&gt; &lt;span class="n"&gt;row&lt;/span&gt;
+
+      &lt;span class="n"&gt;cursor&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;connection&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;cursor&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+      &lt;span class="n"&gt;cursor&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;execute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sql&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;params&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+      &lt;span class="n"&gt;generator&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;generate_data&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;cursor&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+      &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;render_to_response&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;generator&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+  &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;render_to_response&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;generator&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;response_kwargs&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+      &lt;span class="n"&gt;response&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;HttpResponse&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;content_type&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;text/plain; charset=utf-8&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+      &lt;span class="n"&gt;response&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;Content-Disposition&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;attachment; filename=export.csv&amp;#39;&lt;/span&gt;
+      &lt;span class="n"&gt;w&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;unicodecsv&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;writer&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;response&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;encoding&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;utf-8&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+      &lt;span class="n"&gt;w&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;writerow&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;headers&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+      &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;row&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;generator&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+          &lt;span class="n"&gt;w&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;writerow&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;row&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+      &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;response&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;The above View has three attributes:
+* sql, which is a string with the raw sql that will be executed
+* headers, which is an array with the names of each header of the resulting data
+* params, which is an array with parameters that may need to be passed to the&amp;nbsp;query&lt;/p&gt;
+&lt;p&gt;The &lt;tt class="docutils literal"&gt;get&lt;/tt&gt; method executes the query and passes the result to &lt;tt class="docutils literal"&gt;render_to_response&lt;/tt&gt;
+using a generator.  The &lt;tt class="docutils literal"&gt;render_to_response&lt;/tt&gt; method instantiates an HttpResponse
+object with the correct attributes and writes the &lt;span class="caps"&gt;CSV&lt;/span&gt; to the response object using&amp;nbsp;unicodecsv.&lt;/p&gt;
+&lt;p&gt;We can now quickly create a route that will export data from the users&amp;nbsp;table:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="s"&gt;r&amp;#39;^raw_export_users/$&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;views&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;CsvRawSqlExportView&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;as_view&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+        &lt;span class="n"&gt;sql&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;select id, username from auth_user&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="n"&gt;headers&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;id&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;username&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+    &lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;raw_export_users&amp;#39;&lt;/span&gt;
+&lt;span class="p"&gt;),&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;If instead of &lt;span class="caps"&gt;CSV&lt;/span&gt; we wanted to export to &lt;span class="caps"&gt;XLS&lt;/span&gt; (using xlwt), we&amp;#8217;d just need to create a&amp;nbsp;Mixin:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;XlsRawSqlResponseMixin&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;object&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+  &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;render_to_response&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;generator&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;response_kwargs&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+      &lt;span class="n"&gt;response&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;HttpResponse&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;content_type&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;application/ms-excel&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+      &lt;span class="n"&gt;response&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;Content-Disposition&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;attachment; filename=export.xls&amp;#39;&lt;/span&gt;
+      &lt;span class="n"&gt;wb&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;xlwt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Workbook&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;encoding&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;utf-8&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+      &lt;span class="n"&gt;ws&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;wb&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;add_sheet&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;data&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+      &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;j&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;enumerate&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;headers&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+              &lt;span class="n"&gt;ws&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;j&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+      &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;row&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;enumerate&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;generator&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+          &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;j&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;enumerate&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;row&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+              &lt;span class="n"&gt;ws&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;j&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+      &lt;span class="n"&gt;wb&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;save&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;response&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+      &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;response&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;and create a View that inherits from &lt;tt class="docutils literal"&gt;CsvRawSqlExportView&lt;/tt&gt; and uses the above&amp;nbsp;mixin:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;XlsRawSqlExportView&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="n"&gt;XlsRawSqlResponseMixin&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;CsvRawSqlExportView&lt;/span&gt; &lt;span class="p"&gt;):&lt;/span&gt;
+  &lt;span class="k"&gt;pass&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;and route to that view to get the &lt;span class="caps"&gt;XLS&lt;/span&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="s"&gt;r&amp;#39;^raw_export_users/$&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;views&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;XlsRawSqlExportView&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;as_view&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+        &lt;span class="n"&gt;sql&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;select id, username from auth_user&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="n"&gt;headers&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;id&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;username&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]),&lt;/span&gt;
+    &lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;raw_export_users&amp;#39;&lt;/span&gt;
+&lt;span class="p"&gt;),&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="conclusion"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id6"&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Using the above techniques we can define CBVs that will output their content in various content types
+beyond &lt;span class="caps"&gt;HTML&lt;/span&gt;. This will help us write write clean and &lt;span class="caps"&gt;DRY&lt;/span&gt;&amp;nbsp;code.&lt;/p&gt;
+&lt;/div&gt;
+</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Serafeim Papastefanos</dc:creator><pubDate>Mon, 15 Sep 2014 14:20:00 +0300</pubDate><guid>tag:spapas.github.io,2014-09-15:2014/09/15/django-non-html-responses/</guid><category>django</category><category>python</category><category>cbv</category><category>class-based-views</category></item><item><title>Django generic FormViews for objects</title><link>http://spapas.github.io/2014/04/11/django-generic-formviews-for-objects/</link><description>&lt;div class="contents topic" id="contents"&gt;
+&lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id1"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#a-quick-introduction-to-the-formview" id="id2"&gt;A quick introduction to the &lt;tt class="docutils literal"&gt;FormView&lt;/tt&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#a-quick-introduction-to-the-singleobjectmixin" id="id3"&gt;A quick introduction to the &lt;tt class="docutils literal"&gt;SingleObjectMixin&lt;/tt&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#being-generic-and-dry" id="id4"&gt;Being generic and &lt;span class="caps"&gt;DRY&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#being-more-generic-and-dry" id="id5"&gt;Being more generic and &lt;span class="caps"&gt;DRY&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#other-options" id="id6"&gt;Other&amp;nbsp;options&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="introduction"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id1"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;We recently needed to create a number of views for changing the status of an Application model instance for our organization.
+An Application model instance can be filled and then cancelled, submitted, acceptted etc - for each of these status changes a form should be
+presented to the user. When the user submits the form the status of the Application will be&amp;nbsp;changed.&lt;/p&gt;
+&lt;p&gt;To implement the above requirement we created a generic FormView that acts on the specific model instance. This
+used two basic &lt;span class="caps"&gt;CBV&lt;/span&gt; components: The &lt;tt class="docutils literal"&gt;FormView&lt;/tt&gt; for the form manipulation and the &lt;tt class="docutils literal"&gt;SingleObjectMixing&lt;/tt&gt; for the
+object&amp;nbsp;handling.&lt;/p&gt;
+&lt;p&gt;Django &lt;a class="reference external" href="https://docs.djangoproject.com/en/1.6/topics/class-based-views/"&gt;Class Based Views&lt;/a&gt; (CBVs) can be used to create reusable Views using normal class inheritance. Most
+people use the well-known &lt;tt class="docutils literal"&gt;CreateView&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;UpdateView&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;DetailView&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;ListView&lt;/tt&gt;, however, as we
+will see below, the &lt;tt class="docutils literal"&gt;FormView&lt;/tt&gt; will help us write &lt;span class="caps"&gt;DRY&lt;/span&gt;&amp;nbsp;code.&lt;/p&gt;
+&lt;p&gt;I have to notice here that an invaluable tool to help you understanding CBVs is the &lt;a class="reference external" href="http://ccbv.co.uk/"&gt;&lt;span class="caps"&gt;CBV&lt;/span&gt; inspector&lt;/a&gt; which
+has a nice web interface for browsing the &lt;span class="caps"&gt;CBV&lt;/span&gt; hierarchies, attributes and&amp;nbsp;methods.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="a-quick-introduction-to-the-formview"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id2"&gt;A quick introduction to the &lt;tt class="docutils literal"&gt;FormView&lt;/tt&gt;&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;A simple &lt;tt class="docutils literal"&gt;FormView&lt;/tt&gt; can be defined like this (&lt;a class="reference external" href="http://ccbv.co.uk/projects/Django/1.6/django.views.generic.edit/FormView/"&gt;&lt;span class="caps"&gt;CBV&lt;/span&gt; FormView&lt;/a&gt;):&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class MyFormView(FormView):
+  form_class = forms.MyFormView
+  template_name = 'my_template.html'
+&lt;/pre&gt;
+&lt;p&gt;The above can be used in urls.py like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+urlpatterns = patterns('',
+  url(r'^my_formview/$', views.MyFormView.as_view() , name='my_formview' ),
+&lt;/pre&gt;
+&lt;p&gt;This will present a form to the user when he visits the &lt;tt class="docutils literal"&gt;my_formview&lt;/tt&gt;  url &amp;#8212; however this form won&amp;#8217;t do anything. To allow
+the form to actually do something when it&amp;#8217;s been submitted we need to override the &lt;tt class="docutils literal"&gt;form_valid&lt;/tt&gt; method.&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+def form_valid(self, form):
+    value = form.cleaned_data['value']
+    messages.info(self.request, &amp;quot;MyForm submitted with value {0}!&amp;quot;.format(value) )
+    return HttpResponseRedirect( reverse('my_formview') )
+&lt;/pre&gt;
+&lt;p&gt;As you can see the submitted form is passed in the method and can be used to receive its &lt;tt class="docutils literal"&gt;cleaned_data&lt;/tt&gt;. The &lt;tt class="docutils literal"&gt;FormView&lt;/tt&gt;
+has various other options for instance a &lt;tt class="docutils literal"&gt;form_invalid&lt;/tt&gt; method, an &lt;tt class="docutils literal"&gt;initial&lt;/tt&gt; attribute to set the initial values for the form&amp;nbsp;etc.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="a-quick-introduction-to-the-singleobjectmixin"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id3"&gt;A quick introduction to the &lt;tt class="docutils literal"&gt;SingleObjectMixin&lt;/tt&gt;&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;A &lt;tt class="docutils literal"&gt;SingleObjectMixin&lt;/tt&gt; adds a number of attributes &lt;span class="amp"&gt;&amp;amp;&lt;/span&gt; methods to a view that can be used for object manipulation. The
+most important ones is the &lt;tt class="docutils literal"&gt;model&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;queryset&lt;/tt&gt; attributes and the &lt;tt class="docutils literal"&gt;get_queryset&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;get_object()&lt;/tt&gt;. To use
+the &lt;tt class="docutils literal"&gt;SingleObjectMixin&lt;/tt&gt; in your &lt;span class="caps"&gt;CBV&lt;/span&gt; just add it to the list of the classes to inherit from and define either the
+&lt;tt class="docutils literal"&gt;model&lt;/tt&gt; or the &lt;tt class="docutils literal"&gt;queryset&lt;/tt&gt; attribute. After that you may pass a &lt;tt class="docutils literal"&gt;pk&lt;/tt&gt; parameter to your view and you will get an
+&lt;tt class="docutils literal"&gt;object&lt;/tt&gt; context variable in the template with the selected&amp;nbsp;object!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="being-generic-and-dry"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id4"&gt;Being generic and &lt;span class="caps"&gt;DRY&lt;/span&gt;&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;We can more or less now understand how we should use &lt;tt class="docutils literal"&gt;FormView&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;SingleObjectMixin&lt;/tt&gt; to generate our
+generic &lt;tt class="docutils literal"&gt;FormView&lt;/tt&gt; for acting on objects: Our &lt;tt class="docutils literal"&gt;FormView&lt;/tt&gt; should &lt;em&gt;get&lt;/em&gt; the object using the &lt;tt class="docutils literal"&gt;SingleObjectMixin&lt;/tt&gt;
+and change it when the form is submitted using the values from the form. A first implementation would be the&amp;nbsp;following:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class GenericObjectFormView1(FormView, SingleObjectMixin):
+
+    def form_valid(self, form):
+        obj = self.get_object()
+        obj.change_status(form)
+        return HttpResponseRedirect( obj.get_absolute_url() )
+&lt;/pre&gt;
+&lt;p&gt;So our &lt;tt class="docutils literal"&gt;GenericObjectFormView1&lt;/tt&gt; class inherits from &lt;tt class="docutils literal"&gt;FormView&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;SingleObjectMixin&lt;/tt&gt;. The only thing that we have
+to assure is that the Model we want to act on needs to implement a &lt;tt class="docutils literal"&gt;change_status&lt;/tt&gt; method which gets the &lt;tt class="docutils literal"&gt;form&lt;/tt&gt; and
+changes the status of that object based on its value. For instance, two implementations can be the&amp;nbsp;following:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class CancelObjectFormView(GenericObjectFormView1):
+    template_name = 'cancel.html'
+    form_class = forms.CancelForm
+    model = models.Application
+
+class SubmitObjectFormView(GenericObjectFormView1):
+    template_name = 'submit.html'
+    form_class = forms.SubmitForm
+    model = models.Application
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="being-more-generic-and-dry"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt;Being more generic and &lt;span class="caps"&gt;DRY&lt;/span&gt;&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The previous implementation has two&amp;nbsp;problems:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;What happens if the status of the object should not be changed even if the form &lt;em&gt;is&lt;/em&gt;&amp;nbsp;valid?&lt;/li&gt;
+&lt;li&gt;We shouldn&amp;#8217;t need to create a new template for every new &lt;tt class="docutils literal"&gt;GenericObjectFormView&lt;/tt&gt; since all these templates will just output the object information, ask a question for the status change and output the&amp;nbsp;form.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Let&amp;#8217;s write a new version of our GenericObjectFormView that actually resolves&amp;nbsp;these:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class GenericObjectFormView2(FormView, SingleObjectMixin):
+    template_name = 'generic_formview.html'
+    ok_message = ''
+    not_ok_message = ''
+    title = ''
+    question =''
+
+    def form_valid(self, form):
+        obj = self.get_object()
+        r = obj.change_status(form)
+        if r:
+            messages.info(self.request, self.yes_message)
+        else:
+            messages.info(self.request, self.not_ok_message)
+        return HttpResponseRedirect( obj.get_absolute_url() )
+
+    def get_context_data(self, **kwargs):
+        context = super(GenericYesNoFormView, self).get_context_data(**kwargs)
+        context['title'] = self.title
+        context['question'] = self.question
+        return context
+&lt;/pre&gt;
+&lt;p&gt;The above adds an ok and not ok message which will be outputed if the status can or cannot be changed. To accomplish this,
+the &lt;tt class="docutils literal"&gt;change_status&lt;/tt&gt; method should now return a boolean value to mark if the action was ok or not. Also, a generic template
+will now be used. This template has two placeholders: One for the title of the page (&lt;tt class="docutils literal"&gt;title&lt;/tt&gt; attribute) and one for the
+question asked to the user (&lt;tt class="docutils literal"&gt;question&lt;/tt&gt; attribute). Now we can use it like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class CancelObjectFormView(GenericObjectFormView2):
+    form_class = forms.CancelForm
+    model = models.Application
+    ok_message = 'Cancel success!'
+    not_ok_message = 'Not able to cancel!'
+    title = 'Cancel an object'
+    question = 'Do you want to cancel this object?'
+
+class SubmitObjectFormView(GenericObjectFormView2):
+    form_class = forms.SubmitForm
+    model = models.Application
+    ok_message = 'Submit  ok'
+    not_ok_message = 'Cannot submit!'
+    title = 'Submit an object'
+    question ='Do you want to submit this object?'
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="other-options"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id6"&gt;Other&amp;nbsp;options&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;We&amp;#8217;ve just got a glimpse of how we can use CBVs to increase the DRYness of our Django applications. There are various
+extra things that we can add to our &lt;tt class="docutils literal"&gt;GenericObjectFormView2&lt;/tt&gt; as attributes which will be defined by inheriting
+classes. Some ideas is to check if the current user actually has access to modify the object (hint: override the
+&lt;tt class="docutils literal"&gt;get_object&lt;/tt&gt; method of &lt;tt class="docutils literal"&gt;SingleObjectMixin&lt;/tt&gt;) or render the form diffirently depending on the current user (hint:
+override the &lt;tt class="docutils literal"&gt;get_form_kwargs&lt;/tt&gt; method of &lt;tt class="docutils literal"&gt;FormView&lt;/tt&gt;).&lt;/p&gt;
+&lt;/div&gt;
+</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Serafeim Papastefanos</dc:creator><pubDate>Fri, 11 Apr 2014 10:23:00 +0300</pubDate><guid>tag:spapas.github.io,2014-04-11:2014/04/11/django-generic-formviews-for-objects/</guid><category>django</category><category>python</category><category>cbv</category><category>class-based-views</category></item><item><title>Django dynamic forms</title><link>http://spapas.github.io/2013/12/24/django-dynamic-forms/</link><description>&lt;div class="contents topic" id="contents"&gt;
+&lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id1"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#describing-a-django-form-in-json" id="id2"&gt;Describing a django form in &lt;span class="caps"&gt;JSON&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#creating-the-form-fields" id="id3"&gt;Creating the form&amp;nbsp;fields&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#creating-the-actual-form" id="id4"&gt;Creating the actual&amp;nbsp;form&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#using-the-dynamic-form" id="id5"&gt;Using the dynamic&amp;nbsp;form&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="introduction"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id1"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;To define a form in django, a developer has to create a class which extends
+&lt;tt class="docutils literal"&gt;django.forms.Form&lt;/tt&gt;
+and has  a number of attributes extending from &lt;tt class="docutils literal"&gt;django.forms.Field&lt;/tt&gt;. This makes
+it very easy for the developer to create static forms, but creating
+dynamic forms whose fields can be changed depending on the data contributed by the
+users of the application is not so&amp;nbsp;obvious.&lt;/p&gt;
+&lt;p&gt;Of course, some people may argue that they can do whatever
+they want just by spitting html input tags to their templates, however this totally violates
+&lt;span class="caps"&gt;DRY&lt;/span&gt; and any serious django developer would prefer to write &lt;a class="reference external" href="http://thedailywtf.com/Articles/A_Case_of_the_MUMPS.aspx"&gt;&lt;span class="caps"&gt;MUMPS&lt;/span&gt;&lt;/a&gt; than creating
+html&amp;nbsp;dynamically.&lt;/p&gt;
+&lt;p&gt;The implementation I will present here had been developed for an old project: In that
+project there was a number of services which could be edited dynamically by the
+moderators. For each service, the moderators would generate a questionnaire to
+get input from the users which would be defined  using &lt;span class="caps"&gt;JSON&lt;/span&gt;. When the users needed
+to submit information for each service, a dynamic django form would be generated
+from this &lt;span class="caps"&gt;JSON&lt;/span&gt; and the answers would be saved to no-&lt;span class="caps"&gt;SQL&lt;/span&gt; database like&amp;nbsp;MongoDB.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="describing-a-django-form-in-json"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id2"&gt;Describing a django form in &lt;span class="caps"&gt;JSON&lt;/span&gt;&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;A &lt;span class="caps"&gt;JSON&lt;/span&gt; described django form is just an array of field &lt;span class="caps"&gt;JSON&lt;/span&gt; objects. Each field
+object  has three required attributes: name which is the keyword of the field, label which is
+how the label of the field and type which is the type of the input of that field. The
+supported types are text, textarea, integer, radio, select, checkbox. Now, depending
+on the type of the field, there could be also some more required attributes, for instace
+text has a max_length attribute and select has a choices attribute (which is an array
+of name/value objects). Also there are two optional attributes,
+required with a default value of False and help_text with a default value of&amp;nbsp;&amp;#8221;.&lt;/p&gt;
+&lt;p&gt;As you can understand these map one by one to the corresponding attributes of the
+actual django form fields. An example containing a complete &lt;span class="caps"&gt;JSON&lt;/span&gt; described form
+is the&amp;nbsp;following:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+[
+    {
+        &amp;quot;name&amp;quot;: &amp;quot;firstname&amp;quot;,
+        &amp;quot;label&amp;quot;: &amp;quot;First Name&amp;quot;,
+        &amp;quot;type&amp;quot;: &amp;quot;text&amp;quot;,
+        &amp;quot;max_length&amp;quot;: 25,
+        &amp;quot;required&amp;quot;: 1
+    },
+    {
+        &amp;quot;name&amp;quot;: &amp;quot;lastname&amp;quot;,
+        &amp;quot;label&amp;quot;: &amp;quot;Last Name&amp;quot;,
+        &amp;quot;type&amp;quot;: &amp;quot;text&amp;quot;,
+        &amp;quot;max_length&amp;quot;: 25,
+        &amp;quot;required&amp;quot;: 1
+    },
+    {
+        &amp;quot;name&amp;quot;: &amp;quot;smallcv&amp;quot;,
+        &amp;quot;label&amp;quot;: &amp;quot;Small CV&amp;quot;,
+        &amp;quot;type&amp;quot;: &amp;quot;textarea&amp;quot;,
+        &amp;quot;help_text&amp;quot;: &amp;quot;Please insert a small CV&amp;quot;
+    },
+    {
+        &amp;quot;name&amp;quot;: &amp;quot;age&amp;quot;,
+        &amp;quot;label&amp;quot;: &amp;quot;Age&amp;quot;,
+        &amp;quot;type&amp;quot;: &amp;quot;integer&amp;quot;,
+        &amp;quot;max_value&amp;quot;: 200,
+        &amp;quot;min_value&amp;quot;: 0
+    },
+    {
+        &amp;quot;name&amp;quot;: &amp;quot;marital_status&amp;quot;,
+        &amp;quot;label&amp;quot;: &amp;quot;Marital Status&amp;quot;,
+        &amp;quot;type&amp;quot;: &amp;quot;radio&amp;quot;,
+        &amp;quot;choices&amp;quot;: [
+            {&amp;quot;name&amp;quot;: &amp;quot;Single&amp;quot;, &amp;quot;value&amp;quot;:&amp;quot;single&amp;quot;},
+            {&amp;quot;name&amp;quot;: &amp;quot;Married&amp;quot;, &amp;quot;value&amp;quot;:&amp;quot;married&amp;quot;},
+            {&amp;quot;name&amp;quot;: &amp;quot;Divorced&amp;quot;, &amp;quot;value&amp;quot;:&amp;quot;divorced&amp;quot;},
+            {&amp;quot;name&amp;quot;: &amp;quot;Widower&amp;quot;, &amp;quot;value&amp;quot;:&amp;quot;widower&amp;quot;}
+        ]
+    },
+    {
+        &amp;quot;name&amp;quot;: &amp;quot;occupation&amp;quot;,
+        &amp;quot;label&amp;quot;: &amp;quot;Occupation&amp;quot;,
+        &amp;quot;type&amp;quot;: &amp;quot;select&amp;quot;,
+        &amp;quot;choices&amp;quot;: [
+            {&amp;quot;name&amp;quot;: &amp;quot;Farmer&amp;quot;, &amp;quot;value&amp;quot;:&amp;quot;farmer&amp;quot;},
+            {&amp;quot;name&amp;quot;: &amp;quot;Engineer&amp;quot;, &amp;quot;value&amp;quot;:&amp;quot;engineer&amp;quot;},
+            {&amp;quot;name&amp;quot;: &amp;quot;Teacher&amp;quot;, &amp;quot;value&amp;quot;:&amp;quot;teacher&amp;quot;},
+            {&amp;quot;name&amp;quot;: &amp;quot;Office Clerk&amp;quot;, &amp;quot;value&amp;quot;:&amp;quot;office_clerk&amp;quot;},
+            {&amp;quot;name&amp;quot;: &amp;quot;Merchant&amp;quot;, &amp;quot;value&amp;quot;:&amp;quot;merchant&amp;quot;},
+            {&amp;quot;name&amp;quot;: &amp;quot;Unemployed&amp;quot;, &amp;quot;value&amp;quot;:&amp;quot;unemployed&amp;quot;},
+            {&amp;quot;name&amp;quot;: &amp;quot;Retired&amp;quot;, &amp;quot;value&amp;quot;:&amp;quot;retired&amp;quot;},
+            {&amp;quot;name&amp;quot;: &amp;quot;Other&amp;quot;, &amp;quot;value&amp;quot;:&amp;quot;other&amp;quot;}
+        ]
+    },
+    {
+        &amp;quot;name&amp;quot;: &amp;quot;internet&amp;quot;,
+        &amp;quot;label&amp;quot;: &amp;quot;Internet Access&amp;quot;,
+        &amp;quot;type&amp;quot;: &amp;quot;checkbox&amp;quot;
+    }
+]
+&lt;/pre&gt;
+&lt;p&gt;The above &lt;span class="caps"&gt;JSON&lt;/span&gt; string can be easily converted to an array of dictionaries with the following&amp;nbsp;code:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+import json
+fields=json.loads(json_fields)
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="creating-the-form-fields"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id3"&gt;Creating the form&amp;nbsp;fields&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The most import part in the django dynamic form creation is to convert the above array
+of field-describing dictionaries to actual objects of type &lt;tt class="docutils literal"&gt;django.forms.Field&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;To help with that I implemented a class named &lt;tt class="docutils literal"&gt;FieldHandler&lt;/tt&gt; which gets an
+array of field dictionaries and after initialization will have an attribute named &lt;tt class="docutils literal"&gt;formfields&lt;/tt&gt; which
+will be a dictionary with keys the names of each field an values the corresponding &lt;tt class="docutils literal"&gt;django.forms.Field&lt;/tt&gt; objects. The implementation is as&amp;nbsp;follows:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+import django.forms
+
+class FieldHandler():
+    formfields = {}
+    def __init__(self, fields):
+        for field in fields:
+            options = self.get_options(field)
+            f = getattr(self, &amp;quot;create_field_for_&amp;quot;+field['type'] )(field, options)
+            self.formfields[field['name']] = f
+
+    def get_options(self, field):
+        options = {}
+        options['label'] = field['label']
+        options['help_text'] = field.get(&amp;quot;help_text&amp;quot;, None)
+        options['required'] = bool(field.get(&amp;quot;required&amp;quot;, 0) )
+        return options
+
+    def create_field_for_text(self, field, options):
+        options['max_length'] = int(field.get(&amp;quot;max_length&amp;quot;, &amp;quot;20&amp;quot;) )
+        return django.forms.CharField(**options)
+
+    def create_field_for_textarea(self, field, options):
+        options['max_length'] = int(field.get(&amp;quot;max_value&amp;quot;, &amp;quot;9999&amp;quot;) )
+        return django.forms.CharField(widget=django.forms.Textarea, **options)
+
+    def create_field_for_integer(self, field, options):
+        options['max_value'] = int(field.get(&amp;quot;max_value&amp;quot;, &amp;quot;999999999&amp;quot;) )
+        options['min_value'] = int(field.get(&amp;quot;min_value&amp;quot;, &amp;quot;-999999999&amp;quot;) )
+        return django.forms.IntegerField(**options)
+
+    def create_field_for_radio(self, field, options):
+        options['choices'] = [ (c['value'], c['name'] ) for c in field['choices'] ]
+        return django.forms.ChoiceField(widget=django.forms.RadioSelect,   **options)
+
+    def create_field_for_select(self, field, options):
+        options['choices']  = [ (c['value'], c['name'] ) for c in field['choices'] ]
+        return django.forms.ChoiceField(  **options)
+
+    def create_field_for_checkbox(self, field, options):
+        return django.forms.BooleanField(widget=django.forms.CheckboxInput, **options)
+&lt;/pre&gt;
+&lt;p&gt;As can be seen, in the &lt;tt class="docutils literal"&gt;__init__&lt;/tt&gt; method, the &lt;tt class="docutils literal"&gt;get_options&lt;/tt&gt; method is called first which
+returns a dictionary with the common options (label, help_text, required). After that,
+depending on the type of each field the correct method will be generated with
+&lt;tt class="docutils literal"&gt;getattr(self, &lt;span class="pre"&gt;&amp;quot;create_field_for_&amp;quot;+field['type']&lt;/span&gt; )&lt;/tt&gt; (so if type is text this
+will return a reference to the create_field_for_text method) and then called passing
+the field dictinary and the options returned from &lt;tt class="docutils literal"&gt;get_options&lt;/tt&gt;. Each one of
+the &lt;tt class="docutils literal"&gt;create_field_for_xxx&lt;/tt&gt; methods will extract the required (or optional)
+attributes for the specific field type, update options and initialize the correct Field passing
+the options as kwargs. Finally the formfields attribute will be updated with the name
+and Field&amp;nbsp;object.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="creating-the-actual-form"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id4"&gt;Creating the actual&amp;nbsp;form&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;To create the actual dynamic &lt;tt class="docutils literal"&gt;django.forms.Form&lt;/tt&gt; I used the function &lt;tt class="docutils literal"&gt;get_form&lt;/tt&gt;
+which receives a string with the json description, parses it to a python array,
+creates the array of fields with the help of &lt;tt class="docutils literal"&gt;FieldHandler&lt;/tt&gt; and then generates
+the &lt;tt class="docutils literal"&gt;Form&lt;/tt&gt; class with &lt;tt class="docutils literal"&gt;type&lt;/tt&gt; passing it &lt;tt class="docutils literal"&gt;django.forms.Form&lt;/tt&gt; as a parent
+and the array of &lt;tt class="docutils literal"&gt;django.forms.Field&lt;/tt&gt; from &lt;tt class="docutils literal"&gt;FieldHandler&lt;/tt&gt; as&amp;nbsp;attributes:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+def get_form(jstr):
+    fields=json.loads(jstr)
+    fh = FieldHandler(fields)
+    return type('DynaForm', (django.forms.Form,), fh.formfields )
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="using-the-dynamic-form"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt;Using the dynamic&amp;nbsp;form&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The result of &lt;tt class="docutils literal"&gt;get_form&lt;/tt&gt; can be used as a normal form class. As an&amp;nbsp;example:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+import dynaform
+
+def dform(request):
+    json_form = get_json_form_from_somewhere()
+    form_class = dynaform.get_form(json_form)
+    data = {}
+    if request.method == 'POST':
+        form = form_class(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+    else:
+        form = form_class()
+
+    return render_to_response( &amp;quot;dform.html&amp;quot;, {
+        'form': form,  'data': data,
+    }, RequestContext(request) )
+&lt;/pre&gt;
+&lt;p&gt;So, we have to get our &lt;span class="caps"&gt;JSON&lt;/span&gt; form description from somewhere (for instance
+a field in a model) and then generate the form class with &lt;tt class="docutils literal"&gt;get_form&lt;/tt&gt;.
+After that we follow the normal procedure of checking if the &lt;tt class="docutils literal"&gt;request.method&lt;/tt&gt;
+is &lt;span class="caps"&gt;POST&lt;/span&gt; so we pass the &lt;span class="caps"&gt;POST&lt;/span&gt; data to the form and check if it is value or
+we just create an empty form. As a result we just pass the data that was
+read from the form to the view for&amp;nbsp;presentation.&lt;/p&gt;
+&lt;/div&gt;
+</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Serafeim Papastefanos</dc:creator><pubDate>Tue, 24 Dec 2013 14:20:00 +0200</pubDate><guid>tag:spapas.github.io,2013-12-24:2013/12/24/django-dynamic-forms/</guid><category>django</category><category>python</category><category>forms</category></item><item><title>Django authority data</title><link>http://spapas.github.io/2013/11/05/django-authoritiy-data/</link><description>&lt;div class="contents topic" id="contents"&gt;
+&lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id1"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#defining-authorities" id="id2"&gt;Defining authorities&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#using-groups" id="id3"&gt;Using&amp;nbsp;groups&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#by-storing-the-authority-to-the-session" id="id4"&gt;By storing the authority to the&amp;nbsp;session&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#by-using-a-custom-user-profile" id="id5"&gt;By using a Custom User&amp;nbsp;Profile&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#getting-the-authority-of-the-user-has-to-be-dry" id="id6"&gt;Getting the authority of the user has to be &lt;span class="caps"&gt;DRY&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#adding-authority-data" id="id7"&gt;Adding authority&amp;nbsp;data&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#conclusion" id="id8"&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="introduction"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id1"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;One common requirement in an organization is to separate users in authorities (meaning departments / units / branches etc)
+and each authority have its own data. So users belonging to the &amp;quot;Athens Branch&amp;quot; won&amp;#8217;t be able to
+edit data submitted from users of the &amp;quot;Thessaloniki&amp;nbsp;Branch&amp;quot;.&lt;/p&gt;
+&lt;p&gt;This is a special case of the more general row-level-security in which each instance of a domain object will
+have an &lt;span class="caps"&gt;ACL&lt;/span&gt;. Row-level-security would need a many-to-many relation between object instances and authorities, something
+that would be overkill in our&amp;nbsp;case.&lt;/p&gt;
+&lt;p&gt;Authority data is also a more general case of the user-data meaning that each user can have access
+to data that he inserts in the system. Implementing user-data is easy using the techniques we will present&amp;nbsp;below.&lt;/p&gt;
+&lt;p&gt;We have to notice that the django permissions do not support our requirements since they define security for all instances of a&amp;nbsp;model.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="defining-authorities"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id2"&gt;Defining&amp;nbsp;authorities&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;In order to have custom authorities I propose first of all to add an Authority model that would define the authority. Even if
+your authorities only have a name I believe that adding the Authority model would be beneficial.
+Now, there are many ways to separate normal django users (&lt;tt class="docutils literal"&gt;django.contrib.auth.models.User&lt;/tt&gt;) to&amp;nbsp;authorities:&lt;/p&gt;
+&lt;div class="section" id="using-groups"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id3"&gt;Using&amp;nbsp;groups&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Just define a &lt;tt class="docutils literal"&gt;django.contrib.auth.models.Group&lt;/tt&gt; for each authority and add the users to the groups you want using the django-admin.
+Your Authority model would have an one-to-one relation with the &lt;tt class="docutils literal"&gt;django.contrib.auth.models.Group&lt;/tt&gt; so you will be able to find out the other
+information of the authority (since django groups only have&amp;nbsp;names).&lt;/p&gt;
+&lt;p&gt;Now you can just get the groups for the user and find out his authorities. This could lead to problems when users belong to django groups
+that are not related to authorities so you must filter these out (for instance by checking which groups actually have a corresponding&amp;nbsp;Authority).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="by-storing-the-authority-to-the-session"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id4"&gt;By storing the authority to the&amp;nbsp;session&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;When the user logs in you can add an attribute to the session that would save the authority of the user. To do that, you should define
+a custom middleware that checks to see if there is an authority attribute to the session and if not it will do whatever it needs to find it and set it.
+An example is&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class CustomAuthorityMiddleware:
+  def process_request(self, request):
+    if not request.session.get('authority'):
+      authority = get_the_authority(request.user)
+      request.session['authority']=authority
+&lt;/pre&gt;
+&lt;p&gt;This way, whenever you want to find out the authority of the user you just check the&amp;nbsp;session.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="by-using-a-custom-user-profile"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id5"&gt;By using a Custom User&amp;nbsp;Profile&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Just create a &lt;a class="reference external" href="https://docs.djangoproject.com/en/dev/topics/auth/customizing/#extending-the-existing-user-model"&gt;django user profile&lt;/a&gt; and add to it a &lt;tt class="docutils literal"&gt;ForeignKey&lt;/tt&gt; to your Authority&amp;nbsp;model:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class Profile(models.Model):
+  user = models.OneToOneField('django.auth.User')
+  authority = models.ForeignKey('authorities.Authority', blank=True, null=True )
+
+class Authority(models.Model):
+  id = models.IntegerField(primary_key = True)
+  name = models.CharField(max_length=64, )
+  auth_type = models.CharField(max_length=16, )
+&lt;/pre&gt;
+&lt;p&gt;You can get the authority of the user through &lt;tt class="docutils literal"&gt;request.user.profile.authority&lt;/tt&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="getting-the-authority-of-the-user-has-to-be-dry"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id6"&gt;Getting the authority of the user has to be &lt;span class="caps"&gt;DRY&lt;/span&gt;&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Whatever method you use to define the authorities of your users you have to remember that it is very
+important to define somewhere a function that will return the authority (or authorities) of a
+user. You need to define a function even in the simple case in which your function would just return &lt;tt class="docutils literal"&gt;request.user.profile.authority&lt;/tt&gt;.
+This will greatly help you when you wish to add some logic to this, for instance &amp;quot;quickly disable users belonging to Authority X
+or temporary move users from Authority Y to authority&amp;nbsp;Z&amp;quot;.&lt;/p&gt;
+&lt;p&gt;Let us suppose that you have defined a &lt;tt class="docutils literal"&gt;get_user_authority&lt;/tt&gt; function. Also, you need to define a &lt;tt class="docutils literal"&gt;has_access&lt;/tt&gt; function
+that would decide if a users/request has access to a particular object. This also needs to be &lt;span class="caps"&gt;DRY&lt;/span&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="adding-authority-data"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id7"&gt;Adding authority&amp;nbsp;data&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;To define authority data you have to add a field to your model that would define its authority, for instance like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class AuthorityData(models.Model):
+  authority = models.ForeignKey('authorities.Authority', editable=False,)
+&lt;/pre&gt;
+&lt;p&gt;This field should not be editable (at least by your end users) because they shouldn&amp;#8217;t be able to change the authority of the data they&amp;nbsp;insert.&lt;/p&gt;
+&lt;p&gt;If you want to have user-data then just add a &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;models.ForeignKey('django.auth.User',&lt;/span&gt; editable=False)&lt;/tt&gt;&lt;/p&gt;
+&lt;p&gt;Now, your Create and Update Class Based Views have to pass the request to your forms and also your Detail and Update &lt;span class="caps"&gt;CBV&lt;/span&gt; should allow only getting
+objects that belong to the authority of the&amp;nbsp;user:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class AuthorityDataCreateView(CreateView):
+  model=models.AuthorityData
+
+  def get_form_kwargs(self):
+      kwargs = super(AuthorityDataCreateView, self).get_form_kwargs()
+      kwargs.update({'request': self.request})
+      return kwargs
+
+class AuthorityDataDetailView(DetailView):
+  def get_object(self, queryset=None):
+      obj = super(AuthorityDataDetailView, self).get_object(queryset)
+      if if not user_has_access(obj, self.request):
+          raise Http404(u&amp;quot;Access Denied&amp;quot;)
+      return obj
+
+class AuthorityDataUpdateView(UpdateView):
+  model=models.AuthorityData
+
+  def get_form_kwargs(self):
+      kwargs = super(AuthorityDataUpdateView, self).get_form_kwargs()
+      kwargs.update({'request': self.request})
+      return kwargs
+
+  def get_object(self, queryset=None):
+      obj = super(AuthorityDataUpdateView, self).get_object(queryset)
+      if if not user_has_access(obj, self.request):
+          raise Http404(u&amp;quot;Access Denied&amp;quot;)
+      return obj
+&lt;/pre&gt;
+&lt;p&gt;Your ModelForm can now use the request to get the Authority and set it (don&amp;#8217;t forget
+that you should not use &lt;tt class="docutils literal"&gt;Meta.exclude&lt;/tt&gt; but instead use &lt;tt class="docutils literal"&gt;Meta.include&lt;/tt&gt;!):&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class AuthorityDataModelForm(forms.ModelForm):
+    class Meta:
+      model = models.AuthorityData
+      exclude = ('authority',)
+
+    def __init__(self, *args, **kwargs):
+      self.request = kwargs.pop('request', None)
+      super(ActionModelForm, self).__init__(*args, **kwargs)
+
+
+    def save(self, force_insert=False, force_update=False, commit=True):
+      obj = super(AuthorityDataModelForm, self).save(commit=False)
+      if obj:
+          obj.authority = get_user_authority(self.request)
+          obj.save()
+      return obj
+&lt;/pre&gt;
+&lt;p&gt;The previous work fine for Create/Detail/Update CBVs but not for ListsViews. List views querysets
+and in general all queries to the object have to be filtered through&amp;nbsp;authority.&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class AuthorityDataListView(ListView):
+  def get_queryset(self):
+    queryset = super(AuthorityDataModelForm, self).get_queryset()
+    return queryset.filter(authority = get_user_authority(request))
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="conclusion"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id8"&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Using the above techniques we can define authority (or just user) data. Your AuthorityData should
+have a &lt;tt class="docutils literal"&gt;ForeignKey&lt;/tt&gt; to your Authority  and you have configure your queries, ModelForms and CBVs
+to use that. If you have more than one models that belong to an authority and want to stay &lt;span class="caps"&gt;DRY&lt;/span&gt; then you&amp;#8217;d need
+to define all the above as &lt;a class="reference external" href="https://docs.djangoproject.com/en/dev/topics/class-based-views/mixins/"&gt;mixins&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Serafeim Papastefanos</dc:creator><pubDate>Tue, 05 Nov 2013 14:20:00 +0200</pubDate><guid>tag:spapas.github.io,2013-11-05:2013/11/05/django-authoritiy-data/</guid><category>django</category><category>python</category><category>security</category></item></channel></rss>

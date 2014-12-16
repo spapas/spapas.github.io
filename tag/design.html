@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="google-site-verification" content="5_8DTmIiEq4gFvNAfxAD6TsGOgrMAjp8lQFQvfA6zZc" />
-  <title>/var/</title>
+  <title>/var/ - design</title>
   <meta name="author" content="Serafeim Papastefanos">
 
 
@@ -54,7 +54,7 @@
     <li >
     <a href="http://spapas.github.io/category/pelican.html">Pelican</a>
     </li>
-    <li class="active">
+    <li >
     <a href="http://spapas.github.io/category/python.html">Python</a>
     </li>
     <li >
@@ -70,59 +70,59 @@
   		<article>
 <header>
       <h1 class="entry-title">
-        <a href="http://spapas.github.io/2014/10/23/retrieve-gmail-blocked-attachments/">Retrieving Gmail blocked attachments</a>
+        <a href="http://spapas.github.io/2014/12/13/change-bootstrap-material-primary-color/">Change the primary color of bootstrap material design</a>
       </h1>
-      <p class="meta"><time datetime="2014-10-23T14:20:00" pubdate>Πεμ 23 Οκτώβριος 2014</time></p>
+      <p class="meta"><time datetime="2014-12-13T16:20:00" pubdate>Σαβ 13 Δεκέμβριος 2014</time></p>
 </header>
 
-  <div class="entry-content"><p>Before services like Dropbox were widely available, some people (including me) were using
-their Gmail account as a primitive backup solution: Compress your directory and send it to
-your gmail. There. Backup&nbsp;complete.</p>
-<p>However, nothing is so&nbsp;easy&#8230;</p>
-<p>Recently, I wanted to retrieve one of these backups, a .rar containing the complete
-source code (since it was written in TeX) of my PhD thesis. The problem was that Gmail blocked the access to these attachments&nbsp;saying</p>
-<blockquote>
-Anti-virus warning - 1 attachment contains a virus or blocked file. Downloading this attachment is disabled.</blockquote>
-<p>probably because I had a number of .bat files inside that .rar archive to automate my work&nbsp;:(</p>
-<p>Now what&nbsp;?</p>
-<p>After searching the internet and not founding any solutions, I tried the options that gmail gives for each email. One
-particular one cought my interest: <em>Show&nbsp;original</em></p>
-<img alt="Here it is!" src="/images/show_original.png" style="width: 780px;" />
-<p>Clicking this option opened a text file with the original, <span class="caps">MIME</span> encoded message. The interesting thing of course&nbsp;was</p>
+  <div class="entry-content"><div class="section" id="introduction">
+<h2>Introduction</h2>
+<p><a class="reference external" href="https://github.com/FezVrasta/bootstrap-material-design">Bootstrap Material Design</a> is a great theme that sits on top of <a class="reference external" href="http://getbootstrap.com/">Bootstrap</a> and transforms it to
+<a class="reference external" href="http://www.google.com/design/spec/material-design/introduction.html">Material Design</a>! The great thing about Bootstrap Material Design is that you just need to include
+its css and js files after your Bootstrap files and&nbsp;&#8230;</p>
+<p>boom! Your page is Material Design&nbsp;compatible!</p>
+<object data="https://google.github.io/material-design-icons/action/svg/ic_thumb_up_24px.svg" type="image/svg+xml">
+</object>
+<p>A nice feature of Bootstrap Material Design is that you can change its default color to a new one (I
+don&#8217;t really like the current - greenish one). This is easy for people with less skills however I
+found it rather challenging when I tried it. That&#8217;s why I will present a step by step tutorial on
+changing the default primary color of the Bootstrap Material Design&nbsp;theme:</p>
+</div>
+<div class="section" id="step-1-get-the-code">
+<h2>Step 1: Get the&nbsp;code</h2>
+<p>Use git to make a local clone of the project with <tt class="docutils literal">git clone <span class="pre">https://github.com/FezVrasta/bootstrap-material-design.git</span></tt>. This will create a directory
+named <tt class="docutils literal"><span class="pre">bootstrap-material-design</span></tt>. Or you can download the latest version of the code using (<a class="reference external" href="https://github.com/FezVrasta/bootstrap-material-design/archive/master.zip">https://github.com/FezVrasta/bootstrap-material-design/archive/master.zip</a>)
+and unzip it to the <tt class="docutils literal"><span class="pre">bootstrap-material-design</span></tt> directory.</p>
+</div>
+<div class="section" id="step-2-install-node-js-and-npm">
+<h2>Step 2: Install node.js and&nbsp;npm</h2>
+<p>You need to have <a class="reference external" href="http://nodejs.org/">node.js</a> and npm installed in your system - this is something very easy so I won&#8217;t go into any details about this. After you have installed
+both node.js and npm you need to put them in your path so that you&#8217;ll be able to run <tt class="docutils literal">npm <span class="pre">-v</span></tt> without errors and receive something like <tt class="docutils literal">1.4.14</tt>.</p>
+</div>
+<div class="section" id="step-3-install-less">
+<h2>Step 3: Install&nbsp;less</h2>
+<p><a class="reference external" href="http://lesscss.org/">less</a> is a <span class="caps">CSS</span> preprocessor in which Bootstrap Material Design has been written. To install it, just enter the command <tt class="docutils literal">npm install <span class="pre">-g</span> less</tt>. After that
+you should have a command named <tt class="docutils literal">lessc</tt> which, when run would output something like: <tt class="docutils literal">lessc 2.1.1 (Less Compiler) [JavaScript]</tt>.</p>
+</div>
+<div class="section" id="step-4-create-the-customizations-files">
+<h2>Step 4: Create the customizations&nbsp;files</h2>
+<p>Go to the directory where you cloned (or unzipped) the Bootstrap Material Design code and create a file named <tt class="docutils literal">custom.less</tt> (so, that file should be
+in the same folder as with <tt class="docutils literal">bower.json</tt>, <tt class="docutils literal">Gruntfile.js</tt> etc) with the following&nbsp;contents:</p>
 <pre class="code literal-block">
-------=_NextPart_000_004F_01CA0AED.E63C2A30
-Content-Type: application/octet-stream;
-      name=&quot;phdstuff.rar&quot;
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
-      filename=&quot;phdstuff.rar&quot;
+&#64;import &quot;less/material-wfont.less&quot;;
 
-UmFyIRoHAM+QcwAADQAAAAAAAAB0f3TAgCwANAMAAFQEAAACRbXCx8lr9TodMwwAIAAAAG5ld2Zp
-bmFsLnR4dA3dEQzM082BF7sB+D3q6QPUNEfwG7vHQgNkiQDTkGvfhOE4mNltIJJlBFMOCQPzPeKD
-...
+// Override &#64;primary color with one took from _colors.less
+&#64;primary: &#64;indigo;
 </pre>
-<p>So the whole attachment was contained in that text file, encoded in base64! Now I just
-needed to extract it from the email and convert it back to&nbsp;binary.</p>
-<p>This was very easy to do using Python - some people <a class="reference external" href="http://stackoverflow.com/questions/4067937/getting-mail-attachment-to-python-file-object">had already asked the same thing on <span class="caps">SO</span></a>.
-So here&#8217;s a simple program that gets an email in text/mime format as input and dumps all&nbsp;attachments:</p>
-<div class="highlight"><pre><span class="kn">import</span> <span class="nn">email</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-
-<span class="k">if</span> <span class="n">__name__</span><span class="o">==</span><span class="s">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span><span class="o">&lt;</span><span class="mi">2</span><span class="p">:</span>
-        <span class="k">print</span> <span class="s">&quot;Please enter a file to extract attachments from&quot;</span>
-        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-
-    <span class="n">msg</span> <span class="o">=</span> <span class="n">email</span><span class="o">.</span><span class="n">message_from_file</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
-    <span class="k">for</span> <span class="n">pl</span> <span class="ow">in</span> <span class="n">msg</span><span class="o">.</span><span class="n">get_payload</span><span class="p">():</span>
-        <span class="k">if</span> <span class="n">pl</span><span class="o">.</span><span class="n">get_filename</span><span class="p">():</span> <span class="c"># if it is an attachment</span>
-            <span class="nb">open</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">get_filename</span><span class="p">(),</span> <span class="s">&#39;wb&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">get_payload</span><span class="p">(</span><span class="n">decode</span><span class="o">=</span><span class="bp">True</span><span class="p">))</span>
-</pre></div>
-<p>Save this to a file named <tt class="docutils literal">get_attachments.py</tt> and, after saving the original message to a file
-named <tt class="docutils literal">0.txt</tt> run <tt class="docutils literal">python get_attachments.py 0.txt</tt> and you&#8217;ll see the attachments of your email in the same&nbsp;folder!</p>
-<blockquote>
-Disclaimer: I have to warn you that since Gmail claims that an attachment is <em>not safe</em> it may be <strong>actually not safe</strong>. So
-you must be 100% sure that you know what you are doing before retrievening your email attachments like this.</blockquote>
+<p>(I wanted to use the indigo color as my primary one - you may of course use whichever color from the ones defined in <tt class="docutils literal">less/_variables.less</tt> you&nbsp;like)</p>
+<p>This file may contain other default values for variables - if I find anything useful I will add it to this post (also please reply with any&nbsp;recommendations).</p>
+</div>
+<div class="section" id="step-5-create-your-custom-material-css-file">
+<h2>Step 5: Create your custom material css&nbsp;file</h2>
+<p>Finally, run the following command: <tt class="docutils literal">lessc custom.less&nbsp; &gt; <span class="pre">material-custom.css</span></tt>. This will create a file named <tt class="docutils literal"><span class="pre">material-custom.css</span></tt> that contains your
+custom version of Bootstrap Material Design! If you want your <tt class="docutils literal"><span class="pre">material-custom.css</span></tt> to be compressed, add the <tt class="docutils literal"><span class="pre">-x</span></tt> option like this:  <tt class="docutils literal">lessc <span class="pre">-x</span> custom.less&nbsp; &gt; <span class="pre">material-custom.css</span></tt>.</p>
+<p>You may now include <tt class="docutils literal"><span class="pre">material-custom.css</span></tt> instead of <tt class="docutils literal">material.css</tt> (or the minified version of it) to your projects and you&#8217;ll have your own primary&nbsp;color!</p>
+</div>
 </div>
   		</article>
 <div class="pagination">
@@ -134,7 +134,7 @@ you must be 100% sure that you know what you are doing before retrievening your 
     <h1>Recent Posts</h1>
     <ul id="recent_posts">
       <li class="post">
-          <a href="http://spapas.github.io/2014/10/23/retrieve-gmail-blocked-attachments/">Retrieving Gmail blocked attachments</a>
+          <a href="http://spapas.github.io/2014/12/13/change-bootstrap-material-primary-color/">Change the primary color of bootstrap material design</a>
       </li>
     </ul>
   </section>

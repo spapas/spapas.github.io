@@ -1,5 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>/var/</title><link href="http://spapas.github.io/" rel="alternate"></link><link href="http://spapas.github.io/feeds/all.atom.xml" rel="self"></link><id>http://spapas.github.io/</id><updated>2014-10-23T14:20:00+03:00</updated><entry><title>Retrieving Gmail blocked attachments</title><link href="http://spapas.github.io/2014/10/23/retrieve-gmail-blocked-attachments/" rel="alternate"></link><updated>2014-10-23T14:20:00+03:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2014-10-23:2014/10/23/retrieve-gmail-blocked-attachments/</id><summary type="html">&lt;p&gt;Before services like Dropbox were widely available, some people (including me) were using
+<feed xmlns="http://www.w3.org/2005/Atom"><title>/var/</title><link href="http://spapas.github.io/" rel="alternate"></link><link href="http://spapas.github.io/feeds/all.atom.xml" rel="self"></link><id>http://spapas.github.io/</id><updated>2014-12-13T16:20:00+02:00</updated><entry><title>Change the primary color of bootstrap material design</title><link href="http://spapas.github.io/2014/12/13/change-bootstrap-material-primary-color/" rel="alternate"></link><updated>2014-12-13T16:20:00+02:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2014-12-13:2014/12/13/change-bootstrap-material-primary-color/</id><summary type="html">&lt;div class="section" id="introduction"&gt;
+&lt;h2&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://github.com/FezVrasta/bootstrap-material-design"&gt;Bootstrap Material Design&lt;/a&gt; is a great theme that sits on top of &lt;a class="reference external" href="http://getbootstrap.com/"&gt;Bootstrap&lt;/a&gt; and transforms it to
+&lt;a class="reference external" href="http://www.google.com/design/spec/material-design/introduction.html"&gt;Material Design&lt;/a&gt;! The great thing about Bootstrap Material Design is that you just need to include
+its css and js files after your Bootstrap files and&amp;nbsp;&amp;#8230;&lt;/p&gt;
+&lt;p&gt;boom! Your page is Material Design&amp;nbsp;compatible!&lt;/p&gt;
+&lt;object data="https://google.github.io/material-design-icons/action/svg/ic_thumb_up_24px.svg" type="image/svg+xml"&gt;
+&lt;/object&gt;
+&lt;p&gt;A nice feature of Bootstrap Material Design is that you can change its default color to a new one (I
+don&amp;#8217;t really like the current - greenish one). This is easy for people with less skills however I
+found it rather challenging when I tried it. That&amp;#8217;s why I will present a step by step tutorial on
+changing the default primary color of the Bootstrap Material Design&amp;nbsp;theme:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="step-1-get-the-code"&gt;
+&lt;h2&gt;Step 1: Get the&amp;nbsp;code&lt;/h2&gt;
+&lt;p&gt;Use git to make a local clone of the project with &lt;tt class="docutils literal"&gt;git clone &lt;span class="pre"&gt;https://github.com/FezVrasta/bootstrap-material-design.git&lt;/span&gt;&lt;/tt&gt;. This will create a directory
+named &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;bootstrap-material-design&lt;/span&gt;&lt;/tt&gt;. Or you can download the latest version of the code using (&lt;a class="reference external" href="https://github.com/FezVrasta/bootstrap-material-design/archive/master.zip"&gt;https://github.com/FezVrasta/bootstrap-material-design/archive/master.zip&lt;/a&gt;)
+and unzip it to the &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;bootstrap-material-design&lt;/span&gt;&lt;/tt&gt; directory.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="step-2-install-node-js-and-npm"&gt;
+&lt;h2&gt;Step 2: Install node.js and&amp;nbsp;npm&lt;/h2&gt;
+&lt;p&gt;You need to have &lt;a class="reference external" href="http://nodejs.org/"&gt;node.js&lt;/a&gt; and npm installed in your system - this is something very easy so I won&amp;#8217;t go into any details about this. After you have installed
+both node.js and npm you need to put them in your path so that you&amp;#8217;ll be able to run &lt;tt class="docutils literal"&gt;npm &lt;span class="pre"&gt;-v&lt;/span&gt;&lt;/tt&gt; without errors and receive something like &lt;tt class="docutils literal"&gt;1.4.14&lt;/tt&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="step-3-install-less"&gt;
+&lt;h2&gt;Step 3: Install&amp;nbsp;less&lt;/h2&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://lesscss.org/"&gt;less&lt;/a&gt; is a &lt;span class="caps"&gt;CSS&lt;/span&gt; preprocessor in which Bootstrap Material Design has been written. To install it, just enter the command &lt;tt class="docutils literal"&gt;npm install &lt;span class="pre"&gt;-g&lt;/span&gt; less&lt;/tt&gt;. After that
+you should have a command named &lt;tt class="docutils literal"&gt;lessc&lt;/tt&gt; which, when run would output something like: &lt;tt class="docutils literal"&gt;lessc 2.1.1 (Less Compiler) [JavaScript]&lt;/tt&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="step-4-create-the-customizations-files"&gt;
+&lt;h2&gt;Step 4: Create the customizations&amp;nbsp;files&lt;/h2&gt;
+&lt;p&gt;Go to the directory where you cloned (or unzipped) the Bootstrap Material Design code and create a file named &lt;tt class="docutils literal"&gt;custom.less&lt;/tt&gt; (so, that file should be
+in the same folder as with &lt;tt class="docutils literal"&gt;bower.json&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;Gruntfile.js&lt;/tt&gt; etc) with the following&amp;nbsp;contents:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;#64;import &amp;quot;less/material-wfont.less&amp;quot;;
+
+// Override &amp;#64;primary color with one took from _colors.less
+&amp;#64;primary: &amp;#64;indigo;
+&lt;/pre&gt;
+&lt;p&gt;(I wanted to use the indigo color as my primary one - you may of course use whichever color from the ones defined in &lt;tt class="docutils literal"&gt;less/_variables.less&lt;/tt&gt; you&amp;nbsp;like)&lt;/p&gt;
+&lt;p&gt;This file may contain other default values for variables - if I find anything useful I will add it to this post (also please reply with any&amp;nbsp;recommendations).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="step-5-create-your-custom-material-css-file"&gt;
+&lt;h2&gt;Step 5: Create your custom material css&amp;nbsp;file&lt;/h2&gt;
+&lt;p&gt;Finally, run the following command: &lt;tt class="docutils literal"&gt;lessc custom.less&amp;nbsp; &amp;gt; &lt;span class="pre"&gt;material-custom.css&lt;/span&gt;&lt;/tt&gt;. This will create a file named &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;material-custom.css&lt;/span&gt;&lt;/tt&gt; that contains your
+custom version of Bootstrap Material Design! If you want your &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;material-custom.css&lt;/span&gt;&lt;/tt&gt; to be compressed, add the &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;-x&lt;/span&gt;&lt;/tt&gt; option like this:  &lt;tt class="docutils literal"&gt;lessc &lt;span class="pre"&gt;-x&lt;/span&gt; custom.less&amp;nbsp; &amp;gt; &lt;span class="pre"&gt;material-custom.css&lt;/span&gt;&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;You may now include &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;material-custom.css&lt;/span&gt;&lt;/tt&gt; instead of &lt;tt class="docutils literal"&gt;material.css&lt;/tt&gt; (or the minified version of it) to your projects and you&amp;#8217;ll have your own primary&amp;nbsp;color!&lt;/p&gt;
+&lt;/div&gt;
+</summary><category term="css"></category><category term="design"></category><category term="boostrap-material-design"></category><category term="less"></category><category term="node.js"></category></entry><entry><title>Retrieving Gmail blocked attachments</title><link href="http://spapas.github.io/2014/10/23/retrieve-gmail-blocked-attachments/" rel="alternate"></link><updated>2014-10-23T14:20:00+03:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2014-10-23:2014/10/23/retrieve-gmail-blocked-attachments/</id><summary type="html">&lt;p&gt;Before services like Dropbox were widely available, some people (including me) were using
 their Gmail account as a primitive backup solution: Compress your directory and send it to
 your gmail. There. Backup&amp;nbsp;complete.&lt;/p&gt;
 &lt;p&gt;However, nothing is so&amp;nbsp;easy&amp;#8230;&lt;/p&gt;

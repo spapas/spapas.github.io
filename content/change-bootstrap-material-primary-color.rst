@@ -1,7 +1,7 @@
 Change the primary color of bootstrap material design
 #####################################################
 
-:date: 2014-12-13 16:20
+:date: 2014-12-16 16:20
 :tags: css, design, boostrap-material-design, less, node.js
 :category: css
 :slug: change-bootstrap-material-primary-color

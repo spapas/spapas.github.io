@@ -5,35 +5,35 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>http://spapas.github.io/index.html</loc>
-<lastmod>2014-12-16T16:23:39-00:00</lastmod>
+<lastmod>2014-12-16T16:25:04-00:00</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://spapas.github.io/archives.html</loc>
-<lastmod>2014-12-16T16:23:39-00:00</lastmod>
+<lastmod>2014-12-16T16:25:04-00:00</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://spapas.github.io/tags.html</loc>
-<lastmod>2014-12-16T16:23:39-00:00</lastmod>
+<lastmod>2014-12-16T16:25:04-00:00</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://spapas.github.io/categories.html</loc>
-<lastmod>2014-12-16T16:23:39-00:00</lastmod>
+<lastmod>2014-12-16T16:25:04-00:00</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
-<loc>http://spapas.github.io/2014/12/13/change-bootstrap-material-primary-color/</loc>
-<lastmod>2014-12-13T16:20:00-00:00</lastmod>
+<loc>http://spapas.github.io/2014/12/16/change-bootstrap-material-primary-color/</loc>
+<lastmod>2014-12-16T16:20:00-00:00</lastmod>
 <changefreq>monthly</changefreq>
 <priority>0.5</priority>
 </url>
@@ -110,7 +110,7 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>http://spapas.github.io/category/css.html</loc>
-<lastmod>2014-12-13T16:20:00+01:35</lastmod>
+<lastmod>2014-12-16T16:20:00+01:35</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.5</priority>
 </url>
@@ -180,7 +180,7 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>http://spapas.github.io/tag/nodejs.html</loc>
-<lastmod>2014-12-13T16:20:00+01:35</lastmod>
+<lastmod>2014-12-16T16:20:00+01:35</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.5</priority>
 </url>
@@ -201,7 +201,7 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>http://spapas.github.io/tag/design.html</loc>
-<lastmod>2014-12-13T16:20:00+01:35</lastmod>
+<lastmod>2014-12-16T16:20:00+01:35</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.5</priority>
 </url>
@@ -236,7 +236,7 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>http://spapas.github.io/tag/less.html</loc>
-<lastmod>2014-12-13T16:20:00+01:35</lastmod>
+<lastmod>2014-12-16T16:20:00+01:35</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.5</priority>
 </url>
@@ -278,7 +278,7 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>http://spapas.github.io/tag/css.html</loc>
-<lastmod>2014-12-13T16:20:00+01:35</lastmod>
+<lastmod>2014-12-16T16:20:00+01:35</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.5</priority>
 </url>
@@ -383,14 +383,14 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>http://spapas.github.io/tag/boostrap-material-design.html</loc>
-<lastmod>2014-12-13T16:20:00+01:35</lastmod>
+<lastmod>2014-12-16T16:20:00+01:35</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://spapas.github.io/author/serafeim-papastefanos.html</loc>
-<lastmod>2014-12-13T16:20:00+01:35</lastmod>
+<lastmod>2014-12-16T16:20:00+01:35</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.5</priority>
 </url>

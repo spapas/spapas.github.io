@@ -80,5 +80,8 @@ named ``0.txt`` run ``python get_attachments.py 0.txt`` and you'll see the attac
  Disclaimer: I have to warn you that since Gmail claims that an attachment is *not safe* it may be **actually not safe**. So 
  you must be 100% sure that you know what you are doing before retrievening your email attachments like this.
  
+**Update**: Stefan `created an improved version`_ of the attachment extractor which is also compatible with Python 3.4! 
+
+.. _`created an improved version`: https://gist.github.com/stefansundin/a99bbfb6cda873d14fd2
  
  

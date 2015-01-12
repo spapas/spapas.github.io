@@ -25,6 +25,7 @@ probably because I had a number of .bat files inside that .rar archive to automa
 
 Now what ? 
 
+
 After searching the internet and not founding any solutions, I tried the options that gmail gives for each email. One
 particular one cought my interest: *Show original*
 
@@ -81,6 +82,17 @@ named ``0.txt`` run ``python get_attachments.py 0.txt`` and you'll see the attac
  you must be 100% sure that you know what you are doing before retrievening your email attachments like this.
  
 **Update**: Stefan `created an improved version`_ of the attachment extractor which is also compatible with Python 3.4! 
+
+**Update, 12 January 2015**: Ivana (at the comments section) proposed a different solution that may work
+for some files: *Use a mobile Gmail client (I tested it with Android) and "Save to Drive" your attachment.
+You'll then be able to download it from the Google Drive!* 
+
+I am not sure if this works for all attachments, 
+however it worked for the source of my PhD thesis! I'm writing it may not work for all attachments because
+when you download something from Google Drive it does a virus check so it may not allow you to download the
+attachment and then  you'll still need to do it manually using the method below (however **in that case you 
+must be even more cautious for the case the attachment actualyl contains a malicious file**).
+
 
 .. _`created an improved version`: https://gist.github.com/stefansundin/a99bbfb6cda873d14fd2
  

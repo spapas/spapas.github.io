@@ -48,4 +48,12 @@ named &lt;tt class="docutils literal"&gt;0.txt&lt;/tt&gt; run &lt;tt class="docu
 Disclaimer: I have to warn you that since Gmail claims that an attachment is &lt;em&gt;not safe&lt;/em&gt; it may be &lt;strong&gt;actually not safe&lt;/strong&gt;. So
 you must be 100% sure that you know what you are doing before retrievening your email attachments like this.&lt;/blockquote&gt;
 &lt;p&gt;&lt;strong&gt;Update&lt;/strong&gt;: Stefan &lt;a class="reference external" href="https://gist.github.com/stefansundin/a99bbfb6cda873d14fd2"&gt;created an improved version&lt;/a&gt; of the attachment extractor which is also compatible with Python&amp;nbsp;3.4!&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Update, 12 January 2015&lt;/strong&gt;: Ivana (at the comments section) proposed a different solution that may work
+for some files: &lt;em&gt;Use a mobile Gmail client (I tested it with Android) and &amp;quot;Save to Drive&amp;quot; your attachment.
+You&amp;#8217;ll then be able to download it from the Google&amp;nbsp;Drive!&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;I am not sure if this works for all attachments,
+however it worked for the source of my PhD thesis! I&amp;#8217;m writing it may not work for all attachments because
+when you download something from Google Drive it does a virus check so it may not allow you to download the
+attachment and then  you&amp;#8217;ll still need to do it manually using the method below (however &lt;strong&gt;in that case you
+must be even more cautious for the case the attachment actualyl contains a malicious file&lt;/strong&gt;).&lt;/p&gt;
 </summary><category term="gmail"></category><category term="python"></category><category term="security"></category><category term="google"></category></entry></feed>

@@ -1,5 +1,348 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>/var/</title><link>http://spapas.github.io/</link><description>Various programming stuff</description><atom:link href="http://spapas.github.io/feeds/all.rss.xml" rel="self"></atom:link><lastBuildDate>Tue, 16 Dec 2014 16:20:00 +0200</lastBuildDate><item><title>Change the primary color of bootstrap material design</title><link>http://spapas.github.io/2014/12/16/change-bootstrap-material-primary-color/</link><description>&lt;div class="section" id="introduction"&gt;
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>/var/</title><link>http://spapas.github.io/</link><description>Various programming stuff</description><atom:link href="http://spapas.github.io/feeds/all.rss.xml" rel="self"></atom:link><lastBuildDate>Wed, 21 Jan 2015 14:20:00 +0200</lastBuildDate><item><title>Django model auditing</title><link>http://spapas.github.io/2015/01/21/django-model-auditing/</link><description>&lt;div class="contents topic" id="contents"&gt;
+&lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id5"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#adding-simple-auditing-functionality-ourselves" id="id6"&gt;Adding simple auditing functionality&amp;nbsp;ourselves&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#example" id="id7"&gt;Example&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#models-py" id="id8"&gt;models.py&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#forms-py" id="id9"&gt;forms.py&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#views-py" id="id10"&gt;views.py&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#urls-py" id="id11"&gt;urls.py&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#templates" id="id12"&gt;templates&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#using-django-simple-history" id="id13"&gt;Using django-simple-history&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#installation" id="id14"&gt;Installation&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#id1" id="id15"&gt;Example&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#usage" id="id16"&gt;Usage&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#using-django-reversion" id="id17"&gt;Using django-reversion&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#id2" id="id18"&gt;Installation&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#id3" id="id19"&gt;Example&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#id4" id="id20"&gt;Usage&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#conclusion" id="id21"&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="introduction"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;An auditing trail is a common requirement in most non-trivial applications. Organizations
+need to know &lt;em&gt;who&lt;/em&gt; did the change, &lt;em&gt;when&lt;/em&gt; it was done and &lt;em&gt;what&lt;/em&gt; was actually changed.
+In this post we will see three
+different solution in order to add this functionality in Django: doing it ourselves,
+using django-simple-history and using&amp;nbsp;django-reversion.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="adding-simple-auditing-functionality-ourselves"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id6"&gt;Adding simple auditing functionality&amp;nbsp;ourselves&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;A simple way to actually do auditing is to keep four extra fields in our models:
+&lt;tt class="docutils literal"&gt;created_by&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;created_on&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;modified_by&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;modified_on&lt;/tt&gt;. The first two
+will be filled when the model instance is created while the latter two will be
+changed whenever the model instance is saved. So we only have &lt;em&gt;who&lt;/em&gt; and &lt;em&gt;whe&lt;/em&gt;.
+Sometimes, these are enough so let&amp;#8217;s see how easy it is to implement it in&amp;nbsp;django.&lt;/p&gt;
+&lt;p&gt;We&amp;#8217;ll need an abstract model that could be used as a base class for models that need&amp;nbsp;auditing:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;django.conf&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;settings&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;django.db&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;models&lt;/span&gt;
+
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Auditable&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;models&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Model&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="n"&gt;created_on&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;models&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;DateTimeField&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;auto_now_add&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;True&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;created_by&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;models&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;ForeignKey&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;settings&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;AUTH_USER_MODEL&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;related_name&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;created_by&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+    &lt;span class="n"&gt;modified_on&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;models&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;DateTimeField&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;auto_now&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;True&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;modified_by&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;models&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;ForeignKey&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;settings&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;AUTH_USER_MODEL&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;related_name&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;modified_by&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+    &lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Meta&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="n"&gt;abstract&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;True&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Models inheriting from &lt;tt class="docutils literal"&gt;Auditable&lt;/tt&gt; will contain their datetime of creation and modification
+which will be automatically filled using the very usefull &lt;tt class="docutils literal"&gt;auto_now_add_&lt;/tt&gt; (which will
+set the current datetime when the model instance is created) and &lt;tt class="docutils literal"&gt;auto_now_&lt;/tt&gt; (which will
+set the current datetime when the model instance is&amp;nbsp;modified).&lt;/p&gt;
+&lt;p&gt;Such models will also have two foreign keys to &lt;tt class="docutils literal"&gt;User&lt;/tt&gt;, one for the user
+that created the and one of the user that modified them. The problem with these two fields
+is that they cannot be filled automatically (like the datetimes) because the user that
+actually did create/change the objects must be&amp;nbsp;provided!&lt;/p&gt;
+&lt;p&gt;Since I am really fond of CBVs I will present a simple mixin that can be used with CreateView
+and UpdateView and does exactly&amp;nbsp;that:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;AuditableMixin&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;object&lt;/span&gt;&lt;span class="p"&gt;,):&lt;/span&gt;
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;form_valid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;form&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="ow"&gt;not&lt;/span&gt; &lt;span class="n"&gt;form&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;instance&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;created_by&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+            &lt;span class="n"&gt;form&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;instance&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;created_by&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;user&lt;/span&gt;
+        &lt;span class="n"&gt;form&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;instance&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;modified_by&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;user&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nb"&gt;super&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;AuditableMixin&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;form_valid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;form&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;The above mixin overrides the &lt;tt class="docutils literal"&gt;form_valid&lt;/tt&gt; method of &lt;tt class="docutils literal"&gt;CreateView&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;UpdateView&lt;/tt&gt;:
+First it checks if the object is created (if it is created it won&amp;#8217;t be saved in the
+database yet thus it won&amp;#8217;t have an id) in order to set the &lt;tt class="docutils literal"&gt;created_by&lt;/tt&gt; attribute to
+the current user. After that it will set the &lt;tt class="docutils literal"&gt;modified_by&lt;/tt&gt; attribute of the object to
+the current user. Finally, it will call the next &lt;tt class="docutils literal"&gt;form_valid&lt;/tt&gt; method to do whatever
+is required (save the model instance and redirect to &lt;tt class="docutils literal"&gt;success_url&lt;/tt&gt; by&amp;nbsp;default).&lt;/p&gt;
+&lt;p&gt;The views using &lt;tt class="docutils literal"&gt;AuditableMixin&lt;/tt&gt; should allow only logged in users (or else an
+exception will be thrown). Also, don&amp;#8217;t forget to exclude the &lt;tt class="docutils literal"&gt;created_by&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;modified_by&lt;/tt&gt;
+fields from your model form (&lt;tt class="docutils literal"&gt;created_on&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;modified_on&lt;/tt&gt; will automatically be&amp;nbsp;excluded).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="example"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id7"&gt;Example&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Let&amp;#8217;s see a simple example of creating a small django application using the previously defined abstract model and&amp;nbsp;mixin:&lt;/p&gt;
+&lt;div class="section" id="models-py"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id8"&gt;models.py&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;django.conf&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;settings&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;django.core.urlresolvers&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;reverse&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;django.db&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;models&lt;/span&gt;
+
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;auditable.models&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;Auditable&lt;/span&gt;
+
+
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Book&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Auditable&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="n"&gt;name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;models&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;CharField&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;max_length&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;128&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;author&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;models&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;CharField&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;max_length&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;128&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;get_absolute_url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;reverse&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;book_list&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;In the above we suppose that the &lt;tt class="docutils literal"&gt;Auditable&lt;/tt&gt; abstract model is imported from the
+&lt;tt class="docutils literal"&gt;auditable.models&lt;/tt&gt; module and that a view named &lt;tt class="docutils literal"&gt;book_list&lt;/tt&gt; that shows all books&amp;nbsp;exists.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="forms-py"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id9"&gt;forms.py&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;django.forms&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;ModelForm&lt;/span&gt;
+
+
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;BookForm&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ModelForm&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Meta&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="n"&gt;model&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Book&lt;/span&gt;
+        &lt;span class="n"&gt;fields&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;name&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;author&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Show only &lt;tt class="docutils literal"&gt;name&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;author&lt;/tt&gt; fields (and not the auditable fields) in the &lt;tt class="docutils literal"&gt;Book ModelForm&lt;/tt&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="views-py"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id10"&gt;views.py&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;django.views.generic.edit&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;CreateView&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;UpdateView&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;django.views.generic&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;ListView&lt;/span&gt;
+
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;auditable.views&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;AuditableMixin&lt;/span&gt;
+
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;models&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;Book&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;forms&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;BookForm&lt;/span&gt;
+
+
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;BookCreateView&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;AuditableMixin&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;CreateView&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="n"&gt;model&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Book&lt;/span&gt;
+    &lt;span class="n"&gt;form_class&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;BookForm&lt;/span&gt;
+
+
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;BookUpdateView&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;AuditableMixin&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;UpdateView&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="n"&gt;model&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Book&lt;/span&gt;
+    &lt;span class="n"&gt;form_class&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;BookForm&lt;/span&gt;
+
+
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;BookListView&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ListView&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="n"&gt;model&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Book&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;We import the &lt;tt class="docutils literal"&gt;AuditableMixin&lt;/tt&gt; from &lt;tt class="docutils literal"&gt;auditable.views&lt;/tt&gt; and make our Create and Update views
+inherit from this mixin also in addition to &lt;tt class="docutils literal"&gt;CreateView&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;UpdateView&lt;/tt&gt;. Pay attention that our
+mixin is placed &lt;em&gt;before&lt;/em&gt; CreateView in order to call &lt;tt class="docutils literal"&gt;form_valid&lt;/tt&gt; in the proper order: When multiple
+inheritance is used like this python will check each class from left to right to find the proper method
+and call it. For example, in our &lt;tt class="docutils literal"&gt;BookCreateView&lt;/tt&gt;, when the &lt;tt class="docutils literal"&gt;form_valid&lt;/tt&gt; method is called, python
+will first check if &lt;tt class="docutils literal"&gt;BookCreateView&lt;/tt&gt; has a &lt;tt class="docutils literal"&gt;form_valid&lt;/tt&gt; method. Since it does not, it will check
+if &lt;tt class="docutils literal"&gt;AuditableMixin&lt;/tt&gt; has a &lt;tt class="docutils literal"&gt;form_valid&lt;/tt&gt; method and call it. Now, we are calling the &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;super(...).form_valid()&lt;/span&gt;&lt;/tt&gt; in the
+&lt;tt class="docutils literal"&gt;AuditableMixin&lt;/tt&gt; &lt;tt class="docutils literal"&gt;form_valid&lt;/tt&gt;, so the &lt;tt class="docutils literal"&gt;form_valid&lt;/tt&gt; of &lt;tt class="docutils literal"&gt;CreateView&lt;/tt&gt; will &lt;em&gt;also&lt;/em&gt; be&amp;nbsp;called.&lt;/p&gt;
+&lt;p&gt;A simple &lt;tt class="docutils literal"&gt;ListView&lt;/tt&gt; is also added to just show the info on all&amp;nbsp;books.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="urls-py"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id11"&gt;urls.py&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;django.conf.urls&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;patterns&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;include&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;url&lt;/span&gt;
+
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;views&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;BookCreateView&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;BookUpdateView&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;BookListView&lt;/span&gt;
+
+&lt;span class="n"&gt;urlpatterns&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;patterns&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;r&amp;#39;^accounts/login/$&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;django.contrib.auth.views.login&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;),&lt;/span&gt;
+    &lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;r&amp;#39;^accounts/logout/$&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;django.contrib.auth.views.logout&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;),&lt;/span&gt;
+
+    &lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;r&amp;#39;^create/$&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;BookCreateView&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;as_view&lt;/span&gt;&lt;span class="p"&gt;(),&lt;/span&gt; &lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;create_book&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+    &lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;r&amp;#39;^update/(?P&amp;lt;pk&amp;gt;\d+)/$&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;BookUpdateView&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;as_view&lt;/span&gt;&lt;span class="p"&gt;(),&lt;/span&gt; &lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;update_book&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+    &lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;r&amp;#39;^$&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;BookListView&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;as_view&lt;/span&gt;&lt;span class="p"&gt;(),&lt;/span&gt; &lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;book_list&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Just add the previously defined Create/Update/List views along with a login/logout&amp;nbsp;views.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="templates"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id12"&gt;templates&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;You&amp;#8217;ll need four&amp;nbsp;templates:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;books/book_list.html: Show the list of&amp;nbsp;books&lt;/li&gt;
+&lt;li&gt;books/book_form.html: Show the book editing&amp;nbsp;form&lt;/li&gt;
+&lt;li&gt;registration/login.html: Login&amp;nbsp;form&lt;/li&gt;
+&lt;li&gt;registration/logout.html: Logout&amp;nbsp;message&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="using-django-simple-history"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id13"&gt;Using&amp;nbsp;django-simple-history&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://github.com/treyhunner/django-simple-history"&gt;django-simple-history&lt;/a&gt;  can be used to not only store the user and date of each modification
+but a different version for each modification. To do that, for every model that is registered
+to be used with django-simple-history, it wil create a second table in
+the database hosting all versions (historical records) of that model. As we can understand this is really powerfull
+since we can see exactly what was changed and also do normal &lt;span class="caps"&gt;SQL&lt;/span&gt; queries on&amp;nbsp;that!&lt;/p&gt;
+&lt;div class="section" id="installation"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id14"&gt;Installation&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;To use django-simple-history in a project, after we do a &lt;tt class="docutils literal"&gt;pip install &lt;span class="pre"&gt;django-simple-history&lt;/span&gt;&lt;/tt&gt;,
+we just need to add it to &lt;tt class="docutils literal"&gt;INSTALLED_APPS&lt;/tt&gt; and
+add the &lt;tt class="docutils literal"&gt;simple_history.middleware.HistoryRequestMiddleware&lt;/tt&gt; to the &lt;tt class="docutils literal"&gt;MIDDLEWARE_CLASSES&lt;/tt&gt; list.&lt;/p&gt;
+&lt;p&gt;Finally, to keep the historical records for a model, just add an instace of &lt;tt class="docutils literal"&gt;HistoricalRecords&lt;/tt&gt; to this&amp;nbsp;model.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id1"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id15"&gt;Example&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;For example, our previously defined &lt;tt class="docutils literal"&gt;Book&lt;/tt&gt; model will be modified like&amp;nbsp;this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;class SHBook(models.Model):
+    name = models.CharField(max_length=128)
+    author = models.CharField(max_length=128)
+
+    def get_absolute_url(self):
+        return reverse(&amp;quot;shbook_list&amp;quot;)
+
+    history = HistoricalRecords()
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;When we run &lt;tt class="docutils literal"&gt;python manage.py makemigrations&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;migrate&lt;/tt&gt; this, we&amp;#8217;ll see that beyond the table for SHBook, a table for HistoricalSHBook will be&amp;nbsp;created:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+Migrations for 'sample':
+  0002_historicalshbook_shbook.py:
+    - Create model HistoricalSHBook
+    - Create model SHBook
+&lt;/pre&gt;
+&lt;p&gt;Let&amp;#8217;s see the schema of&amp;nbsp;historicalshbook:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+CREATE TABLE &amp;quot;sample_historicalshbook&amp;quot; (
+    &amp;quot;id&amp;quot; integer NOT NULL,
+    &amp;quot;name&amp;quot; varchar(128) NOT NULL,
+    &amp;quot;author&amp;quot; varchar(128) NOT NULL,
+    &amp;quot;history_id&amp;quot; integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+    &amp;quot;history_date&amp;quot; datetime NOT NULL,
+    &amp;quot;history_type&amp;quot; varchar(1) NOT NULL,
+    &amp;quot;history_user_id&amp;quot; integer NULL REFERENCES &amp;quot;auth_user&amp;quot; (&amp;quot;id&amp;quot;)
+);
+&lt;/pre&gt;
+&lt;p&gt;So we see that it has the &lt;em&gt;same&lt;/em&gt; fields as with &lt;tt class="docutils literal"&gt;SHBook&lt;/tt&gt; (&lt;tt class="docutils literal"&gt;id, name, author&lt;/tt&gt;) with the addition of
+the primary key (&lt;tt class="docutils literal"&gt;history_id&lt;/tt&gt;) of this historical record, the date and user that did the change
+(&lt;tt class="docutils literal"&gt;history_date&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;history_user_id&lt;/tt&gt;) and the type of the record (created / update /&amp;nbsp;delete).&lt;/p&gt;
+&lt;p&gt;So, just by adding a &lt;tt class="docutils literal"&gt;HistoricalRecords()&lt;/tt&gt; attribute to our model definition we&amp;#8217;ll get complete auditing
+for the instance of that&amp;nbsp;model&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="usage"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id16"&gt;Usage&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;To find out information about the historical records we&amp;#8217;ll just use the &lt;tt class="docutils literal"&gt;HistoricalRecords()&lt;/tt&gt; attribute
+of that&amp;nbsp;model:&lt;/p&gt;
+&lt;p&gt;For example, running &lt;tt class="docutils literal"&gt;SHBook.history.filter(id=1)&lt;/tt&gt; will return all historical records of the book with
+&lt;tt class="docutils literal"&gt;id = 1&lt;/tt&gt;. For each one of them we have can use the&amp;nbsp;following:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;get the user that made the change through the &lt;tt class="docutils literal"&gt;history_user&lt;/tt&gt; attribute&lt;/li&gt;
+&lt;li&gt;get the date of the change through the &lt;tt class="docutils literal"&gt;history_date&lt;/tt&gt; attribute&lt;/li&gt;
+&lt;li&gt;get the type of the change through the &lt;tt class="docutils literal"&gt;history_type&lt;/tt&gt; attribute (and the corresponding &lt;tt class="docutils literal"&gt;get_history_type_dispaly&lt;/tt&gt;)&lt;/li&gt;
+&lt;li&gt;get a model instance as it was then through the &lt;tt class="docutils literal"&gt;history_object&lt;/tt&gt; attribute (in order to &lt;tt class="docutils literal"&gt;save()&lt;/tt&gt; it and revert to this&amp;nbsp;version)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="using-django-reversion"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id17"&gt;Using&amp;nbsp;django-reversion&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://github.com/etianen/django-reversion"&gt;django-reversion&lt;/a&gt;  offers more or less the same functionality of django-simple-history by following a different philosophy:
+Instead of creating an extra table holding the history records for each model, it insteads converts all the fields of each model
+to json and stores that &lt;span class="caps"&gt;JSON&lt;/span&gt; in the database in a text&amp;nbsp;field.&lt;/p&gt;
+&lt;p&gt;This has the advantage that no extra tables are created to the database but the disadvantage that you can&amp;#8217;t easily query
+your historical records. So you may choose one or the other depending on your actual&amp;nbsp;requirements.&lt;/p&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id18"&gt;Installation&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;To use django-reversion in a project, after we do a &lt;tt class="docutils literal"&gt;pip install &lt;span class="pre"&gt;django-reversion&lt;/span&gt;&lt;/tt&gt;,
+we just need to add it to &lt;tt class="docutils literal"&gt;INSTALLED_APPS&lt;/tt&gt; and
+add the &lt;tt class="docutils literal"&gt;reversion.middleware.RevisionMiddleware&lt;/tt&gt; to the &lt;tt class="docutils literal"&gt;MIDDLEWARE_CLASSES&lt;/tt&gt; list.&lt;/p&gt;
+&lt;p&gt;In order to save the revisions of a model, you need to register this model to django-reversion. This can be
+done either through the django-admin, by inheriting the admin class of that model from &lt;tt class="docutils literal"&gt;reversion.VersionAdmin&lt;/tt&gt;
+or, if you don&amp;#8217;t want to use the admin by &lt;tt class="docutils literal"&gt;reversion.register&lt;/tt&gt; decorator.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id3"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id19"&gt;Example&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;To use django-reversion to keep track of changes to &lt;tt class="docutils literal"&gt;Book&lt;/tt&gt; we can modify it like&amp;nbsp;this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;@reversion.register
+class RBook(models.Model):
+    name = models.CharField(max_length=128)
+    author = models.CharField(max_length=128)
+
+    def get_absolute_url(self):
+        return reverse(&amp;quot;rbook_list&amp;quot;)
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;django-reversion uses two tables in the database to keep track of revisions: &lt;tt class="docutils literal"&gt;revision&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;version&lt;/tt&gt;. Let&amp;#8217;s
+take a look at their&amp;nbsp;schemata:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+.schema reversion_revision
+CREATE TABLE &amp;quot;reversion_revision&amp;quot; (
+    &amp;quot;id&amp;quot; integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+    &amp;quot;manager_slug&amp;quot; varchar(200) NOT NULL,
+    &amp;quot;date_created&amp;quot; datetime NOT NULL,
+    &amp;quot;comment&amp;quot; text NOT NULL,
+    &amp;quot;user_id&amp;quot; integer NULL REFERENCES &amp;quot;auth_user&amp;quot; (&amp;quot;id&amp;quot;)
+);
+
+.schema reversion_version
+CREATE TABLE &amp;quot;reversion_version&amp;quot; (
+    &amp;quot;id&amp;quot; integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+    &amp;quot;object_id&amp;quot; text NOT NULL,
+    &amp;quot;object_id_int&amp;quot; integer NULL,
+    &amp;quot;format&amp;quot; varchar(255) NOT NULL,
+    &amp;quot;serialized_data&amp;quot; text NOT NULL,
+    &amp;quot;object_repr&amp;quot; text NOT NULL,
+    &amp;quot;content_type_id&amp;quot; integer NOT NULL REFERENCES &amp;quot;django_content_type&amp;quot; (&amp;quot;id&amp;quot;),
+    &amp;quot;revision_id&amp;quot; integer NOT NULL REFERENCES &amp;quot;reversion_revision&amp;quot; (&amp;quot;id&amp;quot;)
+);
+&lt;/pre&gt;
+&lt;p&gt;As we can understand, the &lt;tt class="docutils literal"&gt;revision&lt;/tt&gt; table holds information like who created this
+revison (&lt;tt class="docutils literal"&gt;user_id&lt;/tt&gt;) and when (&lt;tt class="docutils literal"&gt;date_created&lt;/tt&gt;) while the &lt;tt class="docutils literal"&gt;version&lt;/tt&gt; stores
+a reference to the object that was modified (through a GenericForeignKey) and
+the actual data (in the &lt;tt class="docutils literal"&gt;serialized_data&lt;/tt&gt; field). By default it uses &lt;span class="caps"&gt;JSON&lt;/span&gt;
+to serialize the data (the serialization format is in the &lt;tt class="docutils literal"&gt;format&lt;/tt&gt; field). There&amp;#8217;s
+an one-to-one relation between &lt;tt class="docutils literal"&gt;revision&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;version&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;If we create an instance of &lt;tt class="docutils literal"&gt;RBook&lt;/tt&gt; we&amp;#8217;ll see the following in the&amp;nbsp;database:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+sqlite&amp;gt; select * from reversion_revision;
+1|default|2015-01-21 10:31:25.233000||1
+
+sqlite&amp;gt; select * from reversion_version;
+1|1|1|json|[{&amp;quot;fields&amp;quot;: {&amp;quot;name&amp;quot;: &amp;quot;asdasdasd&amp;quot;, &amp;quot;author&amp;quot;: &amp;quot;asdasd&amp;quot;}, &amp;quot;model&amp;quot;: &amp;quot;sample.rbook&amp;quot;, &amp;quot;pk&amp;quot;: 1}]|RBook object|12|1
+&lt;/pre&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;date_created&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;user_id&lt;/tt&gt; are stored on &lt;tt class="docutils literal"&gt;revision&lt;/tt&gt; while &lt;tt class="docutils literal"&gt;format&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;serialized_data&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;content_type_id&lt;/tt&gt; and
+&lt;tt class="docutils literal"&gt;object_id_int&lt;/tt&gt; (the &lt;tt class="docutils literal"&gt;GenericForeignKey&lt;/tt&gt;) are stored in &lt;tt class="docutils literal"&gt;version&lt;/tt&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id4"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id20"&gt;Usage&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;To find out information about an object you have to use the &lt;tt class="docutils literal"&gt;reversion.get_for_object(object)&lt;/tt&gt; method. In order to be
+easily used in templates I recommend creating the following &lt;tt class="docutils literal"&gt;get_versions()&lt;/tt&gt; method in each model that is registered with&amp;nbsp;django-reversion&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+def get_versions(self):
+    return reversion.get_for_object(self)
+&lt;/pre&gt;
+&lt;p&gt;Now, each version has a &lt;tt class="docutils literal"&gt;revision&lt;/tt&gt; attribute for the corresponding revision and can be used to do the&amp;nbsp;following:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;get the user that made the change through the &lt;tt class="docutils literal"&gt;revision.user&lt;/tt&gt; attribute&lt;/li&gt;
+&lt;li&gt;get the date of the change through the &lt;tt class="docutils literal"&gt;revision.date_created&lt;/tt&gt; attribute&lt;/li&gt;
+&lt;li&gt;get the values of the object fields as they were in this revision using the &lt;tt class="docutils literal"&gt;field_dict&lt;/tt&gt; attribute&lt;/li&gt;
+&lt;li&gt;get a model instance as it was on that revision using the &lt;tt class="docutils literal"&gt;object_version.object&lt;/tt&gt; attribute&lt;/li&gt;
+&lt;li&gt;revert to that previous version of that object using the &lt;tt class="docutils literal"&gt;rever()&lt;/tt&gt; method&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="conclusion"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id21"&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;In the above we say that it is really easy to add basic (&lt;em&gt;who&lt;/em&gt; and &lt;em&gt;when&lt;/em&gt;) auditing capabilities to your models: You just need to
+inherit your models from the &lt;tt class="docutils literal"&gt;Auditable&lt;/tt&gt; abstract class and inherit your Create and Update CBVs from &lt;tt class="docutils literal"&gt;AuditableMixin&lt;/tt&gt;.
+If you want to know exactly &lt;em&gt;what&lt;/em&gt; was changed then you have two solutions: django-simple-history to create an extra table for
+each of your models so you&amp;#8217;ll be able to query your historical records (and easily extra aggregates, statistics etc) and
+django-reversion to save each version as a json object, so no extra tables will be&amp;nbsp;created.&lt;/p&gt;
+&lt;p&gt;All three solutions for auditing have been implemented in a sample project at &lt;a class="reference external" href="https://github.com/spapas/auditing-sample"&gt;https://github.com/spapas/auditing-sample&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;You can clone the project and, preferrably in a virtual environment, install requirements (&lt;tt class="docutils literal"&gt;pip install &lt;span class="pre"&gt;-r&lt;/span&gt; requirements.txt&lt;/tt&gt;),
+do a migrate (&lt;tt class="docutils literal"&gt;python manage.py migrate&lt;/tt&gt; &amp;#8212; uses sqlite3 by default) and run the local development
+server (&lt;tt class="docutils literal"&gt;python manage.py ruinserver&lt;/tt&gt;).&lt;/p&gt;
+&lt;/div&gt;
+</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Serafeim Papastefanos</dc:creator><pubDate>Wed, 21 Jan 2015 14:20:00 +0200</pubDate><guid>tag:spapas.github.io,2015-01-21:2015/01/21/django-model-auditing/</guid><category>django</category><category>python</category><category>auditing</category></item><item><title>Change the primary color of bootstrap material design</title><link>http://spapas.github.io/2014/12/16/change-bootstrap-material-primary-color/</link><description>&lt;div class="section" id="introduction"&gt;
 &lt;h2&gt;Introduction&lt;/h2&gt;
 &lt;p&gt;&lt;a class="reference external" href="https://github.com/FezVrasta/bootstrap-material-design"&gt;Bootstrap Material Design&lt;/a&gt; is a great theme that sits on top of &lt;a class="reference external" href="http://getbootstrap.com/"&gt;Bootstrap&lt;/a&gt; and transforms it to
 &lt;a class="reference external" href="http://www.google.com/design/spec/material-design/introduction.html"&gt;Material Design&lt;/a&gt;! The great thing about Bootstrap Material Design is that you just need to include

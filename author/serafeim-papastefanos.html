@@ -70,6 +70,359 @@
   		<article>
 <header>
       <h1 class="entry-title">
+        <a href="http://spapas.github.io/2015/01/21/django-model-auditing/">Django model auditing</a>
+      </h1>
+      <p class="meta"><time datetime="2015-01-21T14:20:00" pubdate>Τετ 21 Ιανουάριος 2015</time></p>
+</header>
+
+  <div class="entry-content"><div class="contents topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#introduction" id="id5">Introduction</a></li>
+<li><a class="reference internal" href="#adding-simple-auditing-functionality-ourselves" id="id6">Adding simple auditing functionality&nbsp;ourselves</a></li>
+<li><a class="reference internal" href="#example" id="id7">Example</a><ul>
+<li><a class="reference internal" href="#models-py" id="id8">models.py</a></li>
+<li><a class="reference internal" href="#forms-py" id="id9">forms.py</a></li>
+<li><a class="reference internal" href="#views-py" id="id10">views.py</a></li>
+<li><a class="reference internal" href="#urls-py" id="id11">urls.py</a></li>
+<li><a class="reference internal" href="#templates" id="id12">templates</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-django-simple-history" id="id13">Using django-simple-history</a><ul>
+<li><a class="reference internal" href="#installation" id="id14">Installation</a></li>
+<li><a class="reference internal" href="#id1" id="id15">Example</a></li>
+<li><a class="reference internal" href="#usage" id="id16">Usage</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-django-reversion" id="id17">Using django-reversion</a><ul>
+<li><a class="reference internal" href="#id2" id="id18">Installation</a></li>
+<li><a class="reference internal" href="#id3" id="id19">Example</a></li>
+<li><a class="reference internal" href="#id4" id="id20">Usage</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#conclusion" id="id21">Conclusion</a></li>
+</ul>
+</div>
+<div class="section" id="introduction">
+<h2><a class="toc-backref" href="#id5">Introduction</a></h2>
+<p>An auditing trail is a common requirement in most non-trivial applications. Organizations
+need to know <em>who</em> did the change, <em>when</em> it was done and <em>what</em> was actually changed.
+In this post we will see three
+different solution in order to add this functionality in Django: doing it ourselves,
+using django-simple-history and using&nbsp;django-reversion.</p>
+</div>
+<div class="section" id="adding-simple-auditing-functionality-ourselves">
+<h2><a class="toc-backref" href="#id6">Adding simple auditing functionality&nbsp;ourselves</a></h2>
+<p>A simple way to actually do auditing is to keep four extra fields in our models:
+<tt class="docutils literal">created_by</tt>, <tt class="docutils literal">created_on</tt>, <tt class="docutils literal">modified_by</tt> and <tt class="docutils literal">modified_on</tt>. The first two
+will be filled when the model instance is created while the latter two will be
+changed whenever the model instance is saved. So we only have <em>who</em> and <em>whe</em>.
+Sometimes, these are enough so let&#8217;s see how easy it is to implement it in&nbsp;django.</p>
+<p>We&#8217;ll need an abstract model that could be used as a base class for models that need&nbsp;auditing:</p>
+<div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.conf</span> <span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
+
+<span class="k">class</span> <span class="nc">Auditable</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">created_on</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">auto_now_add</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
+    <span class="n">created_by</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">AUTH_USER_MODEL</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s">&#39;created_by&#39;</span><span class="p">)</span>
+
+    <span class="n">modified_on</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">auto_now</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
+    <span class="n">modified_by</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">AUTH_USER_MODEL</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s">&#39;modified_by&#39;</span><span class="p">)</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">abstract</span> <span class="o">=</span> <span class="bp">True</span>
+</pre></div>
+<p>Models inheriting from <tt class="docutils literal">Auditable</tt> will contain their datetime of creation and modification
+which will be automatically filled using the very usefull <tt class="docutils literal">auto_now_add_</tt> (which will
+set the current datetime when the model instance is created) and <tt class="docutils literal">auto_now_</tt> (which will
+set the current datetime when the model instance is&nbsp;modified).</p>
+<p>Such models will also have two foreign keys to <tt class="docutils literal">User</tt>, one for the user
+that created the and one of the user that modified them. The problem with these two fields
+is that they cannot be filled automatically (like the datetimes) because the user that
+actually did create/change the objects must be&nbsp;provided!</p>
+<p>Since I am really fond of CBVs I will present a simple mixin that can be used with CreateView
+and UpdateView and does exactly&nbsp;that:</p>
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">AuditableMixin</span><span class="p">(</span><span class="nb">object</span><span class="p">,):</span>
+    <span class="k">def</span> <span class="nf">form_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">,</span> <span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">form</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">created_by</span><span class="p">:</span>
+            <span class="n">form</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">created_by</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span>
+        <span class="n">form</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">modified_by</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">AuditableMixin</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">form_valid</span><span class="p">(</span><span class="n">form</span><span class="p">)</span>
+</pre></div>
+<p>The above mixin overrides the <tt class="docutils literal">form_valid</tt> method of <tt class="docutils literal">CreateView</tt> and <tt class="docutils literal">UpdateView</tt>:
+First it checks if the object is created (if it is created it won&#8217;t be saved in the
+database yet thus it won&#8217;t have an id) in order to set the <tt class="docutils literal">created_by</tt> attribute to
+the current user. After that it will set the <tt class="docutils literal">modified_by</tt> attribute of the object to
+the current user. Finally, it will call the next <tt class="docutils literal">form_valid</tt> method to do whatever
+is required (save the model instance and redirect to <tt class="docutils literal">success_url</tt> by&nbsp;default).</p>
+<p>The views using <tt class="docutils literal">AuditableMixin</tt> should allow only logged in users (or else an
+exception will be thrown). Also, don&#8217;t forget to exclude the <tt class="docutils literal">created_by</tt> and <tt class="docutils literal">modified_by</tt>
+fields from your model form (<tt class="docutils literal">created_on</tt> and <tt class="docutils literal">modified_on</tt> will automatically be&nbsp;excluded).</p>
+</div>
+<div class="section" id="example">
+<h2><a class="toc-backref" href="#id7">Example</a></h2>
+<p>Let&#8217;s see a simple example of creating a small django application using the previously defined abstract model and&nbsp;mixin:</p>
+<div class="section" id="models-py">
+<h3><a class="toc-backref" href="#id8">models.py</a></h3>
+<div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.conf</span> <span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span> <span class="nn">django.core.urlresolvers</span> <span class="kn">import</span> <span class="n">reverse</span>
+<span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
+
+<span class="kn">from</span> <span class="nn">auditable.models</span> <span class="kn">import</span> <span class="n">Auditable</span>
+
+
+<span class="k">class</span> <span class="nc">Book</span><span class="p">(</span><span class="n">Auditable</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
+    <span class="n">author</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_absolute_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">reverse</span><span class="p">(</span><span class="s">&quot;book_list&quot;</span><span class="p">)</span>
+</pre></div>
+<p>In the above we suppose that the <tt class="docutils literal">Auditable</tt> abstract model is imported from the
+<tt class="docutils literal">auditable.models</tt> module and that a view named <tt class="docutils literal">book_list</tt> that shows all books&nbsp;exists.</p>
+</div>
+<div class="section" id="forms-py">
+<h3><a class="toc-backref" href="#id9">forms.py</a></h3>
+<div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.forms</span> <span class="kn">import</span> <span class="n">ModelForm</span>
+
+
+<span class="k">class</span> <span class="nc">BookForm</span><span class="p">(</span><span class="n">ModelForm</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">Book</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="s">&#39;author&#39;</span><span class="p">]</span>
+</pre></div>
+<p>Show only <tt class="docutils literal">name</tt> and <tt class="docutils literal">author</tt> fields (and not the auditable fields) in the <tt class="docutils literal">Book ModelForm</tt>.</p>
+</div>
+<div class="section" id="views-py">
+<h3><a class="toc-backref" href="#id10">views.py</a></h3>
+<div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.views.generic.edit</span> <span class="kn">import</span> <span class="n">CreateView</span><span class="p">,</span> <span class="n">UpdateView</span>
+<span class="kn">from</span> <span class="nn">django.views.generic</span> <span class="kn">import</span> <span class="n">ListView</span>
+
+<span class="kn">from</span> <span class="nn">auditable.views</span> <span class="kn">import</span> <span class="n">AuditableMixin</span>
+
+<span class="kn">from</span> <span class="nn">models</span> <span class="kn">import</span> <span class="n">Book</span>
+<span class="kn">from</span> <span class="nn">forms</span> <span class="kn">import</span> <span class="n">BookForm</span>
+
+
+<span class="k">class</span> <span class="nc">BookCreateView</span><span class="p">(</span><span class="n">AuditableMixin</span><span class="p">,</span> <span class="n">CreateView</span><span class="p">):</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Book</span>
+    <span class="n">form_class</span> <span class="o">=</span> <span class="n">BookForm</span>
+
+
+<span class="k">class</span> <span class="nc">BookUpdateView</span><span class="p">(</span><span class="n">AuditableMixin</span><span class="p">,</span> <span class="n">UpdateView</span><span class="p">):</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Book</span>
+    <span class="n">form_class</span> <span class="o">=</span> <span class="n">BookForm</span>
+
+
+<span class="k">class</span> <span class="nc">BookListView</span><span class="p">(</span><span class="n">ListView</span><span class="p">):</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Book</span>
+</pre></div>
+<p>We import the <tt class="docutils literal">AuditableMixin</tt> from <tt class="docutils literal">auditable.views</tt> and make our Create and Update views
+inherit from this mixin also in addition to <tt class="docutils literal">CreateView</tt> and <tt class="docutils literal">UpdateView</tt>. Pay attention that our
+mixin is placed <em>before</em> CreateView in order to call <tt class="docutils literal">form_valid</tt> in the proper order: When multiple
+inheritance is used like this python will check each class from left to right to find the proper method
+and call it. For example, in our <tt class="docutils literal">BookCreateView</tt>, when the <tt class="docutils literal">form_valid</tt> method is called, python
+will first check if <tt class="docutils literal">BookCreateView</tt> has a <tt class="docutils literal">form_valid</tt> method. Since it does not, it will check
+if <tt class="docutils literal">AuditableMixin</tt> has a <tt class="docutils literal">form_valid</tt> method and call it. Now, we are calling the <tt class="docutils literal"><span class="pre">super(...).form_valid()</span></tt> in the
+<tt class="docutils literal">AuditableMixin</tt> <tt class="docutils literal">form_valid</tt>, so the <tt class="docutils literal">form_valid</tt> of <tt class="docutils literal">CreateView</tt> will <em>also</em> be&nbsp;called.</p>
+<p>A simple <tt class="docutils literal">ListView</tt> is also added to just show the info on all&nbsp;books.</p>
+</div>
+<div class="section" id="urls-py">
+<h3><a class="toc-backref" href="#id11">urls.py</a></h3>
+<div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.conf.urls</span> <span class="kn">import</span> <span class="n">patterns</span><span class="p">,</span> <span class="n">include</span><span class="p">,</span> <span class="n">url</span>
+
+<span class="kn">from</span> <span class="nn">views</span> <span class="kn">import</span> <span class="n">BookCreateView</span><span class="p">,</span> <span class="n">BookUpdateView</span><span class="p">,</span> <span class="n">BookListView</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+    <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^accounts/login/$&#39;</span><span class="p">,</span> <span class="s">&#39;django.contrib.auth.views.login&#39;</span><span class="p">,</span> <span class="p">),</span>
+    <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^accounts/logout/$&#39;</span><span class="p">,</span> <span class="s">&#39;django.contrib.auth.views.logout&#39;</span><span class="p">,</span> <span class="p">),</span>
+
+    <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^create/$&#39;</span><span class="p">,</span> <span class="n">BookCreateView</span><span class="o">.</span><span class="n">as_view</span><span class="p">(),</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;create_book&#39;</span><span class="p">),</span>
+    <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^update/(?P&lt;pk&gt;\d+)/$&#39;</span><span class="p">,</span> <span class="n">BookUpdateView</span><span class="o">.</span><span class="n">as_view</span><span class="p">(),</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;update_book&#39;</span><span class="p">),</span>
+    <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^$&#39;</span><span class="p">,</span> <span class="n">BookListView</span><span class="o">.</span><span class="n">as_view</span><span class="p">(),</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;book_list&#39;</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+<p>Just add the previously defined Create/Update/List views along with a login/logout&nbsp;views.</p>
+</div>
+<div class="section" id="templates">
+<h3><a class="toc-backref" href="#id12">templates</a></h3>
+<p>You&#8217;ll need four&nbsp;templates:</p>
+<ul class="simple">
+<li>books/book_list.html: Show the list of&nbsp;books</li>
+<li>books/book_form.html: Show the book editing&nbsp;form</li>
+<li>registration/login.html: Login&nbsp;form</li>
+<li>registration/logout.html: Logout&nbsp;message</li>
+</ul>
+</div>
+</div>
+<div class="section" id="using-django-simple-history">
+<h2><a class="toc-backref" href="#id13">Using&nbsp;django-simple-history</a></h2>
+<p><a class="reference external" href="https://github.com/treyhunner/django-simple-history">django-simple-history</a>  can be used to not only store the user and date of each modification
+but a different version for each modification. To do that, for every model that is registered
+to be used with django-simple-history, it wil create a second table in
+the database hosting all versions (historical records) of that model. As we can understand this is really powerfull
+since we can see exactly what was changed and also do normal <span class="caps">SQL</span> queries on&nbsp;that!</p>
+<div class="section" id="installation">
+<h3><a class="toc-backref" href="#id14">Installation</a></h3>
+<p>To use django-simple-history in a project, after we do a <tt class="docutils literal">pip install <span class="pre">django-simple-history</span></tt>,
+we just need to add it to <tt class="docutils literal">INSTALLED_APPS</tt> and
+add the <tt class="docutils literal">simple_history.middleware.HistoryRequestMiddleware</tt> to the <tt class="docutils literal">MIDDLEWARE_CLASSES</tt> list.</p>
+<p>Finally, to keep the historical records for a model, just add an instace of <tt class="docutils literal">HistoricalRecords</tt> to this&nbsp;model.</p>
+</div>
+<div class="section" id="id1">
+<h3><a class="toc-backref" href="#id15">Example</a></h3>
+<p>For example, our previously defined <tt class="docutils literal">Book</tt> model will be modified like&nbsp;this:</p>
+<div class="highlight"><pre>class SHBook(models.Model):
+    name = models.CharField(max_length=128)
+    author = models.CharField(max_length=128)
+
+    def get_absolute_url(self):
+        return reverse(&quot;shbook_list&quot;)
+
+    history = HistoricalRecords()
+</pre></div>
+<p>When we run <tt class="docutils literal">python manage.py makemigrations</tt> and <tt class="docutils literal">migrate</tt> this, we&#8217;ll see that beyond the table for SHBook, a table for HistoricalSHBook will be&nbsp;created:</p>
+<pre class="code literal-block">
+Migrations for 'sample':
+  0002_historicalshbook_shbook.py:
+    - Create model HistoricalSHBook
+    - Create model SHBook
+</pre>
+<p>Let&#8217;s see the schema of&nbsp;historicalshbook:</p>
+<pre class="code literal-block">
+CREATE TABLE &quot;sample_historicalshbook&quot; (
+    &quot;id&quot; integer NOT NULL,
+    &quot;name&quot; varchar(128) NOT NULL,
+    &quot;author&quot; varchar(128) NOT NULL,
+    &quot;history_id&quot; integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+    &quot;history_date&quot; datetime NOT NULL,
+    &quot;history_type&quot; varchar(1) NOT NULL,
+    &quot;history_user_id&quot; integer NULL REFERENCES &quot;auth_user&quot; (&quot;id&quot;)
+);
+</pre>
+<p>So we see that it has the <em>same</em> fields as with <tt class="docutils literal">SHBook</tt> (<tt class="docutils literal">id, name, author</tt>) with the addition of
+the primary key (<tt class="docutils literal">history_id</tt>) of this historical record, the date and user that did the change
+(<tt class="docutils literal">history_date</tt>, <tt class="docutils literal">history_user_id</tt>) and the type of the record (created / update /&nbsp;delete).</p>
+<p>So, just by adding a <tt class="docutils literal">HistoricalRecords()</tt> attribute to our model definition we&#8217;ll get complete auditing
+for the instance of that&nbsp;model</p>
+</div>
+<div class="section" id="usage">
+<h3><a class="toc-backref" href="#id16">Usage</a></h3>
+<p>To find out information about the historical records we&#8217;ll just use the <tt class="docutils literal">HistoricalRecords()</tt> attribute
+of that&nbsp;model:</p>
+<p>For example, running <tt class="docutils literal">SHBook.history.filter(id=1)</tt> will return all historical records of the book with
+<tt class="docutils literal">id = 1</tt>. For each one of them we have can use the&nbsp;following:</p>
+<ul class="simple">
+<li>get the user that made the change through the <tt class="docutils literal">history_user</tt> attribute</li>
+<li>get the date of the change through the <tt class="docutils literal">history_date</tt> attribute</li>
+<li>get the type of the change through the <tt class="docutils literal">history_type</tt> attribute (and the corresponding <tt class="docutils literal">get_history_type_dispaly</tt>)</li>
+<li>get a model instance as it was then through the <tt class="docutils literal">history_object</tt> attribute (in order to <tt class="docutils literal">save()</tt> it and revert to this&nbsp;version)</li>
+</ul>
+</div>
+</div>
+<div class="section" id="using-django-reversion">
+<h2><a class="toc-backref" href="#id17">Using&nbsp;django-reversion</a></h2>
+<p><a class="reference external" href="https://github.com/etianen/django-reversion">django-reversion</a>  offers more or less the same functionality of django-simple-history by following a different philosophy:
+Instead of creating an extra table holding the history records for each model, it insteads converts all the fields of each model
+to json and stores that <span class="caps">JSON</span> in the database in a text&nbsp;field.</p>
+<p>This has the advantage that no extra tables are created to the database but the disadvantage that you can&#8217;t easily query
+your historical records. So you may choose one or the other depending on your actual&nbsp;requirements.</p>
+<div class="section" id="id2">
+<h3><a class="toc-backref" href="#id18">Installation</a></h3>
+<p>To use django-reversion in a project, after we do a <tt class="docutils literal">pip install <span class="pre">django-reversion</span></tt>,
+we just need to add it to <tt class="docutils literal">INSTALLED_APPS</tt> and
+add the <tt class="docutils literal">reversion.middleware.RevisionMiddleware</tt> to the <tt class="docutils literal">MIDDLEWARE_CLASSES</tt> list.</p>
+<p>In order to save the revisions of a model, you need to register this model to django-reversion. This can be
+done either through the django-admin, by inheriting the admin class of that model from <tt class="docutils literal">reversion.VersionAdmin</tt>
+or, if you don&#8217;t want to use the admin by <tt class="docutils literal">reversion.register</tt> decorator.</p>
+</div>
+<div class="section" id="id3">
+<h3><a class="toc-backref" href="#id19">Example</a></h3>
+<p>To use django-reversion to keep track of changes to <tt class="docutils literal">Book</tt> we can modify it like&nbsp;this:</p>
+<div class="highlight"><pre>@reversion.register
+class RBook(models.Model):
+    name = models.CharField(max_length=128)
+    author = models.CharField(max_length=128)
+
+    def get_absolute_url(self):
+        return reverse(&quot;rbook_list&quot;)
+</pre></div>
+<p>django-reversion uses two tables in the database to keep track of revisions: <tt class="docutils literal">revision</tt> and <tt class="docutils literal">version</tt>. Let&#8217;s
+take a look at their&nbsp;schemata:</p>
+<pre class="code literal-block">
+.schema reversion_revision
+CREATE TABLE &quot;reversion_revision&quot; (
+    &quot;id&quot; integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+    &quot;manager_slug&quot; varchar(200) NOT NULL,
+    &quot;date_created&quot; datetime NOT NULL,
+    &quot;comment&quot; text NOT NULL,
+    &quot;user_id&quot; integer NULL REFERENCES &quot;auth_user&quot; (&quot;id&quot;)
+);
+
+.schema reversion_version
+CREATE TABLE &quot;reversion_version&quot; (
+    &quot;id&quot; integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+    &quot;object_id&quot; text NOT NULL,
+    &quot;object_id_int&quot; integer NULL,
+    &quot;format&quot; varchar(255) NOT NULL,
+    &quot;serialized_data&quot; text NOT NULL,
+    &quot;object_repr&quot; text NOT NULL,
+    &quot;content_type_id&quot; integer NOT NULL REFERENCES &quot;django_content_type&quot; (&quot;id&quot;),
+    &quot;revision_id&quot; integer NOT NULL REFERENCES &quot;reversion_revision&quot; (&quot;id&quot;)
+);
+</pre>
+<p>As we can understand, the <tt class="docutils literal">revision</tt> table holds information like who created this
+revison (<tt class="docutils literal">user_id</tt>) and when (<tt class="docutils literal">date_created</tt>) while the <tt class="docutils literal">version</tt> stores
+a reference to the object that was modified (through a GenericForeignKey) and
+the actual data (in the <tt class="docutils literal">serialized_data</tt> field). By default it uses <span class="caps">JSON</span>
+to serialize the data (the serialization format is in the <tt class="docutils literal">format</tt> field). There&#8217;s
+an one-to-one relation between <tt class="docutils literal">revision</tt> and <tt class="docutils literal">version</tt>.</p>
+<p>If we create an instance of <tt class="docutils literal">RBook</tt> we&#8217;ll see the following in the&nbsp;database:</p>
+<pre class="code literal-block">
+sqlite&gt; select * from reversion_revision;
+1|default|2015-01-21 10:31:25.233000||1
+
+sqlite&gt; select * from reversion_version;
+1|1|1|json|[{&quot;fields&quot;: {&quot;name&quot;: &quot;asdasdasd&quot;, &quot;author&quot;: &quot;asdasd&quot;}, &quot;model&quot;: &quot;sample.rbook&quot;, &quot;pk&quot;: 1}]|RBook object|12|1
+</pre>
+<p><tt class="docutils literal">date_created</tt> and <tt class="docutils literal">user_id</tt> are stored on <tt class="docutils literal">revision</tt> while <tt class="docutils literal">format</tt>, <tt class="docutils literal">serialized_data</tt>, <tt class="docutils literal">content_type_id</tt> and
+<tt class="docutils literal">object_id_int</tt> (the <tt class="docutils literal">GenericForeignKey</tt>) are stored in <tt class="docutils literal">version</tt>.</p>
+</div>
+<div class="section" id="id4">
+<h3><a class="toc-backref" href="#id20">Usage</a></h3>
+<p>To find out information about an object you have to use the <tt class="docutils literal">reversion.get_for_object(object)</tt> method. In order to be
+easily used in templates I recommend creating the following <tt class="docutils literal">get_versions()</tt> method in each model that is registered with&nbsp;django-reversion</p>
+<pre class="code literal-block">
+def get_versions(self):
+    return reversion.get_for_object(self)
+</pre>
+<p>Now, each version has a <tt class="docutils literal">revision</tt> attribute for the corresponding revision and can be used to do the&nbsp;following:</p>
+<ul class="simple">
+<li>get the user that made the change through the <tt class="docutils literal">revision.user</tt> attribute</li>
+<li>get the date of the change through the <tt class="docutils literal">revision.date_created</tt> attribute</li>
+<li>get the values of the object fields as they were in this revision using the <tt class="docutils literal">field_dict</tt> attribute</li>
+<li>get a model instance as it was on that revision using the <tt class="docutils literal">object_version.object</tt> attribute</li>
+<li>revert to that previous version of that object using the <tt class="docutils literal">rever()</tt> method</li>
+</ul>
+</div>
+</div>
+<div class="section" id="conclusion">
+<h2><a class="toc-backref" href="#id21">Conclusion</a></h2>
+<p>In the above we say that it is really easy to add basic (<em>who</em> and <em>when</em>) auditing capabilities to your models: You just need to
+inherit your models from the <tt class="docutils literal">Auditable</tt> abstract class and inherit your Create and Update CBVs from <tt class="docutils literal">AuditableMixin</tt>.
+If you want to know exactly <em>what</em> was changed then you have two solutions: django-simple-history to create an extra table for
+each of your models so you&#8217;ll be able to query your historical records (and easily extra aggregates, statistics etc) and
+django-reversion to save each version as a json object, so no extra tables will be&nbsp;created.</p>
+<p>All three solutions for auditing have been implemented in a sample project at <a class="reference external" href="https://github.com/spapas/auditing-sample">https://github.com/spapas/auditing-sample</a>.</p>
+<p>You can clone the project and, preferrably in a virtual environment, install requirements (<tt class="docutils literal">pip install <span class="pre">-r</span> requirements.txt</tt>),
+do a migrate (<tt class="docutils literal">python manage.py migrate</tt> &#8212; uses sqlite3 by default) and run the local development
+server (<tt class="docutils literal">python manage.py ruinserver</tt>).</p>
+</div>
+</div>
+  		</article>
+  		<article>
+<header>
+      <h1 class="entry-title">
         <a href="http://spapas.github.io/2014/12/16/change-bootstrap-material-primary-color/">Change the primary color of bootstrap material design</a>
       </h1>
       <p class="meta"><time datetime="2014-12-16T16:20:00" pubdate>Τρι 16 Δεκέμβριος 2014</time></p>
@@ -622,162 +975,6 @@ heroku open
 </div>
 </div>
   		</article>
-  		<article>
-<header>
-      <h1 class="entry-title">
-        <a href="http://spapas.github.io/2014/04/11/django-generic-formviews-for-objects/">Django generic FormViews for objects</a>
-      </h1>
-      <p class="meta"><time datetime="2014-04-11T10:23:00" pubdate>Παρ 11 Απρίλιος 2014</time></p>
-</header>
-
-  <div class="entry-content"><div class="contents topic" id="contents">
-<p class="topic-title first">Contents</p>
-<ul class="simple">
-<li><a class="reference internal" href="#introduction" id="id1">Introduction</a></li>
-<li><a class="reference internal" href="#a-quick-introduction-to-the-formview" id="id2">A quick introduction to the <tt class="docutils literal">FormView</tt></a></li>
-<li><a class="reference internal" href="#a-quick-introduction-to-the-singleobjectmixin" id="id3">A quick introduction to the <tt class="docutils literal">SingleObjectMixin</tt></a></li>
-<li><a class="reference internal" href="#being-generic-and-dry" id="id4">Being generic and <span class="caps">DRY</span></a></li>
-<li><a class="reference internal" href="#being-more-generic-and-dry" id="id5">Being more generic and <span class="caps">DRY</span></a></li>
-<li><a class="reference internal" href="#other-options" id="id6">Other&nbsp;options</a></li>
-</ul>
-</div>
-<div class="section" id="introduction">
-<h2><a class="toc-backref" href="#id1">Introduction</a></h2>
-<p>We recently needed to create a number of views for changing the status of an Application model instance for our organization.
-An Application model instance can be filled and then cancelled, submitted, acceptted etc - for each of these status changes a form should be
-presented to the user. When the user submits the form the status of the Application will be&nbsp;changed.</p>
-<p>To implement the above requirement we created a generic FormView that acts on the specific model instance. This
-used two basic <span class="caps">CBV</span> components: The <tt class="docutils literal">FormView</tt> for the form manipulation and the <tt class="docutils literal">SingleObjectMixing</tt> for the
-object&nbsp;handling.</p>
-<p>Django <a class="reference external" href="https://docs.djangoproject.com/en/1.6/topics/class-based-views/">Class Based Views</a> (CBVs) can be used to create reusable Views using normal class inheritance. Most
-people use the well-known <tt class="docutils literal">CreateView</tt>, <tt class="docutils literal">UpdateView</tt>, <tt class="docutils literal">DetailView</tt> and <tt class="docutils literal">ListView</tt>, however, as we
-will see below, the <tt class="docutils literal">FormView</tt> will help us write <span class="caps">DRY</span>&nbsp;code.</p>
-<p>I have to notice here that an invaluable tool to help you understanding CBVs is the <a class="reference external" href="http://ccbv.co.uk/"><span class="caps">CBV</span> inspector</a> which
-has a nice web interface for browsing the <span class="caps">CBV</span> hierarchies, attributes and&nbsp;methods.</p>
-</div>
-<div class="section" id="a-quick-introduction-to-the-formview">
-<h2><a class="toc-backref" href="#id2">A quick introduction to the <tt class="docutils literal">FormView</tt></a></h2>
-<p>A simple <tt class="docutils literal">FormView</tt> can be defined like this (<a class="reference external" href="http://ccbv.co.uk/projects/Django/1.6/django.views.generic.edit/FormView/"><span class="caps">CBV</span> FormView</a>):</p>
-<pre class="code literal-block">
-class MyFormView(FormView):
-  form_class = forms.MyFormView
-  template_name = 'my_template.html'
-</pre>
-<p>The above can be used in urls.py like&nbsp;this:</p>
-<pre class="code literal-block">
-urlpatterns = patterns('',
-  url(r'^my_formview/$', views.MyFormView.as_view() , name='my_formview' ),
-</pre>
-<p>This will present a form to the user when he visits the <tt class="docutils literal">my_formview</tt>  url &#8212; however this form won&#8217;t do anything. To allow
-the form to actually do something when it&#8217;s been submitted we need to override the <tt class="docutils literal">form_valid</tt> method.</p>
-<pre class="code literal-block">
-def form_valid(self, form):
-    value = form.cleaned_data['value']
-    messages.info(self.request, &quot;MyForm submitted with value {0}!&quot;.format(value) )
-    return HttpResponseRedirect( reverse('my_formview') )
-</pre>
-<p>As you can see the submitted form is passed in the method and can be used to receive its <tt class="docutils literal">cleaned_data</tt>. The <tt class="docutils literal">FormView</tt>
-has various other options for instance a <tt class="docutils literal">form_invalid</tt> method, an <tt class="docutils literal">initial</tt> attribute to set the initial values for the form&nbsp;etc.</p>
-</div>
-<div class="section" id="a-quick-introduction-to-the-singleobjectmixin">
-<h2><a class="toc-backref" href="#id3">A quick introduction to the <tt class="docutils literal">SingleObjectMixin</tt></a></h2>
-<p>A <tt class="docutils literal">SingleObjectMixin</tt> adds a number of attributes <span class="amp">&amp;</span> methods to a view that can be used for object manipulation. The
-most important ones is the <tt class="docutils literal">model</tt> and <tt class="docutils literal">queryset</tt> attributes and the <tt class="docutils literal">get_queryset</tt> and <tt class="docutils literal">get_object()</tt>. To use
-the <tt class="docutils literal">SingleObjectMixin</tt> in your <span class="caps">CBV</span> just add it to the list of the classes to inherit from and define either the
-<tt class="docutils literal">model</tt> or the <tt class="docutils literal">queryset</tt> attribute. After that you may pass a <tt class="docutils literal">pk</tt> parameter to your view and you will get an
-<tt class="docutils literal">object</tt> context variable in the template with the selected&nbsp;object!</p>
-</div>
-<div class="section" id="being-generic-and-dry">
-<h2><a class="toc-backref" href="#id4">Being generic and <span class="caps">DRY</span></a></h2>
-<p>We can more or less now understand how we should use <tt class="docutils literal">FormView</tt> and <tt class="docutils literal">SingleObjectMixin</tt> to generate our
-generic <tt class="docutils literal">FormView</tt> for acting on objects: Our <tt class="docutils literal">FormView</tt> should <em>get</em> the object using the <tt class="docutils literal">SingleObjectMixin</tt>
-and change it when the form is submitted using the values from the form. A first implementation would be the&nbsp;following:</p>
-<pre class="code literal-block">
-class GenericObjectFormView1(FormView, SingleObjectMixin):
-
-    def form_valid(self, form):
-        obj = self.get_object()
-        obj.change_status(form)
-        return HttpResponseRedirect( obj.get_absolute_url() )
-</pre>
-<p>So our <tt class="docutils literal">GenericObjectFormView1</tt> class inherits from <tt class="docutils literal">FormView</tt> and <tt class="docutils literal">SingleObjectMixin</tt>. The only thing that we have
-to assure is that the Model we want to act on needs to implement a <tt class="docutils literal">change_status</tt> method which gets the <tt class="docutils literal">form</tt> and
-changes the status of that object based on its value. For instance, two implementations can be the&nbsp;following:</p>
-<pre class="code literal-block">
-class CancelObjectFormView(GenericObjectFormView1):
-    template_name = 'cancel.html'
-    form_class = forms.CancelForm
-    model = models.Application
-
-class SubmitObjectFormView(GenericObjectFormView1):
-    template_name = 'submit.html'
-    form_class = forms.SubmitForm
-    model = models.Application
-</pre>
-</div>
-<div class="section" id="being-more-generic-and-dry">
-<h2><a class="toc-backref" href="#id5">Being more generic and <span class="caps">DRY</span></a></h2>
-<p>The previous implementation has two&nbsp;problems:</p>
-<ul class="simple">
-<li>What happens if the status of the object should not be changed even if the form <em>is</em>&nbsp;valid?</li>
-<li>We shouldn&#8217;t need to create a new template for every new <tt class="docutils literal">GenericObjectFormView</tt> since all these templates will just output the object information, ask a question for the status change and output the&nbsp;form.</li>
-</ul>
-<p>Let&#8217;s write a new version of our GenericObjectFormView that actually resolves&nbsp;these:</p>
-<pre class="code literal-block">
-class GenericObjectFormView2(FormView, SingleObjectMixin):
-    template_name = 'generic_formview.html'
-    ok_message = ''
-    not_ok_message = ''
-    title = ''
-    question =''
-
-    def form_valid(self, form):
-        obj = self.get_object()
-        r = obj.change_status(form)
-        if r:
-            messages.info(self.request, self.yes_message)
-        else:
-            messages.info(self.request, self.not_ok_message)
-        return HttpResponseRedirect( obj.get_absolute_url() )
-
-    def get_context_data(self, **kwargs):
-        context = super(GenericYesNoFormView, self).get_context_data(**kwargs)
-        context['title'] = self.title
-        context['question'] = self.question
-        return context
-</pre>
-<p>The above adds an ok and not ok message which will be outputed if the status can or cannot be changed. To accomplish this,
-the <tt class="docutils literal">change_status</tt> method should now return a boolean value to mark if the action was ok or not. Also, a generic template
-will now be used. This template has two placeholders: One for the title of the page (<tt class="docutils literal">title</tt> attribute) and one for the
-question asked to the user (<tt class="docutils literal">question</tt> attribute). Now we can use it like&nbsp;this:</p>
-<pre class="code literal-block">
-class CancelObjectFormView(GenericObjectFormView2):
-    form_class = forms.CancelForm
-    model = models.Application
-    ok_message = 'Cancel success!'
-    not_ok_message = 'Not able to cancel!'
-    title = 'Cancel an object'
-    question = 'Do you want to cancel this object?'
-
-class SubmitObjectFormView(GenericObjectFormView2):
-    form_class = forms.SubmitForm
-    model = models.Application
-    ok_message = 'Submit  ok'
-    not_ok_message = 'Cannot submit!'
-    title = 'Submit an object'
-    question ='Do you want to submit this object?'
-</pre>
-</div>
-<div class="section" id="other-options">
-<h2><a class="toc-backref" href="#id6">Other&nbsp;options</a></h2>
-<p>We&#8217;ve just got a glimpse of how we can use CBVs to increase the DRYness of our Django applications. There are various
-extra things that we can add to our <tt class="docutils literal">GenericObjectFormView2</tt> as attributes which will be defined by inheriting
-classes. Some ideas is to check if the current user actually has access to modify the object (hint: override the
-<tt class="docutils literal">get_object</tt> method of <tt class="docutils literal">SingleObjectMixin</tt>) or render the form diffirently depending on the current user (hint:
-override the <tt class="docutils literal">get_form_kwargs</tt> method of <tt class="docutils literal">FormView</tt>).</p>
-</div>
-</div>
-  		</article>
 <div class="pagination">
     <a class="prev" href="http://spapas.github.io/author\serafeim-papastefanos2.html">&larr; Older</a>
 
@@ -787,6 +984,9 @@ override the <tt class="docutils literal">get_form_kwargs</tt> method of <tt cla
   <section>
     <h1>Recent Posts</h1>
     <ul id="recent_posts">
+      <li class="post">
+          <a href="http://spapas.github.io/2015/01/21/django-model-auditing/">Django model auditing</a>
+      </li>
       <li class="post">
           <a href="http://spapas.github.io/2014/12/16/change-bootstrap-material-primary-color/">Change the primary color of bootstrap material design</a>
       </li>
@@ -798,9 +998,6 @@ override the <tt class="docutils literal">get_form_kwargs</tt> method of <tt cla
       </li>
       <li class="post">
           <a href="http://spapas.github.io/2014/06/30/rest-flask-mongodb-heroku/">Implementing a simple, Heroku-hosted REST service using Flask and mongoDB</a>
-      </li>
-      <li class="post">
-          <a href="http://spapas.github.io/2014/04/11/django-generic-formviews-for-objects/">Django generic FormViews for objects</a>
       </li>
     </ul>
   </section>
@@ -822,14 +1019,14 @@ override the <tt class="docutils literal">get_form_kwargs</tt> method of <tt cla
 
   <section>
   <h1>Tags</h1>
-    <a href="http://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="http://spapas.github.io/tag/google.html">google</a>,    <a href="http://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="http://spapas.github.io/tag/spring.html">spring</a>,    <a href="http://spapas.github.io/tag/rest.html">rest</a>,    <a href="http://spapas.github.io/tag/design.html">design</a>,    <a href="http://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="http://spapas.github.io/tag/git.html">git</a>,    <a href="http://spapas.github.io/tag/java.html">java</a>,    <a href="http://spapas.github.io/tag/flask.html">flask</a>,    <a href="http://spapas.github.io/tag/less.html">less</a>,    <a href="http://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="http://spapas.github.io/tag/forms.html">forms</a>,    <a href="http://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="http://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="http://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="http://spapas.github.io/tag/css.html">css</a>,    <a href="http://spapas.github.io/tag/python.html">python</a>,    <a href="http://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="http://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="http://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="http://spapas.github.io/tag/rst.html">rst</a>,    <a href="http://spapas.github.io/tag/branching.html">branching</a>,    <a href="http://spapas.github.io/tag/github.html">github</a>,    <a href="http://spapas.github.io/tag/windows.html">windows</a>,    <a href="http://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="http://spapas.github.io/tag/django.html">django</a>,    <a href="http://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="http://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="http://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="http://spapas.github.io/tag/security.html">security</a>,    <a href="http://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>  </section>
+    <a href="http://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="http://spapas.github.io/tag/google.html">google</a>,    <a href="http://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="http://spapas.github.io/tag/spring.html">spring</a>,    <a href="http://spapas.github.io/tag/rest.html">rest</a>,    <a href="http://spapas.github.io/tag/design.html">design</a>,    <a href="http://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="http://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="http://spapas.github.io/tag/git.html">git</a>,    <a href="http://spapas.github.io/tag/java.html">java</a>,    <a href="http://spapas.github.io/tag/flask.html">flask</a>,    <a href="http://spapas.github.io/tag/less.html">less</a>,    <a href="http://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="http://spapas.github.io/tag/forms.html">forms</a>,    <a href="http://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="http://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="http://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="http://spapas.github.io/tag/css.html">css</a>,    <a href="http://spapas.github.io/tag/python.html">python</a>,    <a href="http://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="http://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="http://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="http://spapas.github.io/tag/rst.html">rst</a>,    <a href="http://spapas.github.io/tag/branching.html">branching</a>,    <a href="http://spapas.github.io/tag/github.html">github</a>,    <a href="http://spapas.github.io/tag/windows.html">windows</a>,    <a href="http://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="http://spapas.github.io/tag/django.html">django</a>,    <a href="http://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="http://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="http://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="http://spapas.github.io/tag/security.html">security</a>,    <a href="http://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>  </section>
 
 
 
 </aside>    </div>
   </div>
   <footer role="contentinfo"><p>
-    Copyright &copy;  2013-2014  - Serafeim Papastefanos -
+    Copyright &copy;  2013-2015  - Serafeim Papastefanos -
   <span class="credit">Powered by <a href="http://getpelican.com">Pelican</a></span>
 </p></footer>
     <script>

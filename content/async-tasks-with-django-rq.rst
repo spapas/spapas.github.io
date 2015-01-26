@@ -19,7 +19,7 @@ seperate worker. This adds much complexity to the project since beyond the basic
 at least one more (worker) process needs to be run (and monitored etc) -- however, in most cases it can't be avoided.
 
 Even for fairly quick tasks (like sending email through an SMTP server) you need to use an asynchronous task since
-the time required for such a task is not really limited.
+the time required for such a task is not really limited. So
 
 Beyond job queuing, another relative requirement for many projects is to schedule a task to be run in the future
 (similar to the ``at`` unix command) or at specific time intervals (similar to the ``cron`` unix command). For
@@ -170,8 +170,21 @@ Configuring rqworker and rqscheduler
 Conclusion
 ==========
 
-Using RQ (and the relative projects django-rq and rq-scheduler) we can easily add queueued and
-scheduled jobs to any django project. 
+Although using job queues makes it more difficult for the developer and adds at least one
+(and probably more) points of failure to a project (the workers, the broker etc) their
+usage, even for very simple projects is unavoidable. 
+
+Unless a complex, enterprise solution like celery is really required for a project
+I recommend using the much simpler and easier to configure RQ project for all your
+asynchronous and scheduled task needs. Using RQ (and the relative projects django-rq 
+and rq-scheduler) we can easily add production ready queueued and scheduled jobs to 
+any django project. 
+
+In this article we presented a small introduction to RQ and its friends, andswered
+a bunch of questions on how it is working and saw how
+to configure django to use it in a production ready environment. Finally a small
+django project (https://github.com/spapas/django-test-rq) was implemented as a companion 
+to help readers quickly test the concepts presented here.
 
 
 .. _celery: http://www.celeryproject.org/

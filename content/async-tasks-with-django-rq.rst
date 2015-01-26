@@ -37,13 +37,13 @@ Some terminology
 - Broker: Jobs/tasks to be executed are stored in the broker in a first in a first out queue which could be a normal database but most of the times is a specialized system called message broker
 - Worker: A worker is a process/thread that runs independently and checks the broker for new tasks to be executed. When there are queued tasks, the worker dequeues them and executes them
 
-
 Job queues in python
 ====================
 
 The most known application for using job queues in python is celery_ which is a really great project that supports
 many brokers,  integrates nicely
-with django and has many more features (most of them are only useful on really big, enterprise projects). I've already used 
+with python/django (but can be used even with other languages) and has
+many more features (most of them are only useful on really big, enterprise projects). I've already used 
 it in a previous application, however, because celery is really complex it needed a lot of time to configure it
 successfully and I never was perfectly sure that my asynchronous task would work 100% :( 
 
@@ -51,10 +51,29 @@ Celery also has `many dependencies`_ in order to be able to talk with the differ
 improve multithreading support etc. They may be required in enterprise apps but not for most Django web based projects.
 
 So, for small-to-average projects I recommend using a different asynchronous task solution instead of celery, particularly
-(as you've already guessed from the title of this post) RQ_. RQ is simpler than celery, it integrates better with django
+(as you've already guessed from the title of this post) RQ_. RQ is simpler than celery, it integrates great with django
 using the excellent django-rq_ package and doesn't actually have any more dependencies beyond redis support which is
 needed as a broker. It even supports supports job scheduling through the rq-scheduler_ package (celery also supports
 job scheduling through celery beat).
+
+What do we want to see here
+===========================
+
+Although RQ, rq-scheduler and django-rq are really small packages whose code can be easily read and have good
+documentation I had a bunch of questions when I first encountered them, more specifically: 
+
+- What does a queued job/task look like?
+- How can I get info about a job and what to do with its result?
+- How should jobs/tasks be integrated to a normal django request/response workflow?
+- How do scheduled tasks work
+- How can I monitor workers? 
+- How can I check the logs of my jobs?
+
+I know that the best way to resolve these was to actually implement a small django project that uses
+the above tools to support asynchronous and scheduled tasks. You may find the result at 
+https://github.com/spapas/django-test-rq. 
+
+
 
 
 .. code-block:: python
@@ -84,17 +103,6 @@ take a look at their schemata:
         "user_id" integer NULL REFERENCES "auth_user" ("id")
     );
 
-    .schema reversion_version
-    CREATE TABLE "reversion_version" (
-        "id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
-        "object_id" text NOT NULL,
-        "object_id_int" integer NULL,
-        "format" varchar(255) NOT NULL,
-        "serialized_data" text NOT NULL,
-        "object_repr" text NOT NULL,
-        "content_type_id" integer NOT NULL REFERENCES "django_content_type" ("id"),
-        "revision_id" integer NOT NULL REFERENCES "reversion_revision" ("id")
-    );
 
 Conclusion
 ==========

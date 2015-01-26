@@ -56,29 +56,6 @@ using the excellent django-rq_ package and doesn't actually have any more depend
 needed as a broker. It even supports supports job scheduling through the rq-scheduler_ package (celery also supports
 job scheduling through celery beat).
 
-Answering questions about RQ
-============================
-
-Although RQ, rq-scheduler and django-rq are really small packages whose code can be easily read and have good
-documentation I had a bunch of questions when I first encountered them, more specifically: 
-
-- What does a queued job/task look like?
-- How can I get info about a job and what to do with its result?
-- How should jobs/tasks be integrated to a normal django request/response workflow?
-- How do scheduled tasks work
-- How can I monitor workers? 
-- How can I check the logs of my jobs?
-
-I know that the best way to resolve these was to actually implement a small django project that uses
-the above tools to support asynchronous and scheduled tasks. You may find the result at 
-https://github.com/spapas/django-test-rq. 
-
-What does a queued job/task look like
--------------------------------------
-
-
-How can I get info about a job and what to do with its result
--------------------------------------------------------------
 
 What was implemented
 ====================
@@ -141,6 +118,69 @@ be only one job id* for each run of that task!
 
 settings.py
 -----------
+In order to use django_rq in your project you need to add it to your ``INSTALLED_APPS`` list. Beyond that, I've added the following
+to my ``settings.py``
+
+.. code-block:: python
+
+    CACHES = {
+        "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": "redis://127.0.0.1:6379/0",
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            }
+        }
+    }
+    
+    RQ_QUEUES = {
+        'default': {
+            'USE_REDIS_CACHE': 'default',
+        },
+    }
+    
+    RQ_SHOW_ADMIN_LINK = True
+    
+The CACHES configures the default django cache to a localhost installed Redis 
+while RQ_QUEUES creates a default job queue for RQ that will use the same Redis
+connection. RQ_SHOW_ADMIN_LINK just adds a link to django-admin of this project
+that shows the status of the queues.
+
+Configuring logging
+-------------------
+
+.. code-block:: python
+
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'formatters': {
+            'simple': {
+                'format': '%(asctime)s %(levelname)s %(message)s'
+            },
+        },
+        'handlers': {
+            'console': {
+                'level': 'DEBUG',
+                'class': 'logging.StreamHandler',
+                'formatter': 'simple'
+            },
+        },
+        
+        'loggers': {
+            'django.request': {
+                'handlers': ['console'],
+                'level': 'DEBUG',
+                'propagate': True,
+            },
+            'rq_scheduler': {
+                'handlers': ['console'],
+                'level': 'DEBUG',
+                'propagate': True,
+            },
+        },
+    }
+
 
 Running the project
 -------------------
@@ -180,10 +220,9 @@ asynchronous and scheduled task needs. Using RQ (and the relative projects djang
 and rq-scheduler) we can easily add production ready queueued and scheduled jobs to 
 any django project. 
 
-In this article we presented a small introduction to RQ and its friends, andswered
-a bunch of questions on how it is working and saw how
-to configure django to use it in a production ready environment. Finally a small
-django project (https://github.com/spapas/django-test-rq) was implemented as a companion 
+In this article we presented a small introduction to RQ and its friends and saw how
+to configure django to use it in a production ready environment using a small
+django project (https://github.com/spapas/django-test-rq) which was implemented as a companion 
 to help readers quickly test the concepts presented here.
 
 

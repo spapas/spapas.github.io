@@ -56,8 +56,8 @@ using the excellent django-rq_ package and doesn't actually have any more depend
 needed as a broker. It even supports supports job scheduling through the rq-scheduler_ package (celery also supports
 job scheduling through celery beat).
 
-What do we want to see here
-===========================
+Answering questions about RQ
+============================
 
 Although RQ, rq-scheduler and django-rq are really small packages whose code can be easily read and have good
 documentation I had a bunch of questions when I first encountered them, more specifically: 
@@ -73,20 +73,71 @@ I know that the best way to resolve these was to actually implement a small djan
 the above tools to support asynchronous and scheduled tasks. You may find the result at 
 https://github.com/spapas/django-test-rq. 
 
+What was implemented
+--------------------
 
+This is a simple django project that can be used to asynchronously 
+run and schedule jobs and examine their behavior
 
+The job that is run
+-------------------
+
+The asychronous task will run the following
+function (defined in tasks.py - some code ommited):
 
 .. code-block:: python
-    import reversion
+import requests
+
+def get_url_words(url):
+    r = requests.get(url)
+    t.result = len(r.text)
+    return t.result
+
+So, it just retrieves the content of a url and counts its length. This is actually the
+example that RQ also uses in its documentation.
+
+Models
+------
+
+Beyond this, there are two models: ``Task`` that saves info
+about an asynchronous task and ``ScheduledTask`` that saves info about a 
+scheduled task. For each scheduled run of a scheduled task a new ``ScheduledTaskInstance``
+will be created. These models contain info about when each job was started,
+what was its result and what is the job id.
+
+Views and forms
+---------------
+
+The homepage will show all ``Task`` and ``ScheduledTask`` instances. For each
+``ScheduledTask`` all the corresponding ``ScheduledTaskInstance`` instances will
+also be presented.
+
+The form just retrieves a url to counts its content length. It also retrieves
+two extra parameters if we want to create a scheduled task: 
+scheduled times (how many times this task should run) and schedule interval
+(how much time between each run).
+
+Depending on if the task is scheduled or not, a different version of 
+``get_url_words`` will be run: For the simple version, a new ``Task``
+will be created which will contain the result of the ``get_url_words``,
+the id of the job, the created time and the url. For the scheduled
+version, a ``ScheduledTask`` containing the url and the job id will
+be created only once, while for each scheduled run, a new 
+``ScheduledTaskInstance`` will be created with the
+result and start time (and a ForeignKey to then single ``ScheduledTask``
+instance). 
+
+It is important to notice here that *for scheduled tasks there would
+be only one job id* for each run of that task!
 
 
-    @reversion.register
-    class RBook(models.Model):
-        name = models.CharField(max_length=128)
-        author = models.CharField(max_length=128)
 
-        def get_absolute_url(self):
-            return reverse("rbook_list")
+I recommend using Vagrant_ to start a stock ubuntu/trusty32 box. After that, instal virtualenv and virtualenvwrapper
+and create/activate a virtualenv named ``rq``. You can go to the home directory of ``django-test-rq``
+and install requirements through ``pip install requirements.txt`` and create the database tables with
+``python manage.py migrate``. Finally you may 
+
+
 
 
 django-reversion uses two tables in the database to keep track of revisions: ``revision`` and ``version``. Let's
@@ -125,3 +176,4 @@ server (``python manage.py ruinserver``).
 .. _`many dependencies`: http://celery.readthedocs.org/en/latest/faq.html#does-celery-have-many-dependencies
 .. _django-rq: https://github.com/ui/django-rq
 .. _rq-scheduler: https://github.com/ui/rq-scheduler
+.. _Vagrant: https://www.vagrantup.com/

@@ -28,11 +28,34 @@ if he hasn't then probably he's having problems and we can call him to help him.
 to see if any users that have registered to our application don't have activated their account through email activation
 and delete these accounts.
 
-The most known application for using job queues in python is celery_ which is a really great project and integrates nicely
-with django. I've already used it with great success in a previous application. However, unfortuanately celery
+Some terminology
+----------------
+
+- Job/Task: A piece of code that needs to be executed asynchronously by a worker
+- Synchronous execution: A task is executed synchronously when the caller will wait (blocks) until the task has finished executing
+- Asynchronous execution: A task is executed asynchronously when the caller just signals the callee to start executing and resumes execution immediately without waiting for the callee to finish
+- Broker: Jobs/tasks to be executed are stored in the broker in a first in a first out queue which could be a normal database but most of the times is a specialized system called message broker
+- Worker: A worker is a process/thread that runs independently and checks the broker for new tasks to be executed. When there are queued tasks, the worker dequeues them and executes them
 
 
-To use django-reversion to keep track of changes to ``Book`` we can modify it like this:
+Job queues in python
+====================
+
+The most known application for using job queues in python is celery_ which is a really great project that supports
+many brokers,  integrates nicely
+with django and has many more features (most of them are only useful on really big, enterprise projects). I've already used 
+it in a previous application, however, because celery is really complex it needed a lot of time to configure it
+successfully and I never was perfectly sure that my asynchronous task would work 100% :( 
+
+Celery also has `many dependencies`_ in order to be able to talk with the different broker backends it supports,
+improve multithreading support etc. They may be required in enterprise apps but not for most Django web based projects.
+
+So, for small-to-average projects I recommend using a different asynchronous task solution instead of celery, particularly
+(as you've already guessed from the title of this post) RQ_. RQ is simpler than celery, it integrates better with django
+using the excellent django-rq_ package and doesn't actually have any more dependencies beyond redis support which is
+needed as a broker. It even supports supports job scheduling through the rq-scheduler_ package (celery also supports
+job scheduling through celery beat).
+
 
 .. code-block:: python
     import reversion
@@ -73,45 +96,6 @@ take a look at their schemata:
         "revision_id" integer NOT NULL REFERENCES "reversion_revision" ("id")
     );
 
-As we can understand, the ``revision`` table holds information like who created this
-revison (``user_id``) and when (``date_created``) while the ``version`` stores
-a reference to the object that was modified (through a GenericForeignKey) and
-the actual data (in the ``serialized_data`` field). By default it uses JSON
-to serialize the data (the serialization format is in the ``format`` field). There's
-an one-to-one relation between ``revision`` and ``version``.
-
-If we create an instance of ``RBook`` we'll see the following in the database:
-
-.. code::
-
-    sqlite> select * from reversion_revision;
-    1|default|2015-01-21 10:31:25.233000||1
-
-    sqlite> select * from reversion_version;
-    1|1|1|json|[{"fields": {"name": "asdasdasd", "author": "asdasd"}, "model": "sample.rbook", "pk": 1}]|RBook object|12|1
-
-``date_created`` and ``user_id`` are stored on ``revision`` while ``format``, ``serialized_data``, ``content_type_id`` and
-``object_id_int`` (the ``GenericForeignKey``) are stored in ``version``.
-
-Usage
------
-
-To find out information about an object you have to use the ``reversion.get_for_object(object)`` method. In order to be
-easily used in templates I recommend creating the following ``get_versions()`` method in each model that is registered with django-reversion
-
-.. code::
-
-    def get_versions(self):
-        return reversion.get_for_object(self)
-
-Now, each version has a ``revision`` attribute for the corresponding revision and can be used to do the following:
-
-* get the user that made the change through the ``revision.user`` attribute
-* get the date of the change through the ``revision.date_created`` attribute
-* get the values of the object fields as they were in this revision using the ``field_dict`` attribute
-* get a model instance as it was on that revision using the ``object_version.object`` attribute
-* revert to that previous version of that object using the ``rever()`` method
-
 Conclusion
 ==========
 
@@ -129,4 +113,7 @@ server (``python manage.py ruinserver``).
 
 
 .. _celery: http://www.celeryproject.org/
-
+.. _RQ: http://python-rq.org/
+.. _`many dependencies`: http://celery.readthedocs.org/en/latest/faq.html#does-celery-have-many-dependencies
+.. _django-rq: https://github.com/ui/django-rq
+.. _rq-scheduler: https://github.com/ui/rq-scheduler

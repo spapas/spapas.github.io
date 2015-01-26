@@ -56,12 +56,16 @@ using the excellent django-rq_ package and doesn't actually have any more depend
 needed as a broker. It even supports supports job scheduling through the rq-scheduler_ package (celery also supports
 job scheduling through celery beat).
 
+Although RQ and frieds are really easy to use (and have a nice documentation) I wasn't able to find
+a complete example of using it with django, so I'll present one rather complete
+exampe here (also found at https://github.com/spapas/django-test-rq), along with some comments on
+how to use it in your production environment.
 
-What was implemented
-====================
+django-rq example
+=================
 
 This is a simple django project that can be used to asynchronously 
-run and schedule jobs and examine their behavior
+run and schedule jobs and examine their behavior:
 
 The job that is run
 -------------------

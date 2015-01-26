@@ -73,8 +73,15 @@ I know that the best way to resolve these was to actually implement a small djan
 the above tools to support asynchronous and scheduled tasks. You may find the result at 
 https://github.com/spapas/django-test-rq. 
 
+What does a queued job/task look like
+-------------------------------------
+
+
+How can I get info about a job and what to do with its result
+-------------------------------------------------------------
+
 What was implemented
---------------------
+====================
 
 This is a simple django project that can be used to asynchronously 
 run and schedule jobs and examine their behavior
@@ -86,12 +93,14 @@ The asychronous task will run the following
 function (defined in tasks.py - some code ommited):
 
 .. code-block:: python
+
 import requests
 
 def get_url_words(url):
     r = requests.get(url)
     t.result = len(r.text)
     return t.result
+
 
 So, it just retrieves the content of a url and counts its length. This is actually the
 example that RQ also uses in its documentation.
@@ -130,45 +139,39 @@ instance).
 It is important to notice here that *for scheduled tasks there would
 be only one job id* for each run of that task!
 
+settings.py
+-----------
 
+Running the project
+-------------------
 
-I recommend using Vagrant_ to start a stock ubuntu/trusty32 box. After that, instal virtualenv and virtualenvwrapper
+I recommend using Vagrant_ to start a stock ubuntu/trusty32 box. After that, instal redis, virtualenv and virtualenvwrapper
 and create/activate a virtualenv named ``rq``. You can go to the home directory of ``django-test-rq``
 and install requirements through ``pip install requirements.txt`` and create the database tables with
-``python manage.py migrate``. Finally you may 
+``python manage.py migrate``. Finally you may run the project with ``python manage.py runserver_plus``.
+
+Before scheduling any tasks we need to configure TODO
+
+Configuring rqworker and rqscheduler
+====================================
 
 
-
-
-django-reversion uses two tables in the database to keep track of revisions: ``revision`` and ``version``. Let's
-take a look at their schemata:
 
 .. code::
 
-    .schema reversion_revision
-    CREATE TABLE "reversion_revision" (
-        "id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
-        "manager_slug" varchar(200) NOT NULL,
-        "date_created" datetime NOT NULL,
-        "comment" text NOT NULL,
-        "user_id" integer NULL REFERENCES "auth_user" ("id")
-    );
+    [program:rqworker]
+    command=python manage.py rqworker
+    directory=/vagrant/progr/py/rq/django-test-rq
+    environment=PATH="/home/vagrant/.virtualenvs/rq/bin"
+    user=vagrant
+    redirect_stderr=true
 
 
 Conclusion
 ==========
 
-In the above we say that it is really easy to add basic (*who* and *when*) auditing capabilities to your models: You just need to
-inherit your models from the ``Auditable`` abstract class and inherit your Create and Update CBVs from ``AuditableMixin``.
-If you want to know exactly *what* was changed then you have two solutions: django-simple-history to create an extra table for
-each of your models so you'll be able to query your historical records (and easily extra aggregates, statistics etc) and 
-django-reversion to save each version as a json object, so no extra tables will be created.
-
-All three solutions for auditing have been implemented in a sample project at https://github.com/spapas/auditing-sample.
-
-You can clone the project and, preferrably in a virtual environment, install requirements (``pip install -r requirements.txt``), 
-do a migrate (``python manage.py migrate`` -- uses sqlite3 by default) and run the local development 
-server (``python manage.py ruinserver``).
+Using RQ (and the relative projects django-rq and rq-scheduler) we can easily add queueued and
+scheduled jobs to any django project. 
 
 
 .. _celery: http://www.celeryproject.org/

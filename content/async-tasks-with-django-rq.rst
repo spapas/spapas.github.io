@@ -29,7 +29,8 @@ to see if any users that have registered to our application don't have activated
 and delete these accounts.
 
 The most known application for using job queues in python is celery_ which is a really great project and integrates nicely
-with django. I've already used it with great success in a previous application. However, unfortuanately celery
+with django. I've already used it with great success in a previous application. However, unfortuanately celery is rather
+
 
 
 To use django-reversion to keep track of changes to ``Book`` we can modify it like this:

@@ -70,6 +70,223 @@
   		<article>
 <header>
       <h1 class="entry-title">
+        <a href="http://spapas.github.io/2014/06/30/rest-flask-mongodb-heroku/">Implementing a simple, Heroku-hosted REST service using Flask and mongoDB</a>
+      </h1>
+      <p class="meta"><time datetime="2014-06-30T15:23:00" pubdate>Δευ 30 Ιούνιος 2014</time></p>
+</header>
+
+  <div class="entry-content"><div class="contents topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#introduction" id="id1">Introduction</a></li>
+<li><a class="reference internal" href="#requirements" id="id2">Requirements</a></li>
+<li><a class="reference internal" href="#implementing-the-rest-service" id="id3">Implementing the <span class="caps">REST</span>&nbsp;service</a></li>
+<li><a class="reference internal" href="#testing-it-locally" id="id4">Testing it&nbsp;locally</a></li>
+<li><a class="reference internal" href="#deploying-to-heroku" id="id5">Deploying to&nbsp;Heroku</a></li>
+</ul>
+</div>
+<div class="section" id="introduction">
+<h2><a class="toc-backref" href="#id1">Introduction</a></h2>
+<p>In the following, I will describe how I used <a class="reference external" href="http://flask.pocoo.org/">Flask</a>, a very nice web <em>microframework</em> for python along  with <a class="reference external" href="http://www.mongodb.org/">mongoDB</a>, the most
+popular No-<span class="caps">SQL</span> database to implement a simple <span class="caps">REST</span> service that was hosted on <a class="reference external" href="https://dashboard.heroku.com/apps">Heroku</a>. This <span class="caps">REST</span> service would get readings from
+a number of sensors from an Android&nbsp;device.</p>
+<p>I chose Flask instead of Django mainly because the <span class="caps">REST</span> service that I needed to implement would be very simple and most of
+the Django bells and whistles (<span class="caps">ORM</span>, auth, admin, etc) wouldn&#8217;t be needed anyway. Also, Flask is much quicker to set-up than
+Django since almost everything (views, urls, etc) can be put inside one python&nbsp;module.</p>
+<p>Concerning the choice of a NoSQL persistance solution (mongoDB), I wanted to have a table (or collection as it is called in the
+mongoDB world) of readings from the sensor. Each reading would just have a timestamp and various other
+arbitrary data depending on the type of the reading, so saving it as a <span class="caps">JSON</span> document in a NoSQL database is a good&nbsp;solution.</p>
+<p>Finally, all the above will be deployed to Heroku which offers some great services for deploying python code in the&nbsp;cloud.</p>
+</div>
+<div class="section" id="requirements">
+<h2><a class="toc-backref" href="#id2">Requirements</a></h2>
+<p>I propose creating a file named <tt class="docutils literal">requirements.txt</tt> that will host the required packages for your project, so you will be
+able to setup your projects after creating a virtual environment with <a class="reference external" href="http://virtualenv.readthedocs.org/en/latest/">virtualenv</a> just by running <tt class="docutils literal">pip install <span class="pre">-r</span> requirements.txt</tt>.
+Also, the requirements.txt is required for deploying python to&nbsp;Heroku.</p>
+<p>So, for my case, the contents of requirements.txt are the&nbsp;following:</p>
+<pre class="code literal-block">
+Flask==0.10.1
+Flask-PyMongo==0.3.0
+Flask-RESTful==0.2.12
+Jinja2==2.7.3
+MarkupSafe==0.23
+Werkzeug==0.9.6
+aniso8601==0.82
+gunicorn==19.0.0
+itsdangerous==0.24
+pymongo==2.7.1
+pytz==2014.4
+six==1.7.2
+</pre>
+<ul class="simple">
+<li>Flask-PyMongo is a simple wrapper for Flask around pymongo which is the python mongoDB&nbsp;driver.</li>
+<li>Flask-RESTful is a simple library for creating <span class="caps">REST</span> APIs - it needs aniso8601 and&nbsp;pytz.</li>
+<li>Jinja2 is the template library for Flask (we won&#8217;t use it but it is required by Flask installation) - it needs&nbsp;MarkupSafe.</li>
+<li>Werkzeug is a <span class="caps">WSGI</span> utility library - required by&nbsp;Flask</li>
+<li>gunicorn is a <span class="caps">WSGI</span> <span class="caps">HTTP</span> server - needed for deployment to&nbsp;Heroku</li>
+<li>itsdangerous is used to sign data for usage in untrusted&nbsp;environments</li>
+<li>six is the python 2/3 compatibility&nbsp;layer</li>
+</ul>
+</div>
+<div class="section" id="implementing-the-rest-service">
+<h2><a class="toc-backref" href="#id3">Implementing the <span class="caps">REST</span>&nbsp;service</a></h2>
+<p>Instead of using just one single file for our Flask web application, we will create a python module to contain it and a
+file named <tt class="docutils literal">runserver.py</tt> that will start a local development server to test&nbsp;it:</p>
+<p>So, in the same folder as the <tt class="docutils literal">requirements.txt</tt> create a folder named <tt class="docutils literal">flask_rest_service</tt> and in there put
+two files: <tt class="docutils literal">__init__.py</tt> and <tt class="docutils literal">resources.py</tt>.</p>
+<p>The <tt class="docutils literal">__init__.py</tt> initializes our Flask application, our mongoDB connection and our Flask-RESTful&nbsp;api:</p>
+<pre class="code literal-block">
+import os
+from flask import Flask
+from flask.ext import restful
+from flask.ext.pymongo import PyMongo
+from flask import make_response
+from bson.json_util import dumps
+
+MONGO_URL = os.environ.get('MONGO_URL')
+if not MONGO_URL:
+    MONGO_URL = &quot;mongodb://localhost:27017/rest&quot;;
+
+app = Flask(__name__)
+
+app.config['MONGO_URI'] = MONGO_URL
+mongo = PyMongo(app)
+
+def output_json(obj, code, headers=None):
+    resp = make_response(dumps(obj), code)
+    resp.headers.extend(headers or {})
+    return resp
+
+DEFAULT_REPRESENTATIONS = {'application/json': output_json}
+api = restful.Api(app)
+api.representations = DEFAULT_REPRESENTATIONS
+
+import flask_rest_service.resources
+</pre>
+<p>So what happens here? After the imports, we check if we have a MONGO_URL environment variable. This is
+how we set options in Heroku. If such option does not exist in the environment then we are in our
+development environment so we set it to the localhost (we must have a running mongoDB installation in
+our dev&nbsp;environment).</p>
+<p>In the next lines, we initialize our Flask application and our mongoDB connection (pymongo
+uses a <tt class="docutils literal">MONGO_URI</tt> configuration option to know the database <span class="caps">URI</span>).</p>
+<p>The <tt class="docutils literal">output_json</tt> is used to dump the <span class="caps">BSON</span> encoded mongoDB objects to <span class="caps">JSON</span> and was borrowed from
+<a class="reference external" href="http://blog.alienretro.com/using-mongodb-with-flask-restful/">alienretro&#8217;s blog</a> &#8212; we initialize our restful <span class="caps">REST</span> <span class="caps">API</span> with this&nbsp;function.</p>
+<p>Finally, we import the <tt class="docutils literal">resources.py</tt> module which actually defines our <span class="caps">REST</span>&nbsp;resources.</p>
+<pre class="code literal-block">
+import json
+from flask import request, abort
+from flask.ext import restful
+from flask.ext.restful import reqparse
+from flask_rest_service import app, api, mongo
+from bson.objectid import ObjectId
+
+class ReadingList(restful.Resource):
+    def __init__(self, *args, **kwargs):
+        self.parser = reqparse.RequestParser()
+        self.parser.add_argument('reading', type=str)
+        super(ReadingList, self).__init__()
+
+    def get(self):
+        return  [x for x in mongo.db.readings.find()]
+
+    def post(self):
+        args = self.parser.parse_args()
+        if not args['reading']:
+            abort(400)
+
+        jo = json.loads(args['reading'])
+        reading_id =  mongo.db.readings.insert(jo)
+        return mongo.db.readings.find_one({&quot;_id&quot;: reading_id})
+
+
+class Reading(restful.Resource):
+    def get(self, reading_id):
+        return mongo.db.readings.find_one_or_404({&quot;_id&quot;: reading_id})
+
+    def delete(self, reading_id):
+        mongo.db.readings.find_one_or_404({&quot;_id&quot;: reading_id})
+        mongo.db.readings.remove({&quot;_id&quot;: reading_id})
+        return '', 204
+
+
+class Root(restful.Resource):
+    def get(self):
+        return {
+            'status': 'OK',
+            'mongo': str(mongo.db),
+        }
+
+api.add_resource(Root, '/')
+api.add_resource(ReadingList, '/readings/')
+api.add_resource(Reading, '/readings/&lt;ObjectId:reading_id&gt;')
+</pre>
+<p>Here we define three <tt class="docutils literal">Resource</tt> classes and add them to our previously defined <tt class="docutils literal">api</tt>: <tt class="docutils literal">Root</tt>, <tt class="docutils literal">Reading</tt> and <tt class="docutils literal">ReadingList</tt>.</p>
+<p><tt class="docutils literal">Root</tt> just returns a dictionary with an <span class="caps">OK</span> status and some info on our mongodb&nbsp;connection.</p>
+<p><tt class="docutils literal">Reading</tt> has gets an ObjectId
+(which is the mongodb primary key) as a parameter and depending on the <span class="caps">HTTP</span> operation, it returns the reading with that
+id when receiving an <tt class="docutils literal"><span class="caps">HTTP</span> <span class="caps">GET</span></tt> and deletes the reading with that id when receiving an <tt class="docutils literal"><span class="caps">HTTP</span> <span class="caps">DELETE</span></tt>.</p>
+<p><tt class="docutils literal">ReadingList</tt> will return all readings when receiving an <tt class="docutils literal"><span class="caps">HTTP</span> <span class="caps">GET</span></tt> and will create a new reading when
+receiving an <tt class="docutils literal"><span class="caps">HTTP</span> <span class="caps">POST</span></tt> The <tt class="docutils literal">post</tt> function uses the parser defined in <tt class="docutils literal">__init__</tt> which requires
+a <tt class="docutils literal">reading</tt> parameter with the actual reading to be&nbsp;inserted.</p>
+</div>
+<div class="section" id="testing-it-locally">
+<h2><a class="toc-backref" href="#id4">Testing it&nbsp;locally</a></h2>
+<p>In order to run the development server, you will need to install and start mongodb locally which is beyond the scope of this post. After that
+create a file named <tt class="docutils literal">runserver.py</tt> in the same folder as with the <tt class="docutils literal">requirements.txt</tt>
+and the <tt class="docutils literal">flask_rest_service</tt> folder. The contents of this file should&nbsp;be:</p>
+<pre class="code literal-block">
+from flask_rest_service import app
+app.run(debug=True)
+</pre>
+<p>When you run this file with <tt class="docutils literal">python runserver.py</tt> you should be able top visit your rest service at <a class="reference external" href="http://localhost:5000">http://localhost:5000</a> and get
+an &quot;<span class="caps">OK</span>&quot;&nbsp;status.</p>
+</div>
+<div class="section" id="deploying-to-heroku">
+<h2><a class="toc-backref" href="#id5">Deploying to&nbsp;Heroku</a></h2>
+<p>To deploy to Heroku, you must create a <tt class="docutils literal">Procfile</tt> that contains the workers of your application. In our case, the
+<tt class="docutils literal">Procfile</tt> should contain the&nbsp;following:</p>
+<pre class="code literal-block">
+web: gunicorn flask_rest_service:app
+</pre>
+<p>Also, you should add a .gitignore file with the&nbsp;following:</p>
+<pre class="code literal-block">
+*.pyc
+</pre>
+<p>Finally, to deploy your application to Heroku you can follow the instructions here: <a class="reference external" href="https://devcenter.heroku.com/articles/getting-started-with-python">https://devcenter.heroku.com/articles/getting-started-with-python</a>:</p>
+<ul class="simple">
+<li>Initialize a git repository and commit&nbsp;everything:</li>
+</ul>
+<pre class="code literal-block">
+git init
+git add .
+git commit -m
+</pre>
+<ul class="simple">
+<li>Create a new Heroku application (after logging in to heroku with <tt class="docutils literal">heroku login</tt>) and set the MONGO_URL environment variable (of course you have to obtain ths MONGO_URL variable for your heroku envirotnment by adding a mongoDB&nbsp;database):</li>
+</ul>
+<pre class="code literal-block">
+heroku create
+heroku config:set MONGO_URL=mongodb://user:pass&#64;mongoprovider.com:27409/rest
+</pre>
+<ul class="simple">
+<li>And finally push your master branch to the heroku remote&nbsp;repository:</li>
+</ul>
+<pre class="code literal-block">
+git push heroku master
+</pre>
+<p>If everything went ok you should be able to start a worker for your application, check that the worker is running, and finally visit&nbsp;it:</p>
+<pre class="code literal-block">
+heroku ps:scale web=1
+heroku ps
+heroku open
+</pre>
+<p>If everything was ok you should see an status-<span class="caps">OK</span> <span class="caps">JSON</span>&nbsp;!</p>
+</div>
+</div>
+  		</article>
+  		<article>
+<header>
+      <h1 class="entry-title">
         <a href="http://spapas.github.io/2014/04/11/django-generic-formviews-for-objects/">Django generic FormViews for objects</a>
       </h1>
       <p class="meta"><time datetime="2014-04-11T10:23:00" pubdate>Παρ 11 Απρίλιος 2014</time></p>
@@ -1067,216 +1284,6 @@ to define all the above as <a class="reference external" href="https://docs.djan
 </div>
 </div>
   		</article>
-  		<article>
-<header>
-      <h1 class="entry-title">
-        <a href="http://spapas.github.io/2013/10/14/spring-ldap-custom-authorities/">Using custom authorities with spring-security LDAP authentication</a>
-      </h1>
-      <p class="meta"><time datetime="2013-10-14T08:55:00" pubdate>Δευ 14 Οκτώβριος 2013</time></p>
-</header>
-
-  <div class="entry-content"><div class="contents topic" id="contents">
-<p class="topic-title first">Contents</p>
-<ul class="simple">
-<li><a class="reference internal" href="#introduction" id="id3">Introduction</a></li>
-<li><a class="reference internal" href="#a-basic-spring-security-setup" id="id4">A basic spring security&nbsp;setup</a></li>
-<li><a class="reference internal" href="#spring-security-ldap-with-custom-authorities" id="id5">Spring security <span class="caps">LDAP</span> with custom authorities</a><ul>
-<li><a class="reference internal" href="#contextsource" id="id6">contextSource</a></li>
-<li><a class="reference internal" href="#usersearch" id="id7">userSearch</a></li>
-<li><a class="reference internal" href="#ldapauthprovider" id="id8">ldapAuthProvider</a></li>
-<li><a class="reference internal" href="#customldapauthoritiespopulator" id="id9">CustomLdapAuthoritiesPopulator</a></li>
-<li><a class="reference internal" href="#example" id="id10">Example</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#conclusion" id="id11">Conclusion</a></li>
-</ul>
-</div>
-<div class="section" id="introduction">
-<h2><a class="toc-backref" href="#id3">Introduction</a></h2>
-<p>One very useful component of the <a class="reference external" href="http://spring.io/">spring</a> java framework is <a class="reference external" href="http://projects.spring.io/spring-security/">spring-security</a> since it allows consistent usage of various security providers for
-authentication and authorization. Although I&#8217;ve found a great number of basic spring-security tutorials on the internet, I wasn&#8217;t able to find a complete solution for my own&nbsp;requirements:</p>
-<p>Logging in with <span class="caps">LDAP</span> but configuring the authorities <a class="footnote-reference" href="#id2" id="id1">[*]</a> of the logged in user with the help of a custom method and not through <span class="caps">LDAP</span>.</p>
-<p>I think that the above is a common requirement in many organizations: There is a central <span class="caps">LDAP</span> repository in which the usernames and passwords of the users are stored, but the groups of the users are not stored there. Or maybe the groups that are actually stored in the <span class="caps">LDAP</span> cannot be transformed easily to application specific groups for each&nbsp;application.</p>
-<p>You may find the working spring project that uses ldap and a custom groups populator here: <a class="reference external" href="https://github.com/spapas/SpringLdapCustomAuthorities/">https://github.com/spapas/SpringLdapCustomAuthorities/</a></p>
-</div>
-<div class="section" id="a-basic-spring-security-setup">
-<h2><a class="toc-backref" href="#id4">A basic spring security&nbsp;setup</a></h2>
-<p>I&#8217;ve created a very basic setup for spring-security for a spring-mvc project. Please take a look here for a more thorough explanation of a simple spring-security project <a class="reference external" href="http://www.mkyong.com/spring-security/spring-security-hello-world-example/">http://www.mkyong.com/spring-security/spring-security-hello-world-example/</a> and here <a class="reference external" href="http://www.codeproject.com/Articles/253901/Getting-Started-Spring-Security">http://www.codeproject.com/Articles/253901/Getting-Started-Spring-Security</a> for a great explanation of the various spring-security&nbsp;classes.</p>
-<p>In my setup there is a controller that defines two mappings, the &quot;/&quot; which is the homepage that has a link to the &quot;/enter&quot; and the &quot;/enter&quot; which is an internal page in which only authorized users have access. When the user clicks on &quot;enter&quot; he will be represented with a login form first. If the use logs in successfully, the enter.jsp will list the username and the authorities of the logged in user through the following spring-security&nbsp;tags:</p>
-<div class="highlight"><pre><span class="k">&lt;%@</span> <span class="n">taglib</span> <span class="n">prefix</span><span class="o">=</span><span class="s">&quot;sec&quot;</span> <span class="n">uri</span><span class="o">=</span><span class="s">&quot;http://www.springframework.org/security/tags&quot;</span> <span class="k">%&gt;</span>
-[...]
-Username: <span class="nt">&lt;sec:authentication</span> <span class="na">property=</span><span class="s">&quot;principal.username&quot;</span> <span class="nt">/&gt;&lt;br</span> <span class="nt">/&gt;</span>
-Authorities: <span class="nt">&lt;sec:authentication</span> <span class="na">property=</span><span class="s">&quot;principal.authorities&quot;</span><span class="nt">/&gt;&lt;br</span> <span class="nt">/&gt;</span>
-</pre></div>
-<p>The authentication provider is an in memory service in which the username, password and authorities of each user are defined in the <span class="caps">XML</span>. So this is a simple spring-security example that can be found in a number of places on the internet. The security rules, login form and the authentication provider are configured with the following <tt class="docutils literal"><span class="pre">security-config.xml</span></tt>:</p>
-<div class="highlight"><pre><span class="nt">&lt;beans:beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/security&quot;</span>
-   <span class="na">xmlns:beans=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
-   <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
-   <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://www.springframework.org/schema/beans</span>
-<span class="s">                   http://www.springframework.org/schema/beans/spring-beans-3.1.xsd</span>
-<span class="s">                   http://www.springframework.org/schema/security</span>
-<span class="s">                   http://www.springframework.org/schema/security/spring-security-3.1.xsd&quot;</span><span class="nt">&gt;</span>
-
-   <span class="nt">&lt;http</span> <span class="na">pattern=</span><span class="s">&quot;/static/**&quot;</span> <span class="na">security=</span><span class="s">&quot;none&quot;</span> <span class="nt">/&gt;</span>
-
-   <span class="nt">&lt;http</span> <span class="na">use-expressions=</span><span class="s">&quot;true&quot;</span><span class="nt">&gt;</span>
-       <span class="nt">&lt;intercept-url</span> <span class="na">pattern=</span><span class="s">&quot;/&quot;</span> <span class="na">access=</span><span class="s">&quot;permitAll&quot;</span> <span class="nt">/&gt;</span>
-       <span class="nt">&lt;intercept-url</span> <span class="na">pattern=</span><span class="s">&quot;/enter&quot;</span> <span class="na">access=</span><span class="s">&quot;hasRole(&#39;user&#39;)&quot;</span> <span class="nt">/&gt;</span>
-       <span class="nt">&lt;intercept-url</span> <span class="na">pattern=</span><span class="s">&quot;/**&quot;</span> <span class="na">access=</span><span class="s">&quot;denyAll&quot;</span> <span class="nt">/&gt;</span>
-       <span class="nt">&lt;form-login</span> <span class="na">default-target-url=</span><span class="s">&quot;/&quot;</span> <span class="nt">/&gt;</span>
-       <span class="nt">&lt;logout</span>  <span class="na">logout-success-url=</span><span class="s">&quot;/&quot;</span> <span class="nt">/&gt;</span>
-   <span class="nt">&lt;/http&gt;</span>
-
-   <span class="nt">&lt;authentication-manager&gt;</span>
-       <span class="nt">&lt;authentication-provider&gt;</span>
-           <span class="nt">&lt;user-service&gt;</span>
-               <span class="nt">&lt;user</span> <span class="na">name=</span><span class="s">&quot;spapas&quot;</span> <span class="na">password=</span><span class="s">&quot;123&quot;</span> <span class="na">authorities=</span><span class="s">&quot;admin, user, nonldap&quot;</span> <span class="nt">/&gt;</span>
-               <span class="nt">&lt;user</span> <span class="na">name=</span><span class="s">&quot;serafeim&quot;</span> <span class="na">password=</span><span class="s">&quot;123&quot;</span> <span class="na">authorities=</span><span class="s">&quot;user&quot;</span> <span class="nt">/&gt;</span>
-           <span class="nt">&lt;/user-service&gt;</span>
-       <span class="nt">&lt;/authentication-provider&gt;</span>
-   <span class="nt">&lt;/authentication-manager&gt;</span>
-
-<span class="nt">&lt;/beans:beans&gt;</span>
-</pre></div>
-<p>When we run this application and go to the /enter, we will get the following&nbsp;output:</p>
-<blockquote>
-<p>Username:&nbsp;spapas</p>
-<p>Authorities: [admin, nonldap,&nbsp;user]</p>
-</blockquote>
-</div>
-<div class="section" id="spring-security-ldap-with-custom-authorities">
-<h2><a class="toc-backref" href="#id5">Spring security <span class="caps">LDAP</span> with custom&nbsp;authorities</a></h2>
-<p>The previous application can be modified to login through <span class="caps">LDAP</span> and get the authorities from a custom class. The main differences are in the <tt class="docutils literal">pom.xml</tt> which adsd the <tt class="docutils literal"><span class="pre">spring-security-ldap</span></tt> dependency, the addition of a <tt class="docutils literal">CustomLdapAuthoritiesPopulator.java</tt> which does the actual mapping of username to authority and various changes to the <tt class="docutils literal"><span class="pre">security-config.xml</span></tt>.</p>
-<p>As you will see we had to define our security beans mainly using spring beans and not using the various elements from security namespace like <tt class="docutils literal"><span class="pre">&lt;ldap-server&gt;</span></tt> and <tt class="docutils literal"><span class="pre">&lt;ldap-authentication-provder&gt;</span></tt>. For a good tutorial on using these elements and ldap in spring security in general check these out: <a class="reference external" href="http://docs.spring.io/spring-security/site/docs/3.1.x/reference/ldap.html">http://docs.spring.io/spring-security/site/docs/3.1.x/reference/ldap.html</a> and <a class="reference external" href="http://krams915.blogspot.gr/2011/01/spring-security-mvc-using-ldap.html">http://krams915.blogspot.gr/2011/01/spring-security-mvc-using-ldap.html</a>.</p>
-<div class="highlight"><pre><span class="nt">&lt;beans:beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/security&quot;</span>
-   <span class="na">xmlns:beans=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
-   <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
-   <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://www.springframework.org/schema/beans</span>
-<span class="s">                   http://www.springframework.org/schema/beans/spring-beans-3.1.xsd</span>
-<span class="s">                   http://www.springframework.org/schema/security</span>
-<span class="s">                   http://www.springframework.org/schema/security/spring-security-3.1.xsd&quot;</span><span class="nt">&gt;</span>
-
-   <span class="nt">&lt;http</span> <span class="na">pattern=</span><span class="s">&quot;/static/**&quot;</span> <span class="na">security=</span><span class="s">&quot;none&quot;</span> <span class="nt">/&gt;</span>
-
-   <span class="nt">&lt;http</span> <span class="na">use-expressions=</span><span class="s">&quot;true&quot;</span> <span class="nt">&gt;</span>
-     <span class="nt">&lt;intercept-url</span> <span class="na">pattern=</span><span class="s">&quot;/&quot;</span> <span class="na">access=</span><span class="s">&quot;permitAll&quot;</span> <span class="nt">/&gt;</span>
-     <span class="nt">&lt;intercept-url</span> <span class="na">pattern=</span><span class="s">&quot;/enter&quot;</span> <span class="na">access=</span><span class="s">&quot;hasRole(&#39;user&#39;)&quot;</span> <span class="nt">/&gt;</span>
-     <span class="nt">&lt;intercept-url</span> <span class="na">pattern=</span><span class="s">&quot;/**&quot;</span> <span class="na">access=</span><span class="s">&quot;denyAll&quot;</span> <span class="nt">/&gt;</span>
-     <span class="nt">&lt;form-login</span> <span class="na">default-target-url=</span><span class="s">&quot;/&quot;</span> <span class="nt">/&gt;</span>
-     <span class="nt">&lt;logout</span>  <span class="na">logout-success-url=</span><span class="s">&quot;/&quot;</span> <span class="nt">/&gt;</span>
-   <span class="nt">&lt;/http&gt;</span>
-
-   <span class="nt">&lt;beans:bean</span> <span class="na">id=</span><span class="s">&quot;contextSource&quot;</span>
-         <span class="na">class=</span><span class="s">&quot;org.springframework.security.ldap.DefaultSpringSecurityContextSource&quot;</span><span class="nt">&gt;</span>
-     <span class="nt">&lt;beans:constructor-arg</span> <span class="na">value=</span><span class="s">&quot;ldap://login.serafeim.gr:389/dc=serafeim,dc=gr&quot;</span><span class="nt">/&gt;</span>
-     <span class="nt">&lt;beans:property</span> <span class="na">name=</span><span class="s">&quot;anonymousReadOnly&quot;</span> <span class="na">value=</span><span class="s">&quot;true&quot;</span><span class="nt">/&gt;</span>
-   <span class="nt">&lt;/beans:bean&gt;</span>
-
-   <span class="nt">&lt;beans:bean</span>
-         <span class="na">id=</span><span class="s">&quot;userSearch&quot;</span>
-         <span class="na">class=</span><span class="s">&quot;org.springframework.security.ldap.search.FilterBasedLdapUserSearch&quot;</span><span class="nt">&gt;</span>
-     <span class="nt">&lt;beans:constructor-arg</span> <span class="na">index=</span><span class="s">&quot;0&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span><span class="nt">/&gt;</span>
-     <span class="nt">&lt;beans:constructor-arg</span> <span class="na">index=</span><span class="s">&quot;1&quot;</span> <span class="na">value=</span><span class="s">&quot;(uid={0})&quot;</span><span class="nt">/&gt;</span>
-     <span class="nt">&lt;beans:constructor-arg</span> <span class="na">index=</span><span class="s">&quot;2&quot;</span> <span class="na">ref=</span><span class="s">&quot;contextSource&quot;</span> <span class="nt">/&gt;</span>
-   <span class="nt">&lt;/beans:bean&gt;</span>
-
-   <span class="nt">&lt;beans:bean</span>
-         <span class="na">id=</span><span class="s">&quot;ldapAuthProvider&quot;</span>
-         <span class="na">class=</span><span class="s">&quot;org.springframework.security.ldap.authentication.LdapAuthenticationProvider&quot;</span><span class="nt">&gt;</span>
-     <span class="nt">&lt;beans:constructor-arg&gt;</span>
-       <span class="nt">&lt;beans:bean</span> <span class="na">class=</span><span class="s">&quot;org.springframework.security.ldap.authentication.BindAuthenticator&quot;</span><span class="nt">&gt;</span>
-         <span class="nt">&lt;beans:constructor-arg</span> <span class="na">ref=</span><span class="s">&quot;contextSource&quot;</span><span class="nt">/&gt;</span>
-         <span class="nt">&lt;beans:property</span> <span class="na">name=</span><span class="s">&quot;userSearch&quot;</span> <span class="na">ref=</span><span class="s">&quot;userSearch&quot;</span> <span class="nt">/&gt;</span>
-         <span class="c">&lt;!--</span>
-<span class="c">         &lt;beans:property name=&quot;userDnPatterns&quot;&gt;</span>
-<span class="c">           &lt;beans:list&gt;&lt;beans:value&gt;uid={0},ou=People&lt;/beans:value&gt;&lt;/beans:list&gt;</span>
-<span class="c">         &lt;/beans:property&gt;</span>
-<span class="c">         --&gt;</span>
-       <span class="nt">&lt;/beans:bean&gt;</span>
-     <span class="nt">&lt;/beans:constructor-arg&gt;</span>
-     <span class="nt">&lt;beans:constructor-arg&gt;</span>
-       <span class="nt">&lt;beans:bean</span> <span class="na">class=</span><span class="s">&quot;gr.serafeim.springldapcustom.CustomLdapAuthoritiesPopulator&quot;</span> <span class="nt">/&gt;</span>
-     <span class="nt">&lt;/beans:constructor-arg&gt;</span>
-   <span class="nt">&lt;/beans:bean&gt;</span>
-
-   <span class="nt">&lt;authentication-manager&gt;</span>
-     <span class="nt">&lt;authentication-provider</span> <span class="na">ref=</span><span class="s">&quot;ldapAuthProvider&quot;</span> <span class="nt">/&gt;</span>
-   <span class="nt">&lt;/authentication-manager&gt;</span>
-
-<span class="nt">&lt;/beans:beans&gt;</span>
-</pre></div>
-<p>So, in the above configuration we&#8217;ve defined three spring beans: <tt class="docutils literal">contextSource</tt>, <tt class="docutils literal">userSearch</tt> and <tt class="docutils literal">ldapAuthProvider</tt>. The <tt class="docutils literal"><span class="pre">&lt;authentication-manager&gt;</span></tt> element uses the <tt class="docutils literal">ldapAuthProvider</tt> as an authentication provider. Below we will explain these&nbsp;beans:</p>
-<div class="section" id="contextsource">
-<h3><a class="toc-backref" href="#id6">contextSource</a></h3>
-<p>The contextSource bean defines the actual <span class="caps">LDAP</span> server that we are going to connect to. It has the class <tt class="docutils literal">o.s.s.ldap.DefaultSpringSecurityContextSource</tt>. This will need to be passed to other beans that would need to connect to the server for a number of operations. We pass to it the url of our <span class="caps">LDAP</span> server and set its <tt class="docutils literal">anonymousReadOnly</tt> property to true. The <tt class="docutils literal">anonymousReadOnly</tt> defines if we can anonymously connect to our <span class="caps">LDAP</span> server in order to perform the search operation below. If we cannot connect anonymously then we have to set its <tt class="docutils literal">userDn</tt> and <tt class="docutils literal">password</tt> properties.</p>
-<p>A very interesting question is if the <tt class="docutils literal"><span class="pre">&lt;ldap-server&gt;</span></tt> element of the spring security namespace is related to <tt class="docutils literal">the o.s.s.ldap.DefaultSpringSecurityContextSource</tt> like our <tt class="docutils literal">contextSource</tt>. To find out, we need to check the <tt class="docutils literal">o.s.s.config.SecurityNamespaceHandler</tt> class of the <tt class="docutils literal"><span class="pre">spring-security-config.jar</span></tt>. In there we see the <tt class="docutils literal">loadParsers</tt> method which has the line: <tt class="docutils literal">parsers.put(Elements.LDAP_SERVER, new <span class="pre">LdapServerBeanDefinitionParser());</span></tt>. The constant <tt class="docutils literal">o.s.s.config.Elements.LDAP_SERVER</tt> has the value of <tt class="docutils literal"><span class="pre">&quot;ldap-server&quot;</span></tt> as expected, so we need to see what does the class <tt class="docutils literal">o.s.s.config.ldap.LdapServerBeanDefinitionParser</tt> do. This class has a parse() method that receives the xml that was used to instantiate the <tt class="docutils literal"><span class="pre">&lt;ldap-server&gt;</span></tt> element and, depending an on the actualy configuration, instantiates a bean of the class <tt class="docutils literal">o.s.s.ldap.DefaultSpringSecurityContextSource</tt> with an id of <tt class="docutils literal">o.s.s.securityContextSource</tt> that will be used by the other elements in the security namespace&nbsp;!</p>
-<p>This actually solves another question I had concerning the following&nbsp;error:</p>
-<blockquote>
-No bean named &#8216;org.springframework.security.authenticationManager&#8217; is defined: Did you forget to add a gobal &lt;authentication-manager&gt; element to your configuration (with child &lt;authentication-provider&gt;  elements)? Alternatively you can use the authentication-manager-ref attribute on your &lt;http&gt; and &lt;global-method-security&gt; elements.</blockquote>
-<p>What happens is that when spring-security-configuration encounters an <tt class="docutils literal"><span class="pre">&lt;authentication-manager&gt;</span></tt> it will instantiate a bean named <tt class="docutils literal">o.s.s.authenticationManager</tt>  having the class
-<tt class="docutils literal">o.s.s.authentication.ProviderManager</tt> and will create and pass to it a <tt class="docutils literal">providers</tt> list with all the authentication providers that are defined inside the <tt class="docutils literal"><span class="pre">&lt;authentication-manager&gt;</span></tt> element with <tt class="docutils literal"><span class="pre">&lt;authentication-provider&gt;</span></tt> nodes. So, if you encounter the above error, the problem is that for some reason your <tt class="docutils literal"><span class="pre">&lt;authentication-manager&gt;</span></tt> is not configured correctly, so no <tt class="docutils literal">o.s.s.authenticatioManager</tt> bean is&nbsp;created!</p>
-</div>
-<div class="section" id="usersearch">
-<h3><a class="toc-backref" href="#id7">userSearch</a></h3>
-<p>The <tt class="docutils literal">userSearch</tt> bean is needed if we don&#8217;t know exactly where our users are stored in the <span class="caps">LDAP</span> directory so we will use this bean as a search filter. If we do know our user tree then we won&#8217;t need this bean at all as will be explained later. It has the class <tt class="docutils literal">o.s.s.ldap.search.FilterBasedLdapUserSearch</tt> and gets three constructor parameters: <tt class="docutils literal">searchBase</tt>, <tt class="docutils literal">searchFilter</tt> and <tt class="docutils literal">contextSource</tt>. The <tt class="docutils literal">searchBase</tt> is from where in the <span class="caps">LDAP</span> tree to start searching (empty in our case), the <tt class="docutils literal">searchFilter</tt> defines where is the username (uid in our case) and the <tt class="docutils literal">contextSource</tt> has been defined&nbsp;before.</p>
-</div>
-<div class="section" id="ldapauthprovider">
-<h3><a class="toc-backref" href="#id8">ldapAuthProvider</a></h3>
-<p>This is the actual <tt class="docutils literal"><span class="pre">authentication-provider</span></tt> that the spring-security <tt class="docutils literal"><span class="pre">authentication-manager</span></tt> is going to use. It is an instance of class <tt class="docutils literal">o.s.s.ldap.authentication.LdapAuthenticationProvider</tt> which has two main properties: An <tt class="docutils literal">o.s.s.ldap.authentication.LdapAuthenticator</tt> implementation and an <tt class="docutils literal">o.s.s.ldap.userdetails.LdapAuthoritiesPopulator</tt> implementation. The first interface defines an <tt class="docutils literal">authenticate</tt> method and is used to actually authenticate the user with the <span class="caps">LDAP</span> server. The second interface defines a <tt class="docutils literal">getGrantedAuthorities</tt> which returns the roles for the authenticated user. The LdapAuthoritiesPopulator parameter is actually optional (so we can use <span class="caps">LDAP</span> to authenticate only the users) and we can provide our own implementation to have custom authorities for our application. That is exactly what we&#8217;ve done&nbsp;here.</p>
-<p>The two arguments used to initialize the ldapAuthProvoder are one instance of <tt class="docutils literal">o.s.s.ldap.authentication.BindAuthenticator</tt> which is a simple authenticator that tries to bind with the given credentials to the <span class="caps">LDAP</span> server to check the credentials and one instance of a custom class named <tt class="docutils literal">g.s.s.CustomLdapAuthoritiesPopulator</tt> which is the actual implementation of the custom roles provider. The <tt class="docutils literal">BindAuthenticator</tt> gets the <tt class="docutils literal">contextSource</tt> as a constructor parameter and its <tt class="docutils literal">userSearch</tt> property is set with the <tt class="docutils literal">userSearch</tt> bean defined previously. If we instead knew the actual place of the users, we could use the commented out <tt class="docutils literal">userDnPatterns</tt> property which takes a list of possible places in the <span class="caps">LDAP</span> catalog which will be checked for the&nbsp;username.</p>
-</div>
-<div class="section" id="customldapauthoritiespopulator">
-<h3><a class="toc-backref" href="#id9">CustomLdapAuthoritiesPopulator</a></h3>
-<p>The <tt class="docutils literal">CustomLdapAuthoritiesPopulator</tt> just needs to implement the <tt class="docutils literal">LdapAuthoritiesPopulator</tt> interface. Here&#8217;s our&nbsp;implmentation:</p>
-<div class="highlight"><pre><span class="kn">package</span> <span class="n">gr</span><span class="o">.</span><span class="na">serafeim</span><span class="o">.</span><span class="na">springldapcustom</span><span class="o">;</span>
-
-<span class="kn">import</span> <span class="nn">java.util.Collection</span><span class="o">;</span>
-<span class="kn">import</span> <span class="nn">java.util.HashSet</span><span class="o">;</span>
-<span class="kn">import</span> <span class="nn">org.springframework.ldap.core.DirContextOperations</span><span class="o">;</span>
-<span class="kn">import</span> <span class="nn">org.springframework.security.core.GrantedAuthority</span><span class="o">;</span>
-<span class="kn">import</span> <span class="nn">org.springframework.security.core.authority.SimpleGrantedAuthority</span><span class="o">;</span>
-<span class="kn">import</span> <span class="nn">org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator</span><span class="o">;</span>
-<span class="kn">import</span> <span class="nn">org.springframework.stereotype.Component</span><span class="o">;</span>
-
-<span class="nd">@Component</span>
-<span class="kd">public</span> <span class="kd">class</span> <span class="nc">CustomLdapAuthoritiesPopulator</span> <span class="kd">implements</span> <span class="n">LdapAuthoritiesPopulator</span> <span class="o">{</span>
-       <span class="nd">@Override</span>
-       <span class="kd">public</span> <span class="n">Collection</span><span class="o">&lt;?</span> <span class="kd">extends</span> <span class="n">GrantedAuthority</span><span class="o">&gt;</span> <span class="n">getGrantedAuthorities</span><span class="o">(</span>
-                       <span class="n">DirContextOperations</span> <span class="n">userData</span><span class="o">,</span> <span class="n">String</span> <span class="n">username</span><span class="o">)</span> <span class="o">{</span>
-               <span class="n">Collection</span><span class="o">&lt;</span><span class="n">GrantedAuthority</span><span class="o">&gt;</span> <span class="n">gas</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashSet</span><span class="o">&lt;</span><span class="n">GrantedAuthority</span><span class="o">&gt;();</span>
-               <span class="k">if</span><span class="o">(</span><span class="n">username</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="s">&quot;spapas&quot;</span><span class="o">))</span> <span class="o">{</span>
-                       <span class="n">gas</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="k">new</span> <span class="n">SimpleGrantedAuthority</span><span class="o">(</span><span class="s">&quot;admin&quot;</span><span class="o">));</span>
-               <span class="o">}</span>
-               <span class="n">gas</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="k">new</span> <span class="n">SimpleGrantedAuthority</span><span class="o">(</span><span class="s">&quot;user&quot;</span><span class="o">));</span>
-               <span class="k">return</span> <span class="n">gas</span><span class="o">;</span>
-       <span class="o">}</span>
-<span class="o">}</span>
-</pre></div>
-<p>The <tt class="docutils literal">getGrantedAuthorities</tt> just checks the username and add another role if it is a specific one. Of course here we would autowire our user roles repository and query the database to get the roles of the user, however I&#8217;m not going to do that for the case of&nbsp;simplicity.</p>
-</div>
-<div class="section" id="example">
-<h3><a class="toc-backref" href="#id10">Example</a></h3>
-<p>When we run this application and go to the /enter, after logging in with our <span class="caps">LDAP</span> credentials as spapas, we will get the following&nbsp;output:</p>
-<blockquote>
-<p>Username:&nbsp;spapas</p>
-<p>Authorities: [admin,&nbsp;user]</p>
-</blockquote>
-</div>
-</div>
-<div class="section" id="conclusion">
-<h2><a class="toc-backref" href="#id11">Conclusion</a></h2>
-<p>In the previous a complete example of configuring a custom authorities populator was represented. Using this configuration we can login through the <span class="caps">LDAP</span> server of our organization but use application specific roles for our logged-in&nbsp;users.</p>
-<!-- font-size: 0.5em;
-vertical-align: top; -->
-<table class="docutils footnote" frame="void" id="id2" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id1">[*]</a></td><td>Which is how spring calls the groups/roles the user belongs to</td></tr>
-</tbody>
-</table>
-</div>
-</div>
-  		</article>
 <div class="pagination">
     <a class="prev" href="http://spapas.github.io/author\serafeim-papastefanos3.html">&larr; Older</a>
 
@@ -1288,6 +1295,9 @@ vertical-align: top; -->
     <h1>Recent Posts</h1>
     <ul id="recent_posts">
       <li class="post">
+          <a href="http://spapas.github.io/2015/01/27/async-tasks-with-django-rq/">Asynchronous tasks in django with django-rq</a>
+      </li>
+      <li class="post">
           <a href="http://spapas.github.io/2015/01/21/django-model-auditing/">Django model auditing</a>
       </li>
       <li class="post">
@@ -1298,9 +1308,6 @@ vertical-align: top; -->
       </li>
       <li class="post">
           <a href="http://spapas.github.io/2014/09/15/django-non-html-responses/">Django non-HTML responses</a>
-      </li>
-      <li class="post">
-          <a href="http://spapas.github.io/2014/06/30/rest-flask-mongodb-heroku/">Implementing a simple, Heroku-hosted REST service using Flask and mongoDB</a>
       </li>
     </ul>
   </section>
@@ -1322,7 +1329,7 @@ vertical-align: top; -->
 
   <section>
   <h1>Tags</h1>
-    <a href="http://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="http://spapas.github.io/tag/google.html">google</a>,    <a href="http://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="http://spapas.github.io/tag/spring.html">spring</a>,    <a href="http://spapas.github.io/tag/rest.html">rest</a>,    <a href="http://spapas.github.io/tag/design.html">design</a>,    <a href="http://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="http://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="http://spapas.github.io/tag/git.html">git</a>,    <a href="http://spapas.github.io/tag/java.html">java</a>,    <a href="http://spapas.github.io/tag/flask.html">flask</a>,    <a href="http://spapas.github.io/tag/less.html">less</a>,    <a href="http://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="http://spapas.github.io/tag/forms.html">forms</a>,    <a href="http://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="http://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="http://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="http://spapas.github.io/tag/css.html">css</a>,    <a href="http://spapas.github.io/tag/python.html">python</a>,    <a href="http://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="http://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="http://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="http://spapas.github.io/tag/rst.html">rst</a>,    <a href="http://spapas.github.io/tag/branching.html">branching</a>,    <a href="http://spapas.github.io/tag/github.html">github</a>,    <a href="http://spapas.github.io/tag/windows.html">windows</a>,    <a href="http://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="http://spapas.github.io/tag/django.html">django</a>,    <a href="http://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="http://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="http://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="http://spapas.github.io/tag/security.html">security</a>,    <a href="http://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>  </section>
+    <a href="http://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="http://spapas.github.io/tag/tasks.html">tasks</a>,    <a href="http://spapas.github.io/tag/less.html">less</a>,    <a href="http://spapas.github.io/tag/spring.html">spring</a>,    <a href="http://spapas.github.io/tag/rest.html">rest</a>,    <a href="http://spapas.github.io/tag/google.html">google</a>,    <a href="http://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="http://spapas.github.io/tag/scheduling.html">scheduling</a>,    <a href="http://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="http://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="http://spapas.github.io/tag/git.html">git</a>,    <a href="http://spapas.github.io/tag/java.html">java</a>,    <a href="http://spapas.github.io/tag/rq.html">rq</a>,    <a href="http://spapas.github.io/tag/django-rq.html">django-rq</a>,    <a href="http://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="http://spapas.github.io/tag/redis.html">redis</a>,    <a href="http://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="http://spapas.github.io/tag/forms.html">forms</a>,    <a href="http://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="http://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="http://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="http://spapas.github.io/tag/css.html">css</a>,    <a href="http://spapas.github.io/tag/jobs.html">jobs</a>,    <a href="http://spapas.github.io/tag/python.html">python</a>,    <a href="http://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="http://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="http://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="http://spapas.github.io/tag/rst.html">rst</a>,    <a href="http://spapas.github.io/tag/branching.html">branching</a>,    <a href="http://spapas.github.io/tag/design.html">design</a>,    <a href="http://spapas.github.io/tag/github.html">github</a>,    <a href="http://spapas.github.io/tag/windows.html">windows</a>,    <a href="http://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="http://spapas.github.io/tag/django.html">django</a>,    <a href="http://spapas.github.io/tag/flask.html">flask</a>,    <a href="http://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="http://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="http://spapas.github.io/tag/asynchronous.html">asynchronous</a>,    <a href="http://spapas.github.io/tag/security.html">security</a>,    <a href="http://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>  </section>
 
 
 

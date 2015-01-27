@@ -70,6 +70,465 @@
   		<article>
 <header>
       <h1 class="entry-title">
+        <a href="http://spapas.github.io/2015/01/27/async-tasks-with-django-rq/">Asynchronous tasks in django with django-rq</a>
+      </h1>
+      <p class="meta"><time datetime="2015-01-27T14:20:00" pubdate>Τρι 27 Ιανουάριος 2015</time></p>
+</header>
+
+  <div class="entry-content"><div class="contents topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#introduction" id="id1">Introduction</a></li>
+<li><a class="reference internal" href="#job-queues-in-python" id="id2">Job queues in&nbsp;python</a></li>
+<li><a class="reference internal" href="#django-test-rq" id="id3">django-test-rq</a><ul>
+<li><a class="reference internal" href="#models-py" id="id4">models.py</a></li>
+<li><a class="reference internal" href="#forms-py" id="id5">forms.py</a></li>
+<li><a class="reference internal" href="#views-py" id="id6">views.py</a></li>
+<li><a class="reference internal" href="#tasks-py" id="id7">tasks.py</a></li>
+<li><a class="reference internal" href="#settings-py" id="id8">settings.py</a></li>
+<li><a class="reference internal" href="#running-the-project" id="id9">Running the&nbsp;project</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#rqworker-and-rqscheduler" id="id10">rqworker and rqscheduler</a><ul>
+<li><a class="reference internal" href="#for-development" id="id11">For&nbsp;development</a></li>
+<li><a class="reference internal" href="#for-production" id="id12">For&nbsp;production</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#conclusion" id="id13">Conclusion</a></li>
+</ul>
+</div>
+<div class="section" id="introduction">
+<h2><a class="toc-backref" href="#id1">Introduction</a></h2>
+<p>Job queuing (asynchronous tasks) is a common requirement for non-trivial django projects. Whenever an operation
+can take more than half a second it should be put to a job queue in order to be run asynchronously by a
+seperate worker. This is really important since the response to a user request needs to be immediate
+or else the users will experience laggy behavior and start complaining!
+Even for fairly quick tasks (like sending email through an <span class="caps">SMTP</span> server) you need to use an asynchronous task
+if you care about your users since
+the time required for such a task is not really&nbsp;limited.</p>
+<p>Using job queues is involved not only for the developers of the application (who need to create the
+asynchronous tasks and give feedback to the users when the&#8217;ve finished since they can&#8217;t use the normal
+<span class="caps">HTTP</span> response) and but also for the administrators, since, in order to support job queues at least two
+more componets will be&nbsp;needed:</p>
+<ul class="simple">
+<li>One job queue that will store the jobs to be executed next in a first in first queue. This could be the normal database of the project however it&#8217;s not recommended for performance reasons and most of thetimes it is a specific component called &quot;Message&nbsp;Broker&quot;</li>
+<li>One (or more) workers that will monitor the job queue and when there is work to do they will dequeue and execute&nbsp;it</li>
+</ul>
+<p>These can all run in the same server but if it gets saturated they can easily be seperated (even more work for&nbsp;administrators).</p>
+<p>Beyond job queuing, another relative requirement for many projects is to schedule a task to be run in the future
+(similar to the <tt class="docutils literal">at</tt> unix command) or at specific time intervals (similar to the <tt class="docutils literal">cron</tt> unix command). For
+instance, if a user is registered today we may need to check after one or two days if he&#8217;s logged in and used our application -
+if he hasn&#8217;t then probably he&#8217;s having problems and we can call him to help him. Also, we could check every night
+to see if any users that have registered to our application don&#8217;t have activated their account through email activation
+and delete these accounts. Scheduled tasks should be also run by the workers mentioned&nbsp;above.</p>
+</div>
+<div class="section" id="job-queues-in-python">
+<h2><a class="toc-backref" href="#id2">Job queues in&nbsp;python</a></h2>
+<p>The most known application for using job queues in python is <a class="reference external" href="http://www.celeryproject.org/">celery</a> which is a really great project that supports
+many brokers,  integrates nicely
+with python/django (but can be used even with other languages) and has
+many more features (most of them are only useful on really big, enterprise projects). I&#8217;ve already used
+it in a previous application, however, because celery is really complex I found it rather difficult to
+configure it successfully and I never was perfectly sure that my asynchronous task would actually work or
+that I&#8217;d used the correct configuration for my&nbsp;needs!</p>
+<p>Celery also has <a class="reference external" href="http://celery.readthedocs.org/en/latest/faq.html#does-celery-have-many-dependencies">many dependencies</a> in order to be able to talk with the different broker backends it supports,
+improve multithreading support etc. They may be required in enterprise apps but not for most Django web based&nbsp;projects.</p>
+<p>So, for small-to-average projects I recommend using a different asynchronous task solution instead of celery, particularly
+(as you&#8217;ve already guessed from the title of this post) <a class="reference external" href="http://python-rq.org/"><span class="caps">RQ</span></a>. <span class="caps">RQ</span> is simpler than celery, it integrates great with django
+using the excellent <a class="reference external" href="https://github.com/ui/django-rq">django-rq</a> package and doesn&#8217;t actually have any more dependencies beyond redis support which is
+used as a broker (however most modern django projects already use redis for their caching needs as an  alternative
+to&nbsp;memcached).</p>
+<p>It even supports supports job scheduling through the <a class="reference external" href="https://github.com/ui/rq-scheduler">rq-scheduler</a> package (celery also supports
+job scheduling through celery beat): Run a different process (scheduler) that polls the job
+scheduling queue for any jobs that need to be run because of scheduling and if yes put them to
+the normal job&nbsp;queue.</p>
+<p>Although <span class="caps">RQ</span> and frieds are really easy to use (and have nice documentation) I wasn&#8217;t able to find
+a <em>complete</em> example of using it with django, so I&#8217;ve implemented one
+(found at <a class="reference external" href="https://github.com/spapas/django-test-rq">https://github.com/spapas/django-test-rq</a>) mainly for my own testing
+purposes. To help others that want to also use <span class="caps">RQ</span> in their project but don&#8217;t know from where
+to start, I&#8217;ll present it in the following paragraphs, along with some comments on
+how to actually use <span class="caps">RQ</span> in your production&nbsp;environment.</p>
+</div>
+<div class="section" id="django-test-rq">
+<h2><a class="toc-backref" href="#id3">django-test-rq</a></h2>
+<p>This is a simple django project that can be used to asynchronously
+run and schedule jobs and examine their behavior. The job to be scheduled just downloads a provided
+<span class="caps">URL</span> and counts its length. There is only one django application (tasks) that contains two views, one
+to display existing tasks and create new ones and one to display some info for the&nbsp;jobs.</p>
+<div class="section" id="models-py">
+<h3><a class="toc-backref" href="#id4">models.py</a></h3>
+<p>Two models (<tt class="docutils literal">Task</tt> and <tt class="docutils literal">ScheduledTask</tt>) for saving individual tasks and
+scheduled tasks and one model (<tt class="docutils literal">ScheduledTaskInstance</tt>) to save scheduled
+instances of each scheduled&nbsp;task.</p>
+<div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">from</span> <span class="nn">rq</span> <span class="kn">import</span> <span class="n">get_current_job</span>
+
+
+<span class="k">class</span> <span class="nc">Task</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="c"># A model to save information about an asynchronous task</span>
+    <span class="n">created_on</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">auto_now_add</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
+    <span class="n">job_id</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">ScheduledTask</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="c"># A model to save information about a scheduled task</span>
+    <span class="n">created_on</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">auto_now_add</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
+    <span class="c"># A scheduled task has a common job id for all its occurences</span>
+    <span class="n">job_id</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">ScheduledTaskInstance</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="c"># A model to save information about instances of a scheduled task</span>
+    <span class="n">scheduled_task</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="s">&#39;ScheduledTask&#39;</span><span class="p">)</span>
+    <span class="n">created_on</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">auto_now_add</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="forms-py">
+<h3><a class="toc-backref" href="#id5">forms.py</a></h3>
+<p>A very simple form to create a new&nbsp;task.</p>
+<div class="highlight"><pre><span class="kn">from</span> <span class="nn">django</span> <span class="kn">import</span> <span class="n">forms</span>
+
+<span class="k">class</span> <span class="nc">TaskForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">Form</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A simple form to read a url from the user in order to find out its length</span>
+<span class="sd">    and either run it asynchronously or schedule it schedule_times times,</span>
+<span class="sd">    every schedule_interval seconds.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s">&#39;URL&#39;</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">help_text</span><span class="o">=</span><span class="s">&#39;Enter a url (starting with http/https) to start a job that will download it and count its words&#39;</span> <span class="p">)</span>
+    <span class="n">schedule_times</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">required</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">help_text</span><span class="o">=</span><span class="s">&#39;How many times to run this job. Leave empty or 0 to run it only once.&#39;</span><span class="p">)</span>
+    <span class="n">schedule_interval</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">required</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">help_text</span><span class="o">=</span><span class="s">&#39;How much time (in seconds) between runs of the job. Leave empty to run it only once.&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">clean</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TaskForm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">clean</span><span class="p">()</span>
+        <span class="n">schedule_times</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;schedule_times&#39;</span><span class="p">)</span>
+        <span class="n">schedule_interval</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;schedule_interval&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">schedule_times</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">schedule_interval</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">schedule_times</span> <span class="ow">and</span> <span class="n">schedule_interval</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s">&#39;Please fill both schedule_times and schedule_interval to schedule a job or leave them both empty&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_error</span><span class="p">(</span><span class="s">&#39;schedule_times&#39;</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_error</span><span class="p">(</span><span class="s">&#39;schedule_interval&#39;</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="views-py">
+<h3><a class="toc-backref" href="#id6">views.py</a></h3>
+<p>This is actually very simple if you&#8217;re familiar with Class Based Views. Two CBVs
+are defined, one for the Task form + Task display and another for the Job&nbsp;display.</p>
+<div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.views.generic.edit</span> <span class="kn">import</span> <span class="n">FormView</span>
+<span class="kn">from</span> <span class="nn">django.views.generic</span> <span class="kn">import</span> <span class="n">TemplateView</span>
+<span class="kn">from</span> <span class="nn">forms</span> <span class="kn">import</span> <span class="n">TaskForm</span>
+<span class="kn">from</span> <span class="nn">tasks</span> <span class="kn">import</span> <span class="n">get_url_words</span><span class="p">,</span> <span class="n">scheduled_get_url_words</span>
+<span class="kn">from</span> <span class="nn">models</span> <span class="kn">import</span> <span class="n">Task</span><span class="p">,</span><span class="n">ScheduledTask</span>
+<span class="kn">from</span> <span class="nn">rq.job</span> <span class="kn">import</span> <span class="n">Job</span>
+<span class="kn">import</span> <span class="nn">django_rq</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+
+<span class="k">class</span> <span class="nc">TasksHomeFormView</span><span class="p">(</span><span class="n">FormView</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class that displays a form to read a url to read its contents and if the job</span>
+<span class="sd">    is to be scheduled or not and information about all the tasks and scheduled tasks.</span>
+
+<span class="sd">    When the form is submitted, the task will be either scheduled based on the</span>
+<span class="sd">    parameters of the form or will be just executed asynchronously immediately.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">form_class</span> <span class="o">=</span> <span class="n">TaskForm</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s">&#39;tasks_home.html&#39;</span>
+    <span class="n">success_url</span> <span class="o">=</span> <span class="s">&#39;/&#39;</span>
+
+    <span class="k">def</span> <span class="nf">form_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">):</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s">&#39;url&#39;</span><span class="p">]</span>
+        <span class="n">schedule_times</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;schedule_times&#39;</span><span class="p">)</span>
+        <span class="n">schedule_interval</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;schedule_interval&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">schedule_times</span> <span class="ow">and</span> <span class="n">schedule_interval</span><span class="p">:</span>
+            <span class="c"># Schedule the job with the form parameters</span>
+            <span class="n">scheduler</span> <span class="o">=</span> <span class="n">django_rq</span><span class="o">.</span><span class="n">get_scheduler</span><span class="p">(</span><span class="s">&#39;default&#39;</span><span class="p">)</span>
+            <span class="n">job</span> <span class="o">=</span> <span class="n">scheduler</span><span class="o">.</span><span class="n">schedule</span><span class="p">(</span>
+                <span class="n">scheduled_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
+                <span class="n">func</span><span class="o">=</span><span class="n">scheduled_get_url_words</span><span class="p">,</span>
+                <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">url</span><span class="p">],</span>
+                <span class="n">interval</span><span class="o">=</span><span class="n">schedule_interval</span><span class="p">,</span>
+                <span class="n">repeat</span><span class="o">=</span><span class="n">schedule_times</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c"># Just execute the job asynchronously</span>
+            <span class="n">get_url_words</span><span class="o">.</span><span class="n">delay</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">TasksHomeFormView</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">form_valid</span><span class="p">(</span><span class="n">form</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_context_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">ctx</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TasksHomeFormView</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_context_data</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">ctx</span><span class="p">[</span><span class="s">&#39;tasks&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Task</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">&#39;-created_on&#39;</span><span class="p">)</span>
+        <span class="n">ctx</span><span class="p">[</span><span class="s">&#39;scheduled_tasks&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ScheduledTask</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">&#39;-created_on&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ctx</span>
+
+
+<span class="k">class</span> <span class="nc">JobTemplateView</span><span class="p">(</span><span class="n">TemplateView</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A simple template view that gets a job id as a kwarg parameter</span>
+<span class="sd">    and tries to fetch that job from RQ. It will then print all attributes</span>
+<span class="sd">    of that object using __dict__.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s">&#39;job.html&#39;</span>
+
+    <span class="k">def</span> <span class="nf">get_context_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">ctx</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">JobTemplateView</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_context_data</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">redis_conn</span> <span class="o">=</span> <span class="n">django_rq</span><span class="o">.</span><span class="n">get_connection</span><span class="p">(</span><span class="s">&#39;default&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">job</span> <span class="o">=</span> <span class="n">Job</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;job&#39;</span><span class="p">],</span> <span class="n">connection</span><span class="o">=</span><span class="n">redis_conn</span><span class="p">)</span>
+            <span class="n">job</span> <span class="o">=</span> <span class="n">job</span><span class="o">.</span><span class="n">__dict__</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">job</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="n">ctx</span><span class="p">[</span><span class="s">&#39;job&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">job</span>
+        <span class="k">return</span> <span class="n">ctx</span>
+</pre></div>
+</div>
+<div class="section" id="tasks-py">
+<h3><a class="toc-backref" href="#id7">tasks.py</a></h3>
+<p>Here two jobs are defined: One to be used for simple asynchronous tasks and the
+other to be used for scheduled asynchronous tasks (since for asynchronous tasks
+we wanted to group their runs per job&nbsp;id).</p>
+<p>The <tt class="docutils literal">&#64;job</tt> decorator will add the <tt class="docutils literal">delay()</tt> method (used in <tt class="docutils literal">views.py</tt>) to
+the function. It&#8217;s not really required for <tt class="docutils literal">scheduled_get_url_words</tt> since
+it&#8217;s called through the <tt class="docutils literal">scheduled.schedule</tt>.</p>
+<p>When a task is finished, it can return a value (like we do in <tt class="docutils literal">return task.result</tt>)
+which will be saved for a limited amount of time (500 seconds by default - could be
+even saved for ever) to redis.
+This may be useful in some cases, however, I think that for normal web applications it&#8217;s
+not that useful, and since here we use normal django models
+for each task, we can save it to that model&#8217;s instance&nbsp;instead.</p>
+<div class="highlight"><pre><span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">from</span> <span class="nn">models</span> <span class="kn">import</span> <span class="n">Task</span><span class="p">,</span> <span class="n">ScheduledTask</span><span class="p">,</span> <span class="n">ScheduledTaskInstance</span>
+<span class="kn">from</span> <span class="nn">rq</span> <span class="kn">import</span> <span class="n">get_current_job</span>
+<span class="kn">from</span> <span class="nn">django_rq</span> <span class="kn">import</span> <span class="n">job</span>
+
+
+<span class="nd">@job</span>
+<span class="k">def</span> <span class="nf">get_url_words</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+    <span class="c"># This creates a Task instance to save the job instance and job result</span>
+    <span class="n">job</span> <span class="o">=</span> <span class="n">get_current_job</span><span class="p">()</span>
+
+    <span class="n">task</span> <span class="o">=</span> <span class="n">Task</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+        <span class="n">job_id</span><span class="o">=</span><span class="n">job</span><span class="o">.</span><span class="n">get_id</span><span class="p">(),</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">url</span>
+    <span class="p">)</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="n">task</span><span class="o">.</span><span class="n">result</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+    <span class="n">task</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">task</span><span class="o">.</span><span class="n">result</span>
+
+
+<span class="nd">@job</span>
+<span class="k">def</span> <span class="nf">scheduled_get_url_words</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This creates a ScheduledTask instance for each group of</span>
+<span class="sd">    scheduled task - each time this scheduled task is run</span>
+<span class="sd">    a new instance of ScheduledTaskInstance will be created</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">job</span> <span class="o">=</span> <span class="n">get_current_job</span><span class="p">()</span>
+
+    <span class="n">task</span><span class="p">,</span> <span class="n">created</span> <span class="o">=</span> <span class="n">ScheduledTask</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_or_create</span><span class="p">(</span>
+        <span class="n">job_id</span><span class="o">=</span><span class="n">job</span><span class="o">.</span><span class="n">get_id</span><span class="p">(),</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">url</span>
+    <span class="p">)</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="n">response_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+    <span class="n">ScheduledTaskInstance</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+        <span class="n">scheduled_task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">response_len</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">response_len</span>
+</pre></div>
+</div>
+<div class="section" id="settings-py">
+<h3><a class="toc-backref" href="#id8">settings.py</a></h3>
+<div class="highlight"><pre><span class="kn">import</span> <span class="nn">os</span>
+<span class="n">BASE_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">))</span>
+
+<span class="n">SECRET_KEY</span> <span class="o">=</span> <span class="s">&#39;123&#39;</span>
+<span class="n">DEBUG</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="n">TEMPLATE_DEBUG</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="n">ALLOWED_HOSTS</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="n">INSTALLED_APPS</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s">&#39;django.contrib.admin&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.contrib.auth&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.contrib.contenttypes&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.contrib.sessions&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.contrib.messages&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.contrib.staticfiles&#39;</span><span class="p">,</span>
+
+    <span class="s">&#39;django_extensions&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django_rq&#39;</span><span class="p">,</span>
+
+    <span class="s">&#39;tasks&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">MIDDLEWARE_CLASSES</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s">&#39;django.contrib.sessions.middleware.SessionMiddleware&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.middleware.common.CommonMiddleware&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.middleware.csrf.CsrfViewMiddleware&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.contrib.auth.middleware.AuthenticationMiddleware&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.contrib.auth.middleware.SessionAuthenticationMiddleware&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.contrib.messages.middleware.MessageMiddleware&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.middleware.clickjacking.XFrameOptionsMiddleware&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">ROOT_URLCONF</span> <span class="o">=</span> <span class="s">&#39;django_test_rq.urls&#39;</span>
+<span class="n">WSGI_APPLICATION</span> <span class="o">=</span> <span class="s">&#39;django_test_rq.wsgi.application&#39;</span>
+
+<span class="n">DATABASES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&#39;ENGINE&#39;</span><span class="p">:</span> <span class="s">&#39;django.db.backends.sqlite3&#39;</span><span class="p">,</span>
+        <span class="s">&#39;NAME&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">BASE_DIR</span><span class="p">,</span> <span class="s">&#39;db.sqlite3&#39;</span><span class="p">),</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">LANGUAGE_CODE</span> <span class="o">=</span> <span class="s">&#39;en-us&#39;</span>
+<span class="n">TIME_ZONE</span> <span class="o">=</span> <span class="s">&#39;UTC&#39;</span>
+<span class="n">USE_I18N</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="n">USE_L10N</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="n">USE_TZ</span> <span class="o">=</span> <span class="bp">True</span>
+
+<span class="n">STATIC_URL</span> <span class="o">=</span> <span class="s">&#39;/static/&#39;</span>
+
+<span class="c"># Use redis for caches</span>
+<span class="n">CACHES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&quot;BACKEND&quot;</span><span class="p">:</span> <span class="s">&quot;django_redis.cache.RedisCache&quot;</span><span class="p">,</span>
+        <span class="s">&quot;LOCATION&quot;</span><span class="p">:</span> <span class="s">&quot;redis://127.0.0.1:6379/0&quot;</span><span class="p">,</span>
+        <span class="s">&quot;OPTIONS&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&quot;CLIENT_CLASS&quot;</span><span class="p">:</span> <span class="s">&quot;django_redis.client.DefaultClient&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c"># Use the same redis as with caches for RQ</span>
+<span class="n">RQ_QUEUES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&#39;USE_REDIS_CACHE&#39;</span><span class="p">:</span> <span class="s">&#39;default&#39;</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+
+<span class="n">SESSION_ENGINE</span> <span class="o">=</span> <span class="s">&quot;django.contrib.sessions.backends.cache&quot;</span>
+<span class="n">SESSION_CACHE_ALIAS</span> <span class="o">=</span> <span class="s">&quot;default&quot;</span>
+<span class="n">RQ_SHOW_ADMIN_LINK</span> <span class="o">=</span> <span class="bp">True</span>
+
+<span class="c"># Add a logger for rq_scheduler in order to display when jobs are queueud</span>
+<span class="n">LOGGING</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&#39;version&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s">&#39;disable_existing_loggers&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+    <span class="s">&#39;formatters&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&#39;simple&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&#39;format&#39;</span><span class="p">:</span> <span class="s">&#39;</span><span class="si">%(asctime)s</span><span class="s"> </span><span class="si">%(levelname)s</span><span class="s"> </span><span class="si">%(message)s</span><span class="s">&#39;</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+    <span class="s">&#39;handlers&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&#39;console&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&#39;level&#39;</span><span class="p">:</span> <span class="s">&#39;DEBUG&#39;</span><span class="p">,</span>
+            <span class="s">&#39;class&#39;</span><span class="p">:</span> <span class="s">&#39;logging.StreamHandler&#39;</span><span class="p">,</span>
+            <span class="s">&#39;formatter&#39;</span><span class="p">:</span> <span class="s">&#39;simple&#39;</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+
+    <span class="s">&#39;loggers&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&#39;django.request&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&#39;handlers&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;console&#39;</span><span class="p">],</span>
+            <span class="s">&#39;level&#39;</span><span class="p">:</span> <span class="s">&#39;DEBUG&#39;</span><span class="p">,</span>
+            <span class="s">&#39;propagate&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s">&#39;rq_scheduler&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&#39;handlers&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;console&#39;</span><span class="p">],</span>
+            <span class="s">&#39;level&#39;</span><span class="p">:</span> <span class="s">&#39;DEBUG&#39;</span><span class="p">,</span>
+            <span class="s">&#39;propagate&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+<p>By default, rq_scheduler won&#8217;t log anything so we won&#8217;t be able to see
+any output when new instances of each scheduled task are queued for execution.
+That&#8217;s why we&#8217;ve overriden the <span class="caps">LOGGING</span> setting in order to actually log
+rq_scheduler output to the&nbsp;console.</p>
+</div>
+<div class="section" id="running-the-project">
+<h3><a class="toc-backref" href="#id9">Running the&nbsp;project</a></h3>
+<p>I recommend using <a class="reference external" href="https://www.vagrantup.com/">Vagrant</a> to start a stock ubuntu/trusty32 box. After that, install redis, virtualenv and virtualenvwrapper
+and create/activate a virtualenv named <tt class="docutils literal">rq</tt>. You can go to the home directory of <tt class="docutils literal"><span class="pre">django-test-rq</span></tt>
+and install requirements through <tt class="docutils literal">pip install requirements.txt</tt> and create the database tables with
+<tt class="docutils literal">python manage.py migrate</tt>. Finally you may run the project with <tt class="docutils literal">python manage.py runserver_plus</tt>.</p>
+</div>
+</div>
+<div class="section" id="rqworker-and-rqscheduler">
+<h2><a class="toc-backref" href="#id10">rqworker and&nbsp;rqscheduler</a></h2>
+<p>Before scheduling any tasks we need to run two more&nbsp;processes:</p>
+<ul class="simple">
+<li>rqworker: This is a worker that dequeues jobs from the queue and executes them. We could run more than one onstance of this job if we need&nbsp;it.</li>
+<li>rqscheduler: This is a process that runs every one minute and checks if there are scheduled jobs that have to be executed. If yes, it will add them to the queue in order to be executed by a&nbsp;worker.</li>
+</ul>
+<div class="section" id="for-development">
+<h3><a class="toc-backref" href="#id11">For&nbsp;development</a></h3>
+<p>If you want to run rqworker and rqscheduler for your development environment you can just do it with
+running <tt class="docutils literal">python manage.py rqworker</tt> and <tt class="docutils literal">python mange.py rqscheduler</tt> through screen/tmux. If everything
+is allright you should see tasks being added to the queue and scheduled (you may need to refresh the
+homepage before seeing everything since a task may be executed after the response is&nbsp;created).</p>
+<p>Also, keep in mind that rqscheduler runs once every minute by default so you may need to wait up to
+minute to see a <tt class="docutils literal">ScheduledTask</tt> instance. Also, this means that you can&#8217;t run more than one scheduled
+task instance per&nbsp;minute.</p>
+</div>
+<div class="section" id="for-production">
+<h3><a class="toc-backref" href="#id12">For&nbsp;production</a></h3>
+<p>Trying to create daemons through screen is not
+sufficient for a production envornment since we&#8217;d like to actually have logging, monitoring and of course
+automatically start rqworker and rqscheduler when the server&nbsp;boots.</p>
+<p>For this, I recommend using the <a class="reference external" href="http://supervisord.org/">supervisord</a> tool which
+can be used to monitor and control a number of processes. There are other similar tools, however I&#8217;ve
+found supervisord the easier to&nbsp;use.</p>
+<p>In order to monitor/control a process through supervisord you need to add a <tt class="docutils literal">[program:progrname]</tt> section in
+supervisord&#8217;s configuration and pass a number of parameters. The <tt class="docutils literal">progname</tt> is the name of the monitoring
+process. Here&#8217;s how rqworker can be configured using&nbsp;supervisord:</p>
+<pre class="code literal-block">
+[program:rqworker]
+command=python manage.py rqworker
+directory=/vagrant/progr/py/rq/django-test-rq
+environment=PATH=&quot;/home/vagrant/.virtualenvs/rq/bin&quot;
+user=vagrant
+</pre>
+<p>The options used will chdir to <tt class="docutils literal">directory</tt> and execute <tt class="docutils literal">command</tt> as <tt class="docutils literal">user</tt>. The <tt class="docutils literal">environment</tt>
+option can be used to set envirotnment variables - here we set <tt class="docutils literal"><span class="caps">PATH</span></tt> in order to use a specific
+virtual environment. This will allow you to monitor rqworker through supervisord and log its
+output to a file in <tt class="docutils literal">/var/log/supervisor</tt> (by default). A similar entry needs to be added for
+rqscheduler of course. If everything has been configured correctly, when you reload the supervisord
+settings you can run <tt class="docutils literal">sudo /usr/bin/supervisorctl</tt> and should see something&nbsp;like</p>
+<pre class="code literal-block">
+rqscheduler                      RUNNING    pid 1561, uptime 0:00:03
+rqworker                         RUNNING    pid 1562, uptime 0:00:03
+</pre>
+<p>Also, tho log files should contain some debug&nbsp;info.</p>
+</div>
+</div>
+<div class="section" id="conclusion">
+<h2><a class="toc-backref" href="#id13">Conclusion</a></h2>
+<p>Although using job queues makes it more difficult for the developer and adds at least one
+(and probably more) points of failure to a project (the workers, the broker etc) their
+usage, even for very simple projects is&nbsp;unavoidable.</p>
+<p>Unless a complex, enterprise solution like celery is really required for a project
+I recommend using the much simpler and easier to configure <span class="caps">RQ</span> for all your
+asynchronous and scheduled task needs. Using <span class="caps">RQ</span> (and the relative projects django-rq
+and rq-scheduler) we can easily add production ready queueued and scheduled jobs to
+any django&nbsp;project.</p>
+<p>In this article we presented a small introduction to <span class="caps">RQ</span> and its friends and saw how
+to configure django to use it in a production ready environment using a small
+django project (<a class="reference external" href="https://github.com/spapas/django-test-rq">https://github.com/spapas/django-test-rq</a>) which was implemented as a companion
+to help readers quickly test the concepts presented&nbsp;here.</p>
+</div>
+</div>
+  		</article>
+  		<article>
+<header>
+      <h1 class="entry-title">
         <a href="http://spapas.github.io/2015/01/21/django-model-auditing/">Django model auditing</a>
       </h1>
       <p class="meta"><time datetime="2015-01-21T14:20:00" pubdate>Τετ 21 Ιανουάριος 2015</time></p>
@@ -758,223 +1217,6 @@ beyond <span class="caps">HTML</span>. This will help us write write clean and <
 </div>
 </div>
   		</article>
-  		<article>
-<header>
-      <h1 class="entry-title">
-        <a href="http://spapas.github.io/2014/06/30/rest-flask-mongodb-heroku/">Implementing a simple, Heroku-hosted REST service using Flask and mongoDB</a>
-      </h1>
-      <p class="meta"><time datetime="2014-06-30T15:23:00" pubdate>Δευ 30 Ιούνιος 2014</time></p>
-</header>
-
-  <div class="entry-content"><div class="contents topic" id="contents">
-<p class="topic-title first">Contents</p>
-<ul class="simple">
-<li><a class="reference internal" href="#introduction" id="id1">Introduction</a></li>
-<li><a class="reference internal" href="#requirements" id="id2">Requirements</a></li>
-<li><a class="reference internal" href="#implementing-the-rest-service" id="id3">Implementing the <span class="caps">REST</span>&nbsp;service</a></li>
-<li><a class="reference internal" href="#testing-it-locally" id="id4">Testing it&nbsp;locally</a></li>
-<li><a class="reference internal" href="#deploying-to-heroku" id="id5">Deploying to&nbsp;Heroku</a></li>
-</ul>
-</div>
-<div class="section" id="introduction">
-<h2><a class="toc-backref" href="#id1">Introduction</a></h2>
-<p>In the following, I will describe how I used <a class="reference external" href="http://flask.pocoo.org/">Flask</a>, a very nice web <em>microframework</em> for python along  with <a class="reference external" href="http://www.mongodb.org/">mongoDB</a>, the most
-popular No-<span class="caps">SQL</span> database to implement a simple <span class="caps">REST</span> service that was hosted on <a class="reference external" href="https://dashboard.heroku.com/apps">Heroku</a>. This <span class="caps">REST</span> service would get readings from
-a number of sensors from an Android&nbsp;device.</p>
-<p>I chose Flask instead of Django mainly because the <span class="caps">REST</span> service that I needed to implement would be very simple and most of
-the Django bells and whistles (<span class="caps">ORM</span>, auth, admin, etc) wouldn&#8217;t be needed anyway. Also, Flask is much quicker to set-up than
-Django since almost everything (views, urls, etc) can be put inside one python&nbsp;module.</p>
-<p>Concerning the choice of a NoSQL persistance solution (mongoDB), I wanted to have a table (or collection as it is called in the
-mongoDB world) of readings from the sensor. Each reading would just have a timestamp and various other
-arbitrary data depending on the type of the reading, so saving it as a <span class="caps">JSON</span> document in a NoSQL database is a good&nbsp;solution.</p>
-<p>Finally, all the above will be deployed to Heroku which offers some great services for deploying python code in the&nbsp;cloud.</p>
-</div>
-<div class="section" id="requirements">
-<h2><a class="toc-backref" href="#id2">Requirements</a></h2>
-<p>I propose creating a file named <tt class="docutils literal">requirements.txt</tt> that will host the required packages for your project, so you will be
-able to setup your projects after creating a virtual environment with <a class="reference external" href="http://virtualenv.readthedocs.org/en/latest/">virtualenv</a> just by running <tt class="docutils literal">pip install <span class="pre">-r</span> requirements.txt</tt>.
-Also, the requirements.txt is required for deploying python to&nbsp;Heroku.</p>
-<p>So, for my case, the contents of requirements.txt are the&nbsp;following:</p>
-<pre class="code literal-block">
-Flask==0.10.1
-Flask-PyMongo==0.3.0
-Flask-RESTful==0.2.12
-Jinja2==2.7.3
-MarkupSafe==0.23
-Werkzeug==0.9.6
-aniso8601==0.82
-gunicorn==19.0.0
-itsdangerous==0.24
-pymongo==2.7.1
-pytz==2014.4
-six==1.7.2
-</pre>
-<ul class="simple">
-<li>Flask-PyMongo is a simple wrapper for Flask around pymongo which is the python mongoDB&nbsp;driver.</li>
-<li>Flask-RESTful is a simple library for creating <span class="caps">REST</span> APIs - it needs aniso8601 and&nbsp;pytz.</li>
-<li>Jinja2 is the template library for Flask (we won&#8217;t use it but it is required by Flask installation) - it needs&nbsp;MarkupSafe.</li>
-<li>Werkzeug is a <span class="caps">WSGI</span> utility library - required by&nbsp;Flask</li>
-<li>gunicorn is a <span class="caps">WSGI</span> <span class="caps">HTTP</span> server - needed for deployment to&nbsp;Heroku</li>
-<li>itsdangerous is used to sign data for usage in untrusted&nbsp;environments</li>
-<li>six is the python 2/3 compatibility&nbsp;layer</li>
-</ul>
-</div>
-<div class="section" id="implementing-the-rest-service">
-<h2><a class="toc-backref" href="#id3">Implementing the <span class="caps">REST</span>&nbsp;service</a></h2>
-<p>Instead of using just one single file for our Flask web application, we will create a python module to contain it and a
-file named <tt class="docutils literal">runserver.py</tt> that will start a local development server to test&nbsp;it:</p>
-<p>So, in the same folder as the <tt class="docutils literal">requirements.txt</tt> create a folder named <tt class="docutils literal">flask_rest_service</tt> and in there put
-two files: <tt class="docutils literal">__init__.py</tt> and <tt class="docutils literal">resources.py</tt>.</p>
-<p>The <tt class="docutils literal">__init__.py</tt> initializes our Flask application, our mongoDB connection and our Flask-RESTful&nbsp;api:</p>
-<pre class="code literal-block">
-import os
-from flask import Flask
-from flask.ext import restful
-from flask.ext.pymongo import PyMongo
-from flask import make_response
-from bson.json_util import dumps
-
-MONGO_URL = os.environ.get('MONGO_URL')
-if not MONGO_URL:
-    MONGO_URL = &quot;mongodb://localhost:27017/rest&quot;;
-
-app = Flask(__name__)
-
-app.config['MONGO_URI'] = MONGO_URL
-mongo = PyMongo(app)
-
-def output_json(obj, code, headers=None):
-    resp = make_response(dumps(obj), code)
-    resp.headers.extend(headers or {})
-    return resp
-
-DEFAULT_REPRESENTATIONS = {'application/json': output_json}
-api = restful.Api(app)
-api.representations = DEFAULT_REPRESENTATIONS
-
-import flask_rest_service.resources
-</pre>
-<p>So what happens here? After the imports, we check if we have a MONGO_URL environment variable. This is
-how we set options in Heroku. If such option does not exist in the environment then we are in our
-development environment so we set it to the localhost (we must have a running mongoDB installation in
-our dev&nbsp;environment).</p>
-<p>In the next lines, we initialize our Flask application and our mongoDB connection (pymongo
-uses a <tt class="docutils literal">MONGO_URI</tt> configuration option to know the database <span class="caps">URI</span>).</p>
-<p>The <tt class="docutils literal">output_json</tt> is used to dump the <span class="caps">BSON</span> encoded mongoDB objects to <span class="caps">JSON</span> and was borrowed from
-<a class="reference external" href="http://blog.alienretro.com/using-mongodb-with-flask-restful/">alienretro&#8217;s blog</a> &#8212; we initialize our restful <span class="caps">REST</span> <span class="caps">API</span> with this&nbsp;function.</p>
-<p>Finally, we import the <tt class="docutils literal">resources.py</tt> module which actually defines our <span class="caps">REST</span>&nbsp;resources.</p>
-<pre class="code literal-block">
-import json
-from flask import request, abort
-from flask.ext import restful
-from flask.ext.restful import reqparse
-from flask_rest_service import app, api, mongo
-from bson.objectid import ObjectId
-
-class ReadingList(restful.Resource):
-    def __init__(self, *args, **kwargs):
-        self.parser = reqparse.RequestParser()
-        self.parser.add_argument('reading', type=str)
-        super(ReadingList, self).__init__()
-
-    def get(self):
-        return  [x for x in mongo.db.readings.find()]
-
-    def post(self):
-        args = self.parser.parse_args()
-        if not args['reading']:
-            abort(400)
-
-        jo = json.loads(args['reading'])
-        reading_id =  mongo.db.readings.insert(jo)
-        return mongo.db.readings.find_one({&quot;_id&quot;: reading_id})
-
-
-class Reading(restful.Resource):
-    def get(self, reading_id):
-        return mongo.db.readings.find_one_or_404({&quot;_id&quot;: reading_id})
-
-    def delete(self, reading_id):
-        mongo.db.readings.find_one_or_404({&quot;_id&quot;: reading_id})
-        mongo.db.readings.remove({&quot;_id&quot;: reading_id})
-        return '', 204
-
-
-class Root(restful.Resource):
-    def get(self):
-        return {
-            'status': 'OK',
-            'mongo': str(mongo.db),
-        }
-
-api.add_resource(Root, '/')
-api.add_resource(ReadingList, '/readings/')
-api.add_resource(Reading, '/readings/&lt;ObjectId:reading_id&gt;')
-</pre>
-<p>Here we define three <tt class="docutils literal">Resource</tt> classes and add them to our previously defined <tt class="docutils literal">api</tt>: <tt class="docutils literal">Root</tt>, <tt class="docutils literal">Reading</tt> and <tt class="docutils literal">ReadingList</tt>.</p>
-<p><tt class="docutils literal">Root</tt> just returns a dictionary with an <span class="caps">OK</span> status and some info on our mongodb&nbsp;connection.</p>
-<p><tt class="docutils literal">Reading</tt> has gets an ObjectId
-(which is the mongodb primary key) as a parameter and depending on the <span class="caps">HTTP</span> operation, it returns the reading with that
-id when receiving an <tt class="docutils literal"><span class="caps">HTTP</span> <span class="caps">GET</span></tt> and deletes the reading with that id when receiving an <tt class="docutils literal"><span class="caps">HTTP</span> <span class="caps">DELETE</span></tt>.</p>
-<p><tt class="docutils literal">ReadingList</tt> will return all readings when receiving an <tt class="docutils literal"><span class="caps">HTTP</span> <span class="caps">GET</span></tt> and will create a new reading when
-receiving an <tt class="docutils literal"><span class="caps">HTTP</span> <span class="caps">POST</span></tt> The <tt class="docutils literal">post</tt> function uses the parser defined in <tt class="docutils literal">__init__</tt> which requires
-a <tt class="docutils literal">reading</tt> parameter with the actual reading to be&nbsp;inserted.</p>
-</div>
-<div class="section" id="testing-it-locally">
-<h2><a class="toc-backref" href="#id4">Testing it&nbsp;locally</a></h2>
-<p>In order to run the development server, you will need to install and start mongodb locally which is beyond the scope of this post. After that
-create a file named <tt class="docutils literal">runserver.py</tt> in the same folder as with the <tt class="docutils literal">requirements.txt</tt>
-and the <tt class="docutils literal">flask_rest_service</tt> folder. The contents of this file should&nbsp;be:</p>
-<pre class="code literal-block">
-from flask_rest_service import app
-app.run(debug=True)
-</pre>
-<p>When you run this file with <tt class="docutils literal">python runserver.py</tt> you should be able top visit your rest service at <a class="reference external" href="http://localhost:5000">http://localhost:5000</a> and get
-an &quot;<span class="caps">OK</span>&quot;&nbsp;status.</p>
-</div>
-<div class="section" id="deploying-to-heroku">
-<h2><a class="toc-backref" href="#id5">Deploying to&nbsp;Heroku</a></h2>
-<p>To deploy to Heroku, you must create a <tt class="docutils literal">Procfile</tt> that contains the workers of your application. In our case, the
-<tt class="docutils literal">Procfile</tt> should contain the&nbsp;following:</p>
-<pre class="code literal-block">
-web: gunicorn flask_rest_service:app
-</pre>
-<p>Also, you should add a .gitignore file with the&nbsp;following:</p>
-<pre class="code literal-block">
-*.pyc
-</pre>
-<p>Finally, to deploy your application to Heroku you can follow the instructions here: <a class="reference external" href="https://devcenter.heroku.com/articles/getting-started-with-python">https://devcenter.heroku.com/articles/getting-started-with-python</a>:</p>
-<ul class="simple">
-<li>Initialize a git repository and commit&nbsp;everything:</li>
-</ul>
-<pre class="code literal-block">
-git init
-git add .
-git commit -m
-</pre>
-<ul class="simple">
-<li>Create a new Heroku application (after logging in to heroku with <tt class="docutils literal">heroku login</tt>) and set the MONGO_URL environment variable (of course you have to obtain ths MONGO_URL variable for your heroku envirotnment by adding a mongoDB&nbsp;database):</li>
-</ul>
-<pre class="code literal-block">
-heroku create
-heroku config:set MONGO_URL=mongodb://user:pass&#64;mongoprovider.com:27409/rest
-</pre>
-<ul class="simple">
-<li>And finally push your master branch to the heroku remote&nbsp;repository:</li>
-</ul>
-<pre class="code literal-block">
-git push heroku master
-</pre>
-<p>If everything went ok you should be able to start a worker for your application, check that the worker is running, and finally visit&nbsp;it:</p>
-<pre class="code literal-block">
-heroku ps:scale web=1
-heroku ps
-heroku open
-</pre>
-<p>If everything was ok you should see an status-<span class="caps">OK</span> <span class="caps">JSON</span>&nbsp;!</p>
-</div>
-</div>
-  		</article>
 <div class="pagination">
     <a class="prev" href="http://spapas.github.io/index2.html">&larr; Older</a>
 
@@ -984,6 +1226,9 @@ heroku open
   <section>
     <h1>Recent Posts</h1>
     <ul id="recent_posts">
+      <li class="post">
+          <a href="http://spapas.github.io/2015/01/27/async-tasks-with-django-rq/">Asynchronous tasks in django with django-rq</a>
+      </li>
       <li class="post">
           <a href="http://spapas.github.io/2015/01/21/django-model-auditing/">Django model auditing</a>
       </li>
@@ -995,9 +1240,6 @@ heroku open
       </li>
       <li class="post">
           <a href="http://spapas.github.io/2014/09/15/django-non-html-responses/">Django non-HTML responses</a>
-      </li>
-      <li class="post">
-          <a href="http://spapas.github.io/2014/06/30/rest-flask-mongodb-heroku/">Implementing a simple, Heroku-hosted REST service using Flask and mongoDB</a>
       </li>
     </ul>
   </section>
@@ -1019,7 +1261,7 @@ heroku open
 
   <section>
   <h1>Tags</h1>
-    <a href="http://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="http://spapas.github.io/tag/google.html">google</a>,    <a href="http://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="http://spapas.github.io/tag/spring.html">spring</a>,    <a href="http://spapas.github.io/tag/rest.html">rest</a>,    <a href="http://spapas.github.io/tag/design.html">design</a>,    <a href="http://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="http://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="http://spapas.github.io/tag/git.html">git</a>,    <a href="http://spapas.github.io/tag/java.html">java</a>,    <a href="http://spapas.github.io/tag/flask.html">flask</a>,    <a href="http://spapas.github.io/tag/less.html">less</a>,    <a href="http://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="http://spapas.github.io/tag/forms.html">forms</a>,    <a href="http://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="http://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="http://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="http://spapas.github.io/tag/css.html">css</a>,    <a href="http://spapas.github.io/tag/python.html">python</a>,    <a href="http://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="http://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="http://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="http://spapas.github.io/tag/rst.html">rst</a>,    <a href="http://spapas.github.io/tag/branching.html">branching</a>,    <a href="http://spapas.github.io/tag/github.html">github</a>,    <a href="http://spapas.github.io/tag/windows.html">windows</a>,    <a href="http://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="http://spapas.github.io/tag/django.html">django</a>,    <a href="http://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="http://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="http://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="http://spapas.github.io/tag/security.html">security</a>,    <a href="http://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>  </section>
+    <a href="http://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="http://spapas.github.io/tag/tasks.html">tasks</a>,    <a href="http://spapas.github.io/tag/less.html">less</a>,    <a href="http://spapas.github.io/tag/spring.html">spring</a>,    <a href="http://spapas.github.io/tag/rest.html">rest</a>,    <a href="http://spapas.github.io/tag/google.html">google</a>,    <a href="http://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="http://spapas.github.io/tag/scheduling.html">scheduling</a>,    <a href="http://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="http://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="http://spapas.github.io/tag/git.html">git</a>,    <a href="http://spapas.github.io/tag/java.html">java</a>,    <a href="http://spapas.github.io/tag/rq.html">rq</a>,    <a href="http://spapas.github.io/tag/django-rq.html">django-rq</a>,    <a href="http://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="http://spapas.github.io/tag/redis.html">redis</a>,    <a href="http://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="http://spapas.github.io/tag/forms.html">forms</a>,    <a href="http://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="http://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="http://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="http://spapas.github.io/tag/css.html">css</a>,    <a href="http://spapas.github.io/tag/jobs.html">jobs</a>,    <a href="http://spapas.github.io/tag/python.html">python</a>,    <a href="http://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="http://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="http://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="http://spapas.github.io/tag/rst.html">rst</a>,    <a href="http://spapas.github.io/tag/branching.html">branching</a>,    <a href="http://spapas.github.io/tag/design.html">design</a>,    <a href="http://spapas.github.io/tag/github.html">github</a>,    <a href="http://spapas.github.io/tag/windows.html">windows</a>,    <a href="http://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="http://spapas.github.io/tag/django.html">django</a>,    <a href="http://spapas.github.io/tag/flask.html">flask</a>,    <a href="http://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="http://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="http://spapas.github.io/tag/asynchronous.html">asynchronous</a>,    <a href="http://spapas.github.io/tag/security.html">security</a>,    <a href="http://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>  </section>
 
 
 

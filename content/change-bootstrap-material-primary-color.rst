@@ -27,7 +27,7 @@ of the times they want to use this project and *their* contributions to their ow
 projects which (most probably) are commercial, so people contributing to 
 bootstrap-material-design won't be able to use it in their own projects!
 
-**After this, I recommend people to avoiding contributing to and using django-material-design 
+**After this, I recommend people to avoid contributing to and using django-material-design 
 for their own projects.**
 
 Introduction

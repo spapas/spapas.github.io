@@ -162,7 +162,7 @@ spapas.github.io\output&amp;gt;git init
 spapas.github.io\output&amp;gt;git add .
 spapas.github.io\output&amp;gt;git commit -m Initial
 spapas.github.io\output&amp;gt;git remote add origin https://github.com/spapas/spapas.github.io.git
-spapas.github.io\output&amp;gt;git push master --force
+spapas.github.io\output&amp;gt;git push origin master --force
 &lt;/pre&gt;
 &lt;p&gt;The &amp;#8212;force is to overwrite any previous versions - you don&amp;#8217;t care about version control on your output (but you want it on your&amp;nbsp;source).&lt;/p&gt;
 &lt;p&gt;You can now visit &lt;a class="reference external" href="http://username.github.io"&gt;http://username.github.io&lt;/a&gt; and see your statically generated site&amp;nbsp;!&lt;/p&gt;

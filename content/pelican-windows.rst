@@ -195,7 +195,7 @@ Finally, go to your output directory, create a git repository, add everything an
  spapas.github.io\output>git add .
  spapas.github.io\output>git commit -m Initial
  spapas.github.io\output>git remote add origin https://github.com/spapas/spapas.github.io.git
- spapas.github.io\output>git push master --force
+ spapas.github.io\output>git push origin master --force
  
 The --force is to overwrite any previous versions - you don't care about version control on your output (but you want it on your source). 
 

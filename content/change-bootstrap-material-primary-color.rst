@@ -76,7 +76,7 @@ in the same folder as with ``bower.json``, ``Gruntfile.js`` etc) with the follow
 
 .. code::
 
-    @import "less/material-wfont.less";
+    @import "less/material.less";
 
     // Override @primary color with one took from _colors.less
     @primary: @indigo;

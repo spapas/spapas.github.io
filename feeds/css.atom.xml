@@ -198,7 +198,7 @@ you should have a command named &lt;tt class="docutils literal"&gt;lessc&lt;/tt&
 &lt;p&gt;Go to the directory where you cloned (or unzipped) the Bootstrap Material Design code and create a file named &lt;tt class="docutils literal"&gt;custom.less&lt;/tt&gt; (so, that file should be
 in the same folder as with &lt;tt class="docutils literal"&gt;bower.json&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;Gruntfile.js&lt;/tt&gt; etc) with the following&amp;nbsp;contents:&lt;/p&gt;
 &lt;pre class="code literal-block"&gt;
-&amp;#64;import &amp;quot;less/material-wfont.less&amp;quot;;
+&amp;#64;import &amp;quot;less/material.less&amp;quot;;
 
 // Override &amp;#64;primary color with one took from _colors.less
 &amp;#64;primary: &amp;#64;indigo;

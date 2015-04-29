@@ -1,5 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>/var/</title><link>http://spapas.github.io/</link><description>Various programming stuff</description><atom:link href="http://spapas.github.io/feeds%5Cserafeim-papastefanos.rss.xml" rel="self"></atom:link><lastBuildDate>Fri, 06 Feb 2015 12:20:00 +0200</lastBuildDate><item><title>Calling the REST API of Pusher from python</title><link>http://spapas.github.io/2015/02/06/python-pusher-rest/</link><description>&lt;div class="section" id="introduction"&gt;
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>/var/</title><link>http://spapas.github.io/</link><description>Various programming stuff</description><atom:link href="http://spapas.github.io/feeds%5Cserafeim-papastefanos.rss.xml" rel="self"></atom:link><lastBuildDate>Wed, 29 Apr 2015 10:20:00 +0300</lastBuildDate><item><title>Show 404 page on django when DEBUG=True</title><link>http://spapas.github.io/2015/04/29/django-show-404-page/</link><description>&lt;p&gt;The default 404 error page on django can be &lt;a class="reference external" href="https://docs.djangoproject.com/en/1.8/topics/http/views/#the-http404-exception"&gt;easily overriden&lt;/a&gt; by adding
+a template named &lt;tt class="docutils literal"&gt;404.html&lt;/tt&gt; to the top level directory of your templates.
+However, on your development environment you&amp;#8217;ll never be able to see this
+template because when &lt;tt class="docutils literal"&gt;&lt;span class="caps"&gt;DEBUG&lt;/span&gt;=True&lt;/tt&gt; django will render the debug not found
+page to help you debug your url&amp;nbsp;configuration.&lt;/p&gt;
+&lt;p&gt;If you want to display that page in your development environment you can always
+change the &lt;span class="caps"&gt;DEBUG&lt;/span&gt; setting to False, however there&amp;#8217;s a better way: Add a url
+pattern for django&amp;#8217;s default 404 view - just  add the following to your &lt;tt class="docutils literal"&gt;urls.py&lt;/tt&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;django.views.defaults&lt;/span&gt;
+
+&lt;span class="n"&gt;urlpatterns&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;patterns&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="c"&gt;# Other url patterns ...&lt;/span&gt;
+    &lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;r&amp;#39;^404/$&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;django&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;views&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;defaults&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;page_not_found&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;),&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;You&amp;#8217;ll then be able to see your 404 page by visiting the defined &lt;span class="caps"&gt;URL&lt;/span&gt;!&lt;/p&gt;
+</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Serafeim Papastefanos</dc:creator><pubDate>Wed, 29 Apr 2015 10:20:00 +0300</pubDate><guid>tag:spapas.github.io,2015-04-29:2015/04/29/django-show-404-page/</guid><category>django</category><category>debug</category><category>404</category><category>error</category><category>python</category></item><item><title>Calling the REST API of Pusher from python</title><link>http://spapas.github.io/2015/02/06/python-pusher-rest/</link><description>&lt;div class="section" id="introduction"&gt;
 &lt;h2&gt;Introduction&lt;/h2&gt;
 &lt;p&gt;&lt;a class="reference external" href="https://pusher.com/"&gt;Pusher&lt;/a&gt; is one of the best real time frameworks right now. Using it you can add real time
 events in your projects without the need to configure and use &lt;span class="caps"&gt;HTTP&lt;/span&gt; servers that support

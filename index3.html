@@ -70,6 +70,228 @@
   		<article>
 <header>
       <h1 class="entry-title">
+        <a href="http://spapas.github.io/2013/12/24/django-dynamic-forms/">Django dynamic forms</a>
+      </h1>
+      <p class="meta"><time datetime="2013-12-24T14:20:00" pubdate>Τρι 24 Δεκέμβριος 2013</time></p>
+</header>
+
+  <div class="entry-content"><div class="contents topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#introduction" id="id1">Introduction</a></li>
+<li><a class="reference internal" href="#describing-a-django-form-in-json" id="id2">Describing a django form in <span class="caps">JSON</span></a></li>
+<li><a class="reference internal" href="#creating-the-form-fields" id="id3">Creating the form&nbsp;fields</a></li>
+<li><a class="reference internal" href="#creating-the-actual-form" id="id4">Creating the actual&nbsp;form</a></li>
+<li><a class="reference internal" href="#using-the-dynamic-form" id="id5">Using the dynamic&nbsp;form</a></li>
+</ul>
+</div>
+<div class="section" id="introduction">
+<h2><a class="toc-backref" href="#id1">Introduction</a></h2>
+<p>To define a form in django, a developer has to create a class which extends
+<tt class="docutils literal">django.forms.Form</tt>
+and has  a number of attributes extending from <tt class="docutils literal">django.forms.Field</tt>. This makes
+it very easy for the developer to create static forms, but creating
+dynamic forms whose fields can be changed depending on the data contributed by the
+users of the application is not so&nbsp;obvious.</p>
+<p>Of course, some people may argue that they can do whatever
+they want just by spitting html input tags to their templates, however this totally violates
+<span class="caps">DRY</span> and any serious django developer would prefer to write <a class="reference external" href="http://thedailywtf.com/Articles/A_Case_of_the_MUMPS.aspx"><span class="caps">MUMPS</span></a> than creating
+html&nbsp;dynamically.</p>
+<p>The implementation I will present here had been developed for an old project: In that
+project there was a number of services which could be edited dynamically by the
+moderators. For each service, the moderators would generate a questionnaire to
+get input from the users which would be defined  using <span class="caps">JSON</span>. When the users needed
+to submit information for each service, a dynamic django form would be generated
+from this <span class="caps">JSON</span> and the answers would be saved to no-<span class="caps">SQL</span> database like&nbsp;MongoDB.</p>
+</div>
+<div class="section" id="describing-a-django-form-in-json">
+<h2><a class="toc-backref" href="#id2">Describing a django form in <span class="caps">JSON</span></a></h2>
+<p>A <span class="caps">JSON</span> described django form is just an array of field <span class="caps">JSON</span> objects. Each field
+object  has three required attributes: name which is the keyword of the field, label which is
+how the label of the field and type which is the type of the input of that field. The
+supported types are text, textarea, integer, radio, select, checkbox. Now, depending
+on the type of the field, there could be also some more required attributes, for instace
+text has a max_length attribute and select has a choices attribute (which is an array
+of name/value objects). Also there are two optional attributes,
+required with a default value of False and help_text with a default value of&nbsp;&#8221;.</p>
+<p>As you can understand these map one by one to the corresponding attributes of the
+actual django form fields. An example containing a complete <span class="caps">JSON</span> described form
+is the&nbsp;following:</p>
+<pre class="code literal-block">
+[
+    {
+        &quot;name&quot;: &quot;firstname&quot;,
+        &quot;label&quot;: &quot;First Name&quot;,
+        &quot;type&quot;: &quot;text&quot;,
+        &quot;max_length&quot;: 25,
+        &quot;required&quot;: 1
+    },
+    {
+        &quot;name&quot;: &quot;lastname&quot;,
+        &quot;label&quot;: &quot;Last Name&quot;,
+        &quot;type&quot;: &quot;text&quot;,
+        &quot;max_length&quot;: 25,
+        &quot;required&quot;: 1
+    },
+    {
+        &quot;name&quot;: &quot;smallcv&quot;,
+        &quot;label&quot;: &quot;Small CV&quot;,
+        &quot;type&quot;: &quot;textarea&quot;,
+        &quot;help_text&quot;: &quot;Please insert a small CV&quot;
+    },
+    {
+        &quot;name&quot;: &quot;age&quot;,
+        &quot;label&quot;: &quot;Age&quot;,
+        &quot;type&quot;: &quot;integer&quot;,
+        &quot;max_value&quot;: 200,
+        &quot;min_value&quot;: 0
+    },
+    {
+        &quot;name&quot;: &quot;marital_status&quot;,
+        &quot;label&quot;: &quot;Marital Status&quot;,
+        &quot;type&quot;: &quot;radio&quot;,
+        &quot;choices&quot;: [
+            {&quot;name&quot;: &quot;Single&quot;, &quot;value&quot;:&quot;single&quot;},
+            {&quot;name&quot;: &quot;Married&quot;, &quot;value&quot;:&quot;married&quot;},
+            {&quot;name&quot;: &quot;Divorced&quot;, &quot;value&quot;:&quot;divorced&quot;},
+            {&quot;name&quot;: &quot;Widower&quot;, &quot;value&quot;:&quot;widower&quot;}
+        ]
+    },
+    {
+        &quot;name&quot;: &quot;occupation&quot;,
+        &quot;label&quot;: &quot;Occupation&quot;,
+        &quot;type&quot;: &quot;select&quot;,
+        &quot;choices&quot;: [
+            {&quot;name&quot;: &quot;Farmer&quot;, &quot;value&quot;:&quot;farmer&quot;},
+            {&quot;name&quot;: &quot;Engineer&quot;, &quot;value&quot;:&quot;engineer&quot;},
+            {&quot;name&quot;: &quot;Teacher&quot;, &quot;value&quot;:&quot;teacher&quot;},
+            {&quot;name&quot;: &quot;Office Clerk&quot;, &quot;value&quot;:&quot;office_clerk&quot;},
+            {&quot;name&quot;: &quot;Merchant&quot;, &quot;value&quot;:&quot;merchant&quot;},
+            {&quot;name&quot;: &quot;Unemployed&quot;, &quot;value&quot;:&quot;unemployed&quot;},
+            {&quot;name&quot;: &quot;Retired&quot;, &quot;value&quot;:&quot;retired&quot;},
+            {&quot;name&quot;: &quot;Other&quot;, &quot;value&quot;:&quot;other&quot;}
+        ]
+    },
+    {
+        &quot;name&quot;: &quot;internet&quot;,
+        &quot;label&quot;: &quot;Internet Access&quot;,
+        &quot;type&quot;: &quot;checkbox&quot;
+    }
+]
+</pre>
+<p>The above <span class="caps">JSON</span> string can be easily converted to an array of dictionaries with the following&nbsp;code:</p>
+<pre class="code literal-block">
+import json
+fields=json.loads(json_fields)
+</pre>
+</div>
+<div class="section" id="creating-the-form-fields">
+<h2><a class="toc-backref" href="#id3">Creating the form&nbsp;fields</a></h2>
+<p>The most import part in the django dynamic form creation is to convert the above array
+of field-describing dictionaries to actual objects of type <tt class="docutils literal">django.forms.Field</tt>.</p>
+<p>To help with that I implemented a class named <tt class="docutils literal">FieldHandler</tt> which gets an
+array of field dictionaries and after initialization will have an attribute named <tt class="docutils literal">formfields</tt> which
+will be a dictionary with keys the names of each field an values the corresponding <tt class="docutils literal">django.forms.Field</tt> objects. The implementation is as&nbsp;follows:</p>
+<pre class="code literal-block">
+import django.forms
+
+class FieldHandler():
+    formfields = {}
+    def __init__(self, fields):
+        for field in fields:
+            options = self.get_options(field)
+            f = getattr(self, &quot;create_field_for_&quot;+field['type'] )(field, options)
+            self.formfields[field['name']] = f
+
+    def get_options(self, field):
+        options = {}
+        options['label'] = field['label']
+        options['help_text'] = field.get(&quot;help_text&quot;, None)
+        options['required'] = bool(field.get(&quot;required&quot;, 0) )
+        return options
+
+    def create_field_for_text(self, field, options):
+        options['max_length'] = int(field.get(&quot;max_length&quot;, &quot;20&quot;) )
+        return django.forms.CharField(**options)
+
+    def create_field_for_textarea(self, field, options):
+        options['max_length'] = int(field.get(&quot;max_value&quot;, &quot;9999&quot;) )
+        return django.forms.CharField(widget=django.forms.Textarea, **options)
+
+    def create_field_for_integer(self, field, options):
+        options['max_value'] = int(field.get(&quot;max_value&quot;, &quot;999999999&quot;) )
+        options['min_value'] = int(field.get(&quot;min_value&quot;, &quot;-999999999&quot;) )
+        return django.forms.IntegerField(**options)
+
+    def create_field_for_radio(self, field, options):
+        options['choices'] = [ (c['value'], c['name'] ) for c in field['choices'] ]
+        return django.forms.ChoiceField(widget=django.forms.RadioSelect,   **options)
+
+    def create_field_for_select(self, field, options):
+        options['choices']  = [ (c['value'], c['name'] ) for c in field['choices'] ]
+        return django.forms.ChoiceField(  **options)
+
+    def create_field_for_checkbox(self, field, options):
+        return django.forms.BooleanField(widget=django.forms.CheckboxInput, **options)
+</pre>
+<p>As can be seen, in the <tt class="docutils literal">__init__</tt> method, the <tt class="docutils literal">get_options</tt> method is called first which
+returns a dictionary with the common options (label, help_text, required). After that,
+depending on the type of each field the correct method will be generated with
+<tt class="docutils literal">getattr(self, <span class="pre">&quot;create_field_for_&quot;+field['type']</span> )</tt> (so if type is text this
+will return a reference to the create_field_for_text method) and then called passing
+the field dictinary and the options returned from <tt class="docutils literal">get_options</tt>. Each one of
+the <tt class="docutils literal">create_field_for_xxx</tt> methods will extract the required (or optional)
+attributes for the specific field type, update options and initialize the correct Field passing
+the options as kwargs. Finally the formfields attribute will be updated with the name
+and Field&nbsp;object.</p>
+</div>
+<div class="section" id="creating-the-actual-form">
+<h2><a class="toc-backref" href="#id4">Creating the actual&nbsp;form</a></h2>
+<p>To create the actual dynamic <tt class="docutils literal">django.forms.Form</tt> I used the function <tt class="docutils literal">get_form</tt>
+which receives a string with the json description, parses it to a python array,
+creates the array of fields with the help of <tt class="docutils literal">FieldHandler</tt> and then generates
+the <tt class="docutils literal">Form</tt> class with <tt class="docutils literal">type</tt> passing it <tt class="docutils literal">django.forms.Form</tt> as a parent
+and the array of <tt class="docutils literal">django.forms.Field</tt> from <tt class="docutils literal">FieldHandler</tt> as&nbsp;attributes:</p>
+<pre class="code literal-block">
+def get_form(jstr):
+    fields=json.loads(jstr)
+    fh = FieldHandler(fields)
+    return type('DynaForm', (django.forms.Form,), fh.formfields )
+</pre>
+</div>
+<div class="section" id="using-the-dynamic-form">
+<h2><a class="toc-backref" href="#id5">Using the dynamic&nbsp;form</a></h2>
+<p>The result of <tt class="docutils literal">get_form</tt> can be used as a normal form class. As an&nbsp;example:</p>
+<pre class="code literal-block">
+import dynaform
+
+def dform(request):
+    json_form = get_json_form_from_somewhere()
+    form_class = dynaform.get_form(json_form)
+    data = {}
+    if request.method == 'POST':
+        form = form_class(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+    else:
+        form = form_class()
+
+    return render_to_response( &quot;dform.html&quot;, {
+        'form': form,  'data': data,
+    }, RequestContext(request) )
+</pre>
+<p>So, we have to get our <span class="caps">JSON</span> form description from somewhere (for instance
+a field in a model) and then generate the form class with <tt class="docutils literal">get_form</tt>.
+After that we follow the normal procedure of checking if the <tt class="docutils literal">request.method</tt>
+is <span class="caps">POST</span> so we pass the <span class="caps">POST</span> data to the form and check if it is value or
+we just create an empty form. As a result we just pass the data that was
+read from the form to the view for&nbsp;presentation.</p>
+</div>
+</div>
+  		</article>
+  		<article>
+<header>
+      <h1 class="entry-title">
         <a href="http://spapas.github.io/2013/11/05/django-authoritiy-data/">Django authority data</a>
       </h1>
       <p class="meta"><time datetime="2013-11-05T14:20:00" pubdate>Τρι 05 Νοέμβριος 2013</time></p>
@@ -965,6 +1187,9 @@ named origin/master that will be your actual site and will be displayed through 
     <h1>Recent Posts</h1>
     <ul id="recent_posts">
       <li class="post">
+          <a href="http://spapas.github.io/2015/04/29/django-show-404-page/">Show 404 page on django when DEBUG=True</a>
+      </li>
+      <li class="post">
           <a href="http://spapas.github.io/2015/02/06/python-pusher-rest/">Calling the REST API of Pusher from python</a>
       </li>
       <li class="post">
@@ -975,9 +1200,6 @@ named origin/master that will be your actual site and will be displayed through 
       </li>
       <li class="post">
           <a href="http://spapas.github.io/2014/12/16/change-bootstrap-material-primary-color/">Change the primary color of bootstrap material design</a>
-      </li>
-      <li class="post">
-          <a href="http://spapas.github.io/2014/10/23/retrieve-gmail-blocked-attachments/">Retrieving Gmail blocked attachments</a>
       </li>
     </ul>
   </section>
@@ -999,7 +1221,7 @@ named origin/master that will be your actual site and will be displayed through 
 
   <section>
   <h1>Tags</h1>
-    <a href="http://spapas.github.io/tag/.html"></a>,    <a href="http://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="http://spapas.github.io/tag/tasks.html">tasks</a>,    <a href="http://spapas.github.io/tag/less.html">less</a>,    <a href="http://spapas.github.io/tag/spring.html">spring</a>,    <a href="http://spapas.github.io/tag/rest.html">rest</a>,    <a href="http://spapas.github.io/tag/google.html">google</a>,    <a href="http://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="http://spapas.github.io/tag/scheduling.html">scheduling</a>,    <a href="http://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="http://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="http://spapas.github.io/tag/git.html">git</a>,    <a href="http://spapas.github.io/tag/java.html">java</a>,    <a href="http://spapas.github.io/tag/rq.html">rq</a>,    <a href="http://spapas.github.io/tag/django-rq.html">django-rq</a>,    <a href="http://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="http://spapas.github.io/tag/redis.html">redis</a>,    <a href="http://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="http://spapas.github.io/tag/forms.html">forms</a>,    <a href="http://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="http://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="http://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="http://spapas.github.io/tag/css.html">css</a>,    <a href="http://spapas.github.io/tag/jobs.html">jobs</a>,    <a href="http://spapas.github.io/tag/python.html">python</a>,    <a href="http://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="http://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="http://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="http://spapas.github.io/tag/rst.html">rst</a>,    <a href="http://spapas.github.io/tag/branching.html">branching</a>,    <a href="http://spapas.github.io/tag/design.html">design</a>,    <a href="http://spapas.github.io/tag/github.html">github</a>,    <a href="http://spapas.github.io/tag/pusher.html">pusher</a>,    <a href="http://spapas.github.io/tag/windows.html">windows</a>,    <a href="http://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="http://spapas.github.io/tag/django.html">django</a>,    <a href="http://spapas.github.io/tag/flask.html">flask</a>,    <a href="http://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="http://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="http://spapas.github.io/tag/asynchronous.html">asynchronous</a>,    <a href="http://spapas.github.io/tag/security.html">security</a>,    <a href="http://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>  </section>
+    <a href="http://spapas.github.io/tag/.html"></a>,    <a href="http://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="http://spapas.github.io/tag/tasks.html">tasks</a>,    <a href="http://spapas.github.io/tag/less.html">less</a>,    <a href="http://spapas.github.io/tag/spring.html">spring</a>,    <a href="http://spapas.github.io/tag/rest.html">rest</a>,    <a href="http://spapas.github.io/tag/google.html">google</a>,    <a href="http://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="http://spapas.github.io/tag/scheduling.html">scheduling</a>,    <a href="http://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="http://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="http://spapas.github.io/tag/git.html">git</a>,    <a href="http://spapas.github.io/tag/java.html">java</a>,    <a href="http://spapas.github.io/tag/rq.html">rq</a>,    <a href="http://spapas.github.io/tag/django-rq.html">django-rq</a>,    <a href="http://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="http://spapas.github.io/tag/redis.html">redis</a>,    <a href="http://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="http://spapas.github.io/tag/forms.html">forms</a>,    <a href="http://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="http://spapas.github.io/tag/404.html">404</a>,    <a href="http://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="http://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="http://spapas.github.io/tag/css.html">css</a>,    <a href="http://spapas.github.io/tag/jobs.html">jobs</a>,    <a href="http://spapas.github.io/tag/python.html">python</a>,    <a href="http://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="http://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="http://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="http://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="http://spapas.github.io/tag/rst.html">rst</a>,    <a href="http://spapas.github.io/tag/branching.html">branching</a>,    <a href="http://spapas.github.io/tag/design.html">design</a>,    <a href="http://spapas.github.io/tag/github.html">github</a>,    <a href="http://spapas.github.io/tag/pusher.html">pusher</a>,    <a href="http://spapas.github.io/tag/windows.html">windows</a>,    <a href="http://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="http://spapas.github.io/tag/django.html">django</a>,    <a href="http://spapas.github.io/tag/flask.html">flask</a>,    <a href="http://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="http://spapas.github.io/tag/error.html">error</a>,    <a href="http://spapas.github.io/tag/debug.html">debug</a>,    <a href="http://spapas.github.io/tag/asynchronous.html">asynchronous</a>,    <a href="http://spapas.github.io/tag/security.html">security</a>,    <a href="http://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>  </section>
 
 
 

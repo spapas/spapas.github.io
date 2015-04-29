@@ -70,6 +70,32 @@
   		<article>
 <header>
       <h1 class="entry-title">
+        <a href="http://spapas.github.io/2015/04/29/django-show-404-page/">Show 404 page on django when DEBUG=True</a>
+      </h1>
+      <p class="meta"><time datetime="2015-04-29T10:20:00" pubdate>Τετ 29 Απρίλιος 2015</time></p>
+</header>
+
+  <div class="entry-content"><p>The default 404 error page on django can be <a class="reference external" href="https://docs.djangoproject.com/en/1.8/topics/http/views/#the-http404-exception">easily overriden</a> by adding
+a template named <tt class="docutils literal">404.html</tt> to the top level directory of your templates.
+However, on your development environment you&#8217;ll never be able to see this
+template because when <tt class="docutils literal"><span class="caps">DEBUG</span>=True</tt> django will render the debug not found
+page to help you debug your url&nbsp;configuration.</p>
+<p>If you want to display that page in your development environment you can always
+change the <span class="caps">DEBUG</span> setting to False, however there&#8217;s a better way: Add a url
+pattern for django&#8217;s default 404 view - just  add the following to your <tt class="docutils literal">urls.py</tt>:</p>
+<div class="highlight"><pre><span class="kn">import</span> <span class="nn">django.views.defaults</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+    <span class="c"># Other url patterns ...</span>
+    <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^404/$&#39;</span><span class="p">,</span> <span class="n">django</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">defaults</span><span class="o">.</span><span class="n">page_not_found</span><span class="p">,</span> <span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+<p>You&#8217;ll then be able to see your 404 page by visiting the defined <span class="caps">URL</span>!</p>
+</div>
+  		</article>
+  		<article>
+<header>
+      <h1 class="entry-title">
         <a href="http://spapas.github.io/2015/02/06/python-pusher-rest/">Calling the REST API of Pusher from python</a>
       </h1>
       <p class="meta"><time datetime="2015-02-06T12:20:00" pubdate>Παρ 06 Φεβρουάριος 2015</time></p>
@@ -1112,73 +1138,6 @@ custom version of Bootstrap Material Design! If you want your <tt class="docutil
 </div>
 </div>
   		</article>
-  		<article>
-<header>
-      <h1 class="entry-title">
-        <a href="http://spapas.github.io/2014/10/23/retrieve-gmail-blocked-attachments/">Retrieving Gmail blocked attachments</a>
-      </h1>
-      <p class="meta"><time datetime="2014-10-23T14:20:00" pubdate>Πεμ 23 Οκτώβριος 2014</time></p>
-</header>
-
-  <div class="entry-content"><p>Before services like Dropbox were widely available, some people (including me) were using
-their Gmail account as a primitive backup solution: Compress your directory and send it to
-your gmail. There. Backup&nbsp;complete.</p>
-<p>However, nothing is so&nbsp;easy&#8230;</p>
-<p>Recently, I wanted to retrieve one of these backups, a .rar containing the complete
-source code (since it was written in TeX) of my PhD thesis. The problem was that Gmail blocked the access to these attachments&nbsp;saying</p>
-<blockquote>
-Anti-virus warning - 1 attachment contains a virus or blocked file. Downloading this attachment is disabled.</blockquote>
-<p>probably because I had a number of .bat files inside that .rar archive to automate my work&nbsp;:(</p>
-<p>Now what&nbsp;?</p>
-<p>After searching the internet and not founding any solutions, I tried the options that gmail gives for each email. One
-particular one cought my interest: <em>Show&nbsp;original</em></p>
-<img alt="Here it is!" src="/images/show_original.png" style="width: 780px;" />
-<p>Clicking this option opened a text file with the original, <span class="caps">MIME</span> encoded message. The interesting thing of course&nbsp;was</p>
-<pre class="code literal-block">
-------=_NextPart_000_004F_01CA0AED.E63C2A30
-Content-Type: application/octet-stream;
-      name=&quot;phdstuff.rar&quot;
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
-      filename=&quot;phdstuff.rar&quot;
-
-UmFyIRoHAM+QcwAADQAAAAAAAAB0f3TAgCwANAMAAFQEAAACRbXCx8lr9TodMwwAIAAAAG5ld2Zp
-bmFsLnR4dA3dEQzM082BF7sB+D3q6QPUNEfwG7vHQgNkiQDTkGvfhOE4mNltIJJlBFMOCQPzPeKD
-...
-</pre>
-<p>So the whole attachment was contained in that text file, encoded in base64! Now I just
-needed to extract it from the email and convert it back to&nbsp;binary.</p>
-<p>This was very easy to do using Python - some people <a class="reference external" href="http://stackoverflow.com/questions/4067937/getting-mail-attachment-to-python-file-object">had already asked the same thing on <span class="caps">SO</span></a>.
-So here&#8217;s a simple program that gets an email in text/mime format as input and dumps all&nbsp;attachments:</p>
-<div class="highlight"><pre><span class="kn">import</span> <span class="nn">email</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-
-<span class="k">if</span> <span class="n">__name__</span><span class="o">==</span><span class="s">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span><span class="o">&lt;</span><span class="mi">2</span><span class="p">:</span>
-        <span class="k">print</span> <span class="s">&quot;Please enter a file to extract attachments from&quot;</span>
-        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-
-    <span class="n">msg</span> <span class="o">=</span> <span class="n">email</span><span class="o">.</span><span class="n">message_from_file</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
-    <span class="k">for</span> <span class="n">pl</span> <span class="ow">in</span> <span class="n">msg</span><span class="o">.</span><span class="n">get_payload</span><span class="p">():</span>
-        <span class="k">if</span> <span class="n">pl</span><span class="o">.</span><span class="n">get_filename</span><span class="p">():</span> <span class="c"># if it is an attachment</span>
-            <span class="nb">open</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">get_filename</span><span class="p">(),</span> <span class="s">&#39;wb&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">get_payload</span><span class="p">(</span><span class="n">decode</span><span class="o">=</span><span class="bp">True</span><span class="p">))</span>
-</pre></div>
-<p>Save this to a file named <tt class="docutils literal">get_attachments.py</tt> and, after saving the original message to a file
-named <tt class="docutils literal">0.txt</tt> run <tt class="docutils literal">python get_attachments.py 0.txt</tt> and you&#8217;ll see the attachments of your email in the same&nbsp;folder!</p>
-<blockquote>
-Disclaimer: I have to warn you that since Gmail claims that an attachment is <em>not safe</em> it may be <strong>actually not safe</strong>. So
-you must be 100% sure that you know what you are doing before retrievening your email attachments like this.</blockquote>
-<p><strong>Update</strong>: Stefan <a class="reference external" href="https://gist.github.com/stefansundin/a99bbfb6cda873d14fd2">created an improved version</a> of the attachment extractor which is also compatible with Python&nbsp;3.4!</p>
-<p><strong>Update, 12 January 2015</strong>: Ivana (at the comments section) proposed a different solution that may work
-for some files: <em>Use a mobile Gmail client (I tested it with Android) and &quot;Save to Drive&quot; your attachment.
-You&#8217;ll then be able to download it from the Google&nbsp;Drive!</em></p>
-<p>I am not sure if this works for all attachments,
-however it worked for the source of my PhD thesis! I&#8217;m writing it may not work for all attachments because
-when you download something from Google Drive it does a virus check so it may not allow you to download the
-attachment and then  you&#8217;ll still need to do it manually using the method below (however <strong>in that case you
-must be even more cautious for the case the attachment actualyl contains a malicious file</strong>).</p>
-</div>
-  		</article>
 <div class="pagination">
     <a class="prev" href="http://spapas.github.io/author\serafeim-papastefanos2.html">&larr; Older</a>
 
@@ -1188,6 +1147,9 @@ must be even more cautious for the case the attachment actualyl contains a malic
   <section>
     <h1>Recent Posts</h1>
     <ul id="recent_posts">
+      <li class="post">
+          <a href="http://spapas.github.io/2015/04/29/django-show-404-page/">Show 404 page on django when DEBUG=True</a>
+      </li>
       <li class="post">
           <a href="http://spapas.github.io/2015/02/06/python-pusher-rest/">Calling the REST API of Pusher from python</a>
       </li>
@@ -1199,9 +1161,6 @@ must be even more cautious for the case the attachment actualyl contains a malic
       </li>
       <li class="post">
           <a href="http://spapas.github.io/2014/12/16/change-bootstrap-material-primary-color/">Change the primary color of bootstrap material design</a>
-      </li>
-      <li class="post">
-          <a href="http://spapas.github.io/2014/10/23/retrieve-gmail-blocked-attachments/">Retrieving Gmail blocked attachments</a>
       </li>
     </ul>
   </section>
@@ -1223,7 +1182,7 @@ must be even more cautious for the case the attachment actualyl contains a malic
 
   <section>
   <h1>Tags</h1>
-    <a href="http://spapas.github.io/tag/.html"></a>,    <a href="http://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="http://spapas.github.io/tag/tasks.html">tasks</a>,    <a href="http://spapas.github.io/tag/less.html">less</a>,    <a href="http://spapas.github.io/tag/spring.html">spring</a>,    <a href="http://spapas.github.io/tag/rest.html">rest</a>,    <a href="http://spapas.github.io/tag/google.html">google</a>,    <a href="http://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="http://spapas.github.io/tag/scheduling.html">scheduling</a>,    <a href="http://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="http://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="http://spapas.github.io/tag/git.html">git</a>,    <a href="http://spapas.github.io/tag/java.html">java</a>,    <a href="http://spapas.github.io/tag/rq.html">rq</a>,    <a href="http://spapas.github.io/tag/django-rq.html">django-rq</a>,    <a href="http://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="http://spapas.github.io/tag/redis.html">redis</a>,    <a href="http://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="http://spapas.github.io/tag/forms.html">forms</a>,    <a href="http://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="http://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="http://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="http://spapas.github.io/tag/css.html">css</a>,    <a href="http://spapas.github.io/tag/jobs.html">jobs</a>,    <a href="http://spapas.github.io/tag/python.html">python</a>,    <a href="http://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="http://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="http://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="http://spapas.github.io/tag/rst.html">rst</a>,    <a href="http://spapas.github.io/tag/branching.html">branching</a>,    <a href="http://spapas.github.io/tag/design.html">design</a>,    <a href="http://spapas.github.io/tag/github.html">github</a>,    <a href="http://spapas.github.io/tag/pusher.html">pusher</a>,    <a href="http://spapas.github.io/tag/windows.html">windows</a>,    <a href="http://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="http://spapas.github.io/tag/django.html">django</a>,    <a href="http://spapas.github.io/tag/flask.html">flask</a>,    <a href="http://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="http://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="http://spapas.github.io/tag/asynchronous.html">asynchronous</a>,    <a href="http://spapas.github.io/tag/security.html">security</a>,    <a href="http://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>  </section>
+    <a href="http://spapas.github.io/tag/.html"></a>,    <a href="http://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="http://spapas.github.io/tag/tasks.html">tasks</a>,    <a href="http://spapas.github.io/tag/less.html">less</a>,    <a href="http://spapas.github.io/tag/spring.html">spring</a>,    <a href="http://spapas.github.io/tag/rest.html">rest</a>,    <a href="http://spapas.github.io/tag/google.html">google</a>,    <a href="http://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="http://spapas.github.io/tag/scheduling.html">scheduling</a>,    <a href="http://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="http://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="http://spapas.github.io/tag/git.html">git</a>,    <a href="http://spapas.github.io/tag/java.html">java</a>,    <a href="http://spapas.github.io/tag/rq.html">rq</a>,    <a href="http://spapas.github.io/tag/django-rq.html">django-rq</a>,    <a href="http://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="http://spapas.github.io/tag/redis.html">redis</a>,    <a href="http://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="http://spapas.github.io/tag/forms.html">forms</a>,    <a href="http://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="http://spapas.github.io/tag/404.html">404</a>,    <a href="http://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="http://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="http://spapas.github.io/tag/css.html">css</a>,    <a href="http://spapas.github.io/tag/jobs.html">jobs</a>,    <a href="http://spapas.github.io/tag/python.html">python</a>,    <a href="http://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="http://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="http://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="http://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="http://spapas.github.io/tag/rst.html">rst</a>,    <a href="http://spapas.github.io/tag/branching.html">branching</a>,    <a href="http://spapas.github.io/tag/design.html">design</a>,    <a href="http://spapas.github.io/tag/github.html">github</a>,    <a href="http://spapas.github.io/tag/pusher.html">pusher</a>,    <a href="http://spapas.github.io/tag/windows.html">windows</a>,    <a href="http://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="http://spapas.github.io/tag/django.html">django</a>,    <a href="http://spapas.github.io/tag/flask.html">flask</a>,    <a href="http://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="http://spapas.github.io/tag/error.html">error</a>,    <a href="http://spapas.github.io/tag/debug.html">debug</a>,    <a href="http://spapas.github.io/tag/asynchronous.html">asynchronous</a>,    <a href="http://spapas.github.io/tag/security.html">security</a>,    <a href="http://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>  </section>
 
 
 

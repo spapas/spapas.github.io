@@ -56,6 +56,7 @@ This was very easy to do using Python - some people `had already asked the same 
 So here's a simple program that gets an email in text/mime format as input and dumps all
 attachments: 
 
+
 .. code-block:: python
 
   import email

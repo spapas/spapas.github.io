@@ -27,8 +27,12 @@ of the times they want to use this project and *their* contributions to their ow
 projects which (most probably) are commercial, so people contributing to 
 bootstrap-material-design won't be able to use it in their own projects!
 
-**After this, I recommend people to avoid contributing to and using django-material-design 
+**After this, I recommend people to avoid contributing to and stop using bootstrap-material-design 
 for their own projects.**
+
+Instead, they should either use vanilla bootstrap, or a (MIT licensed) theme from bootswatch_. Also,
+I've noticed (but not used yet) `django-material`_ which seems like a nice solution for django projects.
+
 
 Introduction
 ------------
@@ -99,3 +103,5 @@ You may now include ``material-custom.css`` instead of ``material.css`` (or the 
 .. _`Material Design`: http://www.google.com/design/spec/material-design/introduction.html
 .. _`node.js`: http://nodejs.org/
 .. _`less`: http://lesscss.org/
+.. _bootswatch: https://bootswatch.com/
+.. _`django-material`: https://github.com/viewflow/django-material

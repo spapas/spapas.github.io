@@ -2,7 +2,7 @@ Calling the REST API of Pusher from python
 ##########################################
 
 :date: 2015-02-06 12:20
-:tags: pusher, python, rest, 
+:tags: pusher, python, rest
 :category: python
 :slug: python-pusher-rest
 :author: Serafeim Papastefanos

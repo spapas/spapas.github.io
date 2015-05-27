@@ -55,6 +55,10 @@ your HTML! Using watchify, you can *watch* your ``main.js`` for changes (the cha
 be in the files included from main.js) and automatically generate the resulting ``bundle.js`` so that
 you'll just need to hit F5 to refresh and get the new version!
 
+browserify not only concatenates your javascript libraries to a single bundle but can also transform
+your coffesscript, typescript, jsx etc files to javascrpt and *then* also add them to the bundle. This
+is possible through a concept called transforms -- there are `a lot of transforms`_ that you can use.
+
 Below, I will propose a really simple and generic workflow that should cover most of your javascript needs.
 I should mention that I mainly develop django apps and my development machine is running windows, however you
 can easily use exactly the  same workflow from any kind of server-side technology (ruby, python, javascript,
@@ -138,14 +142,90 @@ Whenever you install more client-side libraries they'll be saved there. When you
 when you clone your project) you can just do a
 
 .. code::
+
   npm install 
 
-And all dependencies of ``package.json`` will be installed in ``node_modules`` (that's why ``node_modules`` should not be
+and all dependencies of ``package.json`` will be installed in ``node_modules`` (that's why ``node_modules`` should not be
 tracked).
 
+After you've installed moment.js to your project change ``src/main.js`` to: 
+
+.. code::
+
+  moment = require('moment')
+  console.log(moment() );
+  
+and rerun ``browserify src/main.js -o dist/bundle.js``. When you reload your HTML you'll see the that you are able to use 
+moment - all this without changing your HTML!!!
+
+As you can understand, in order to use a library with browserify, this library must support it by having an npm package. The nice thing is that
+most libraries already support it -- let's try for another example to use underscore.js_ and (for some reason) we need version underscore 1.7 :
+
+.. code::
+  
+  npm install underscore@1.7--save
+
+you'll se that your package.json dependencies will also contain underscore.js 1.7:
+
+.. code::
+
+  {
+    "dependencies": {
+      "moment": "^2.10.3",
+      "underscore": "^1.7.0"
+    }
+  }
+
+If you want to upgrade underscore to the latest version run a:   
+
+.. code::
+  
+  npm install underscore --upgrade --save
+  
+and you'll see that your ``package.json`` will contan the latest version of underscore.js.
+
+Finally, let's change our ``src/man.js`` to use underscore:
+
+.. code::
+
+  moment = require('moment')
+  _ = require('underscore')
+
+  _([1,2,3]).map(function(x) {
+    console.log(x+1);
+  });
+  
+After you create your bundle you should se 2 3 4 in your console!
+  
+
+Introducing watchify
+--------------------
+
+Running browserify *every* time you change your js files to create the ``bundle.js`` feels
+like doing repetitive work - this is where wachify comes to the rescue; watchify is a 
+tool that watches your source code and dependencies and when a change is detected it will
+recreate the bundle automagically! 
+
+To run it, you can use:
+
+.. code::
+
+  watchify src/main.js -o dist/bundle.js -d
+  
+and you'll see something like: ``155544 bytes written to dist/bundle.js (0.57 seconds)`` -- try
+changing main.js and you'll see that bundle.js will also be re-written!
+
+Some things to keep in mind with watchify usage:
+
+- The -d flag outputs the debug text (or else you won't se any postive messages) - I like using it to be sure that everything is ok.
+- You need to use the -o flag with watchify -- you can't output to stdout(we'll see that this will change our workflow for production a bit later)
+- watchify takes the same parameters with browserify -- so if you do any transformations with browserify you can also do them with watchify
+  
 .. _browserify: http://browserify.org/
 .. _watchify: https://github.com/substack/watchify
 .. _`NIH syndrome`: http://en.wikipedia.org/wiki/Not_invented_here
 .. _require: https://github.com/substack/browserify-handbook#require
 .. _`a package for windows`: https://nodejs.org/download/
 .. _moment.js: http://momentjs.com/
+.. _underscore.js: http://underscorejs.org/
+.. _`a lot of transforms`: https://github.com/substack/node-browserify/wiki/list-of-transforms

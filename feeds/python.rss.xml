@@ -162,7 +162,7 @@ presence&amp;nbsp;channel.&lt;/p&gt;
 channel in python but to also call any method we want from the Pusher &lt;span class="caps"&gt;REST&lt;/span&gt; &lt;span class="caps"&gt;API&lt;/span&gt; by implementing a function
 similar to  &lt;tt class="docutils literal"&gt;get_users&lt;/tt&gt;.&lt;/p&gt;
 &lt;/div&gt;
-</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Serafeim Papastefanos</dc:creator><pubDate>Fri, 06 Feb 2015 12:20:00 +0200</pubDate><guid>tag:spapas.github.io,2015-02-06:2015/02/06/python-pusher-rest/</guid><category>pusher</category><category>python</category><category>rest</category><category></category></item><item><title>Retrieving Gmail blocked attachments</title><link>http://spapas.github.io/2014/10/23/retrieve-gmail-blocked-attachments/</link><description>&lt;p&gt;Before services like Dropbox were widely available, some people (including me) were using
+</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Serafeim Papastefanos</dc:creator><pubDate>Fri, 06 Feb 2015 12:20:00 +0200</pubDate><guid>tag:spapas.github.io,2015-02-06:2015/02/06/python-pusher-rest/</guid><category>pusher</category><category>python</category><category>rest</category></item><item><title>Retrieving Gmail blocked attachments</title><link>http://spapas.github.io/2014/10/23/retrieve-gmail-blocked-attachments/</link><description>&lt;p&gt;Before services like Dropbox were widely available, some people (including me) were using
 their Gmail account as a primitive backup solution: Compress your directory and send it to
 your gmail. There. Backup&amp;nbsp;complete.&lt;/p&gt;
 &lt;p&gt;However, nothing is so&amp;nbsp;easy&amp;#8230;&lt;/p&gt;

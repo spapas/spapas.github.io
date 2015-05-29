@@ -5,140 +5,140 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>http://spapas.github.io/index.html</loc>
-<lastmod>2015-05-29T08:54:57-00:00</lastmod>
+<lastmod>2015-05-29T09:04:42-00:00</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://spapas.github.io/archives.html</loc>
-<lastmod>2015-05-29T08:54:57-00:00</lastmod>
+<lastmod>2015-05-29T09:04:42-00:00</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://spapas.github.io/tags.html</loc>
-<lastmod>2015-05-29T08:54:57-00:00</lastmod>
+<lastmod>2015-05-29T09:04:42-00:00</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://spapas.github.io/categories.html</loc>
-<lastmod>2015-05-29T08:54:57-00:00</lastmod>
+<lastmod>2015-05-29T09:04:42-00:00</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://spapas.github.io/2015/05/27/using-browserify-watchify/</loc>
-<lastmod>2015-05-27T14:20:00-00:00</lastmod>
+<lastmod>2015-05-27T14:20:00+03:00</lastmod>
 <changefreq>monthly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://spapas.github.io/2015/04/29/django-show-404-page/</loc>
-<lastmod>2015-04-29T10:20:00-00:00</lastmod>
+<lastmod>2015-04-29T10:20:00+03:00</lastmod>
 <changefreq>monthly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://spapas.github.io/2015/02/06/python-pusher-rest/</loc>
-<lastmod>2015-02-06T12:20:00-00:00</lastmod>
+<lastmod>2015-02-06T12:20:00+02:00</lastmod>
 <changefreq>monthly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://spapas.github.io/2015/01/27/async-tasks-with-django-rq/</loc>
-<lastmod>2015-01-27T14:20:00-00:00</lastmod>
+<lastmod>2015-01-27T14:20:00+02:00</lastmod>
 <changefreq>monthly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://spapas.github.io/2015/01/21/django-model-auditing/</loc>
-<lastmod>2015-01-21T14:20:00-00:00</lastmod>
+<lastmod>2015-01-21T14:20:00+02:00</lastmod>
 <changefreq>monthly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://spapas.github.io/2014/12/16/change-bootstrap-material-primary-color/</loc>
-<lastmod>2014-12-16T16:20:00-00:00</lastmod>
+<lastmod>2014-12-16T16:20:00+02:00</lastmod>
 <changefreq>monthly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://spapas.github.io/2014/10/23/retrieve-gmail-blocked-attachments/</loc>
-<lastmod>2014-10-23T14:20:00-00:00</lastmod>
+<lastmod>2014-10-23T14:20:00+03:00</lastmod>
 <changefreq>monthly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://spapas.github.io/2014/09/15/django-non-html-responses/</loc>
-<lastmod>2014-09-15T14:20:00-00:00</lastmod>
+<lastmod>2014-09-15T14:20:00+03:00</lastmod>
 <changefreq>monthly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://spapas.github.io/2014/06/30/rest-flask-mongodb-heroku/</loc>
-<lastmod>2014-06-30T15:23:00-00:00</lastmod>
+<lastmod>2014-06-30T15:23:00+03:00</lastmod>
 <changefreq>monthly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://spapas.github.io/2014/04/11/django-generic-formviews-for-objects/</loc>
-<lastmod>2014-04-11T10:23:00-00:00</lastmod>
+<lastmod>2014-04-11T10:23:00+03:00</lastmod>
 <changefreq>monthly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://spapas.github.io/2014/02/13/wagtail-tutorial/</loc>
-<lastmod>2014-02-13T21:20:00-00:00</lastmod>
+<lastmod>2014-02-13T21:20:00+02:00</lastmod>
 <changefreq>monthly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://spapas.github.io/2013/12/24/django-dynamic-forms/</loc>
-<lastmod>2013-12-24T14:20:00-00:00</lastmod>
+<lastmod>2013-12-24T14:20:00+02:00</lastmod>
 <changefreq>monthly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://spapas.github.io/2013/11/05/django-authoritiy-data/</loc>
-<lastmod>2013-11-05T14:20:00-00:00</lastmod>
+<lastmod>2013-11-05T14:20:00+02:00</lastmod>
 <changefreq>monthly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://spapas.github.io/2013/10/14/spring-ldap-custom-authorities/</loc>
-<lastmod>2013-10-14T08:55:00-00:00</lastmod>
+<lastmod>2013-10-14T08:55:00+03:00</lastmod>
 <changefreq>monthly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://spapas.github.io/2013/10/08/git-branches/</loc>
-<lastmod>2013-10-08T13:20:00-00:00</lastmod>
+<lastmod>2013-10-08T13:20:00+03:00</lastmod>
 <changefreq>monthly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://spapas.github.io/2013/10/07/pelican-static-windows/</loc>
-<lastmod>2013-10-07T10:20:00-00:00</lastmod>
+<lastmod>2013-10-07T10:20:00+03:00</lastmod>
 <changefreq>monthly</changefreq>
 <priority>0.5</priority>
 </url>

@@ -5,8 +5,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="google-site-verification" content="5_8DTmIiEq4gFvNAfxAD6TsGOgrMAjp8lQFQvfA6zZc" />
-  <title>/var/</title>
+  <title>Category: django &mdash; /var/</title>
   <meta name="author" content="Serafeim Papastefanos">
+
 
 
 
@@ -15,12 +16,11 @@
   <meta name="MobileOptimized" content="320">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <link href="http://spapas.github.io/favicon.png" rel="icon">
+
+    <link href="http://spapas.github.io/favicon.png" rel="icon">
+
   <link href="http://spapas.github.io/theme/css/main.css" media="screen, projection"
         rel="stylesheet" type="text/css">
-  <script src="http://spapas.github.io/theme/js/modernizr-2.0.js"></script>
-  <script src="http://spapas.github.io/theme/js/ender.js"></script>
-  <script src="http://spapas.github.io/theme/js/octopress.js" type="text/javascript"></script>
 
   <link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic"
         rel="stylesheet" type="text/css">
@@ -37,1447 +37,128 @@
 </ul>
 
 
-
 <ul class="main-navigation">
-    <li >
-    <a href="http://spapas.github.io/category/css.html">Css</a>
-    </li>
-    <li class="active">
-    <a href="http://spapas.github.io/category/django.html">Django</a>
-    </li>
-    <li >
-    <a href="http://spapas.github.io/category/flask.html">Flask</a>
-    </li>
-    <li >
-    <a href="http://spapas.github.io/category/git.html">Git</a>
-    </li>
-    <li >
-    <a href="http://spapas.github.io/category/javascript.html">Javascript</a>
-    </li>
-    <li >
-    <a href="http://spapas.github.io/category/pelican.html">Pelican</a>
-    </li>
-    <li >
-    <a href="http://spapas.github.io/category/python.html">Python</a>
-    </li>
-    <li >
-    <a href="http://spapas.github.io/category/spring.html">Spring</a>
-    </li>
-    <li >
-    <a href="http://spapas.github.io/category/wagtail.html">Wagtail</a>
-    </li>
+      <li >
+        <a href="http://spapas.github.io/category/css.html">Css</a>
+      </li>
+      <li class="active">
+        <a href="http://spapas.github.io/category/django.html">Django</a>
+      </li>
+      <li >
+        <a href="http://spapas.github.io/category/flask.html">Flask</a>
+      </li>
+      <li >
+        <a href="http://spapas.github.io/category/git.html">Git</a>
+      </li>
+      <li >
+        <a href="http://spapas.github.io/category/javascript.html">Javascript</a>
+      </li>
+      <li >
+        <a href="http://spapas.github.io/category/pelican.html">Pelican</a>
+      </li>
+      <li >
+        <a href="http://spapas.github.io/category/python.html">Python</a>
+      </li>
+      <li >
+        <a href="http://spapas.github.io/category/spring.html">Spring</a>
+      </li>
+      <li >
+        <a href="http://spapas.github.io/category/wagtail.html">Wagtail</a>
+      </li>
 </ul></nav>
   <div id="main">
     <div id="content">
-<div class="blog-index">
-  		<article>
-<header>
-      <h1 class="entry-title">
-        <a href="http://spapas.github.io/2015/01/27/async-tasks-with-django-rq/">Asynchronous tasks in django with django-rq</a>
-      </h1>
-      <p class="meta"><time datetime="2015-01-27T14:20:00" pubdate>Τρι 27 Ιανουάριος 2015</time></p>
-</header>
+<div>
+	<article role="article">
+    	<header>
+    		<h1 class="entry-title">Category: django</h1>
+    	</header>
 
-  <div class="entry-content"><div class="contents topic" id="contents">
-<p class="topic-title first">Contents</p>
-<ul class="simple">
-<li><a class="reference internal" href="#introduction" id="id1">Introduction</a></li>
-<li><a class="reference internal" href="#job-queues-in-python" id="id2">Job queues in&nbsp;python</a></li>
-<li><a class="reference internal" href="#django-test-rq" id="id3">django-test-rq</a><ul>
-<li><a class="reference internal" href="#models-py" id="id4">models.py</a></li>
-<li><a class="reference internal" href="#forms-py" id="id5">forms.py</a></li>
-<li><a class="reference internal" href="#views-py" id="id6">views.py</a></li>
-<li><a class="reference internal" href="#tasks-py" id="id7">tasks.py</a></li>
-<li><a class="reference internal" href="#settings-py" id="id8">settings.py</a></li>
-<li><a class="reference internal" href="#running-the-project" id="id9">Running the&nbsp;project</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#rqworker-and-rqscheduler" id="id10">rqworker and rqscheduler</a><ul>
-<li><a class="reference internal" href="#for-development" id="id11">For&nbsp;development</a></li>
-<li><a class="reference internal" href="#for-production" id="id12">For&nbsp;production</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#conclusion" id="id13">Conclusion</a></li>
-</ul>
+    	<div id="blog-archives">
+            <h2>2015</h2>
+                    <article>
+                        <h1><a href="http://spapas.github.io/2015/01/27/async-tasks-with-django-rq/">Asynchronous tasks in django with&nbsp;django-rq</a></h1>
+                        <time datetime="2015-01-27 14:20:00" pubdate>
+                            <span class="month">Ιαν</span>
+                            <span class="day">27</span>
+                            <span class="year">2015</span>
+                        </time>
+                        <footer>
+                            <span class="categories">posted in
+                                <a class='category' href='http://spapas.github.io/category/django.html'>django</a>
+                            </span>
+                        </footer>
+                    </article>
+                    <article>
+                        <h1><a href="http://spapas.github.io/2015/01/21/django-model-auditing/">Django model&nbsp;auditing</a></h1>
+                        <time datetime="2015-01-21 14:20:00" pubdate>
+                            <span class="month">Ιαν</span>
+                            <span class="day">21</span>
+                            <span class="year">2015</span>
+                        </time>
+                        <footer>
+                            <span class="categories">posted in
+                                <a class='category' href='http://spapas.github.io/category/django.html'>django</a>
+                            </span>
+                        </footer>
+                    </article>
+            <h2>2014</h2>
+                    <article>
+                        <h1><a href="http://spapas.github.io/2014/09/15/django-non-html-responses/">Django non-<span class="caps">HTML</span>&nbsp;responses</a></h1>
+                        <time datetime="2014-09-15 14:20:00" pubdate>
+                            <span class="month">Σεπ</span>
+                            <span class="day">15</span>
+                            <span class="year">2014</span>
+                        </time>
+                        <footer>
+                            <span class="categories">posted in
+                                <a class='category' href='http://spapas.github.io/category/django.html'>django</a>
+                            </span>
+                        </footer>
+                    </article>
+                    <article>
+                        <h1><a href="http://spapas.github.io/2014/04/11/django-generic-formviews-for-objects/">Django generic FormViews for&nbsp;objects</a></h1>
+                        <time datetime="2014-04-11 10:23:00" pubdate>
+                            <span class="month">Απρ</span>
+                            <span class="day">11</span>
+                            <span class="year">2014</span>
+                        </time>
+                        <footer>
+                            <span class="categories">posted in
+                                <a class='category' href='http://spapas.github.io/category/django.html'>django</a>
+                            </span>
+                        </footer>
+                    </article>
+            <h2>2013</h2>
+                    <article>
+                        <h1><a href="http://spapas.github.io/2013/12/24/django-dynamic-forms/">Django dynamic&nbsp;forms</a></h1>
+                        <time datetime="2013-12-24 14:20:00" pubdate>
+                            <span class="month">Δεκ</span>
+                            <span class="day">24</span>
+                            <span class="year">2013</span>
+                        </time>
+                        <footer>
+                            <span class="categories">posted in
+                                <a class='category' href='http://spapas.github.io/category/django.html'>django</a>
+                            </span>
+                        </footer>
+                    </article>
+                    <article>
+                        <h1><a href="http://spapas.github.io/2013/11/05/django-authoritiy-data/">Django authority&nbsp;data</a></h1>
+                        <time datetime="2013-11-05 14:20:00" pubdate>
+                            <span class="month">Νοέ</span>
+                            <span class="day">05</span>
+                            <span class="year">2013</span>
+                        </time>
+                        <footer>
+                            <span class="categories">posted in
+                                <a class='category' href='http://spapas.github.io/category/django.html'>django</a>
+                            </span>
+                        </footer>
+                    </article>
+	    </div>
+    </article>
 </div>
-<div class="section" id="introduction">
-<h2><a class="toc-backref" href="#id1">Introduction</a></h2>
-<p>Job queuing (asynchronous tasks) is a common requirement for non-trivial django projects. Whenever an operation
-can take more than half a second it should be put to a job queue in order to be run asynchronously by a
-seperate worker. This is really important since the response to a user request needs to be immediate
-or else the users will experience laggy behavior and start complaining!
-Even for fairly quick tasks (like sending email through an <span class="caps">SMTP</span> server) you need to use an asynchronous task
-if you care about your users since
-the time required for such a task is not really&nbsp;limited.</p>
-<p>Using job queues is involved not only for the developers of the application (who need to create the
-asynchronous tasks and give feedback to the users when the&#8217;ve finished since they can&#8217;t use the normal
-<span class="caps">HTTP</span> response) and but also for the administrators, since, in order to support job queues at least two
-more componets will be&nbsp;needed:</p>
-<ul class="simple">
-<li>One job queue that will store the jobs to be executed next in a first in first queue. This could be the normal database of the project however it&#8217;s not recommended for performance reasons and most of thetimes it is a specific component called &quot;Message&nbsp;Broker&quot;</li>
-<li>One (or more) workers that will monitor the job queue and when there is work to do they will dequeue and execute&nbsp;it</li>
-</ul>
-<p>These can all run in the same server but if it gets saturated they can easily be seperated (even more work for&nbsp;administrators).</p>
-<p>Beyond job queuing, another relative requirement for many projects is to schedule a task to be run in the future
-(similar to the <tt class="docutils literal">at</tt> unix command) or at specific time intervals (similar to the <tt class="docutils literal">cron</tt> unix command). For
-instance, if a user is registered today we may need to check after one or two days if he&#8217;s logged in and used our application -
-if he hasn&#8217;t then probably he&#8217;s having problems and we can call him to help him. Also, we could check every night
-to see if any users that have registered to our application don&#8217;t have activated their account through email activation
-and delete these accounts. Scheduled tasks should be also run by the workers mentioned&nbsp;above.</p>
-</div>
-<div class="section" id="job-queues-in-python">
-<h2><a class="toc-backref" href="#id2">Job queues in&nbsp;python</a></h2>
-<p>The most known application for using job queues in python is <a class="reference external" href="http://www.celeryproject.org/">celery</a> which is a really great project that supports
-many brokers,  integrates nicely
-with python/django (but can be used even with other languages) and has
-many more features (most of them are only useful on really big, enterprise projects). I&#8217;ve already used
-it in a previous application, however, because celery is really complex I found it rather difficult to
-configure it successfully and I never was perfectly sure that my asynchronous task would actually work or
-that I&#8217;d used the correct configuration for my&nbsp;needs!</p>
-<p>Celery also has <a class="reference external" href="http://celery.readthedocs.org/en/latest/faq.html#does-celery-have-many-dependencies">many dependencies</a> in order to be able to talk with the different broker backends it supports,
-improve multithreading support etc. They may be required in enterprise apps but not for most Django web based&nbsp;projects.</p>
-<p>So, for small-to-average projects I recommend using a different asynchronous task solution instead of celery, particularly
-(as you&#8217;ve already guessed from the title of this post) <a class="reference external" href="http://python-rq.org/"><span class="caps">RQ</span></a>. <span class="caps">RQ</span> is simpler than celery, it integrates great with django
-using the excellent <a class="reference external" href="https://github.com/ui/django-rq">django-rq</a> package and doesn&#8217;t actually have any more dependencies beyond redis support which is
-used as a broker (however most modern django projects already use redis for their caching needs as an  alternative
-to&nbsp;memcached).</p>
-<p>It even supports supports job scheduling through the <a class="reference external" href="https://github.com/ui/rq-scheduler">rq-scheduler</a> package (celery also supports
-job scheduling through celery beat): Run a different process (scheduler) that polls the job
-scheduling queue for any jobs that need to be run because of scheduling and if yes put them to
-the normal job&nbsp;queue.</p>
-<p>Although <span class="caps">RQ</span> and frieds are really easy to use (and have nice documentation) I wasn&#8217;t able to find
-a <em>complete</em> example of using it with django, so I&#8217;ve implemented one
-(found at <a class="reference external" href="https://github.com/spapas/django-test-rq">https://github.com/spapas/django-test-rq</a>) mainly for my own testing
-purposes. To help others that want to also use <span class="caps">RQ</span> in their project but don&#8217;t know from where
-to start, I&#8217;ll present it in the following paragraphs, along with some comments on
-how to actually use <span class="caps">RQ</span> in your production&nbsp;environment.</p>
-</div>
-<div class="section" id="django-test-rq">
-<h2><a class="toc-backref" href="#id3">django-test-rq</a></h2>
-<p>This is a simple django project that can be used to asynchronously
-run and schedule jobs and examine their behavior. The job to be scheduled just downloads a provided
-<span class="caps">URL</span> and counts its length. There is only one django application (tasks) that contains two views, one
-to display existing tasks and create new ones and one to display some info for the&nbsp;jobs.</p>
-<div class="section" id="models-py">
-<h3><a class="toc-backref" href="#id4">models.py</a></h3>
-<p>Two models (<tt class="docutils literal">Task</tt> and <tt class="docutils literal">ScheduledTask</tt>) for saving individual tasks and
-scheduled tasks and one model (<tt class="docutils literal">ScheduledTaskInstance</tt>) to save scheduled
-instances of each scheduled&nbsp;task.</p>
-<div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
-<span class="kn">import</span> <span class="nn">requests</span>
-<span class="kn">from</span> <span class="nn">rq</span> <span class="kn">import</span> <span class="n">get_current_job</span>
-
-
-<span class="k">class</span> <span class="nc">Task</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
-    <span class="c"># A model to save information about an asynchronous task</span>
-    <span class="n">created_on</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">auto_now_add</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
-    <span class="n">job_id</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-
-
-<span class="k">class</span> <span class="nc">ScheduledTask</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
-    <span class="c"># A model to save information about a scheduled task</span>
-    <span class="n">created_on</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">auto_now_add</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
-    <span class="c"># A scheduled task has a common job id for all its occurences</span>
-    <span class="n">job_id</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
-
-
-<span class="k">class</span> <span class="nc">ScheduledTaskInstance</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
-    <span class="c"># A model to save information about instances of a scheduled task</span>
-    <span class="n">scheduled_task</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="s">&#39;ScheduledTask&#39;</span><span class="p">)</span>
-    <span class="n">created_on</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">auto_now_add</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="section" id="forms-py">
-<h3><a class="toc-backref" href="#id5">forms.py</a></h3>
-<p>A very simple form to create a new&nbsp;task.</p>
-<div class="highlight"><pre><span class="kn">from</span> <span class="nn">django</span> <span class="kn">import</span> <span class="n">forms</span>
-
-<span class="k">class</span> <span class="nc">TaskForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">Form</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; A simple form to read a url from the user in order to find out its length</span>
-<span class="sd">    and either run it asynchronously or schedule it schedule_times times,</span>
-<span class="sd">    every schedule_interval seconds.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">url</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s">&#39;URL&#39;</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">help_text</span><span class="o">=</span><span class="s">&#39;Enter a url (starting with http/https) to start a job that will download it and count its words&#39;</span> <span class="p">)</span>
-    <span class="n">schedule_times</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">required</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">help_text</span><span class="o">=</span><span class="s">&#39;How many times to run this job. Leave empty or 0 to run it only once.&#39;</span><span class="p">)</span>
-    <span class="n">schedule_interval</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">required</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">help_text</span><span class="o">=</span><span class="s">&#39;How much time (in seconds) between runs of the job. Leave empty to run it only once.&#39;</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">clean</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TaskForm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">clean</span><span class="p">()</span>
-        <span class="n">schedule_times</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;schedule_times&#39;</span><span class="p">)</span>
-        <span class="n">schedule_interval</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;schedule_interval&#39;</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">schedule_times</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">schedule_interval</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">schedule_times</span> <span class="ow">and</span> <span class="n">schedule_interval</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s">&#39;Please fill both schedule_times and schedule_interval to schedule a job or leave them both empty&#39;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">add_error</span><span class="p">(</span><span class="s">&#39;schedule_times&#39;</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">add_error</span><span class="p">(</span><span class="s">&#39;schedule_interval&#39;</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="section" id="views-py">
-<h3><a class="toc-backref" href="#id6">views.py</a></h3>
-<p>This is actually very simple if you&#8217;re familiar with Class Based Views. Two CBVs
-are defined, one for the Task form + Task display and another for the Job&nbsp;display.</p>
-<div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.views.generic.edit</span> <span class="kn">import</span> <span class="n">FormView</span>
-<span class="kn">from</span> <span class="nn">django.views.generic</span> <span class="kn">import</span> <span class="n">TemplateView</span>
-<span class="kn">from</span> <span class="nn">forms</span> <span class="kn">import</span> <span class="n">TaskForm</span>
-<span class="kn">from</span> <span class="nn">tasks</span> <span class="kn">import</span> <span class="n">get_url_words</span><span class="p">,</span> <span class="n">scheduled_get_url_words</span>
-<span class="kn">from</span> <span class="nn">models</span> <span class="kn">import</span> <span class="n">Task</span><span class="p">,</span><span class="n">ScheduledTask</span>
-<span class="kn">from</span> <span class="nn">rq.job</span> <span class="kn">import</span> <span class="n">Job</span>
-<span class="kn">import</span> <span class="nn">django_rq</span>
-<span class="kn">import</span> <span class="nn">datetime</span>
-
-<span class="k">class</span> <span class="nc">TasksHomeFormView</span><span class="p">(</span><span class="n">FormView</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A class that displays a form to read a url to read its contents and if the job</span>
-<span class="sd">    is to be scheduled or not and information about all the tasks and scheduled tasks.</span>
-
-<span class="sd">    When the form is submitted, the task will be either scheduled based on the</span>
-<span class="sd">    parameters of the form or will be just executed asynchronously immediately.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">form_class</span> <span class="o">=</span> <span class="n">TaskForm</span>
-    <span class="n">template_name</span> <span class="o">=</span> <span class="s">&#39;tasks_home.html&#39;</span>
-    <span class="n">success_url</span> <span class="o">=</span> <span class="s">&#39;/&#39;</span>
-
-    <span class="k">def</span> <span class="nf">form_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">):</span>
-        <span class="n">url</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s">&#39;url&#39;</span><span class="p">]</span>
-        <span class="n">schedule_times</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;schedule_times&#39;</span><span class="p">)</span>
-        <span class="n">schedule_interval</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;schedule_interval&#39;</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">schedule_times</span> <span class="ow">and</span> <span class="n">schedule_interval</span><span class="p">:</span>
-            <span class="c"># Schedule the job with the form parameters</span>
-            <span class="n">scheduler</span> <span class="o">=</span> <span class="n">django_rq</span><span class="o">.</span><span class="n">get_scheduler</span><span class="p">(</span><span class="s">&#39;default&#39;</span><span class="p">)</span>
-            <span class="n">job</span> <span class="o">=</span> <span class="n">scheduler</span><span class="o">.</span><span class="n">schedule</span><span class="p">(</span>
-                <span class="n">scheduled_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
-                <span class="n">func</span><span class="o">=</span><span class="n">scheduled_get_url_words</span><span class="p">,</span>
-                <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">url</span><span class="p">],</span>
-                <span class="n">interval</span><span class="o">=</span><span class="n">schedule_interval</span><span class="p">,</span>
-                <span class="n">repeat</span><span class="o">=</span><span class="n">schedule_times</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="c"># Just execute the job asynchronously</span>
-            <span class="n">get_url_words</span><span class="o">.</span><span class="n">delay</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">TasksHomeFormView</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">form_valid</span><span class="p">(</span><span class="n">form</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">get_context_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">ctx</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TasksHomeFormView</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_context_data</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">ctx</span><span class="p">[</span><span class="s">&#39;tasks&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Task</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">&#39;-created_on&#39;</span><span class="p">)</span>
-        <span class="n">ctx</span><span class="p">[</span><span class="s">&#39;scheduled_tasks&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ScheduledTask</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">&#39;-created_on&#39;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">ctx</span>
-
-
-<span class="k">class</span> <span class="nc">JobTemplateView</span><span class="p">(</span><span class="n">TemplateView</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A simple template view that gets a job id as a kwarg parameter</span>
-<span class="sd">    and tries to fetch that job from RQ. It will then print all attributes</span>
-<span class="sd">    of that object using __dict__.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">template_name</span> <span class="o">=</span> <span class="s">&#39;job.html&#39;</span>
-
-    <span class="k">def</span> <span class="nf">get_context_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">ctx</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">JobTemplateView</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_context_data</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">redis_conn</span> <span class="o">=</span> <span class="n">django_rq</span><span class="o">.</span><span class="n">get_connection</span><span class="p">(</span><span class="s">&#39;default&#39;</span><span class="p">)</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">job</span> <span class="o">=</span> <span class="n">Job</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;job&#39;</span><span class="p">],</span> <span class="n">connection</span><span class="o">=</span><span class="n">redis_conn</span><span class="p">)</span>
-            <span class="n">job</span> <span class="o">=</span> <span class="n">job</span><span class="o">.</span><span class="n">__dict__</span>
-        <span class="k">except</span><span class="p">:</span>
-            <span class="n">job</span> <span class="o">=</span> <span class="bp">None</span>
-
-        <span class="n">ctx</span><span class="p">[</span><span class="s">&#39;job&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">job</span>
-        <span class="k">return</span> <span class="n">ctx</span>
-</pre></div>
-</div>
-<div class="section" id="tasks-py">
-<h3><a class="toc-backref" href="#id7">tasks.py</a></h3>
-<p>Here two jobs are defined: One to be used for simple asynchronous tasks and the
-other to be used for scheduled asynchronous tasks (since for asynchronous tasks
-we wanted to group their runs per job&nbsp;id).</p>
-<p>The <tt class="docutils literal">&#64;job</tt> decorator will add the <tt class="docutils literal">delay()</tt> method (used in <tt class="docutils literal">views.py</tt>) to
-the function. It&#8217;s not really required for <tt class="docutils literal">scheduled_get_url_words</tt> since
-it&#8217;s called through the <tt class="docutils literal">scheduled.schedule</tt>.</p>
-<p>When a task is finished, it can return a value (like we do in <tt class="docutils literal">return task.result</tt>)
-which will be saved for a limited amount of time (500 seconds by default - could be
-even saved for ever) to redis.
-This may be useful in some cases, however, I think that for normal web applications it&#8217;s
-not that useful, and since here we use normal django models
-for each task, we can save it to that model&#8217;s instance&nbsp;instead.</p>
-<div class="highlight"><pre><span class="kn">import</span> <span class="nn">requests</span>
-<span class="kn">from</span> <span class="nn">models</span> <span class="kn">import</span> <span class="n">Task</span><span class="p">,</span> <span class="n">ScheduledTask</span><span class="p">,</span> <span class="n">ScheduledTaskInstance</span>
-<span class="kn">from</span> <span class="nn">rq</span> <span class="kn">import</span> <span class="n">get_current_job</span>
-<span class="kn">from</span> <span class="nn">django_rq</span> <span class="kn">import</span> <span class="n">job</span>
-
-
-<span class="nd">@job</span>
-<span class="k">def</span> <span class="nf">get_url_words</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
-    <span class="c"># This creates a Task instance to save the job instance and job result</span>
-    <span class="n">job</span> <span class="o">=</span> <span class="n">get_current_job</span><span class="p">()</span>
-
-    <span class="n">task</span> <span class="o">=</span> <span class="n">Task</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-        <span class="n">job_id</span><span class="o">=</span><span class="n">job</span><span class="o">.</span><span class="n">get_id</span><span class="p">(),</span>
-        <span class="n">name</span><span class="o">=</span><span class="n">url</span>
-    <span class="p">)</span>
-    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-    <span class="n">task</span><span class="o">.</span><span class="n">result</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
-    <span class="n">task</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">task</span><span class="o">.</span><span class="n">result</span>
-
-
-<span class="nd">@job</span>
-<span class="k">def</span> <span class="nf">scheduled_get_url_words</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This creates a ScheduledTask instance for each group of</span>
-<span class="sd">    scheduled task - each time this scheduled task is run</span>
-<span class="sd">    a new instance of ScheduledTaskInstance will be created</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">job</span> <span class="o">=</span> <span class="n">get_current_job</span><span class="p">()</span>
-
-    <span class="n">task</span><span class="p">,</span> <span class="n">created</span> <span class="o">=</span> <span class="n">ScheduledTask</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_or_create</span><span class="p">(</span>
-        <span class="n">job_id</span><span class="o">=</span><span class="n">job</span><span class="o">.</span><span class="n">get_id</span><span class="p">(),</span>
-        <span class="n">name</span><span class="o">=</span><span class="n">url</span>
-    <span class="p">)</span>
-    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-    <span class="n">response_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
-    <span class="n">ScheduledTaskInstance</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-        <span class="n">scheduled_task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">response_len</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="k">return</span> <span class="n">response_len</span>
-</pre></div>
-</div>
-<div class="section" id="settings-py">
-<h3><a class="toc-backref" href="#id8">settings.py</a></h3>
-<div class="highlight"><pre><span class="kn">import</span> <span class="nn">os</span>
-<span class="n">BASE_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">))</span>
-
-<span class="n">SECRET_KEY</span> <span class="o">=</span> <span class="s">&#39;123&#39;</span>
-<span class="n">DEBUG</span> <span class="o">=</span> <span class="bp">True</span>
-<span class="n">TEMPLATE_DEBUG</span> <span class="o">=</span> <span class="bp">True</span>
-<span class="n">ALLOWED_HOSTS</span> <span class="o">=</span> <span class="p">[]</span>
-
-<span class="n">INSTALLED_APPS</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="s">&#39;django.contrib.admin&#39;</span><span class="p">,</span>
-    <span class="s">&#39;django.contrib.auth&#39;</span><span class="p">,</span>
-    <span class="s">&#39;django.contrib.contenttypes&#39;</span><span class="p">,</span>
-    <span class="s">&#39;django.contrib.sessions&#39;</span><span class="p">,</span>
-    <span class="s">&#39;django.contrib.messages&#39;</span><span class="p">,</span>
-    <span class="s">&#39;django.contrib.staticfiles&#39;</span><span class="p">,</span>
-
-    <span class="s">&#39;django_extensions&#39;</span><span class="p">,</span>
-    <span class="s">&#39;django_rq&#39;</span><span class="p">,</span>
-
-    <span class="s">&#39;tasks&#39;</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="n">MIDDLEWARE_CLASSES</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="s">&#39;django.contrib.sessions.middleware.SessionMiddleware&#39;</span><span class="p">,</span>
-    <span class="s">&#39;django.middleware.common.CommonMiddleware&#39;</span><span class="p">,</span>
-    <span class="s">&#39;django.middleware.csrf.CsrfViewMiddleware&#39;</span><span class="p">,</span>
-    <span class="s">&#39;django.contrib.auth.middleware.AuthenticationMiddleware&#39;</span><span class="p">,</span>
-    <span class="s">&#39;django.contrib.auth.middleware.SessionAuthenticationMiddleware&#39;</span><span class="p">,</span>
-    <span class="s">&#39;django.contrib.messages.middleware.MessageMiddleware&#39;</span><span class="p">,</span>
-    <span class="s">&#39;django.middleware.clickjacking.XFrameOptionsMiddleware&#39;</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="n">ROOT_URLCONF</span> <span class="o">=</span> <span class="s">&#39;django_test_rq.urls&#39;</span>
-<span class="n">WSGI_APPLICATION</span> <span class="o">=</span> <span class="s">&#39;django_test_rq.wsgi.application&#39;</span>
-
-<span class="n">DATABASES</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s">&#39;ENGINE&#39;</span><span class="p">:</span> <span class="s">&#39;django.db.backends.sqlite3&#39;</span><span class="p">,</span>
-        <span class="s">&#39;NAME&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">BASE_DIR</span><span class="p">,</span> <span class="s">&#39;db.sqlite3&#39;</span><span class="p">),</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="n">LANGUAGE_CODE</span> <span class="o">=</span> <span class="s">&#39;en-us&#39;</span>
-<span class="n">TIME_ZONE</span> <span class="o">=</span> <span class="s">&#39;UTC&#39;</span>
-<span class="n">USE_I18N</span> <span class="o">=</span> <span class="bp">True</span>
-<span class="n">USE_L10N</span> <span class="o">=</span> <span class="bp">True</span>
-<span class="n">USE_TZ</span> <span class="o">=</span> <span class="bp">True</span>
-
-<span class="n">STATIC_URL</span> <span class="o">=</span> <span class="s">&#39;/static/&#39;</span>
-
-<span class="c"># Use redis for caches</span>
-<span class="n">CACHES</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s">&quot;BACKEND&quot;</span><span class="p">:</span> <span class="s">&quot;django_redis.cache.RedisCache&quot;</span><span class="p">,</span>
-        <span class="s">&quot;LOCATION&quot;</span><span class="p">:</span> <span class="s">&quot;redis://127.0.0.1:6379/0&quot;</span><span class="p">,</span>
-        <span class="s">&quot;OPTIONS&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s">&quot;CLIENT_CLASS&quot;</span><span class="p">:</span> <span class="s">&quot;django_redis.client.DefaultClient&quot;</span><span class="p">,</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="c"># Use the same redis as with caches for RQ</span>
-<span class="n">RQ_QUEUES</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s">&#39;USE_REDIS_CACHE&#39;</span><span class="p">:</span> <span class="s">&#39;default&#39;</span><span class="p">,</span>
-    <span class="p">},</span>
-<span class="p">}</span>
-
-<span class="n">SESSION_ENGINE</span> <span class="o">=</span> <span class="s">&quot;django.contrib.sessions.backends.cache&quot;</span>
-<span class="n">SESSION_CACHE_ALIAS</span> <span class="o">=</span> <span class="s">&quot;default&quot;</span>
-<span class="n">RQ_SHOW_ADMIN_LINK</span> <span class="o">=</span> <span class="bp">True</span>
-
-<span class="c"># Add a logger for rq_scheduler in order to display when jobs are queueud</span>
-<span class="n">LOGGING</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s">&#39;version&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-    <span class="s">&#39;disable_existing_loggers&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
-    <span class="s">&#39;formatters&#39;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s">&#39;simple&#39;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s">&#39;format&#39;</span><span class="p">:</span> <span class="s">&#39;</span><span class="si">%(asctime)s</span><span class="s"> </span><span class="si">%(levelname)s</span><span class="s"> </span><span class="si">%(message)s</span><span class="s">&#39;</span>
-        <span class="p">},</span>
-    <span class="p">},</span>
-    <span class="s">&#39;handlers&#39;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s">&#39;console&#39;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s">&#39;level&#39;</span><span class="p">:</span> <span class="s">&#39;DEBUG&#39;</span><span class="p">,</span>
-            <span class="s">&#39;class&#39;</span><span class="p">:</span> <span class="s">&#39;logging.StreamHandler&#39;</span><span class="p">,</span>
-            <span class="s">&#39;formatter&#39;</span><span class="p">:</span> <span class="s">&#39;simple&#39;</span>
-        <span class="p">},</span>
-    <span class="p">},</span>
-
-    <span class="s">&#39;loggers&#39;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s">&#39;django.request&#39;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s">&#39;handlers&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;console&#39;</span><span class="p">],</span>
-            <span class="s">&#39;level&#39;</span><span class="p">:</span> <span class="s">&#39;DEBUG&#39;</span><span class="p">,</span>
-            <span class="s">&#39;propagate&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
-        <span class="p">},</span>
-        <span class="s">&#39;rq_scheduler&#39;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s">&#39;handlers&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;console&#39;</span><span class="p">],</span>
-            <span class="s">&#39;level&#39;</span><span class="p">:</span> <span class="s">&#39;DEBUG&#39;</span><span class="p">,</span>
-            <span class="s">&#39;propagate&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
-        <span class="p">},</span>
-    <span class="p">},</span>
-<span class="p">}</span>
-</pre></div>
-<p>By default, rq_scheduler won&#8217;t log anything so we won&#8217;t be able to see
-any output when new instances of each scheduled task are queued for execution.
-That&#8217;s why we&#8217;ve overriden the <span class="caps">LOGGING</span> setting in order to actually log
-rq_scheduler output to the&nbsp;console.</p>
-</div>
-<div class="section" id="running-the-project">
-<h3><a class="toc-backref" href="#id9">Running the&nbsp;project</a></h3>
-<p>I recommend using <a class="reference external" href="https://www.vagrantup.com/">Vagrant</a> to start a stock ubuntu/trusty32 box. After that, install redis, virtualenv and virtualenvwrapper
-and create/activate a virtualenv named <tt class="docutils literal">rq</tt>. You can go to the home directory of <tt class="docutils literal"><span class="pre">django-test-rq</span></tt>
-and install requirements through <tt class="docutils literal">pip install requirements.txt</tt> and create the database tables with
-<tt class="docutils literal">python manage.py migrate</tt>. Finally you may run the project with <tt class="docutils literal">python manage.py runserver_plus</tt>.</p>
-</div>
-</div>
-<div class="section" id="rqworker-and-rqscheduler">
-<h2><a class="toc-backref" href="#id10">rqworker and&nbsp;rqscheduler</a></h2>
-<p>Before scheduling any tasks we need to run two more&nbsp;processes:</p>
-<ul class="simple">
-<li>rqworker: This is a worker that dequeues jobs from the queue and executes them. We could run more than one onstance of this job if we need&nbsp;it.</li>
-<li>rqscheduler: This is a process that runs every one minute and checks if there are scheduled jobs that have to be executed. If yes, it will add them to the queue in order to be executed by a&nbsp;worker.</li>
-</ul>
-<div class="section" id="for-development">
-<h3><a class="toc-backref" href="#id11">For&nbsp;development</a></h3>
-<p>If you want to run rqworker and rqscheduler for your development environment you can just do it with
-running <tt class="docutils literal">python manage.py rqworker</tt> and <tt class="docutils literal">python mange.py rqscheduler</tt> through screen/tmux. If everything
-is allright you should see tasks being added to the queue and scheduled (you may need to refresh the
-homepage before seeing everything since a task may be executed after the response is&nbsp;created).</p>
-<p>Also, keep in mind that rqscheduler runs once every minute by default so you may need to wait up to
-minute to see a <tt class="docutils literal">ScheduledTask</tt> instance. Also, this means that you can&#8217;t run more than one scheduled
-task instance per&nbsp;minute.</p>
-</div>
-<div class="section" id="for-production">
-<h3><a class="toc-backref" href="#id12">For&nbsp;production</a></h3>
-<p>Trying to create daemons through screen is not
-sufficient for a production envornment since we&#8217;d like to actually have logging, monitoring and of course
-automatically start rqworker and rqscheduler when the server&nbsp;boots.</p>
-<p>For this, I recommend using the <a class="reference external" href="http://supervisord.org/">supervisord</a> tool which
-can be used to monitor and control a number of processes. There are other similar tools, however I&#8217;ve
-found supervisord the easier to&nbsp;use.</p>
-<p>In order to monitor/control a process through supervisord you need to add a <tt class="docutils literal">[program:progrname]</tt> section in
-supervisord&#8217;s configuration and pass a number of parameters. The <tt class="docutils literal">progname</tt> is the name of the monitoring
-process. Here&#8217;s how rqworker can be configured using&nbsp;supervisord:</p>
-<pre class="code literal-block">
-[program:rqworker]
-command=python manage.py rqworker
-directory=/vagrant/progr/py/rq/django-test-rq
-environment=PATH=&quot;/home/vagrant/.virtualenvs/rq/bin&quot;
-user=vagrant
-</pre>
-<p>The options used will chdir to <tt class="docutils literal">directory</tt> and execute <tt class="docutils literal">command</tt> as <tt class="docutils literal">user</tt>. The <tt class="docutils literal">environment</tt>
-option can be used to set envirotnment variables - here we set <tt class="docutils literal"><span class="caps">PATH</span></tt> in order to use a specific
-virtual environment. This will allow you to monitor rqworker through supervisord and log its
-output to a file in <tt class="docutils literal">/var/log/supervisor</tt> (by default). A similar entry needs to be added for
-rqscheduler of course. If everything has been configured correctly, when you reload the supervisord
-settings you can run <tt class="docutils literal">sudo /usr/bin/supervisorctl</tt> and should see something&nbsp;like</p>
-<pre class="code literal-block">
-rqscheduler                      RUNNING    pid 1561, uptime 0:00:03
-rqworker                         RUNNING    pid 1562, uptime 0:00:03
-</pre>
-<p>Also, tho log files should contain some debug&nbsp;info.</p>
-</div>
-</div>
-<div class="section" id="conclusion">
-<h2><a class="toc-backref" href="#id13">Conclusion</a></h2>
-<p>Although using job queues makes it more difficult for the developer and adds at least one
-(and probably more) points of failure to a project (the workers, the broker etc) their
-usage, even for very simple projects is&nbsp;unavoidable.</p>
-<p>Unless a complex, enterprise solution like celery is really required for a project
-I recommend using the much simpler and easier to configure <span class="caps">RQ</span> for all your
-asynchronous and scheduled task needs. Using <span class="caps">RQ</span> (and the relative projects django-rq
-and rq-scheduler) we can easily add production ready queueued and scheduled jobs to
-any django&nbsp;project.</p>
-<p>In this article we presented a small introduction to <span class="caps">RQ</span> and its friends and saw how
-to configure django to use it in a production ready environment using a small
-django project (<a class="reference external" href="https://github.com/spapas/django-test-rq">https://github.com/spapas/django-test-rq</a>) which was implemented as a companion
-to help readers quickly test the concepts presented&nbsp;here.</p>
-</div>
-</div>
-  		</article>
-  		<article>
-<header>
-      <h1 class="entry-title">
-        <a href="http://spapas.github.io/2015/01/21/django-model-auditing/">Django model auditing</a>
-      </h1>
-      <p class="meta"><time datetime="2015-01-21T14:20:00" pubdate>Τετ 21 Ιανουάριος 2015</time></p>
-</header>
-
-  <div class="entry-content"><div class="contents topic" id="contents">
-<p class="topic-title first">Contents</p>
-<ul class="simple">
-<li><a class="reference internal" href="#introduction" id="id5">Introduction</a></li>
-<li><a class="reference internal" href="#adding-simple-auditing-functionality-ourselves" id="id6">Adding simple auditing functionality&nbsp;ourselves</a></li>
-<li><a class="reference internal" href="#example" id="id7">Example</a><ul>
-<li><a class="reference internal" href="#models-py" id="id8">models.py</a></li>
-<li><a class="reference internal" href="#forms-py" id="id9">forms.py</a></li>
-<li><a class="reference internal" href="#views-py" id="id10">views.py</a></li>
-<li><a class="reference internal" href="#urls-py" id="id11">urls.py</a></li>
-<li><a class="reference internal" href="#templates" id="id12">templates</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#using-django-simple-history" id="id13">Using django-simple-history</a><ul>
-<li><a class="reference internal" href="#installation" id="id14">Installation</a></li>
-<li><a class="reference internal" href="#id1" id="id15">Example</a></li>
-<li><a class="reference internal" href="#usage" id="id16">Usage</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#using-django-reversion" id="id17">Using django-reversion</a><ul>
-<li><a class="reference internal" href="#id2" id="id18">Installation</a></li>
-<li><a class="reference internal" href="#id3" id="id19">Example</a></li>
-<li><a class="reference internal" href="#id4" id="id20">Usage</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#conclusion" id="id21">Conclusion</a></li>
-</ul>
-</div>
-<div class="section" id="introduction">
-<h2><a class="toc-backref" href="#id5">Introduction</a></h2>
-<p>An auditing trail is a common requirement in most non-trivial applications. Organizations
-need to know <em>who</em> did the change, <em>when</em> it was done and <em>what</em> was actually changed.
-In this post we will see three
-different solution in order to add this functionality in Django: doing it ourselves,
-using django-simple-history and using&nbsp;django-reversion.</p>
-</div>
-<div class="section" id="adding-simple-auditing-functionality-ourselves">
-<h2><a class="toc-backref" href="#id6">Adding simple auditing functionality&nbsp;ourselves</a></h2>
-<p>A simple way to actually do auditing is to keep four extra fields in our models:
-<tt class="docutils literal">created_by</tt>, <tt class="docutils literal">created_on</tt>, <tt class="docutils literal">modified_by</tt> and <tt class="docutils literal">modified_on</tt>. The first two
-will be filled when the model instance is created while the latter two will be
-changed whenever the model instance is saved. So we only have <em>who</em> and <em>whe</em>.
-Sometimes, these are enough so let&#8217;s see how easy it is to implement it in&nbsp;django.</p>
-<p>We&#8217;ll need an abstract model that could be used as a base class for models that need&nbsp;auditing:</p>
-<div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.conf</span> <span class="kn">import</span> <span class="n">settings</span>
-<span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
-
-<span class="k">class</span> <span class="nc">Auditable</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
-    <span class="n">created_on</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">auto_now_add</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
-    <span class="n">created_by</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">AUTH_USER_MODEL</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s">&#39;created_by&#39;</span><span class="p">)</span>
-
-    <span class="n">modified_on</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">auto_now</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
-    <span class="n">modified_by</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">AUTH_USER_MODEL</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s">&#39;modified_by&#39;</span><span class="p">)</span>
-
-    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
-        <span class="n">abstract</span> <span class="o">=</span> <span class="bp">True</span>
-</pre></div>
-<p>Models inheriting from <tt class="docutils literal">Auditable</tt> will contain their datetime of creation and modification
-which will be automatically filled using the very usefull <tt class="docutils literal">auto_now_add_</tt> (which will
-set the current datetime when the model instance is created) and <tt class="docutils literal">auto_now_</tt> (which will
-set the current datetime when the model instance is&nbsp;modified).</p>
-<p>Such models will also have two foreign keys to <tt class="docutils literal">User</tt>, one for the user
-that created the and one of the user that modified them. The problem with these two fields
-is that they cannot be filled automatically (like the datetimes) because the user that
-actually did create/change the objects must be&nbsp;provided!</p>
-<p>Since I am really fond of CBVs I will present a simple mixin that can be used with CreateView
-and UpdateView and does exactly&nbsp;that:</p>
-<div class="highlight"><pre><span class="k">class</span> <span class="nc">AuditableMixin</span><span class="p">(</span><span class="nb">object</span><span class="p">,):</span>
-    <span class="k">def</span> <span class="nf">form_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">,</span> <span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">form</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">created_by</span><span class="p">:</span>
-            <span class="n">form</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">created_by</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span>
-        <span class="n">form</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">modified_by</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">AuditableMixin</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">form_valid</span><span class="p">(</span><span class="n">form</span><span class="p">)</span>
-</pre></div>
-<p>The above mixin overrides the <tt class="docutils literal">form_valid</tt> method of <tt class="docutils literal">CreateView</tt> and <tt class="docutils literal">UpdateView</tt>:
-First it checks if the object is created (if it is created it won&#8217;t be saved in the
-database yet thus it won&#8217;t have an id) in order to set the <tt class="docutils literal">created_by</tt> attribute to
-the current user. After that it will set the <tt class="docutils literal">modified_by</tt> attribute of the object to
-the current user. Finally, it will call the next <tt class="docutils literal">form_valid</tt> method to do whatever
-is required (save the model instance and redirect to <tt class="docutils literal">success_url</tt> by&nbsp;default).</p>
-<p>The views using <tt class="docutils literal">AuditableMixin</tt> should allow only logged in users (or else an
-exception will be thrown). Also, don&#8217;t forget to exclude the <tt class="docutils literal">created_by</tt> and <tt class="docutils literal">modified_by</tt>
-fields from your model form (<tt class="docutils literal">created_on</tt> and <tt class="docutils literal">modified_on</tt> will automatically be&nbsp;excluded).</p>
-</div>
-<div class="section" id="example">
-<h2><a class="toc-backref" href="#id7">Example</a></h2>
-<p>Let&#8217;s see a simple example of creating a small django application using the previously defined abstract model and&nbsp;mixin:</p>
-<div class="section" id="models-py">
-<h3><a class="toc-backref" href="#id8">models.py</a></h3>
-<div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.conf</span> <span class="kn">import</span> <span class="n">settings</span>
-<span class="kn">from</span> <span class="nn">django.core.urlresolvers</span> <span class="kn">import</span> <span class="n">reverse</span>
-<span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
-
-<span class="kn">from</span> <span class="nn">auditable.models</span> <span class="kn">import</span> <span class="n">Auditable</span>
-
-
-<span class="k">class</span> <span class="nc">Book</span><span class="p">(</span><span class="n">Auditable</span><span class="p">):</span>
-    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
-    <span class="n">author</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">get_absolute_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">reverse</span><span class="p">(</span><span class="s">&quot;book_list&quot;</span><span class="p">)</span>
-</pre></div>
-<p>In the above we suppose that the <tt class="docutils literal">Auditable</tt> abstract model is imported from the
-<tt class="docutils literal">auditable.models</tt> module and that a view named <tt class="docutils literal">book_list</tt> that shows all books&nbsp;exists.</p>
-</div>
-<div class="section" id="forms-py">
-<h3><a class="toc-backref" href="#id9">forms.py</a></h3>
-<div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.forms</span> <span class="kn">import</span> <span class="n">ModelForm</span>
-
-
-<span class="k">class</span> <span class="nc">BookForm</span><span class="p">(</span><span class="n">ModelForm</span><span class="p">):</span>
-    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
-        <span class="n">model</span> <span class="o">=</span> <span class="n">Book</span>
-        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="s">&#39;author&#39;</span><span class="p">]</span>
-</pre></div>
-<p>Show only <tt class="docutils literal">name</tt> and <tt class="docutils literal">author</tt> fields (and not the auditable fields) in the <tt class="docutils literal">Book ModelForm</tt>.</p>
-</div>
-<div class="section" id="views-py">
-<h3><a class="toc-backref" href="#id10">views.py</a></h3>
-<div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.views.generic.edit</span> <span class="kn">import</span> <span class="n">CreateView</span><span class="p">,</span> <span class="n">UpdateView</span>
-<span class="kn">from</span> <span class="nn">django.views.generic</span> <span class="kn">import</span> <span class="n">ListView</span>
-
-<span class="kn">from</span> <span class="nn">auditable.views</span> <span class="kn">import</span> <span class="n">AuditableMixin</span>
-
-<span class="kn">from</span> <span class="nn">models</span> <span class="kn">import</span> <span class="n">Book</span>
-<span class="kn">from</span> <span class="nn">forms</span> <span class="kn">import</span> <span class="n">BookForm</span>
-
-
-<span class="k">class</span> <span class="nc">BookCreateView</span><span class="p">(</span><span class="n">AuditableMixin</span><span class="p">,</span> <span class="n">CreateView</span><span class="p">):</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">Book</span>
-    <span class="n">form_class</span> <span class="o">=</span> <span class="n">BookForm</span>
-
-
-<span class="k">class</span> <span class="nc">BookUpdateView</span><span class="p">(</span><span class="n">AuditableMixin</span><span class="p">,</span> <span class="n">UpdateView</span><span class="p">):</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">Book</span>
-    <span class="n">form_class</span> <span class="o">=</span> <span class="n">BookForm</span>
-
-
-<span class="k">class</span> <span class="nc">BookListView</span><span class="p">(</span><span class="n">ListView</span><span class="p">):</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">Book</span>
-</pre></div>
-<p>We import the <tt class="docutils literal">AuditableMixin</tt> from <tt class="docutils literal">auditable.views</tt> and make our Create and Update views
-inherit from this mixin also in addition to <tt class="docutils literal">CreateView</tt> and <tt class="docutils literal">UpdateView</tt>. Pay attention that our
-mixin is placed <em>before</em> CreateView in order to call <tt class="docutils literal">form_valid</tt> in the proper order: When multiple
-inheritance is used like this python will check each class from left to right to find the proper method
-and call it. For example, in our <tt class="docutils literal">BookCreateView</tt>, when the <tt class="docutils literal">form_valid</tt> method is called, python
-will first check if <tt class="docutils literal">BookCreateView</tt> has a <tt class="docutils literal">form_valid</tt> method. Since it does not, it will check
-if <tt class="docutils literal">AuditableMixin</tt> has a <tt class="docutils literal">form_valid</tt> method and call it. Now, we are calling the <tt class="docutils literal"><span class="pre">super(...).form_valid()</span></tt> in the
-<tt class="docutils literal">AuditableMixin</tt> <tt class="docutils literal">form_valid</tt>, so the <tt class="docutils literal">form_valid</tt> of <tt class="docutils literal">CreateView</tt> will <em>also</em> be&nbsp;called.</p>
-<p>A simple <tt class="docutils literal">ListView</tt> is also added to just show the info on all&nbsp;books.</p>
-</div>
-<div class="section" id="urls-py">
-<h3><a class="toc-backref" href="#id11">urls.py</a></h3>
-<div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.conf.urls</span> <span class="kn">import</span> <span class="n">patterns</span><span class="p">,</span> <span class="n">include</span><span class="p">,</span> <span class="n">url</span>
-
-<span class="kn">from</span> <span class="nn">views</span> <span class="kn">import</span> <span class="n">BookCreateView</span><span class="p">,</span> <span class="n">BookUpdateView</span><span class="p">,</span> <span class="n">BookListView</span>
-
-<span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span>
-    <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^accounts/login/$&#39;</span><span class="p">,</span> <span class="s">&#39;django.contrib.auth.views.login&#39;</span><span class="p">,</span> <span class="p">),</span>
-    <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^accounts/logout/$&#39;</span><span class="p">,</span> <span class="s">&#39;django.contrib.auth.views.logout&#39;</span><span class="p">,</span> <span class="p">),</span>
-
-    <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^create/$&#39;</span><span class="p">,</span> <span class="n">BookCreateView</span><span class="o">.</span><span class="n">as_view</span><span class="p">(),</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;create_book&#39;</span><span class="p">),</span>
-    <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^update/(?P&lt;pk&gt;\d+)/$&#39;</span><span class="p">,</span> <span class="n">BookUpdateView</span><span class="o">.</span><span class="n">as_view</span><span class="p">(),</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;update_book&#39;</span><span class="p">),</span>
-    <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^$&#39;</span><span class="p">,</span> <span class="n">BookListView</span><span class="o">.</span><span class="n">as_view</span><span class="p">(),</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;book_list&#39;</span><span class="p">),</span>
-<span class="p">)</span>
-</pre></div>
-<p>Just add the previously defined Create/Update/List views along with a login/logout&nbsp;views.</p>
-</div>
-<div class="section" id="templates">
-<h3><a class="toc-backref" href="#id12">templates</a></h3>
-<p>You&#8217;ll need four&nbsp;templates:</p>
-<ul class="simple">
-<li>books/book_list.html: Show the list of&nbsp;books</li>
-<li>books/book_form.html: Show the book editing&nbsp;form</li>
-<li>registration/login.html: Login&nbsp;form</li>
-<li>registration/logout.html: Logout&nbsp;message</li>
-</ul>
-</div>
-</div>
-<div class="section" id="using-django-simple-history">
-<h2><a class="toc-backref" href="#id13">Using&nbsp;django-simple-history</a></h2>
-<p><a class="reference external" href="https://github.com/treyhunner/django-simple-history">django-simple-history</a>  can be used to not only store the user and date of each modification
-but a different version for each modification. To do that, for every model that is registered
-to be used with django-simple-history, it wil create a second table in
-the database hosting all versions (historical records) of that model. As we can understand this is really powerfull
-since we can see exactly what was changed and also do normal <span class="caps">SQL</span> queries on&nbsp;that!</p>
-<div class="section" id="installation">
-<h3><a class="toc-backref" href="#id14">Installation</a></h3>
-<p>To use django-simple-history in a project, after we do a <tt class="docutils literal">pip install <span class="pre">django-simple-history</span></tt>,
-we just need to add it to <tt class="docutils literal">INSTALLED_APPS</tt> and
-add the <tt class="docutils literal">simple_history.middleware.HistoryRequestMiddleware</tt> to the <tt class="docutils literal">MIDDLEWARE_CLASSES</tt> list.</p>
-<p>Finally, to keep the historical records for a model, just add an instace of <tt class="docutils literal">HistoricalRecords</tt> to this&nbsp;model.</p>
-</div>
-<div class="section" id="id1">
-<h3><a class="toc-backref" href="#id15">Example</a></h3>
-<p>For example, our previously defined <tt class="docutils literal">Book</tt> model will be modified like&nbsp;this:</p>
-<div class="highlight"><pre>class SHBook(models.Model):
-    name = models.CharField(max_length=128)
-    author = models.CharField(max_length=128)
-
-    def get_absolute_url(self):
-        return reverse(&quot;shbook_list&quot;)
-
-    history = HistoricalRecords()
-</pre></div>
-<p>When we run <tt class="docutils literal">python manage.py makemigrations</tt> and <tt class="docutils literal">migrate</tt> this, we&#8217;ll see that beyond the table for SHBook, a table for HistoricalSHBook will be&nbsp;created:</p>
-<pre class="code literal-block">
-Migrations for 'sample':
-  0002_historicalshbook_shbook.py:
-    - Create model HistoricalSHBook
-    - Create model SHBook
-</pre>
-<p>Let&#8217;s see the schema of&nbsp;historicalshbook:</p>
-<pre class="code literal-block">
-CREATE TABLE &quot;sample_historicalshbook&quot; (
-    &quot;id&quot; integer NOT NULL,
-    &quot;name&quot; varchar(128) NOT NULL,
-    &quot;author&quot; varchar(128) NOT NULL,
-    &quot;history_id&quot; integer NOT NULL PRIMARY KEY AUTOINCREMENT,
-    &quot;history_date&quot; datetime NOT NULL,
-    &quot;history_type&quot; varchar(1) NOT NULL,
-    &quot;history_user_id&quot; integer NULL REFERENCES &quot;auth_user&quot; (&quot;id&quot;)
-);
-</pre>
-<p>So we see that it has the <em>same</em> fields as with <tt class="docutils literal">SHBook</tt> (<tt class="docutils literal">id, name, author</tt>) with the addition of
-the primary key (<tt class="docutils literal">history_id</tt>) of this historical record, the date and user that did the change
-(<tt class="docutils literal">history_date</tt>, <tt class="docutils literal">history_user_id</tt>) and the type of the record (created / update /&nbsp;delete).</p>
-<p>So, just by adding a <tt class="docutils literal">HistoricalRecords()</tt> attribute to our model definition we&#8217;ll get complete auditing
-for the instance of that&nbsp;model</p>
-</div>
-<div class="section" id="usage">
-<h3><a class="toc-backref" href="#id16">Usage</a></h3>
-<p>To find out information about the historical records we&#8217;ll just use the <tt class="docutils literal">HistoricalRecords()</tt> attribute
-of that&nbsp;model:</p>
-<p>For example, running <tt class="docutils literal">SHBook.history.filter(id=1)</tt> will return all historical records of the book with
-<tt class="docutils literal">id = 1</tt>. For each one of them we have can use the&nbsp;following:</p>
-<ul class="simple">
-<li>get the user that made the change through the <tt class="docutils literal">history_user</tt> attribute</li>
-<li>get the date of the change through the <tt class="docutils literal">history_date</tt> attribute</li>
-<li>get the type of the change through the <tt class="docutils literal">history_type</tt> attribute (and the corresponding <tt class="docutils literal">get_history_type_dispaly</tt>)</li>
-<li>get a model instance as it was then through the <tt class="docutils literal">history_object</tt> attribute (in order to <tt class="docutils literal">save()</tt> it and revert to this&nbsp;version)</li>
-</ul>
-</div>
-</div>
-<div class="section" id="using-django-reversion">
-<h2><a class="toc-backref" href="#id17">Using&nbsp;django-reversion</a></h2>
-<p><a class="reference external" href="https://github.com/etianen/django-reversion">django-reversion</a>  offers more or less the same functionality of django-simple-history by following a different philosophy:
-Instead of creating an extra table holding the history records for each model, it insteads converts all the fields of each model
-to json and stores that <span class="caps">JSON</span> in the database in a text&nbsp;field.</p>
-<p>This has the advantage that no extra tables are created to the database but the disadvantage that you can&#8217;t easily query
-your historical records. So you may choose one or the other depending on your actual&nbsp;requirements.</p>
-<div class="section" id="id2">
-<h3><a class="toc-backref" href="#id18">Installation</a></h3>
-<p>To use django-reversion in a project, after we do a <tt class="docutils literal">pip install <span class="pre">django-reversion</span></tt>,
-we just need to add it to <tt class="docutils literal">INSTALLED_APPS</tt> and
-add the <tt class="docutils literal">reversion.middleware.RevisionMiddleware</tt> to the <tt class="docutils literal">MIDDLEWARE_CLASSES</tt> list.</p>
-<p>In order to save the revisions of a model, you need to register this model to django-reversion. This can be
-done either through the django-admin, by inheriting the admin class of that model from <tt class="docutils literal">reversion.VersionAdmin</tt>
-or, if you don&#8217;t want to use the admin by <tt class="docutils literal">reversion.register</tt> decorator.</p>
-</div>
-<div class="section" id="id3">
-<h3><a class="toc-backref" href="#id19">Example</a></h3>
-<p>To use django-reversion to keep track of changes to <tt class="docutils literal">Book</tt> we can modify it like&nbsp;this:</p>
-<div class="highlight"><pre>@reversion.register
-class RBook(models.Model):
-    name = models.CharField(max_length=128)
-    author = models.CharField(max_length=128)
-
-    def get_absolute_url(self):
-        return reverse(&quot;rbook_list&quot;)
-</pre></div>
-<p>django-reversion uses two tables in the database to keep track of revisions: <tt class="docutils literal">revision</tt> and <tt class="docutils literal">version</tt>. Let&#8217;s
-take a look at their&nbsp;schemata:</p>
-<pre class="code literal-block">
-.schema reversion_revision
-CREATE TABLE &quot;reversion_revision&quot; (
-    &quot;id&quot; integer NOT NULL PRIMARY KEY AUTOINCREMENT,
-    &quot;manager_slug&quot; varchar(200) NOT NULL,
-    &quot;date_created&quot; datetime NOT NULL,
-    &quot;comment&quot; text NOT NULL,
-    &quot;user_id&quot; integer NULL REFERENCES &quot;auth_user&quot; (&quot;id&quot;)
-);
-
-.schema reversion_version
-CREATE TABLE &quot;reversion_version&quot; (
-    &quot;id&quot; integer NOT NULL PRIMARY KEY AUTOINCREMENT,
-    &quot;object_id&quot; text NOT NULL,
-    &quot;object_id_int&quot; integer NULL,
-    &quot;format&quot; varchar(255) NOT NULL,
-    &quot;serialized_data&quot; text NOT NULL,
-    &quot;object_repr&quot; text NOT NULL,
-    &quot;content_type_id&quot; integer NOT NULL REFERENCES &quot;django_content_type&quot; (&quot;id&quot;),
-    &quot;revision_id&quot; integer NOT NULL REFERENCES &quot;reversion_revision&quot; (&quot;id&quot;)
-);
-</pre>
-<p>As we can understand, the <tt class="docutils literal">revision</tt> table holds information like who created this
-revison (<tt class="docutils literal">user_id</tt>) and when (<tt class="docutils literal">date_created</tt>) while the <tt class="docutils literal">version</tt> stores
-a reference to the object that was modified (through a GenericForeignKey) and
-the actual data (in the <tt class="docutils literal">serialized_data</tt> field). By default it uses <span class="caps">JSON</span>
-to serialize the data (the serialization format is in the <tt class="docutils literal">format</tt> field). There&#8217;s
-an one-to-one relation between <tt class="docutils literal">revision</tt> and <tt class="docutils literal">version</tt>.</p>
-<p>If we create an instance of <tt class="docutils literal">RBook</tt> we&#8217;ll see the following in the&nbsp;database:</p>
-<pre class="code literal-block">
-sqlite&gt; select * from reversion_revision;
-1|default|2015-01-21 10:31:25.233000||1
-
-sqlite&gt; select * from reversion_version;
-1|1|1|json|[{&quot;fields&quot;: {&quot;name&quot;: &quot;asdasdasd&quot;, &quot;author&quot;: &quot;asdasd&quot;}, &quot;model&quot;: &quot;sample.rbook&quot;, &quot;pk&quot;: 1}]|RBook object|12|1
-</pre>
-<p><tt class="docutils literal">date_created</tt> and <tt class="docutils literal">user_id</tt> are stored on <tt class="docutils literal">revision</tt> while <tt class="docutils literal">format</tt>, <tt class="docutils literal">serialized_data</tt>, <tt class="docutils literal">content_type_id</tt> and
-<tt class="docutils literal">object_id_int</tt> (the <tt class="docutils literal">GenericForeignKey</tt>) are stored in <tt class="docutils literal">version</tt>.</p>
-</div>
-<div class="section" id="id4">
-<h3><a class="toc-backref" href="#id20">Usage</a></h3>
-<p>To find out information about an object you have to use the <tt class="docutils literal">reversion.get_for_object(object)</tt> method. In order to be
-easily used in templates I recommend creating the following <tt class="docutils literal">get_versions()</tt> method in each model that is registered with&nbsp;django-reversion</p>
-<pre class="code literal-block">
-def get_versions(self):
-    return reversion.get_for_object(self)
-</pre>
-<p>Now, each version has a <tt class="docutils literal">revision</tt> attribute for the corresponding revision and can be used to do the&nbsp;following:</p>
-<ul class="simple">
-<li>get the user that made the change through the <tt class="docutils literal">revision.user</tt> attribute</li>
-<li>get the date of the change through the <tt class="docutils literal">revision.date_created</tt> attribute</li>
-<li>get the values of the object fields as they were in this revision using the <tt class="docutils literal">field_dict</tt> attribute</li>
-<li>get a model instance as it was on that revision using the <tt class="docutils literal">object_version.object</tt> attribute</li>
-<li>revert to that previous version of that object using the <tt class="docutils literal">rever()</tt> method</li>
-</ul>
-</div>
-</div>
-<div class="section" id="conclusion">
-<h2><a class="toc-backref" href="#id21">Conclusion</a></h2>
-<p>In the above we say that it is really easy to add basic (<em>who</em> and <em>when</em>) auditing capabilities to your models: You just need to
-inherit your models from the <tt class="docutils literal">Auditable</tt> abstract class and inherit your Create and Update CBVs from <tt class="docutils literal">AuditableMixin</tt>.
-If you want to know exactly <em>what</em> was changed then you have two solutions: django-simple-history to create an extra table for
-each of your models so you&#8217;ll be able to query your historical records (and easily extra aggregates, statistics etc) and
-django-reversion to save each version as a json object, so no extra tables will be&nbsp;created.</p>
-<p>All three solutions for auditing have been implemented in a sample project at <a class="reference external" href="https://github.com/spapas/auditing-sample">https://github.com/spapas/auditing-sample</a>.</p>
-<p>You can clone the project and, preferrably in a virtual environment, install requirements (<tt class="docutils literal">pip install <span class="pre">-r</span> requirements.txt</tt>),
-do a migrate (<tt class="docutils literal">python manage.py migrate</tt> &#8212; uses sqlite3 by default) and run the local development
-server (<tt class="docutils literal">python manage.py ruinserver</tt>).</p>
-</div>
-</div>
-  		</article>
-  		<article>
-<header>
-      <h1 class="entry-title">
-        <a href="http://spapas.github.io/2014/09/15/django-non-html-responses/">Django non-HTML responses</a>
-      </h1>
-      <p class="meta"><time datetime="2014-09-15T14:20:00" pubdate>Δευ 15 Σεπτέμβριος 2014</time></p>
-</header>
-
-  <div class="entry-content"><div class="contents topic" id="contents">
-<p class="topic-title first">Contents</p>
-<ul class="simple">
-<li><a class="reference internal" href="#introduction" id="id1">Introduction</a></li>
-<li><a class="reference internal" href="#how-are-cbvs-rendered" id="id2">How are CBVs&nbsp;rendered</a></li>
-<li><a class="reference internal" href="#rendering-to-non-html" id="id3">Rendering to non-<span class="caps">HTML</span></a></li>
-<li><a class="reference internal" href="#a-non-html-mixin" id="id4">A non-<span class="caps">HTML</span>&nbsp;mixin</a></li>
-<li><a class="reference internal" href="#a-more-complex-example" id="id5">A more complex&nbsp;example</a></li>
-<li><a class="reference internal" href="#conclusion" id="id6">Conclusion</a></li>
-</ul>
-</div>
-<div class="section" id="introduction">
-<h2><a class="toc-backref" href="#id1">Introduction</a></h2>
-<p>I have already written about the many advantages (<span class="caps">DRY</span>!) of using <a class="reference external" href="http://spapas.github.io/2014/04/11/django-generic-formviews-for-objects/">CBVs in a previous article.</a>
-In this article I will present the correct (pythonic) way to allow a normal <span class="caps">CBV</span> to return non-<span class="caps">HTML</span> responses, like <span class="caps">PDF</span>, <span class="caps">CSV</span>, <span class="caps">XSL</span>&nbsp;etc.</p>
-</div>
-<div class="section" id="how-are-cbvs-rendered">
-<h2><a class="toc-backref" href="#id2">How are CBVs&nbsp;rendered</a></h2>
-<p>Before proceeding, we need to understand how CBVs are rendered. By walking through the
-class hierarchy in the <a class="reference external" href="http://ccbv.co.uk/"><span class="caps">CBV</span> inspector</a>, we can see that
-all the normal Django CBVs (DetailView, CreateView, TemplateView etc) are using a mixin
-named <a class="reference external" href="http://ccbv.co.uk/projects/Django/1.7/django.views.generic.base/TemplateResponseMixin/">TemplateResponseMixin</a> which defines a method named <tt class="docutils literal">render_to_response</tt>. This
-is the method that is used for rendering the output of the Views. Let&#8217;s take a look at
-<a class="reference external" href="http://ccbv.co.uk/projects/Django/1.7/django.views.generic.base/TemplateResponseMixin/">how it is defined</a> (I&#8217;ll remove the&nbsp;comments):</p>
-<div class="highlight"><pre><span class="k">class</span> <span class="nc">TemplateResponseMixin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-  <span class="n">template_name</span> <span class="o">=</span> <span class="bp">None</span>
-  <span class="n">response_class</span> <span class="o">=</span> <span class="n">TemplateResponse</span>
-  <span class="n">content_type</span> <span class="o">=</span> <span class="bp">None</span>
-
-  <span class="k">def</span> <span class="nf">render_to_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="o">**</span><span class="n">response_kwargs</span><span class="p">):</span>
-      <span class="n">response_kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s">&#39;content_type&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">content_type</span><span class="p">)</span>
-      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">response_class</span><span class="p">(</span>
-          <span class="n">request</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">,</span>
-          <span class="n">template</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_template_names</span><span class="p">(),</span>
-          <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">,</span>
-          <span class="o">**</span><span class="n">response_kwargs</span>
-      <span class="p">)</span>
-
-  <span class="k">def</span> <span class="nf">get_template_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_name</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-          <span class="k">raise</span> <span class="n">ImproperlyConfigured</span><span class="p">(</span>
-              <span class="s">&quot;TemplateResponseMixin requires either a definition of &quot;</span>
-              <span class="s">&quot;&#39;template_name&#39; or an implementation of &#39;get_template_names()&#39;&quot;</span><span class="p">)</span>
-      <span class="k">else</span><span class="p">:</span>
-          <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">template_name</span><span class="p">]</span>
-</pre></div>
-<p>This method will try to find out which html template should be used to render the View
-(using the  <tt class="docutils literal">get_template_names</tt> method and template_name attribute of the mixin) and
-then render this view by instantiating an instance of the <tt class="docutils literal">TemplateResponse</tt> class
-(as defined in the <tt class="docutils literal">response_class</tt> attribute)
-and passing the request, template, context and other response_args to&nbsp;it.</p>
-<p>The <a class="reference external" href="https://github.com/django/django/blob/master/django/template/response.py">TemplateResponse</a> class which is instantiated in the <tt class="docutils literal">render_to_response</tt> method
-inherits from a normal <tt class="docutils literal">HttpResponse</tt> and is used to render
-the template passed to it as a&nbsp;parameter.</p>
-</div>
-<div class="section" id="rendering-to-non-html">
-<h2><a class="toc-backref" href="#id3">Rendering to non-<span class="caps">HTML</span></a></h2>
-<p>From the previous discussion we can conclude that if your non-<span class="caps">HTML</span> response <em>needs</em>
-a template then you just need to create a subclass of <tt class="docutils literal">TemplateResponse</tt> and
-assign it to the <tt class="docutils literal">response_class</tt> attribute (and also change the <tt class="docutils literal">content_type</tt>
-attribute). On the other hand, if your non-<span class="caps">HTML</span> respond does not need a template
-to be rendered then you have to override <tt class="docutils literal">render_to_response</tt> completely
-(since the template parameter does not need to be passed now) and either define
-a subclass of HttpResponse or do the rendering in the&nbsp;render_to_response.</p>
-<p>Since almost always you won&#8217;t need a template to create a non-<span class="caps">HTML</span> view and because
-I believe that the solution is <span class="caps">DRY</span>-enough by implementing the rendering code to
-the <tt class="docutils literal">render_to_response</tt> method (<em>without</em> subclassing <tt class="docutils literal">HttpResponse</tt>) I will
-implement a mixin that does exactly&nbsp;that.</p>
-<p>Subclassing <tt class="docutils literal">HttpResponse</tt> will not make our design more <span class="caps">DRY</span> because for every
-subclass of <tt class="docutils literal">HttpResponse</tt> the <tt class="docutils literal">render_to_response</tt> method would also need to
-be modified (by subclassing <tt class="docutils literal">TemplateResponseMixin) to instantiate the subclass of ``HttpResponse</tt> with the correct parameters.
-For instance, the existing <tt class="docutils literal">TemplateResponseMixin</tt> cannot be used if the subclass
-of <tt class="docutils literal">HttpResponse</tt> does not take a template as a parameter (solutions like
-passing None to the template parameter are signals of bad&nbsp;design).</p>
-<p>In any case, changing just the <tt class="docutils literal">render_to_response</tt> method using a Mixin is in my opinion the best solution
-to the above problem.
-A <a class="reference external" href="http://stackoverflow.com/questions/533631/what-is-a-mixin-and-why-are-they-useful">Mixin</a> is a simple class that can be used to extend other classes either by overriding functionality of the base class or
-by adding extra features. Django CBVs use various <a class="reference external" href="https://docs.djangoproject.com/en/dev/topics/class-based-views/mixins/">mixins</a> to extend the base Views and add&nbsp;functionality.</p>
-</div>
-<div class="section" id="a-non-html-mixin">
-<h2><a class="toc-backref" href="#id4">A non-<span class="caps">HTML</span>&nbsp;mixin</a></h2>
-<p>So, a basic skeleton for our mixin would be something like&nbsp;this:</p>
-<div class="highlight"><pre><span class="k">class</span> <span class="nc">NonHtmlResponseMixin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">render_to_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="o">**</span><span class="n">response_kwargs</span><span class="p">):</span>
-        <span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">content_type</span><span class="o">=</span><span class="s">&#39;text/plain&#39;</span><span class="p">)</span>
-        <span class="n">response</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="s">&quot;Hello, world&quot;</span> <span class="p">)</span>
-        <span class="k">return</span> <span class="n">response</span>
-</pre></div>
-<p>The previous mixin overrides the render_to_response method to just return the text &quot;Hello, world&quot;. For instance
-we could define the following&nbsp;class:</p>
-<div class="highlight"><pre><span class="k">class</span> <span class="nc">DummyTextResponseView</span><span class="p">(</span><span class="n">NonHtmlResponseMixin</span><span class="p">,</span> <span class="n">TemplateView</span><span class="p">,):</span>
-  <span class="k">pass</span>
-</pre></div>
-<p>which can be added as a route to <tt class="docutils literal">urls.py</tt> (using the <tt class="docutils literal">as_view</tt> method) and will always return the &quot;Hello, world&quot;&nbsp;text.</p>
-<p>Here&#8217;s something more complicated: A Mixin that can be used along with a DetailView and will output the properties of the
-object as&nbsp;text:</p>
-<div class="highlight"><pre><span class="k">class</span> <span class="nc">TextPropertiesResponseMixin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-  <span class="k">def</span> <span class="nf">render_to_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="o">**</span><span class="n">response_kwargs</span><span class="p">):</span>
-      <span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">content_type</span><span class="o">=</span><span class="s">&#39;text/plain; charset=utf-8&#39;</span><span class="p">)</span>
-      <span class="n">o</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_object</span><span class="p">()</span>
-      <span class="n">o</span><span class="o">.</span><span class="n">_meta</span><span class="o">.</span><span class="n">fields</span>
-      <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">o</span><span class="o">.</span><span class="n">_meta</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span>
-          <span class="n">response</span><span class="o">.</span><span class="n">write</span> <span class="p">(</span><span class="s">u&#39;{0}: {1}</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>  <span class="nb">unicode</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">__dict__</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">))</span> <span class="p">)</span> <span class="p">)</span>
-      <span class="k">return</span> <span class="n">response</span>
-</pre></div>
-<p>and can be used like&nbsp;this</p>
-<div class="highlight"><pre><span class="k">class</span> <span class="nc">TextPropertiesDetailView</span><span class="p">(</span><span class="n">TextPropertiesResponseMixin</span><span class="p">,</span> <span class="n">FooDetailView</span><span class="p">,):</span>
-  <span class="k">pass</span>
-</pre></div>
-<p>The above mixin will use the get_object() method of the DetailView to get the object and then output
-it as text. We can create similar mixins that will integrate with other types of CBVs, for instance
-to export a ListView as an <span class="caps">CSV</span> or generate an png from a DetailView of an Image&nbsp;file.</p>
-</div>
-<div class="section" id="a-more-complex-example">
-<h2><a class="toc-backref" href="#id5">A more complex&nbsp;example</a></h2>
-<p>The previous examples all built upon an existing view (either a TemplateView, a DetailView or a ListView).
-However, an existing view that will fit our requirements won&#8217;t always be available. For instance,
-sometimes I want to export data from my database using a raw <span class="caps">SQL</span> query. Also I&#8217;d like to be able to easily
-export this data as csv or&nbsp;excel.</p>
-<p>First of all, we need to define a view that will inherit from <tt class="docutils literal">View</tt> and export the data as a <span class="caps">CSV</span>:</p>
-<div class="highlight"><pre><span class="kn">import</span> <span class="nn">unicodecsv</span>
-<span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">connection</span>
-<span class="kn">from</span> <span class="nn">django.views.generic</span> <span class="kn">import</span> <span class="n">View</span>
-
-<span class="k">class</span> <span class="nc">CsvRawSqlExportView</span><span class="p">(</span><span class="n">View</span><span class="p">,</span> <span class="p">):</span>
-  <span class="n">sql</span> <span class="o">=</span> <span class="s">&#39;select 1+1&#39;</span>
-  <span class="n">headers</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;res&#39;</span><span class="p">]</span>
-  <span class="n">params</span> <span class="o">=</span> <span class="p">[]</span>
-
-  <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
-      <span class="k">def</span> <span class="nf">generate_data</span><span class="p">(</span><span class="n">cursor</span><span class="p">):</span>
-          <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">():</span>
-              <span class="k">yield</span> <span class="n">row</span>
-
-      <span class="n">cursor</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
-      <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
-      <span class="n">generator</span> <span class="o">=</span> <span class="n">generate_data</span><span class="p">(</span><span class="n">cursor</span><span class="p">)</span>
-      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">render_to_response</span><span class="p">(</span><span class="n">generator</span><span class="p">)</span>
-
-  <span class="k">def</span> <span class="nf">render_to_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">generator</span><span class="p">,</span> <span class="o">**</span><span class="n">response_kwargs</span><span class="p">):</span>
-      <span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">content_type</span><span class="o">=</span><span class="s">&#39;text/plain; charset=utf-8&#39;</span><span class="p">)</span>
-      <span class="n">response</span><span class="p">[</span><span class="s">&#39;Content-Disposition&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;attachment; filename=export.csv&#39;</span>
-      <span class="n">w</span> <span class="o">=</span> <span class="n">unicodecsv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span>
-      <span class="n">w</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">headers</span><span class="p">)</span>
-      <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">generator</span><span class="p">:</span>
-          <span class="n">w</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
-
-      <span class="k">return</span> <span class="n">response</span>
-</pre></div>
-<p>The above View has three attributes:
-* sql, which is a string with the raw sql that will be executed
-* headers, which is an array with the names of each header of the resulting data
-* params, which is an array with parameters that may need to be passed to the&nbsp;query</p>
-<p>The <tt class="docutils literal">get</tt> method executes the query and passes the result to <tt class="docutils literal">render_to_response</tt>
-using a generator.  The <tt class="docutils literal">render_to_response</tt> method instantiates an HttpResponse
-object with the correct attributes and writes the <span class="caps">CSV</span> to the response object using&nbsp;unicodecsv.</p>
-<p>We can now quickly create a route that will export data from the users&nbsp;table:</p>
-<div class="highlight"><pre><span class="n">url</span><span class="p">(</span>
-    <span class="s">r&#39;^raw_export_users/$&#39;</span><span class="p">,</span>
-    <span class="n">views</span><span class="o">.</span><span class="n">CsvRawSqlExportView</span><span class="o">.</span><span class="n">as_view</span><span class="p">(</span>
-        <span class="n">sql</span><span class="o">=</span><span class="s">&#39;select id, username from auth_user&#39;</span><span class="p">,</span>
-        <span class="n">headers</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;id&#39;</span><span class="p">,</span> <span class="s">&#39;username&#39;</span><span class="p">]</span>
-    <span class="p">)</span> <span class="p">,</span>
-    <span class="n">name</span><span class="o">=</span><span class="s">&#39;raw_export_users&#39;</span>
-<span class="p">),</span>
-</pre></div>
-<p>If instead of <span class="caps">CSV</span> we wanted to export to <span class="caps">XLS</span> (using xlwt), we&#8217;d just need to create a&nbsp;Mixin:</p>
-<div class="highlight"><pre><span class="k">class</span> <span class="nc">XlsRawSqlResponseMixin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-  <span class="k">def</span> <span class="nf">render_to_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">generator</span><span class="p">,</span> <span class="o">**</span><span class="n">response_kwargs</span><span class="p">):</span>
-      <span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">content_type</span><span class="o">=</span><span class="s">&#39;application/ms-excel&#39;</span><span class="p">)</span>
-      <span class="n">response</span><span class="p">[</span><span class="s">&#39;Content-Disposition&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;attachment; filename=export.xls&#39;</span>
-      <span class="n">wb</span> <span class="o">=</span> <span class="n">xlwt</span><span class="o">.</span><span class="n">Workbook</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span>
-      <span class="n">ws</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_sheet</span><span class="p">(</span><span class="s">&quot;data&quot;</span><span class="p">)</span>
-
-      <span class="k">for</span> <span class="n">j</span><span class="p">,</span><span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">headers</span><span class="p">):</span>
-              <span class="n">ws</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">c</span><span class="p">)</span>
-
-      <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">generator</span><span class="p">):</span>
-          <span class="k">for</span> <span class="n">j</span><span class="p">,</span><span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
-              <span class="n">ws</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">c</span><span class="p">)</span>
-
-      <span class="n">wb</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
-      <span class="k">return</span> <span class="n">response</span>
-</pre></div>
-<p>and create a View that inherits from <tt class="docutils literal">CsvRawSqlExportView</tt> and uses the above&nbsp;mixin:</p>
-<div class="highlight"><pre><span class="k">class</span> <span class="nc">XlsRawSqlExportView</span><span class="p">(</span> <span class="n">XlsRawSqlResponseMixin</span><span class="p">,</span> <span class="n">CsvRawSqlExportView</span> <span class="p">):</span>
-  <span class="k">pass</span>
-</pre></div>
-<p>and route to that view to get the <span class="caps">XLS</span>:</p>
-<div class="highlight"><pre><span class="n">url</span><span class="p">(</span>
-    <span class="s">r&#39;^raw_export_users/$&#39;</span><span class="p">,</span>
-    <span class="n">views</span><span class="o">.</span><span class="n">XlsRawSqlExportView</span><span class="o">.</span><span class="n">as_view</span><span class="p">(</span>
-        <span class="n">sql</span><span class="o">=</span><span class="s">&#39;select id, username from auth_user&#39;</span><span class="p">,</span>
-        <span class="n">headers</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;id&#39;</span><span class="p">,</span> <span class="s">&#39;username&#39;</span><span class="p">]),</span>
-    <span class="n">name</span><span class="o">=</span><span class="s">&#39;raw_export_users&#39;</span>
-<span class="p">),</span>
-</pre></div>
-</div>
-<div class="section" id="conclusion">
-<h2><a class="toc-backref" href="#id6">Conclusion</a></h2>
-<p>Using the above techniques we can define CBVs that will output their content in various content types
-beyond <span class="caps">HTML</span>. This will help us write write clean and <span class="caps">DRY</span>&nbsp;code.</p>
-</div>
-</div>
-  		</article>
-  		<article>
-<header>
-      <h1 class="entry-title">
-        <a href="http://spapas.github.io/2014/04/11/django-generic-formviews-for-objects/">Django generic FormViews for objects</a>
-      </h1>
-      <p class="meta"><time datetime="2014-04-11T10:23:00" pubdate>Παρ 11 Απρίλιος 2014</time></p>
-</header>
-
-  <div class="entry-content"><div class="contents topic" id="contents">
-<p class="topic-title first">Contents</p>
-<ul class="simple">
-<li><a class="reference internal" href="#introduction" id="id1">Introduction</a></li>
-<li><a class="reference internal" href="#a-quick-introduction-to-the-formview" id="id2">A quick introduction to the <tt class="docutils literal">FormView</tt></a></li>
-<li><a class="reference internal" href="#a-quick-introduction-to-the-singleobjectmixin" id="id3">A quick introduction to the <tt class="docutils literal">SingleObjectMixin</tt></a></li>
-<li><a class="reference internal" href="#being-generic-and-dry" id="id4">Being generic and <span class="caps">DRY</span></a></li>
-<li><a class="reference internal" href="#being-more-generic-and-dry" id="id5">Being more generic and <span class="caps">DRY</span></a></li>
-<li><a class="reference internal" href="#other-options" id="id6">Other&nbsp;options</a></li>
-</ul>
-</div>
-<div class="section" id="introduction">
-<h2><a class="toc-backref" href="#id1">Introduction</a></h2>
-<p>We recently needed to create a number of views for changing the status of an Application model instance for our organization.
-An Application model instance can be filled and then cancelled, submitted, acceptted etc - for each of these status changes a form should be
-presented to the user. When the user submits the form the status of the Application will be&nbsp;changed.</p>
-<p>To implement the above requirement we created a generic FormView that acts on the specific model instance. This
-used two basic <span class="caps">CBV</span> components: The <tt class="docutils literal">FormView</tt> for the form manipulation and the <tt class="docutils literal">SingleObjectMixing</tt> for the
-object&nbsp;handling.</p>
-<p>Django <a class="reference external" href="https://docs.djangoproject.com/en/1.6/topics/class-based-views/">Class Based Views</a> (CBVs) can be used to create reusable Views using normal class inheritance. Most
-people use the well-known <tt class="docutils literal">CreateView</tt>, <tt class="docutils literal">UpdateView</tt>, <tt class="docutils literal">DetailView</tt> and <tt class="docutils literal">ListView</tt>, however, as we
-will see below, the <tt class="docutils literal">FormView</tt> will help us write <span class="caps">DRY</span>&nbsp;code.</p>
-<p>I have to notice here that an invaluable tool to help you understanding CBVs is the <a class="reference external" href="http://ccbv.co.uk/"><span class="caps">CBV</span> inspector</a> which
-has a nice web interface for browsing the <span class="caps">CBV</span> hierarchies, attributes and&nbsp;methods.</p>
-</div>
-<div class="section" id="a-quick-introduction-to-the-formview">
-<h2><a class="toc-backref" href="#id2">A quick introduction to the <tt class="docutils literal">FormView</tt></a></h2>
-<p>A simple <tt class="docutils literal">FormView</tt> can be defined like this (<a class="reference external" href="http://ccbv.co.uk/projects/Django/1.6/django.views.generic.edit/FormView/"><span class="caps">CBV</span> FormView</a>):</p>
-<pre class="code literal-block">
-class MyFormView(FormView):
-  form_class = forms.MyFormView
-  template_name = 'my_template.html'
-</pre>
-<p>The above can be used in urls.py like&nbsp;this:</p>
-<pre class="code literal-block">
-urlpatterns = patterns('',
-  url(r'^my_formview/$', views.MyFormView.as_view() , name='my_formview' ),
-</pre>
-<p>This will present a form to the user when he visits the <tt class="docutils literal">my_formview</tt>  url &#8212; however this form won&#8217;t do anything. To allow
-the form to actually do something when it&#8217;s been submitted we need to override the <tt class="docutils literal">form_valid</tt> method.</p>
-<pre class="code literal-block">
-def form_valid(self, form):
-    value = form.cleaned_data['value']
-    messages.info(self.request, &quot;MyForm submitted with value {0}!&quot;.format(value) )
-    return HttpResponseRedirect( reverse('my_formview') )
-</pre>
-<p>As you can see the submitted form is passed in the method and can be used to receive its <tt class="docutils literal">cleaned_data</tt>. The <tt class="docutils literal">FormView</tt>
-has various other options for instance a <tt class="docutils literal">form_invalid</tt> method, an <tt class="docutils literal">initial</tt> attribute to set the initial values for the form&nbsp;etc.</p>
-</div>
-<div class="section" id="a-quick-introduction-to-the-singleobjectmixin">
-<h2><a class="toc-backref" href="#id3">A quick introduction to the <tt class="docutils literal">SingleObjectMixin</tt></a></h2>
-<p>A <tt class="docutils literal">SingleObjectMixin</tt> adds a number of attributes <span class="amp">&amp;</span> methods to a view that can be used for object manipulation. The
-most important ones is the <tt class="docutils literal">model</tt> and <tt class="docutils literal">queryset</tt> attributes and the <tt class="docutils literal">get_queryset</tt> and <tt class="docutils literal">get_object()</tt>. To use
-the <tt class="docutils literal">SingleObjectMixin</tt> in your <span class="caps">CBV</span> just add it to the list of the classes to inherit from and define either the
-<tt class="docutils literal">model</tt> or the <tt class="docutils literal">queryset</tt> attribute. After that you may pass a <tt class="docutils literal">pk</tt> parameter to your view and you will get an
-<tt class="docutils literal">object</tt> context variable in the template with the selected&nbsp;object!</p>
-</div>
-<div class="section" id="being-generic-and-dry">
-<h2><a class="toc-backref" href="#id4">Being generic and <span class="caps">DRY</span></a></h2>
-<p>We can more or less now understand how we should use <tt class="docutils literal">FormView</tt> and <tt class="docutils literal">SingleObjectMixin</tt> to generate our
-generic <tt class="docutils literal">FormView</tt> for acting on objects: Our <tt class="docutils literal">FormView</tt> should <em>get</em> the object using the <tt class="docutils literal">SingleObjectMixin</tt>
-and change it when the form is submitted using the values from the form. A first implementation would be the&nbsp;following:</p>
-<pre class="code literal-block">
-class GenericObjectFormView1(FormView, SingleObjectMixin):
-
-    def form_valid(self, form):
-        obj = self.get_object()
-        obj.change_status(form)
-        return HttpResponseRedirect( obj.get_absolute_url() )
-</pre>
-<p>So our <tt class="docutils literal">GenericObjectFormView1</tt> class inherits from <tt class="docutils literal">FormView</tt> and <tt class="docutils literal">SingleObjectMixin</tt>. The only thing that we have
-to assure is that the Model we want to act on needs to implement a <tt class="docutils literal">change_status</tt> method which gets the <tt class="docutils literal">form</tt> and
-changes the status of that object based on its value. For instance, two implementations can be the&nbsp;following:</p>
-<pre class="code literal-block">
-class CancelObjectFormView(GenericObjectFormView1):
-    template_name = 'cancel.html'
-    form_class = forms.CancelForm
-    model = models.Application
-
-class SubmitObjectFormView(GenericObjectFormView1):
-    template_name = 'submit.html'
-    form_class = forms.SubmitForm
-    model = models.Application
-</pre>
-</div>
-<div class="section" id="being-more-generic-and-dry">
-<h2><a class="toc-backref" href="#id5">Being more generic and <span class="caps">DRY</span></a></h2>
-<p>The previous implementation has two&nbsp;problems:</p>
-<ul class="simple">
-<li>What happens if the status of the object should not be changed even if the form <em>is</em>&nbsp;valid?</li>
-<li>We shouldn&#8217;t need to create a new template for every new <tt class="docutils literal">GenericObjectFormView</tt> since all these templates will just output the object information, ask a question for the status change and output the&nbsp;form.</li>
-</ul>
-<p>Let&#8217;s write a new version of our GenericObjectFormView that actually resolves&nbsp;these:</p>
-<pre class="code literal-block">
-class GenericObjectFormView2(FormView, SingleObjectMixin):
-    template_name = 'generic_formview.html'
-    ok_message = ''
-    not_ok_message = ''
-    title = ''
-    question =''
-
-    def form_valid(self, form):
-        obj = self.get_object()
-        r = obj.change_status(form)
-        if r:
-            messages.info(self.request, self.yes_message)
-        else:
-            messages.info(self.request, self.not_ok_message)
-        return HttpResponseRedirect( obj.get_absolute_url() )
-
-    def get_context_data(self, **kwargs):
-        context = super(GenericYesNoFormView, self).get_context_data(**kwargs)
-        context['title'] = self.title
-        context['question'] = self.question
-        return context
-</pre>
-<p>The above adds an ok and not ok message which will be outputed if the status can or cannot be changed. To accomplish this,
-the <tt class="docutils literal">change_status</tt> method should now return a boolean value to mark if the action was ok or not. Also, a generic template
-will now be used. This template has two placeholders: One for the title of the page (<tt class="docutils literal">title</tt> attribute) and one for the
-question asked to the user (<tt class="docutils literal">question</tt> attribute). Now we can use it like&nbsp;this:</p>
-<pre class="code literal-block">
-class CancelObjectFormView(GenericObjectFormView2):
-    form_class = forms.CancelForm
-    model = models.Application
-    ok_message = 'Cancel success!'
-    not_ok_message = 'Not able to cancel!'
-    title = 'Cancel an object'
-    question = 'Do you want to cancel this object?'
-
-class SubmitObjectFormView(GenericObjectFormView2):
-    form_class = forms.SubmitForm
-    model = models.Application
-    ok_message = 'Submit  ok'
-    not_ok_message = 'Cannot submit!'
-    title = 'Submit an object'
-    question ='Do you want to submit this object?'
-</pre>
-</div>
-<div class="section" id="other-options">
-<h2><a class="toc-backref" href="#id6">Other&nbsp;options</a></h2>
-<p>We&#8217;ve just got a glimpse of how we can use CBVs to increase the DRYness of our Django applications. There are various
-extra things that we can add to our <tt class="docutils literal">GenericObjectFormView2</tt> as attributes which will be defined by inheriting
-classes. Some ideas is to check if the current user actually has access to modify the object (hint: override the
-<tt class="docutils literal">get_object</tt> method of <tt class="docutils literal">SingleObjectMixin</tt>) or render the form diffirently depending on the current user (hint:
-override the <tt class="docutils literal">get_form_kwargs</tt> method of <tt class="docutils literal">FormView</tt>).</p>
-</div>
-</div>
-  		</article>
-  		<article>
-<header>
-      <h1 class="entry-title">
-        <a href="http://spapas.github.io/2013/12/24/django-dynamic-forms/">Django dynamic forms</a>
-      </h1>
-      <p class="meta"><time datetime="2013-12-24T14:20:00" pubdate>Τρι 24 Δεκέμβριος 2013</time></p>
-</header>
-
-  <div class="entry-content"><div class="contents topic" id="contents">
-<p class="topic-title first">Contents</p>
-<ul class="simple">
-<li><a class="reference internal" href="#introduction" id="id1">Introduction</a></li>
-<li><a class="reference internal" href="#describing-a-django-form-in-json" id="id2">Describing a django form in <span class="caps">JSON</span></a></li>
-<li><a class="reference internal" href="#creating-the-form-fields" id="id3">Creating the form&nbsp;fields</a></li>
-<li><a class="reference internal" href="#creating-the-actual-form" id="id4">Creating the actual&nbsp;form</a></li>
-<li><a class="reference internal" href="#using-the-dynamic-form" id="id5">Using the dynamic&nbsp;form</a></li>
-</ul>
-</div>
-<div class="section" id="introduction">
-<h2><a class="toc-backref" href="#id1">Introduction</a></h2>
-<p>To define a form in django, a developer has to create a class which extends
-<tt class="docutils literal">django.forms.Form</tt>
-and has  a number of attributes extending from <tt class="docutils literal">django.forms.Field</tt>. This makes
-it very easy for the developer to create static forms, but creating
-dynamic forms whose fields can be changed depending on the data contributed by the
-users of the application is not so&nbsp;obvious.</p>
-<p>Of course, some people may argue that they can do whatever
-they want just by spitting html input tags to their templates, however this totally violates
-<span class="caps">DRY</span> and any serious django developer would prefer to write <a class="reference external" href="http://thedailywtf.com/Articles/A_Case_of_the_MUMPS.aspx"><span class="caps">MUMPS</span></a> than creating
-html&nbsp;dynamically.</p>
-<p>The implementation I will present here had been developed for an old project: In that
-project there was a number of services which could be edited dynamically by the
-moderators. For each service, the moderators would generate a questionnaire to
-get input from the users which would be defined  using <span class="caps">JSON</span>. When the users needed
-to submit information for each service, a dynamic django form would be generated
-from this <span class="caps">JSON</span> and the answers would be saved to no-<span class="caps">SQL</span> database like&nbsp;MongoDB.</p>
-</div>
-<div class="section" id="describing-a-django-form-in-json">
-<h2><a class="toc-backref" href="#id2">Describing a django form in <span class="caps">JSON</span></a></h2>
-<p>A <span class="caps">JSON</span> described django form is just an array of field <span class="caps">JSON</span> objects. Each field
-object  has three required attributes: name which is the keyword of the field, label which is
-how the label of the field and type which is the type of the input of that field. The
-supported types are text, textarea, integer, radio, select, checkbox. Now, depending
-on the type of the field, there could be also some more required attributes, for instace
-text has a max_length attribute and select has a choices attribute (which is an array
-of name/value objects). Also there are two optional attributes,
-required with a default value of False and help_text with a default value of&nbsp;&#8221;.</p>
-<p>As you can understand these map one by one to the corresponding attributes of the
-actual django form fields. An example containing a complete <span class="caps">JSON</span> described form
-is the&nbsp;following:</p>
-<pre class="code literal-block">
-[
-    {
-        &quot;name&quot;: &quot;firstname&quot;,
-        &quot;label&quot;: &quot;First Name&quot;,
-        &quot;type&quot;: &quot;text&quot;,
-        &quot;max_length&quot;: 25,
-        &quot;required&quot;: 1
-    },
-    {
-        &quot;name&quot;: &quot;lastname&quot;,
-        &quot;label&quot;: &quot;Last Name&quot;,
-        &quot;type&quot;: &quot;text&quot;,
-        &quot;max_length&quot;: 25,
-        &quot;required&quot;: 1
-    },
-    {
-        &quot;name&quot;: &quot;smallcv&quot;,
-        &quot;label&quot;: &quot;Small CV&quot;,
-        &quot;type&quot;: &quot;textarea&quot;,
-        &quot;help_text&quot;: &quot;Please insert a small CV&quot;
-    },
-    {
-        &quot;name&quot;: &quot;age&quot;,
-        &quot;label&quot;: &quot;Age&quot;,
-        &quot;type&quot;: &quot;integer&quot;,
-        &quot;max_value&quot;: 200,
-        &quot;min_value&quot;: 0
-    },
-    {
-        &quot;name&quot;: &quot;marital_status&quot;,
-        &quot;label&quot;: &quot;Marital Status&quot;,
-        &quot;type&quot;: &quot;radio&quot;,
-        &quot;choices&quot;: [
-            {&quot;name&quot;: &quot;Single&quot;, &quot;value&quot;:&quot;single&quot;},
-            {&quot;name&quot;: &quot;Married&quot;, &quot;value&quot;:&quot;married&quot;},
-            {&quot;name&quot;: &quot;Divorced&quot;, &quot;value&quot;:&quot;divorced&quot;},
-            {&quot;name&quot;: &quot;Widower&quot;, &quot;value&quot;:&quot;widower&quot;}
-        ]
-    },
-    {
-        &quot;name&quot;: &quot;occupation&quot;,
-        &quot;label&quot;: &quot;Occupation&quot;,
-        &quot;type&quot;: &quot;select&quot;,
-        &quot;choices&quot;: [
-            {&quot;name&quot;: &quot;Farmer&quot;, &quot;value&quot;:&quot;farmer&quot;},
-            {&quot;name&quot;: &quot;Engineer&quot;, &quot;value&quot;:&quot;engineer&quot;},
-            {&quot;name&quot;: &quot;Teacher&quot;, &quot;value&quot;:&quot;teacher&quot;},
-            {&quot;name&quot;: &quot;Office Clerk&quot;, &quot;value&quot;:&quot;office_clerk&quot;},
-            {&quot;name&quot;: &quot;Merchant&quot;, &quot;value&quot;:&quot;merchant&quot;},
-            {&quot;name&quot;: &quot;Unemployed&quot;, &quot;value&quot;:&quot;unemployed&quot;},
-            {&quot;name&quot;: &quot;Retired&quot;, &quot;value&quot;:&quot;retired&quot;},
-            {&quot;name&quot;: &quot;Other&quot;, &quot;value&quot;:&quot;other&quot;}
-        ]
-    },
-    {
-        &quot;name&quot;: &quot;internet&quot;,
-        &quot;label&quot;: &quot;Internet Access&quot;,
-        &quot;type&quot;: &quot;checkbox&quot;
-    }
-]
-</pre>
-<p>The above <span class="caps">JSON</span> string can be easily converted to an array of dictionaries with the following&nbsp;code:</p>
-<pre class="code literal-block">
-import json
-fields=json.loads(json_fields)
-</pre>
-</div>
-<div class="section" id="creating-the-form-fields">
-<h2><a class="toc-backref" href="#id3">Creating the form&nbsp;fields</a></h2>
-<p>The most import part in the django dynamic form creation is to convert the above array
-of field-describing dictionaries to actual objects of type <tt class="docutils literal">django.forms.Field</tt>.</p>
-<p>To help with that I implemented a class named <tt class="docutils literal">FieldHandler</tt> which gets an
-array of field dictionaries and after initialization will have an attribute named <tt class="docutils literal">formfields</tt> which
-will be a dictionary with keys the names of each field an values the corresponding <tt class="docutils literal">django.forms.Field</tt> objects. The implementation is as&nbsp;follows:</p>
-<pre class="code literal-block">
-import django.forms
-
-class FieldHandler():
-    formfields = {}
-    def __init__(self, fields):
-        for field in fields:
-            options = self.get_options(field)
-            f = getattr(self, &quot;create_field_for_&quot;+field['type'] )(field, options)
-            self.formfields[field['name']] = f
-
-    def get_options(self, field):
-        options = {}
-        options['label'] = field['label']
-        options['help_text'] = field.get(&quot;help_text&quot;, None)
-        options['required'] = bool(field.get(&quot;required&quot;, 0) )
-        return options
-
-    def create_field_for_text(self, field, options):
-        options['max_length'] = int(field.get(&quot;max_length&quot;, &quot;20&quot;) )
-        return django.forms.CharField(**options)
-
-    def create_field_for_textarea(self, field, options):
-        options['max_length'] = int(field.get(&quot;max_value&quot;, &quot;9999&quot;) )
-        return django.forms.CharField(widget=django.forms.Textarea, **options)
-
-    def create_field_for_integer(self, field, options):
-        options['max_value'] = int(field.get(&quot;max_value&quot;, &quot;999999999&quot;) )
-        options['min_value'] = int(field.get(&quot;min_value&quot;, &quot;-999999999&quot;) )
-        return django.forms.IntegerField(**options)
-
-    def create_field_for_radio(self, field, options):
-        options['choices'] = [ (c['value'], c['name'] ) for c in field['choices'] ]
-        return django.forms.ChoiceField(widget=django.forms.RadioSelect,   **options)
-
-    def create_field_for_select(self, field, options):
-        options['choices']  = [ (c['value'], c['name'] ) for c in field['choices'] ]
-        return django.forms.ChoiceField(  **options)
-
-    def create_field_for_checkbox(self, field, options):
-        return django.forms.BooleanField(widget=django.forms.CheckboxInput, **options)
-</pre>
-<p>As can be seen, in the <tt class="docutils literal">__init__</tt> method, the <tt class="docutils literal">get_options</tt> method is called first which
-returns a dictionary with the common options (label, help_text, required). After that,
-depending on the type of each field the correct method will be generated with
-<tt class="docutils literal">getattr(self, <span class="pre">&quot;create_field_for_&quot;+field['type']</span> )</tt> (so if type is text this
-will return a reference to the create_field_for_text method) and then called passing
-the field dictinary and the options returned from <tt class="docutils literal">get_options</tt>. Each one of
-the <tt class="docutils literal">create_field_for_xxx</tt> methods will extract the required (or optional)
-attributes for the specific field type, update options and initialize the correct Field passing
-the options as kwargs. Finally the formfields attribute will be updated with the name
-and Field&nbsp;object.</p>
-</div>
-<div class="section" id="creating-the-actual-form">
-<h2><a class="toc-backref" href="#id4">Creating the actual&nbsp;form</a></h2>
-<p>To create the actual dynamic <tt class="docutils literal">django.forms.Form</tt> I used the function <tt class="docutils literal">get_form</tt>
-which receives a string with the json description, parses it to a python array,
-creates the array of fields with the help of <tt class="docutils literal">FieldHandler</tt> and then generates
-the <tt class="docutils literal">Form</tt> class with <tt class="docutils literal">type</tt> passing it <tt class="docutils literal">django.forms.Form</tt> as a parent
-and the array of <tt class="docutils literal">django.forms.Field</tt> from <tt class="docutils literal">FieldHandler</tt> as&nbsp;attributes:</p>
-<pre class="code literal-block">
-def get_form(jstr):
-    fields=json.loads(jstr)
-    fh = FieldHandler(fields)
-    return type('DynaForm', (django.forms.Form,), fh.formfields )
-</pre>
-</div>
-<div class="section" id="using-the-dynamic-form">
-<h2><a class="toc-backref" href="#id5">Using the dynamic&nbsp;form</a></h2>
-<p>The result of <tt class="docutils literal">get_form</tt> can be used as a normal form class. As an&nbsp;example:</p>
-<pre class="code literal-block">
-import dynaform
-
-def dform(request):
-    json_form = get_json_form_from_somewhere()
-    form_class = dynaform.get_form(json_form)
-    data = {}
-    if request.method == 'POST':
-        form = form_class(request.POST)
-        if form.is_valid():
-            data = form.cleaned_data
-    else:
-        form = form_class()
-
-    return render_to_response( &quot;dform.html&quot;, {
-        'form': form,  'data': data,
-    }, RequestContext(request) )
-</pre>
-<p>So, we have to get our <span class="caps">JSON</span> form description from somewhere (for instance
-a field in a model) and then generate the form class with <tt class="docutils literal">get_form</tt>.
-After that we follow the normal procedure of checking if the <tt class="docutils literal">request.method</tt>
-is <span class="caps">POST</span> so we pass the <span class="caps">POST</span> data to the form and check if it is value or
-we just create an empty form. As a result we just pass the data that was
-read from the form to the view for&nbsp;presentation.</p>
-</div>
-</div>
-  		</article>
-<div class="pagination">
-    <a class="prev" href="http://spapas.github.io/category\django2.html">&larr; Older</a>
-
-  <br />
-</div></div>
 <aside class="sidebar">
   <section>
     <h1>Recent Posts</h1>
@@ -1525,9 +206,12 @@ read from the form to the view for&nbsp;presentation.</p>
 </aside>    </div>
   </div>
   <footer role="contentinfo"><p>
-    Copyright &copy;  2013-2015  - Serafeim Papastefanos -
+    Copyright &copy;  2013&ndash;2015  Serafeim Papastefanos &mdash;
   <span class="credit">Powered by <a href="http://getpelican.com">Pelican</a></span>
 </p></footer>
+  <script src="http://spapas.github.io/theme/js/modernizr-2.0.js"></script>
+  <script src="http://spapas.github.io/theme/js/ender.js"></script>
+  <script src="http://spapas.github.io/theme/js/octopress.js" type="text/javascript"></script>
     <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -1535,16 +219,17 @@ read from the form to the view for&nbsp;presentation.</p>
     })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
     ga('create', 'UA-44750952-1', 'auto');
+
     ga('send', 'pageview');
     </script>
-	<script type="text/javascript">
-	  var disqus_shortname = 'spapas-github-io';
-	  (function() {
-	    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-	    dsq.src = "//" + disqus_shortname + '.disqus.com/embed.js';
-	    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-	   })();
-	</script>
+  <script type="text/javascript">
+    var disqus_shortname = 'spapas-github-io';
+    (function() {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = "//" + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+     })();
+  </script>
   <script type="text/javascript">
     (function(){
       var twitterWidgets = document.createElement('script');

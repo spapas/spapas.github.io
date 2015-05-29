@@ -5,8 +5,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="google-site-verification" content="5_8DTmIiEq4gFvNAfxAD6TsGOgrMAjp8lQFQvfA6zZc" />
-  <title>/var/ - mongodb</title>
+  <title>Tag: mongodb &mdash; /var/</title>
   <meta name="author" content="Serafeim Papastefanos">
+
 
 
 
@@ -15,12 +16,11 @@
   <meta name="MobileOptimized" content="320">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <link href="http://spapas.github.io/favicon.png" rel="icon">
+
+    <link href="http://spapas.github.io/favicon.png" rel="icon">
+
   <link href="http://spapas.github.io/theme/css/main.css" media="screen, projection"
         rel="stylesheet" type="text/css">
-  <script src="http://spapas.github.io/theme/js/modernizr-2.0.js"></script>
-  <script src="http://spapas.github.io/theme/js/ender.js"></script>
-  <script src="http://spapas.github.io/theme/js/octopress.js" type="text/javascript"></script>
 
   <link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic"
         rel="stylesheet" type="text/css">
@@ -37,260 +37,61 @@
 </ul>
 
 
-
 <ul class="main-navigation">
-    <li >
-    <a href="http://spapas.github.io/category/css.html">Css</a>
-    </li>
-    <li >
-    <a href="http://spapas.github.io/category/django.html">Django</a>
-    </li>
-    <li >
-    <a href="http://spapas.github.io/category/flask.html">Flask</a>
-    </li>
-    <li >
-    <a href="http://spapas.github.io/category/git.html">Git</a>
-    </li>
-    <li >
-    <a href="http://spapas.github.io/category/javascript.html">Javascript</a>
-    </li>
-    <li >
-    <a href="http://spapas.github.io/category/pelican.html">Pelican</a>
-    </li>
-    <li >
-    <a href="http://spapas.github.io/category/python.html">Python</a>
-    </li>
-    <li >
-    <a href="http://spapas.github.io/category/spring.html">Spring</a>
-    </li>
-    <li >
-    <a href="http://spapas.github.io/category/wagtail.html">Wagtail</a>
-    </li>
+      <li >
+        <a href="http://spapas.github.io/category/css.html">Css</a>
+      </li>
+      <li >
+        <a href="http://spapas.github.io/category/django.html">Django</a>
+      </li>
+      <li >
+        <a href="http://spapas.github.io/category/flask.html">Flask</a>
+      </li>
+      <li >
+        <a href="http://spapas.github.io/category/git.html">Git</a>
+      </li>
+      <li >
+        <a href="http://spapas.github.io/category/javascript.html">Javascript</a>
+      </li>
+      <li >
+        <a href="http://spapas.github.io/category/pelican.html">Pelican</a>
+      </li>
+      <li >
+        <a href="http://spapas.github.io/category/python.html">Python</a>
+      </li>
+      <li >
+        <a href="http://spapas.github.io/category/spring.html">Spring</a>
+      </li>
+      <li >
+        <a href="http://spapas.github.io/category/wagtail.html">Wagtail</a>
+      </li>
 </ul></nav>
   <div id="main">
     <div id="content">
-<div class="blog-index">
-  		<article>
-<header>
-      <h1 class="entry-title">
-        <a href="http://spapas.github.io/2014/06/30/rest-flask-mongodb-heroku/">Implementing a simple, Heroku-hosted REST service using Flask and mongoDB</a>
-      </h1>
-      <p class="meta"><time datetime="2014-06-30T15:23:00" pubdate>Δευ 30 Ιούνιος 2014</time></p>
-</header>
+<div>
+	<article role="article">
+    	<header>
+    		<h1 class="entry-title">Tag: mongodb</h1>
+    	</header>
 
-  <div class="entry-content"><div class="contents topic" id="contents">
-<p class="topic-title first">Contents</p>
-<ul class="simple">
-<li><a class="reference internal" href="#introduction" id="id1">Introduction</a></li>
-<li><a class="reference internal" href="#requirements" id="id2">Requirements</a></li>
-<li><a class="reference internal" href="#implementing-the-rest-service" id="id3">Implementing the <span class="caps">REST</span>&nbsp;service</a></li>
-<li><a class="reference internal" href="#testing-it-locally" id="id4">Testing it&nbsp;locally</a></li>
-<li><a class="reference internal" href="#deploying-to-heroku" id="id5">Deploying to&nbsp;Heroku</a></li>
-</ul>
+    	<div id="blog-archives">
+            <h2>2014</h2>
+                    <article>
+                        <h1><a href="http://spapas.github.io/2014/06/30/rest-flask-mongodb-heroku/">Implementing a simple, Heroku-hosted <span class="caps">REST</span> service using Flask and&nbsp;mongoDB</a></h1>
+                        <time datetime="2014-06-30 15:23:00" pubdate>
+                            <span class="month">Ιού</span>
+                            <span class="day">30</span>
+                            <span class="year">2014</span>
+                        </time>
+                        <footer>
+                            <span class="categories">posted in
+                                <a class='category' href='http://spapas.github.io/category/flask.html'>flask</a>
+                            </span>
+                        </footer>
+                    </article>
+	    </div>
+    </article>
 </div>
-<div class="section" id="introduction">
-<h2><a class="toc-backref" href="#id1">Introduction</a></h2>
-<p>In the following, I will describe how I used <a class="reference external" href="http://flask.pocoo.org/">Flask</a>, a very nice web <em>microframework</em> for python along  with <a class="reference external" href="http://www.mongodb.org/">mongoDB</a>, the most
-popular No-<span class="caps">SQL</span> database to implement a simple <span class="caps">REST</span> service that was hosted on <a class="reference external" href="https://dashboard.heroku.com/apps">Heroku</a>. This <span class="caps">REST</span> service would get readings from
-a number of sensors from an Android&nbsp;device.</p>
-<p>I chose Flask instead of Django mainly because the <span class="caps">REST</span> service that I needed to implement would be very simple and most of
-the Django bells and whistles (<span class="caps">ORM</span>, auth, admin, etc) wouldn&#8217;t be needed anyway. Also, Flask is much quicker to set-up than
-Django since almost everything (views, urls, etc) can be put inside one python&nbsp;module.</p>
-<p>Concerning the choice of a NoSQL persistance solution (mongoDB), I wanted to have a table (or collection as it is called in the
-mongoDB world) of readings from the sensor. Each reading would just have a timestamp and various other
-arbitrary data depending on the type of the reading, so saving it as a <span class="caps">JSON</span> document in a NoSQL database is a good&nbsp;solution.</p>
-<p>Finally, all the above will be deployed to Heroku which offers some great services for deploying python code in the&nbsp;cloud.</p>
-</div>
-<div class="section" id="requirements">
-<h2><a class="toc-backref" href="#id2">Requirements</a></h2>
-<p>I propose creating a file named <tt class="docutils literal">requirements.txt</tt> that will host the required packages for your project, so you will be
-able to setup your projects after creating a virtual environment with <a class="reference external" href="http://virtualenv.readthedocs.org/en/latest/">virtualenv</a> just by running <tt class="docutils literal">pip install <span class="pre">-r</span> requirements.txt</tt>.
-Also, the requirements.txt is required for deploying python to&nbsp;Heroku.</p>
-<p>So, for my case, the contents of requirements.txt are the&nbsp;following:</p>
-<pre class="code literal-block">
-Flask==0.10.1
-Flask-PyMongo==0.3.0
-Flask-RESTful==0.2.12
-Jinja2==2.7.3
-MarkupSafe==0.23
-Werkzeug==0.9.6
-aniso8601==0.82
-gunicorn==19.0.0
-itsdangerous==0.24
-pymongo==2.7.1
-pytz==2014.4
-six==1.7.2
-</pre>
-<ul class="simple">
-<li>Flask-PyMongo is a simple wrapper for Flask around pymongo which is the python mongoDB&nbsp;driver.</li>
-<li>Flask-RESTful is a simple library for creating <span class="caps">REST</span> APIs - it needs aniso8601 and&nbsp;pytz.</li>
-<li>Jinja2 is the template library for Flask (we won&#8217;t use it but it is required by Flask installation) - it needs&nbsp;MarkupSafe.</li>
-<li>Werkzeug is a <span class="caps">WSGI</span> utility library - required by&nbsp;Flask</li>
-<li>gunicorn is a <span class="caps">WSGI</span> <span class="caps">HTTP</span> server - needed for deployment to&nbsp;Heroku</li>
-<li>itsdangerous is used to sign data for usage in untrusted&nbsp;environments</li>
-<li>six is the python 2/3 compatibility&nbsp;layer</li>
-</ul>
-</div>
-<div class="section" id="implementing-the-rest-service">
-<h2><a class="toc-backref" href="#id3">Implementing the <span class="caps">REST</span>&nbsp;service</a></h2>
-<p>Instead of using just one single file for our Flask web application, we will create a python module to contain it and a
-file named <tt class="docutils literal">runserver.py</tt> that will start a local development server to test&nbsp;it:</p>
-<p>So, in the same folder as the <tt class="docutils literal">requirements.txt</tt> create a folder named <tt class="docutils literal">flask_rest_service</tt> and in there put
-two files: <tt class="docutils literal">__init__.py</tt> and <tt class="docutils literal">resources.py</tt>.</p>
-<p>The <tt class="docutils literal">__init__.py</tt> initializes our Flask application, our mongoDB connection and our Flask-RESTful&nbsp;api:</p>
-<pre class="code literal-block">
-import os
-from flask import Flask
-from flask.ext import restful
-from flask.ext.pymongo import PyMongo
-from flask import make_response
-from bson.json_util import dumps
-
-MONGO_URL = os.environ.get('MONGO_URL')
-if not MONGO_URL:
-    MONGO_URL = &quot;mongodb://localhost:27017/rest&quot;;
-
-app = Flask(__name__)
-
-app.config['MONGO_URI'] = MONGO_URL
-mongo = PyMongo(app)
-
-def output_json(obj, code, headers=None):
-    resp = make_response(dumps(obj), code)
-    resp.headers.extend(headers or {})
-    return resp
-
-DEFAULT_REPRESENTATIONS = {'application/json': output_json}
-api = restful.Api(app)
-api.representations = DEFAULT_REPRESENTATIONS
-
-import flask_rest_service.resources
-</pre>
-<p>So what happens here? After the imports, we check if we have a MONGO_URL environment variable. This is
-how we set options in Heroku. If such option does not exist in the environment then we are in our
-development environment so we set it to the localhost (we must have a running mongoDB installation in
-our dev&nbsp;environment).</p>
-<p>In the next lines, we initialize our Flask application and our mongoDB connection (pymongo
-uses a <tt class="docutils literal">MONGO_URI</tt> configuration option to know the database <span class="caps">URI</span>).</p>
-<p>The <tt class="docutils literal">output_json</tt> is used to dump the <span class="caps">BSON</span> encoded mongoDB objects to <span class="caps">JSON</span> and was borrowed from
-<a class="reference external" href="http://blog.alienretro.com/using-mongodb-with-flask-restful/">alienretro&#8217;s blog</a> &#8212; we initialize our restful <span class="caps">REST</span> <span class="caps">API</span> with this&nbsp;function.</p>
-<p>Finally, we import the <tt class="docutils literal">resources.py</tt> module which actually defines our <span class="caps">REST</span>&nbsp;resources.</p>
-<pre class="code literal-block">
-import json
-from flask import request, abort
-from flask.ext import restful
-from flask.ext.restful import reqparse
-from flask_rest_service import app, api, mongo
-from bson.objectid import ObjectId
-
-class ReadingList(restful.Resource):
-    def __init__(self, *args, **kwargs):
-        self.parser = reqparse.RequestParser()
-        self.parser.add_argument('reading', type=str)
-        super(ReadingList, self).__init__()
-
-    def get(self):
-        return  [x for x in mongo.db.readings.find()]
-
-    def post(self):
-        args = self.parser.parse_args()
-        if not args['reading']:
-            abort(400)
-
-        jo = json.loads(args['reading'])
-        reading_id =  mongo.db.readings.insert(jo)
-        return mongo.db.readings.find_one({&quot;_id&quot;: reading_id})
-
-
-class Reading(restful.Resource):
-    def get(self, reading_id):
-        return mongo.db.readings.find_one_or_404({&quot;_id&quot;: reading_id})
-
-    def delete(self, reading_id):
-        mongo.db.readings.find_one_or_404({&quot;_id&quot;: reading_id})
-        mongo.db.readings.remove({&quot;_id&quot;: reading_id})
-        return '', 204
-
-
-class Root(restful.Resource):
-    def get(self):
-        return {
-            'status': 'OK',
-            'mongo': str(mongo.db),
-        }
-
-api.add_resource(Root, '/')
-api.add_resource(ReadingList, '/readings/')
-api.add_resource(Reading, '/readings/&lt;ObjectId:reading_id&gt;')
-</pre>
-<p>Here we define three <tt class="docutils literal">Resource</tt> classes and add them to our previously defined <tt class="docutils literal">api</tt>: <tt class="docutils literal">Root</tt>, <tt class="docutils literal">Reading</tt> and <tt class="docutils literal">ReadingList</tt>.</p>
-<p><tt class="docutils literal">Root</tt> just returns a dictionary with an <span class="caps">OK</span> status and some info on our mongodb&nbsp;connection.</p>
-<p><tt class="docutils literal">Reading</tt> has gets an ObjectId
-(which is the mongodb primary key) as a parameter and depending on the <span class="caps">HTTP</span> operation, it returns the reading with that
-id when receiving an <tt class="docutils literal"><span class="caps">HTTP</span> <span class="caps">GET</span></tt> and deletes the reading with that id when receiving an <tt class="docutils literal"><span class="caps">HTTP</span> <span class="caps">DELETE</span></tt>.</p>
-<p><tt class="docutils literal">ReadingList</tt> will return all readings when receiving an <tt class="docutils literal"><span class="caps">HTTP</span> <span class="caps">GET</span></tt> and will create a new reading when
-receiving an <tt class="docutils literal"><span class="caps">HTTP</span> <span class="caps">POST</span></tt> The <tt class="docutils literal">post</tt> function uses the parser defined in <tt class="docutils literal">__init__</tt> which requires
-a <tt class="docutils literal">reading</tt> parameter with the actual reading to be&nbsp;inserted.</p>
-</div>
-<div class="section" id="testing-it-locally">
-<h2><a class="toc-backref" href="#id4">Testing it&nbsp;locally</a></h2>
-<p>In order to run the development server, you will need to install and start mongodb locally which is beyond the scope of this post. After that
-create a file named <tt class="docutils literal">runserver.py</tt> in the same folder as with the <tt class="docutils literal">requirements.txt</tt>
-and the <tt class="docutils literal">flask_rest_service</tt> folder. The contents of this file should&nbsp;be:</p>
-<pre class="code literal-block">
-from flask_rest_service import app
-app.run(debug=True)
-</pre>
-<p>When you run this file with <tt class="docutils literal">python runserver.py</tt> you should be able top visit your rest service at <a class="reference external" href="http://localhost:5000">http://localhost:5000</a> and get
-an &quot;<span class="caps">OK</span>&quot;&nbsp;status.</p>
-</div>
-<div class="section" id="deploying-to-heroku">
-<h2><a class="toc-backref" href="#id5">Deploying to&nbsp;Heroku</a></h2>
-<p>To deploy to Heroku, you must create a <tt class="docutils literal">Procfile</tt> that contains the workers of your application. In our case, the
-<tt class="docutils literal">Procfile</tt> should contain the&nbsp;following:</p>
-<pre class="code literal-block">
-web: gunicorn flask_rest_service:app
-</pre>
-<p>Also, you should add a .gitignore file with the&nbsp;following:</p>
-<pre class="code literal-block">
-*.pyc
-</pre>
-<p>Finally, to deploy your application to Heroku you can follow the instructions here: <a class="reference external" href="https://devcenter.heroku.com/articles/getting-started-with-python">https://devcenter.heroku.com/articles/getting-started-with-python</a>:</p>
-<ul class="simple">
-<li>Initialize a git repository and commit&nbsp;everything:</li>
-</ul>
-<pre class="code literal-block">
-git init
-git add .
-git commit -m
-</pre>
-<ul class="simple">
-<li>Create a new Heroku application (after logging in to heroku with <tt class="docutils literal">heroku login</tt>) and set the MONGO_URL environment variable (of course you have to obtain ths MONGO_URL variable for your heroku envirotnment by adding a mongoDB&nbsp;database):</li>
-</ul>
-<pre class="code literal-block">
-heroku create
-heroku config:set MONGO_URL=mongodb://user:pass&#64;mongoprovider.com:27409/rest
-</pre>
-<ul class="simple">
-<li>And finally push your master branch to the heroku remote&nbsp;repository:</li>
-</ul>
-<pre class="code literal-block">
-git push heroku master
-</pre>
-<p>If everything went ok you should be able to start a worker for your application, check that the worker is running, and finally visit&nbsp;it:</p>
-<pre class="code literal-block">
-heroku ps:scale web=1
-heroku ps
-heroku open
-</pre>
-<p>If everything was ok you should see an status-<span class="caps">OK</span> <span class="caps">JSON</span>&nbsp;!</p>
-</div>
-</div>
-  		</article>
-<div class="pagination">
-
-  <br />
-</div></div>
 <aside class="sidebar">
   <section>
     <h1>Recent Posts</h1>
@@ -326,9 +127,12 @@ heroku open
 </aside>    </div>
   </div>
   <footer role="contentinfo"><p>
-    Copyright &copy;  2014  - Serafeim Papastefanos -
+    Copyright &copy;  2014  Serafeim Papastefanos &mdash;
   <span class="credit">Powered by <a href="http://getpelican.com">Pelican</a></span>
 </p></footer>
+  <script src="http://spapas.github.io/theme/js/modernizr-2.0.js"></script>
+  <script src="http://spapas.github.io/theme/js/ender.js"></script>
+  <script src="http://spapas.github.io/theme/js/octopress.js" type="text/javascript"></script>
     <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -336,16 +140,17 @@ heroku open
     })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
     ga('create', 'UA-44750952-1', 'auto');
+
     ga('send', 'pageview');
     </script>
-	<script type="text/javascript">
-	  var disqus_shortname = 'spapas-github-io';
-	  (function() {
-	    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-	    dsq.src = "//" + disqus_shortname + '.disqus.com/embed.js';
-	    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-	   })();
-	</script>
+  <script type="text/javascript">
+    var disqus_shortname = 'spapas-github-io';
+    (function() {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = "//" + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+     })();
+  </script>
   <script type="text/javascript">
     (function(){
       var twitterWidgets = document.createElement('script');

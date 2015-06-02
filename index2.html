@@ -185,6 +185,8 @@ bmFsLnR4dA3dEQzM082BF7sB+D3q6QPUNEfwG7vHQgNkiQDTkGvfhOE4mNltIJJlBFMOCQPzPeKD
 </pre>
 <p>So the whole attachment was contained in that text file, encoded in base64! Now I just
 needed to extract it from the email and convert it back to&nbsp;binary.</p>
+<blockquote>
+<strong>Important: Before going the python way, please check the 2 June 2015 update at the end of the article for an easier solution!</strong></blockquote>
 <p>This was very easy to do using Python - some people <a class="reference external" href="http://stackoverflow.com/questions/4067937/getting-mail-attachment-to-python-file-object">had already asked the same thing on <span class="caps">SO</span></a>.
 So here&#8217;s a simple program that gets an email in text/mime format as input and dumps all&nbsp;attachments:</p>
 <div class="highlight"><pre><span class="kn">import</span> <span class="nn">email</span>
@@ -209,6 +211,10 @@ you must be 100% sure that you know what you are doing before retrievening your 
 <p><strong>Update, 12 January 2015</strong>: Ivana (at the comments section) proposed a different solution that may work
 for some files: <em>Use a mobile Gmail client (I tested it with Android) and &quot;Save to Drive&quot; your attachment.
 You&#8217;ll then be able to download it from the Google&nbsp;Drive!</em></p>
+<p><strong>Update, 2 June 2015</strong>: Commenter Sumit Chauhan (and Yuri Marx) proposed to change the extension
+of the downloaded <span class="caps">MIME</span> text file (original message) to eml and open it with Outlook. I don&#8217;t have
+Outlook in my system, however I tried opening it with <a class="reference external" href="https://www.mozilla.org/el/thunderbird/">Thunderbird</a> and it worked!!! So please
+try this solution before trying the pythonic way (especially if you&#8217;re not familiar with&nbsp;python).</p>
 <p>I am not sure if this works for all attachments,
 however it worked for the source of my PhD thesis! I&#8217;m writing it may not work for all attachments because
 when you download something from Google Drive it does a virus check so it may not allow you to download the

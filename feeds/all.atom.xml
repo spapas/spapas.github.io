@@ -1392,16 +1392,15 @@ you must be 100% sure that you know what you are doing before retrievening your 
 &lt;p&gt;&lt;strong&gt;Update&lt;/strong&gt;: Stefan &lt;a class="reference external" href="https://gist.github.com/stefansundin/a99bbfb6cda873d14fd2"&gt;created an improved version&lt;/a&gt; of the attachment extractor which is also compatible with Python&amp;nbsp;3.4!&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;Update, 12 January 2015&lt;/strong&gt;: Ivana (at the comments section) proposed a different solution that may work
 for some files: &lt;em&gt;Use a mobile Gmail client (I tested it with Android) and &amp;quot;Save to Drive&amp;quot; your attachment.
-You&amp;#8217;ll then be able to download it from the Google&amp;nbsp;Drive!&lt;/em&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Update, 2 June 2015&lt;/strong&gt;: Commenter Sumit Chauhan (and Yuri Marx) proposed to change the extension
-of the downloaded &lt;span class="caps"&gt;MIME&lt;/span&gt; text file (original message) to eml and open it with Outlook. I don&amp;#8217;t have
-Outlook in my system, however I tried opening it with &lt;a class="reference external" href="https://www.mozilla.org/el/thunderbird/"&gt;Thunderbird&lt;/a&gt; and it worked!!! So please
-try this solution before trying the pythonic way (especially if you&amp;#8217;re not familiar with&amp;nbsp;python).&lt;/p&gt;
-&lt;p&gt;I am not sure if this works for all attachments,
+You&amp;#8217;ll then be able to download it from the Google Drive!&lt;/em&gt; I am not sure if this works for all attachments,
 however it worked for the source of my PhD thesis! I&amp;#8217;m writing it may not work for all attachments because
 when you download something from Google Drive it does a virus check so it may not allow you to download the
 attachment and then  you&amp;#8217;ll still need to do it manually using the method below (however &lt;strong&gt;in that case you
 must be even more cautious for the case the attachment actualyl contains a malicious file&lt;/strong&gt;).&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Update, 2 June 2015&lt;/strong&gt;: Commenter Sumit Chauhan (and Yuri Marx) proposed to change the extension
+of the downloaded &lt;span class="caps"&gt;MIME&lt;/span&gt; text file (original message) to eml and open it with Outlook. I don&amp;#8217;t have
+Outlook in my system, however I tried opening it with &lt;a class="reference external" href="https://www.mozilla.org/el/thunderbird/"&gt;Thunderbird&lt;/a&gt; and it worked!!! So please
+try this solution before trying the pythonic way (especially if you&amp;#8217;re not familiar with&amp;nbsp;python).&lt;/p&gt;
 </summary><category term="gmail"></category><category term="python"></category><category term="security"></category><category term="google"></category></entry><entry><title>Django non-HTML responses</title><link href="http://spapas.github.io/2014/09/15/django-non-html-responses/" rel="alternate"></link><updated>2014-09-15T14:20:00+03:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2014-09-15:2014/09/15/django-non-html-responses/</id><summary type="html">&lt;div class="contents topic" id="contents"&gt;
 &lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
 &lt;ul class="simple"&gt;

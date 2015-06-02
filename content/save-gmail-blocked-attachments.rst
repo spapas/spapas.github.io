@@ -9,6 +9,8 @@ Retrieving Gmail blocked attachments
 :summary: A method to retrieve blocked attachments from your Gmail
 
 
+
+
 Before services like Dropbox were widely available, some people (including me) were using
 their Gmail account as a primitive backup solution: Compress your directory and send it to
 your gmail. There. Backup complete.
@@ -52,6 +54,8 @@ Clicking this option opened a text file with the original, MIME encoded message.
 So the whole attachment was contained in that text file, encoded in base64! Now I just
 needed to extract it from the email and convert it back to binary. 
 
+ **Important: Before going the python way, please check the 2 June 2015 update at the end of the article for an easier solution!**
+
 This was very easy to do using Python - some people `had already asked the same thing on SO`_.
 So here's a simple program that gets an email in text/mime format as input and dumps all
 attachments: 
@@ -84,9 +88,15 @@ named ``0.txt`` run ``python get_attachments.py 0.txt`` and you'll see the attac
  
 **Update**: Stefan `created an improved version`_ of the attachment extractor which is also compatible with Python 3.4! 
 
+
 **Update, 12 January 2015**: Ivana (at the comments section) proposed a different solution that may work
 for some files: *Use a mobile Gmail client (I tested it with Android) and "Save to Drive" your attachment.
 You'll then be able to download it from the Google Drive!* 
+
+**Update, 2 June 2015**: Commenter Sumit Chauhan (and Yuri Marx) proposed to change the extension
+of the downloaded MIME text file (original message) to eml and open it with Outlook. I don't have
+Outlook in my system, however I tried opening it with Thunderbird_ and it worked!!! So please
+try this solution before trying the pythonic way (especially if you're not familiar with python).
 
 I am not sure if this works for all attachments, 
 however it worked for the source of my PhD thesis! I'm writing it may not work for all attachments because
@@ -96,5 +106,5 @@ must be even more cautious for the case the attachment actualyl contains a malic
 
 
 .. _`created an improved version`: https://gist.github.com/stefansundin/a99bbfb6cda873d14fd2
- 
+.. _Thunderbird: https://www.mozilla.org/el/thunderbird/
  

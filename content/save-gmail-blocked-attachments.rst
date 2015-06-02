@@ -91,18 +91,18 @@ named ``0.txt`` run ``python get_attachments.py 0.txt`` and you'll see the attac
 
 **Update, 12 January 2015**: Ivana (at the comments section) proposed a different solution that may work
 for some files: *Use a mobile Gmail client (I tested it with Android) and "Save to Drive" your attachment.
-You'll then be able to download it from the Google Drive!* 
+You'll then be able to download it from the Google Drive!* I am not sure if this works for all attachments, 
+however it worked for the source of my PhD thesis! I'm writing it may not work for all attachments because
+when you download something from Google Drive it does a virus check so it may not allow you to download the
+attachment and then  you'll still need to do it manually using the method below (however **in that case you 
+must be even more cautious for the case the attachment actualyl contains a malicious file**).
+
 
 **Update, 2 June 2015**: Commenter Sumit Chauhan (and Yuri Marx) proposed to change the extension
 of the downloaded MIME text file (original message) to eml and open it with Outlook. I don't have
 Outlook in my system, however I tried opening it with Thunderbird_ and it worked!!! So please
 try this solution before trying the pythonic way (especially if you're not familiar with python).
 
-I am not sure if this works for all attachments, 
-however it worked for the source of my PhD thesis! I'm writing it may not work for all attachments because
-when you download something from Google Drive it does a virus check so it may not allow you to download the
-attachment and then  you'll still need to do it manually using the method below (however **in that case you 
-must be even more cautious for the case the attachment actualyl contains a malicious file**).
 
 
 .. _`created an improved version`: https://gist.github.com/stefansundin/a99bbfb6cda873d14fd2

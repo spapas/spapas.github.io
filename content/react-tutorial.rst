@@ -301,46 +301,48 @@ In the first part of ``BookPanel``, its react component methods will be presente
 
 .. code::
 
-    var BookPanel = React.createClass({
-        getInitialState: function() {
-            return {
-                books: [],
-                editingBook: {
-                    title:"",
-                    category:"",
-                },
-                search:"",
-                message:""
-            };
+  var BookPanel = React.createClass({
+    getInitialState: function() {
+      return {
+        books: [],
+        editingBook: {
+          title:"",
+          category:"",
         },
-        render: function() {
-            return(
-                <div className="row">
-                    <div className="one-half column">
-                        <SearchPanel
-                            search={this.state.search}
-                            onSearchChanged={this.onSearchChanged}
-                            onClearSearch={this.onClearSearch}
-                        />
-                        <BookTable books={this.state.books} handleEditClickPanel={this.handleEditClickPanel} />
-                    </div>
-                    <div className="one-half column">
-                        <BookForm
-                            book={this.state.editingBook}
-                            message={this.state.message}
-                            handleChange={this.handleChange}
-                            handleSubmitClick={this.handleSubmitClick}
-                            handleCancelClick={this.handleCancelClick}
-                            handleDeleteClick={this.handleDeleteClick}
-                        />
-                    </div>
-                </div>
-            );
-        },
-        componentDidMount: function() {
-            this.reloadBooks('');
-        },
-
+        search:"",
+        message:""
+      };
+    },
+    render: function() {
+      return(
+        <div className="row">
+          <div className="one-half column">
+            <SearchPanel
+              search={this.state.search}
+              onSearchChanged={this.onSearchChanged}
+              onClearSearch={this.onClearSearch}
+            />
+            <BookTable books={this.state.books} handleEditClickPanel={this.handleEditClickPanel} />
+          </div>
+          <div className="one-half column">
+            <BookForm
+              book={this.state.editingBook}
+              message={this.state.message}
+              handleChange={this.handleChange}
+              handleSubmitClick={this.handleSubmitClick}
+              handleCancelClick={this.handleCancelClick}
+              handleDeleteClick={this.handleDeleteClick}
+            />
+          </div>
+        </div>
+      );
+    },
+    componentDidMount: function() {
+      this.reloadBooks('');
+    },
+    // To be continued ...
+    
+    
 ``getInitialState`` is called the first time the component is created or mounted (attached to an HTML component in the page
 and should return the initial values of the state - here we return an object with empty placeholders. ``componentDidMount``
 will be called *after* the component is mounted and that's the place we should do any initializationn -- here we call the
@@ -353,48 +355,50 @@ Non-ajax object methods
 
 .. code::
 
-        onSearchChanged: function(query) {
-            if (this.promise) {
-                clearInterval(this.promise)
-            }
-            this.setState({
-                search: query
-            });
-            this.promise = setTimeout(function () {
-                this.reloadBooks(query);
-            }.bind(this), 200);
-        },
-        onClearSearch: function() {
-            this.setState({
-                search: ''
-            });
-            this.reloadBooks('');
-        },
-        handleEditClickPanel: function(id) {
-            var book = $.extend({}, this.state.books.filter(function(x) {
-                return x.id == id;
-            })[0] );
+  // Continuing from above
+  onSearchChanged: function(query) {
+    if (this.promise) {
+      clearInterval(this.promise)
+    }
+    this.setState({
+      search: query
+    });
+    this.promise = setTimeout(function () {
+      this.reloadBooks(query);
+    }.bind(this), 200);
+  },
+  onClearSearch: function() {
+    this.setState({
+      search: ''
+    });
+    this.reloadBooks('');
+  },
+  handleEditClickPanel: function(id) {
+    var book = $.extend({}, this.state.books.filter(function(x) {
+      return x.id == id;
+    })[0] );
 
-            this.setState({
-                editingBook: book,
-                message: ''
-            });
-        },
-        handleChange: function(title, category) {
-            this.setState({
-                editingBook: {
-                    title: title,
-                    category: category,
-                    id: this.state.editingBook.id
-                }
-            });
-        },
-        handleCancelClick: function(e) {
-            e.preventDefault();
-            this.setState({
-                editingBook: {}
-            });
-        },
+    this.setState({
+      editingBook: book,
+      message: ''
+    });
+  },
+  handleChange: function(title, category) {
+    this.setState({
+      editingBook: {
+        title: title,
+        category: category,
+        id: this.state.editingBook.id
+      }
+    });
+  },
+  handleCancelClick: function(e) {
+    e.preventDefault();
+    this.setState({
+      editingBook: {}
+    });
+  },
+  // to be continued ...
 
 All the above function change the ``BookPanel`` state so that the properties of the child components will
 also be updated:
@@ -412,94 +416,95 @@ Finally, we need a buncch of object methods that use ajax calls to retrieve or u
 
 .. code::
 
-        reloadBooks: function(query) {
-            $.ajax({
-                url: this.props.url+'?search='+query,
-                dataType: 'json',
-                cache: false,
-                success: function(data) {
-                    this.setState({
-                        books: data
-                    });
-                }.bind(this),
-                error: function(xhr, status, err) {
-                    console.error(this.props.url, status, err.toString());
-                    this.setState({
-                        message: err.toString(),
-                        search: query
-                    });
-                }.bind(this)
-            });
-        },
-        handleSubmitClick: function(e) {
-            e.preventDefault();
-            if(this.state.editingBook.id) {
-                $.ajax({
-                    url: this.props.url+this.state.editingBook.id,
-                    dataType: 'json',
-                    method: 'PUT',
-                    data:this.state.editingBook,
-                    cache: false,
-                    success: function(data) {
-                        this.setState({
-                            message: "Successfully updated book!"
-                        });
-                        this.reloadBooks('');
-                    }.bind(this),
-                    error: function(xhr, status, err) {
-                        console.error(this.props.url, status, err.toString());
-                        this.setState({
-                            message: err.toString()
-                        });
-                    }.bind(this)
-                });
-            } else {
-                $.ajax({
-                    url: this.props.url,
-                    dataType: 'json',
-                    method: 'POST',
-                    data:this.state.editingBook,
-                    cache: false,
-                    success: function(data) {
-                        this.setState({
-                            message: "Successfully added book!"
-                        });
-                        this.reloadBooks('');
-                    }.bind(this),
-                    error: function(xhr, status, err) {
-                        console.error(this.props.url, status, err.toString());
-                        this.setState({
-                            message: err.toString()
-                        });
-                    }.bind(this)
-                });
-            }
+    // Continuing from above
+    reloadBooks: function(query) {
+      $.ajax({
+        url: this.props.url+'?search='+query,
+        dataType: 'json',
+        cache: false,
+        success: function(data) {
+          this.setState({
+            books: data
+          });
+        }.bind(this),
+        error: function(xhr, status, err) {
+          console.error(this.props.url, status, err.toString());
+          this.setState({
+            message: err.toString(),
+            search: query
+          });
+        }.bind(this)
+      });
+    },
+    handleSubmitClick: function(e) {
+      e.preventDefault();
+      if(this.state.editingBook.id) {
+        $.ajax({
+          url: this.props.url+this.state.editingBook.id,
+          dataType: 'json',
+          method: 'PUT',
+          data:this.state.editingBook,
+          cache: false,
+          success: function(data) {
             this.setState({
-                editingBook: {}
+              message: "Successfully updated book!"
             });
-        },
-        handleDeleteClick: function(e) {
-            e.preventDefault();
-            $.ajax({
-                url: this.props.url+this.state.editingBook.id,
-                method: 'DELETE',
-                cache: false,
-                success: function(data) {
-                    this.setState({
-                        message: "Successfully deleted book!",
-                        editingBook: {}
-                    });
-                    this.reloadBooks('');
-                }.bind(this),
-                error: function(xhr, status, err) {
-                    console.error(this.props.url, status, err.toString());
-                    this.setState({
-                        message: err.toString()
-                    });
-                }.bind(this)
+            this.reloadBooks('');
+          }.bind(this),
+          error: function(xhr, status, err) {
+            console.error(this.props.url, status, err.toString());
+            this.setState({
+              message: err.toString()
             });
-        },
-    });
+          }.bind(this)
+        });
+      } else {
+        $.ajax({
+          url: this.props.url,
+          dataType: 'json',
+          method: 'POST',
+          data:this.state.editingBook,
+          cache: false,
+          success: function(data) {
+            this.setState({
+              message: "Successfully added book!"
+            });
+            this.reloadBooks('');
+          }.bind(this),
+          error: function(xhr, status, err) {
+            console.error(this.props.url, status, err.toString());
+            this.setState({
+              message: err.toString()
+            });
+          }.bind(this)
+        });
+      }
+      this.setState({
+        editingBook: {}
+      });
+    },
+    handleDeleteClick: function(e) {
+    e.preventDefault();
+    $.ajax({
+      url: this.props.url+this.state.editingBook.id,
+      method: 'DELETE',
+      cache: false,
+      success: function(data) {
+        this.setState({
+            message: "Successfully deleted book!",
+            editingBook: {}
+        });
+        this.reloadBooks('');
+      }.bind(this),
+      error: function(xhr, status, err) {
+        console.error(this.props.url, status, err.toString());
+        this.setState({
+            message: err.toString()
+        });
+      }.bind(this)
+      });
+    },
+  });
 
 * ``reloadBooks`` will try to load the books using an ajax GET and pass its query parameter to filter the books (or get all books if query is an empty string). If the ajax call was successfull the state will be updated with the retrieved books and the search text (to clear the  search text when we reload because of a save/edit/delete) while if there was an error the state will be updated with the error message.
 * ``handleSubmitClick`` checks if the state's ``editingBook`` has an id and  will do either a POST to create a new book or a PUT to update the existing one. Depending on the result of the operation will either reload books and clear the editingBook or set the error message.

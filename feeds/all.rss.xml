@@ -1,5 +1,549 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>/var/</title><link>http://spapas.github.io/</link><description>Various programming stuff</description><atom:link href="http://spapas.github.io/feeds/all.rss.xml" rel="self"></atom:link><lastBuildDate>Wed, 27 May 2015 14:20:00 +0300</lastBuildDate><item><title>Using browserify and watchify to improve your client-side-javascript workflow</title><link>http://spapas.github.io/2015/05/27/using-browserify-watchify/</link><description>&lt;div class="contents topic" id="contents"&gt;
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>/var/</title><link>http://spapas.github.io/</link><description>Various programming stuff</description><atom:link href="http://spapas.github.io/feeds/all.rss.xml" rel="self"></atom:link><lastBuildDate>Fri, 05 Jun 2015 14:20:00 +0300</lastBuildDate><item><title>A comprehensive React and Flux tutorial part 1: React</title><link>http://spapas.github.io/2015/06/05/comprehensive-react-flux-tutorial/</link><description>&lt;div class="contents topic" id="contents"&gt;
+&lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id1"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#our-project" id="id2"&gt;Our&amp;nbsp;project&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#a-top-level-view-of-the-components" id="id3"&gt;A top-level view of the&amp;nbsp;components&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#the-react-only-version" id="id4"&gt;The react-only version&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#searchpanel" id="id5"&gt;&lt;tt class="docutils literal"&gt;SearchPanel&lt;/tt&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#booktablerow" id="id6"&gt;&lt;tt class="docutils literal"&gt;BookTableRow&lt;/tt&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#booktable" id="id7"&gt;&lt;tt class="docutils literal"&gt;BookTable&lt;/tt&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#interlude-the-bind-function-method" id="id8"&gt;Interlude: The &lt;tt class="docutils literal"&gt;bind&lt;/tt&gt; function&amp;nbsp;method&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#bookform" id="id9"&gt;&lt;tt class="docutils literal"&gt;BookForm&lt;/tt&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#bookpanel" id="id10"&gt;&lt;tt class="docutils literal"&gt;BookPanel&lt;/tt&gt;&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#component-methods" id="id11"&gt;Component&amp;nbsp;methods&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#non-ajax-object-methods" id="id12"&gt;Non-ajax object&amp;nbsp;methods&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#ajax-object-methods" id="id13"&gt;Ajax object&amp;nbsp;methods&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#local-state" id="id14"&gt;Local&amp;nbsp;state&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#conclusion-to-the-first-part" id="id15"&gt;Conclusion to the first&amp;nbsp;part&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="introduction"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id1"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://facebook.github.io/react/"&gt;React&lt;/a&gt; is a rather new library from Facebook for building dynamic components for web pages.
+It introduces a really simple, fresh approach to javascript user interface building. React
+allows you to define composable and self-contained &lt;span class="caps"&gt;HTML&lt;/span&gt; components through Javascript (or a special syntax that compiles
+to javascript named &lt;span class="caps"&gt;JSX&lt;/span&gt;) and that&amp;#8217;s all &amp;#8212; it doesn&amp;#8217;t force you into any specific
+framework or architecture, you may use whatever you like. It&amp;#8217;s like writing pure
+&lt;span class="caps"&gt;HTML&lt;/span&gt; but you have the advantage of using classes with all their advantages for your
+components (self-contained, composable, reusable, mixins&amp;nbsp;etc).&lt;/p&gt;
+&lt;p&gt;Although React components can be used however you like in your client-side applications, Facebook proposes a specific
+architecture for the data flow of your events/data between the components called &lt;a class="reference external" href="https://facebook.github.io/flux/docs/overview.html"&gt;Flux&lt;/a&gt;.
+It&amp;#8217;s important to keep in your mind that Flux is not a
+specific framework but a way to organize the flow of events and data in your applicition.
+Unfortunately, although Flux is a rather simple architecture it is a little difficult to understand
+without a proper example (at least it was difficult for me to understand by reading the
+Facebook documentation and some tutorials I&amp;nbsp;found).&lt;/p&gt;
+&lt;p&gt;So, in this two-part tutorial we are going to build a (not-so-simple) single page &lt;span class="caps"&gt;CRUD&lt;/span&gt; application using
+React and Flux. Two versions of the same application will be built and explained: One with
+React (this part) only and one with React and Flux (part two). This will help us understand how
+Flux architecture fits to our project and why it greatly improves the experience with&amp;nbsp;React.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Warning&lt;/strong&gt;: This is not an introduction to react. Before reading this you need
+to be familiar with basic react usage, having read  at least the following three
+pages from react&amp;nbsp;documentation:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference external" href="https://facebook.github.io/react/docs/getting-started.html"&gt;https://facebook.github.io/react/docs/getting-started.html&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="https://facebook.github.io/react/docs/tutorial.html"&gt;https://facebook.github.io/react/docs/tutorial.html&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="https://facebook.github.io/react/docs/thinking-in-react.html"&gt;https://facebook.github.io/react/docs/thinking-in-react.html&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="our-project"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id2"&gt;Our&amp;nbsp;project&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;We are going to built a &lt;span class="caps"&gt;CRUD&lt;/span&gt; single-page application for editing views, let&amp;#8217;s take a look at how it&amp;nbsp;works:&lt;/p&gt;
+&lt;img alt="Our project" src="/images/demo.gif" style="width: 780px;" /&gt;
+&lt;p&gt;Our application will be seperated to two panels: In  the left one the user will be able to filter (search) for
+a book and in the right panel she&amp;#8217;ll be able to add / edit / delete a book. Everything is supported by
+a &lt;a class="reference external" href="http://www.django-rest-framework.org/"&gt;django-rest-framework&lt;/a&gt; implemented &lt;span class="caps"&gt;REST&lt;/span&gt; &lt;span class="caps"&gt;API&lt;/span&gt;. You can find the complete source code at
+&lt;a class="reference external" href="https://github.com/spapas/react-tutorial"&gt;https://github.com/spapas/react-tutorial&lt;/a&gt;. I&amp;#8217;ve added a couple of git tags to the source history in
+order to help us identify the differences between variou stages of the project (before and
+after integrating the Flux&amp;nbsp;architecture).&lt;/p&gt;
+&lt;p&gt;Django-rest-framework is used in the server-side back-end to create a really simple &lt;span class="caps"&gt;REST&lt;/span&gt; &lt;span class="caps"&gt;API&lt;/span&gt; - I won&amp;#8217;t
+provide any tutorial details on that (unless somebody wants it !), however
+you may either use the source code as is or create it from scratch using a different language/framework
+or even just a static json file (however you won&amp;#8217;t see any changes to the data this&amp;nbsp;way).&lt;/p&gt;
+&lt;p&gt;For styling (mainly to have a simple grid) we&amp;#8217;ll use &lt;a class="reference external" href="http://getskeleton.com/"&gt;skeleton&lt;/a&gt;. For the ajax calls and some utils we&amp;#8217;ll
+use &lt;a class="reference external" href="https://jquery.com/"&gt;jquery&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;All client-side code will be contained in the file static/main.js. The placeholder &lt;span class="caps"&gt;HTML&lt;/span&gt; for our
+application&amp;nbsp;is:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;lt;html&amp;gt;
+  &amp;lt;!-- styling etc ignored --&amp;gt;
+&amp;lt;body&amp;gt;
+  &amp;lt;h1&amp;gt;Hello, React!&amp;lt;/h1&amp;gt;
+  &amp;lt;div class=&amp;quot;container&amp;quot;&amp;gt;&amp;lt;div id=&amp;quot;content&amp;quot;&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;/div&amp;gt;
+&amp;lt;/body&amp;gt;
+&amp;lt;script src=&amp;quot;//fb.me/react-0.13.3.js&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
+&amp;lt;script src=&amp;quot;//fb.me/JSXTransformer-0.13.3.js&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
+&amp;lt;script src=&amp;quot;//code.jquery.com/jquery-2.1.3.min.js&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
+&amp;lt;script type=&amp;quot;text/jsx&amp;quot; src=&amp;quot;{% static 'main.js' %}&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
+&amp;lt;/html&amp;gt;
+&lt;/pre&gt;
+&lt;p&gt;We are using the version 0.13.3 of react and the same version of the JSXTransformer to translate &lt;span class="caps"&gt;JSX&lt;/span&gt;
+code to pure&amp;nbsp;javascript.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="a-top-level-view-of-the-components"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id3"&gt;A top-level view of the&amp;nbsp;components&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The following image shows how our components are&amp;nbsp;composed:&lt;/p&gt;
+&lt;img alt="Our components" src="/images/components.png" style="width: 780px;" /&gt;
+&lt;p&gt;So, the main component of our application is &lt;tt class="docutils literal"&gt;BookPanel&lt;/tt&gt; which contains three&amp;nbsp;components:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;SearchPanel&lt;/tt&gt;: To allow search (filtering) books based on their&amp;nbsp;title/category&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;BookForm&lt;/tt&gt;: To add/update/delete&amp;nbsp;books&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;BookTable&lt;/tt&gt;: To display all available books - each book is displayed in a &lt;tt class="docutils literal"&gt;BookTableRow&lt;/tt&gt; component.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;BookPanel&lt;/tt&gt; is the only component having state &amp;#8212; all other components will be initialized by property
+passing. The &lt;tt class="docutils literal"&gt;BookPanel&lt;/tt&gt; element will be mounted to the &lt;tt class="docutils literal"&gt;#content&lt;/tt&gt; element when the page&amp;nbsp;loads.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="the-react-only-version"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id4"&gt;The react-only&amp;nbsp;version&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The first version, using only react (and not flux) will use &lt;tt class="docutils literal"&gt;BookPanel&lt;/tt&gt; as a central information &lt;span class="caps"&gt;HUB&lt;/span&gt;.&lt;/p&gt;
+&lt;div class="section" id="searchpanel"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id5"&gt;&lt;tt class="docutils literal"&gt;SearchPanel&lt;/tt&gt;&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;SearchPanel&lt;/tt&gt; renders an input element with a value defined by the &lt;tt class="docutils literal"&gt;search&lt;/tt&gt; key of this component&amp;#8217;same
+properties. When this is changed the &lt;tt class="docutils literal"&gt;onSearchChanged&lt;/tt&gt; method of the component will be called, which in turn,
+retrieves the value of the input (using refs) and passes it to the properties &lt;tt class="docutils literal"&gt;onSearchChanged&lt;/tt&gt; callback function.
+Finally, with the line &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;{this.props.search?&amp;lt;button&lt;/span&gt; &lt;span class="pre"&gt;onClick={this.props.onClearSearch}&lt;/span&gt; &lt;span class="pre"&gt;&amp;gt;x&amp;lt;/button&amp;gt;:null}&lt;/span&gt;&lt;/tt&gt;
+we check if the search property contains any text and if yes, we display a clear filter button that will call
+properties onClearSearch&amp;nbsp;method:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+var SearchPanel = React.createClass({
+  render: function() {
+    return (
+      &amp;lt;div className=&amp;quot;row&amp;quot;&amp;gt;
+        &amp;lt;div className=&amp;quot;one-fourth column&amp;quot;&amp;gt;
+          Filter: &amp;amp;nbsp;
+          &amp;lt;input ref='search' type='text' value={this.props.search} onChange={this.onSearchChanged} /&amp;gt;
+          {this.props.search?&amp;lt;button onClick={this.props.onClearSearch} &amp;gt;x&amp;lt;/button&amp;gt;:null}
+        &amp;lt;/div&amp;gt;
+      &amp;lt;/div&amp;gt;
+    )
+  },
+  onSearchChanged: function() {
+    var query = React.findDOMNode(this.refs.search).value;
+    this.props.onSearchChanged(query);
+  }
+});
+&lt;/pre&gt;
+&lt;p&gt;So, this component has three&amp;nbsp;properties:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;search which is the text to display in the input&amp;nbsp;box&lt;/li&gt;
+&lt;li&gt;onSearchChanged (callback) which is called when the contents of the input box are&amp;nbsp;changed&lt;/li&gt;
+&lt;li&gt;onClearSearch (callback) which is called when the button is&amp;nbsp;pressed&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Notice that this component doesn&amp;#8217;t do anything - for all actions it uses the callbacks passed to it &amp;#8212;this
+means that exactly the same component would easily be reused in a totally different application or could
+be duplicated if we wanted to have a different search component for the book title and&amp;nbsp;category.&lt;/p&gt;
+&lt;p&gt;Another thing to notice is that the local &lt;tt class="docutils literal"&gt;onSearchChanged&lt;/tt&gt; method is defined only to help us retrieve the
+value of the input and use it to call the &lt;tt class="docutils literal"&gt;onSearchChanged&lt;/tt&gt; callback. Instead, we could just call the
+passed
+&lt;tt class="docutils literal"&gt;this.props.onSearchChanged&lt;/tt&gt; &amp;#8212; however to do this we&amp;#8217;d need a way to find the value of the input. This
+could be done if we added a ref to the included &lt;tt class="docutils literal"&gt;SearchPanel&lt;/tt&gt; from the parent component, so
+we&amp;#8217;d be able to use something like
+&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;React.findDOMNode(this.refs.searchPanel.refs.search).value&lt;/span&gt;&lt;/tt&gt; to find out the value of the input
+(see that we use a ref to go to the searchPanel component and another ref to go to input&amp;nbsp;component).&lt;/p&gt;
+&lt;p&gt;Both versions (getting the value directly from the child component or using the callback) could be used, however I
+believe that the callback version defines a more clear interface since the parent component shouldn&amp;#8217;t need
+to know the implementation details of its&amp;nbsp;children.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="booktablerow"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id6"&gt;&lt;tt class="docutils literal"&gt;BookTableRow&lt;/tt&gt;&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;BookTableRow&lt;/tt&gt; will render a table row by creating a simple table row that will contain the &lt;tt class="docutils literal"&gt;title&lt;/tt&gt;
+and &lt;tt class="docutils literal"&gt;category&lt;/tt&gt; attributes of the passed book property and an edit link that will call the &lt;tt class="docutils literal"&gt;handleEditClickPanel&lt;/tt&gt;
+property by passing the id of that&amp;nbsp;book:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+var BookTableRow = React.createClass({
+  render: function() {
+    return (
+      &amp;lt;tr&amp;gt;
+        &amp;lt;td&amp;gt;{this.props.book.title}&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;{this.props.book.category}&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;&amp;lt;a href='#' onClick={this.onClick}&amp;gt;Edit&amp;lt;/a&amp;gt;&amp;lt;/td&amp;gt;
+      &amp;lt;/tr&amp;gt;
+    );
+  },
+  onClick: function(id) {
+    this.props.handleEditClickPanel(this.props.book.id);
+  }
+});
+&lt;/pre&gt;
+&lt;p&gt;This component is used by &lt;tt class="docutils literal"&gt;BookTable&lt;/tt&gt; to render each one of the&amp;nbsp;books.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="booktable"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id7"&gt;&lt;tt class="docutils literal"&gt;BookTable&lt;/tt&gt;&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;This component create the left-side table using an array of &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;BookTableRow``s&lt;/span&gt; by passing it each one of the
+books of the ``books&lt;/tt&gt; array property. The &lt;tt class="docutils literal"&gt;handleEditClickPanel&lt;/tt&gt;
+property is retrieved from the parent of the component and passed as is to the&amp;nbsp;row.&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+var BookTable = React.createClass({
+  render: function() {
+    var rows = [];
+    this.props.books.forEach(function(book) {
+      rows.push(&amp;lt;BookTableRow key={book.id} book={book} handleEditClickPanel={this.props.handleEditClickPanel}  /&amp;gt;);
+    }.bind(this));
+    return (
+      &amp;lt;table&amp;gt;
+        &amp;lt;thead&amp;gt;
+          &amp;lt;tr&amp;gt;
+            &amp;lt;th&amp;gt;Title&amp;lt;/th&amp;gt;
+            &amp;lt;th&amp;gt;Category&amp;lt;/th&amp;gt;
+            &amp;lt;th&amp;gt;Edit&amp;lt;/th&amp;gt;
+          &amp;lt;/tr&amp;gt;
+        &amp;lt;/thead&amp;gt;
+        &amp;lt;tbody&amp;gt;{rows}&amp;lt;/tbody&amp;gt;
+      &amp;lt;/table&amp;gt;
+    );
+  }
+});
+&lt;/pre&gt;
+&lt;p&gt;The key attribute is used by React to uniquely identify each component - we are using the id (primary key)
+of each book. Before continuing with the other components, I&amp;#8217;d like to explain what is the purpose of that
+strange &lt;tt class="docutils literal"&gt;bind&lt;/tt&gt; call!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="interlude-the-bind-function-method"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id8"&gt;Interlude: The &lt;tt class="docutils literal"&gt;bind&lt;/tt&gt; function&amp;nbsp;method&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind"&gt;bind&lt;/a&gt; is a method of the function javascript object, since in javascript &lt;a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function"&gt;functions are objects&lt;/a&gt;! This
+method is useful for a number of things, however here we use it to set the &lt;tt class="docutils literal"&gt;this&lt;/tt&gt; keyword of the
+anonymous function that is passed to foreach to the &lt;tt class="docutils literal"&gt;this&lt;/tt&gt; keyword of the &lt;tt class="docutils literal"&gt;render&lt;/tt&gt; method of &lt;tt class="docutils literal"&gt;BookTable&lt;/tt&gt;,
+which will be the current BookTable&amp;nbsp;instance.&lt;/p&gt;
+&lt;p&gt;To make things crystal: Since we are using an anonymous function to pass to &lt;tt class="docutils literal"&gt;forEach&lt;/tt&gt;, this anonymous
+function won&amp;#8217;t have a &lt;tt class="docutils literal"&gt;this&lt;/tt&gt; keyword set to the current &lt;tt class="docutils literal"&gt;BookTable&lt;/tt&gt; object so we will get an error
+that &lt;tt class="docutils literal"&gt;this.props&lt;/tt&gt; is undefined. That&amp;#8217;s why we use bind to set &lt;tt class="docutils literal"&gt;this&lt;/tt&gt; to the current &lt;tt class="docutils literal"&gt;BookTable&lt;/tt&gt;. If
+instead of using the anonymous function we had created a &lt;tt class="docutils literal"&gt;createBookTableRow&lt;/tt&gt; method inside the
+&lt;tt class="docutils literal"&gt;BookTable&lt;/tt&gt; object that returned the &lt;tt class="docutils literal"&gt;BookTableRow&lt;/tt&gt; and passed &lt;tt class="docutils literal"&gt;this.createBookTableRow&lt;/tt&gt; to
+&lt;tt class="docutils literal"&gt;forEach&lt;/tt&gt;, we wouldn&amp;#8217;t have to use bind (notice that we&amp;#8217;d also need to make rows a class attribute
+and  refer to it through &lt;tt class="docutils literal"&gt;this.rows&lt;/tt&gt; for this to&amp;nbsp;work).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="bookform"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id9"&gt;&lt;tt class="docutils literal"&gt;BookForm&lt;/tt&gt;&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;BookForm&lt;/tt&gt; will create a form to either create a new book or update/delete an existing one. It has a &lt;tt class="docutils literal"&gt;book&lt;/tt&gt; object
+property - when this object has an &lt;tt class="docutils literal"&gt;id&lt;/tt&gt; (so it is saved to the database) the update/delete/cancel buttons will be shown,
+when it doesn&amp;#8217;t have an id the add button will be&amp;nbsp;shown.&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+var BookForm = React.createClass({
+  render: function() {
+    return(
+      &amp;lt;form onSubmit={this.props.handleSubmitClick}&amp;gt;
+        &amp;lt;label forHtml='title'&amp;gt;Title&amp;lt;/label&amp;gt;&amp;lt;input ref='title' name='title' type='text' value={this.props.book.title} onChange={this.onChange}/&amp;gt;
+        &amp;lt;label forHtml='category'&amp;gt;Category&amp;lt;/label&amp;gt;
+        &amp;lt;select ref='category' name='category' value={this.props.book.category} onChange={this.onChange} &amp;gt;
+          &amp;lt;option value='CRIME' &amp;gt;Crime&amp;lt;/option&amp;gt;
+          &amp;lt;option value='HISTORY'&amp;gt;History&amp;lt;/option&amp;gt;
+          &amp;lt;option value='HORROR'&amp;gt;Horror&amp;lt;/option&amp;gt;
+          &amp;lt;option value='SCIFI'&amp;gt;SciFi&amp;lt;/option&amp;gt;
+        &amp;lt;/select&amp;gt;
+        &amp;lt;br /&amp;gt;
+        &amp;lt;input type='submit' value={this.props.book.id?&amp;quot;Save (id = &amp;quot; +this.props.book.id+ &amp;quot;)&amp;quot;:&amp;quot;Add&amp;quot;} /&amp;gt;
+        {this.props.book.id?&amp;lt;button onClick={this.props.handleDeleteClick}&amp;gt;Delete&amp;lt;/button&amp;gt;:null}
+        {this.props.book.id?&amp;lt;button onClick={this.props.handleCancelClick}&amp;gt;Cancel&amp;lt;/button&amp;gt;:null}
+        {this.props.message?&amp;lt;div&amp;gt;{this.props.message}&amp;lt;/div&amp;gt;:null}
+      &amp;lt;/form&amp;gt;
+    );
+  },
+  onChange: function() {
+    var title = React.findDOMNode(this.refs.title).value;
+    var category = React.findDOMNode(this.refs.category).value;
+    this.props.handleChange(title, category);
+  }
+});
+&lt;/pre&gt;
+&lt;p&gt;As we can see, this component uses many properties &amp;#8212; most are passed callbacks functions for various&amp;nbsp;actions:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;book&lt;/tt&gt;: This will either be a new book object (without and id) when adding one or an existing (from the database) book when updating&amp;nbsp;one.&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;message&lt;/tt&gt;: To display the result of the last operation (save/delete) &amp;#8212; this is passed by the parent and probably it would be better if I had put it in a different component (and added styling&amp;nbsp;etc).&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;handleSubmitClick&lt;/tt&gt;: Will be called when the submit button is pressed to save the form (either by adding or&amp;nbsp;updating).&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;handleCancelClick&lt;/tt&gt;: Will be called when the cancel button is pressed &amp;#8212; we decide that we want actually want to edit a&amp;nbsp;book.&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;handleDeleteClick&lt;/tt&gt;: Will be called when the delete button is&amp;nbsp;pressed.&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;handleChange&lt;/tt&gt;: Will be called whenever the title or the category of the currently edited book is changed through the local onChange method. The onChange will retrieve that values of title and category and pass them to handleChange to do the state update. As already discussed, we could retrieve the values immediately from the parent but this creates a better interface to our&amp;nbsp;component.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="bookpanel"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id10"&gt;&lt;tt class="docutils literal"&gt;BookPanel&lt;/tt&gt;&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The &lt;tt class="docutils literal"&gt;BookPanel&lt;/tt&gt; component will contain all other components, will keep the global state
+and will also act as a central communications &lt;span class="caps"&gt;HUB&lt;/span&gt; between the components and the server. Because
+it is rather large class, I will explain it in three&amp;nbsp;parts:&lt;/p&gt;
+&lt;div class="section" id="component-methods"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#id11"&gt;Component&amp;nbsp;methods&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;In the first part of &lt;tt class="docutils literal"&gt;BookPanel&lt;/tt&gt;, its react component methods will be&amp;nbsp;presented:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+var BookPanel = React.createClass({
+  getInitialState: function() {
+    return {
+      books: [],
+      editingBook: {
+        title:&amp;quot;&amp;quot;,
+        category:&amp;quot;&amp;quot;,
+      },
+      search:&amp;quot;&amp;quot;,
+      message:&amp;quot;&amp;quot;
+    };
+  },
+  render: function() {
+    return(
+      &amp;lt;div className=&amp;quot;row&amp;quot;&amp;gt;
+        &amp;lt;div className=&amp;quot;one-half column&amp;quot;&amp;gt;
+          &amp;lt;SearchPanel
+            search={this.state.search}
+            onSearchChanged={this.onSearchChanged}
+            onClearSearch={this.onClearSearch}
+          /&amp;gt;
+          &amp;lt;BookTable books={this.state.books} handleEditClickPanel={this.handleEditClickPanel} /&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;div className=&amp;quot;one-half column&amp;quot;&amp;gt;
+          &amp;lt;BookForm
+            book={this.state.editingBook}
+            message={this.state.message}
+            handleChange={this.handleChange}
+            handleSubmitClick={this.handleSubmitClick}
+            handleCancelClick={this.handleCancelClick}
+            handleDeleteClick={this.handleDeleteClick}
+          /&amp;gt;
+        &amp;lt;/div&amp;gt;
+      &amp;lt;/div&amp;gt;
+    );
+  },
+  componentDidMount: function() {
+    this.reloadBooks('');
+  },
+  // To be continued ...
+&lt;/pre&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;getInitialState&lt;/tt&gt; is called the first time the component is created or mounted (attached to an &lt;span class="caps"&gt;HTML&lt;/span&gt; component in the page
+and should return the initial values of the state - here we return an object with empty placeholders. &lt;tt class="docutils literal"&gt;componentDidMount&lt;/tt&gt;
+will be called &lt;em&gt;after&lt;/em&gt; the component is mounted and that&amp;#8217;s the place we should do any initializationn &amp;#8212; here we call the
+&lt;tt class="docutils literal"&gt;reloadBooks&lt;/tt&gt; method (with an empty search string) to just retrieve all books. Finally, the &lt;tt class="docutils literal"&gt;render&lt;/tt&gt; method creates a
+&lt;tt class="docutils literal"&gt;div&lt;/tt&gt; that will contain all other components and initializes their properties with either state variables or object methods
+(these are the callbacks that were used in all other&amp;nbsp;components).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="non-ajax-object-methods"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#id12"&gt;Non-ajax object&amp;nbsp;methods&lt;/a&gt;&lt;/h4&gt;
+&lt;pre class="code literal-block"&gt;
+// Continuing from above
+onSearchChanged: function(query) {
+  if (this.promise) {
+    clearInterval(this.promise)
+  }
+  this.setState({
+    search: query
+  });
+  this.promise = setTimeout(function () {
+    this.reloadBooks(query);
+  }.bind(this), 200);
+},
+onClearSearch: function() {
+  this.setState({
+    search: ''
+  });
+  this.reloadBooks('');
+},
+handleEditClickPanel: function(id) {
+  var book = $.extend({}, this.state.books.filter(function(x) {
+    return x.id == id;
+  })[0] );
+
+  this.setState({
+    editingBook: book,
+    message: ''
+  });
+},
+handleChange: function(title, category) {
+  this.setState({
+    editingBook: {
+      title: title,
+      category: category,
+      id: this.state.editingBook.id
+    }
+  });
+},
+handleCancelClick: function(e) {
+  e.preventDefault();
+  this.setState({
+    editingBook: {}
+  });
+},
+// to be continued ...
+&lt;/pre&gt;
+&lt;p&gt;All the above function change the &lt;tt class="docutils literal"&gt;BookPanel&lt;/tt&gt; state so that the properties of the child components will
+also be&amp;nbsp;updated:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;onSearchChanged&lt;/tt&gt; is called when the search text is changed. The behavior here is interesting: Instead of immediately reloading the books, we create a timeout to be executed after 200 ms (also notice the usage of the &lt;tt class="docutils literal"&gt;bind&lt;/tt&gt; function method to allow us call the &lt;tt class="docutils literal"&gt;reloadBooks&lt;/tt&gt; method). If the user presses a key before these 200 ms, we cancel the previous timeout (using &lt;tt class="docutils literal"&gt;clearInterval&lt;/tt&gt;) and create a new one. This technique greatly reduces ajax calls to the server when the user is just typing something in the search box &amp;#8212; we could even increase the delay to reduce even more the ajax calls (but hurt the user experience a bit since the user will notice that his search results won&amp;#8217;t be updated&amp;nbsp;immediately).&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;onClearSearch&lt;/tt&gt; is called when the clear filter button is pressed and removes the search text and reloads all&amp;nbsp;books.&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;handleEditClickPanel&lt;/tt&gt; is called when the edit link of a &lt;tt class="docutils literal"&gt;BookTableRow&lt;/tt&gt; is clicked. The book with the passed &lt;tt class="docutils literal"&gt;id&lt;/tt&gt; will be found (using filter) and then a clone of it will be created with (&lt;tt class="docutils literal"&gt;$.extend&lt;/tt&gt;) and will be used to set the &lt;tt class="docutils literal"&gt;editingBook&lt;/tt&gt; state attribute. If instead of the clone we passed the filtered book object we&amp;#8217;d see that when the title or category in the &lt;tt class="docutils literal"&gt;BookForm&lt;/tt&gt; were changed they&amp;#8217;d also be changed in the &lt;tt class="docutils literal"&gt;BookTableRow&lt;/tt&gt;!&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;handleChange&lt;/tt&gt; just changes the state of the currently edited book based on the values passed (it does not modify the id of the&amp;nbsp;book)&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;handleCancelClick&lt;/tt&gt; when the cancel editing is pressed we clear the &lt;tt class="docutils literal"&gt;editingBook&lt;/tt&gt; state attribute. Notice the &lt;tt class="docutils literal"&gt;e.preventDefault()&lt;/tt&gt; method that needs to be there in order to prevent the form from submitting since the form submitting would result in an undesirable full page&amp;nbsp;reload!&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="ajax-object-methods"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#id13"&gt;Ajax object&amp;nbsp;methods&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;Finally, we need a buncch of object methods that use ajax calls to retrieve or update&amp;nbsp;books:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+  // Continuing from above
+  reloadBooks: function(query) {
+    $.ajax({
+      url: this.props.url+'?search='+query,
+      dataType: 'json',
+      cache: false,
+      success: function(data) {
+        this.setState({
+          books: data
+        });
+      }.bind(this),
+      error: function(xhr, status, err) {
+        console.error(this.props.url, status, err.toString());
+        this.setState({
+          message: err.toString(),
+          search: query
+        });
+      }.bind(this)
+    });
+  },
+  handleSubmitClick: function(e) {
+    e.preventDefault();
+    if(this.state.editingBook.id) {
+      $.ajax({
+        url: this.props.url+this.state.editingBook.id,
+        dataType: 'json',
+        method: 'PUT',
+        data:this.state.editingBook,
+        cache: false,
+        success: function(data) {
+          this.setState({
+            message: &amp;quot;Successfully updated book!&amp;quot;
+          });
+          this.reloadBooks('');
+        }.bind(this),
+        error: function(xhr, status, err) {
+          console.error(this.props.url, status, err.toString());
+          this.setState({
+            message: err.toString()
+          });
+        }.bind(this)
+      });
+    } else {
+      $.ajax({
+        url: this.props.url,
+        dataType: 'json',
+        method: 'POST',
+        data:this.state.editingBook,
+        cache: false,
+        success: function(data) {
+          this.setState({
+            message: &amp;quot;Successfully added book!&amp;quot;
+          });
+          this.reloadBooks('');
+        }.bind(this),
+        error: function(xhr, status, err) {
+          console.error(this.props.url, status, err.toString());
+          this.setState({
+            message: err.toString()
+          });
+        }.bind(this)
+      });
+    }
+    this.setState({
+      editingBook: {}
+    });
+  },
+  handleDeleteClick: function(e) {
+  e.preventDefault();
+  $.ajax({
+    url: this.props.url+this.state.editingBook.id,
+    method: 'DELETE',
+    cache: false,
+    success: function(data) {
+      this.setState({
+          message: &amp;quot;Successfully deleted book!&amp;quot;,
+          editingBook: {}
+      });
+      this.reloadBooks('');
+    }.bind(this),
+    error: function(xhr, status, err) {
+      console.error(this.props.url, status, err.toString());
+      this.setState({
+          message: err.toString()
+      });
+    }.bind(this)
+    });
+  },
+});
+&lt;/pre&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;reloadBooks&lt;/tt&gt; will try to load the books using an ajax &lt;span class="caps"&gt;GET&lt;/span&gt; and pass its query parameter to filter the books (or get all books if query is an empty string). If the ajax call was successfull the state will be updated with the retrieved books and the search text (to clear the  search text when we reload because of a save/edit/delete) while if there was an error the state will be updated with the error message. The books will be returned as a json array of book&amp;nbsp;objects.&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;handleSubmitClick&lt;/tt&gt; checks if the state&amp;#8217;s &lt;tt class="docutils literal"&gt;editingBook&lt;/tt&gt; has an id and  will do either a &lt;span class="caps"&gt;POST&lt;/span&gt; to create a new book or a &lt;span class="caps"&gt;PUT&lt;/span&gt; to update the existing one. Depending on the result of the operation will either reload books and clear the editingBook or set the error&amp;nbsp;message.&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;handleDeleteClick&lt;/tt&gt; will do a &lt;span class="caps"&gt;DELETE&lt;/span&gt; to delete the state&amp;#8217;s &lt;tt class="docutils literal"&gt;editingBook&lt;/tt&gt; and clear&amp;nbsp;it.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Notice that all success and error functions above were binded to &lt;tt class="docutils literal"&gt;this&lt;/tt&gt; so that they could update the state of the current &lt;tt class="docutils literal"&gt;BookPanel&lt;/tt&gt; object.&lt;/p&gt;
+&lt;p&gt;After each succesfull ajax call we do a reload to the books to keep the state between server and client side consistent. We could
+instead update the book array immediately before doing the ajax call - however this would increase complexity
+(what should happen if an error happens at the ajax call) without improving the &lt;span class="caps"&gt;UX&lt;/span&gt; that much. A better solution
+would be to add a loading css&amp;nbsp;animation.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="local-state"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id14"&gt;Local&amp;nbsp;state&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;One thing to keep in mind is that there should only be one place of truth for the state and
+that the state should be as high in the component hierarch as possible. All changes should
+be propagated to thhe child components through properties.
+That&amp;#8217;s the only way to be sure of the your data flow: When a change should happen
+(either because of a user action or an asynchronous call e.g ajax or timeout) just
+go to the state-holding component up in the hierarchy and change its state. Then the
+changes will be propagated in a top-down fashion from that component to its&amp;nbsp;children.&lt;/p&gt;
+&lt;p&gt;The above paragraph does not mean that the state should be contained in just a single
+component! For example, let&amp;#8217;s say that we had an &lt;tt class="docutils literal"&gt;AuthorPanel&lt;/tt&gt; in the same web application
+and both &lt;tt class="docutils literal"&gt;BookPanel&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;AuthorPanel&lt;/tt&gt; would be contained in a &lt;tt class="docutils literal"&gt;BookAuthorPanel&lt;/tt&gt;.
+In this case, we should keep a different state object for &lt;tt class="docutils literal"&gt;BookPanel&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;AuthorPanel&lt;/tt&gt;,
+we wouldn&amp;#8217;t need to combine them into a single object contained in the &lt;tt class="docutils literal"&gt;BookAuthorPanel&lt;/tt&gt;
+since they are&amp;nbsp;unrelated!&lt;/p&gt;
+&lt;p&gt;One decision that we took in &lt;tt class="docutils literal"&gt;BookForm&lt;/tt&gt; (and also to the &lt;tt class="docutils literal"&gt;SearchPanel&lt;/tt&gt; before) is to &lt;em&gt;not&lt;/em&gt; keep a local state for the
+book that is edited but move it to &lt;tt class="docutils literal"&gt;BookPanel&lt;/tt&gt;. This means that whenever the value of the &lt;tt class="docutils literal"&gt;title&lt;/tt&gt; or &lt;tt class="docutils literal"&gt;category&lt;/tt&gt; is changed the parent
+component will be informed (through &lt;tt class="docutils literal"&gt;handleChange&lt;/tt&gt;) so that it will change its state and the new values will
+be passed down to &lt;tt class="docutils literal"&gt;BookForm&lt;/tt&gt; as properties so our changes will be reflected to the inputs. To make it more
+clear, when you press a letter on the &lt;tt class="docutils literal"&gt;title&lt;/tt&gt; input:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;the &lt;tt class="docutils literal"&gt;onChange&lt;/tt&gt; method of &lt;tt class="docutils literal"&gt;BookForm&lt;/tt&gt; will be&amp;nbsp;called,&lt;/li&gt;
+&lt;li&gt;it will get the values of both &lt;tt class="docutils literal"&gt;title&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;category&lt;/tt&gt; fields&lt;/li&gt;
+&lt;li&gt;and call &lt;tt class="docutils literal"&gt;handleChange&lt;/tt&gt; with these&amp;nbsp;values.&lt;/li&gt;
+&lt;li&gt;The &lt;tt class="docutils literal"&gt;handleChange&lt;/tt&gt; method of  &lt;tt class="docutils literal"&gt;BookPanel&lt;/tt&gt; will update the &lt;tt class="docutils literal"&gt;editingBook&lt;/tt&gt; state&amp;nbsp;attribute,&lt;/li&gt;
+&lt;li&gt;so the &lt;tt class="docutils literal"&gt;book&lt;/tt&gt; property of &lt;tt class="docutils literal"&gt;BookForm&lt;/tt&gt; will be also&amp;nbsp;updated&lt;/li&gt;
+&lt;li&gt;and the new value of the &lt;tt class="docutils literal"&gt;title&lt;/tt&gt; will be displayed (since the components will be re-rendered due to the state&amp;nbsp;update)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Conceptually, the above seems like a lot of work for just pressing a simple key! However, due to how react
+is implemented (virtual &lt;span class="caps"&gt;DOM&lt;/span&gt;) it won&amp;#8217;t actually introduce any performance problems in our application.
+If nevertheless we wanted to have a local state of the currently edited book inside the &lt;tt class="docutils literal"&gt;BookForm&lt;/tt&gt; then we&amp;#8217;d need to use
+&lt;tt class="docutils literal"&gt;state.book&lt;/tt&gt; and update the state using the &lt;tt class="docutils literal"&gt;componentWillReceiveProps&lt;/tt&gt; method of &lt;tt class="docutils literal"&gt;BookForm&lt;/tt&gt;: If we
+have a book to edit in the properties then copy it to the state or else just create an empty book. Also,
+the &lt;tt class="docutils literal"&gt;onChange&lt;/tt&gt; method of the &lt;tt class="docutils literal"&gt;BookForm&lt;/tt&gt; won&amp;#8217;t need to notify the parent component that there is a
+state change (but only update the local state) and of course when the submit button is pressed the
+current book should be passed to the parent component (to either save it or delete it) since it won&amp;#8217;t
+know the book that is currently&amp;nbsp;edited.&lt;/p&gt;
+&lt;p&gt;So we could either have a local state object for the edited book in the &lt;tt class="docutils literal"&gt;BookForm&lt;/tt&gt; or
+just save it as a property of the global state object in &lt;tt class="docutils literal"&gt;BookPanel&lt;/tt&gt; &amp;#8212; both solutions are
+correct. What wouldn&amp;#8217;t be correct is if we had two copies of the same information in both the
+states of &lt;tt class="docutils literal"&gt;BookPanel&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;BookForm&lt;/tt&gt;, for example the book id that is&amp;nbsp;edited.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="conclusion-to-the-first-part"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id15"&gt;Conclusion to the first&amp;nbsp;part&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;We just created a not-so-simple React single page application offering &lt;span class="caps"&gt;CRUD&lt;/span&gt; for an object.
+This application of course could be improved by adding a pagination component to the table,
+but I&amp;#8217;m going to leave that as an excersie to the reader: To do that, I propose to create
+another component named &lt;tt class="docutils literal"&gt;TablePager&lt;/tt&gt; that would have two properties: &lt;tt class="docutils literal"&gt;currentPage&lt;/tt&gt; and
+a &lt;tt class="docutils literal"&gt;changePageTo&lt;/tt&gt; callback. The &lt;tt class="docutils literal"&gt;currentPage&lt;/tt&gt; would also be needed to added to the global
+state. When the &lt;tt class="docutils literal"&gt;changePageTo` is called by the ``TablePager&lt;/tt&gt; it would update the global
+&lt;tt class="docutils literal"&gt;currentPage&lt;/tt&gt; and will do a &lt;tt class="docutils literal"&gt;reloadBooks&lt;/tt&gt; that will use the &lt;tt class="docutils literal"&gt;currentPage&lt;/tt&gt; to fetch
+the correct&amp;nbsp;page.&lt;/p&gt;
+&lt;p&gt;For application state keeping, we have selected to store all state attributes in &lt;tt class="docutils literal"&gt;BookPanel&lt;/tt&gt;,
+for every state changing action we create a method that we pass in the child components
+so that the children can call it when the state needs to be&amp;nbsp;updated.&lt;/p&gt;
+&lt;p&gt;As we will see in the next part, with Flux, Facebook proposes a design pattern for
+where to store the state and how to update it. We&amp;#8217;ll see how to convert our React
+application to also use Flux and find out how Flux will help us when developing
+complex client-side&amp;nbsp;applications!&lt;/p&gt;
+&lt;/div&gt;
+</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Serafeim Papastefanos</dc:creator><pubDate>Fri, 05 Jun 2015 14:20:00 +0300</pubDate><guid>tag:spapas.github.io,2015-06-05:2015/06/05/comprehensive-react-flux-tutorial/</guid><category>javascript</category><category>python</category><category>django</category><category>react</category><category>flux</category></item><item><title>Using browserify and watchify to improve your client-side-javascript workflow</title><link>http://spapas.github.io/2015/05/27/using-browserify-watchify/</link><description>&lt;div class="contents topic" id="contents"&gt;
 &lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
 &lt;ul class="simple"&gt;
 &lt;li&gt;&lt;a class="reference internal" href="#the-problem" id="id1"&gt;The&amp;nbsp;problem&lt;/a&gt;&lt;/li&gt;

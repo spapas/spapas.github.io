@@ -1,7 +1,7 @@
 A comprehensive React and Flux tutorial part 1: React
 #####################################################
 
-:date: 2015-06-04 14:20
+:date: 2015-06-05 14:20
 :tags: javascript, python, django, react, flux
 :category: javascript
 :slug: comprehensive-react-flux-tutorial
@@ -506,18 +506,39 @@ Finally, we need a buncch of object methods that use ajax calls to retrieve or u
     },
   });
 
-* ``reloadBooks`` will try to load the books using an ajax GET and pass its query parameter to filter the books (or get all books if query is an empty string). If the ajax call was successfull the state will be updated with the retrieved books and the search text (to clear the  search text when we reload because of a save/edit/delete) while if there was an error the state will be updated with the error message.
+* ``reloadBooks`` will try to load the books using an ajax GET and pass its query parameter to filter the books (or get all books if query is an empty string). If the ajax call was successfull the state will be updated with the retrieved books and the search text (to clear the  search text when we reload because of a save/edit/delete) while if there was an error the state will be updated with the error message. The books will be returned as a json array of book objects.
 * ``handleSubmitClick`` checks if the state's ``editingBook`` has an id and  will do either a POST to create a new book or a PUT to update the existing one. Depending on the result of the operation will either reload books and clear the editingBook or set the error message.
 * ``handleDeleteClick`` will do a DELETE to delete the state's ``editingBook`` and clear it.
 
-Notice that all success and error functions above were binded to ``this`` so
-that they could update the state of the current ``BookPanel`` object.
+Notice that all success and error functions above were binded to ``this`` so that they could update the state of the current ``BookPanel`` object.
+
+After each succesfull ajax call we do a reload to the books to keep the state between server and client side consistent. We could 
+instead update the book array immediately before doing the ajax call - however this would increase complexity
+(what should happen if an error happens at the ajax call) without improving the UX that much. A better solution
+would be to add a loading css animation.
+
+
 
 Local state
 -----------
 
+One thing to keep in mind is that there should only be one place of truth for the state and
+that the state should be as high in the component hierarch as possible. All changes should
+be propagated to thhe child components through properties. 
+That's the only way to be sure of the your data flow: When a change should happen
+(either because of a user action or an asynchronous call e.g ajax or timeout) just 
+go to the state-holding component up in the hierarchy and change its state. Then the
+changes will be propagated in a top-down fashion from that component to its children. 
+
+The above paragraph does not mean that the state should be contained in just a single
+component! For example, let's say that we had an ``AuthorPanel`` in the same web application
+and both ``BookPanel`` and ``AuthorPanel`` would be contained in a ``BookAuthorPanel``.
+In this case, we should keep a different state object for ``BookPanel`` and ``AuthorPanel``,
+we wouldn't need to combine them into a single object contained in the ``BookAuthorPanel``
+since they are unrelated!
+
 One decision that we took in ``BookForm`` (and also to the ``SearchPanel`` before) is to *not* keep a local state for the
-book that is edited. This means that whenever the value of the ``title`` or ``category`` is changed the parent
+book that is edited but move it to ``BookPanel``. This means that whenever the value of the ``title`` or ``category`` is changed the parent
 component will be informed (through ``handleChange``) so that it will change its state and the new values will
 be passed down to ``BookForm`` as properties so our changes will be reflected to the inputs. To make it more
 clear, when you press a letter on the ``title`` input:
@@ -539,10 +560,33 @@ state change (but only update the local state) and of course when the submit but
 current book should be passed to the parent component (to either save it or delete it) since it won't
 know the book that is currently edited.
 
+So we could either have a local state object for the edited book in the ``BookForm`` or 
+just save it as a property of the global state object in ``BookPanel`` -- both solutions are
+correct. What wouldn't be correct is if we had two copies of the same information in both the
+states of ``BookPanel`` and ``BookForm``, for example the book id that is edited.
 
 
 Conclusion to the first part
 ----------------------------
+
+We just created a not-so-simple React single page application offering CRUD for an object. 
+This application of course could be improved by adding a pagination component to the table,
+but I'm going to leave that as an excersie to the reader: To do that, I propose to create
+another component named ``TablePager`` that would have two properties: ``currentPage`` and
+a ``changePageTo`` callback. The ``currentPage`` would also be needed to added to the global
+state. When the ``changePageTo` is called by the ``TablePager`` it would update the global
+``currentPage`` and will do a ``reloadBooks`` that will use the ``currentPage`` to fetch
+the correct page.
+
+For application state keeping, we have selected to store all state attributes in ``BookPanel``,
+for every state changing action we create a method that we pass in the child components
+so that the children can call it when the state needs to be updated. 
+
+As we will see in the next part, with Flux, Facebook proposes a design pattern for 
+where to store the state and how to update it. We'll see how to convert our React 
+application to also use Flux and find out how Flux will help us when developing
+complex client-side applications!
+
 
 
 

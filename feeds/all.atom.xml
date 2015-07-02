@@ -1,5 +1,624 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>/var/</title><link href="http://spapas.github.io/" rel="alternate"></link><link href="http://spapas.github.io/feeds/all.atom.xml" rel="self"></link><id>http://spapas.github.io/</id><updated>2015-06-05T14:20:00+03:00</updated><entry><title>A comprehensive React and Flux tutorial part 1: React</title><link href="http://spapas.github.io/2015/06/05/comprehensive-react-flux-tutorial/" rel="alternate"></link><updated>2015-06-05T14:20:00+03:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2015-06-05:2015/06/05/comprehensive-react-flux-tutorial/</id><summary type="html">&lt;div class="contents topic" id="contents"&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>/var/</title><link href="http://spapas.github.io/" rel="alternate"></link><link href="http://spapas.github.io/feeds/all.atom.xml" rel="self"></link><id>http://spapas.github.io/</id><updated>2015-06-30T14:20:00+03:00</updated><entry><title>A comprehensive React and Flux tutorial part 2: Flux</title><link href="http://spapas.github.io/2015/06/30/comprehensive-react-flux-tutorial-2/" rel="alternate"></link><updated>2015-06-30T14:20:00+03:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2015-06-30:2015/06/30/comprehensive-react-flux-tutorial-2/</id><summary type="html">&lt;div class="contents topic" id="contents"&gt;
+&lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id1"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#flux-components" id="id2"&gt;Flux&amp;nbsp;components&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#the-react-flux-version" id="id3"&gt;The react-flux version&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#main-js" id="id4"&gt;main.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#constants-js" id="id5"&gt;constants.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#actions-js" id="id6"&gt;actions.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#stores-js" id="id7"&gt;stores.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#components-js" id="id8"&gt;components.js&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#explaining-the-data-flow" id="id9"&gt;Explaining the data&amp;nbsp;flow&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#a-better-code-organization" id="id10"&gt;A better code&amp;nbsp;organization&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#conclusion" id="id11"&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="introduction"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id1"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;In the &lt;a class="reference external" href="http://spapas.github.io/2015/06/05/comprehensive-react-flux-tutorial/"&gt;first part of this series&lt;/a&gt; we implemented a
+not-so-simple one page application with full &lt;span class="caps"&gt;CRUD&lt;/span&gt; capabilities. In this part, we will
+modify that applicaiton to make it use the Flux architecture. The full source code can
+be found at &lt;a class="reference external" href="https://github.com/spapas/react-tutorial"&gt;https://github.com/spapas/react-tutorial&lt;/a&gt; (tag name&amp;nbsp;react-flux).&lt;/p&gt;
+&lt;p&gt;I recommend reading Facebook&amp;#8217;s &lt;a class="reference external" href="https://facebook.github.io/flux/docs/overview.html"&gt;Flux overview&lt;/a&gt; before reading this article &amp;#8212; please
+read it even if you find some concepts difficult to grasp (I know I found it difficult
+the first time I read it), I will try to explain everything here. Also,
+because a rather large number of extra components will need to be created, we are
+going to split our javascript code to different files using &lt;a class="reference external" href="http://browserify.org/"&gt;browserify&lt;/a&gt; - you can
+learn &lt;a class="reference external" href="http://spapas.github.io/2015/05/27/using-browserify-watchify/"&gt;how to use browserify here&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="flux-components"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id2"&gt;Flux&amp;nbsp;components&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;To implement the Flux architecture, an application needs to have at least a store and about&amp;nbsp;dispatcher.&lt;/p&gt;
+&lt;p&gt;The store is the central place of truth for the application and the dispacher is the central
+place of communications. The store should hold the
+state (and any models/DAOs) of the application and notify the react components when this state is changed. Also,
+the store will be notified by the dispatcher when an action happens (for example a button is clicked)
+so that it will change the state. As a flow, we can think of something like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+a ui action on a component (click, change, etc) -&amp;gt;
+ ^   dispatcher is notified -&amp;gt;
+ |   store is notified (by the dispacher)-&amp;gt;
+ |   store state is changed -&amp;gt;
+ └─  component is notified (by the store) and updated to reflect the change
+&lt;/pre&gt;
+&lt;p&gt;One thing to keep in mind is that although each flux application will have only one dispatcher, it may
+have more stores, depending on the application&amp;#8217;s architecture and separation of concerns. If there are
+more than store, all will be notified by the dispatcher and change their state (if needed of course).
+The ui will pass the action type and any optional parameters to the dispatcher and the dispatcher
+will notify all stores with these&amp;nbsp;parameters.&lt;/p&gt;
+&lt;p&gt;An optional component in the Flux architecture is the Action. An action is a store related class that
+acts as an intermediate between the ui and the dispatcher. So, when a user clicks a button, an action
+will be called that will notify the dispatcher. As we will see we can just call the dispatcher directly
+from the components ui, but calling it through the Action makes the calls more consistent and creates
+an&amp;nbsp;interface.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="the-react-flux-version"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id3"&gt;The react-flux&amp;nbsp;version&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Since we are using browserify, we will include a single file in our html file with a &lt;tt class="docutils literal"&gt;&amp;lt;script&amp;gt;&lt;/tt&gt; tag
+and everything else will be included through the &lt;tt class="docutils literal"&gt;require&lt;/tt&gt; function. We have the following packages
+as requirements for&amp;nbsp;browserify:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;quot;dependencies&amp;quot;: {
+  &amp;quot;flux&amp;quot;: &amp;quot;^2.0.3&amp;quot;,
+  &amp;quot;jquery&amp;quot;: &amp;quot;^2.1.4&amp;quot;,
+  &amp;quot;react&amp;quot;: &amp;quot;^0.13.3&amp;quot;,
+  &amp;quot;reactify&amp;quot;: &amp;quot;^1.1.1&amp;quot;
+}
+&lt;/pre&gt;
+&lt;div class="section" id="main-js"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id4"&gt;main.js&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The &lt;tt class="docutils literal"&gt;main.js&lt;/tt&gt; file will
+just render the BookPanel component (the &lt;tt class="docutils literal"&gt;components.js&lt;/tt&gt; file contains the source for all React components) and call
+the &lt;tt class="docutils literal"&gt;reloadBooks&lt;/tt&gt; function from &lt;tt class="docutils literal"&gt;stores.js&lt;/tt&gt; that will reload all books from the &lt;span class="caps"&gt;REST&lt;/span&gt; &lt;span class="caps"&gt;API&lt;/span&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+var React = require('react');
+var components = require('./components');
+var stores = require('./stores');
+
+React.render(&amp;lt;components.BookPanel url='/api/books/' /&amp;gt;, document.getElementById('content'));
+
+stores.reloadBooks();
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="constants-js"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id5"&gt;constants.js&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Before going into more complex modules, let&amp;#8217;s present the &lt;tt class="docutils literal"&gt;constants.js&lt;/tt&gt; which just
+exports some strings that will be passed to the dispatcher to differentiate between each
+ui&amp;nbsp;action:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+module.exports = {
+    BOOK_EDIT: 'BOOK_EDIT',
+    BOOK_EDIT_CANCEL: 'BOOK_EDIT_CANCEL',
+    BOOK_SAVE: 'BOOK_SAVE',
+    BOOK_SEARCH: 'BOOK_SEARCH',
+    BOOK_DELETE: 'BOOK_DELETE',
+};
+&lt;/pre&gt;
+&lt;p&gt;As we can see, these constants are exported as a single object so when we do something like
+&lt;tt class="docutils literal"&gt;var BookConstants = &lt;span class="pre"&gt;require('./constants')&lt;/span&gt;&lt;/tt&gt; we&amp;#8217;ll the be able to refer to each constant
+through &lt;tt class="docutils literal"&gt;BookConstants.CONSTANT_NAME&lt;/tt&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="actions-js"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id6"&gt;actions.js&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The &lt;tt class="docutils literal"&gt;actions.js&lt;/tt&gt; creates the dispatcher singleton and a BookActions object that defines the
+actions for&amp;nbsp;books.&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+var BookConstants = require('./constants')
+var Dispatcher = require('flux').Dispatcher;
+var AppDispatcher = new Dispatcher();
+
+var BookActions = {
+    search: function(query) {
+        AppDispatcher.dispatch({
+            actionType: BookConstants.BOOK_SEARCH,
+            query: query
+        });
+    },
+    save: function(book) {
+        AppDispatcher.dispatch({
+            actionType: BookConstants.BOOK_SAVE,
+            book: book
+        });
+    },
+    edit: function(book) {
+        AppDispatcher.dispatch({
+            actionType: BookConstants.BOOK_EDIT,
+            book: book
+        });
+    },
+    edit_cancel: function() {
+        AppDispatcher.dispatch({
+            actionType: BookConstants.BOOK_EDIT_CANCEL
+        });
+    },
+    delete: function(bookId) {
+        AppDispatcher.dispatch({
+            actionType: BookConstants.BOOK_DELETE,
+            bookId: bookId
+        });
+    }
+};
+
+module.exports.BookActions = BookActions;
+module.exports.AppDispatcher = AppDispatcher;
+&lt;/pre&gt;
+&lt;p&gt;As we can see, the BookActions is just a collection of methods that will
+be called from the ui. Instead of calling BookActions.search() we could
+just call the dispatch method with the correct parameter object (actionType
+and optional parameter), both the BookActions object and the AppDispatcher
+singleton are&amp;nbsp;exported.&lt;/p&gt;
+&lt;p&gt;The dispatcher is imported from the flux requirement: It offers a functionality
+to register callbacks for the various actions as we will see in the
+next module. This is a rather simple class that we could implement ourselves
+(each store passes a callback to the dispatcher that is called on the dispatch
+method, passing actionType and any other parameters). The dispatcher also
+offers a &lt;tt class="docutils literal"&gt;waitFor&lt;/tt&gt; method that can be used to ensure that the dispatch callback
+for a store will be finished before another store&amp;#8217;s dispatch callback (
+when the second store uses the state of the first store &amp;#8212; for example
+when implementing a series of related dropdowns&amp;nbsp;).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="stores-js"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id7"&gt;stores.js&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The next module we will discuss is the &lt;tt class="docutils literal"&gt;stores.js&lt;/tt&gt; that contains the
+&lt;tt class="docutils literal"&gt;BookStore&lt;/tt&gt; object.&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+var $ = require('jquery');
+var EventEmitter = require('events').EventEmitter;
+var AppDispatcher = require('./actions').AppDispatcher;
+var BookConstants = require('./constants')
+
+var _state = {
+    books: [],
+    message:&amp;quot;&amp;quot;,
+    editingBook: null
+}
+
+var _props = {
+    url: '/api/books/'
+}
+
+var _search = function(query) {
+    $.ajax({
+        url: _props.url+'?search='+query,
+        dataType: 'json',
+        cache: false,
+        success: function(data) {
+            _state.books = data;
+            BookStore.emitChange();
+        },
+        error: function(xhr, status, err) {
+            console.error(this.props.url, status, err.toString());
+            _state.message = err.toString();
+            BookStore.emitChange();
+        }
+    });
+};
+
+var _reloadBooks = function() {
+    _search('');
+};
+
+var _deleteBook = function(bookId) {
+    $.ajax({
+        url: _props.url+bookId,
+        method: 'DELETE',
+        cache: false,
+        success: function(data) {
+            _state.message = &amp;quot;Successfully deleted book!&amp;quot;
+            _clearEditingBook();
+            _reloadBooks();
+        },
+        error: function(xhr, status, err) {
+            console.error(this.props.url, status, err.toString());
+            _state.message = err.toString();
+            BookStore.emitChange();
+        }
+    });
+};
+
+var _saveBook = function(book) {
+    if(book.id) {
+        $.ajax({
+            url: _props.url+book.id,
+            dataType: 'json',
+            method: 'PUT',
+            data:book,
+            cache: false,
+            success: function(data) {
+                _state.message = &amp;quot;Successfully updated book!&amp;quot;
+                _clearEditingBook();
+                _reloadBooks();
+            },
+            error: function(xhr, status, err) {
+                _state.message = err.toString()
+                BookStore.emitChange();
+            }
+        });
+    } else {
+        $.ajax({
+            url: _props.url,
+            dataType: 'json',
+            method: 'POST',
+            data:book,
+            cache: false,
+            success: function(data) {
+                _state.message = &amp;quot;Successfully added book!&amp;quot;
+                _clearEditingBook();
+                _reloadBooks();
+            },
+            error: function(xhr, status, err) {
+                _state.message = err.toString()
+                BookStore.emitChange();
+            }
+        });
+    }
+};
+
+var _clearEditingBook = function() {
+    _state.editingBook = null;
+};
+
+var _editBook = function(book) {
+    _state.editingBook = book;
+    BookStore.emitChange();
+};
+
+var _cancelEditBook = function() {
+    _clearEditingBook();
+    BookStore.emitChange();
+};
+
+var BookStore = $.extend({}, EventEmitter.prototype, {
+    getState: function() {
+        return _state;
+    },
+    emitChange: function() {
+        this.emit('change');
+    },
+    addChangeListener: function(callback) {
+        this.on('change', callback);
+    },
+    removeChangeListener: function(callback) {
+        this.removeListener('change', callback);
+    }
+});
+
+AppDispatcher.register(function(action) {
+    switch(action.actionType) {
+        case BookConstants.BOOK_EDIT:
+            _editBook(action.book);
+        break;
+        case BookConstants.BOOK_EDIT_CANCEL:
+            _cancelEditBook();
+        break;
+        case BookConstants.BOOK_SAVE:
+            _saveBook(action.book);
+        break;
+        case BookConstants.BOOK_SEARCH:
+            _search(action.query);
+        break;
+        case BookConstants.BOOK_DELETE:
+            _deleteBook(action.bookId);
+        break;
+    }
+    return true;
+});
+
+module.exports.BookStore = BookStore;
+module.exports.reloadBooks = _reloadBooks;
+&lt;/pre&gt;
+&lt;p&gt;The &lt;tt class="docutils literal"&gt;stores.js&lt;/tt&gt; module exports only the &lt;tt class="docutils literal"&gt;BookStore&lt;/tt&gt; object and the &lt;tt class="docutils literal"&gt;reloadBooks&lt;/tt&gt; method (that could also be
+called from inside the module since it&amp;#8217;s just called when the application is loaded to load the books for the
+first time). All other objects/funtions are private to the&amp;nbsp;module.&lt;/p&gt;
+&lt;p&gt;As we saw, the &lt;tt class="docutils literal"&gt;_state&lt;/tt&gt; objects keep the global state of the application which are the list of books, the book
+that is edited right now and the result message for any update we are doing. The ajax methods are more or less
+the same as the ones in the react-only version of the application. However, please notice that when the ajax methods
+return and have to set the result, instead of setting the state of a React object they are just calling the
+&lt;tt class="docutils literal"&gt;emitChange&lt;/tt&gt; method of the &lt;tt class="docutils literal"&gt;BookStore&lt;/tt&gt; that will notify all react objects that &amp;quot;listen&amp;quot; to this store.
+This is possible because the ajax (&lt;span class="caps"&gt;DAO&lt;/span&gt;) methods are in the same module with the store - if we wanted instead
+to put them in different modules, we&amp;#8217;d just need to add another action (e.g &lt;tt class="docutils literal"&gt;ReloadBooks&lt;/tt&gt;) that would
+be called when the ajax method returns &amp;#8212; this action would call the dispatcher which would in turn update the
+state of the&amp;nbsp;store.&lt;/p&gt;
+&lt;p&gt;We can see that we are importing the
+AppDispatcher singleton and, depending on the action type we call the correct method that changes the state. So
+when a BookActions action is called it will call the corresponding &lt;tt class="docutils literal"&gt;AppDispatcher.register&lt;/tt&gt; case branch which
+will call the corresponding state-changing&amp;nbsp;function.&lt;/p&gt;
+&lt;p&gt;The  BookStore extends the &lt;tt class="docutils literal"&gt;EventEmitter&lt;/tt&gt; object (so we need to &lt;tt class="docutils literal"&gt;require&lt;/tt&gt; the &lt;tt class="docutils literal"&gt;events&lt;/tt&gt; module) in order to
+notify the React components when the state of the store is changed. Instead of using &lt;tt class="docutils literal"&gt;EventEmitter&lt;/tt&gt; we could
+just implement the emit change logic ourselves by saving all the listener callbacks to an array and calling them
+all when there&amp;#8217;s a state change (if we wanted to also add the &amp;#8216;change&amp;#8217; parameter to group the listener
+callbacks we&amp;#8217;d just make the complex more complex, something not needed for our&amp;nbsp;case):&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+var BookStore = {
+    listeners: [],
+    getState: function() {
+        return _state;
+    },
+    emitChange: function() {
+        var i;
+        for(i=0;i&amp;lt;this.listeners.length;i++) {
+            this.listeners[i]();
+        }
+    },
+    addChangeListener: function(callback) {
+        this.listeners.push(callback);
+    },
+    removeChangeListener: function(callback) {
+        this.listeners.splice(this.listeners.indexOf(callback), 1);
+    }
+};
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="components-js"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id8"&gt;components.js&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Finally, the &lt;tt class="docutils literal"&gt;components.js&lt;/tt&gt; module contains all the React components. These are more
+or less the same with the react-only version with three&amp;nbsp;differences:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;When something happens in the ui, the corresponding &lt;tt class="docutils literal"&gt;BookAction&lt;/tt&gt; action is called with the needed parameter &amp;#8212; no callbacks are passed between the&amp;nbsp;components&lt;/li&gt;
+&lt;li&gt;The &lt;tt class="docutils literal"&gt;BookPanel&lt;/tt&gt; component registers with the &lt;tt class="docutils literal"&gt;BookStore&lt;/tt&gt; in order to be notified when the state changes and just gets its state from the store &amp;#8212; these values are propagated to all other components through&amp;nbsp;properties&lt;/li&gt;
+&lt;li&gt;The &lt;tt class="docutils literal"&gt;BookForm&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;SearcchPanel&lt;/tt&gt; now hold their own temporary state instead of using the global state &amp;#8212; notice that when a book is edited this book will be propagated to the &lt;tt class="docutils literal"&gt;BookForm&lt;/tt&gt; through the book property, however &lt;tt class="docutils literal"&gt;BookForm&lt;/tt&gt; needs to update its state through the &lt;tt class="docutils literal"&gt;componentWillReceiveProps&lt;/tt&gt; method.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre class="code literal-block"&gt;
+var React = require('react');
+var BookStore = require('./stores').BookStore;
+var BookActions = require('./actions').BookActions;
+
+var BookTableRow = React.createClass({
+    render: function() {
+        return (
+            &amp;lt;tr&amp;gt;
+                &amp;lt;td&amp;gt;{this.props.book.id}&amp;lt;/td&amp;gt;
+                &amp;lt;td&amp;gt;{this.props.book.title}&amp;lt;/td&amp;gt;
+                &amp;lt;td&amp;gt;{this.props.book.category}&amp;lt;/td&amp;gt;
+                &amp;lt;td&amp;gt;&amp;lt;a href='#' onClick={this.onClick}&amp;gt;Edit&amp;lt;/a&amp;gt;&amp;lt;/td&amp;gt;
+            &amp;lt;/tr&amp;gt;
+        );
+    },
+    onClick: function(e) {
+        e.preventDefault();
+        BookActions.edit(this.props.book);
+    }
+});
+
+var BookTable = React.createClass({
+    render: function() {
+        var rows = [];
+        this.props.books.forEach(function(book) {
+            rows.push(&amp;lt;BookTableRow key={book.id} book={book} /&amp;gt;);
+        });
+        return (
+            &amp;lt;table&amp;gt;
+                &amp;lt;thead&amp;gt;
+                    &amp;lt;tr&amp;gt;
+                        &amp;lt;th&amp;gt;Id&amp;lt;/th&amp;gt;
+                        &amp;lt;th&amp;gt;Title&amp;lt;/th&amp;gt;
+                        &amp;lt;th&amp;gt;Category&amp;lt;/th&amp;gt;
+                        &amp;lt;th&amp;gt;Edit&amp;lt;/th&amp;gt;
+                    &amp;lt;/tr&amp;gt;
+                &amp;lt;/thead&amp;gt;
+                &amp;lt;tbody&amp;gt;{rows}&amp;lt;/tbody&amp;gt;
+            &amp;lt;/table&amp;gt;
+        );
+    }
+});
+
+var BookForm = React.createClass({
+    getInitialState: function() {
+        if (this.props.book) {
+            return this.props.book;
+        } else {
+            return {};
+        }
+    },
+    componentWillReceiveProps: function(props) {
+        if (props.book) {
+            this.setState(props.book);
+        } else {
+            this.replaceState({});
+        }
+    },
+    render: function() {
+        return(
+            &amp;lt;form onSubmit={this.onSubmit}&amp;gt;
+                &amp;lt;label forHtml='title'&amp;gt;Title&amp;lt;/label&amp;gt;&amp;lt;input ref='title' name='title' type='text' value={this.state.title} onChange={this.onFormChange} /&amp;gt;
+                &amp;lt;label forHtml='category'&amp;gt;Category&amp;lt;/label&amp;gt;
+                &amp;lt;select ref='category' name='category' value={this.state.category} onChange={this.onFormChange} &amp;gt;
+                    &amp;lt;option value='CRIME' &amp;gt;Crime&amp;lt;/option&amp;gt;
+                    &amp;lt;option value='HISTORY'&amp;gt;History&amp;lt;/option&amp;gt;
+                    &amp;lt;option value='HORROR'&amp;gt;Horror&amp;lt;/option&amp;gt;
+                    &amp;lt;option value='SCIFI'&amp;gt;SciFi&amp;lt;/option&amp;gt;
+                &amp;lt;/select&amp;gt;
+                &amp;lt;br /&amp;gt;
+                &amp;lt;input type='submit' value={this.state.id?&amp;quot;Save (id = &amp;quot; +this.state.id+ &amp;quot;)&amp;quot;:&amp;quot;Add&amp;quot;} /&amp;gt;
+                {this.state.id?&amp;lt;button onClick={this.onDeleteClick}&amp;gt;Delete&amp;lt;/button&amp;gt;:&amp;quot;&amp;quot;}
+                {this.state.id?&amp;lt;button onClick={this.onCancelClick}&amp;gt;Cancel&amp;lt;/button&amp;gt;:&amp;quot;&amp;quot;}
+                {this.props.message?&amp;lt;div&amp;gt;{this.props.message}&amp;lt;/div&amp;gt;:&amp;quot;&amp;quot;}
+            &amp;lt;/form&amp;gt;
+        );
+    },
+    onFormChange: function() {
+        this.setState({
+            title: React.findDOMNode(this.refs.title).value,
+            category: React.findDOMNode(this.refs.category).value
+        })
+    },
+    onSubmit: function(e) {
+        e.preventDefault();
+        BookActions.save(this.state)
+    },
+    onCancelClick: function(e) {
+        e.preventDefault();
+        BookActions.edit_cancel()
+    },
+    onDeleteClick: function(e) {
+        e.preventDefault();
+        BookActions.delete(this.state.id)
+    }
+});
+
+var SearchPanel = React.createClass({
+    getInitialState: function() {
+        return {
+            search: '',
+        }
+    },
+    render: function() {
+        return (
+            &amp;lt;div className=&amp;quot;row&amp;quot;&amp;gt;
+                &amp;lt;div className=&amp;quot;one-fourth column&amp;quot;&amp;gt;
+                    Filter: &amp;amp;nbsp;
+                    &amp;lt;input ref='search' name='search' type='text' value={this.state.search} onChange={this.onSearchChange} /&amp;gt;
+                    {this.state.search?&amp;lt;button onClick={this.onClearSearch} &amp;gt;x&amp;lt;/button&amp;gt;:''}
+                &amp;lt;/div&amp;gt;
+            &amp;lt;/div&amp;gt;
+        )
+    },
+    onSearchChange: function() {
+        var query = React.findDOMNode(this.refs.search).value;
+        if (this.promise) {
+            clearInterval(this.promise)
+        }
+        this.setState({
+            search: query
+        });
+        this.promise = setTimeout(function () {
+            BookActions.search(query);
+        }.bind(this), 200);
+    },
+    onClearSearch: function() {
+        this.setState({
+            search: ''
+        });
+        BookActions.search('');
+    }
+});
+
+var BookPanel = React.createClass({
+    getInitialState: function() {
+        return BookStore.getState();
+    },
+    render: function() {
+        return(
+            &amp;lt;div className=&amp;quot;row&amp;quot;&amp;gt;
+                &amp;lt;div className=&amp;quot;one-half column&amp;quot;&amp;gt;
+                    &amp;lt;SearchPanel&amp;gt;&amp;lt;/SearchPanel&amp;gt;
+                    &amp;lt;BookTable books={this.state.books} /&amp;gt;
+                &amp;lt;/div&amp;gt;
+                &amp;lt;div className=&amp;quot;one-half column&amp;quot;&amp;gt;
+                    &amp;lt;BookForm
+                        book={this.state.editingBook}
+                        message={this.state.message}
+                    /&amp;gt;
+                &amp;lt;/div&amp;gt;
+                &amp;lt;br /&amp;gt;
+            &amp;lt;/div&amp;gt;
+        );
+    },
+    _onChange: function() {
+        this.setState( BookStore.getState() );
+    },
+    componentWillUnmount: function() {
+        BookStore.removeChangeListener(this._onChange);
+    },
+    componentDidMount: function() {
+        BookStore.addChangeListener(this._onChange);
+    }
+});
+
+module.exports.BookPanel = BookPanel ;
+&lt;/pre&gt;
+&lt;p&gt;Only the &lt;tt class="docutils literal"&gt;BookPanel&lt;/tt&gt; is exported &amp;#8212; all other react components will be private to the&amp;nbsp;module.&lt;/p&gt;
+&lt;p&gt;We can see that, beyond BookPanel, the code of all other components
+are more or less the same. However, &lt;em&gt;not&lt;/em&gt; having to pass callbacks for state upddates
+is a huge win for readability and&amp;nbsp;DRYness.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="explaining-the-data-flow"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id9"&gt;Explaining the data&amp;nbsp;flow&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;I&amp;#8217;ve added a bunch of console.log statements to see how the data/actions flow between
+all the components when the &amp;quot;Edit&amp;quot; book is clicked. So, when we click &amp;quot;Edit&amp;quot; we see
+the following messages to our&amp;nbsp;console:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+Inside BookTableRow.onClick
+Inside BookActions.edit
+Inside AppDispatcher.register
+Inside AppDispatcher.register case BookConstants.BOOK_EDIT
+Inside _editBook
+Inside BookStore.emitChange
+Inside BookPanel._onChange
+Inside BookForm.componentWillReceiveProps
+Inside BookForm.render
+&lt;/pre&gt;
+&lt;p&gt;First of all the &lt;tt class="docutils literal"&gt;onClick&lt;/tt&gt; method of &lt;tt class="docutils literal"&gt;BookTableRow&lt;/tt&gt; will be called (which is the onClick property of the
+a href link) which will call &lt;tt class="docutils literal"&gt;BookActions.edit&lt;/tt&gt; and pass it the book of that specific row. The &lt;tt class="docutils literal"&gt;edit&lt;/tt&gt;
+method will create a new dispatcher object by setting the &lt;tt class="docutils literal"&gt;actionType&lt;/tt&gt; and passing the &lt;tt class="docutils literal"&gt;book&lt;/tt&gt; and
+pass it to &lt;tt class="docutils literal"&gt;AppDispatcher.register&lt;/tt&gt;. &lt;tt class="docutils literal"&gt;register&lt;/tt&gt; will go to the &lt;tt class="docutils literal"&gt;BookConstants.BOOK_EDIT&lt;/tt&gt; case branch
+which will call the private &lt;tt class="docutils literal"&gt;_editBook&lt;/tt&gt; function. &lt;tt class="docutils literal"&gt;_editBook&lt;/tt&gt; will update the state of the store (by
+setting the &lt;tt class="docutils literal"&gt;_state.editingBook&lt;/tt&gt; property and will call the &lt;tt class="docutils literal"&gt;BookStore.emitChange&lt;/tt&gt; method
+which calls the dispatcher&amp;#8217;s emit method, so all listening components will update. We only have one
+component that listens to this emit, &lt;tt class="docutils literal"&gt;BookPanel&lt;/tt&gt; whose &lt;tt class="docutils literal"&gt;_onChange&lt;/tt&gt; method is called. This method
+gets the application state from the &lt;tt class="docutils literal"&gt;BookStore&lt;/tt&gt; and updates its own state. Now, the state will be
+propagated through properties - for example, for &lt;tt class="docutils literal"&gt;BookForm&lt;/tt&gt;, first its &lt;tt class="docutils literal"&gt;componentWillReceiveProps&lt;/tt&gt;
+method will be called (with the new properties) and finally its &lt;tt class="docutils literal"&gt;render&lt;/tt&gt; method!&lt;/p&gt;
+&lt;p&gt;So the full data flow is something like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+user action/callback etc -&amp;gt;
+  component calls action -&amp;gt;
+    dispatcher informes stores -&amp;gt;
+      stores set their state -&amp;gt;
+        state holding components are notified and update their state -&amp;gt;
+          all other components are updated through properties
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="a-better-code-organization"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id10"&gt;A better code&amp;nbsp;organization&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;As you&amp;#8217;ve seen, I&amp;#8217;ve only created four javascript modules (components, stores, actions and constants)
+and put them all in the same folder. I did this for clarity and to keep everything together since
+our tutorial is a very small project. Facebook proposes a much better organization that what I did
+as can be seen in the &lt;a class="reference external" href="https://facebook.github.io/flux/docs/todo-list.html"&gt;TodoMVC tutorial&lt;/a&gt;: Instead of putting everything to a single folder, create
+a different foloder for each type of object: actions (for all your actions), components (for all
+your React components), constants and stores and put inside the objects each in a different javascript
+module, for example, the components folder should contain the following&amp;nbsp;files:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;BookTable.react.js&lt;/li&gt;
+&lt;li&gt;BookTableRow.react.js&lt;/li&gt;
+&lt;li&gt;BookForm.react.js&lt;/li&gt;
+&lt;li&gt;BookPanel.react.js&lt;/li&gt;
+&lt;li&gt;SearchPanel.react.js&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Each one will export only the same-named React component and &lt;tt class="docutils literal"&gt;require&lt;/tt&gt; only the components that it&amp;nbsp;uses.&lt;/p&gt;
+&lt;p&gt;If you want to see the code of this tutorial organized like this go to the tag &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;react-flux-better-organization&lt;/span&gt;&lt;/tt&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="conclusion"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id11"&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;In this two-part series we saw how we can create a full &lt;span class="caps"&gt;CRUD&lt;/span&gt; application with React.js and how can
+we enable it with the Facebook proposed Flux architecture. Comparing the react-only with the react-flux
+version we can see that we added a number of objects in the second version (dispatcher, store, actions, constants)
+whose usefulness may not be obvious from our example. However, our created application (and especially
+the better organized version) is war-ready and can easily fight any complexities that we throw to it!
+Unfortunately, if we really wanted to show the usefulness of the Flux architecture we&amp;#8217;d need to create
+a really complex application that won&amp;#8217;t be suitable for a&amp;nbsp;tutorial.&lt;/p&gt;
+&lt;p&gt;However, we can already understand the obvious advantages of the React / Flux&amp;nbsp;architecture:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Components can easily be re-used by changing their properties - &lt;span class="caps"&gt;DRY&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;Easy to grasp (but a little complex) data flow between components and&amp;nbsp;stores&lt;/li&gt;
+&lt;li&gt;Separation of concerns - react components for the view, stores to hold the state/models, dispatcher to handle the data&amp;nbsp;flow&lt;/li&gt;
+&lt;li&gt;Really easy to test - all components are simple objects and can be easily created fom&amp;nbsp;tests&lt;/li&gt;
+&lt;li&gt;Works well for complex architectures - one dispatcher, multiple stores/action collections, react components only interact with actions and get their state from&amp;nbsp;stores&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I&amp;#8217;ve tried to make the above as comprehensive as possible for the readers of these posts
+(and also resolve some of my own questions). I have to mention again that although React/Flux may
+seem complex at a first glance, when it is used in a complex architecture it will shine and
+make everything much easier. Everything is debuggable and we can always understand what&amp;#8217;s
+really going on! This is in contrast with more complex frameworks that do various hidden
+stuff (two way data binding, magic in the &lt;span class="caps"&gt;REST&lt;/span&gt; etc) where, although it is easier to
+create a simple app, moving to something more complex (and especially debugging it) is a real&amp;nbsp;nightmare!&lt;/p&gt;
+&lt;/div&gt;
+</summary><category term="javascript"></category><category term="python"></category><category term="django"></category><category term="react"></category><category term="flux"></category></entry><entry><title>A comprehensive React and Flux tutorial part 1: React</title><link href="http://spapas.github.io/2015/06/05/comprehensive-react-flux-tutorial/" rel="alternate"></link><updated>2015-06-05T14:20:00+03:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2015-06-05:2015/06/05/comprehensive-react-flux-tutorial/</id><summary type="html">&lt;div class="contents topic" id="contents"&gt;
 &lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
 &lt;ul class="simple"&gt;
 &lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id1"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
@@ -538,7 +1157,7 @@ the correct&amp;nbsp;page.&lt;/p&gt;
 &lt;p&gt;For application state keeping, we have selected to store all state attributes in &lt;tt class="docutils literal"&gt;BookPanel&lt;/tt&gt;,
 for every state changing action we create a method that we pass in the child components
 so that the children can call it when the state needs to be&amp;nbsp;updated.&lt;/p&gt;
-&lt;p&gt;As we will see in the next part, with Flux, Facebook proposes a design pattern for
+&lt;p&gt;As we will see &lt;a class="reference external" href="http://spapas.github.io/2015/06/30/comprehensive-react-flux-tutorial-2/"&gt;in the next part&lt;/a&gt;, with Flux, Facebook proposes a design pattern for
 where to store the state and how to update it. We&amp;#8217;ll see how to convert our React
 application to also use Flux and find out how Flux will help us when developing
 complex client-side&amp;nbsp;applications!&lt;/p&gt;

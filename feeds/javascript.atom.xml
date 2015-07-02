@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>/var/</title><link href="http://spapas.github.io/" rel="alternate"></link><link href="http://spapas.github.io/feeds/javascript.atom.xml" rel="self"></link><id>http://spapas.github.io/</id><updated>2015-06-30T14:20:00+03:00</updated><entry><title>A comprehensive React and Flux tutorial part 2: Flux</title><link href="http://spapas.github.io/2015/06/30/comprehensive-react-flux-tutorial-2/" rel="alternate"></link><updated>2015-06-30T14:20:00+03:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2015-06-30:2015/06/30/comprehensive-react-flux-tutorial-2/</id><summary type="html">&lt;div class="contents topic" id="contents"&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>/var/</title><link href="http://spapas.github.io/" rel="alternate"></link><link href="http://spapas.github.io/feeds/javascript.atom.xml" rel="self"></link><id>http://spapas.github.io/</id><updated>2015-07-02T14:20:00+03:00</updated><entry><title>A comprehensive React and Flux tutorial part 2: Flux</title><link href="http://spapas.github.io/2015/07/02/comprehensive-react-flux-tutorial-2/" rel="alternate"></link><updated>2015-07-02T14:20:00+03:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2015-07-02:2015/07/02/comprehensive-react-flux-tutorial-2/</id><summary type="html">&lt;div class="contents topic" id="contents"&gt;
 &lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
 &lt;ul class="simple"&gt;
 &lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id1"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
@@ -1157,7 +1157,7 @@ the correct&amp;nbsp;page.&lt;/p&gt;
 &lt;p&gt;For application state keeping, we have selected to store all state attributes in &lt;tt class="docutils literal"&gt;BookPanel&lt;/tt&gt;,
 for every state changing action we create a method that we pass in the child components
 so that the children can call it when the state needs to be&amp;nbsp;updated.&lt;/p&gt;
-&lt;p&gt;As we will see &lt;a class="reference external" href="http://spapas.github.io/2015/06/30/comprehensive-react-flux-tutorial-2/"&gt;in the next part&lt;/a&gt;, with Flux, Facebook proposes a design pattern for
+&lt;p&gt;As we will see &lt;a class="reference external" href="http://spapas.github.io/2015/07/02/comprehensive-react-flux-tutorial-2/"&gt;in the next part&lt;/a&gt;, with Flux, Facebook proposes a design pattern for
 where to store the state and how to update it. We&amp;#8217;ll see how to convert our React
 application to also use Flux and find out how Flux will help us when developing
 complex client-side&amp;nbsp;applications!&lt;/p&gt;

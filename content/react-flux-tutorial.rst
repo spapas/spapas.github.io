@@ -1,7 +1,7 @@
 A comprehensive React and Flux tutorial part 2: Flux
 ####################################################
 
-:date: 2015-06-30 14:20
+:date: 2015-07-02 14:20
 :tags: javascript, python, django, react, flux
 :category: javascript
 :slug: comprehensive-react-flux-tutorial-2

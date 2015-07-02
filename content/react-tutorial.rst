@@ -582,7 +582,7 @@ For application state keeping, we have selected to store all state attributes in
 for every state changing action we create a method that we pass in the child components
 so that the children can call it when the state needs to be updated. 
 
-As we will see in the next part, with Flux, Facebook proposes a design pattern for 
+As we will see `in the next part <{filename}react-flux-tutorial.rst>`_, with Flux, Facebook proposes a design pattern for 
 where to store the state and how to update it. We'll see how to convert our React 
 application to also use Flux and find out how Flux will help us when developing
 complex client-side applications!

@@ -10,8 +10,14 @@ Asynchronous tasks in django with django-rq
 
 .. contents::
 
+**Update 01/09/15**: I've written a new post about rq and django with some
+`more advanced techniques <{filename}django-rq-redux.rst>`_
+! 
+
 Introduction
 ============
+
+
 
 Job queuing (asynchronous tasks) is a common requirement for non-trivial django projects. Whenever an operation
 can take more than half a second it should be put to a job queue in order to be run asynchronously by a
@@ -67,7 +73,9 @@ the normal job queue.
 
 Although RQ and frieds are really easy to use (and have nice documentation) I wasn't able to find
 a *complete* example of using it with django, so I've implemented one 
-(found at https://github.com/spapas/django-test-rq) mainly for my own testing
+(found at https://github.com/spapas/django-test-rq -- since I've updated this project a bit
+with new stuff, 
+please checkout tag django-test-rq-simple ``git checkout django-test-rq-simple``) mainly for my own testing
 purposes. To help others that want to also use RQ in their project but don't know from where
 to start, I'll present it in the following paragraphs, along with some comments on
 how to actually use RQ in your production environment. 

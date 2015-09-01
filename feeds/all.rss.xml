@@ -1,5 +1,306 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>/var/</title><link>http://spapas.github.io/</link><description>Various programming stuff</description><atom:link href="http://spapas.github.io/feeds/all.rss.xml" rel="self"></atom:link><lastBuildDate>Thu, 02 Jul 2015 14:20:00 +0300</lastBuildDate><item><title>A comprehensive React and Flux tutorial part 2: Flux</title><link>http://spapas.github.io/2015/07/02/comprehensive-react-flux-tutorial-2/</link><description>&lt;div class="contents topic" id="contents"&gt;
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>/var/</title><link>http://spapas.github.io/</link><description>Various programming stuff</description><atom:link href="http://spapas.github.io/feeds/all.rss.xml" rel="self"></atom:link><lastBuildDate>Tue, 01 Sep 2015 14:20:00 +0300</lastBuildDate><item><title>django-rq redux: advanced techniques and tools</title><link>http://spapas.github.io/2015/09/01/django-rq-redux/</link><description>&lt;div class="contents topic" id="contents"&gt;
+&lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id1"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#displaying-your-task-progress" id="id2"&gt;Displaying your task&amp;nbsp;progress&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#displaying-your-queue-statistics" id="id3"&gt;Displaying your queue&amp;nbsp;statistics&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#making-sure-that-workers-for-your-queue-are-actually-running" id="id4"&gt;Making sure that workers for your queue are actually&amp;nbsp;running&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#checking-how-many-jobs-are-in-the-queue" id="id5"&gt;Checking how many jobs are in the&amp;nbsp;queue&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#better-exception-handling" id="id6"&gt;Better exception&amp;nbsp;handling&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#multiple-django-apps-single-redis-db" id="id7"&gt;Multiple django-apps, single redis&amp;nbsp;db&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#low-level-debugging" id="id8"&gt;Low level&amp;nbsp;debugging&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#conclusion" id="id9"&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="introduction"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id1"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;In the &lt;a class="reference external" href="http://spapas.github.io/2015/01/27/async-tasks-with-django-rq/"&gt;previous django-rq article&lt;/a&gt;
+we presented a quick introduction to asynchronous job queues and created a
+small (but complete) project that used rq and django-rq to implement asynchronous
+job queues in a django&amp;nbsp;project.&lt;/p&gt;
+&lt;p&gt;In this article, we will present some more advanced techniques and tools
+for improving the capabilities of our asynchronous tasks and
+integrate them to the &lt;a class="reference external" href="https://github.com/spapas/django-test-rq"&gt;https://github.com/spapas/django-test-rq&lt;/a&gt; project (please
+checkout tag django-rq-redux
+&lt;tt class="docutils literal"&gt;git checkout &lt;span class="pre"&gt;django-rq-redux&lt;/span&gt;&lt;/tt&gt;)&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="displaying-your-task-progress"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id2"&gt;Displaying your task&amp;nbsp;progress&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Sometimes, especially for long-running tasks it is useful to let
+the user (task initiator) know what is the status of each task he&amp;#8217;s started. For this,
+I recommend creating a task-description model that will hold the required information for this
+task with more or less the following fields (please also check &lt;tt class="docutils literal"&gt;LongTask&lt;/tt&gt; model of&amp;nbsp;django-test-rq):&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class LongTask(models.Model):
+  created_on = models.DateTimeField(auto_now_add=True)
+  name = models.CharField(max_length=128, help_text='Enter a unique name for the task',)
+  progress = models.PositiveIntegerField(default=0)
+  result = models.CharField(max_length=128, blank=True, null=True)
+&lt;/pre&gt;
+&lt;p&gt;Now, when the view that starts the task is &lt;tt class="docutils literal"&gt;&lt;span class="caps"&gt;POST&lt;/span&gt;&lt;/tt&gt; ed, you&amp;#8217;ll first create
+the &lt;tt class="docutils literal"&gt;LongTask&lt;/tt&gt; model instance with a result of &lt;tt class="docutils literal"&gt;'&lt;span class="caps"&gt;QUEUED&lt;/span&gt;'&lt;/tt&gt; and a progress
+of 0 (and a name that identifies your task) and then you&amp;#8217;ll start the real task
+asynchronously by passing the LongTask instance, something like this (also check
+&lt;tt class="docutils literal"&gt;LongTaskCreateView&lt;/tt&gt;):&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+long_task = LongTask.objects.create(...)
+long_runnig_task.delay(long_task)
+&lt;/pre&gt;
+&lt;p&gt;In your asynchronous job, the first thing you&amp;#8217;ll need to do is to set its result
+to &amp;#8216;&lt;span class="caps"&gt;STARTED&lt;/span&gt;&amp;#8217; and save it so that the user will immediately see when he&amp;#8217;s job is
+actually started. Also, if you can estimate its progress, you can update its
+progress value with the current value so that the user will know how close he
+is to finishing. Finally, when the job finished (or if it throws an expectable
+exception) you&amp;#8217;ll update its status accordingly. Here&amp;#8217;s an example of my
+long_running_task that just waits for the specifid amount of&amp;nbsp;seconds:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;#64;job('django-test-rq-low')
+def long_runnig_task(task):
+  job = get_current_job()
+  task.job_id = job.get_id()
+
+  task.result = 'STARTED'
+
+  duration_in_second_persentages = task.duration*1.0 / 100
+  for i in range(100):
+      task.progress = i
+      task.save()
+      print task.progress
+      time.sleep(duration_in_second_persentages)
+
+  task.result = 'FINISHED'
+  task.save()
+  return task.result
+&lt;/pre&gt;
+&lt;p&gt;To have proper feedback I propose to have your task-description model instance
+created by the view that starts the asynchronous task and &lt;em&gt;not&lt;/em&gt; by the
+actual task! This is important since the worker may be full so the asynchronous
+task will need a lot of time until is actually started (or maybe there are no
+running workers - more on this later) and the user will not be able to see
+his task instance anywhere (unless of course you provide him access to the actual task
+queue but I don&amp;#8217;t recommend&amp;nbsp;this).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="displaying-your-queue-statistics"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id3"&gt;Displaying your queue&amp;nbsp;statistics&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;django-rq has a really nice dashboard with a lot of queue statistics (
+instructions here
+&lt;a class="reference external" href="https://github.com/ui/django-rq#queue-statistics"&gt;https://github.com/ui/django-rq#queue-statistics&lt;/a&gt; and also on django-test-rq
+project) which I recommend to always&amp;nbsp;enable.&lt;/p&gt;
+&lt;p&gt;Also, there&amp;#8217;s the individual use &lt;a class="reference external" href="https://github.com/brutasse/django-rq-dashboard"&gt;django-rq-dashboard&lt;/a&gt; project that could
+be installed to display some more statistics, however the only extra
+statistic that you can see throuh django-rq-dashboard is the status of
+your scheduled jobs so I don&amp;#8217;t recommend installing it if you don&amp;#8217;t
+use&amp;nbsp;scheduling.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="making-sure-that-workers-for-your-queue-are-actually-running"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id4"&gt;Making sure that workers for your queue are actually&amp;nbsp;running&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Using the django-rq dashboard you can make sure that all queues
+have at least one worker. However, sometimes workers fail, or
+maybe you&amp;#8217;ve forgotten to start your workers or not configured
+your application correctly (this happens to me all the time for
+test/uat projects). So, for tasks that you want to display feedback
+to the user, you can easily add a check to make sure that there are
+active workers using the following&amp;nbsp;code:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+from rq import Worker
+import django_rq
+
+redis_conn = django_rq.get_connection('default')
+if len([
+    x for x in Worker.all(connection=redis_conn)
+        if 'django-test-rq-low' in x.queue_names()
+]) == 0:
+    # Error -- no workers
+&lt;/pre&gt;
+&lt;p&gt;With &lt;tt class="docutils literal"&gt;Worker.all()&lt;/tt&gt; you get all workers for a connection and the &lt;tt class="docutils literal"&gt;queue_names()&lt;/tt&gt;
+method returns the names that each worker serves. So we check that we have at least one
+worker for that&amp;nbsp;queue.&lt;/p&gt;
+&lt;p&gt;This check can be added when the job is started and display a feedback error
+to the user (check example in&amp;nbsp;django-test-rq).&lt;/p&gt;
+&lt;p&gt;For quick tasks (for example sending emails etc) you should not display anything
+to the user even if no workers are running (since the task &lt;em&gt;will&lt;/em&gt; be queued and
+will be executed eventually when the workers are started) but instead send an email to the administrators
+so that they will start the&amp;nbsp;workers.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="checking-how-many-jobs-are-in-the-queue"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt;Checking how many jobs are in the&amp;nbsp;queue&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;To find out programatically how many jobs are actually in the queue (and display a message
+if the queue has too many jobs etc) you&amp;#8217;ll need to use the &lt;tt class="docutils literal"&gt;Queue&lt;/tt&gt; class, something like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+from rq import Queue
+
+redis_conn = django_rq.get_connection('default')
+queue = Queue('django-test-rq-default', connection=redis_conn)
+print queue.name
+print len(queue.jobs)
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="better-exception-handling"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id6"&gt;Better exception&amp;nbsp;handling&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;When a job fails, rq will put it in a failed jobs queue and finish with it. You (as administrator)
+won&amp;#8217;t get any feedback and the user (unless he has access to that failed jobs queue) won&amp;#8217;t be
+able to do anything aboutt this&amp;nbsp;job.&lt;/p&gt;
+&lt;p&gt;In almost all cases you can&amp;#8217;t rely only on this behavior but instead you have to
+&lt;a class="reference external" href="http://python-rq.org/docs/exceptions/"&gt;install a custom exception handler&lt;/a&gt;. Using the custom exception handler you can
+do whatever you want for each failed job. For instance, you can create a new instance
+of a &lt;tt class="docutils literal"&gt;FailedTask&lt;/tt&gt; model which will have information about the failure and the
+original task allow the user (or administrator) to restart the failed task after
+he&amp;#8217;s fixed the error&amp;nbsp;conditions.&lt;/p&gt;
+&lt;p&gt;Or, if you want to be informed when a job is failed, you can just send an email
+to &lt;tt class="docutils literal"&gt;&lt;span class="caps"&gt;ADMINS&lt;/span&gt;&lt;/tt&gt; and fall back to the default behavior to enqueue the failed task the
+failed jobs queue (since job exception handlers can be&amp;nbsp;chained).&lt;/p&gt;
+&lt;p&gt;A simple management command that starts a worker for a specific queue and installs
+a custom exception handler&amp;nbsp;follows:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+from django.conf import settings
+from django.core.management.base import BaseCommand
+
+import django_rq
+from rq import Queue, Worker
+
+def my_handler(job, *exc_info):
+    print &amp;quot;FAILURE&amp;quot;
+    print job
+    print exc_info
+
+class Command(BaseCommand):
+    def handle(self, *args, **options):
+        redis_conn = django_rq.get_connection('default')
+
+        q = Queue(settings.DJANGO_TEST_RQ_LOW_QUEUE, connection=redis_conn)
+        worker = Worker([q], exc_handler=my_handler, connection=redis_conn)
+        worker.work()
+&lt;/pre&gt;
+&lt;p&gt;This handler is for demonstration purposes since it just prints a message to the console
+(so please do not use&amp;nbsp;it)!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="multiple-django-apps-single-redis-db"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id7"&gt;Multiple django-apps, single redis&amp;nbsp;db&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;One thing to keep in mind is that the only thing that seperates the queues are
+their name. If you have many django applications that define a &amp;quot;default&amp;quot; (or &amp;quot;low&amp;quot;, &amp;quot;hight&amp;quot; etc)
+and they all use the &lt;em&gt;same&lt;/em&gt; redis database to store their queue, the workers
+of each application won&amp;#8217;t know which jobs belong to them and they&amp;#8217;ll end up
+dequeuing the wrong job types. This will lead to an exception or, if you
+are really unlucky to a very nasty&amp;nbsp;bug!&lt;/p&gt;
+&lt;p&gt;To avoid this, you can either use a different redis database (not database server)
+for each of your apps or add a prefix with the name of your app to your queue&amp;nbsp;names:&lt;/p&gt;
+&lt;p&gt;Each redis database server can host a number of databases that are identified
+by a number (that&amp;#8217;s what the /0 you see in &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;redis://127.0.0.1:6379/0&lt;/span&gt;&lt;/tt&gt; means)
+and each one of them has a totally different keyspace. So, if you use /0 in an
+application and /1 in another application, you&amp;#8217;ll have no problems. This solution
+has the disadvantage that you need to be really careful to use different database
+numbers for your projects and also the number of possible databases that redis
+can use is limited by a configuration file (so if you reach the maximum you&amp;#8217;ll
+need to also increase that&amp;nbsp;number)!&lt;/p&gt;
+&lt;p&gt;Instead of this, you can avoid using the &amp;#8216;default&amp;#8217; queue, and yse queues that
+contain your application name in their name, for example, for the sample project
+you could create something like &amp;#8216;django-test-rq-default&amp;#8217;, &amp;#8216;django-test-rq-low&amp;#8217;,
+&amp;#8216;django-test-rq-high&amp;#8217; etc. You need to configure the extra queues by adding them
+to the &lt;tt class="docutils literal"&gt;RQ_QUEUES&lt;/tt&gt; dictionary (check settings.py of django-test-rq) and then
+put the jobs to these queues using for example the job decorator
+(&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;&amp;#64;job('django-test-rq-default')&lt;/span&gt;&lt;/tt&gt;)
+and run your workers so that they will retrieve jobs from these queues
+(&lt;tt class="docutils literal"&gt;python manage.py rqworker &lt;span class="pre"&gt;django-test-rq-default&lt;/span&gt;&lt;/tt&gt;) and not the
+default one (which may contain jobs of other&amp;nbsp;applications).&lt;/p&gt;
+&lt;p&gt;If you use the default queue, and because you&amp;#8217;ll need to use its name to
+many places, I recommend to add a (f.i) &lt;tt class="docutils literal"&gt;QUEUE_NAME = &lt;span class="pre"&gt;'django-test-rq-default'&lt;/span&gt;&lt;/tt&gt;
+setting and use this instead of just a string to be totally &lt;span class="caps"&gt;DRY&lt;/span&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="low-level-debugging"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id8"&gt;Low level&amp;nbsp;debugging&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;In this section I&amp;#8217;ll present some commands that you can issue to your redis
+server using a simple telnet connection to get various info about your queues. You
+probably will never need to issue these commands to actually debug, but they
+will answer some of your (scientific) questions! In the following, &lt;tt class="docutils literal"&gt;&amp;gt;&lt;/tt&gt; is
+things I type, &lt;tt class="docutils literal"&gt;#&lt;/tt&gt; are comments, &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;[...]&lt;/span&gt;&lt;/tt&gt; is more output and everything else is the output I&amp;nbsp;get:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;gt; telnet 127.0.0.1 6379
+
+# You won't see anything at first but you'll be connected and you can try typing things
+
+&amp;gt; INFO
+
+$1020
+redis_version:2.4.10
+redis_git_sha1:00000000
+# [...]
+db0:keys=83,expires=2
+db1:keys=26,expires=1 # My redis server has two databases
+
+# Now you'll see what you type!
+
+&amp;gt; SELECT 1
++ OK # Now queries will be issued to database 1
+&amp;gt; SELECT 0
++ OK # Now queries will be issued to database 0
+
+KEYS rq* # List all rq related queues
+*25
+$43
+rq:job:1d7afa32-3f90-4502-912f-d58eaa049fb1
+$43
+rq:queue:django-test-rq-low
+$43
+[...]
+
+&amp;gt; SMEMBERS rq:workers # See workers
+*1
+$26
+rq:worker:SERAFEIM-PC.6892
+
+&amp;gt; LRANGE rq:queue:django-test-rq-low 0 100 # Check queued jobs
+*2
+$36
+def896f4-84cb-4833-be6a-54d917f05271
+$36
+53cb1367-2fb5-46b3-99b2-7680397203b9
+
+&amp;gt; HGETALL rq:job:def896f4-84cb-4833-be6a-54d917f05271 # Get info about this job
+*16
+$6
+status
+$6
+queued
+$11
+description
+$57
+tasks.tasks.long_runnig_task(&amp;lt;LongTask: LongTask object&amp;gt;)
+$10
+created_at
+$20
+2015-09-01T09:04:38Z
+$7
+timeout
+$3
+180
+$6
+origin
+$18
+django-test-rq-low
+$11
+enqueued_at
+$20
+2015-09-01T09:04:38Z
+$4
+data
+$409
+[...] # data is the pickled parameters passed to the job !
+
+&amp;gt; HGET rq:job:def896f4-84cb-4833-be6a-54d917f05271 status # Get only status
+$6
+queued
+&lt;/pre&gt;
+&lt;p&gt;For more info on querying redis you can check the &lt;a class="reference external" href="http://redis.io/documentation"&gt;redis documentation&lt;/a&gt; and especially
+&lt;a class="reference external" href="http://redis.io/topics/data-types"&gt;http://redis.io/topics/data-types&lt;/a&gt; and &lt;a class="reference external" href="http://redis.io/commands"&gt;http://redis.io/commands&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="conclusion"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id9"&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Using some of the above techniques will help you in your asynchronous
+task adventures with rq. I&amp;#8217;ll try to keep this article updated with
+any new techniques or tools I find in the&amp;nbsp;future!&lt;/p&gt;
+&lt;/div&gt;
+</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Serafeim Papastefanos</dc:creator><pubDate>Tue, 01 Sep 2015 14:20:00 +0300</pubDate><guid>tag:spapas.github.io,2015-09-01:2015/09/01/django-rq-redux/</guid><category>django</category><category>python</category><category>tasks</category><category>jobs</category><category>rq</category><category>django-rq</category><category>asynchronous</category><category>scheduling</category><category>redis</category></item><item><title>A comprehensive React and Flux tutorial part 2: Flux</title><link>http://spapas.github.io/2015/07/02/comprehensive-react-flux-tutorial-2/</link><description>&lt;div class="contents topic" id="contents"&gt;
 &lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
 &lt;ul class="simple"&gt;
 &lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id1"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
@@ -1664,6 +1965,8 @@ similar to  &lt;tt class="docutils literal"&gt;get_users&lt;/tt&gt;.&lt;/p&gt;
 &lt;li&gt;&lt;a class="reference internal" href="#conclusion" id="id13"&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;Update 01/09/15&lt;/strong&gt;: I&amp;#8217;ve written a new post about rq and django with some
+&lt;a class="reference external" href="http://spapas.github.io/2015/09/01/django-rq-redux/"&gt;more advanced techniques&lt;/a&gt;&amp;nbsp;!&lt;/p&gt;
 &lt;div class="section" id="introduction"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id1"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;Job queuing (asynchronous tasks) is a common requirement for non-trivial django projects. Whenever an operation
@@ -1711,7 +2014,9 @@ scheduling queue for any jobs that need to be run because of scheduling and if y
 the normal job&amp;nbsp;queue.&lt;/p&gt;
 &lt;p&gt;Although &lt;span class="caps"&gt;RQ&lt;/span&gt; and frieds are really easy to use (and have nice documentation) I wasn&amp;#8217;t able to find
 a &lt;em&gt;complete&lt;/em&gt; example of using it with django, so I&amp;#8217;ve implemented one
-(found at &lt;a class="reference external" href="https://github.com/spapas/django-test-rq"&gt;https://github.com/spapas/django-test-rq&lt;/a&gt;) mainly for my own testing
+(found at &lt;a class="reference external" href="https://github.com/spapas/django-test-rq"&gt;https://github.com/spapas/django-test-rq&lt;/a&gt; &amp;#8212; since I&amp;#8217;ve updated this project a bit
+with new stuff,
+please checkout tag django-test-rq-simple &lt;tt class="docutils literal"&gt;git checkout &lt;span class="pre"&gt;django-test-rq-simple&lt;/span&gt;&lt;/tt&gt;) mainly for my own testing
 purposes. To help others that want to also use &lt;span class="caps"&gt;RQ&lt;/span&gt; in their project but don&amp;#8217;t know from where
 to start, I&amp;#8217;ll present it in the following paragraphs, along with some comments on
 how to actually use &lt;span class="caps"&gt;RQ&lt;/span&gt; in your production&amp;nbsp;environment.&lt;/p&gt;

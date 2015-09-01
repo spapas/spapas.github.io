@@ -100,6 +100,8 @@
 <li><a class="reference internal" href="#conclusion" id="id13">Conclusion</a></li>
 </ul>
 </div>
+<p><strong>Update 01/09/15</strong>: I&#8217;ve written a new post about rq and django with some
+<a class="reference external" href="http://spapas.github.io/2015/09/01/django-rq-redux/">more advanced techniques</a>&nbsp;!</p>
 <div class="section" id="introduction">
 <h2><a class="toc-backref" href="#id1">Introduction</a></h2>
 <p>Job queuing (asynchronous tasks) is a common requirement for non-trivial django projects. Whenever an operation
@@ -147,7 +149,9 @@ scheduling queue for any jobs that need to be run because of scheduling and if y
 the normal job&nbsp;queue.</p>
 <p>Although <span class="caps">RQ</span> and frieds are really easy to use (and have nice documentation) I wasn&#8217;t able to find
 a <em>complete</em> example of using it with django, so I&#8217;ve implemented one
-(found at <a class="reference external" href="https://github.com/spapas/django-test-rq">https://github.com/spapas/django-test-rq</a>) mainly for my own testing
+(found at <a class="reference external" href="https://github.com/spapas/django-test-rq">https://github.com/spapas/django-test-rq</a> &#8212; since I&#8217;ve updated this project a bit
+with new stuff,
+please checkout tag django-test-rq-simple <tt class="docutils literal">git checkout <span class="pre">django-test-rq-simple</span></tt>) mainly for my own testing
 purposes. To help others that want to also use <span class="caps">RQ</span> in their project but don&#8217;t know from where
 to start, I&#8217;ll present it in the following paragraphs, along with some comments on
 how to actually use <span class="caps">RQ</span> in your production&nbsp;environment.</p>
@@ -561,6 +565,9 @@ to help readers quickly test the concepts presented&nbsp;here.</p>
     <h1>Recent Posts</h1>
     <ul id="recent_posts">
       <li class="post">
+          <a href="http://spapas.github.io/2015/09/01/django-rq-redux/">django-rq redux: advanced techniques and tools</a>
+      </li>
+      <li class="post">
           <a href="http://spapas.github.io/2015/07/02/comprehensive-react-flux-tutorial-2/">A comprehensive React and Flux tutorial part 2: Flux</a>
       </li>
       <li class="post">
@@ -571,9 +578,6 @@ to help readers quickly test the concepts presented&nbsp;here.</p>
       </li>
       <li class="post">
           <a href="http://spapas.github.io/2015/04/29/django-show-404-page/">Show 404 page on django when DEBUG=True</a>
-      </li>
-      <li class="post">
-          <a href="http://spapas.github.io/2015/02/06/python-pusher-rest/">Calling the REST API of Pusher from python</a>
       </li>
     </ul>
   </section>

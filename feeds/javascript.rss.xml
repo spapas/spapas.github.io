@@ -32,9 +32,9 @@
 &lt;li&gt;&lt;a class="reference internal" href="#id2" id="id24"&gt;MessageStore.js&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a class="reference internal" href="#authorstore-js" id="id25"&gt;AuthorStore.js&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a class="reference internal" href="#categorystore-js" id="id26"&gt;CategoryStore.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#bookstore-js" id="id27"&gt;BookStore.js&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#bookstore-js" id="id27"&gt;BookStore.js&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a class="reference internal" href="#conclusion" id="id28"&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
@@ -1174,9 +1174,8 @@ CategoryStore.dispatchToken = AppDispatcher.register(function(action) {
 });
 &lt;/pre&gt;
 &lt;/div&gt;
-&lt;/div&gt;
 &lt;div class="section" id="bookstore-js"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id27"&gt;BookStore.js&lt;/a&gt;&lt;/h2&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id27"&gt;BookStore.js&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;Here, beyond the book-related functionality we have also implemented the
 &lt;span class="caps"&gt;URL&lt;/span&gt; updating. The getUrlParameter that returns the value of a &lt;span class="caps"&gt;URL&lt;/span&gt; parameter has been taken from
 &lt;a class="reference external" href="http://stackoverflow.com/questions/19491336/get-url-parameter-jquery"&gt;http://stackoverflow.com/questions/19491336/get-url-parameter-jquery&lt;/a&gt;. Depending on the url parameters, we set some initial properties of
@@ -1317,6 +1316,7 @@ BookStore.dispatchToken = AppDispatcher.register(function(action) {
     return true;
 });
 &lt;/pre&gt;
+&lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="section" id="conclusion"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id28"&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;

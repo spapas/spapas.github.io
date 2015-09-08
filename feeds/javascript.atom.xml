@@ -1,5 +1,1336 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>/var/</title><link href="http://spapas.github.io/" rel="alternate"></link><link href="http://spapas.github.io/feeds/javascript.atom.xml" rel="self"></link><id>http://spapas.github.io/</id><updated>2015-07-02T14:20:00+03:00</updated><entry><title>A comprehensive React and Flux tutorial part 2: Flux</title><link href="http://spapas.github.io/2015/07/02/comprehensive-react-flux-tutorial-2/" rel="alternate"></link><updated>2015-07-02T14:20:00+03:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2015-07-02:2015/07/02/comprehensive-react-flux-tutorial-2/</id><summary type="html">&lt;div class="contents topic" id="contents"&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>/var/</title><link href="http://spapas.github.io/" rel="alternate"></link><link href="http://spapas.github.io/feeds/javascript.atom.xml" rel="self"></link><id>http://spapas.github.io/</id><updated>2015-09-08T12:55:00+03:00</updated><entry><title>A (little more) complex react and flux example</title><link href="http://spapas.github.io/2015/09/08/more-complex-react-flux-example/" rel="alternate"></link><updated>2015-09-08T12:55:00+03:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2015-09-08:2015/09/08/more-complex-react-flux-example/</id><summary type="html">&lt;div class="contents topic" id="contents"&gt;
+&lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id3"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#more-about-flux-components" id="id4"&gt;More about Flux&amp;nbsp;components&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#explaining-the-application-components" id="id5"&gt;Explaining the application&amp;nbsp;components&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#reusable-application-components" id="id6"&gt;Reusable application components&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#dropdown-react-js" id="id7"&gt;DropDown.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#id1" id="id8"&gt;DropDown.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#pagingpanel-react-js" id="id9"&gt;PagingPanel.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#searchpanel-react-js" id="id10"&gt;SearchPanel.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#messagepanel" id="id11"&gt;MessagePanel&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#messagepanel-react-js" id="id12"&gt;MessagePanel.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#messagestore-js" id="id13"&gt;MessageStore.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#messageactions" id="id14"&gt;MessageActions&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#non-reusable-application-components" id="id15"&gt;Non-reusable application components&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#booktable-react-js" id="id16"&gt;BookTable.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#authordialog-react-js" id="id17"&gt;AuthorDialog.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#authorpanel-react-js" id="id18"&gt;AuthorPanel.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#statpanel-react-js" id="id19"&gt;StatPanel.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#bookform-react-js" id="id20"&gt;BookForm.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#bookpanel-react-js" id="id21"&gt;BookPanel.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#the-actions" id="id22"&gt;The&amp;nbsp;Actions&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#the-stores" id="id23"&gt;The Stores&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#id2" id="id24"&gt;MessageStore.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#authorstore-js" id="id25"&gt;AuthorStore.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#categorystore-js" id="id26"&gt;CategoryStore.js&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#bookstore-js" id="id27"&gt;BookStore.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#conclusion" id="id28"&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="introduction"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id3"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;In &lt;a class="reference external" href="http://spapas.github.io/2015/06/05/comprehensive-react-flux-tutorial/"&gt;previous&lt;/a&gt;
+&lt;a class="reference external" href="http://spapas.github.io/2015/06/05/comprehensive-react-flux-tutorial/"&gt;two&lt;/a&gt; parts of this series, we have seen
+how we could implement a
+not-so-simple single page application with full &lt;span class="caps"&gt;CRUD&lt;/span&gt; capabilities
+using react only (in the &lt;a class="reference external" href="http://spapas.github.io/2015/06/05/comprehensive-react-flux-tutorial/"&gt;first part&lt;/a&gt; ) and then how to
+change it to use the flux architecture (in the &lt;a class="reference external" href="http://spapas.github.io/2015/06/05/comprehensive-react-flux-tutorial/"&gt;second part&lt;/a&gt;).&lt;/p&gt;
+&lt;p&gt;In this, third, part, we will
+add some more capabilities to the previous app
+to prove how easy it is to create complex apps
+and continue the discussion on
+the Flux architecture. The source code of this project
+can
+be found at &lt;a class="reference external" href="https://github.com/spapas/react-tutorial"&gt;https://github.com/spapas/react-tutorial&lt;/a&gt; (tag name&amp;nbsp;react-flux-complex).&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s a demo of the final&amp;nbsp;application:&lt;/p&gt;
+&lt;img alt="Our project" src="/images/demo2.gif" style="width: 780px;" /&gt;
+&lt;p&gt;We can see that, when compared to the previous version this one&amp;nbsp;has:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Sorting by table&amp;nbsp;columns&lt;/li&gt;
+&lt;li&gt;Pagination&lt;/li&gt;
+&lt;li&gt;Message for&amp;nbsp;loading&lt;/li&gt;
+&lt;li&gt;Client side url updating (with&amp;nbsp;hashes)&lt;/li&gt;
+&lt;li&gt;Cascading drop downs (selecting category will filter out&amp;nbsp;subcategories)&lt;/li&gt;
+&lt;li&gt;Integration with jquery-ui&amp;nbsp;datepicker&lt;/li&gt;
+&lt;li&gt;Add a child object&amp;nbsp;(author)&lt;/li&gt;
+&lt;li&gt;Add authors with a modal dialog&amp;nbsp;(popup)&lt;/li&gt;
+&lt;li&gt;Delete authors (using the &amp;quot;-&amp;quot;&amp;nbsp;button)&lt;/li&gt;
+&lt;li&gt;Colored ajax result messages (green when all is ok, red with&amp;nbsp;error)&lt;/li&gt;
+&lt;li&gt;A statistics panel (number of books /&amp;nbsp;authors)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;In the paragraphs below, beyond the whole architecture, we&amp;#8217;ll see
+a bunch of techniques such&amp;nbsp;as:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Creating reusable flux&amp;nbsp;components&lt;/li&gt;
+&lt;li&gt;Integrating react with&amp;nbsp;jquery&lt;/li&gt;
+&lt;li&gt;Creating cascading&amp;nbsp;dropdowns&lt;/li&gt;
+&lt;li&gt;Updating URLs with&amp;nbsp;hashes&lt;/li&gt;
+&lt;li&gt;Adding pagination/sorting/querying to a table of&amp;nbsp;results&lt;/li&gt;
+&lt;li&gt;Displaying pop&amp;nbsp;ups&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="more-about-flux-components"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id4"&gt;More about Flux&amp;nbsp;components&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Before delving into the source code of the above application, I&amp;#8217;d like to
+make crystal what is the proposed way to call methods in the flux chain
+and which types of components can include other types of components. Let&amp;#8217;s
+take a look at the following&amp;nbsp;diagram:&lt;/p&gt;
+&lt;img alt="flux dependencies" src="/images/react_flux_deps1.png" style="width: 480px;" /&gt;
+&lt;p&gt;The arrows display the dependencies of the Flux architecture - an arrow
+from X to Y means that a component of type Y could depend on an Component
+of type X (of example, a store could depend on an action or another store
+but not on a&amp;nbsp;panel).&lt;/p&gt;
+&lt;p&gt;In more detail, we can see that in the top of the hierarchy,
+having no dependencies are the
+Dispatcher and the Constants. The Dispatcher is just a single component
+(which actually is a singleton - only one dispatcher exists in each
+single page react-flux application)
+that inherits from the Facebook&amp;#8217;s dispatcher and is imported by the
+action components (since action methods defined in action components
+call the &lt;tt class="docutils literal"&gt;dispatch&lt;/tt&gt; method of the dispatcher passing the correct
+parameters) and the stores which do the real actions when an action
+is dispatched, depending on the action type. The Constant components
+define constant values for the action types and are used by both
+the actions (to set the action types to the dispatch calls) and by
+the stores to be used on the switch statement when an action is
+dispatched. As an example, for BookActions we have the&amp;nbsp;following&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+var BookConstants = require('../constants/BookConstants')
+var AppDispatcher = require('../dispatcher/AppDispatcher').AppDispatcher;
+
+var BookActions = {
+    change_book: function(book) {
+        AppDispatcher.dispatch({
+            actionType: BookConstants.BOOK_CHANGE,
+            book: book
+        });
+    },
+// Other book actions [...]
+&lt;/pre&gt;
+&lt;p&gt;and for&amp;nbsp;BookStore&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+var $ = require('jquery');
+var AppDispatcher = require('../dispatcher/AppDispatcher').AppDispatcher;
+var BookConstants = require('../constants/BookConstants')
+
+// [...]
+
+BookStore.dispatchToken = AppDispatcher.register(function(action) {
+    switch(action.actionType) {
+        case BookConstants.BOOK_EDIT:
+            _editBook(action.book);
+        break;
+// [...] other switch branches
+&lt;/pre&gt;
+&lt;p&gt;An interesting thing to see is that the actions depend only on the Dispatcher
+and on the Constants, while the stores also depend on actions (not only
+from the same action types as the store type, for example AuthorStore depends
+on both AuthorActions and MessageActions) and on &lt;em&gt;other&lt;/em&gt; stores. This means
+that the actions should be a &amp;quot;clean&amp;quot; component: Just declare your action methods
+whose only purpose is to pass the action type along with the required parameters
+to the&amp;nbsp;dispatcher.&lt;/p&gt;
+&lt;p&gt;On the other hand, the stores are depending on both actions and other stores.
+The action dependency is because sometimes when something is done in a store
+we need to notify another store to do something as a response to that. For
+example, in our case, when a book is updated we need to notify the message
+store to show the &amp;quot;Book updated ok&amp;quot; message. This preferrably should not be done by
+directly calling the corresponding method on the message store but instead
+by calling the corresponding action of MessageAction and passing the correct
+parameters (actually, the method that updates the message in MessageStore
+should be a private method that is called &lt;em&gt;only&lt;/em&gt; through the&amp;nbsp;action).&lt;/p&gt;
+&lt;p&gt;One thing to notice here is that you &lt;em&gt;cannot&lt;/em&gt; call (and dispatch) an action in the
+same call stack (meaning it is directly called) as of another dispatch or you&amp;#8217;ll get a
+&lt;tt class="docutils literal"&gt;Invariant Violation: &lt;span class="pre"&gt;Dispatch.dispatch(...):&lt;/span&gt; Cannot dispatch in the middle of a dispatch.&lt;/tt&gt;
+error in your javascript console. Let&amp;#8217;s see an example of what this means and how
+to avoid it because its a common error. Let&amp;#8217;s say that we have the following
+code to a&amp;nbsp;store:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+AppDispatcher.register(function(action) {
+    switch(action.actionType) {
+        case Constants.TEST_ERR:
+            TestActions.action1();
+        break;
+        case Constants.TEST_OK1:
+            setTimeout(function() {
+                TestActions.action1();
+            }, 0);
+
+        break;
+        case Constants.TEST_OK2:
+            $.get('/get/', function() {
+                TestActions.action1();
+            });
+
+        break;
+    }
+    return true;
+});
+&lt;/pre&gt;
+&lt;p&gt;Here, the &lt;tt class="docutils literal"&gt;TEST_ERR&lt;/tt&gt; branch will throw an error because the &lt;tt class="docutils literal"&gt;TestAction.action1&lt;/tt&gt; is &lt;em&gt;in the same call stack&lt;/em&gt;
+as this dispatch! On the other hand, both &lt;tt class="docutils literal"&gt;TEST_OK1&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;TEST_OK2&lt;/tt&gt; will work: &lt;tt class="docutils literal"&gt;TEST_OK2&lt;/tt&gt; is the most
+usual, since most of the times we want to call an action as a result of an ajax call - however, sometimes we
+want to call an action without any ajax &amp;#8212; in this case we use the setTimeout (with a timeout of 0 ms) in
+order to move the call to &lt;tt class="docutils literal"&gt;TestActions.action1()&lt;/tt&gt; to a different call&amp;nbsp;stack.&lt;/p&gt;
+&lt;p&gt;Now, as I mentioned before, there&amp;#8217;s also a &lt;em&gt;different-store&lt;/em&gt; dependency on stores.
+This dependency is needed because some stores may offer public methods for other stores to use
+(methods that don&amp;#8217;t actually need to be dispatched through the dispatcher) and
+for the &lt;tt class="docutils literal"&gt;waitFor&lt;/tt&gt; method , in case there are two different
+stores that respond to a single action and want to have one store executing
+its dispatch method before the other.
+(the waitFor method takes the dispatchToken, which is the result of &lt;tt class="docutils literal"&gt;Dispatcher.register&lt;/tt&gt; of
+a different store as a parameter in order to wait for that action to&amp;nbsp;finish).&lt;/p&gt;
+&lt;p&gt;Finally, the Panels depend on both actions (to initiate an action as a response
+to user input) and stores (to read the state of the each required store when it
+is changed). Of course, not all panels actually depend on stores, since as we
+already know the state of a React app should be kept as high in the hierarchy
+as possible, so a central component will get the state of a store and pass the
+required state attributes to its children through parameters. On the other
+hand, every component that responds to user input will have to import
+am action object and call the corresponding method &amp;#8212; we should never pass
+callbacks from a parent to a child component as a parameter anymore &lt;em&gt;unless&lt;/em&gt;
+we want to make the component reusable (more on this&amp;nbsp;later).&lt;/p&gt;
+&lt;p&gt;Finally, as expected, because of their hierarchy the compoents depend on their
+child components (a BookTable depends on a BookTableRow&amp;nbsp;etc).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="explaining-the-application-components"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt;Explaining the application&amp;nbsp;components&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;There are a lot of components that are needed for
+the above application. A bird&amp;#8217;s eye view of the components
+and their hierarchies can be seen on the following&amp;nbsp;figure:&lt;/p&gt;
+&lt;img alt="Our components" src="/images/complex_react_components.png" style="width: 780px;" /&gt;
+&lt;p&gt;We will first explain a bit the components that could be easily reused
+by other applications and after that the components that are specifically
+implemented for our book/author single page&amp;nbsp;application.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="reusable-application-components"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id6"&gt;Reusable application&amp;nbsp;components&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;We can see that beyond the specific components (&lt;tt class="docutils literal"&gt;BookPanel&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;BookTable&lt;/tt&gt; etc)
+there&amp;#8217;s a bunch of more general components (&lt;tt class="docutils literal"&gt;DropDown&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;DatePicker&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;PagingPanel&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;SearchPanel&lt;/tt&gt;,
+&lt;tt class="docutils literal"&gt;MessagePanel&lt;/tt&gt;) that have names like they could be used by other applications (for example every application
+that wants to implement a DropDown could use our component) and not only by the
+Book-Author application. Let&amp;#8217;s take a quick look at these components and if they
+are actually&amp;nbsp;reusable:&lt;/p&gt;
+&lt;div class="section" id="dropdown-react-js"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id7"&gt;DropDown.react.js&lt;/a&gt;&lt;/h3&gt;
+&lt;pre class="code literal-block"&gt;
+var React = require('react');
+
+var DropDown = React.createClass({
+    render: function() {
+        var options = [];
+        options.push(&amp;lt;option key='-1' value='' &amp;gt;---&amp;lt;/option&amp;gt;);
+        if(this.props.options) {
+            this.props.options.forEach(function(option) {
+                options.push(&amp;lt;option key={option.id} value={option.id}&amp;gt;{option.name}&amp;lt;/option&amp;gt;);
+            });
+        }
+
+        return(
+            &amp;lt;select ref='dropdown' value={this.props.value?this.props.value:''} onChange={this.onFormChange} &amp;gt;
+                {options}
+            &amp;lt;/select&amp;gt;
+        );
+    },
+    onFormChange: function() {
+        var val = React.findDOMNode(this.refs.dropdown).value
+        this.props.dropDownValueChanged(val);
+    }
+});
+
+module.exports.DropDown = DropDown;
+&lt;/pre&gt;
+&lt;p&gt;What we see here is that this component does not actually have a local state and will need three&amp;nbsp;parameters:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;the list of options (&lt;tt class="docutils literal"&gt;props.options&lt;/tt&gt;)&lt;/li&gt;
+&lt;li&gt;the curently selected option (&lt;tt class="docutils literal"&gt;props.value&lt;/tt&gt;)&lt;/li&gt;
+&lt;li&gt;a callback to be called when the dropdown is changed (&lt;tt class="docutils literal"&gt;props.dropDownValueChanged&lt;/tt&gt;)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;By passing the above three parameters this dropdown component can be reused whenever a dropdown is needed!
+As we can see here we need to pass a callback function to this dropdown and call the corresponding action
+directly. This is important to have a reusable component: The component that includes each dropdown decides
+which should be the action on the dropdown value change. Another option if we wanted to avoid callbacks
+would be to pass an identifier as a property for each dropdown and the dropdown would call a generic
+dropdown action and passing this identifier &amp;#8212; however I think that actually passing the callback is
+easier and makes the code much more&amp;nbsp;readable.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id1"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id8"&gt;DropDown.react.js&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The datepicker component has more or less the same structure as with the dropdown: It needs one parameter
+for its current value (&lt;tt class="docutils literal"&gt;props.value&lt;/tt&gt;) and another as the callback to the function when the date is
+changed (once again this is required to have a reusable&amp;nbsp;component):&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+var React = require('react');
+
+var DatePicker = React.createClass({
+    render: function() {
+        return(
+            &amp;lt;input type='text' ref='date' value={this.props.value} onChange={this.handleChange} /&amp;gt;
+        );
+    },
+    componentDidMount: function() {
+        $(React.findDOMNode(this)).datepicker({ dateFormat: 'yy-mm-dd' });
+        $(React.findDOMNode(this)).on('change', this.handleChange);
+    },
+    componentWillUnmount: function() {
+
+    },
+    handleChange: function() {
+        var date = React.findDOMNode(this.refs.date).value
+        this.props.onChange(date);
+    }
+});
+
+module.exports.DatePicker = DatePicker ;
+&lt;/pre&gt;
+&lt;p&gt;Another thing we can see here is how can integrate jquery components with react: When
+the component is mounted, we get its &lt;span class="caps"&gt;DOM&lt;/span&gt; component using &lt;tt class="docutils literal"&gt;React.findDomNode(this)&lt;/tt&gt; and
+convert it to a datepicker. We also set its change function to be the passed&amp;nbsp;callback.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="pagingpanel-react-js"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id9"&gt;PagingPanel.react.js&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The paging panel is not actually a reusable component because it requires BookActions
+(to handle next and previous page clicks) - so
+it can&amp;#8217;t be used by Authors (if authors was a table that is). However, we can easily
+change it to be reusable if we passed callbacks for next and previous page so that
+the component including PagingPanel would call the correct action on each click. Having
+a reusable PagingPangel is not needed for our application since only books have a&amp;nbsp;table.&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+var React = require('react');
+var BookActions = require('../actions/BookActions').BookActions;
+
+var PagingPanel = React.createClass({
+    render: function() {
+        return(
+            &amp;lt;div className=&amp;quot;row&amp;quot;&amp;gt;
+                {this.props.page==1?'':&amp;lt;button onClick={this.onPreviousPageClick}&amp;gt;&amp;amp;lt;&amp;lt;/button&amp;gt;}
+                &amp;amp;nbsp; Page {this.props.page} of {this.getTotalPages()} &amp;amp;nbsp;
+                {this.props.page==this.getTotalPages()?'':&amp;lt;button onClick={this.onNextPageClick} &amp;gt;&amp;amp;gt;&amp;lt;/button&amp;gt;}
+            &amp;lt;/div&amp;gt;
+        );
+    },
+    onNextPageClick: function(e) {
+        e.preventDefault();
+        BookActions.change_page(this.props.page+1)
+    },
+    onPreviousPageClick: function(e) {
+        e.preventDefault();
+        BookActions.change_page(this.props.page-1)
+    },
+    getTotalPages: function() {
+        return Math.ceil(this.props.total / this.props.page_size);
+    }
+})
+
+module.exports.PagingPanel = PagingPanel;
+&lt;/pre&gt;
+&lt;p&gt;The component is very simple, it needs three&amp;nbsp;parameters:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;the current page (&lt;tt class="docutils literal"&gt;props.page&lt;/tt&gt;)&lt;/li&gt;
+&lt;li&gt;the page size (&lt;tt class="docutils literal"&gt;props.page_size&lt;/tt&gt;)&lt;/li&gt;
+&lt;li&gt;the total pages number (&lt;tt class="docutils literal"&gt;props.total&lt;/tt&gt;)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;and just displayd the current page along with buttons to go to the next or previous page (if these buttons should be visible of&amp;nbsp;course).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="searchpanel-react-js"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id10"&gt;SearchPanel.react.js&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The SearchPanel is another panel that could be reusable if we&amp;#8217;d passed a callbeck instead of calling the &lt;tt class="docutils literal"&gt;BookActions.search&lt;/tt&gt;
+action directly. The promise behavior has been explained in the previous posts and is needed to buffer the queries to the
+server when a user types his search&amp;nbsp;query.&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+var React = require('react');
+var BookActions = require('../actions/BookActions').BookActions;
+
+var SearchPanel = React.createClass({
+    getInitialState: function() {
+        return {
+            search: this.props.query,
+        }
+    },
+    componentWillReceiveProps: function(nextProps) {
+      this.setState({
+            search: nextProps.query
+      });
+    },
+    render: function() {
+        return (
+            &amp;lt;div className=&amp;quot;row&amp;quot;&amp;gt;
+                &amp;lt;div className=&amp;quot;one-fourth column&amp;quot;&amp;gt;
+                    Filter: &amp;amp;nbsp;
+                    &amp;lt;input ref='search' name='search' type='text' value={this.state.search} onChange={this.onSearchChange} /&amp;gt;
+                    {this.state.search?&amp;lt;button onClick={this.onClearSearch} &amp;gt;x&amp;lt;/button&amp;gt;:''}
+                &amp;lt;/div&amp;gt;
+            &amp;lt;/div&amp;gt;
+        )
+    },
+    onSearchChange: function() {
+        var query = React.findDOMNode(this.refs.search).value;
+        if (this.promise) {
+            clearInterval(this.promise)
+        }
+        this.setState({
+            search: query
+        });
+        this.promise = setTimeout(function () {
+            BookActions.search(query);
+        }.bind(this), 400);
+    },
+    onClearSearch: function() {
+        this.setState({
+            search: ''
+        });
+        BookActions.search('');
+    }
+});
+
+module.exports.SearchPanel = SearchPanel;
+&lt;/pre&gt;
+&lt;p&gt;As we can see, this panel is a little different than the previous ones because it actually handles its
+own local state: When the component should get properties from its parent compoent, its state will
+be updated to the &lt;tt class="docutils literal"&gt;query&lt;/tt&gt; attribute - so the current value of the search query gets updated through
+properties. However, when the value of the search input is changed, we see that the local state is
+changed immediately but the &lt;tt class="docutils literal"&gt;BookActions.search&lt;/tt&gt; (or the corresponding callback) gets called &lt;em&gt;only&lt;/em&gt;
+when the timeout has&amp;nbsp;passed!&lt;/p&gt;
+&lt;p&gt;The above means that we can type whatever we want on the search input, but it at first it will be used
+only locally to immediately update the value of the input and, only after the timeout has fired the
+search action will be called. If we hadn&amp;#8217;t used the local state it would be much more difficult to have
+this consistent behavior (we&amp;#8217;d need to add two actions, one to handle the search query value change
+and another to handle the timeout firing &amp;#8212; making everythimg much more&amp;nbsp;complicated).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="messagepanel"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id11"&gt;MessagePanel&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The MessagePanel is really interesting because it is a reusable component that actually has its own action and store module! This
+component can be reused in &lt;em&gt;different&lt;/em&gt; applications that need to display message but &lt;em&gt;not&lt;/em&gt; on the same application (because a single state
+is kept for all messages). If we wanted to use a different MessagePanel for Books or Authors then we&amp;#8217;d need to keep both in the
+state &lt;em&gt;and&lt;/em&gt; also it to the action to differentiate between messages for author and for book. Instead, by keeping a single Messages
+state for both Books and Authors we have a much more simple&amp;nbsp;version.&lt;/p&gt;
+&lt;div class="section" id="messagepanel-react-js"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#id12"&gt;MessagePanel.react.js&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;The MessagePanel component has a local state which responds to changes on MessageStore. When the
+state of MessageStore is changed the MessagePanel will be re-rendered with the new&amp;nbsp;message.&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+var React = require('react');
+var MessageStore = require('../stores/MessageStore').MessageStore;
+
+var MessagePanel = React.createClass({
+    getInitialState: function() {
+        return {
+
+        };
+    },
+    render: function() {
+        return(
+            &amp;lt;div className=&amp;quot;row&amp;quot;&amp;gt;
+                {this.state.message?&amp;lt;div className={this.state.message.color}&amp;gt;{this.state.message.text}&amp;lt;/div&amp;gt;:&amp;quot;&amp;quot;}
+            &amp;lt;/div&amp;gt;
+        );
+    },
+    _onChange: function() {
+        this.setState(MessageStore.getState());
+    },
+    componentWillUnmount: function() {
+        MessageStore.removeChangeListener(this._onChange);
+    },
+    componentDidMount: function() {
+        MessageStore.addChangeListener(this._onChange);
+    }
+})
+
+module.exports.MessagePanel = MessagePanel;
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="messagestore-js"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#id13"&gt;MessageStore.js&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;The MessageStore has a (private) state containing a &lt;tt class="docutils literal"&gt;message&lt;/tt&gt; that gets updated
+only when the ccorresponding action is dispached. The store has a single state
+for all messages - it doesn&amp;#8217;t care if the messages are for books or&amp;nbsp;authors.&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+var $ = require('jquery');
+var EventEmitter = require('events').EventEmitter;
+var AppDispatcher = require('../dispatcher/AppDispatcher').AppDispatcher;
+var BookConstants = require('../constants/BookConstants')
+
+var _state = {
+    message: {}
+};
+
+var MessageStore = $.extend({}, EventEmitter.prototype, {
+    getState: function() {
+        return _state;
+    },
+    emitChange: function() {
+        this.emit('change');
+    },
+    addChangeListener: function(callback) {
+        this.on('change', callback);
+    },
+    removeChangeListener: function(callback) {
+        this.removeListener('change', callback);
+    }
+});
+
+MessageStore.dispatchToken = AppDispatcher.register(function(action) {
+    switch(action.actionType) {
+        case BookConstants.MESSAGE_ADD:
+            _state.message = action.message;
+            MessageStore.emitChange();
+        break;
+    }
+    return true;
+});
+
+module.exports.MessageStore = MessageStore;
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="messageactions"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#id14"&gt;MessageActions&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;Finally, there are two actions that are defined for the MessageStore: One for adding
+an ok message and one for adding an error message - both of which have the same
+message type (but pass a different color&amp;nbsp;parameter).&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+var AppDispatcher = require('../dispatcher/AppDispatcher').AppDispatcher;
+var BookConstants = require('../constants/BookConstants')
+
+var MessageActions = {
+    add_message_ok: function(msg) {
+        AppDispatcher.dispatch({
+            actionType: BookConstants.MESSAGE_ADD,
+            message: {
+                color: 'green',
+                text: msg
+            }
+        });
+    },
+    add_message_error: function(msg) {
+        AppDispatcher.dispatch({
+            actionType: BookConstants.MESSAGE_ADD,
+            message: {
+                color: 'green',
+                text: msg
+            }
+        });
+    }
+};
+
+module.exports.MessageActions = MessageActions;
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="non-reusable-application-components"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id15"&gt;Non-reusable application&amp;nbsp;components&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;I don&amp;#8217;t want to discuss the source code for all the non-reusable components since some of them
+are more or less the same with the previous version and are easy to understand just by
+checking the source code (BookTableRow and ButtonPanel). However, I&amp;#8217;ll
+discuss the other, more complex components starting from the inside of the&amp;nbsp;react-onion:&lt;/p&gt;
+&lt;div class="section" id="booktable-react-js"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id16"&gt;BookTable.react.js&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;I want to display this component to discuss how sorting is implemented: Each column has a key which,
+when passed to django-rest-framework will sort the results based on that key (the &lt;tt class="docutils literal"&gt;__&lt;/tt&gt; does a
+join so by &lt;tt class="docutils literal"&gt;author__last_name&lt;/tt&gt; we mean that we want to sort by the last_name field of the author
+of each book. Also, you can pass the key as it is to sort ascending or with a minus (-) in front
+(for example &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;-author__last_name&lt;/span&gt;&lt;/tt&gt;).&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+var React = require('react');
+var BookTableRow = require('./BookTableRow.react').BookTableRow;
+var BookActions = require('../actions/BookActions').BookActions;
+
+var BookTable = React.createClass({
+    render: function() {
+        var rows = [];
+        this.props.books.forEach(function(book) {
+            rows.push(&amp;lt;BookTableRow key={book.id} book={book} /&amp;gt;);
+        });
+        return (
+            &amp;lt;table&amp;gt;
+                &amp;lt;thead&amp;gt;
+                    &amp;lt;tr&amp;gt;
+                        &amp;lt;th&amp;gt;&amp;lt;a href='#' onClick={this.onClick.bind(this, 'id')}&amp;gt;{this.showOrdering('id')} Id&amp;lt;/a&amp;gt;&amp;lt;/th&amp;gt;
+                        &amp;lt;th&amp;gt;&amp;lt;a href='#' onClick={this.onClick.bind(this, 'title')}&amp;gt;{this.showOrdering('title')} Title&amp;lt;/a&amp;gt;&amp;lt;/th&amp;gt;
+                        &amp;lt;th&amp;gt;&amp;lt;a href='#' onClick={this.onClick.bind(this, 'subcategory__name')}&amp;gt;{this.showOrdering('subcategory__name')} Category&amp;lt;/a&amp;gt;&amp;lt;/th&amp;gt;
+                        &amp;lt;th&amp;gt;&amp;lt;a href='#' onClick={this.onClick.bind(this, 'publish_date')}&amp;gt;{this.showOrdering('publish_date')} Publish date&amp;lt;/a&amp;gt;&amp;lt;/th&amp;gt;
+                        &amp;lt;th&amp;gt;&amp;lt;a href='#' onClick={this.onClick.bind(this, 'author__last_name')}&amp;gt;{this.showOrdering('author__last_name')} Author&amp;lt;/a&amp;gt;&amp;lt;/th&amp;gt;
+                        &amp;lt;th&amp;gt;Edit&amp;lt;/th&amp;gt;
+                    &amp;lt;/tr&amp;gt;
+                &amp;lt;/thead&amp;gt;
+                &amp;lt;tbody&amp;gt;{rows}&amp;lt;/tbody&amp;gt;
+            &amp;lt;/table&amp;gt;
+        );
+    },
+    onClick: function(v, e) {
+        e.preventDefault();
+        BookActions.sort_books(v);
+    },
+    showOrdering: function(v) {
+        if (v==this.props.ordering) {
+            return '+'
+        } else if ('-'+v==this.props.ordering) {
+            return '-'
+        }
+    }
+});
+
+module.exports.BookTable = BookTable ;
+&lt;/pre&gt;
+&lt;p&gt;The only thing that needs explaining in this module is the line of the&amp;nbsp;form&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;lt;th&amp;gt;&amp;lt;a href='#' onClick={this.onClick.bind(this, 'id')}&amp;gt;{this.showOrdering('id')} Id&amp;lt;/a&amp;gt;&amp;lt;/th&amp;gt;
+&lt;/pre&gt;
+&lt;p&gt;that creates the title of each column and triggers ascending or descending sorting on this column by
+clicking on it. So, we can see that we&amp;#8217;ve create an onClick function that actually expects a value - the key
+to that column. To allow passing that value, we use the bind method of the function object which will
+create new a function that has this key as its first parameter. If we didn&amp;#8217;t want to use bind, we&amp;#8217;d need to
+creatre 5 different function (onIdClick, onTitleClick etc)! The most common usage of &lt;tt class="docutils literal"&gt;bind&lt;/tt&gt; is to actually &lt;em&gt;bind&lt;/em&gt;
+a function to an object (that&amp;#8217;s what the first parameter to this function does)
+so that calling this inside that function will refer to that object - here we leave the binding
+of the function to the same object and only do the parameter&amp;nbsp;passing.&lt;/p&gt;
+&lt;p&gt;Also, the showOrdering checks if the current ordering is the same as that column&amp;#8217;s key and displays
+either a + (for ascending) or - (for descending) in front of the column&amp;nbsp;title.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="authordialog-react-js"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id17"&gt;AuthorDialog.react.js&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;This is a handmade pop-up dialog that gets displayed when a new author is added (the + button is clicked)
+using only css to center it on the screen when it is displayed.
+We can see that it is either visible on invisible based on the &lt;tt class="docutils literal"&gt;showDialog&lt;/tt&gt; input property which actually
+is the only input this component requires. When it is visible and the ok or cancel button are pressed
+the corresponding action will be dispatched (which will actually close this popup by setting the &lt;tt class="docutils literal"&gt;showDialog&lt;/tt&gt;
+to&amp;nbsp;false):&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+var React = require('react');
+var AuthorActions = require('../actions/AuthorActions').AuthorActions;
+
+var AuthorDialog = React.createClass({
+
+    render: function() {
+        if (!this.props.showDialog) {
+            return (
+                &amp;lt;div /&amp;gt;
+            )
+        } else {
+            return(
+                &amp;lt;div className='modal-dialog' id=&amp;quot;dialog-form&amp;quot;  &amp;gt;
+                    &amp;lt;label htmlFor=&amp;quot;first_name&amp;quot;&amp;gt;First name:&amp;lt;/label&amp;gt; &amp;lt;input type='text' ref='first_name' name='first_name' /&amp;gt; &amp;lt;br /&amp;gt;
+                    &amp;lt;label htmlFor=&amp;quot;last_name&amp;quot;&amp;gt;Last name:&amp;lt;/label&amp;gt; &amp;lt;input type='text' ref='last_name' name='last_name' /&amp;gt; &amp;lt;br /&amp;gt;
+                    &amp;lt;button onClick={this.onOk}&amp;gt;Ok&amp;lt;/button&amp;gt;
+                    &amp;lt;button onClick={this.onCancel} &amp;gt;Cancel&amp;lt;/button&amp;gt;
+                &amp;lt;/div&amp;gt;
+
+            );
+        }
+    },
+    onCancel: function(e) {
+        e.preventDefault();
+        AuthorActions.hide_add_author();
+    },
+    onOk: function(e) {
+        e.preventDefault();
+        first_name = React.findDOMNode(this.refs.first_name).value;
+        last_name = React.findDOMNode(this.refs.last_name).value;
+        AuthorActions.add_author_ok({
+            first_name: first_name,
+            last_name: last_name
+        });
+    }
+});
+
+module.exports.AuthorDialog = AuthorDialog ;
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="authorpanel-react-js"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id18"&gt;AuthorPanel.react.js&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The AuthorPanel displays the author select DropDown along with the + (add author) and
+- (delete author) buttons. It also contains the AuthorDialog which will be displayed
+or not depending on the value of the &lt;tt class="docutils literal"&gt;showDialog&lt;/tt&gt; property.&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+var React = require('react');
+var DropDown = require('./DropDown.react').DropDown;
+var AuthorDialog = require('./AuthorDialog.react').AuthorDialog;
+var AuthorActions = require('../actions/AuthorActions').AuthorActions;
+
+var AuthorPanel = React.createClass({
+    getInitialState: function() {
+        return {};
+    },
+    render: function() {
+        var authorExists = false ;
+        if(this.props.authors) {
+            var ids = this.props.authors.map(function(x) {
+                return x.id*1;
+            });
+
+            if(ids.indexOf(1*this.props.author)&amp;gt;=0 ) {
+                authorExists = true;
+            }
+        }
+
+        return(
+            &amp;lt;div className='one-half column'&amp;gt;
+                &amp;lt;AuthorDialog showDialog={this.props.showDialog} /&amp;gt;
+                &amp;lt;label forHtml='date'&amp;gt;Author&amp;lt;/label&amp;gt;
+                &amp;lt;DropDown options={this.props.authors} dropDownValueChanged={this.props.onAuthorChanged} value={authorExists?this.props.author:''} /&amp;gt;
+                &amp;lt;button onClick={this.addAuthor} &amp;gt;+&amp;lt;/button&amp;gt;
+                {authorExists?&amp;lt;button onClick={this.deleteAuthor}&amp;gt;-&amp;lt;/button&amp;gt;:&amp;quot;&amp;quot;}
+            &amp;lt;/div&amp;gt;
+        );
+    },
+    addAuthor: function(e) {
+        e.preventDefault();
+        console.log(&amp;quot;ADD AUTHOR&amp;quot;);
+        AuthorActions.show_add_author();
+    },
+    deleteAuthor: function(e) {
+        e.preventDefault();
+        AuthorActions.delete_author(this.props.author);
+        console.log(&amp;quot;DELETE AUTHOR&amp;quot;);
+        console.log(this.props.author);
+    },
+});
+
+module.exports.AuthorPanel = AuthorPanel;
+&lt;/pre&gt;
+&lt;p&gt;As we can see, there are three properties that are passed to this&amp;nbsp;component:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;props.author&lt;/tt&gt;: The currently selected&amp;nbsp;author&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;props.authors&lt;/tt&gt;: The list of all&amp;nbsp;authors&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;props.onAuthorChanged&lt;/tt&gt;: A callback that is called when the author is changed. Here, we could have used an action (just like for add/delete author) instead of a callback, however its not actually required. When the author is changed, it means that the currently edited book&amp;#8217;s author is changed. So we could propagate the change to the parent (form) component that handles the book change along with the other changes (i.e title, publish date&amp;nbsp;etc).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="statpanel-react-js"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id19"&gt;StatPanel.react.js&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The StatPanel is an interesting, read-only component that displays the number of
+authors and books. This component requests updates from both the &lt;tt class="docutils literal"&gt;BookStore&lt;/tt&gt; and
+&lt;tt class="docutils literal"&gt;AuthorStore&lt;/tt&gt; - when their state is updated the component will be re-rendered
+with the number of books and&amp;nbsp;authors:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+var React = require('react');
+var BookStore = require('../stores/BookStore').BookStore;
+var AuthorStore = require('../stores/AuthorStore').AuthorStore;
+
+var StatPanel = React.createClass({
+    getInitialState: function() {
+        return {};
+    },
+    render: function() {
+        var book_len = '-';
+        var author_len = '-';
+        if(this.state.books) {
+            book_len = this.state.books.length
+        }
+        if(this.state.authors) {
+            author_len = this.state.authors.length
+        }
+        return(
+            &amp;lt;div className=&amp;quot;row&amp;quot;&amp;gt;
+                &amp;lt;div className=&amp;quot;one-half column&amp;quot;&amp;gt;
+                    Books number: {book_len}
+                &amp;lt;/div&amp;gt;
+                &amp;lt;div className=&amp;quot;one-half column&amp;quot;&amp;gt;
+                    Authors number: {author_len}
+                &amp;lt;/div&amp;gt;
+                &amp;lt;br /&amp;gt;
+            &amp;lt;/div&amp;gt;
+        );
+    },
+    _onBookChange: function() {
+        this.setState({
+            books:BookStore.getState().books
+        });
+    },
+    _onAuthorChange: function() {
+        this.setState({
+            authors: AuthorStore.getState().authors
+        });
+    },
+    componentWillUnmount: function() {
+        AuthorStore.removeChangeListener(this._onAuthorChange);
+        BookStore.removeChangeListener(this._onBookChange);
+    },
+    componentDidMount: function() {
+        AuthorStore.addChangeListener(this._onAuthorChange);
+        BookStore.addChangeListener(this._onBookChange);
+    }
+});
+
+module.exports.StatPanel = StatPanel ;
+&lt;/pre&gt;
+&lt;p&gt;We&amp;#8217;ve added different change listeners in case we wanted to do
+some more computations for book or author change (instead of just
+getting their books / authors property). Of course the same behavior
+could be achieved with just a single change listener that would
+get both the books and&amp;nbsp;authors.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="bookform-react-js"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id20"&gt;BookForm.react.js&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The BookForm is one of the most complex panels of this application (along with BookPanel) because
+it actually contains a bunch of other panels and has some callbacks for them to&amp;nbsp;use.&lt;/p&gt;
+&lt;p&gt;We can see that, as explained before, when the current book form values are changed (through callbacks) the change_book action will be&amp;nbsp;called.&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+var React = require('react');
+var BookActions = require('../actions/BookActions').BookActions;
+var DropDown = require('./DropDown.react.js').DropDown;
+var StatPanel = require('./StatPanel.react.js').StatPanel;
+var MessagePanel = require('./MessagePanel.react.js').MessagePanel;
+var DatePicker = require('./DatePicker.react.js').DatePicker;
+var ButtonPanel = require('./ButtonPanel.react.js').ButtonPanel;
+var AuthorPanel = require('./AuthorPanel.react.js').AuthorPanel;
+var CategoryStore = require('../stores/CategoryStore').CategoryStore;
+var AuthorStore = require('../stores/AuthorStore').AuthorStore;
+var loadCategories = require('../stores/CategoryStore').loadCategories;
+var loadAuthors = require('../stores/AuthorStore').loadAuthors;
+
+var BookForm = React.createClass({
+    getInitialState: function() {
+        return {};
+    },
+    render: function() {
+        return(
+            &amp;lt;form onSubmit={this.onSubmit}&amp;gt;
+                &amp;lt;div className='row'&amp;gt;
+                    &amp;lt;div className='one-half column'&amp;gt;
+                        &amp;lt;label forHtml='title'&amp;gt;Title&amp;lt;/label&amp;gt;
+                        &amp;lt;input ref='title' name='title' type='text' value={this.props.book.title} onChange={this.onTitleChange} /&amp;gt;
+                    &amp;lt;/div&amp;gt;
+                    &amp;lt;div className='one-half column'&amp;gt;
+                        &amp;lt;label forHtml='date'&amp;gt;Publish date&amp;lt;/label&amp;gt;
+                        &amp;lt;DatePicker ref='date' onChange={this.onDateChange} value={this.props.book.publish_date} /&amp;gt;
+                    &amp;lt;/div&amp;gt;
+                &amp;lt;/div&amp;gt;
+                &amp;lt;div className='row'&amp;gt;
+                    &amp;lt;div className='one-half column'&amp;gt;
+                        &amp;lt;label forHtml='category'&amp;gt;Category&amp;lt;/label&amp;gt;
+                        &amp;lt;DropDown options={this.state.categories} dropDownValueChanged={this.onCategoryChanged} value={this.props.book.category} /&amp;gt;
+                        &amp;lt;DropDown options={this.state.subcategories} dropDownValueChanged={this.onSubCategoryChanged} value={this.props.book.subcategory} /&amp;gt;
+                    &amp;lt;/div&amp;gt;
+                    &amp;lt;AuthorPanel authors={this.state.authors} author={this.props.book.author} onAuthorChanged={this.onAuthorChanged} showDialog={this.state.showDialog} /&amp;gt;
+                &amp;lt;/div&amp;gt;
+
+                &amp;lt;ButtonPanel book={this.props.book}  /&amp;gt;
+                &amp;lt;MessagePanel /&amp;gt;
+                &amp;lt;StatPanel  /&amp;gt;
+            &amp;lt;/form&amp;gt;
+        );
+    },
+    onSubmit: function(e) {
+        e.preventDefault();
+        BookActions.save(this.props.book)
+    },
+    onTitleChange: function() {
+        this.props.book.title = React.findDOMNode(this.refs.title).value;
+        BookActions.change_book(this.props.book);
+    },
+    onDateChange: function(date) {
+        this.props.book.publish_date = date;
+        BookActions.change_book(this.props.book);
+    },
+    onCategoryChanged: function(cat) {
+        this.props.book.category = cat;
+        this.props.book.subcategory = '';
+        BookActions.change_book(this.props.book);
+    },
+    onSubCategoryChanged: function(cat) {
+        this.props.book.subcategory = cat;
+        BookActions.change_book(this.props.book);
+    },
+    onAuthorChanged: function(author) {
+        this.props.book.author = author;
+        BookActions.change_book(this.props.book);
+    },
+    _onChangeCategories: function() {
+        this.setState(CategoryStore.getState());
+    },
+    _onChangeAuthors: function() {
+        this.setState(AuthorStore.getState());
+    },
+    componentWillUnmount: function() {
+        CategoryStore.removeChangeListener(this._onChangeCategories);
+        AuthorStore.removeChangeListener(this._onChangeAuthors);
+    },
+    componentDidMount: function() {
+        CategoryStore.addChangeListener(this._onChangeCategories);
+        AuthorStore.addChangeListener(this._onChangeAuthors);
+        loadCategories();
+        loadAuthors();
+    }
+});
+
+module.exports.BookForm = BookForm;
+&lt;/pre&gt;
+&lt;p&gt;The above component listens for updates on both Category and Author store to update
+when the authors (when an author is added or deleted) and the categories are changed (for example to implement the cascading dropdown
+functionality), so the list of authors and the list of categories and subcategoreis are all stored in
+the local state. The book that is edited is just passed as a property - actually, this is the only
+property that this component needs to&amp;nbsp;work.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="bookpanel-react-js"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id21"&gt;BookPanel.react.js&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Finally, BookPanel is the last component we&amp;#8217;ll talk about. This is the central component
+of the application - however we&amp;#8217;ll see that it is not very complex (since most user interaction
+is performed in other components). This component just listens on changes in the BookStore state
+and depending on the parameters either displays the &amp;quot;Loading&amp;quot; message or the table of books
+(depending on the state of ajax calls that load the books). The other parameters like the
+list of books, the ordering of the books etc are passed to the child&amp;nbsp;components.&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+var React = require('react');
+var BookStore = require('../stores/BookStore').BookStore;
+var BookActions = require('../actions/BookActions').BookActions;
+var SearchPanel = require('./SearchPanel.react').SearchPanel;
+var BookTable = require('./BookTable.react').BookTable;
+var PagingPanel = require('./PagingPanel.react').PagingPanel;
+var BookForm = require('./BookForm.react').BookForm;
+
+var reloadBooks = require('../stores/BookStore').reloadBooks;
+
+var BookPanel = React.createClass({
+    getInitialState: function() {
+        return BookStore.getState();
+    },
+    render: function() {
+        return(
+            &amp;lt;div className=&amp;quot;row&amp;quot;&amp;gt;
+                &amp;lt;div className=&amp;quot;one-half column&amp;quot;&amp;gt;
+                    {
+                        this.state.loading?
+                        &amp;lt;div class='loading' &amp;gt;Loading...&amp;lt;/div&amp;gt;:
+                        &amp;lt;div&amp;gt;
+                            &amp;lt;SearchPanel query={this.state.query} &amp;gt;&amp;lt;/SearchPanel&amp;gt;
+                            &amp;lt;BookTable books={this.state.books} ordering={this.state.ordering} /&amp;gt;
+                            &amp;lt;PagingPanel page_size='5' total={this.state.total} page={this.state.page} /&amp;gt;
+                        &amp;lt;/div&amp;gt;
+                    }
+                &amp;lt;/div&amp;gt;
+                &amp;lt;div className=&amp;quot;one-half column&amp;quot;&amp;gt;
+                    &amp;lt;BookForm
+                        book={this.state.editingBook}
+                    /&amp;gt;
+                &amp;lt;/div&amp;gt;
+                &amp;lt;br /&amp;gt;
+            &amp;lt;/div&amp;gt;
+        );
+    },
+    _onChange: function() {
+        this.setState( BookStore.getState() );
+    },
+    componentWillUnmount: function() {
+        BookStore.removeChangeListener(this._onChange);
+    },
+    componentDidMount: function() {
+        BookStore.addChangeListener(this._onChange);
+        reloadBooks();
+    }
+});
+
+module.exports.BookPanel = BookPanel ;
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="the-actions"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id22"&gt;The&amp;nbsp;Actions&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;All actions are rather simple components without other dependencies as we&amp;#8217;ve already discussed. They
+just define &amp;quot;actions&amp;quot; (which are simple functions) that create the correct parameter object type and pass it
+to the dispatcher. The only attribute that is required for this object is the &lt;tt class="docutils literal"&gt;actionType&lt;/tt&gt; that
+should get a value from the constants. I won&amp;#8217;t go into any more detail about the actions &amp;#8212; please check
+the source code and all your questions will be&amp;nbsp;resolved.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="the-stores"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id23"&gt;The&amp;nbsp;Stores&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;First of all, all stores are defined through the following code that is already discussed in the previous&amp;nbsp;part:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+var MessageStore = $.extend({}, EventEmitter.prototype, {
+    getState: function() {
+        return _state;
+    },
+    emitChange: function() {
+        this.emit('change');
+    },
+    addChangeListener: function(callback) {
+        this.on('change', callback);
+    },
+    removeChangeListener: function(callback) {
+        this.removeListener('change', callback);
+    }
+});
+&lt;/pre&gt;
+&lt;p&gt;When the state of a store is changed its &lt;tt class="docutils literal"&gt;emitChange&lt;/tt&gt; function will be called (I mean
+called manually from the code that actually changes the state and knows that it has
+actually been changed - nothing will be called automatically). When &lt;tt class="docutils literal"&gt;emitChange&lt;/tt&gt; is called,
+all the components that listen for changes for this component (that have called &lt;tt class="docutils literal"&gt;addChangeListener&lt;/tt&gt;
+of the store with a callback)
+will be notified (their callback will be called) and will use
+&lt;tt class="docutils literal"&gt;getState&lt;/tt&gt; of the store to get its current state - after that, these components will set their own state
+to re-render and display the changes to the&amp;nbsp;store.&lt;/p&gt;
+&lt;p&gt;Let&amp;#8217;s now discuss the four stores defined &amp;#8212; I will include only the parts of each file that are
+actually interesting, for everything else &lt;em&gt;use the source Luke&lt;/em&gt;!&lt;/p&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id24"&gt;MessageStore.js&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;A very simple store that goes together with MessagePanel and MessageActions. It just keeps a state with
+the current message object and just changes this message when the MESSAGE_ADD message
+type is dispatched. After changing the message, the listeners (only one in this case) will be notified to
+update the displayed&amp;nbsp;message:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+var _state = {
+    message: {}
+};
+
+MessageStore.dispatchToken = AppDispatcher.register(function(action) {
+    switch(action.actionType) {
+        case BookConstants.MESSAGE_ADD:
+            _state.message = action.message;
+            MessageStore.emitChange();
+        break;
+    }
+    return true;
+});
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="authorstore-js"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id25"&gt;AuthorStore.js&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Here we see that the local state has an array of the authors and a &lt;tt class="docutils literal"&gt;showDialog&lt;/tt&gt; flag that
+controls the state of the add author popup. For the &lt;tt class="docutils literal"&gt;AUTHOR_ADD&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;HIDE_ADD_AUTHOR&lt;/tt&gt;
+cases of the dispatch we just change the state of this flag and emit the change; the &lt;tt class="docutils literal"&gt;BookForm&lt;/tt&gt;
+listens for changes to the &lt;tt class="docutils literal"&gt;AuthorStore&lt;/tt&gt; and will pass the &lt;tt class="docutils literal"&gt;showDialog&lt;/tt&gt; to the &lt;tt class="docutils literal"&gt;AuthorPanel&lt;/tt&gt;
+as a property which in turn will pass it to &lt;tt class="docutils literal"&gt;AuthorDialog&lt;/tt&gt; and it will display the panel (or not)
+depending on the value of that flag. This flag will also take a false value when the add author
+ajax call&amp;nbsp;returns.&lt;/p&gt;
+&lt;p&gt;The &lt;tt class="docutils literal"&gt;showDialog&lt;/tt&gt; flag is not related to the actual data but is &lt;span class="caps"&gt;UI&lt;/span&gt;-related. This
+is something that we should keep in mind when creating stores: Stores don&amp;#8217;t only contain the actual
+data (like models in an &lt;span class="caps"&gt;MVC&lt;/span&gt; application) but they should also contain &lt;span class="caps"&gt;UI&lt;/span&gt; (controller/view in an &lt;span class="caps"&gt;MVC&lt;/span&gt;
+architecture) related information since that is &lt;em&gt;also&lt;/em&gt; part of the&amp;nbsp;state!&lt;/p&gt;
+&lt;p&gt;We can see that the ajax calls just issue the corresponding &lt;span class="caps"&gt;HTTP&lt;/span&gt; method to the &lt;tt class="docutils literal"&gt;authors_url&lt;/tt&gt; and
+when they return the &lt;tt class="docutils literal"&gt;add_message_ok&lt;/tt&gt; or &lt;tt class="docutils literal"&gt;add_message_error&lt;/tt&gt; methods of
+&lt;tt class="docutils literal"&gt;MessageActions&lt;/tt&gt; will be called. These calls are in a different call stack so everything will work fine
+(please remember the discussion about dispatches in different call stacks&amp;nbsp;before).&lt;/p&gt;
+&lt;p&gt;Finally, on the success of &lt;tt class="docutils literal"&gt;_load_authors&lt;/tt&gt; the map array method is called to transform the returned data
+as we want&amp;nbsp;it:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+var $ = require('jquery');
+
+var _state = {
+    authors: [],
+    showDialog: false
+}
+
+var _load_authors = function() {
+    $.ajax({
+        url: _props.authors_url,
+        dataType: 'json',
+        cache: false,
+        success: function(data) {
+            _state.authors = data.map(function(a){
+                return {
+                    id: a.id,
+                    name: a.last_name+' '+a.first_name
+                }
+            });
+            AuthorStore.emitChange();
+        },
+        error: function(xhr, status, err) {
+            MessageActions.add_message_error(err.toString());
+        }
+    });
+};
+
+var _deleteAuthor = function(authorId) {
+    $.ajax({
+        url: _props.authors_url+authorId,
+        method: 'DELETE',
+        cache: false,
+        success: function(data) {
+            _load_authors();
+            MessageActions.add_message_ok(&amp;quot;Author delete ok&amp;quot;);
+            AuthorActions.delete_author_ok();
+        },
+        error: function(xhr, status, err) {
+            MessageActions.add_message_error(err.toString());
+        }
+    });
+};
+
+var _addAuthor = function(author) {
+    $.ajax({
+        url: _props.authors_url,
+        dataType: 'json',
+        method: 'POST',
+        data:author,
+        cache: false,
+        success: function(data) {
+            MessageActions.add_message_ok(&amp;quot;Author add  ok&amp;quot;);
+            _state.showDialog = false;
+            _load_authors();
+        },
+        error: function(xhr, status, err) {
+            MessageActions.add_message_error(err.toString());
+        }
+    });
+
+};
+
+AuthorStore.dispatchToken = AppDispatcher.register(function(action) {
+    switch(action.actionType) {
+        case BookConstants.SHOW_ADD_AUTHOR:
+            _state.showDialog = true;
+            AuthorStore.emitChange();
+        break;
+        case BookConstants.HIDE_ADD_AUTHOR:
+            _state.showDialog = false;
+            AuthorStore.emitChange();
+        break;
+        case BookConstants.AUTHOR_ADD:
+            _addAuthor(action.author);
+        break;
+        case BookConstants.AUTHOR_DELETE:
+            _deleteAuthor(action.authorId);
+        break;
+    }
+    return true;
+});
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="categorystore-js"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id26"&gt;CategoryStore.js&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The CategoryStore has an interesting functionality concerning the load_subcategory
+function. This function is called whenever a book is changed (so its category form field
+may be changed and the subcategories may be reloaded based on this category) or is edited
+(so the category is that of the new book and once again the subcategories may need to because
+rerendered). It is important that we &lt;em&gt;actually&lt;/em&gt; pass the current category to the book to the
+action. If for example we wanted to retrieve that from the state of the BookStore then we&amp;#8217;d
+need to use the &lt;tt class="docutils literal"&gt;waitFor&lt;/tt&gt; functionality of the dispatcher so that the category of the
+current book would be changed first then the load_category (that would read that value to
+read the subcategoreis) would be called after&amp;nbsp;that.&lt;/p&gt;
+&lt;p&gt;Also, another thing to notice here is that there&amp;#8217;s a simple subcat_cache that for each category
+contains the subcategories of that category so that we won&amp;#8217;t do repeated ajax calls to reload
+the subcategories each time the category is&amp;nbsp;changed.&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+var _state = {
+    categories: [],
+    subcategories: []
+}
+
+var _current_cat = ''
+var _subcat_cache = []
+
+var _load_categories = function() {
+    $.ajax({
+        url: _props.categories_url,
+        dataType: 'json',
+        cache: false,
+        success: function(data) {
+            _state.categories = data;
+            CategoryStore.emitChange();
+        },
+        error: function(xhr, status, err) {
+            console.error(this.props.url, status, err.toString());
+        }
+    });
+};
+
+var _load_subcategories = function(cat) {
+
+    if(!cat) {
+        _state.subcategories = [];
+        CategoryStore.emitChange();
+        return ;
+    }
+    if(_subcat_cache[cat]) {
+        _state.subcategories = _subcat_cache[cat] ;
+        CategoryStore.emitChange();
+    }
+    $.ajax({
+        url: _props.subcategories_url+'?category='+cat,
+        dataType: 'json',
+        cache: false,
+        success: function(data) {
+            _state.subcategories = data;
+            _subcat_cache[cat] = data;
+            CategoryStore.emitChange();
+        },
+        error: function(xhr, status, err) {
+            console.error(this.props.url, status, err.toString());
+        }
+    });
+};
+
+CategoryStore.dispatchToken = AppDispatcher.register(function(action) {
+    switch(action.actionType) {
+        case BookConstants.BOOK_EDIT:
+        case BookConstants.BOOK_CHANGE:
+            _load_subcategories(action.book.category);
+        break;
+        case BookConstants.BOOK_EDIT_CANCEL:
+            _state.subcategories = [];
+            CategoryStore.emitChange();
+        break;
+    }
+    return true;
+});
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="bookstore-js"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id27"&gt;BookStore.js&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Here, beyond the book-related functionality we have also implemented the
+&lt;span class="caps"&gt;URL&lt;/span&gt; updating. The getUrlParameter that returns the value of a &lt;span class="caps"&gt;URL&lt;/span&gt; parameter has been taken from
+&lt;a class="reference external" href="http://stackoverflow.com/questions/19491336/get-url-parameter-jquery"&gt;http://stackoverflow.com/questions/19491336/get-url-parameter-jquery&lt;/a&gt;. Depending on the url parameters, we set some initial properties of
+the local state and, on the other hand, when the search query, ordering or page are changed,
+the &lt;tt class="docutils literal"&gt;_update_href&lt;/tt&gt; function is called to update the url parameters. This is not really related
+to the flux architecture beyond the initialization of&amp;nbsp;state.&lt;/p&gt;
+&lt;p&gt;Another thing to notice is that the when the &lt;tt class="docutils literal"&gt;_search&lt;/tt&gt; is executed whenever there&amp;#8217;s
+a change in the list of books (query is updated, sorting is changed, page is changed or
+when an author is deleted since the books that have that author should now display an
+empty field). The setTimeout in the _search ajax return is to simulate a 400ms delay (in order for the &amp;quot;Loading&amp;quot; text to
+be&amp;nbsp;visible).&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+function getUrlParameter(sParam) {
+    var sPageURL = $(location).attr('hash');
+    sPageURL = sPageURL.substr(1)
+    var sURLVariables = sPageURL.split('&amp;amp;');
+    for (var i = 0; i &amp;lt; sURLVariables.length; i++)  {
+        var sParameterName = sURLVariables[i].split('=');
+        if (sParameterName[0] == sParam)  {
+            return sParameterName[1];
+        }
+    }
+}
+
+var _page_init = 1*getUrlParameter('page');
+if(!_page_init) _page_init = 1 ;
+var _ordering_init = getUrlParameter('ordering');
+if(!_ordering_init) _ordering_init = '' ;
+var _query_init = getUrlParameter('query');
+if(!_query_init) _query_init = ''
+
+var _state = {
+    loading: false,
+    books: [],
+    message:{},
+    page: _page_init,
+    total: 0,
+    editingBook: {},
+    query: _query_init,
+    ordering: _ordering_init
+}
+
+
+var _search = function() {
+    _state.loading = true;
+    BookStore.emitChange();
+
+    $.ajax({
+        url: _props.url+'?search='+_state.query+&amp;quot;&amp;amp;ordering=&amp;quot;+_state.ordering+&amp;quot;&amp;amp;page=&amp;quot;+_state.page,
+        dataType: 'json',
+        cache: false,
+        success: function(data) {
+            // Simulate a small delay in server response
+            setTimeout(function() {
+                _state.books = data.results;
+                _state.total = data.count;
+                _state.loading = false;
+                BookStore.emitChange();
+            }, 400);
+        },
+        error: function(xhr, status, err) {
+            _state.loading = false;
+            MessageActions.add_message_error(err.toString());
+            BookStore.emitChange();
+        }
+    });
+};
+
+var _reloadBooks = function() {
+    _search('');
+};
+
+
+var _clearEditingBook = function() {
+    _state.editingBook = {};
+};
+
+var _editBook = function(book) {
+    _state.editingBook = book;
+    BookStore.emitChange();
+};
+
+var _cancelEditBook = function() {
+    _clearEditingBook();
+    BookStore.emitChange();
+};
+
+var _update_href = function() {
+    var hash = 'page='+_state.page;
+    hash += '&amp;amp;ordering='+_state.ordering;
+    hash += '&amp;amp;query='+_state.query;
+    $(location).attr('hash', hash);
+}
+
+BookStore.dispatchToken = AppDispatcher.register(function(action) {
+    switch(action.actionType) {
+        case BookConstants.BOOK_EDIT:
+            _editBook(action.book);
+        break;
+        case BookConstants.BOOK_EDIT_CANCEL:
+            _cancelEditBook();
+        break;
+        case BookConstants.BOOK_SAVE:
+            _saveBook(action.book);
+        break;
+        case BookConstants.BOOK_SEARCH:
+            _state.query = action.query
+            _state.page = 1;
+            _update_href();
+            _search();
+        break;
+        case BookConstants.BOOK_DELETE:
+            _deleteBook(action.bookId);
+        break;
+        case BookConstants.BOOK_CHANGE:
+            _state.editingBook = action.book;
+            BookStore.emitChange();
+        break;
+        case BookConstants.BOOK_PAGE:
+            _state.page = action.page;
+            _update_href();
+            _search();
+        break;
+        case BookConstants.AUTHOR_DELETE_OK:
+            _search();
+        break;
+        case BookConstants.BOOK_SORT:
+            _state.page = 1;
+            if(_state.ordering == action.field) {
+                _state.ordering = '-'+_state.ordering
+            } else {
+                _state.ordering = action.field;
+            }
+            _update_href();
+            _search();
+        break;
+    }
+    return true;
+});
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="conclusion"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id28"&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The application presented here has a number of techniques that will help
+you when you actually try to create a more complex react flux application.
+I hope that in the whole three part series I&amp;#8217;ve thoroughly explained the
+flux architecture and how each
+part of (actions, stores, components) it works. Also, I tried to cover
+almost anything that somebody creating react/flux application
+will need to use &amp;#8212; if you feel that something is not covered and
+could be integrated to the authors/book application I&amp;#8217;d be happy
+to research and implement&amp;nbsp;it!&lt;/p&gt;
+&lt;/div&gt;
+</summary><category term="javascript"></category><category term="python"></category><category term="django"></category><category term="react"></category><category term="flux"></category></entry><entry><title>A comprehensive React and Flux tutorial part 2: Flux</title><link href="http://spapas.github.io/2015/07/02/comprehensive-react-flux-tutorial-2/" rel="alternate"></link><updated>2015-07-02T14:20:00+03:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2015-07-02:2015/07/02/comprehensive-react-flux-tutorial-2/</id><summary type="html">&lt;div class="contents topic" id="contents"&gt;
 &lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
 &lt;ul class="simple"&gt;
 &lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id1"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
@@ -21,8 +1352,10 @@
 &lt;h2&gt;&lt;a class="toc-backref" href="#id1"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;In the &lt;a class="reference external" href="http://spapas.github.io/2015/06/05/comprehensive-react-flux-tutorial/"&gt;first part of this series&lt;/a&gt; we implemented a
 not-so-simple one page application with full &lt;span class="caps"&gt;CRUD&lt;/span&gt; capabilities. In this part, we will
-modify that applicaiton to make it use the Flux architecture. The full source code can
-be found at &lt;a class="reference external" href="https://github.com/spapas/react-tutorial"&gt;https://github.com/spapas/react-tutorial&lt;/a&gt; (tag name&amp;nbsp;react-flux).&lt;/p&gt;
+modify that application to make it use the Flux architecture. The full source code can
+be found at &lt;a class="reference external" href="https://github.com/spapas/react-tutorial"&gt;https://github.com/spapas/react-tutorial&lt;/a&gt; (tag name react-flux). In the
+In &lt;a class="reference external" href="http://spapas.github.io/2015/09/08/more-complex-react-flux-example/"&gt;next part,&lt;/a&gt; we will create an even more complex application
+using&amp;nbsp;react/flux!&lt;/p&gt;
 &lt;p&gt;I recommend reading Facebook&amp;#8217;s &lt;a class="reference external" href="https://facebook.github.io/flux/docs/overview.html"&gt;Flux overview&lt;/a&gt; before reading this article &amp;#8212; please
 read it even if you find some concepts difficult to grasp (I know I found it difficult
 the first time I read it), I will try to explain everything here. Also,

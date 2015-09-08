@@ -1243,7 +1243,7 @@ the subcategories each time the category is changed.
     });
 
 BookStore.js
-------------
+============
 
 Here, beyond the book-related functionality we have also implemented the
 URL updating. The getUrlParameter that returns the value of a URL parameter has been taken from 

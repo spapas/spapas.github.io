@@ -272,7 +272,7 @@ has the disadvantage that you need to be really careful to use different databas
 numbers for your projects and also the number of possible databases that redis
 can use is limited by a configuration file (so if you reach the maximum you&#8217;ll
 need to also increase that&nbsp;number)!</p>
-<p>Instead of this, you can avoid using the &#8216;default&#8217; queue, and yse queues that
+<p>Instead of this, you can avoid using the &#8216;default&#8217; queue, and use queues that
 contain your application name in their name, for example, for the sample project
 you could create something like &#8216;django-test-rq-default&#8217;, &#8216;django-test-rq-low&#8217;,
 &#8216;django-test-rq-high&#8217; etc. You need to configure the extra queues by adding them
@@ -285,6 +285,24 @@ default one (which may contain jobs of other&nbsp;applications).</p>
 <p>If you use the default queue, and because you&#8217;ll need to use its name to
 many places, I recommend to add a (f.i) <tt class="docutils literal">QUEUE_NAME = <span class="pre">'django-test-rq-default'</span></tt>
 setting and use this instead of just a string to be totally <span class="caps">DRY</span>.</p>
+<p><strong>Update 13/09/2015</strong>: Please notice that using a <em>single</em> redis database server
+(either with multiple numeric databases or in the same database using a keyword
+in keys to differentiate the apps) <a class="reference external" href="https://redislabs.com/blog/benchmark-shared-vs-dedicated-redis-instances#.VfUl0xHtmko">is not recommended</a> as commenter
+Itamar Haber pointed out to&nbsp;me!</p>
+<p>This is because for speed reasons redis uses a single thread to handle all requests
+(regardless if they are in the same or different numerical databases), so all
+resources may be used by a single, redis hungry, application and leave all others to&nbsp;starve!</p>
+<p>Therefore, the recommended solution is to have a <em>different redis</em> server for each different
+application. This does not mean that you need to have different servers, just to run
+different instances of redis binding to different <span class="caps">IP</span> ports. Redis uses very little
+resourecs when it is idle (<a class="reference external" href="http://redis.io/topics/faq">empty instance uses ~ 1 <span class="caps">MB</span> <span class="caps">RAM</span></a>) so you can run a lot
+of instances in a single&nbsp;server.</p>
+<p>Long story short, my proposal is to have a redis.conf <em>inside</em> your application root tree
+(next to manage.py and requirements.txt) which has the redis options for each
+application. The options in redis.conf that need to be changed per application
+is the port that this redis instance will bind (this port also needs to be passed to
+django settings.py) and the pid filename if you daemonize redis &#8212; I recommend using
+a tool like <a class="reference external" href="http://supervisord.org/">supervisord</a> instead so that you won&#8217;t need any daemonizing and pid files for&nbsp;redis!</p>
 </div>
 <div class="section" id="low-level-debugging">
 <h2><a class="toc-backref" href="#id8">Low level&nbsp;debugging</a></h2>

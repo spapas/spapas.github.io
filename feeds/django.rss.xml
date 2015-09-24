@@ -1,5 +1,1120 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>/var/</title><link>http://spapas.github.io/</link><description>Various programming stuff</description><atom:link href="http://spapas.github.io/feeds/django.rss.xml" rel="self"></atom:link><lastBuildDate>Mon, 15 Sep 2014 14:20:00 +0300</lastBuildDate><item><title>Django non-HTML responses</title><link>http://spapas.github.io/2014/09/15/django-non-html-responses/</link><description>&lt;div class="contents topic" id="contents"&gt;
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>/var/</title><link>http://spapas.github.io/</link><description>Various programming stuff</description><atom:link href="http://spapas.github.io/feeds/django.rss.xml" rel="self"></atom:link><lastBuildDate>Tue, 01 Sep 2015 14:20:00 +0300</lastBuildDate><item><title>django-rq redux: advanced techniques and tools</title><link>http://spapas.github.io/2015/09/01/django-rq-redux/</link><description>&lt;div class="contents topic" id="contents"&gt;
+&lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id1"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#displaying-your-task-progress" id="id2"&gt;Displaying your task&amp;nbsp;progress&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#displaying-your-queue-statistics" id="id3"&gt;Displaying your queue&amp;nbsp;statistics&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#making-sure-that-workers-for-your-queue-are-actually-running" id="id4"&gt;Making sure that workers for your queue are actually&amp;nbsp;running&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#checking-how-many-jobs-are-in-the-queue" id="id5"&gt;Checking how many jobs are in the&amp;nbsp;queue&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#better-exception-handling" id="id6"&gt;Better exception&amp;nbsp;handling&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#multiple-django-apps-single-redis-db" id="id7"&gt;Multiple django-apps, single redis&amp;nbsp;db&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#low-level-debugging" id="id8"&gt;Low level&amp;nbsp;debugging&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#conclusion" id="id9"&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="introduction"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id1"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;In the &lt;a class="reference external" href="http://spapas.github.io/2015/01/27/async-tasks-with-django-rq/"&gt;previous django-rq article&lt;/a&gt;
+we presented a quick introduction to asynchronous job queues and created a
+small (but complete) project that used rq and django-rq to implement asynchronous
+job queues in a django&amp;nbsp;project.&lt;/p&gt;
+&lt;p&gt;In this article, we will present some more advanced techniques and tools
+for improving the capabilities of our asynchronous tasks and
+integrate them to the &lt;a class="reference external" href="https://github.com/spapas/django-test-rq"&gt;https://github.com/spapas/django-test-rq&lt;/a&gt; project (please
+checkout tag django-rq-redux
+&lt;tt class="docutils literal"&gt;git checkout &lt;span class="pre"&gt;django-rq-redux&lt;/span&gt;&lt;/tt&gt;)&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="displaying-your-task-progress"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id2"&gt;Displaying your task&amp;nbsp;progress&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Sometimes, especially for long-running tasks it is useful to let
+the user (task initiator) know what is the status of each task he&amp;#8217;s started. For this,
+I recommend creating a task-description model that will hold the required information for this
+task with more or less the following fields (please also check &lt;tt class="docutils literal"&gt;LongTask&lt;/tt&gt; model of&amp;nbsp;django-test-rq):&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class LongTask(models.Model):
+  created_on = models.DateTimeField(auto_now_add=True)
+  name = models.CharField(max_length=128, help_text='Enter a unique name for the task',)
+  progress = models.PositiveIntegerField(default=0)
+  result = models.CharField(max_length=128, blank=True, null=True)
+&lt;/pre&gt;
+&lt;p&gt;Now, when the view that starts the task is &lt;tt class="docutils literal"&gt;&lt;span class="caps"&gt;POST&lt;/span&gt;&lt;/tt&gt; ed, you&amp;#8217;ll first create
+the &lt;tt class="docutils literal"&gt;LongTask&lt;/tt&gt; model instance with a result of &lt;tt class="docutils literal"&gt;'&lt;span class="caps"&gt;QUEUED&lt;/span&gt;'&lt;/tt&gt; and a progress
+of 0 (and a name that identifies your task) and then you&amp;#8217;ll start the real task
+asynchronously by passing the LongTask instance, something like this (also check
+&lt;tt class="docutils literal"&gt;LongTaskCreateView&lt;/tt&gt;):&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+long_task = LongTask.objects.create(...)
+long_runnig_task.delay(long_task)
+&lt;/pre&gt;
+&lt;p&gt;In your asynchronous job, the first thing you&amp;#8217;ll need to do is to set its result
+to &amp;#8216;&lt;span class="caps"&gt;STARTED&lt;/span&gt;&amp;#8217; and save it so that the user will immediately see when he&amp;#8217;s job is
+actually started. Also, if you can estimate its progress, you can update its
+progress value with the current value so that the user will know how close he
+is to finishing. Finally, when the job finished (or if it throws an expectable
+exception) you&amp;#8217;ll update its status accordingly. Here&amp;#8217;s an example of my
+long_running_task that just waits for the specifid amount of&amp;nbsp;seconds:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;#64;job('django-test-rq-low')
+def long_runnig_task(task):
+  job = get_current_job()
+  task.job_id = job.get_id()
+
+  task.result = 'STARTED'
+
+  duration_in_second_persentages = task.duration*1.0 / 100
+  for i in range(100):
+      task.progress = i
+      task.save()
+      print task.progress
+      time.sleep(duration_in_second_persentages)
+
+  task.result = 'FINISHED'
+  task.save()
+  return task.result
+&lt;/pre&gt;
+&lt;p&gt;To have proper feedback I propose to have your task-description model instance
+created by the view that starts the asynchronous task and &lt;em&gt;not&lt;/em&gt; by the
+actual task! This is important since the worker may be full so the asynchronous
+task will need a lot of time until is actually started (or maybe there are no
+running workers - more on this later) and the user will not be able to see
+his task instance anywhere (unless of course you provide him access to the actual task
+queue but I don&amp;#8217;t recommend&amp;nbsp;this).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="displaying-your-queue-statistics"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id3"&gt;Displaying your queue&amp;nbsp;statistics&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;django-rq has a really nice dashboard with a lot of queue statistics (
+instructions here
+&lt;a class="reference external" href="https://github.com/ui/django-rq#queue-statistics"&gt;https://github.com/ui/django-rq#queue-statistics&lt;/a&gt; and also on django-test-rq
+project) which I recommend to always&amp;nbsp;enable.&lt;/p&gt;
+&lt;p&gt;Also, there&amp;#8217;s the individual use &lt;a class="reference external" href="https://github.com/brutasse/django-rq-dashboard"&gt;django-rq-dashboard&lt;/a&gt; project that could
+be installed to display some more statistics, however the only extra
+statistic that you can see throuh django-rq-dashboard is the status of
+your scheduled jobs so I don&amp;#8217;t recommend installing it if you don&amp;#8217;t
+use&amp;nbsp;scheduling.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="making-sure-that-workers-for-your-queue-are-actually-running"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id4"&gt;Making sure that workers for your queue are actually&amp;nbsp;running&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Using the django-rq dashboard you can make sure that all queues
+have at least one worker. However, sometimes workers fail, or
+maybe you&amp;#8217;ve forgotten to start your workers or not configured
+your application correctly (this happens to me all the time for
+test/uat projects). So, for tasks that you want to display feedback
+to the user, you can easily add a check to make sure that there are
+active workers using the following&amp;nbsp;code:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+from rq import Worker
+import django_rq
+
+redis_conn = django_rq.get_connection('default')
+if len([
+    x for x in Worker.all(connection=redis_conn)
+        if 'django-test-rq-low' in x.queue_names()
+]) == 0:
+    # Error -- no workers
+&lt;/pre&gt;
+&lt;p&gt;With &lt;tt class="docutils literal"&gt;Worker.all()&lt;/tt&gt; you get all workers for a connection and the &lt;tt class="docutils literal"&gt;queue_names()&lt;/tt&gt;
+method returns the names that each worker serves. So we check that we have at least one
+worker for that&amp;nbsp;queue.&lt;/p&gt;
+&lt;p&gt;This check can be added when the job is started and display a feedback error
+to the user (check example in&amp;nbsp;django-test-rq).&lt;/p&gt;
+&lt;p&gt;For quick tasks (for example sending emails etc) you should not display anything
+to the user even if no workers are running (since the task &lt;em&gt;will&lt;/em&gt; be queued and
+will be executed eventually when the workers are started) but instead send an email to the administrators
+so that they will start the&amp;nbsp;workers.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="checking-how-many-jobs-are-in-the-queue"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt;Checking how many jobs are in the&amp;nbsp;queue&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;To find out programatically how many jobs are actually in the queue (and display a message
+if the queue has too many jobs etc) you&amp;#8217;ll need to use the &lt;tt class="docutils literal"&gt;Queue&lt;/tt&gt; class, something like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+from rq import Queue
+
+redis_conn = django_rq.get_connection('default')
+queue = Queue('django-test-rq-default', connection=redis_conn)
+print queue.name
+print len(queue.jobs)
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="better-exception-handling"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id6"&gt;Better exception&amp;nbsp;handling&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;When a job fails, rq will put it in a failed jobs queue and finish with it. You (as administrator)
+won&amp;#8217;t get any feedback and the user (unless he has access to that failed jobs queue) won&amp;#8217;t be
+able to do anything aboutt this&amp;nbsp;job.&lt;/p&gt;
+&lt;p&gt;In almost all cases you can&amp;#8217;t rely only on this behavior but instead you have to
+&lt;a class="reference external" href="http://python-rq.org/docs/exceptions/"&gt;install a custom exception handler&lt;/a&gt;. Using the custom exception handler you can
+do whatever you want for each failed job. For instance, you can create a new instance
+of a &lt;tt class="docutils literal"&gt;FailedTask&lt;/tt&gt; model which will have information about the failure and the
+original task allow the user (or administrator) to restart the failed task after
+he&amp;#8217;s fixed the error&amp;nbsp;conditions.&lt;/p&gt;
+&lt;p&gt;Or, if you want to be informed when a job is failed, you can just send an email
+to &lt;tt class="docutils literal"&gt;&lt;span class="caps"&gt;ADMINS&lt;/span&gt;&lt;/tt&gt; and fall back to the default behavior to enqueue the failed task the
+failed jobs queue (since job exception handlers can be&amp;nbsp;chained).&lt;/p&gt;
+&lt;p&gt;A simple management command that starts a worker for a specific queue and installs
+a custom exception handler&amp;nbsp;follows:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+from django.conf import settings
+from django.core.management.base import BaseCommand
+
+import django_rq
+from rq import Queue, Worker
+
+def my_handler(job, *exc_info):
+    print &amp;quot;FAILURE&amp;quot;
+    print job
+    print exc_info
+
+class Command(BaseCommand):
+    def handle(self, *args, **options):
+        redis_conn = django_rq.get_connection('default')
+
+        q = Queue(settings.DJANGO_TEST_RQ_LOW_QUEUE, connection=redis_conn)
+        worker = Worker([q], exc_handler=my_handler, connection=redis_conn)
+        worker.work()
+&lt;/pre&gt;
+&lt;p&gt;This handler is for demonstration purposes since it just prints a message to the console
+(so please do not use&amp;nbsp;it)!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="multiple-django-apps-single-redis-db"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id7"&gt;Multiple django-apps, single redis&amp;nbsp;db&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;One thing to keep in mind is that the only thing that seperates the queues are
+their name. If you have many django applications that define a &amp;quot;default&amp;quot; (or &amp;quot;low&amp;quot;, &amp;quot;hight&amp;quot; etc)
+and they all use the &lt;em&gt;same&lt;/em&gt; redis database to store their queue, the workers
+of each application won&amp;#8217;t know which jobs belong to them and they&amp;#8217;ll end up
+dequeuing the wrong job types. This will lead to an exception or, if you
+are really unlucky to a very nasty&amp;nbsp;bug!&lt;/p&gt;
+&lt;p&gt;To avoid this, you can either use a different redis database (not database server)
+for each of your apps or add a prefix with the name of your app to your queue&amp;nbsp;names:&lt;/p&gt;
+&lt;p&gt;Each redis database server can host a number of databases that are identified
+by a number (that&amp;#8217;s what the /0 you see in &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;redis://127.0.0.1:6379/0&lt;/span&gt;&lt;/tt&gt; means)
+and each one of them has a totally different keyspace. So, if you use /0 in an
+application and /1 in another application, you&amp;#8217;ll have no problems. This solution
+has the disadvantage that you need to be really careful to use different database
+numbers for your projects and also the number of possible databases that redis
+can use is limited by a configuration file (so if you reach the maximum you&amp;#8217;ll
+need to also increase that&amp;nbsp;number)!&lt;/p&gt;
+&lt;p&gt;Instead of this, you can avoid using the &amp;#8216;default&amp;#8217; queue, and use queues that
+contain your application name in their name, for example, for the sample project
+you could create something like &amp;#8216;django-test-rq-default&amp;#8217;, &amp;#8216;django-test-rq-low&amp;#8217;,
+&amp;#8216;django-test-rq-high&amp;#8217; etc. You need to configure the extra queues by adding them
+to the &lt;tt class="docutils literal"&gt;RQ_QUEUES&lt;/tt&gt; dictionary (check settings.py of django-test-rq) and then
+put the jobs to these queues using for example the job decorator
+(&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;&amp;#64;job('django-test-rq-default')&lt;/span&gt;&lt;/tt&gt;)
+and run your workers so that they will retrieve jobs from these queues
+(&lt;tt class="docutils literal"&gt;python manage.py rqworker &lt;span class="pre"&gt;django-test-rq-default&lt;/span&gt;&lt;/tt&gt;) and not the
+default one (which may contain jobs of other&amp;nbsp;applications).&lt;/p&gt;
+&lt;p&gt;If you use the default queue, and because you&amp;#8217;ll need to use its name to
+many places, I recommend to add a (f.i) &lt;tt class="docutils literal"&gt;QUEUE_NAME = &lt;span class="pre"&gt;'django-test-rq-default'&lt;/span&gt;&lt;/tt&gt;
+setting and use this instead of just a string to be totally &lt;span class="caps"&gt;DRY&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Update 13/09/2015&lt;/strong&gt;: Please notice that using a &lt;em&gt;single&lt;/em&gt; redis database server
+(either with multiple numeric databases or in the same database using a keyword
+in keys to differentiate the apps) &lt;a class="reference external" href="https://redislabs.com/blog/benchmark-shared-vs-dedicated-redis-instances#.VfUl0xHtmko"&gt;is not recommended&lt;/a&gt; as commenter
+Itamar Haber pointed out to&amp;nbsp;me!&lt;/p&gt;
+&lt;p&gt;This is because for speed reasons redis uses a single thread to handle all requests
+(regardless if they are in the same or different numerical databases), so all
+resources may be used by a single, redis hungry, application and leave all others to&amp;nbsp;starve!&lt;/p&gt;
+&lt;p&gt;Therefore, the recommended solution is to have a &lt;em&gt;different redis&lt;/em&gt; server for each different
+application. This does not mean that you need to have different servers, just to run
+different instances of redis binding to different &lt;span class="caps"&gt;IP&lt;/span&gt; ports. Redis uses very little
+resourecs when it is idle (&lt;a class="reference external" href="http://redis.io/topics/faq"&gt;empty instance uses ~ 1 &lt;span class="caps"&gt;MB&lt;/span&gt; &lt;span class="caps"&gt;RAM&lt;/span&gt;&lt;/a&gt;) so you can run a lot
+of instances in a single&amp;nbsp;server.&lt;/p&gt;
+&lt;p&gt;Long story short, my proposal is to have a redis.conf &lt;em&gt;inside&lt;/em&gt; your application root tree
+(next to manage.py and requirements.txt) which has the redis options for each
+application. The options in redis.conf that need to be changed per application
+is the port that this redis instance will bind (this port also needs to be passed to
+django settings.py) and the pid filename if you daemonize redis &amp;#8212; I recommend using
+a tool like &lt;a class="reference external" href="http://supervisord.org/"&gt;supervisord&lt;/a&gt; instead so that you won&amp;#8217;t need any daemonizing and pid files for&amp;nbsp;redis!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="low-level-debugging"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id8"&gt;Low level&amp;nbsp;debugging&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;In this section I&amp;#8217;ll present some commands that you can issue to your redis
+server using a simple telnet connection to get various info about your queues. You
+probably will never need to issue these commands to actually debug, but they
+will answer some of your (scientific) questions! In the following, &lt;tt class="docutils literal"&gt;&amp;gt;&lt;/tt&gt; is
+things I type, &lt;tt class="docutils literal"&gt;#&lt;/tt&gt; are comments, &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;[...]&lt;/span&gt;&lt;/tt&gt; is more output and everything else is the output I&amp;nbsp;get:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;gt; telnet 127.0.0.1 6379
+
+# You won't see anything at first but you'll be connected and you can try typing things
+
+&amp;gt; INFO
+
+$1020
+redis_version:2.4.10
+redis_git_sha1:00000000
+# [...]
+db0:keys=83,expires=2
+db1:keys=26,expires=1 # My redis server has two databases
+
+# Now you'll see what you type!
+
+&amp;gt; SELECT 1
++ OK # Now queries will be issued to database 1
+&amp;gt; SELECT 0
++ OK # Now queries will be issued to database 0
+
+KEYS rq* # List all rq related queues
+*25
+$43
+rq:job:1d7afa32-3f90-4502-912f-d58eaa049fb1
+$43
+rq:queue:django-test-rq-low
+$43
+[...]
+
+&amp;gt; SMEMBERS rq:workers # See workers
+*1
+$26
+rq:worker:SERAFEIM-PC.6892
+
+&amp;gt; LRANGE rq:queue:django-test-rq-low 0 100 # Check queued jobs
+*2
+$36
+def896f4-84cb-4833-be6a-54d917f05271
+$36
+53cb1367-2fb5-46b3-99b2-7680397203b9
+
+&amp;gt; HGETALL rq:job:def896f4-84cb-4833-be6a-54d917f05271 # Get info about this job
+*16
+$6
+status
+$6
+queued
+$11
+description
+$57
+tasks.tasks.long_runnig_task(&amp;lt;LongTask: LongTask object&amp;gt;)
+$10
+created_at
+$20
+2015-09-01T09:04:38Z
+$7
+timeout
+$3
+180
+$6
+origin
+$18
+django-test-rq-low
+$11
+enqueued_at
+$20
+2015-09-01T09:04:38Z
+$4
+data
+$409
+[...] # data is the pickled parameters passed to the job !
+
+&amp;gt; HGET rq:job:def896f4-84cb-4833-be6a-54d917f05271 status # Get only status
+$6
+queued
+&lt;/pre&gt;
+&lt;p&gt;For more info on querying redis you can check the &lt;a class="reference external" href="http://redis.io/documentation"&gt;redis documentation&lt;/a&gt; and especially
+&lt;a class="reference external" href="http://redis.io/topics/data-types"&gt;http://redis.io/topics/data-types&lt;/a&gt; and &lt;a class="reference external" href="http://redis.io/commands"&gt;http://redis.io/commands&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="conclusion"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id9"&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Using some of the above techniques will help you in your asynchronous
+task adventures with rq. I&amp;#8217;ll try to keep this article updated with
+any new techniques or tools I find in the&amp;nbsp;future!&lt;/p&gt;
+&lt;/div&gt;
+</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Serafeim Papastefanos</dc:creator><pubDate>Tue, 01 Sep 2015 14:20:00 +0300</pubDate><guid>tag:spapas.github.io,2015-09-01:2015/09/01/django-rq-redux/</guid><category>django</category><category>python</category><category>tasks</category><category>jobs</category><category>rq</category><category>django-rq</category><category>asynchronous</category><category>scheduling</category><category>redis</category></item><item><title>Asynchronous tasks in django with django-rq</title><link>http://spapas.github.io/2015/01/27/async-tasks-with-django-rq/</link><description>&lt;div class="contents topic" id="contents"&gt;
+&lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id1"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#job-queues-in-python" id="id2"&gt;Job queues in&amp;nbsp;python&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#django-test-rq" id="id3"&gt;django-test-rq&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#models-py" id="id4"&gt;models.py&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#forms-py" id="id5"&gt;forms.py&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#views-py" id="id6"&gt;views.py&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#tasks-py" id="id7"&gt;tasks.py&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#settings-py" id="id8"&gt;settings.py&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#running-the-project" id="id9"&gt;Running the&amp;nbsp;project&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#rqworker-and-rqscheduler" id="id10"&gt;rqworker and rqscheduler&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#for-development" id="id11"&gt;For&amp;nbsp;development&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#for-production" id="id12"&gt;For&amp;nbsp;production&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#conclusion" id="id13"&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;Update 01/09/15&lt;/strong&gt;: I&amp;#8217;ve written a new post about rq and django with some
+&lt;a class="reference external" href="http://spapas.github.io/2015/09/01/django-rq-redux/"&gt;more advanced techniques&lt;/a&gt;&amp;nbsp;!&lt;/p&gt;
+&lt;div class="section" id="introduction"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id1"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Job queuing (asynchronous tasks) is a common requirement for non-trivial django projects. Whenever an operation
+can take more than half a second it should be put to a job queue in order to be run asynchronously by a
+seperate worker. This is really important since the response to a user request needs to be immediate
+or else the users will experience laggy behavior and start complaining!
+Even for fairly quick tasks (like sending email through an &lt;span class="caps"&gt;SMTP&lt;/span&gt; server) you need to use an asynchronous task
+if you care about your users since
+the time required for such a task is not really&amp;nbsp;limited.&lt;/p&gt;
+&lt;p&gt;Using job queues is involved not only for the developers of the application (who need to create the
+asynchronous tasks and give feedback to the users when the&amp;#8217;ve finished since they can&amp;#8217;t use the normal
+&lt;span class="caps"&gt;HTTP&lt;/span&gt; response) and but also for the administrators, since, in order to support job queues at least two
+more componets will be&amp;nbsp;needed:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;One job queue that will store the jobs to be executed next in a first in first queue. This could be the normal database of the project however it&amp;#8217;s not recommended for performance reasons and most of thetimes it is a specific component called &amp;quot;Message&amp;nbsp;Broker&amp;quot;&lt;/li&gt;
+&lt;li&gt;One (or more) workers that will monitor the job queue and when there is work to do they will dequeue and execute&amp;nbsp;it&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;These can all run in the same server but if it gets saturated they can easily be seperated (even more work for&amp;nbsp;administrators).&lt;/p&gt;
+&lt;p&gt;Beyond job queuing, another relative requirement for many projects is to schedule a task to be run in the future
+(similar to the &lt;tt class="docutils literal"&gt;at&lt;/tt&gt; unix command) or at specific time intervals (similar to the &lt;tt class="docutils literal"&gt;cron&lt;/tt&gt; unix command). For
+instance, if a user is registered today we may need to check after one or two days if he&amp;#8217;s logged in and used our application -
+if he hasn&amp;#8217;t then probably he&amp;#8217;s having problems and we can call him to help him. Also, we could check every night
+to see if any users that have registered to our application don&amp;#8217;t have activated their account through email activation
+and delete these accounts. Scheduled tasks should be also run by the workers mentioned&amp;nbsp;above.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="job-queues-in-python"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id2"&gt;Job queues in&amp;nbsp;python&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The most known application for using job queues in python is &lt;a class="reference external" href="http://www.celeryproject.org/"&gt;celery&lt;/a&gt; which is a really great project that supports
+many brokers,  integrates nicely
+with python/django (but can be used even with other languages) and has
+many more features (most of them are only useful on really big, enterprise projects). I&amp;#8217;ve already used
+it in a previous application, however, because celery is really complex I found it rather difficult to
+configure it successfully and I never was perfectly sure that my asynchronous task would actually work or
+that I&amp;#8217;d used the correct configuration for my&amp;nbsp;needs!&lt;/p&gt;
+&lt;p&gt;Celery also has &lt;a class="reference external" href="http://celery.readthedocs.org/en/latest/faq.html#does-celery-have-many-dependencies"&gt;many dependencies&lt;/a&gt; in order to be able to talk with the different broker backends it supports,
+improve multithreading support etc. They may be required in enterprise apps but not for most Django web based&amp;nbsp;projects.&lt;/p&gt;
+&lt;p&gt;So, for small-to-average projects I recommend using a different asynchronous task solution instead of celery, particularly
+(as you&amp;#8217;ve already guessed from the title of this post) &lt;a class="reference external" href="http://python-rq.org/"&gt;&lt;span class="caps"&gt;RQ&lt;/span&gt;&lt;/a&gt;. &lt;span class="caps"&gt;RQ&lt;/span&gt; is simpler than celery, it integrates great with django
+using the excellent &lt;a class="reference external" href="https://github.com/ui/django-rq"&gt;django-rq&lt;/a&gt; package and doesn&amp;#8217;t actually have any more dependencies beyond redis support which is
+used as a broker (however most modern django projects already use redis for their caching needs as an  alternative
+to&amp;nbsp;memcached).&lt;/p&gt;
+&lt;p&gt;It even supports supports job scheduling through the &lt;a class="reference external" href="https://github.com/ui/rq-scheduler"&gt;rq-scheduler&lt;/a&gt; package (celery also supports
+job scheduling through celery beat): Run a different process (scheduler) that polls the job
+scheduling queue for any jobs that need to be run because of scheduling and if yes put them to
+the normal job&amp;nbsp;queue.&lt;/p&gt;
+&lt;p&gt;Although &lt;span class="caps"&gt;RQ&lt;/span&gt; and frieds are really easy to use (and have nice documentation) I wasn&amp;#8217;t able to find
+a &lt;em&gt;complete&lt;/em&gt; example of using it with django, so I&amp;#8217;ve implemented one
+(found at &lt;a class="reference external" href="https://github.com/spapas/django-test-rq"&gt;https://github.com/spapas/django-test-rq&lt;/a&gt; &amp;#8212; since I&amp;#8217;ve updated this project a bit
+with new stuff,
+please checkout tag django-test-rq-simple &lt;tt class="docutils literal"&gt;git checkout &lt;span class="pre"&gt;django-test-rq-simple&lt;/span&gt;&lt;/tt&gt;) mainly for my own testing
+purposes. To help others that want to also use &lt;span class="caps"&gt;RQ&lt;/span&gt; in their project but don&amp;#8217;t know from where
+to start, I&amp;#8217;ll present it in the following paragraphs, along with some comments on
+how to actually use &lt;span class="caps"&gt;RQ&lt;/span&gt; in your production&amp;nbsp;environment.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="django-test-rq"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id3"&gt;django-test-rq&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;This is a simple django project that can be used to asynchronously
+run and schedule jobs and examine their behavior. The job to be scheduled just downloads a provided
+&lt;span class="caps"&gt;URL&lt;/span&gt; and counts its length. There is only one django application (tasks) that contains two views, one
+to display existing tasks and create new ones and one to display some info for the&amp;nbsp;jobs.&lt;/p&gt;
+&lt;div class="section" id="models-py"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id4"&gt;models.py&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Two models (&lt;tt class="docutils literal"&gt;Task&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;ScheduledTask&lt;/tt&gt;) for saving individual tasks and
+scheduled tasks and one model (&lt;tt class="docutils literal"&gt;ScheduledTaskInstance&lt;/tt&gt;) to save scheduled
+instances of each scheduled&amp;nbsp;task.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;django.db&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;models&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;requests&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;rq&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;get_current_job&lt;/span&gt;
+
+
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Task&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;models&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Model&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="c"&gt;# A model to save information about an asynchronous task&lt;/span&gt;
+    &lt;span class="n"&gt;created_on&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;models&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;DateTimeField&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;auto_now_add&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="bp"&gt;True&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;models&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;CharField&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;max_length&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;128&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;job_id&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;models&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;CharField&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;max_length&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;128&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;result&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;models&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;CharField&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;max_length&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;128&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;blank&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="bp"&gt;True&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;null&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="bp"&gt;True&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;ScheduledTask&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;models&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Model&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="c"&gt;# A model to save information about a scheduled task&lt;/span&gt;
+    &lt;span class="n"&gt;created_on&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;models&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;DateTimeField&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;auto_now_add&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="bp"&gt;True&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;models&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;CharField&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;max_length&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;128&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="c"&gt;# A scheduled task has a common job id for all its occurences&lt;/span&gt;
+    &lt;span class="n"&gt;job_id&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;models&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;CharField&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;max_length&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;128&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;ScheduledTaskInstance&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;models&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Model&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="c"&gt;# A model to save information about instances of a scheduled task&lt;/span&gt;
+    &lt;span class="n"&gt;scheduled_task&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;models&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;ForeignKey&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;ScheduledTask&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;created_on&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;models&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;DateTimeField&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;auto_now_add&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="bp"&gt;True&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;result&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;models&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;CharField&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;max_length&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;128&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;blank&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="bp"&gt;True&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;null&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="bp"&gt;True&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="forms-py"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id5"&gt;forms.py&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;A very simple form to create a new&amp;nbsp;task.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;django&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;forms&lt;/span&gt;
+
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;TaskForm&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;forms&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Form&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="sd"&gt;&amp;quot;&amp;quot;&amp;quot; A simple form to read a url from the user in order to find out its length&lt;/span&gt;
+&lt;span class="sd"&gt;    and either run it asynchronously or schedule it schedule_times times,&lt;/span&gt;
+&lt;span class="sd"&gt;    every schedule_interval seconds.&lt;/span&gt;
+&lt;span class="sd"&gt;    &amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+    &lt;span class="n"&gt;url&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;forms&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;CharField&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;label&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;URL&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;max_length&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;128&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;help_text&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;Enter a url (starting with http/https) to start a job that will download it and count its words&amp;#39;&lt;/span&gt; &lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;schedule_times&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;forms&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;IntegerField&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;required&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="bp"&gt;False&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;help_text&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;How many times to run this job. Leave empty or 0 to run it only once.&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;schedule_interval&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;forms&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;IntegerField&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;required&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="bp"&gt;False&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;help_text&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;How much time (in seconds) between runs of the job. Leave empty to run it only once.&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;clean&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="n"&gt;data&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;super&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;TaskForm&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;clean&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+        &lt;span class="n"&gt;schedule_times&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;schedule_times&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;schedule_interval&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;schedule_interval&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;schedule_times&lt;/span&gt; &lt;span class="ow"&gt;and&lt;/span&gt; &lt;span class="ow"&gt;not&lt;/span&gt; &lt;span class="n"&gt;schedule_interval&lt;/span&gt; &lt;span class="ow"&gt;or&lt;/span&gt; &lt;span class="ow"&gt;not&lt;/span&gt; &lt;span class="n"&gt;schedule_times&lt;/span&gt; &lt;span class="ow"&gt;and&lt;/span&gt; &lt;span class="n"&gt;schedule_interval&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+            &lt;span class="n"&gt;msg&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;Please fill both schedule_times and schedule_interval to schedule a job or leave them both empty&amp;#39;&lt;/span&gt;
+            &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;add_error&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;schedule_times&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;msg&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+            &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;add_error&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;schedule_interval&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;msg&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="views-py"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id6"&gt;views.py&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;This is actually very simple if you&amp;#8217;re familiar with Class Based Views. Two CBVs
+are defined, one for the Task form + Task display and another for the Job&amp;nbsp;display.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;django.views.generic.edit&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;FormView&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;django.views.generic&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;TemplateView&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;forms&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;TaskForm&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;tasks&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;get_url_words&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;scheduled_get_url_words&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;models&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;Task&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;ScheduledTask&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;rq.job&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;Job&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;django_rq&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;datetime&lt;/span&gt;
+
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;TasksHomeFormView&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;FormView&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="sd"&gt;&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+&lt;span class="sd"&gt;    A class that displays a form to read a url to read its contents and if the job&lt;/span&gt;
+&lt;span class="sd"&gt;    is to be scheduled or not and information about all the tasks and scheduled tasks.&lt;/span&gt;
+
+&lt;span class="sd"&gt;    When the form is submitted, the task will be either scheduled based on the&lt;/span&gt;
+&lt;span class="sd"&gt;    parameters of the form or will be just executed asynchronously immediately.&lt;/span&gt;
+&lt;span class="sd"&gt;    &amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+    &lt;span class="n"&gt;form_class&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;TaskForm&lt;/span&gt;
+    &lt;span class="n"&gt;template_name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;tasks_home.html&amp;#39;&lt;/span&gt;
+    &lt;span class="n"&gt;success_url&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;/&amp;#39;&lt;/span&gt;
+
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;form_valid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;form&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="n"&gt;url&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;form&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;cleaned_data&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;url&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+        &lt;span class="n"&gt;schedule_times&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;form&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;cleaned_data&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;schedule_times&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;schedule_interval&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;form&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;cleaned_data&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;schedule_interval&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;schedule_times&lt;/span&gt; &lt;span class="ow"&gt;and&lt;/span&gt; &lt;span class="n"&gt;schedule_interval&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+            &lt;span class="c"&gt;# Schedule the job with the form parameters&lt;/span&gt;
+            &lt;span class="n"&gt;scheduler&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;django_rq&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get_scheduler&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;default&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+            &lt;span class="n"&gt;job&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;scheduler&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;schedule&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+                &lt;span class="n"&gt;scheduled_time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;datetime&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;datetime&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;now&lt;/span&gt;&lt;span class="p"&gt;(),&lt;/span&gt;
+                &lt;span class="n"&gt;func&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;scheduled_get_url_words&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                &lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt;
+                &lt;span class="n"&gt;interval&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;schedule_interval&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                &lt;span class="n"&gt;repeat&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;schedule_times&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+            &lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="k"&gt;else&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+            &lt;span class="c"&gt;# Just execute the job asynchronously&lt;/span&gt;
+            &lt;span class="n"&gt;get_url_words&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;delay&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nb"&gt;super&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;TasksHomeFormView&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;form_valid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;form&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;get_context_data&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;kwargs&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="n"&gt;ctx&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;super&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;TasksHomeFormView&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get_context_data&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;kwargs&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;ctx&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;tasks&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Task&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;objects&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;all&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;order_by&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;-created_on&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;ctx&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;scheduled_tasks&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;ScheduledTask&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;objects&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;all&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;order_by&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;-created_on&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;ctx&lt;/span&gt;
+
+
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;JobTemplateView&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;TemplateView&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="sd"&gt;&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+&lt;span class="sd"&gt;    A simple template view that gets a job id as a kwarg parameter&lt;/span&gt;
+&lt;span class="sd"&gt;    and tries to fetch that job from RQ. It will then print all attributes&lt;/span&gt;
+&lt;span class="sd"&gt;    of that object using __dict__.&lt;/span&gt;
+&lt;span class="sd"&gt;    &amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+    &lt;span class="n"&gt;template_name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;job.html&amp;#39;&lt;/span&gt;
+
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;get_context_data&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;kwargs&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="n"&gt;ctx&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;super&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;JobTemplateView&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get_context_data&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;kwargs&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;redis_conn&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;django_rq&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get_connection&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;default&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="k"&gt;try&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+            &lt;span class="n"&gt;job&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Job&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fetch&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;kwargs&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;job&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="n"&gt;connection&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;redis_conn&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+            &lt;span class="n"&gt;job&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;job&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;__dict__&lt;/span&gt;
+        &lt;span class="k"&gt;except&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+            &lt;span class="n"&gt;job&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;None&lt;/span&gt;
+
+        &lt;span class="n"&gt;ctx&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;job&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;job&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;ctx&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="tasks-py"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id7"&gt;tasks.py&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Here two jobs are defined: One to be used for simple asynchronous tasks and the
+other to be used for scheduled asynchronous tasks (since for asynchronous tasks
+we wanted to group their runs per job&amp;nbsp;id).&lt;/p&gt;
+&lt;p&gt;The &lt;tt class="docutils literal"&gt;&amp;#64;job&lt;/tt&gt; decorator will add the &lt;tt class="docutils literal"&gt;delay()&lt;/tt&gt; method (used in &lt;tt class="docutils literal"&gt;views.py&lt;/tt&gt;) to
+the function. It&amp;#8217;s not really required for &lt;tt class="docutils literal"&gt;scheduled_get_url_words&lt;/tt&gt; since
+it&amp;#8217;s called through the &lt;tt class="docutils literal"&gt;scheduled.schedule&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;When a task is finished, it can return a value (like we do in &lt;tt class="docutils literal"&gt;return task.result&lt;/tt&gt;)
+which will be saved for a limited amount of time (500 seconds by default - could be
+even saved for ever) to redis.
+This may be useful in some cases, however, I think that for normal web applications it&amp;#8217;s
+not that useful, and since here we use normal django models
+for each task, we can save it to that model&amp;#8217;s instance&amp;nbsp;instead.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;requests&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;models&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;Task&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;ScheduledTask&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;ScheduledTaskInstance&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;rq&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;get_current_job&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;django_rq&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;job&lt;/span&gt;
+
+
+&lt;span class="nd"&gt;@job&lt;/span&gt;
+&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;get_url_words&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="c"&gt;# This creates a Task instance to save the job instance and job result&lt;/span&gt;
+    &lt;span class="n"&gt;job&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;get_current_job&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+
+    &lt;span class="n"&gt;task&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Task&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;objects&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;create&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+        &lt;span class="n"&gt;job_id&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;job&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get_id&lt;/span&gt;&lt;span class="p"&gt;(),&lt;/span&gt;
+        &lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;url&lt;/span&gt;
+    &lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;response&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;requests&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;task&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;result&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;response&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;text&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;task&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;save&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;task&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;result&lt;/span&gt;
+
+
+&lt;span class="nd"&gt;@job&lt;/span&gt;
+&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;scheduled_get_url_words&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="sd"&gt;&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+&lt;span class="sd"&gt;    This creates a ScheduledTask instance for each group of&lt;/span&gt;
+&lt;span class="sd"&gt;    scheduled task - each time this scheduled task is run&lt;/span&gt;
+&lt;span class="sd"&gt;    a new instance of ScheduledTaskInstance will be created&lt;/span&gt;
+&lt;span class="sd"&gt;    &amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+    &lt;span class="n"&gt;job&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;get_current_job&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+
+    &lt;span class="n"&gt;task&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;created&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;ScheduledTask&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;objects&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get_or_create&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+        &lt;span class="n"&gt;job_id&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;job&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get_id&lt;/span&gt;&lt;span class="p"&gt;(),&lt;/span&gt;
+        &lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;url&lt;/span&gt;
+    &lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;response&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;requests&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;response_len&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;response&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;text&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;ScheduledTaskInstance&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;objects&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;create&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+        &lt;span class="n"&gt;scheduled_task&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;task&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="n"&gt;result&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;response_len&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;response_len&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="settings-py"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id8"&gt;settings.py&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;os&lt;/span&gt;
+&lt;span class="n"&gt;BASE_DIR&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;os&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;dirname&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;os&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;dirname&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;__file__&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+
+&lt;span class="n"&gt;SECRET_KEY&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;123&amp;#39;&lt;/span&gt;
+&lt;span class="n"&gt;DEBUG&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;True&lt;/span&gt;
+&lt;span class="n"&gt;TEMPLATE_DEBUG&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;True&lt;/span&gt;
+&lt;span class="n"&gt;ALLOWED_HOSTS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[]&lt;/span&gt;
+
+&lt;span class="n"&gt;INSTALLED_APPS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;#39;django.contrib.admin&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;#39;django.contrib.auth&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;#39;django.contrib.contenttypes&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;#39;django.contrib.sessions&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;#39;django.contrib.messages&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;#39;django.contrib.staticfiles&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+
+    &lt;span class="s"&gt;&amp;#39;django_extensions&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;#39;django_rq&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+
+    &lt;span class="s"&gt;&amp;#39;tasks&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;MIDDLEWARE_CLASSES&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;#39;django.contrib.sessions.middleware.SessionMiddleware&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;#39;django.middleware.common.CommonMiddleware&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;#39;django.middleware.csrf.CsrfViewMiddleware&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;#39;django.contrib.auth.middleware.AuthenticationMiddleware&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;#39;django.contrib.auth.middleware.SessionAuthenticationMiddleware&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;#39;django.contrib.messages.middleware.MessageMiddleware&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;#39;django.middleware.clickjacking.XFrameOptionsMiddleware&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;ROOT_URLCONF&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;django_test_rq.urls&amp;#39;&lt;/span&gt;
+&lt;span class="n"&gt;WSGI_APPLICATION&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;django_test_rq.wsgi.application&amp;#39;&lt;/span&gt;
+
+&lt;span class="n"&gt;DATABASES&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;#39;default&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="s"&gt;&amp;#39;ENGINE&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;django.db.backends.sqlite3&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="s"&gt;&amp;#39;NAME&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;os&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;join&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;BASE_DIR&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;db.sqlite3&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="n"&gt;LANGUAGE_CODE&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;en-us&amp;#39;&lt;/span&gt;
+&lt;span class="n"&gt;TIME_ZONE&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;UTC&amp;#39;&lt;/span&gt;
+&lt;span class="n"&gt;USE_I18N&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;True&lt;/span&gt;
+&lt;span class="n"&gt;USE_L10N&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;True&lt;/span&gt;
+&lt;span class="n"&gt;USE_TZ&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;True&lt;/span&gt;
+
+&lt;span class="n"&gt;STATIC_URL&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;/static/&amp;#39;&lt;/span&gt;
+
+&lt;span class="c"&gt;# Use redis for caches&lt;/span&gt;
+&lt;span class="n"&gt;CACHES&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;default&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="s"&gt;&amp;quot;BACKEND&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;django_redis.cache.RedisCache&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="s"&gt;&amp;quot;LOCATION&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;redis://127.0.0.1:6379/0&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="s"&gt;&amp;quot;OPTIONS&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+            &lt;span class="s"&gt;&amp;quot;CLIENT_CLASS&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;django_redis.client.DefaultClient&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="c"&gt;# Use the same redis as with caches for RQ&lt;/span&gt;
+&lt;span class="n"&gt;RQ_QUEUES&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;#39;default&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="s"&gt;&amp;#39;USE_REDIS_CACHE&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;default&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="p"&gt;},&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="n"&gt;SESSION_ENGINE&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;django.contrib.sessions.backends.cache&amp;quot;&lt;/span&gt;
+&lt;span class="n"&gt;SESSION_CACHE_ALIAS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;default&amp;quot;&lt;/span&gt;
+&lt;span class="n"&gt;RQ_SHOW_ADMIN_LINK&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;True&lt;/span&gt;
+
+&lt;span class="c"&gt;# Add a logger for rq_scheduler in order to display when jobs are queueud&lt;/span&gt;
+&lt;span class="n"&gt;LOGGING&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;#39;version&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;#39;disable_existing_loggers&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="bp"&gt;False&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;#39;formatters&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="s"&gt;&amp;#39;simple&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+            &lt;span class="s"&gt;&amp;#39;format&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;&lt;/span&gt;&lt;span class="si"&gt;%(asctime)s&lt;/span&gt;&lt;span class="s"&gt; &lt;/span&gt;&lt;span class="si"&gt;%(levelname)s&lt;/span&gt;&lt;span class="s"&gt; &lt;/span&gt;&lt;span class="si"&gt;%(message)s&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&lt;/span&gt;
+        &lt;span class="p"&gt;},&lt;/span&gt;
+    &lt;span class="p"&gt;},&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;#39;handlers&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="s"&gt;&amp;#39;console&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+            &lt;span class="s"&gt;&amp;#39;level&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;DEBUG&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+            &lt;span class="s"&gt;&amp;#39;class&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;logging.StreamHandler&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+            &lt;span class="s"&gt;&amp;#39;formatter&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;simple&amp;#39;&lt;/span&gt;
+        &lt;span class="p"&gt;},&lt;/span&gt;
+    &lt;span class="p"&gt;},&lt;/span&gt;
+
+    &lt;span class="s"&gt;&amp;#39;loggers&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="s"&gt;&amp;#39;django.request&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+            &lt;span class="s"&gt;&amp;#39;handlers&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;console&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt;
+            &lt;span class="s"&gt;&amp;#39;level&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;DEBUG&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+            &lt;span class="s"&gt;&amp;#39;propagate&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="bp"&gt;True&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="p"&gt;},&lt;/span&gt;
+        &lt;span class="s"&gt;&amp;#39;rq_scheduler&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+            &lt;span class="s"&gt;&amp;#39;handlers&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;console&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt;
+            &lt;span class="s"&gt;&amp;#39;level&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;DEBUG&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+            &lt;span class="s"&gt;&amp;#39;propagate&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="bp"&gt;True&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="p"&gt;},&lt;/span&gt;
+    &lt;span class="p"&gt;},&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;By default, rq_scheduler won&amp;#8217;t log anything so we won&amp;#8217;t be able to see
+any output when new instances of each scheduled task are queued for execution.
+That&amp;#8217;s why we&amp;#8217;ve overriden the &lt;span class="caps"&gt;LOGGING&lt;/span&gt; setting in order to actually log
+rq_scheduler output to the&amp;nbsp;console.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="running-the-project"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id9"&gt;Running the&amp;nbsp;project&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;I recommend using &lt;a class="reference external" href="https://www.vagrantup.com/"&gt;Vagrant&lt;/a&gt; to start a stock ubuntu/trusty32 box. After that, install redis, virtualenv and virtualenvwrapper
+and create/activate a virtualenv named &lt;tt class="docutils literal"&gt;rq&lt;/tt&gt;. You can go to the home directory of &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;django-test-rq&lt;/span&gt;&lt;/tt&gt;
+and install requirements through &lt;tt class="docutils literal"&gt;pip install requirements.txt&lt;/tt&gt; and create the database tables with
+&lt;tt class="docutils literal"&gt;python manage.py migrate&lt;/tt&gt;. Finally you may run the project with &lt;tt class="docutils literal"&gt;python manage.py runserver_plus&lt;/tt&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="rqworker-and-rqscheduler"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id10"&gt;rqworker and&amp;nbsp;rqscheduler&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Before scheduling any tasks we need to run two more&amp;nbsp;processes:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;rqworker: This is a worker that dequeues jobs from the queue and executes them. We could run more than one onstance of this job if we need&amp;nbsp;it.&lt;/li&gt;
+&lt;li&gt;rqscheduler: This is a process that runs every one minute and checks if there are scheduled jobs that have to be executed. If yes, it will add them to the queue in order to be executed by a&amp;nbsp;worker.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="section" id="for-development"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id11"&gt;For&amp;nbsp;development&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;If you want to run rqworker and rqscheduler for your development environment you can just do it with
+running &lt;tt class="docutils literal"&gt;python manage.py rqworker&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;python mange.py rqscheduler&lt;/tt&gt; through screen/tmux. If everything
+is allright you should see tasks being added to the queue and scheduled (you may need to refresh the
+homepage before seeing everything since a task may be executed after the response is&amp;nbsp;created).&lt;/p&gt;
+&lt;p&gt;Also, keep in mind that rqscheduler runs once every minute by default so you may need to wait up to
+minute to see a &lt;tt class="docutils literal"&gt;ScheduledTask&lt;/tt&gt; instance. Also, this means that you can&amp;#8217;t run more than one scheduled
+task instance per&amp;nbsp;minute.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="for-production"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id12"&gt;For&amp;nbsp;production&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Trying to create daemons through screen is not
+sufficient for a production envornment since we&amp;#8217;d like to actually have logging, monitoring and of course
+automatically start rqworker and rqscheduler when the server&amp;nbsp;boots.&lt;/p&gt;
+&lt;p&gt;For this, I recommend using the &lt;a class="reference external" href="http://supervisord.org/"&gt;supervisord&lt;/a&gt; tool which
+can be used to monitor and control a number of processes. There are other similar tools, however I&amp;#8217;ve
+found supervisord the easier to&amp;nbsp;use.&lt;/p&gt;
+&lt;p&gt;In order to monitor/control a process through supervisord you need to add a &lt;tt class="docutils literal"&gt;[program:progrname]&lt;/tt&gt; section in
+supervisord&amp;#8217;s configuration and pass a number of parameters. The &lt;tt class="docutils literal"&gt;progname&lt;/tt&gt; is the name of the monitoring
+process. Here&amp;#8217;s how rqworker can be configured using&amp;nbsp;supervisord:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+[program:rqworker]
+command=python manage.py rqworker
+directory=/vagrant/progr/py/rq/django-test-rq
+environment=PATH=&amp;quot;/home/vagrant/.virtualenvs/rq/bin&amp;quot;
+user=vagrant
+&lt;/pre&gt;
+&lt;p&gt;The options used will chdir to &lt;tt class="docutils literal"&gt;directory&lt;/tt&gt; and execute &lt;tt class="docutils literal"&gt;command&lt;/tt&gt; as &lt;tt class="docutils literal"&gt;user&lt;/tt&gt;. The &lt;tt class="docutils literal"&gt;environment&lt;/tt&gt;
+option can be used to set envirotnment variables - here we set &lt;tt class="docutils literal"&gt;&lt;span class="caps"&gt;PATH&lt;/span&gt;&lt;/tt&gt; in order to use a specific
+virtual environment. This will allow you to monitor rqworker through supervisord and log its
+output to a file in &lt;tt class="docutils literal"&gt;/var/log/supervisor&lt;/tt&gt; (by default). A similar entry needs to be added for
+rqscheduler of course. If everything has been configured correctly, when you reload the supervisord
+settings you can run &lt;tt class="docutils literal"&gt;sudo /usr/bin/supervisorctl&lt;/tt&gt; and should see something&amp;nbsp;like&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+rqscheduler                      RUNNING    pid 1561, uptime 0:00:03
+rqworker                         RUNNING    pid 1562, uptime 0:00:03
+&lt;/pre&gt;
+&lt;p&gt;Also, tho log files should contain some debug&amp;nbsp;info.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="conclusion"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id13"&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Although using job queues makes it more difficult for the developer and adds at least one
+(and probably more) points of failure to a project (the workers, the broker etc) their
+usage, even for very simple projects is&amp;nbsp;unavoidable.&lt;/p&gt;
+&lt;p&gt;Unless a complex, enterprise solution like celery is really required for a project
+I recommend using the much simpler and easier to configure &lt;span class="caps"&gt;RQ&lt;/span&gt; for all your
+asynchronous and scheduled task needs. Using &lt;span class="caps"&gt;RQ&lt;/span&gt; (and the relative projects django-rq
+and rq-scheduler) we can easily add production ready queueued and scheduled jobs to
+any django&amp;nbsp;project.&lt;/p&gt;
+&lt;p&gt;In this article we presented a small introduction to &lt;span class="caps"&gt;RQ&lt;/span&gt; and its friends and saw how
+to configure django to use it in a production ready environment using a small
+django project (&lt;a class="reference external" href="https://github.com/spapas/django-test-rq"&gt;https://github.com/spapas/django-test-rq&lt;/a&gt;) which was implemented as a companion
+to help readers quickly test the concepts presented&amp;nbsp;here.&lt;/p&gt;
+&lt;/div&gt;
+</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Serafeim Papastefanos</dc:creator><pubDate>Tue, 27 Jan 2015 14:20:00 +0200</pubDate><guid>tag:spapas.github.io,2015-01-27:2015/01/27/async-tasks-with-django-rq/</guid><category>django</category><category>python</category><category>tasks</category><category>jobs</category><category>rq</category><category>django-rq</category><category>asynchronous</category><category>scheduling</category><category>redis</category></item><item><title>Django model auditing</title><link>http://spapas.github.io/2015/01/21/django-model-auditing/</link><description>&lt;div class="contents topic" id="contents"&gt;
+&lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id5"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#adding-simple-auditing-functionality-ourselves" id="id6"&gt;Adding simple auditing functionality&amp;nbsp;ourselves&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#example" id="id7"&gt;Example&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#models-py" id="id8"&gt;models.py&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#forms-py" id="id9"&gt;forms.py&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#views-py" id="id10"&gt;views.py&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#urls-py" id="id11"&gt;urls.py&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#templates" id="id12"&gt;templates&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#using-django-simple-history" id="id13"&gt;Using django-simple-history&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#installation" id="id14"&gt;Installation&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#id1" id="id15"&gt;Example&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#usage" id="id16"&gt;Usage&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#using-django-reversion" id="id17"&gt;Using django-reversion&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#id2" id="id18"&gt;Installation&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#id3" id="id19"&gt;Example&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#id4" id="id20"&gt;Usage&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#conclusion" id="id21"&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="introduction"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;An auditing trail is a common requirement in most non-trivial applications. Organizations
+need to know &lt;em&gt;who&lt;/em&gt; did the change, &lt;em&gt;when&lt;/em&gt; it was done and &lt;em&gt;what&lt;/em&gt; was actually changed.
+In this post we will see three
+different solution in order to add this functionality in Django: doing it ourselves,
+using django-simple-history and using&amp;nbsp;django-reversion.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="adding-simple-auditing-functionality-ourselves"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id6"&gt;Adding simple auditing functionality&amp;nbsp;ourselves&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;A simple way to actually do auditing is to keep four extra fields in our models:
+&lt;tt class="docutils literal"&gt;created_by&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;created_on&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;modified_by&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;modified_on&lt;/tt&gt;. The first two
+will be filled when the model instance is created while the latter two will be
+changed whenever the model instance is saved. So we only have &lt;em&gt;who&lt;/em&gt; and &lt;em&gt;whe&lt;/em&gt;.
+Sometimes, these are enough so let&amp;#8217;s see how easy it is to implement it in&amp;nbsp;django.&lt;/p&gt;
+&lt;p&gt;We&amp;#8217;ll need an abstract model that could be used as a base class for models that need&amp;nbsp;auditing:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;django.conf&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;settings&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;django.db&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;models&lt;/span&gt;
+
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Auditable&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;models&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Model&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="n"&gt;created_on&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;models&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;DateTimeField&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;auto_now_add&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;True&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;created_by&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;models&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;ForeignKey&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;settings&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;AUTH_USER_MODEL&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;related_name&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;created_by&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+    &lt;span class="n"&gt;modified_on&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;models&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;DateTimeField&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;auto_now&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;True&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;modified_by&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;models&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;ForeignKey&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;settings&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;AUTH_USER_MODEL&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;related_name&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;modified_by&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+    &lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Meta&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="n"&gt;abstract&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;True&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Models inheriting from &lt;tt class="docutils literal"&gt;Auditable&lt;/tt&gt; will contain their datetime of creation and modification
+which will be automatically filled using the very usefull &lt;tt class="docutils literal"&gt;auto_now_add_&lt;/tt&gt; (which will
+set the current datetime when the model instance is created) and &lt;tt class="docutils literal"&gt;auto_now_&lt;/tt&gt; (which will
+set the current datetime when the model instance is&amp;nbsp;modified).&lt;/p&gt;
+&lt;p&gt;Such models will also have two foreign keys to &lt;tt class="docutils literal"&gt;User&lt;/tt&gt;, one for the user
+that created the and one of the user that modified them. The problem with these two fields
+is that they cannot be filled automatically (like the datetimes) because the user that
+actually did create/change the objects must be&amp;nbsp;provided!&lt;/p&gt;
+&lt;p&gt;Since I am really fond of CBVs I will present a simple mixin that can be used with CreateView
+and UpdateView and does exactly&amp;nbsp;that:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;AuditableMixin&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;object&lt;/span&gt;&lt;span class="p"&gt;,):&lt;/span&gt;
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;form_valid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;form&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="ow"&gt;not&lt;/span&gt; &lt;span class="n"&gt;form&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;instance&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;created_by&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+            &lt;span class="n"&gt;form&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;instance&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;created_by&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;user&lt;/span&gt;
+        &lt;span class="n"&gt;form&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;instance&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;modified_by&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;user&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nb"&gt;super&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;AuditableMixin&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;form_valid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;form&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;The above mixin overrides the &lt;tt class="docutils literal"&gt;form_valid&lt;/tt&gt; method of &lt;tt class="docutils literal"&gt;CreateView&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;UpdateView&lt;/tt&gt;:
+First it checks if the object is created (if it is created it won&amp;#8217;t be saved in the
+database yet thus it won&amp;#8217;t have an id) in order to set the &lt;tt class="docutils literal"&gt;created_by&lt;/tt&gt; attribute to
+the current user. After that it will set the &lt;tt class="docutils literal"&gt;modified_by&lt;/tt&gt; attribute of the object to
+the current user. Finally, it will call the next &lt;tt class="docutils literal"&gt;form_valid&lt;/tt&gt; method to do whatever
+is required (save the model instance and redirect to &lt;tt class="docutils literal"&gt;success_url&lt;/tt&gt; by&amp;nbsp;default).&lt;/p&gt;
+&lt;p&gt;The views using &lt;tt class="docutils literal"&gt;AuditableMixin&lt;/tt&gt; should allow only logged in users (or else an
+exception will be thrown). Also, don&amp;#8217;t forget to exclude the &lt;tt class="docutils literal"&gt;created_by&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;modified_by&lt;/tt&gt;
+fields from your model form (&lt;tt class="docutils literal"&gt;created_on&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;modified_on&lt;/tt&gt; will automatically be&amp;nbsp;excluded).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="example"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id7"&gt;Example&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Let&amp;#8217;s see a simple example of creating a small django application using the previously defined abstract model and&amp;nbsp;mixin:&lt;/p&gt;
+&lt;div class="section" id="models-py"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id8"&gt;models.py&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;django.conf&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;settings&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;django.core.urlresolvers&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;reverse&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;django.db&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;models&lt;/span&gt;
+
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;auditable.models&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;Auditable&lt;/span&gt;
+
+
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Book&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Auditable&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="n"&gt;name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;models&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;CharField&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;max_length&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;128&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;author&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;models&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;CharField&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;max_length&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;128&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;get_absolute_url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;reverse&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;book_list&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;In the above we suppose that the &lt;tt class="docutils literal"&gt;Auditable&lt;/tt&gt; abstract model is imported from the
+&lt;tt class="docutils literal"&gt;auditable.models&lt;/tt&gt; module and that a view named &lt;tt class="docutils literal"&gt;book_list&lt;/tt&gt; that shows all books&amp;nbsp;exists.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="forms-py"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id9"&gt;forms.py&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;django.forms&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;ModelForm&lt;/span&gt;
+
+
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;BookForm&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ModelForm&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Meta&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="n"&gt;model&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Book&lt;/span&gt;
+        &lt;span class="n"&gt;fields&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;name&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;author&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Show only &lt;tt class="docutils literal"&gt;name&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;author&lt;/tt&gt; fields (and not the auditable fields) in the &lt;tt class="docutils literal"&gt;Book ModelForm&lt;/tt&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="views-py"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id10"&gt;views.py&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;django.views.generic.edit&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;CreateView&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;UpdateView&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;django.views.generic&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;ListView&lt;/span&gt;
+
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;auditable.views&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;AuditableMixin&lt;/span&gt;
+
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;models&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;Book&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;forms&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;BookForm&lt;/span&gt;
+
+
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;BookCreateView&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;AuditableMixin&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;CreateView&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="n"&gt;model&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Book&lt;/span&gt;
+    &lt;span class="n"&gt;form_class&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;BookForm&lt;/span&gt;
+
+
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;BookUpdateView&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;AuditableMixin&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;UpdateView&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="n"&gt;model&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Book&lt;/span&gt;
+    &lt;span class="n"&gt;form_class&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;BookForm&lt;/span&gt;
+
+
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;BookListView&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ListView&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="n"&gt;model&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Book&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;We import the &lt;tt class="docutils literal"&gt;AuditableMixin&lt;/tt&gt; from &lt;tt class="docutils literal"&gt;auditable.views&lt;/tt&gt; and make our Create and Update views
+inherit from this mixin also in addition to &lt;tt class="docutils literal"&gt;CreateView&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;UpdateView&lt;/tt&gt;. Pay attention that our
+mixin is placed &lt;em&gt;before&lt;/em&gt; CreateView in order to call &lt;tt class="docutils literal"&gt;form_valid&lt;/tt&gt; in the proper order: When multiple
+inheritance is used like this python will check each class from left to right to find the proper method
+and call it. For example, in our &lt;tt class="docutils literal"&gt;BookCreateView&lt;/tt&gt;, when the &lt;tt class="docutils literal"&gt;form_valid&lt;/tt&gt; method is called, python
+will first check if &lt;tt class="docutils literal"&gt;BookCreateView&lt;/tt&gt; has a &lt;tt class="docutils literal"&gt;form_valid&lt;/tt&gt; method. Since it does not, it will check
+if &lt;tt class="docutils literal"&gt;AuditableMixin&lt;/tt&gt; has a &lt;tt class="docutils literal"&gt;form_valid&lt;/tt&gt; method and call it. Now, we are calling the &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;super(...).form_valid()&lt;/span&gt;&lt;/tt&gt; in the
+&lt;tt class="docutils literal"&gt;AuditableMixin&lt;/tt&gt; &lt;tt class="docutils literal"&gt;form_valid&lt;/tt&gt;, so the &lt;tt class="docutils literal"&gt;form_valid&lt;/tt&gt; of &lt;tt class="docutils literal"&gt;CreateView&lt;/tt&gt; will &lt;em&gt;also&lt;/em&gt; be&amp;nbsp;called.&lt;/p&gt;
+&lt;p&gt;A simple &lt;tt class="docutils literal"&gt;ListView&lt;/tt&gt; is also added to just show the info on all&amp;nbsp;books.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="urls-py"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id11"&gt;urls.py&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;django.conf.urls&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;patterns&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;include&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;url&lt;/span&gt;
+
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;views&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;BookCreateView&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;BookUpdateView&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;BookListView&lt;/span&gt;
+
+&lt;span class="n"&gt;urlpatterns&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;patterns&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;r&amp;#39;^accounts/login/$&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;django.contrib.auth.views.login&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;),&lt;/span&gt;
+    &lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;r&amp;#39;^accounts/logout/$&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;django.contrib.auth.views.logout&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;),&lt;/span&gt;
+
+    &lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;r&amp;#39;^create/$&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;BookCreateView&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;as_view&lt;/span&gt;&lt;span class="p"&gt;(),&lt;/span&gt; &lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;create_book&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+    &lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;r&amp;#39;^update/(?P&amp;lt;pk&amp;gt;\d+)/$&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;BookUpdateView&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;as_view&lt;/span&gt;&lt;span class="p"&gt;(),&lt;/span&gt; &lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;update_book&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+    &lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;r&amp;#39;^$&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;BookListView&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;as_view&lt;/span&gt;&lt;span class="p"&gt;(),&lt;/span&gt; &lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;book_list&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Just add the previously defined Create/Update/List views along with a login/logout&amp;nbsp;views.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="templates"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id12"&gt;templates&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;You&amp;#8217;ll need four&amp;nbsp;templates:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;books/book_list.html: Show the list of&amp;nbsp;books&lt;/li&gt;
+&lt;li&gt;books/book_form.html: Show the book editing&amp;nbsp;form&lt;/li&gt;
+&lt;li&gt;registration/login.html: Login&amp;nbsp;form&lt;/li&gt;
+&lt;li&gt;registration/logout.html: Logout&amp;nbsp;message&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="using-django-simple-history"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id13"&gt;Using&amp;nbsp;django-simple-history&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://github.com/treyhunner/django-simple-history"&gt;django-simple-history&lt;/a&gt;  can be used to not only store the user and date of each modification
+but a different version for each modification. To do that, for every model that is registered
+to be used with django-simple-history, it wil create a second table in
+the database hosting all versions (historical records) of that model. As we can understand this is really powerfull
+since we can see exactly what was changed and also do normal &lt;span class="caps"&gt;SQL&lt;/span&gt; queries on&amp;nbsp;that!&lt;/p&gt;
+&lt;div class="section" id="installation"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id14"&gt;Installation&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;To use django-simple-history in a project, after we do a &lt;tt class="docutils literal"&gt;pip install &lt;span class="pre"&gt;django-simple-history&lt;/span&gt;&lt;/tt&gt;,
+we just need to add it to &lt;tt class="docutils literal"&gt;INSTALLED_APPS&lt;/tt&gt; and
+add the &lt;tt class="docutils literal"&gt;simple_history.middleware.HistoryRequestMiddleware&lt;/tt&gt; to the &lt;tt class="docutils literal"&gt;MIDDLEWARE_CLASSES&lt;/tt&gt; list.&lt;/p&gt;
+&lt;p&gt;Finally, to keep the historical records for a model, just add an instace of &lt;tt class="docutils literal"&gt;HistoricalRecords&lt;/tt&gt; to this&amp;nbsp;model.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id1"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id15"&gt;Example&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;For example, our previously defined &lt;tt class="docutils literal"&gt;Book&lt;/tt&gt; model will be modified like&amp;nbsp;this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;class SHBook(models.Model):
+    name = models.CharField(max_length=128)
+    author = models.CharField(max_length=128)
+
+    def get_absolute_url(self):
+        return reverse(&amp;quot;shbook_list&amp;quot;)
+
+    history = HistoricalRecords()
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;When we run &lt;tt class="docutils literal"&gt;python manage.py makemigrations&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;migrate&lt;/tt&gt; this, we&amp;#8217;ll see that beyond the table for SHBook, a table for HistoricalSHBook will be&amp;nbsp;created:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+Migrations for 'sample':
+  0002_historicalshbook_shbook.py:
+    - Create model HistoricalSHBook
+    - Create model SHBook
+&lt;/pre&gt;
+&lt;p&gt;Let&amp;#8217;s see the schema of&amp;nbsp;historicalshbook:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+CREATE TABLE &amp;quot;sample_historicalshbook&amp;quot; (
+    &amp;quot;id&amp;quot; integer NOT NULL,
+    &amp;quot;name&amp;quot; varchar(128) NOT NULL,
+    &amp;quot;author&amp;quot; varchar(128) NOT NULL,
+    &amp;quot;history_id&amp;quot; integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+    &amp;quot;history_date&amp;quot; datetime NOT NULL,
+    &amp;quot;history_type&amp;quot; varchar(1) NOT NULL,
+    &amp;quot;history_user_id&amp;quot; integer NULL REFERENCES &amp;quot;auth_user&amp;quot; (&amp;quot;id&amp;quot;)
+);
+&lt;/pre&gt;
+&lt;p&gt;So we see that it has the &lt;em&gt;same&lt;/em&gt; fields as with &lt;tt class="docutils literal"&gt;SHBook&lt;/tt&gt; (&lt;tt class="docutils literal"&gt;id, name, author&lt;/tt&gt;) with the addition of
+the primary key (&lt;tt class="docutils literal"&gt;history_id&lt;/tt&gt;) of this historical record, the date and user that did the change
+(&lt;tt class="docutils literal"&gt;history_date&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;history_user_id&lt;/tt&gt;) and the type of the record (created / update /&amp;nbsp;delete).&lt;/p&gt;
+&lt;p&gt;So, just by adding a &lt;tt class="docutils literal"&gt;HistoricalRecords()&lt;/tt&gt; attribute to our model definition we&amp;#8217;ll get complete auditing
+for the instance of that&amp;nbsp;model&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="usage"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id16"&gt;Usage&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;To find out information about the historical records we&amp;#8217;ll just use the &lt;tt class="docutils literal"&gt;HistoricalRecords()&lt;/tt&gt; attribute
+of that&amp;nbsp;model:&lt;/p&gt;
+&lt;p&gt;For example, running &lt;tt class="docutils literal"&gt;SHBook.history.filter(id=1)&lt;/tt&gt; will return all historical records of the book with
+&lt;tt class="docutils literal"&gt;id = 1&lt;/tt&gt;. For each one of them we have can use the&amp;nbsp;following:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;get the user that made the change through the &lt;tt class="docutils literal"&gt;history_user&lt;/tt&gt; attribute&lt;/li&gt;
+&lt;li&gt;get the date of the change through the &lt;tt class="docutils literal"&gt;history_date&lt;/tt&gt; attribute&lt;/li&gt;
+&lt;li&gt;get the type of the change through the &lt;tt class="docutils literal"&gt;history_type&lt;/tt&gt; attribute (and the corresponding &lt;tt class="docutils literal"&gt;get_history_type_dispaly&lt;/tt&gt;)&lt;/li&gt;
+&lt;li&gt;get a model instance as it was then through the &lt;tt class="docutils literal"&gt;history_object&lt;/tt&gt; attribute (in order to &lt;tt class="docutils literal"&gt;save()&lt;/tt&gt; it and revert to this&amp;nbsp;version)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="using-django-reversion"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id17"&gt;Using&amp;nbsp;django-reversion&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://github.com/etianen/django-reversion"&gt;django-reversion&lt;/a&gt;  offers more or less the same functionality of django-simple-history by following a different philosophy:
+Instead of creating an extra table holding the history records for each model, it insteads converts all the fields of each model
+to json and stores that &lt;span class="caps"&gt;JSON&lt;/span&gt; in the database in a text&amp;nbsp;field.&lt;/p&gt;
+&lt;p&gt;This has the advantage that no extra tables are created to the database but the disadvantage that you can&amp;#8217;t easily query
+your historical records. So you may choose one or the other depending on your actual&amp;nbsp;requirements.&lt;/p&gt;
+&lt;div class="section" id="id2"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id18"&gt;Installation&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;To use django-reversion in a project, after we do a &lt;tt class="docutils literal"&gt;pip install &lt;span class="pre"&gt;django-reversion&lt;/span&gt;&lt;/tt&gt;,
+we just need to add it to &lt;tt class="docutils literal"&gt;INSTALLED_APPS&lt;/tt&gt; and
+add the &lt;tt class="docutils literal"&gt;reversion.middleware.RevisionMiddleware&lt;/tt&gt; to the &lt;tt class="docutils literal"&gt;MIDDLEWARE_CLASSES&lt;/tt&gt; list.&lt;/p&gt;
+&lt;p&gt;In order to save the revisions of a model, you need to register this model to django-reversion. This can be
+done either through the django-admin, by inheriting the admin class of that model from &lt;tt class="docutils literal"&gt;reversion.VersionAdmin&lt;/tt&gt;
+or, if you don&amp;#8217;t want to use the admin by &lt;tt class="docutils literal"&gt;reversion.register&lt;/tt&gt; decorator.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id3"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id19"&gt;Example&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;To use django-reversion to keep track of changes to &lt;tt class="docutils literal"&gt;Book&lt;/tt&gt; we can modify it like&amp;nbsp;this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;@reversion.register
+class RBook(models.Model):
+    name = models.CharField(max_length=128)
+    author = models.CharField(max_length=128)
+
+    def get_absolute_url(self):
+        return reverse(&amp;quot;rbook_list&amp;quot;)
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;django-reversion uses two tables in the database to keep track of revisions: &lt;tt class="docutils literal"&gt;revision&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;version&lt;/tt&gt;. Let&amp;#8217;s
+take a look at their&amp;nbsp;schemata:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+.schema reversion_revision
+CREATE TABLE &amp;quot;reversion_revision&amp;quot; (
+    &amp;quot;id&amp;quot; integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+    &amp;quot;manager_slug&amp;quot; varchar(200) NOT NULL,
+    &amp;quot;date_created&amp;quot; datetime NOT NULL,
+    &amp;quot;comment&amp;quot; text NOT NULL,
+    &amp;quot;user_id&amp;quot; integer NULL REFERENCES &amp;quot;auth_user&amp;quot; (&amp;quot;id&amp;quot;)
+);
+
+.schema reversion_version
+CREATE TABLE &amp;quot;reversion_version&amp;quot; (
+    &amp;quot;id&amp;quot; integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+    &amp;quot;object_id&amp;quot; text NOT NULL,
+    &amp;quot;object_id_int&amp;quot; integer NULL,
+    &amp;quot;format&amp;quot; varchar(255) NOT NULL,
+    &amp;quot;serialized_data&amp;quot; text NOT NULL,
+    &amp;quot;object_repr&amp;quot; text NOT NULL,
+    &amp;quot;content_type_id&amp;quot; integer NOT NULL REFERENCES &amp;quot;django_content_type&amp;quot; (&amp;quot;id&amp;quot;),
+    &amp;quot;revision_id&amp;quot; integer NOT NULL REFERENCES &amp;quot;reversion_revision&amp;quot; (&amp;quot;id&amp;quot;)
+);
+&lt;/pre&gt;
+&lt;p&gt;As we can understand, the &lt;tt class="docutils literal"&gt;revision&lt;/tt&gt; table holds information like who created this
+revison (&lt;tt class="docutils literal"&gt;user_id&lt;/tt&gt;) and when (&lt;tt class="docutils literal"&gt;date_created&lt;/tt&gt;) while the &lt;tt class="docutils literal"&gt;version&lt;/tt&gt; stores
+a reference to the object that was modified (through a GenericForeignKey) and
+the actual data (in the &lt;tt class="docutils literal"&gt;serialized_data&lt;/tt&gt; field). By default it uses &lt;span class="caps"&gt;JSON&lt;/span&gt;
+to serialize the data (the serialization format is in the &lt;tt class="docutils literal"&gt;format&lt;/tt&gt; field). There&amp;#8217;s
+an one-to-one relation between &lt;tt class="docutils literal"&gt;revision&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;version&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;If we create an instance of &lt;tt class="docutils literal"&gt;RBook&lt;/tt&gt; we&amp;#8217;ll see the following in the&amp;nbsp;database:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+sqlite&amp;gt; select * from reversion_revision;
+1|default|2015-01-21 10:31:25.233000||1
+
+sqlite&amp;gt; select * from reversion_version;
+1|1|1|json|[{&amp;quot;fields&amp;quot;: {&amp;quot;name&amp;quot;: &amp;quot;asdasdasd&amp;quot;, &amp;quot;author&amp;quot;: &amp;quot;asdasd&amp;quot;}, &amp;quot;model&amp;quot;: &amp;quot;sample.rbook&amp;quot;, &amp;quot;pk&amp;quot;: 1}]|RBook object|12|1
+&lt;/pre&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;date_created&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;user_id&lt;/tt&gt; are stored on &lt;tt class="docutils literal"&gt;revision&lt;/tt&gt; while &lt;tt class="docutils literal"&gt;format&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;serialized_data&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;content_type_id&lt;/tt&gt; and
+&lt;tt class="docutils literal"&gt;object_id_int&lt;/tt&gt; (the &lt;tt class="docutils literal"&gt;GenericForeignKey&lt;/tt&gt;) are stored in &lt;tt class="docutils literal"&gt;version&lt;/tt&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="id4"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id20"&gt;Usage&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;To find out information about an object you have to use the &lt;tt class="docutils literal"&gt;reversion.get_for_object(object)&lt;/tt&gt; method. In order to be
+easily used in templates I recommend creating the following &lt;tt class="docutils literal"&gt;get_versions()&lt;/tt&gt; method in each model that is registered with&amp;nbsp;django-reversion&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+def get_versions(self):
+    return reversion.get_for_object(self)
+&lt;/pre&gt;
+&lt;p&gt;Now, each version has a &lt;tt class="docutils literal"&gt;revision&lt;/tt&gt; attribute for the corresponding revision and can be used to do the&amp;nbsp;following:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;get the user that made the change through the &lt;tt class="docutils literal"&gt;revision.user&lt;/tt&gt; attribute&lt;/li&gt;
+&lt;li&gt;get the date of the change through the &lt;tt class="docutils literal"&gt;revision.date_created&lt;/tt&gt; attribute&lt;/li&gt;
+&lt;li&gt;get the values of the object fields as they were in this revision using the &lt;tt class="docutils literal"&gt;field_dict&lt;/tt&gt; attribute&lt;/li&gt;
+&lt;li&gt;get a model instance as it was on that revision using the &lt;tt class="docutils literal"&gt;object_version.object&lt;/tt&gt; attribute&lt;/li&gt;
+&lt;li&gt;revert to that previous version of that object using the &lt;tt class="docutils literal"&gt;rever()&lt;/tt&gt; method&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="conclusion"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id21"&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;In the above we say that it is really easy to add basic (&lt;em&gt;who&lt;/em&gt; and &lt;em&gt;when&lt;/em&gt;) auditing capabilities to your models: You just need to
+inherit your models from the &lt;tt class="docutils literal"&gt;Auditable&lt;/tt&gt; abstract class and inherit your Create and Update CBVs from &lt;tt class="docutils literal"&gt;AuditableMixin&lt;/tt&gt;.
+If you want to know exactly &lt;em&gt;what&lt;/em&gt; was changed then you have two solutions: django-simple-history to create an extra table for
+each of your models so you&amp;#8217;ll be able to query your historical records (and easily extra aggregates, statistics etc) and
+django-reversion to save each version as a json object, so no extra tables will be&amp;nbsp;created.&lt;/p&gt;
+&lt;p&gt;All three solutions for auditing have been implemented in a sample project at &lt;a class="reference external" href="https://github.com/spapas/auditing-sample"&gt;https://github.com/spapas/auditing-sample&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;You can clone the project and, preferrably in a virtual environment, install requirements (&lt;tt class="docutils literal"&gt;pip install &lt;span class="pre"&gt;-r&lt;/span&gt; requirements.txt&lt;/tt&gt;),
+do a migrate (&lt;tt class="docutils literal"&gt;python manage.py migrate&lt;/tt&gt; &amp;#8212; uses sqlite3 by default) and run the local development
+server (&lt;tt class="docutils literal"&gt;python manage.py ruinserver&lt;/tt&gt;).&lt;/p&gt;
+&lt;/div&gt;
+</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Serafeim Papastefanos</dc:creator><pubDate>Wed, 21 Jan 2015 14:20:00 +0200</pubDate><guid>tag:spapas.github.io,2015-01-21:2015/01/21/django-model-auditing/</guid><category>django</category><category>python</category><category>auditing</category></item><item><title>Django non-HTML responses</title><link>http://spapas.github.io/2014/09/15/django-non-html-responses/</link><description>&lt;div class="contents topic" id="contents"&gt;
 &lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
 &lt;ul class="simple"&gt;
 &lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id1"&gt;Introduction&lt;/a&gt;&lt;/li&gt;

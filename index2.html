@@ -10,17 +10,17 @@
 
 
 
+
   <!-- http://t.co/dKP3o1e -->
   <meta name="HandheldFriendly" content="True">
   <meta name="MobileOptimized" content="320">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <link href="http://spapas.github.io/favicon.png" rel="icon">
+
+    <link href="http://spapas.github.io/favicon.png" rel="icon">
+
   <link href="http://spapas.github.io/theme/css/main.css" media="screen, projection"
         rel="stylesheet" type="text/css">
-  <script src="http://spapas.github.io/theme/js/modernizr-2.0.js"></script>
-  <script src="http://spapas.github.io/theme/js/ender.js"></script>
-  <script src="http://spapas.github.io/theme/js/octopress.js" type="text/javascript"></script>
 
   <link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic"
         rel="stylesheet" type="text/css">
@@ -37,29 +37,34 @@
 </ul>
 
 
-
 <ul class="main-navigation">
-    <li >
-    <a href="http://spapas.github.io/category/django.html">Django</a>
-    </li>
-    <li >
-    <a href="http://spapas.github.io/category/flask.html">Flask</a>
-    </li>
-    <li >
-    <a href="http://spapas.github.io/category/git.html">Git</a>
-    </li>
-    <li >
-    <a href="http://spapas.github.io/category/pelican.html">Pelican</a>
-    </li>
-    <li >
-    <a href="http://spapas.github.io/category/python.html">Python</a>
-    </li>
-    <li >
-    <a href="http://spapas.github.io/category/spring.html">Spring</a>
-    </li>
-    <li >
-    <a href="http://spapas.github.io/category/wagtail.html">Wagtail</a>
-    </li>
+      <li >
+        <a href="http://spapas.github.io/category/css.html">Css</a>
+      </li>
+      <li >
+        <a href="http://spapas.github.io/category/django.html">Django</a>
+      </li>
+      <li >
+        <a href="http://spapas.github.io/category/flask.html">Flask</a>
+      </li>
+      <li >
+        <a href="http://spapas.github.io/category/git.html">Git</a>
+      </li>
+      <li >
+        <a href="http://spapas.github.io/category/javascript.html">Javascript</a>
+      </li>
+      <li >
+        <a href="http://spapas.github.io/category/pelican.html">Pelican</a>
+      </li>
+      <li >
+        <a href="http://spapas.github.io/category/python.html">Python</a>
+      </li>
+      <li >
+        <a href="http://spapas.github.io/category/spring.html">Spring</a>
+      </li>
+      <li >
+        <a href="http://spapas.github.io/category/wagtail.html">Wagtail</a>
+      </li>
 </ul></nav>
   <div id="main">
     <div id="content">
@@ -67,1136 +72,1115 @@
   		<article>
 <header>
       <h1 class="entry-title">
-        <a href="http://spapas.github.io/2013/12/24/django-dynamic-forms/">Django dynamic forms</a>
+        <a href="http://spapas.github.io/2015/04/29/django-show-404-page/">Show 404 page on django when DEBUG=True</a>
       </h1>
-      <p class="meta"><time datetime="2013-12-24T14:20:00" pubdate>Τρι 24 Δεκέμβριος 2013</time></p>
+    <p class="meta">
+<time datetime="2015-04-29T10:20:00+03:00" pubdate>Τετ 29 Απρίλιος 2015</time>    </p>
 </header>
 
-  <div class="entry-content"><div class="contents topic" id="contents">
-<p class="topic-title first">Contents</p>
-<ul class="simple">
-<li><a class="reference internal" href="#introduction" id="id1">Introduction</a></li>
-<li><a class="reference internal" href="#describing-a-django-form-in-json" id="id2">Describing a django form in <span class="caps">JSON</span></a></li>
-<li><a class="reference internal" href="#creating-the-form-fields" id="id3">Creating the form&nbsp;fields</a></li>
-<li><a class="reference internal" href="#creating-the-actual-form" id="id4">Creating the actual&nbsp;form</a></li>
-<li><a class="reference internal" href="#using-the-dynamic-form" id="id5">Using the dynamic&nbsp;form</a></li>
-</ul>
-</div>
-<div class="section" id="introduction">
-<h2><a class="toc-backref" href="#id1">Introduction</a></h2>
-<p>To define a form in django, a developer has to create a class which extends
-<tt class="docutils literal">django.forms.Form</tt>
-and has  a number of attributes extending from <tt class="docutils literal">django.forms.Field</tt>. This makes
-it very easy for the developer to create static forms, but creating
-dynamic forms whose fields can be changed depending on the data contributed by the
-users of the application is not so&nbsp;obvious.</p>
-<p>Of course, some people may argue that they can do whatever
-they want just by spitting html input tags to their templates, however this totally violates
-<span class="caps">DRY</span> and any serious django developer would prefer to write <a class="reference external" href="http://thedailywtf.com/Articles/A_Case_of_the_MUMPS.aspx"><span class="caps">MUMPS</span></a> than creating
-html&nbsp;dynamically.</p>
-<p>The implementation I will present here had been developed for an old project: In that
-project there was a number of services which could be edited dynamically by the
-moderators. For each service, the moderators would generate a questionnaire to
-get input from the users which would be defined  using <span class="caps">JSON</span>. When the users needed
-to submit information for each service, a dynamic django form would be generated
-from this <span class="caps">JSON</span> and the answers would be saved to no-<span class="caps">SQL</span> database like&nbsp;MongoDB.</p>
-</div>
-<div class="section" id="describing-a-django-form-in-json">
-<h2><a class="toc-backref" href="#id2">Describing a django form in <span class="caps">JSON</span></a></h2>
-<p>A <span class="caps">JSON</span> described django form is just an array of field <span class="caps">JSON</span> objects. Each field
-object  has three required attributes: name which is the keyword of the field, label which is
-how the label of the field and type which is the type of the input of that field. The
-supported types are text, textarea, integer, radio, select, checkbox. Now, depending
-on the type of the field, there could be also some more required attributes, for instace
-text has a max_length attribute and select has a choices attribute (which is an array
-of name/value objects). Also there are two optional attributes,
-required with a default value of False and help_text with a default value of&nbsp;&#8221;.</p>
-<p>As you can understand these map one by one to the corresponding attributes of the
-actual django form fields. An example containing a complete <span class="caps">JSON</span> described form
-is the&nbsp;following:</p>
-<pre class="code literal-block">
-[
-    {
-        &quot;name&quot;: &quot;firstname&quot;,
-        &quot;label&quot;: &quot;First Name&quot;,
-        &quot;type&quot;: &quot;text&quot;,
-        &quot;max_length&quot;: 25,
-        &quot;required&quot;: 1
-    },
-    {
-        &quot;name&quot;: &quot;lastname&quot;,
-        &quot;label&quot;: &quot;Last Name&quot;,
-        &quot;type&quot;: &quot;text&quot;,
-        &quot;max_length&quot;: 25,
-        &quot;required&quot;: 1
-    },
-    {
-        &quot;name&quot;: &quot;smallcv&quot;,
-        &quot;label&quot;: &quot;Small CV&quot;,
-        &quot;type&quot;: &quot;textarea&quot;,
-        &quot;help_text&quot;: &quot;Please insert a small CV&quot;
-    },
-    {
-        &quot;name&quot;: &quot;age&quot;,
-        &quot;label&quot;: &quot;Age&quot;,
-        &quot;type&quot;: &quot;integer&quot;,
-        &quot;max_value&quot;: 200,
-        &quot;min_value&quot;: 0
-    },
-    {
-        &quot;name&quot;: &quot;marital_status&quot;,
-        &quot;label&quot;: &quot;Marital Status&quot;,
-        &quot;type&quot;: &quot;radio&quot;,
-        &quot;choices&quot;: [
-            {&quot;name&quot;: &quot;Single&quot;, &quot;value&quot;:&quot;single&quot;},
-            {&quot;name&quot;: &quot;Married&quot;, &quot;value&quot;:&quot;married&quot;},
-            {&quot;name&quot;: &quot;Divorced&quot;, &quot;value&quot;:&quot;divorced&quot;},
-            {&quot;name&quot;: &quot;Widower&quot;, &quot;value&quot;:&quot;widower&quot;}
-        ]
-    },
-    {
-        &quot;name&quot;: &quot;occupation&quot;,
-        &quot;label&quot;: &quot;Occupation&quot;,
-        &quot;type&quot;: &quot;select&quot;,
-        &quot;choices&quot;: [
-            {&quot;name&quot;: &quot;Farmer&quot;, &quot;value&quot;:&quot;farmer&quot;},
-            {&quot;name&quot;: &quot;Engineer&quot;, &quot;value&quot;:&quot;engineer&quot;},
-            {&quot;name&quot;: &quot;Teacher&quot;, &quot;value&quot;:&quot;teacher&quot;},
-            {&quot;name&quot;: &quot;Office Clerk&quot;, &quot;value&quot;:&quot;office_clerk&quot;},
-            {&quot;name&quot;: &quot;Merchant&quot;, &quot;value&quot;:&quot;merchant&quot;},
-            {&quot;name&quot;: &quot;Unemployed&quot;, &quot;value&quot;:&quot;unemployed&quot;},
-            {&quot;name&quot;: &quot;Retired&quot;, &quot;value&quot;:&quot;retired&quot;},
-            {&quot;name&quot;: &quot;Other&quot;, &quot;value&quot;:&quot;other&quot;}
-        ]
-    },
-    {
-        &quot;name&quot;: &quot;internet&quot;,
-        &quot;label&quot;: &quot;Internet Access&quot;,
-        &quot;type&quot;: &quot;checkbox&quot;
-    }
-]
-</pre>
-<p>The above <span class="caps">JSON</span> string can be easily converted to an array of dictionaries with the following&nbsp;code:</p>
-<pre class="code literal-block">
-import json
-fields=json.loads(json_fields)
-</pre>
-</div>
-<div class="section" id="creating-the-form-fields">
-<h2><a class="toc-backref" href="#id3">Creating the form&nbsp;fields</a></h2>
-<p>The most import part in the django dynamic form creation is to convert the above array
-of field-describing dictionaries to actual objects of type <tt class="docutils literal">django.forms.Field</tt>.</p>
-<p>To help with that I implemented a class named <tt class="docutils literal">FieldHandler</tt> which gets an
-array of field dictionaries and after initialization will have an attribute named <tt class="docutils literal">formfields</tt> which
-will be a dictionary with keys the names of each field an values the corresponding <tt class="docutils literal">django.forms.Field</tt> objects. The implementation is as&nbsp;follows:</p>
-<pre class="code literal-block">
-import django.forms
+  <div class="entry-content"><p>The default 404 error page on django can be <a class="reference external" href="https://docs.djangoproject.com/en/1.8/topics/http/views/#the-http404-exception">easily overriden</a> by adding
+a template named <tt class="docutils literal">404.html</tt> to the top level directory of your templates.
+However, on your development environment you&#8217;ll never be able to see this
+template because when <tt class="docutils literal"><span class="caps">DEBUG</span>=True</tt> django will render the debug not found
+page to help you debug your url&nbsp;configuration.</p>
+<p>If you want to display that page in your development environment you can always
+change the <span class="caps">DEBUG</span> setting to False, however there&#8217;s a better way: Add a url
+pattern for django&#8217;s default 404 view - just  add the following to your <tt class="docutils literal">urls.py</tt>:</p>
+<div class="highlight"><pre><span class="kn">import</span> <span class="nn">django.views.defaults</span>
 
-class FieldHandler():
-    formfields = {}
-    def __init__(self, fields):
-        for field in fields:
-            options = self.get_options(field)
-            f = getattr(self, &quot;create_field_for_&quot;+field['type'] )(field, options)
-            self.formfields[field['name']] = f
-
-    def get_options(self, field):
-        options = {}
-        options['label'] = field['label']
-        options['help_text'] = field.get(&quot;help_text&quot;, None)
-        options['required'] = bool(field.get(&quot;required&quot;, 0) )
-        return options
-
-    def create_field_for_text(self, field, options):
-        options['max_length'] = int(field.get(&quot;max_length&quot;, &quot;20&quot;) )
-        return django.forms.CharField(**options)
-
-    def create_field_for_textarea(self, field, options):
-        options['max_length'] = int(field.get(&quot;max_value&quot;, &quot;9999&quot;) )
-        return django.forms.CharField(widget=django.forms.Textarea, **options)
-
-    def create_field_for_integer(self, field, options):
-        options['max_value'] = int(field.get(&quot;max_value&quot;, &quot;999999999&quot;) )
-        options['min_value'] = int(field.get(&quot;min_value&quot;, &quot;-999999999&quot;) )
-        return django.forms.IntegerField(**options)
-
-    def create_field_for_radio(self, field, options):
-        options['choices'] = [ (c['value'], c['name'] ) for c in field['choices'] ]
-        return django.forms.ChoiceField(widget=django.forms.RadioSelect,   **options)
-
-    def create_field_for_select(self, field, options):
-        options['choices']  = [ (c['value'], c['name'] ) for c in field['choices'] ]
-        return django.forms.ChoiceField(  **options)
-
-    def create_field_for_checkbox(self, field, options):
-        return django.forms.BooleanField(widget=django.forms.CheckboxInput, **options)
-</pre>
-<p>As can be seen, in the <tt class="docutils literal">__init__</tt> method, the <tt class="docutils literal">get_options</tt> method is called first which
-returns a dictionary with the common options (label, help_text, required). After that,
-depending on the type of each field the correct method will be generated with
-<tt class="docutils literal">getattr(self, <span class="pre">&quot;create_field_for_&quot;+field['type']</span> )</tt> (so if type is text this
-will return a reference to the create_field_for_text method) and then called passing
-the field dictinary and the options returned from <tt class="docutils literal">get_options</tt>. Each one of
-the <tt class="docutils literal">create_field_for_xxx</tt> methods will extract the required (or optional)
-attributes for the specific field type, update options and initialize the correct Field passing
-the options as kwargs. Finally the formfields attribute will be updated with the name
-and Field&nbsp;object.</p>
-</div>
-<div class="section" id="creating-the-actual-form">
-<h2><a class="toc-backref" href="#id4">Creating the actual&nbsp;form</a></h2>
-<p>To create the actual dynamic <tt class="docutils literal">django.forms.Form</tt> I used the function <tt class="docutils literal">get_form</tt>
-which receives a string with the json description, parses it to a python array,
-creates the array of fields with the help of <tt class="docutils literal">FieldHandler</tt> and then generates
-the <tt class="docutils literal">Form</tt> class with <tt class="docutils literal">type</tt> passing it <tt class="docutils literal">django.forms.Form</tt> as a parent
-and the array of <tt class="docutils literal">django.forms.Field</tt> from <tt class="docutils literal">FieldHandler</tt> as&nbsp;attributes:</p>
-<pre class="code literal-block">
-def get_form(jstr):
-    fields=json.loads(jstr)
-    fh = FieldHandler(fields)
-    return type('DynaForm', (django.forms.Form,), fh.formfields )
-</pre>
-</div>
-<div class="section" id="using-the-dynamic-form">
-<h2><a class="toc-backref" href="#id5">Using the dynamic&nbsp;form</a></h2>
-<p>The result of <tt class="docutils literal">get_form</tt> can be used as a normal form class. As an&nbsp;example:</p>
-<pre class="code literal-block">
-import dynaform
-
-def dform(request):
-    json_form = get_json_form_from_somewhere()
-    form_class = dynaform.get_form(json_form)
-    data = {}
-    if request.method == 'POST':
-        form = form_class(request.POST)
-        if form.is_valid():
-            data = form.cleaned_data
-    else:
-        form = form_class()
-
-    return render_to_response( &quot;dform.html&quot;, {
-        'form': form,  'data': data,
-    }, RequestContext(request) )
-</pre>
-<p>So, we have to get our <span class="caps">JSON</span> form description from somewhere (for instance
-a field in a model) and then generate the form class with <tt class="docutils literal">get_form</tt>.
-After that we follow the normal procedure of checking if the <tt class="docutils literal">request.method</tt>
-is <span class="caps">POST</span> so we pass the <span class="caps">POST</span> data to the form and check if it is value or
-we just create an empty form. As a result we just pass the data that was
-read from the form to the view for&nbsp;presentation.</p>
-</div>
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+    <span class="c"># Other url patterns ...</span>
+    <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^404/$&#39;</span><span class="p">,</span> <span class="n">django</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">defaults</span><span class="o">.</span><span class="n">page_not_found</span><span class="p">,</span> <span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+<p>You&#8217;ll then be able to see your 404 page by visiting the defined <span class="caps">URL</span>!</p>
 </div>
   		</article>
   		<article>
 <header>
       <h1 class="entry-title">
-        <a href="http://spapas.github.io/2013/11/05/django-authoritiy-data/">Django authority data</a>
+        <a href="http://spapas.github.io/2015/02/06/python-pusher-rest/">Calling the REST API of Pusher from python</a>
       </h1>
-      <p class="meta"><time datetime="2013-11-05T14:20:00" pubdate>Τρι 05 Νοέμβριος 2013</time></p>
+    <p class="meta">
+<time datetime="2015-02-06T12:20:00+02:00" pubdate>Παρ 06 Φεβρουάριος 2015</time>    </p>
 </header>
 
-  <div class="entry-content"><div class="contents topic" id="contents">
-<p class="topic-title first">Contents</p>
+  <div class="entry-content"><div class="section" id="introduction">
+<h2>Introduction</h2>
+<p><a class="reference external" href="https://pusher.com/">Pusher</a> is one of the best real time frameworks right now. Using it you can add real time
+events in your projects without the need to configure and use <span class="caps">HTTP</span> servers that support
+real-time events in your environment. I used it recently in a project and it worked really
+good, having a very simple <span class="caps">API</span> and a nice interface for debugging your&nbsp;requests.</p>
+<p>The only problem I&#8217;ve found was that the <a class="reference external" href="https://github.com/pusher/pusher_client_python">Pusher python <span class="caps">API</span></a> misses some features that
+the APIs for other languages have, specifically finding out the users on a presence&nbsp;channel.</p>
+<p>Pusher supports real-time events through the use of &quot;channels&quot;. Each pusher client will
+subscribe to a channel and receive messages that are sent to that channel. A special kind
+of channel are presence channels which keep a list of their subscribers. You can query the
+<a class="reference external" href="https://pusher.com/docs/rest_api">Pusher <span class="caps">REST</span> <span class="caps">API</span></a> (or f.e the Pusher Javascript <span class="caps">API</span>) to find out the names of the users
+in a presence channel - however this is <em>not</em> currently possible with the python <span class="caps">API</span>.</p>
+<p>Unfortuanately, calling the Pusher <span class="caps">REST</span> <span class="caps">API</span> is <em>not</em> so easy, since it needs a complicated
+singining of each request, so I&#8217;ve written this post to help developers that need to call
+this <span class="caps">API</span> from python (to get the users of a presence channel or for any other method the
+<span class="caps">REST</span> <span class="caps">API</span>&nbsp;supports).</p>
+</div>
+<div class="section" id="signing-the-request">
+<h2>Signing the&nbsp;request</h2>
+<p>Quoting from the <a class="reference external" href="https://pusher.com/docs/rest_api">Pusher <span class="caps">REST</span> <span class="caps">API</span></a>, to sign a request we need a signature,&nbsp;which:</p>
+<blockquote>
+<p>The signature is a <span class="caps">HMAC</span> <span class="caps">SHA256</span> hex digest. This is generated by signing a string made up of the following components concatenated with newline characters&nbsp;\n:</p>
 <ul class="simple">
-<li><a class="reference internal" href="#introduction" id="id1">Introduction</a></li>
-<li><a class="reference internal" href="#defining-authorities" id="id2">Defining authorities</a><ul>
-<li><a class="reference internal" href="#using-groups" id="id3">Using&nbsp;groups</a></li>
-<li><a class="reference internal" href="#by-storing-the-authority-to-the-session" id="id4">By storing the authority to the&nbsp;session</a></li>
-<li><a class="reference internal" href="#by-using-a-custom-user-profile" id="id5">By using a Custom User&nbsp;Profile</a></li>
-<li><a class="reference internal" href="#getting-the-authority-of-the-user-has-to-be-dry" id="id6">Getting the authority of the user has to be <span class="caps">DRY</span></a></li>
+<li>The uppercase request method (e.g. <span class="caps">POST</span>)</li>
+<li>The request path (e.g.&nbsp;/some/resource)</li>
+<li>The query parameters sorted by key, with keys converted to lowercase, then joined as in the query string. Note that the string must not be url escaped (e.g. given the keys auth_key: foo, Name: Something else, you get auth_key=foo&amp;name=Something&nbsp;else)</li>
 </ul>
-</li>
-<li><a class="reference internal" href="#adding-authority-data" id="id7">Adding authority&nbsp;data</a></li>
-<li><a class="reference internal" href="#conclusion" id="id8">Conclusion</a></li>
-</ul>
+</blockquote>
+<p>So, we need to create a string and then sign it using our Pusher api_key and secret. To help with this, we create a <tt class="docutils literal">Token</tt>
+class which will be initialzed with out pusher key/secret and correctly sign a&nbsp;string:</p>
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">Token</span><span class="p">(</span><span class="nb">object</span><span class="p">,):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">secret</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">secret</span> <span class="o">=</span> <span class="n">secret</span>
+
+    <span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">string</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">hmac</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">secret</span><span class="p">,</span> <span class="n">string</span><span class="p">,</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+</pre></div>
+<p>It uses the <tt class="docutils literal">hmac</tt> and <tt class="docutils literal">hashlib</tt> python&nbsp;modules.</p>
 </div>
-<div class="section" id="introduction">
-<h2><a class="toc-backref" href="#id1">Introduction</a></h2>
-<p>One common requirement in an organization is to separate users in authorities (meaning departments / units / branches etc)
-and each authority have its own data. So users belonging to the &quot;Athens Branch&quot; won&#8217;t be able to
-edit data submitted from users of the &quot;Thessaloniki&nbsp;Branch&quot;.</p>
-<p>This is a special case of the more general row-level-security in which each instance of a domain object will
-have an <span class="caps">ACL</span>. Row-level-security would need a many-to-many relation between object instances and authorities, something
-that would be overkill in our&nbsp;case.</p>
-<p>Authority data is also a more general case of the user-data meaning that each user can have access
-to data that he inserts in the system. Implementing user-data is easy using the techniques we will present&nbsp;below.</p>
-<p>We have to notice that the django permissions do not support our requirements since they define security for all instances of a&nbsp;model.</p>
+<div class="section" id="generating-the-complete-query-string">
+<h2>Generating the complete query&nbsp;string</h2>
+<p>We can now create a function that will sign a request using an instance of the above&nbsp;token:</p>
+<div class="highlight"><pre><span class="k">def</span> <span class="nf">create_signed_query_string</span><span class="p">(</span><span class="n">token</span><span class="p">,</span> <span class="n">partial_path</span><span class="p">,</span> <span class="n">request_params</span><span class="p">):</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">&#39;auth_key&#39;</span><span class="p">:</span> <span class="n">token</span><span class="o">.</span><span class="n">key</span><span class="p">,</span>
+        <span class="s">&#39;auth_timestamp&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()),</span>
+        <span class="s">&#39;auth_version&#39;</span><span class="p">:</span> <span class="s">&#39;1.0&#39;</span>
+    <span class="p">}</span>
+    <span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">request_params</span><span class="p">)</span>
+    <span class="n">keys</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="p">)</span>
+    <span class="n">params_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+        <span class="n">params_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s">&#39;{0}={1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">params</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="p">)</span>
+
+    <span class="n">query_string</span> <span class="o">=</span> <span class="s">&#39;&amp;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">params_list</span><span class="p">)</span>
+
+    <span class="n">sign_data</span> <span class="o">=</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;GET&#39;</span><span class="p">,</span> <span class="n">partial_path</span><span class="p">,</span> <span class="n">query_string</span><span class="p">])</span>
+    <span class="n">query_string</span> <span class="o">+=</span> <span class="s">&#39;&amp;auth_signature=&#39;</span> <span class="o">+</span> <span class="n">token</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">sign_data</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">query_string</span>
+</pre></div>
+<p><tt class="docutils literal">create_signed_query_string</tt> receives an instance of a <tt class="docutils literal">Token</tt>, the path that we want to request
+without the server part (for example <tt class="docutils literal"><span class="pre">/apps/33/users/my-channel</span></tt>)  and a dictionary of
+request parameters. It then adds three extra fields to the request parameters (<tt class="docutils literal">auth_key, auth_timestamp, auth_version</tt>)
+and creates a list of these parameters in the <tt class="docutils literal">key=value</tt> form, where the keys are alphabetically sorted.
+After that it joins the above <tt class="docutils literal">key=value</tt> parameters using <tt class="docutils literal">&amp;</tt> to create the <tt class="docutils literal">query_string</tt> and then it creates the string to be signed (<tt class="docutils literal">sign_data</tt>)
+by concatenating the <span class="caps">HTTP</span> methdo (<span class="caps">GET</span>) with the path and the <tt class="docutils literal">query_string</tt>. Finally, it appends the signing result as an extra
+query parameter named (<tt class="docutils literal">auth_signature</tt>).</p>
 </div>
-<div class="section" id="defining-authorities">
-<h2><a class="toc-backref" href="#id2">Defining&nbsp;authorities</a></h2>
-<p>In order to have custom authorities I propose first of all to add an Authority model that would define the authority. Even if
-your authorities only have a name I believe that adding the Authority model would be beneficial.
-Now, there are many ways to separate normal django users (<tt class="docutils literal">django.contrib.auth.models.User</tt>) to&nbsp;authorities:</p>
-<div class="section" id="using-groups">
-<h3><a class="toc-backref" href="#id3">Using&nbsp;groups</a></h3>
-<p>Just define a <tt class="docutils literal">django.contrib.auth.models.Group</tt> for each authority and add the users to the groups you want using the django-admin.
-Your Authority model would have an one-to-one relation with the <tt class="docutils literal">django.contrib.auth.models.Group</tt> so you will be able to find out the other
-information of the authority (since django groups only have&nbsp;names).</p>
-<p>Now you can just get the groups for the user and find out his authorities. This could lead to problems when users belong to django groups
-that are not related to authorities so you must filter these out (for instance by checking which groups actually have a corresponding&nbsp;Authority).</p>
+<div class="section" id="requesting-the-users-of-the-presence-channel">
+<h2>Requesting the users of the presence&nbsp;channel</h2>
+<p>The <tt class="docutils literal">create_signed_query_string</tt> can now be used to get the users of a presence channel like&nbsp;this:</p>
+<div class="highlight"><pre><span class="k">def</span> <span class="nf">get_users</span><span class="p">(</span><span class="n">app_id</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">secret</span><span class="p">,</span> <span class="n">channel</span><span class="p">):</span>
+    <span class="n">partial_path</span> <span class="o">=</span>  <span class="s">&#39;/apps/{0}/channels/{1}/users&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">app_id</span><span class="p">,</span> <span class="n">channel</span><span class="p">)</span>
+    <span class="n">token</span> <span class="o">=</span> <span class="n">Token</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">secret</span><span class="p">)</span>
+    <span class="n">qs</span> <span class="o">=</span> <span class="n">create_signed_query_string</span><span class="p">(</span><span class="n">token</span><span class="p">,</span> <span class="n">partial_path</span><span class="p">,</span> <span class="p">{})</span>
+    <span class="n">full_path</span> <span class="o">=</span> <span class="s">&#39;http://api.pusherapp.com/{0}?{1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">partial_path</span><span class="p">,</span> <span class="n">qs</span><span class="p">)</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">full_path</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">text</span>
+</pre></div>
+<p>The <tt class="docutils literal">get_users</tt> function will generate the path of the pusher <span class="caps">REST</span> <span class="caps">API</span> (using
+our pusher app_id and channel name) and initialize a signing <tt class="docutils literal">Token</tt> using
+the pusher key and secret. It will then pass the previous to <tt class="docutils literal">create_signed_query_string</tt>
+to generate the complete <tt class="docutils literal">query_string</tt> and generate the <tt class="docutils literal">full_path</tt> to which
+a simple <span class="caps">HTTP</span> <span class="caps">GET</span> request is issued. The result will be a <span class="caps">JSON</span> list of the users in the
+presence&nbsp;channel.</p>
 </div>
-<div class="section" id="by-storing-the-authority-to-the-session">
-<h3><a class="toc-backref" href="#id4">By storing the authority to the&nbsp;session</a></h3>
-<p>When the user logs in you can add an attribute to the session that would save the authority of the user. To do that, you should define
-a custom middleware that checks to see if there is an authority attribute to the session and if not it will do whatever it needs to find it and set it.
-An example is&nbsp;this:</p>
-<pre class="code literal-block">
-class CustomAuthorityMiddleware:
-  def process_request(self, request):
-    if not request.session.get('authority'):
-      authority = get_the_authority(request.user)
-      request.session['authority']=authority
-</pre>
-<p>This way, whenever you want to find out the authority of the user you just check the&nbsp;session.</p>
-</div>
-<div class="section" id="by-using-a-custom-user-profile">
-<h3><a class="toc-backref" href="#id5">By using a Custom User&nbsp;Profile</a></h3>
-<p>Just create a <a class="reference external" href="https://docs.djangoproject.com/en/dev/topics/auth/customizing/#extending-the-existing-user-model">django user profile</a> and add to it a <tt class="docutils literal">ForeignKey</tt> to your Authority&nbsp;model:</p>
-<pre class="code literal-block">
-class Profile(models.Model):
-  user = models.OneToOneField('django.auth.User')
-  authority = models.ForeignKey('authorities.Authority', blank=True, null=True )
+<div class="section" id="complete-example">
+<h2>Complete&nbsp;example</h2>
+<p>A complete example of getting the presence users of a channel is the&nbsp;following:</p>
+<div class="highlight"><pre><span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">hashlib</span>
+<span class="kn">import</span> <span class="nn">hmac</span>
+<span class="kn">import</span> <span class="nn">requests</span>
 
-class Authority(models.Model):
-  id = models.IntegerField(primary_key = True)
-  name = models.CharField(max_length=64, )
-  auth_type = models.CharField(max_length=16, )
-</pre>
-<p>You can get the authority of the user through <tt class="docutils literal">request.user.profile.authority</tt>.</p>
-</div>
-<div class="section" id="getting-the-authority-of-the-user-has-to-be-dry">
-<h3><a class="toc-backref" href="#id6">Getting the authority of the user has to be <span class="caps">DRY</span></a></h3>
-<p>Whatever method you use to define the authorities of your users you have to remember that it is very
-important to define somewhere a function that will return the authority (or authorities) of a
-user. You need to define a function even in the simple case in which your function would just return <tt class="docutils literal">request.user.profile.authority</tt>.
-This will greatly help you when you wish to add some logic to this, for instance &quot;quickly disable users belonging to Authority X
-or temporary move users from Authority Y to authority&nbsp;Z&quot;.</p>
-<p>Let us suppose that you have defined a <tt class="docutils literal">get_user_authority</tt> function. Also, you need to define a <tt class="docutils literal">has_access</tt> function
-that would decide if a users/request has access to a particular object. This also needs to be <span class="caps">DRY</span>.</p>
-</div>
-</div>
-<div class="section" id="adding-authority-data">
-<h2><a class="toc-backref" href="#id7">Adding authority&nbsp;data</a></h2>
-<p>To define authority data you have to add a field to your model that would define its authority, for instance like&nbsp;this:</p>
-<pre class="code literal-block">
-class AuthorityData(models.Model):
-  authority = models.ForeignKey('authorities.Authority', editable=False,)
-</pre>
-<p>This field should not be editable (at least by your end users) because they shouldn&#8217;t be able to change the authority of the data they&nbsp;insert.</p>
-<p>If you want to have user-data then just add a <tt class="docutils literal"><span class="pre">models.ForeignKey('django.auth.User',</span> editable=False)</tt></p>
-<p>Now, your Create and Update Class Based Views have to pass the request to your forms and also your Detail and Update <span class="caps">CBV</span> should allow only getting
-objects that belong to the authority of the&nbsp;user:</p>
-<pre class="code literal-block">
-class AuthorityDataCreateView(CreateView):
-  model=models.AuthorityData
-
-  def get_form_kwargs(self):
-      kwargs = super(AuthorityDataCreateView, self).get_form_kwargs()
-      kwargs.update({'request': self.request})
-      return kwargs
-
-class AuthorityDataDetailView(DetailView):
-  def get_object(self, queryset=None):
-      obj = super(AuthorityDataDetailView, self).get_object(queryset)
-      if if not user_has_access(obj, self.request):
-          raise Http404(u&quot;Access Denied&quot;)
-      return obj
-
-class AuthorityDataUpdateView(UpdateView):
-  model=models.AuthorityData
-
-  def get_form_kwargs(self):
-      kwargs = super(AuthorityDataUpdateView, self).get_form_kwargs()
-      kwargs.update({'request': self.request})
-      return kwargs
-
-  def get_object(self, queryset=None):
-      obj = super(AuthorityDataUpdateView, self).get_object(queryset)
-      if if not user_has_access(obj, self.request):
-          raise Http404(u&quot;Access Denied&quot;)
-      return obj
-</pre>
-<p>Your ModelForm can now use the request to get the Authority and set it (don&#8217;t forget
-that you should not use <tt class="docutils literal">Meta.exclude</tt> but instead use <tt class="docutils literal">Meta.include</tt>!):</p>
-<pre class="code literal-block">
-class AuthorityDataModelForm(forms.ModelForm):
-    class Meta:
-      model = models.AuthorityData
-      exclude = ('authority',)
-
-    def __init__(self, *args, **kwargs):
-      self.request = kwargs.pop('request', None)
-      super(ActionModelForm, self).__init__(*args, **kwargs)
+<span class="n">app_id</span> <span class="o">=</span> <span class="s">&#39;pusher_app_id&#39;</span>
+<span class="n">key</span> <span class="o">=</span> <span class="s">&#39;pusher_key&#39;</span>
+<span class="n">secret</span> <span class="o">=</span> <span class="s">&#39;pusher_secret&#39;</span>
+<span class="n">channel</span> <span class="o">=</span> <span class="s">&#39;pusher_presence_channel&#39;</span>
 
 
-    def save(self, force_insert=False, force_update=False, commit=True):
-      obj = super(AuthorityDataModelForm, self).save(commit=False)
-      if obj:
-          obj.authority = get_user_authority(self.request)
-          obj.save()
-      return obj
-</pre>
-<p>The previous work fine for Create/Detail/Update CBVs but not for ListsViews. List views querysets
-and in general all queries to the object have to be filtered through&nbsp;authority.</p>
-<pre class="code literal-block">
-class AuthorityDataListView(ListView):
-  def get_queryset(self):
-    queryset = super(AuthorityDataModelForm, self).get_queryset()
-    return queryset.filter(authority = get_user_authority(request))
-</pre>
+<span class="k">class</span> <span class="nc">Token</span><span class="p">(</span><span class="nb">object</span><span class="p">,):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">secret</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">secret</span> <span class="o">=</span> <span class="n">secret</span>
+
+    <span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">string</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">hmac</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">secret</span><span class="p">,</span> <span class="n">string</span><span class="p">,</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">create_signed_query_string</span><span class="p">(</span><span class="n">token</span><span class="p">,</span> <span class="n">partial_path</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">request_params</span><span class="p">):</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">&#39;auth_key&#39;</span><span class="p">:</span> <span class="n">token</span><span class="o">.</span><span class="n">key</span><span class="p">,</span>
+        <span class="s">&#39;auth_timestamp&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()),</span>
+        <span class="s">&#39;auth_version&#39;</span><span class="p">:</span> <span class="s">&#39;1.0&#39;</span>
+    <span class="p">}</span>
+    <span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">request_params</span><span class="p">)</span>
+    <span class="n">keys</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="p">)</span>
+    <span class="n">params_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+        <span class="n">params_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s">&#39;{0}={1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">params</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="p">)</span>
+
+    <span class="n">query_string</span> <span class="o">=</span> <span class="s">&#39;&amp;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">params_list</span><span class="p">)</span>
+
+    <span class="n">sign_data</span> <span class="o">=</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">method</span><span class="p">,</span> <span class="n">partial_path</span><span class="p">,</span> <span class="n">query_string</span><span class="p">])</span>
+    <span class="n">query_string</span> <span class="o">+=</span> <span class="s">&#39;&amp;auth_signature=&#39;</span> <span class="o">+</span> <span class="n">token</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">sign_data</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">query_string</span>
+
+
+<span class="k">def</span> <span class="nf">get_users</span><span class="p">(</span><span class="n">channel</span><span class="p">):</span>
+    <span class="n">partial_path</span> <span class="o">=</span>  <span class="s">&#39;/apps/{0}/channels/{1}/users&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">app_id</span><span class="p">,</span> <span class="n">channel</span><span class="p">)</span>
+    <span class="n">token</span> <span class="o">=</span> <span class="n">Token</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">secret</span><span class="p">)</span>
+    <span class="n">qs</span> <span class="o">=</span>  <span class="n">create_signed_query_string</span><span class="p">(</span><span class="n">token</span><span class="p">,</span> <span class="n">partial_path</span><span class="p">,</span> <span class="s">&#39;GET&#39;</span> <span class="p">{})</span>
+    <span class="n">full_path</span> <span class="o">=</span> <span class="s">&#39;http://api.pusherapp.com/{0}?{1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">partial_path</span><span class="p">,</span> <span class="n">qs</span><span class="p">)</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">full_path</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">text</span>
+
+<span class="k">print</span> <span class="n">get_users</span><span class="p">(</span><span class="n">channel</span><span class="p">)</span>
+</pre></div>
 </div>
 <div class="section" id="conclusion">
-<h2><a class="toc-backref" href="#id8">Conclusion</a></h2>
-<p>Using the above techniques we can define authority (or just user) data. Your AuthorityData should
-have a <tt class="docutils literal">ForeignKey</tt> to your Authority  and you have configure your queries, ModelForms and CBVs
-to use that. If you have more than one models that belong to an authority and want to stay <span class="caps">DRY</span> then you&#8217;d need
-to define all the above as <a class="reference external" href="https://docs.djangoproject.com/en/dev/topics/class-based-views/mixins/">mixins</a>.</p>
+<h2>Conclusion</h2>
+<p>With the above we are able to not only easily get the users of a Pusher presence
+channel in python but to also call any method we want from the Pusher <span class="caps">REST</span> <span class="caps">API</span> by implementing a function
+similar to  <tt class="docutils literal">get_users</tt>.</p>
 </div>
 </div>
   		</article>
   		<article>
 <header>
       <h1 class="entry-title">
-        <a href="http://spapas.github.io/2013/10/14/spring-ldap-custom-authorities/">Using custom authorities with spring-security LDAP authentication</a>
+        <a href="http://spapas.github.io/2015/01/27/async-tasks-with-django-rq/">Asynchronous tasks in django with django-rq</a>
       </h1>
-      <p class="meta"><time datetime="2013-10-14T08:55:00" pubdate>Δευ 14 Οκτώβριος 2013</time></p>
+    <p class="meta">
+<time datetime="2015-01-27T14:20:00+02:00" pubdate>Τρι 27 Ιανουάριος 2015</time>    </p>
 </header>
 
   <div class="entry-content"><div class="contents topic" id="contents">
 <p class="topic-title first">Contents</p>
 <ul class="simple">
-<li><a class="reference internal" href="#introduction" id="id3">Introduction</a></li>
-<li><a class="reference internal" href="#a-basic-spring-security-setup" id="id4">A basic spring security&nbsp;setup</a></li>
-<li><a class="reference internal" href="#spring-security-ldap-with-custom-authorities" id="id5">Spring security <span class="caps">LDAP</span> with custom authorities</a><ul>
-<li><a class="reference internal" href="#contextsource" id="id6">contextSource</a></li>
-<li><a class="reference internal" href="#usersearch" id="id7">userSearch</a></li>
-<li><a class="reference internal" href="#ldapauthprovider" id="id8">ldapAuthProvider</a></li>
-<li><a class="reference internal" href="#customldapauthoritiespopulator" id="id9">CustomLdapAuthoritiesPopulator</a></li>
-<li><a class="reference internal" href="#example" id="id10">Example</a></li>
+<li><a class="reference internal" href="#introduction" id="id1">Introduction</a></li>
+<li><a class="reference internal" href="#job-queues-in-python" id="id2">Job queues in&nbsp;python</a></li>
+<li><a class="reference internal" href="#django-test-rq" id="id3">django-test-rq</a><ul>
+<li><a class="reference internal" href="#models-py" id="id4">models.py</a></li>
+<li><a class="reference internal" href="#forms-py" id="id5">forms.py</a></li>
+<li><a class="reference internal" href="#views-py" id="id6">views.py</a></li>
+<li><a class="reference internal" href="#tasks-py" id="id7">tasks.py</a></li>
+<li><a class="reference internal" href="#settings-py" id="id8">settings.py</a></li>
+<li><a class="reference internal" href="#running-the-project" id="id9">Running the&nbsp;project</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#conclusion" id="id11">Conclusion</a></li>
+<li><a class="reference internal" href="#rqworker-and-rqscheduler" id="id10">rqworker and rqscheduler</a><ul>
+<li><a class="reference internal" href="#for-development" id="id11">For&nbsp;development</a></li>
+<li><a class="reference internal" href="#for-production" id="id12">For&nbsp;production</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#conclusion" id="id13">Conclusion</a></li>
+</ul>
+</div>
+<p><strong>Update 01/09/15</strong>: I&#8217;ve written a new post about rq and django with some
+<a class="reference external" href="http://spapas.github.io/2015/09/01/django-rq-redux/">more advanced techniques</a>&nbsp;!</p>
+<div class="section" id="introduction">
+<h2><a class="toc-backref" href="#id1">Introduction</a></h2>
+<p>Job queuing (asynchronous tasks) is a common requirement for non-trivial django projects. Whenever an operation
+can take more than half a second it should be put to a job queue in order to be run asynchronously by a
+seperate worker. This is really important since the response to a user request needs to be immediate
+or else the users will experience laggy behavior and start complaining!
+Even for fairly quick tasks (like sending email through an <span class="caps">SMTP</span> server) you need to use an asynchronous task
+if you care about your users since
+the time required for such a task is not really&nbsp;limited.</p>
+<p>Using job queues is involved not only for the developers of the application (who need to create the
+asynchronous tasks and give feedback to the users when the&#8217;ve finished since they can&#8217;t use the normal
+<span class="caps">HTTP</span> response) and but also for the administrators, since, in order to support job queues at least two
+more componets will be&nbsp;needed:</p>
+<ul class="simple">
+<li>One job queue that will store the jobs to be executed next in a first in first queue. This could be the normal database of the project however it&#8217;s not recommended for performance reasons and most of thetimes it is a specific component called &quot;Message&nbsp;Broker&quot;</li>
+<li>One (or more) workers that will monitor the job queue and when there is work to do they will dequeue and execute&nbsp;it</li>
+</ul>
+<p>These can all run in the same server but if it gets saturated they can easily be seperated (even more work for&nbsp;administrators).</p>
+<p>Beyond job queuing, another relative requirement for many projects is to schedule a task to be run in the future
+(similar to the <tt class="docutils literal">at</tt> unix command) or at specific time intervals (similar to the <tt class="docutils literal">cron</tt> unix command). For
+instance, if a user is registered today we may need to check after one or two days if he&#8217;s logged in and used our application -
+if he hasn&#8217;t then probably he&#8217;s having problems and we can call him to help him. Also, we could check every night
+to see if any users that have registered to our application don&#8217;t have activated their account through email activation
+and delete these accounts. Scheduled tasks should be also run by the workers mentioned&nbsp;above.</p>
+</div>
+<div class="section" id="job-queues-in-python">
+<h2><a class="toc-backref" href="#id2">Job queues in&nbsp;python</a></h2>
+<p>The most known application for using job queues in python is <a class="reference external" href="http://www.celeryproject.org/">celery</a> which is a really great project that supports
+many brokers,  integrates nicely
+with python/django (but can be used even with other languages) and has
+many more features (most of them are only useful on really big, enterprise projects). I&#8217;ve already used
+it in a previous application, however, because celery is really complex I found it rather difficult to
+configure it successfully and I never was perfectly sure that my asynchronous task would actually work or
+that I&#8217;d used the correct configuration for my&nbsp;needs!</p>
+<p>Celery also has <a class="reference external" href="http://celery.readthedocs.org/en/latest/faq.html#does-celery-have-many-dependencies">many dependencies</a> in order to be able to talk with the different broker backends it supports,
+improve multithreading support etc. They may be required in enterprise apps but not for most Django web based&nbsp;projects.</p>
+<p>So, for small-to-average projects I recommend using a different asynchronous task solution instead of celery, particularly
+(as you&#8217;ve already guessed from the title of this post) <a class="reference external" href="http://python-rq.org/"><span class="caps">RQ</span></a>. <span class="caps">RQ</span> is simpler than celery, it integrates great with django
+using the excellent <a class="reference external" href="https://github.com/ui/django-rq">django-rq</a> package and doesn&#8217;t actually have any more dependencies beyond redis support which is
+used as a broker (however most modern django projects already use redis for their caching needs as an  alternative
+to&nbsp;memcached).</p>
+<p>It even supports supports job scheduling through the <a class="reference external" href="https://github.com/ui/rq-scheduler">rq-scheduler</a> package (celery also supports
+job scheduling through celery beat): Run a different process (scheduler) that polls the job
+scheduling queue for any jobs that need to be run because of scheduling and if yes put them to
+the normal job&nbsp;queue.</p>
+<p>Although <span class="caps">RQ</span> and frieds are really easy to use (and have nice documentation) I wasn&#8217;t able to find
+a <em>complete</em> example of using it with django, so I&#8217;ve implemented one
+(found at <a class="reference external" href="https://github.com/spapas/django-test-rq">https://github.com/spapas/django-test-rq</a> &#8212; since I&#8217;ve updated this project a bit
+with new stuff,
+please checkout tag django-test-rq-simple <tt class="docutils literal">git checkout <span class="pre">django-test-rq-simple</span></tt>) mainly for my own testing
+purposes. To help others that want to also use <span class="caps">RQ</span> in their project but don&#8217;t know from where
+to start, I&#8217;ll present it in the following paragraphs, along with some comments on
+how to actually use <span class="caps">RQ</span> in your production&nbsp;environment.</p>
+</div>
+<div class="section" id="django-test-rq">
+<h2><a class="toc-backref" href="#id3">django-test-rq</a></h2>
+<p>This is a simple django project that can be used to asynchronously
+run and schedule jobs and examine their behavior. The job to be scheduled just downloads a provided
+<span class="caps">URL</span> and counts its length. There is only one django application (tasks) that contains two views, one
+to display existing tasks and create new ones and one to display some info for the&nbsp;jobs.</p>
+<div class="section" id="models-py">
+<h3><a class="toc-backref" href="#id4">models.py</a></h3>
+<p>Two models (<tt class="docutils literal">Task</tt> and <tt class="docutils literal">ScheduledTask</tt>) for saving individual tasks and
+scheduled tasks and one model (<tt class="docutils literal">ScheduledTaskInstance</tt>) to save scheduled
+instances of each scheduled&nbsp;task.</p>
+<div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">from</span> <span class="nn">rq</span> <span class="kn">import</span> <span class="n">get_current_job</span>
+
+
+<span class="k">class</span> <span class="nc">Task</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="c"># A model to save information about an asynchronous task</span>
+    <span class="n">created_on</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">auto_now_add</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
+    <span class="n">job_id</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">ScheduledTask</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="c"># A model to save information about a scheduled task</span>
+    <span class="n">created_on</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">auto_now_add</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
+    <span class="c"># A scheduled task has a common job id for all its occurences</span>
+    <span class="n">job_id</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">ScheduledTaskInstance</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="c"># A model to save information about instances of a scheduled task</span>
+    <span class="n">scheduled_task</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="s">&#39;ScheduledTask&#39;</span><span class="p">)</span>
+    <span class="n">created_on</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">auto_now_add</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="forms-py">
+<h3><a class="toc-backref" href="#id5">forms.py</a></h3>
+<p>A very simple form to create a new&nbsp;task.</p>
+<div class="highlight"><pre><span class="kn">from</span> <span class="nn">django</span> <span class="kn">import</span> <span class="n">forms</span>
+
+<span class="k">class</span> <span class="nc">TaskForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">Form</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A simple form to read a url from the user in order to find out its length</span>
+<span class="sd">    and either run it asynchronously or schedule it schedule_times times,</span>
+<span class="sd">    every schedule_interval seconds.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s">&#39;URL&#39;</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">help_text</span><span class="o">=</span><span class="s">&#39;Enter a url (starting with http/https) to start a job that will download it and count its words&#39;</span> <span class="p">)</span>
+    <span class="n">schedule_times</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">required</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">help_text</span><span class="o">=</span><span class="s">&#39;How many times to run this job. Leave empty or 0 to run it only once.&#39;</span><span class="p">)</span>
+    <span class="n">schedule_interval</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">required</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">help_text</span><span class="o">=</span><span class="s">&#39;How much time (in seconds) between runs of the job. Leave empty to run it only once.&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">clean</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TaskForm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">clean</span><span class="p">()</span>
+        <span class="n">schedule_times</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;schedule_times&#39;</span><span class="p">)</span>
+        <span class="n">schedule_interval</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;schedule_interval&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">schedule_times</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">schedule_interval</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">schedule_times</span> <span class="ow">and</span> <span class="n">schedule_interval</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s">&#39;Please fill both schedule_times and schedule_interval to schedule a job or leave them both empty&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_error</span><span class="p">(</span><span class="s">&#39;schedule_times&#39;</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_error</span><span class="p">(</span><span class="s">&#39;schedule_interval&#39;</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="views-py">
+<h3><a class="toc-backref" href="#id6">views.py</a></h3>
+<p>This is actually very simple if you&#8217;re familiar with Class Based Views. Two CBVs
+are defined, one for the Task form + Task display and another for the Job&nbsp;display.</p>
+<div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.views.generic.edit</span> <span class="kn">import</span> <span class="n">FormView</span>
+<span class="kn">from</span> <span class="nn">django.views.generic</span> <span class="kn">import</span> <span class="n">TemplateView</span>
+<span class="kn">from</span> <span class="nn">forms</span> <span class="kn">import</span> <span class="n">TaskForm</span>
+<span class="kn">from</span> <span class="nn">tasks</span> <span class="kn">import</span> <span class="n">get_url_words</span><span class="p">,</span> <span class="n">scheduled_get_url_words</span>
+<span class="kn">from</span> <span class="nn">models</span> <span class="kn">import</span> <span class="n">Task</span><span class="p">,</span><span class="n">ScheduledTask</span>
+<span class="kn">from</span> <span class="nn">rq.job</span> <span class="kn">import</span> <span class="n">Job</span>
+<span class="kn">import</span> <span class="nn">django_rq</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+
+<span class="k">class</span> <span class="nc">TasksHomeFormView</span><span class="p">(</span><span class="n">FormView</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class that displays a form to read a url to read its contents and if the job</span>
+<span class="sd">    is to be scheduled or not and information about all the tasks and scheduled tasks.</span>
+
+<span class="sd">    When the form is submitted, the task will be either scheduled based on the</span>
+<span class="sd">    parameters of the form or will be just executed asynchronously immediately.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">form_class</span> <span class="o">=</span> <span class="n">TaskForm</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s">&#39;tasks_home.html&#39;</span>
+    <span class="n">success_url</span> <span class="o">=</span> <span class="s">&#39;/&#39;</span>
+
+    <span class="k">def</span> <span class="nf">form_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">):</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s">&#39;url&#39;</span><span class="p">]</span>
+        <span class="n">schedule_times</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;schedule_times&#39;</span><span class="p">)</span>
+        <span class="n">schedule_interval</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;schedule_interval&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">schedule_times</span> <span class="ow">and</span> <span class="n">schedule_interval</span><span class="p">:</span>
+            <span class="c"># Schedule the job with the form parameters</span>
+            <span class="n">scheduler</span> <span class="o">=</span> <span class="n">django_rq</span><span class="o">.</span><span class="n">get_scheduler</span><span class="p">(</span><span class="s">&#39;default&#39;</span><span class="p">)</span>
+            <span class="n">job</span> <span class="o">=</span> <span class="n">scheduler</span><span class="o">.</span><span class="n">schedule</span><span class="p">(</span>
+                <span class="n">scheduled_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
+                <span class="n">func</span><span class="o">=</span><span class="n">scheduled_get_url_words</span><span class="p">,</span>
+                <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">url</span><span class="p">],</span>
+                <span class="n">interval</span><span class="o">=</span><span class="n">schedule_interval</span><span class="p">,</span>
+                <span class="n">repeat</span><span class="o">=</span><span class="n">schedule_times</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c"># Just execute the job asynchronously</span>
+            <span class="n">get_url_words</span><span class="o">.</span><span class="n">delay</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">TasksHomeFormView</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">form_valid</span><span class="p">(</span><span class="n">form</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_context_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">ctx</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TasksHomeFormView</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_context_data</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">ctx</span><span class="p">[</span><span class="s">&#39;tasks&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Task</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">&#39;-created_on&#39;</span><span class="p">)</span>
+        <span class="n">ctx</span><span class="p">[</span><span class="s">&#39;scheduled_tasks&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ScheduledTask</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">&#39;-created_on&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ctx</span>
+
+
+<span class="k">class</span> <span class="nc">JobTemplateView</span><span class="p">(</span><span class="n">TemplateView</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A simple template view that gets a job id as a kwarg parameter</span>
+<span class="sd">    and tries to fetch that job from RQ. It will then print all attributes</span>
+<span class="sd">    of that object using __dict__.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s">&#39;job.html&#39;</span>
+
+    <span class="k">def</span> <span class="nf">get_context_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">ctx</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">JobTemplateView</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_context_data</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">redis_conn</span> <span class="o">=</span> <span class="n">django_rq</span><span class="o">.</span><span class="n">get_connection</span><span class="p">(</span><span class="s">&#39;default&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">job</span> <span class="o">=</span> <span class="n">Job</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;job&#39;</span><span class="p">],</span> <span class="n">connection</span><span class="o">=</span><span class="n">redis_conn</span><span class="p">)</span>
+            <span class="n">job</span> <span class="o">=</span> <span class="n">job</span><span class="o">.</span><span class="n">__dict__</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">job</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="n">ctx</span><span class="p">[</span><span class="s">&#39;job&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">job</span>
+        <span class="k">return</span> <span class="n">ctx</span>
+</pre></div>
+</div>
+<div class="section" id="tasks-py">
+<h3><a class="toc-backref" href="#id7">tasks.py</a></h3>
+<p>Here two jobs are defined: One to be used for simple asynchronous tasks and the
+other to be used for scheduled asynchronous tasks (since for asynchronous tasks
+we wanted to group their runs per job&nbsp;id).</p>
+<p>The <tt class="docutils literal">&#64;job</tt> decorator will add the <tt class="docutils literal">delay()</tt> method (used in <tt class="docutils literal">views.py</tt>) to
+the function. It&#8217;s not really required for <tt class="docutils literal">scheduled_get_url_words</tt> since
+it&#8217;s called through the <tt class="docutils literal">scheduled.schedule</tt>.</p>
+<p>When a task is finished, it can return a value (like we do in <tt class="docutils literal">return task.result</tt>)
+which will be saved for a limited amount of time (500 seconds by default - could be
+even saved for ever) to redis.
+This may be useful in some cases, however, I think that for normal web applications it&#8217;s
+not that useful, and since here we use normal django models
+for each task, we can save it to that model&#8217;s instance&nbsp;instead.</p>
+<div class="highlight"><pre><span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">from</span> <span class="nn">models</span> <span class="kn">import</span> <span class="n">Task</span><span class="p">,</span> <span class="n">ScheduledTask</span><span class="p">,</span> <span class="n">ScheduledTaskInstance</span>
+<span class="kn">from</span> <span class="nn">rq</span> <span class="kn">import</span> <span class="n">get_current_job</span>
+<span class="kn">from</span> <span class="nn">django_rq</span> <span class="kn">import</span> <span class="n">job</span>
+
+
+<span class="nd">@job</span>
+<span class="k">def</span> <span class="nf">get_url_words</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+    <span class="c"># This creates a Task instance to save the job instance and job result</span>
+    <span class="n">job</span> <span class="o">=</span> <span class="n">get_current_job</span><span class="p">()</span>
+
+    <span class="n">task</span> <span class="o">=</span> <span class="n">Task</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+        <span class="n">job_id</span><span class="o">=</span><span class="n">job</span><span class="o">.</span><span class="n">get_id</span><span class="p">(),</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">url</span>
+    <span class="p">)</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="n">task</span><span class="o">.</span><span class="n">result</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+    <span class="n">task</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">task</span><span class="o">.</span><span class="n">result</span>
+
+
+<span class="nd">@job</span>
+<span class="k">def</span> <span class="nf">scheduled_get_url_words</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This creates a ScheduledTask instance for each group of</span>
+<span class="sd">    scheduled task - each time this scheduled task is run</span>
+<span class="sd">    a new instance of ScheduledTaskInstance will be created</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">job</span> <span class="o">=</span> <span class="n">get_current_job</span><span class="p">()</span>
+
+    <span class="n">task</span><span class="p">,</span> <span class="n">created</span> <span class="o">=</span> <span class="n">ScheduledTask</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_or_create</span><span class="p">(</span>
+        <span class="n">job_id</span><span class="o">=</span><span class="n">job</span><span class="o">.</span><span class="n">get_id</span><span class="p">(),</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">url</span>
+    <span class="p">)</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="n">response_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+    <span class="n">ScheduledTaskInstance</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+        <span class="n">scheduled_task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">response_len</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">response_len</span>
+</pre></div>
+</div>
+<div class="section" id="settings-py">
+<h3><a class="toc-backref" href="#id8">settings.py</a></h3>
+<div class="highlight"><pre><span class="kn">import</span> <span class="nn">os</span>
+<span class="n">BASE_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">))</span>
+
+<span class="n">SECRET_KEY</span> <span class="o">=</span> <span class="s">&#39;123&#39;</span>
+<span class="n">DEBUG</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="n">TEMPLATE_DEBUG</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="n">ALLOWED_HOSTS</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="n">INSTALLED_APPS</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s">&#39;django.contrib.admin&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.contrib.auth&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.contrib.contenttypes&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.contrib.sessions&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.contrib.messages&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.contrib.staticfiles&#39;</span><span class="p">,</span>
+
+    <span class="s">&#39;django_extensions&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django_rq&#39;</span><span class="p">,</span>
+
+    <span class="s">&#39;tasks&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">MIDDLEWARE_CLASSES</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s">&#39;django.contrib.sessions.middleware.SessionMiddleware&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.middleware.common.CommonMiddleware&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.middleware.csrf.CsrfViewMiddleware&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.contrib.auth.middleware.AuthenticationMiddleware&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.contrib.auth.middleware.SessionAuthenticationMiddleware&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.contrib.messages.middleware.MessageMiddleware&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.middleware.clickjacking.XFrameOptionsMiddleware&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">ROOT_URLCONF</span> <span class="o">=</span> <span class="s">&#39;django_test_rq.urls&#39;</span>
+<span class="n">WSGI_APPLICATION</span> <span class="o">=</span> <span class="s">&#39;django_test_rq.wsgi.application&#39;</span>
+
+<span class="n">DATABASES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&#39;ENGINE&#39;</span><span class="p">:</span> <span class="s">&#39;django.db.backends.sqlite3&#39;</span><span class="p">,</span>
+        <span class="s">&#39;NAME&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">BASE_DIR</span><span class="p">,</span> <span class="s">&#39;db.sqlite3&#39;</span><span class="p">),</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">LANGUAGE_CODE</span> <span class="o">=</span> <span class="s">&#39;en-us&#39;</span>
+<span class="n">TIME_ZONE</span> <span class="o">=</span> <span class="s">&#39;UTC&#39;</span>
+<span class="n">USE_I18N</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="n">USE_L10N</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="n">USE_TZ</span> <span class="o">=</span> <span class="bp">True</span>
+
+<span class="n">STATIC_URL</span> <span class="o">=</span> <span class="s">&#39;/static/&#39;</span>
+
+<span class="c"># Use redis for caches</span>
+<span class="n">CACHES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&quot;BACKEND&quot;</span><span class="p">:</span> <span class="s">&quot;django_redis.cache.RedisCache&quot;</span><span class="p">,</span>
+        <span class="s">&quot;LOCATION&quot;</span><span class="p">:</span> <span class="s">&quot;redis://127.0.0.1:6379/0&quot;</span><span class="p">,</span>
+        <span class="s">&quot;OPTIONS&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&quot;CLIENT_CLASS&quot;</span><span class="p">:</span> <span class="s">&quot;django_redis.client.DefaultClient&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c"># Use the same redis as with caches for RQ</span>
+<span class="n">RQ_QUEUES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&#39;USE_REDIS_CACHE&#39;</span><span class="p">:</span> <span class="s">&#39;default&#39;</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+
+<span class="n">SESSION_ENGINE</span> <span class="o">=</span> <span class="s">&quot;django.contrib.sessions.backends.cache&quot;</span>
+<span class="n">SESSION_CACHE_ALIAS</span> <span class="o">=</span> <span class="s">&quot;default&quot;</span>
+<span class="n">RQ_SHOW_ADMIN_LINK</span> <span class="o">=</span> <span class="bp">True</span>
+
+<span class="c"># Add a logger for rq_scheduler in order to display when jobs are queueud</span>
+<span class="n">LOGGING</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&#39;version&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s">&#39;disable_existing_loggers&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+    <span class="s">&#39;formatters&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&#39;simple&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&#39;format&#39;</span><span class="p">:</span> <span class="s">&#39;</span><span class="si">%(asctime)s</span><span class="s"> </span><span class="si">%(levelname)s</span><span class="s"> </span><span class="si">%(message)s</span><span class="s">&#39;</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+    <span class="s">&#39;handlers&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&#39;console&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&#39;level&#39;</span><span class="p">:</span> <span class="s">&#39;DEBUG&#39;</span><span class="p">,</span>
+            <span class="s">&#39;class&#39;</span><span class="p">:</span> <span class="s">&#39;logging.StreamHandler&#39;</span><span class="p">,</span>
+            <span class="s">&#39;formatter&#39;</span><span class="p">:</span> <span class="s">&#39;simple&#39;</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+
+    <span class="s">&#39;loggers&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&#39;django.request&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&#39;handlers&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;console&#39;</span><span class="p">],</span>
+            <span class="s">&#39;level&#39;</span><span class="p">:</span> <span class="s">&#39;DEBUG&#39;</span><span class="p">,</span>
+            <span class="s">&#39;propagate&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s">&#39;rq_scheduler&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&#39;handlers&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;console&#39;</span><span class="p">],</span>
+            <span class="s">&#39;level&#39;</span><span class="p">:</span> <span class="s">&#39;DEBUG&#39;</span><span class="p">,</span>
+            <span class="s">&#39;propagate&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+<p>By default, rq_scheduler won&#8217;t log anything so we won&#8217;t be able to see
+any output when new instances of each scheduled task are queued for execution.
+That&#8217;s why we&#8217;ve overriden the <span class="caps">LOGGING</span> setting in order to actually log
+rq_scheduler output to the&nbsp;console.</p>
+</div>
+<div class="section" id="running-the-project">
+<h3><a class="toc-backref" href="#id9">Running the&nbsp;project</a></h3>
+<p>I recommend using <a class="reference external" href="https://www.vagrantup.com/">Vagrant</a> to start a stock ubuntu/trusty32 box. After that, install redis, virtualenv and virtualenvwrapper
+and create/activate a virtualenv named <tt class="docutils literal">rq</tt>. You can go to the home directory of <tt class="docutils literal"><span class="pre">django-test-rq</span></tt>
+and install requirements through <tt class="docutils literal">pip install requirements.txt</tt> and create the database tables with
+<tt class="docutils literal">python manage.py migrate</tt>. Finally you may run the project with <tt class="docutils literal">python manage.py runserver_plus</tt>.</p>
+</div>
+</div>
+<div class="section" id="rqworker-and-rqscheduler">
+<h2><a class="toc-backref" href="#id10">rqworker and&nbsp;rqscheduler</a></h2>
+<p>Before scheduling any tasks we need to run two more&nbsp;processes:</p>
+<ul class="simple">
+<li>rqworker: This is a worker that dequeues jobs from the queue and executes them. We could run more than one onstance of this job if we need&nbsp;it.</li>
+<li>rqscheduler: This is a process that runs every one minute and checks if there are scheduled jobs that have to be executed. If yes, it will add them to the queue in order to be executed by a&nbsp;worker.</li>
+</ul>
+<div class="section" id="for-development">
+<h3><a class="toc-backref" href="#id11">For&nbsp;development</a></h3>
+<p>If you want to run rqworker and rqscheduler for your development environment you can just do it with
+running <tt class="docutils literal">python manage.py rqworker</tt> and <tt class="docutils literal">python mange.py rqscheduler</tt> through screen/tmux. If everything
+is allright you should see tasks being added to the queue and scheduled (you may need to refresh the
+homepage before seeing everything since a task may be executed after the response is&nbsp;created).</p>
+<p>Also, keep in mind that rqscheduler runs once every minute by default so you may need to wait up to
+minute to see a <tt class="docutils literal">ScheduledTask</tt> instance. Also, this means that you can&#8217;t run more than one scheduled
+task instance per&nbsp;minute.</p>
+</div>
+<div class="section" id="for-production">
+<h3><a class="toc-backref" href="#id12">For&nbsp;production</a></h3>
+<p>Trying to create daemons through screen is not
+sufficient for a production envornment since we&#8217;d like to actually have logging, monitoring and of course
+automatically start rqworker and rqscheduler when the server&nbsp;boots.</p>
+<p>For this, I recommend using the <a class="reference external" href="http://supervisord.org/">supervisord</a> tool which
+can be used to monitor and control a number of processes. There are other similar tools, however I&#8217;ve
+found supervisord the easier to&nbsp;use.</p>
+<p>In order to monitor/control a process through supervisord you need to add a <tt class="docutils literal">[program:progrname]</tt> section in
+supervisord&#8217;s configuration and pass a number of parameters. The <tt class="docutils literal">progname</tt> is the name of the monitoring
+process. Here&#8217;s how rqworker can be configured using&nbsp;supervisord:</p>
+<pre class="code literal-block">
+[program:rqworker]
+command=python manage.py rqworker
+directory=/vagrant/progr/py/rq/django-test-rq
+environment=PATH=&quot;/home/vagrant/.virtualenvs/rq/bin&quot;
+user=vagrant
+</pre>
+<p>The options used will chdir to <tt class="docutils literal">directory</tt> and execute <tt class="docutils literal">command</tt> as <tt class="docutils literal">user</tt>. The <tt class="docutils literal">environment</tt>
+option can be used to set envirotnment variables - here we set <tt class="docutils literal"><span class="caps">PATH</span></tt> in order to use a specific
+virtual environment. This will allow you to monitor rqworker through supervisord and log its
+output to a file in <tt class="docutils literal">/var/log/supervisor</tt> (by default). A similar entry needs to be added for
+rqscheduler of course. If everything has been configured correctly, when you reload the supervisord
+settings you can run <tt class="docutils literal">sudo /usr/bin/supervisorctl</tt> and should see something&nbsp;like</p>
+<pre class="code literal-block">
+rqscheduler                      RUNNING    pid 1561, uptime 0:00:03
+rqworker                         RUNNING    pid 1562, uptime 0:00:03
+</pre>
+<p>Also, tho log files should contain some debug&nbsp;info.</p>
+</div>
+</div>
+<div class="section" id="conclusion">
+<h2><a class="toc-backref" href="#id13">Conclusion</a></h2>
+<p>Although using job queues makes it more difficult for the developer and adds at least one
+(and probably more) points of failure to a project (the workers, the broker etc) their
+usage, even for very simple projects is&nbsp;unavoidable.</p>
+<p>Unless a complex, enterprise solution like celery is really required for a project
+I recommend using the much simpler and easier to configure <span class="caps">RQ</span> for all your
+asynchronous and scheduled task needs. Using <span class="caps">RQ</span> (and the relative projects django-rq
+and rq-scheduler) we can easily add production ready queueued and scheduled jobs to
+any django&nbsp;project.</p>
+<p>In this article we presented a small introduction to <span class="caps">RQ</span> and its friends and saw how
+to configure django to use it in a production ready environment using a small
+django project (<a class="reference external" href="https://github.com/spapas/django-test-rq">https://github.com/spapas/django-test-rq</a>) which was implemented as a companion
+to help readers quickly test the concepts presented&nbsp;here.</p>
+</div>
+</div>
+  		</article>
+  		<article>
+<header>
+      <h1 class="entry-title">
+        <a href="http://spapas.github.io/2015/01/21/django-model-auditing/">Django model auditing</a>
+      </h1>
+    <p class="meta">
+<time datetime="2015-01-21T14:20:00+02:00" pubdate>Τετ 21 Ιανουάριος 2015</time>    </p>
+</header>
+
+  <div class="entry-content"><div class="contents topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#introduction" id="id5">Introduction</a></li>
+<li><a class="reference internal" href="#adding-simple-auditing-functionality-ourselves" id="id6">Adding simple auditing functionality&nbsp;ourselves</a></li>
+<li><a class="reference internal" href="#example" id="id7">Example</a><ul>
+<li><a class="reference internal" href="#models-py" id="id8">models.py</a></li>
+<li><a class="reference internal" href="#forms-py" id="id9">forms.py</a></li>
+<li><a class="reference internal" href="#views-py" id="id10">views.py</a></li>
+<li><a class="reference internal" href="#urls-py" id="id11">urls.py</a></li>
+<li><a class="reference internal" href="#templates" id="id12">templates</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-django-simple-history" id="id13">Using django-simple-history</a><ul>
+<li><a class="reference internal" href="#installation" id="id14">Installation</a></li>
+<li><a class="reference internal" href="#id1" id="id15">Example</a></li>
+<li><a class="reference internal" href="#usage" id="id16">Usage</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-django-reversion" id="id17">Using django-reversion</a><ul>
+<li><a class="reference internal" href="#id2" id="id18">Installation</a></li>
+<li><a class="reference internal" href="#id3" id="id19">Example</a></li>
+<li><a class="reference internal" href="#id4" id="id20">Usage</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#conclusion" id="id21">Conclusion</a></li>
 </ul>
 </div>
 <div class="section" id="introduction">
-<h2><a class="toc-backref" href="#id3">Introduction</a></h2>
-<p>One very useful component of the <a class="reference external" href="http://spring.io/">spring</a> java framework is <a class="reference external" href="http://projects.spring.io/spring-security/">spring-security</a> since it allows consistent usage of various security providers for
-authentication and authorization. Although I&#8217;ve found a great number of basic spring-security tutorials on the internet, I wasn&#8217;t able to find a complete solution for my own&nbsp;requirements:</p>
-<p>Logging in with <span class="caps">LDAP</span> but configuring the authorities <a class="footnote-reference" href="#id2" id="id1">[*]</a> of the logged in user with the help of a custom method and not through <span class="caps">LDAP</span>.</p>
-<p>I think that the above is a common requirement in many organizations: There is a central <span class="caps">LDAP</span> repository in which the usernames and passwords of the users are stored, but the groups of the users are not stored there. Or maybe the groups that are actually stored in the <span class="caps">LDAP</span> cannot be transformed easily to application specific groups for each&nbsp;application.</p>
-<p>You may find the working spring project that uses ldap and a custom groups populator here: <a class="reference external" href="https://github.com/spapas/SpringLdapCustomAuthorities/">https://github.com/spapas/SpringLdapCustomAuthorities/</a></p>
+<h2><a class="toc-backref" href="#id5">Introduction</a></h2>
+<p>An auditing trail is a common requirement in most non-trivial applications. Organizations
+need to know <em>who</em> did the change, <em>when</em> it was done and <em>what</em> was actually changed.
+In this post we will see three
+different solution in order to add this functionality in Django: doing it ourselves,
+using django-simple-history and using&nbsp;django-reversion.</p>
 </div>
-<div class="section" id="a-basic-spring-security-setup">
-<h2><a class="toc-backref" href="#id4">A basic spring security&nbsp;setup</a></h2>
-<p>I&#8217;ve created a very basic setup for spring-security for a spring-mvc project. Please take a look here for a more thorough explanation of a simple spring-security project <a class="reference external" href="http://www.mkyong.com/spring-security/spring-security-hello-world-example/">http://www.mkyong.com/spring-security/spring-security-hello-world-example/</a> and here <a class="reference external" href="http://www.codeproject.com/Articles/253901/Getting-Started-Spring-Security">http://www.codeproject.com/Articles/253901/Getting-Started-Spring-Security</a> for a great explanation of the various spring-security&nbsp;classes.</p>
-<p>In my setup there is a controller that defines two mappings, the &quot;/&quot; which is the homepage that has a link to the &quot;/enter&quot; and the &quot;/enter&quot; which is an internal page in which only authorized users have access. When the user clicks on &quot;enter&quot; he will be represented with a login form first. If the use logs in successfully, the enter.jsp will list the username and the authorities of the logged in user through the following spring-security&nbsp;tags:</p>
-<div class="highlight"><pre><span class="k">&lt;%@</span> <span class="n">taglib</span> <span class="n">prefix</span><span class="o">=</span><span class="s">&quot;sec&quot;</span> <span class="n">uri</span><span class="o">=</span><span class="s">&quot;http://www.springframework.org/security/tags&quot;</span> <span class="k">%&gt;</span>
-[...]
-Username: <span class="nt">&lt;sec:authentication</span> <span class="na">property=</span><span class="s">&quot;principal.username&quot;</span> <span class="nt">/&gt;&lt;br</span> <span class="nt">/&gt;</span>
-Authorities: <span class="nt">&lt;sec:authentication</span> <span class="na">property=</span><span class="s">&quot;principal.authorities&quot;</span><span class="nt">/&gt;&lt;br</span> <span class="nt">/&gt;</span>
+<div class="section" id="adding-simple-auditing-functionality-ourselves">
+<h2><a class="toc-backref" href="#id6">Adding simple auditing functionality&nbsp;ourselves</a></h2>
+<p>A simple way to actually do auditing is to keep four extra fields in our models:
+<tt class="docutils literal">created_by</tt>, <tt class="docutils literal">created_on</tt>, <tt class="docutils literal">modified_by</tt> and <tt class="docutils literal">modified_on</tt>. The first two
+will be filled when the model instance is created while the latter two will be
+changed whenever the model instance is saved. So we only have <em>who</em> and <em>whe</em>.
+Sometimes, these are enough so let&#8217;s see how easy it is to implement it in&nbsp;django.</p>
+<p>We&#8217;ll need an abstract model that could be used as a base class for models that need&nbsp;auditing:</p>
+<div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.conf</span> <span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
+
+<span class="k">class</span> <span class="nc">Auditable</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">created_on</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">auto_now_add</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
+    <span class="n">created_by</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">AUTH_USER_MODEL</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s">&#39;created_by&#39;</span><span class="p">)</span>
+
+    <span class="n">modified_on</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">auto_now</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
+    <span class="n">modified_by</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">AUTH_USER_MODEL</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s">&#39;modified_by&#39;</span><span class="p">)</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">abstract</span> <span class="o">=</span> <span class="bp">True</span>
 </pre></div>
-<p>The authentication provider is an in memory service in which the username, password and authorities of each user are defined in the <span class="caps">XML</span>. So this is a simple spring-security example that can be found in a number of places on the internet. The security rules, login form and the authentication provider are configured with the following <tt class="docutils literal"><span class="pre">security-config.xml</span></tt>:</p>
-<div class="highlight"><pre><span class="nt">&lt;beans:beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/security&quot;</span>
-   <span class="na">xmlns:beans=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
-   <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
-   <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://www.springframework.org/schema/beans</span>
-<span class="s">                   http://www.springframework.org/schema/beans/spring-beans-3.1.xsd</span>
-<span class="s">                   http://www.springframework.org/schema/security</span>
-<span class="s">                   http://www.springframework.org/schema/security/spring-security-3.1.xsd&quot;</span><span class="nt">&gt;</span>
-
-   <span class="nt">&lt;http</span> <span class="na">pattern=</span><span class="s">&quot;/static/**&quot;</span> <span class="na">security=</span><span class="s">&quot;none&quot;</span> <span class="nt">/&gt;</span>
-
-   <span class="nt">&lt;http</span> <span class="na">use-expressions=</span><span class="s">&quot;true&quot;</span><span class="nt">&gt;</span>
-       <span class="nt">&lt;intercept-url</span> <span class="na">pattern=</span><span class="s">&quot;/&quot;</span> <span class="na">access=</span><span class="s">&quot;permitAll&quot;</span> <span class="nt">/&gt;</span>
-       <span class="nt">&lt;intercept-url</span> <span class="na">pattern=</span><span class="s">&quot;/enter&quot;</span> <span class="na">access=</span><span class="s">&quot;hasRole(&#39;user&#39;)&quot;</span> <span class="nt">/&gt;</span>
-       <span class="nt">&lt;intercept-url</span> <span class="na">pattern=</span><span class="s">&quot;/**&quot;</span> <span class="na">access=</span><span class="s">&quot;denyAll&quot;</span> <span class="nt">/&gt;</span>
-       <span class="nt">&lt;form-login</span> <span class="na">default-target-url=</span><span class="s">&quot;/&quot;</span> <span class="nt">/&gt;</span>
-       <span class="nt">&lt;logout</span>  <span class="na">logout-success-url=</span><span class="s">&quot;/&quot;</span> <span class="nt">/&gt;</span>
-   <span class="nt">&lt;/http&gt;</span>
-
-   <span class="nt">&lt;authentication-manager&gt;</span>
-       <span class="nt">&lt;authentication-provider&gt;</span>
-           <span class="nt">&lt;user-service&gt;</span>
-               <span class="nt">&lt;user</span> <span class="na">name=</span><span class="s">&quot;spapas&quot;</span> <span class="na">password=</span><span class="s">&quot;123&quot;</span> <span class="na">authorities=</span><span class="s">&quot;admin, user, nonldap&quot;</span> <span class="nt">/&gt;</span>
-               <span class="nt">&lt;user</span> <span class="na">name=</span><span class="s">&quot;serafeim&quot;</span> <span class="na">password=</span><span class="s">&quot;123&quot;</span> <span class="na">authorities=</span><span class="s">&quot;user&quot;</span> <span class="nt">/&gt;</span>
-           <span class="nt">&lt;/user-service&gt;</span>
-       <span class="nt">&lt;/authentication-provider&gt;</span>
-   <span class="nt">&lt;/authentication-manager&gt;</span>
-
-<span class="nt">&lt;/beans:beans&gt;</span>
+<p>Models inheriting from <tt class="docutils literal">Auditable</tt> will contain their datetime of creation and modification
+which will be automatically filled using the very usefull <tt class="docutils literal">auto_now_add_</tt> (which will
+set the current datetime when the model instance is created) and <tt class="docutils literal">auto_now_</tt> (which will
+set the current datetime when the model instance is&nbsp;modified).</p>
+<p>Such models will also have two foreign keys to <tt class="docutils literal">User</tt>, one for the user
+that created the and one of the user that modified them. The problem with these two fields
+is that they cannot be filled automatically (like the datetimes) because the user that
+actually did create/change the objects must be&nbsp;provided!</p>
+<p>Since I am really fond of CBVs I will present a simple mixin that can be used with CreateView
+and UpdateView and does exactly&nbsp;that:</p>
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">AuditableMixin</span><span class="p">(</span><span class="nb">object</span><span class="p">,):</span>
+    <span class="k">def</span> <span class="nf">form_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">,</span> <span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">form</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">created_by</span><span class="p">:</span>
+            <span class="n">form</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">created_by</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span>
+        <span class="n">form</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">modified_by</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">AuditableMixin</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">form_valid</span><span class="p">(</span><span class="n">form</span><span class="p">)</span>
 </pre></div>
-<p>When we run this application and go to the /enter, we will get the following&nbsp;output:</p>
-<blockquote>
-<p>Username:&nbsp;spapas</p>
-<p>Authorities: [admin, nonldap,&nbsp;user]</p>
-</blockquote>
-</div>
-<div class="section" id="spring-security-ldap-with-custom-authorities">
-<h2><a class="toc-backref" href="#id5">Spring security <span class="caps">LDAP</span> with custom&nbsp;authorities</a></h2>
-<p>The previous application can be modified to login through <span class="caps">LDAP</span> and get the authorities from a custom class. The main differences are in the <tt class="docutils literal">pom.xml</tt> which adsd the <tt class="docutils literal"><span class="pre">spring-security-ldap</span></tt> dependency, the addition of a <tt class="docutils literal">CustomLdapAuthoritiesPopulator.java</tt> which does the actual mapping of username to authority and various changes to the <tt class="docutils literal"><span class="pre">security-config.xml</span></tt>.</p>
-<p>As you will see we had to define our security beans mainly using spring beans and not using the various elements from security namespace like <tt class="docutils literal"><span class="pre">&lt;ldap-server&gt;</span></tt> and <tt class="docutils literal"><span class="pre">&lt;ldap-authentication-provder&gt;</span></tt>. For a good tutorial on using these elements and ldap in spring security in general check these out: <a class="reference external" href="http://docs.spring.io/spring-security/site/docs/3.1.x/reference/ldap.html">http://docs.spring.io/spring-security/site/docs/3.1.x/reference/ldap.html</a> and <a class="reference external" href="http://krams915.blogspot.gr/2011/01/spring-security-mvc-using-ldap.html">http://krams915.blogspot.gr/2011/01/spring-security-mvc-using-ldap.html</a>.</p>
-<div class="highlight"><pre><span class="nt">&lt;beans:beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/security&quot;</span>
-   <span class="na">xmlns:beans=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
-   <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
-   <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://www.springframework.org/schema/beans</span>
-<span class="s">                   http://www.springframework.org/schema/beans/spring-beans-3.1.xsd</span>
-<span class="s">                   http://www.springframework.org/schema/security</span>
-<span class="s">                   http://www.springframework.org/schema/security/spring-security-3.1.xsd&quot;</span><span class="nt">&gt;</span>
-
-   <span class="nt">&lt;http</span> <span class="na">pattern=</span><span class="s">&quot;/static/**&quot;</span> <span class="na">security=</span><span class="s">&quot;none&quot;</span> <span class="nt">/&gt;</span>
-
-   <span class="nt">&lt;http</span> <span class="na">use-expressions=</span><span class="s">&quot;true&quot;</span> <span class="nt">&gt;</span>
-     <span class="nt">&lt;intercept-url</span> <span class="na">pattern=</span><span class="s">&quot;/&quot;</span> <span class="na">access=</span><span class="s">&quot;permitAll&quot;</span> <span class="nt">/&gt;</span>
-     <span class="nt">&lt;intercept-url</span> <span class="na">pattern=</span><span class="s">&quot;/enter&quot;</span> <span class="na">access=</span><span class="s">&quot;hasRole(&#39;user&#39;)&quot;</span> <span class="nt">/&gt;</span>
-     <span class="nt">&lt;intercept-url</span> <span class="na">pattern=</span><span class="s">&quot;/**&quot;</span> <span class="na">access=</span><span class="s">&quot;denyAll&quot;</span> <span class="nt">/&gt;</span>
-     <span class="nt">&lt;form-login</span> <span class="na">default-target-url=</span><span class="s">&quot;/&quot;</span> <span class="nt">/&gt;</span>
-     <span class="nt">&lt;logout</span>  <span class="na">logout-success-url=</span><span class="s">&quot;/&quot;</span> <span class="nt">/&gt;</span>
-   <span class="nt">&lt;/http&gt;</span>
-
-   <span class="nt">&lt;beans:bean</span> <span class="na">id=</span><span class="s">&quot;contextSource&quot;</span>
-         <span class="na">class=</span><span class="s">&quot;org.springframework.security.ldap.DefaultSpringSecurityContextSource&quot;</span><span class="nt">&gt;</span>
-     <span class="nt">&lt;beans:constructor-arg</span> <span class="na">value=</span><span class="s">&quot;ldap://login.serafeim.gr:389/dc=serafeim,dc=gr&quot;</span><span class="nt">/&gt;</span>
-     <span class="nt">&lt;beans:property</span> <span class="na">name=</span><span class="s">&quot;anonymousReadOnly&quot;</span> <span class="na">value=</span><span class="s">&quot;true&quot;</span><span class="nt">/&gt;</span>
-   <span class="nt">&lt;/beans:bean&gt;</span>
-
-   <span class="nt">&lt;beans:bean</span>
-         <span class="na">id=</span><span class="s">&quot;userSearch&quot;</span>
-         <span class="na">class=</span><span class="s">&quot;org.springframework.security.ldap.search.FilterBasedLdapUserSearch&quot;</span><span class="nt">&gt;</span>
-     <span class="nt">&lt;beans:constructor-arg</span> <span class="na">index=</span><span class="s">&quot;0&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span><span class="nt">/&gt;</span>
-     <span class="nt">&lt;beans:constructor-arg</span> <span class="na">index=</span><span class="s">&quot;1&quot;</span> <span class="na">value=</span><span class="s">&quot;(uid={0})&quot;</span><span class="nt">/&gt;</span>
-     <span class="nt">&lt;beans:constructor-arg</span> <span class="na">index=</span><span class="s">&quot;2&quot;</span> <span class="na">ref=</span><span class="s">&quot;contextSource&quot;</span> <span class="nt">/&gt;</span>
-   <span class="nt">&lt;/beans:bean&gt;</span>
-
-   <span class="nt">&lt;beans:bean</span>
-         <span class="na">id=</span><span class="s">&quot;ldapAuthProvider&quot;</span>
-         <span class="na">class=</span><span class="s">&quot;org.springframework.security.ldap.authentication.LdapAuthenticationProvider&quot;</span><span class="nt">&gt;</span>
-     <span class="nt">&lt;beans:constructor-arg&gt;</span>
-       <span class="nt">&lt;beans:bean</span> <span class="na">class=</span><span class="s">&quot;org.springframework.security.ldap.authentication.BindAuthenticator&quot;</span><span class="nt">&gt;</span>
-         <span class="nt">&lt;beans:constructor-arg</span> <span class="na">ref=</span><span class="s">&quot;contextSource&quot;</span><span class="nt">/&gt;</span>
-         <span class="nt">&lt;beans:property</span> <span class="na">name=</span><span class="s">&quot;userSearch&quot;</span> <span class="na">ref=</span><span class="s">&quot;userSearch&quot;</span> <span class="nt">/&gt;</span>
-         <span class="c">&lt;!--</span>
-<span class="c">         &lt;beans:property name=&quot;userDnPatterns&quot;&gt;</span>
-<span class="c">           &lt;beans:list&gt;&lt;beans:value&gt;uid={0},ou=People&lt;/beans:value&gt;&lt;/beans:list&gt;</span>
-<span class="c">         &lt;/beans:property&gt;</span>
-<span class="c">         --&gt;</span>
-       <span class="nt">&lt;/beans:bean&gt;</span>
-     <span class="nt">&lt;/beans:constructor-arg&gt;</span>
-     <span class="nt">&lt;beans:constructor-arg&gt;</span>
-       <span class="nt">&lt;beans:bean</span> <span class="na">class=</span><span class="s">&quot;gr.serafeim.springldapcustom.CustomLdapAuthoritiesPopulator&quot;</span> <span class="nt">/&gt;</span>
-     <span class="nt">&lt;/beans:constructor-arg&gt;</span>
-   <span class="nt">&lt;/beans:bean&gt;</span>
-
-   <span class="nt">&lt;authentication-manager&gt;</span>
-     <span class="nt">&lt;authentication-provider</span> <span class="na">ref=</span><span class="s">&quot;ldapAuthProvider&quot;</span> <span class="nt">/&gt;</span>
-   <span class="nt">&lt;/authentication-manager&gt;</span>
-
-<span class="nt">&lt;/beans:beans&gt;</span>
-</pre></div>
-<p>So, in the above configuration we&#8217;ve defined three spring beans: <tt class="docutils literal">contextSource</tt>, <tt class="docutils literal">userSearch</tt> and <tt class="docutils literal">ldapAuthProvider</tt>. The <tt class="docutils literal"><span class="pre">&lt;authentication-manager&gt;</span></tt> element uses the <tt class="docutils literal">ldapAuthProvider</tt> as an authentication provider. Below we will explain these&nbsp;beans:</p>
-<div class="section" id="contextsource">
-<h3><a class="toc-backref" href="#id6">contextSource</a></h3>
-<p>The contextSource bean defines the actual <span class="caps">LDAP</span> server that we are going to connect to. It has the class <tt class="docutils literal">o.s.s.ldap.DefaultSpringSecurityContextSource</tt>. This will need to be passed to other beans that would need to connect to the server for a number of operations. We pass to it the url of our <span class="caps">LDAP</span> server and set its <tt class="docutils literal">anonymousReadOnly</tt> property to true. The <tt class="docutils literal">anonymousReadOnly</tt> defines if we can anonymously connect to our <span class="caps">LDAP</span> server in order to perform the search operation below. If we cannot connect anonymously then we have to set its <tt class="docutils literal">userDn</tt> and <tt class="docutils literal">password</tt> properties.</p>
-<p>A very interesting question is if the <tt class="docutils literal"><span class="pre">&lt;ldap-server&gt;</span></tt> element of the spring security namespace is related to <tt class="docutils literal">the o.s.s.ldap.DefaultSpringSecurityContextSource</tt> like our <tt class="docutils literal">contextSource</tt>. To find out, we need to check the <tt class="docutils literal">o.s.s.config.SecurityNamespaceHandler</tt> class of the <tt class="docutils literal"><span class="pre">spring-security-config.jar</span></tt>. In there we see the <tt class="docutils literal">loadParsers</tt> method which has the line: <tt class="docutils literal">parsers.put(Elements.LDAP_SERVER, new <span class="pre">LdapServerBeanDefinitionParser());</span></tt>. The constant <tt class="docutils literal">o.s.s.config.Elements.LDAP_SERVER</tt> has the value of <tt class="docutils literal"><span class="pre">&quot;ldap-server&quot;</span></tt> as expected, so we need to see what does the class <tt class="docutils literal">o.s.s.config.ldap.LdapServerBeanDefinitionParser</tt> do. This class has a parse() method that receives the xml that was used to instantiate the <tt class="docutils literal"><span class="pre">&lt;ldap-server&gt;</span></tt> element and, depending an on the actualy configuration, instantiates a bean of the class <tt class="docutils literal">o.s.s.ldap.DefaultSpringSecurityContextSource</tt> with an id of <tt class="docutils literal">o.s.s.securityContextSource</tt> that will be used by the other elements in the security namespace&nbsp;!</p>
-<p>This actually solves another question I had concerning the following&nbsp;error:</p>
-<blockquote>
-No bean named &#8216;org.springframework.security.authenticationManager&#8217; is defined: Did you forget to add a gobal &lt;authentication-manager&gt; element to your configuration (with child &lt;authentication-provider&gt;  elements)? Alternatively you can use the authentication-manager-ref attribute on your &lt;http&gt; and &lt;global-method-security&gt; elements.</blockquote>
-<p>What happens is that when spring-security-configuration encounters an <tt class="docutils literal"><span class="pre">&lt;authentication-manager&gt;</span></tt> it will instantiate a bean named <tt class="docutils literal">o.s.s.authenticationManager</tt>  having the class
-<tt class="docutils literal">o.s.s.authentication.ProviderManager</tt> and will create and pass to it a <tt class="docutils literal">providers</tt> list with all the authentication providers that are defined inside the <tt class="docutils literal"><span class="pre">&lt;authentication-manager&gt;</span></tt> element with <tt class="docutils literal"><span class="pre">&lt;authentication-provider&gt;</span></tt> nodes. So, if you encounter the above error, the problem is that for some reason your <tt class="docutils literal"><span class="pre">&lt;authentication-manager&gt;</span></tt> is not configured correctly, so no <tt class="docutils literal">o.s.s.authenticatioManager</tt> bean is&nbsp;created!</p>
-</div>
-<div class="section" id="usersearch">
-<h3><a class="toc-backref" href="#id7">userSearch</a></h3>
-<p>The <tt class="docutils literal">userSearch</tt> bean is needed if we don&#8217;t know exactly where our users are stored in the <span class="caps">LDAP</span> directory so we will use this bean as a search filter. If we do know our user tree then we won&#8217;t need this bean at all as will be explained later. It has the class <tt class="docutils literal">o.s.s.ldap.search.FilterBasedLdapUserSearch</tt> and gets three constructor parameters: <tt class="docutils literal">searchBase</tt>, <tt class="docutils literal">searchFilter</tt> and <tt class="docutils literal">contextSource</tt>. The <tt class="docutils literal">searchBase</tt> is from where in the <span class="caps">LDAP</span> tree to start searching (empty in our case), the <tt class="docutils literal">searchFilter</tt> defines where is the username (uid in our case) and the <tt class="docutils literal">contextSource</tt> has been defined&nbsp;before.</p>
-</div>
-<div class="section" id="ldapauthprovider">
-<h3><a class="toc-backref" href="#id8">ldapAuthProvider</a></h3>
-<p>This is the actual <tt class="docutils literal"><span class="pre">authentication-provider</span></tt> that the spring-security <tt class="docutils literal"><span class="pre">authentication-manager</span></tt> is going to use. It is an instance of class <tt class="docutils literal">o.s.s.ldap.authentication.LdapAuthenticationProvider</tt> which has two main properties: An <tt class="docutils literal">o.s.s.ldap.authentication.LdapAuthenticator</tt> implementation and an <tt class="docutils literal">o.s.s.ldap.userdetails.LdapAuthoritiesPopulator</tt> implementation. The first interface defines an <tt class="docutils literal">authenticate</tt> method and is used to actually authenticate the user with the <span class="caps">LDAP</span> server. The second interface defines a <tt class="docutils literal">getGrantedAuthorities</tt> which returns the roles for the authenticated user. The LdapAuthoritiesPopulator parameter is actually optional (so we can use <span class="caps">LDAP</span> to authenticate only the users) and we can provide our own implementation to have custom authorities for our application. That is exactly what we&#8217;ve done&nbsp;here.</p>
-<p>The two arguments used to initialize the ldapAuthProvoder are one instance of <tt class="docutils literal">o.s.s.ldap.authentication.BindAuthenticator</tt> which is a simple authenticator that tries to bind with the given credentials to the <span class="caps">LDAP</span> server to check the credentials and one instance of a custom class named <tt class="docutils literal">g.s.s.CustomLdapAuthoritiesPopulator</tt> which is the actual implementation of the custom roles provider. The <tt class="docutils literal">BindAuthenticator</tt> gets the <tt class="docutils literal">contextSource</tt> as a constructor parameter and its <tt class="docutils literal">userSearch</tt> property is set with the <tt class="docutils literal">userSearch</tt> bean defined previously. If we instead knew the actual place of the users, we could use the commented out <tt class="docutils literal">userDnPatterns</tt> property which takes a list of possible places in the <span class="caps">LDAP</span> catalog which will be checked for the&nbsp;username.</p>
-</div>
-<div class="section" id="customldapauthoritiespopulator">
-<h3><a class="toc-backref" href="#id9">CustomLdapAuthoritiesPopulator</a></h3>
-<p>The <tt class="docutils literal">CustomLdapAuthoritiesPopulator</tt> just needs to implement the <tt class="docutils literal">LdapAuthoritiesPopulator</tt> interface. Here&#8217;s our&nbsp;implmentation:</p>
-<div class="highlight"><pre><span class="kn">package</span> <span class="n">gr</span><span class="o">.</span><span class="na">serafeim</span><span class="o">.</span><span class="na">springldapcustom</span><span class="o">;</span>
-
-<span class="kn">import</span> <span class="nn">java.util.Collection</span><span class="o">;</span>
-<span class="kn">import</span> <span class="nn">java.util.HashSet</span><span class="o">;</span>
-<span class="kn">import</span> <span class="nn">org.springframework.ldap.core.DirContextOperations</span><span class="o">;</span>
-<span class="kn">import</span> <span class="nn">org.springframework.security.core.GrantedAuthority</span><span class="o">;</span>
-<span class="kn">import</span> <span class="nn">org.springframework.security.core.authority.SimpleGrantedAuthority</span><span class="o">;</span>
-<span class="kn">import</span> <span class="nn">org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator</span><span class="o">;</span>
-<span class="kn">import</span> <span class="nn">org.springframework.stereotype.Component</span><span class="o">;</span>
-
-<span class="nd">@Component</span>
-<span class="kd">public</span> <span class="kd">class</span> <span class="nc">CustomLdapAuthoritiesPopulator</span> <span class="kd">implements</span> <span class="n">LdapAuthoritiesPopulator</span> <span class="o">{</span>
-       <span class="nd">@Override</span>
-       <span class="kd">public</span> <span class="n">Collection</span><span class="o">&lt;?</span> <span class="kd">extends</span> <span class="n">GrantedAuthority</span><span class="o">&gt;</span> <span class="n">getGrantedAuthorities</span><span class="o">(</span>
-                       <span class="n">DirContextOperations</span> <span class="n">userData</span><span class="o">,</span> <span class="n">String</span> <span class="n">username</span><span class="o">)</span> <span class="o">{</span>
-               <span class="n">Collection</span><span class="o">&lt;</span><span class="n">GrantedAuthority</span><span class="o">&gt;</span> <span class="n">gas</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashSet</span><span class="o">&lt;</span><span class="n">GrantedAuthority</span><span class="o">&gt;();</span>
-               <span class="k">if</span><span class="o">(</span><span class="n">username</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="s">&quot;spapas&quot;</span><span class="o">))</span> <span class="o">{</span>
-                       <span class="n">gas</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="k">new</span> <span class="n">SimpleGrantedAuthority</span><span class="o">(</span><span class="s">&quot;admin&quot;</span><span class="o">));</span>
-               <span class="o">}</span>
-               <span class="n">gas</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="k">new</span> <span class="n">SimpleGrantedAuthority</span><span class="o">(</span><span class="s">&quot;user&quot;</span><span class="o">));</span>
-               <span class="k">return</span> <span class="n">gas</span><span class="o">;</span>
-       <span class="o">}</span>
-<span class="o">}</span>
-</pre></div>
-<p>The <tt class="docutils literal">getGrantedAuthorities</tt> just checks the username and add another role if it is a specific one. Of course here we would autowire our user roles repository and query the database to get the roles of the user, however I&#8217;m not going to do that for the case of&nbsp;simplicity.</p>
+<p>The above mixin overrides the <tt class="docutils literal">form_valid</tt> method of <tt class="docutils literal">CreateView</tt> and <tt class="docutils literal">UpdateView</tt>:
+First it checks if the object is created (if it is created it won&#8217;t be saved in the
+database yet thus it won&#8217;t have an id) in order to set the <tt class="docutils literal">created_by</tt> attribute to
+the current user. After that it will set the <tt class="docutils literal">modified_by</tt> attribute of the object to
+the current user. Finally, it will call the next <tt class="docutils literal">form_valid</tt> method to do whatever
+is required (save the model instance and redirect to <tt class="docutils literal">success_url</tt> by&nbsp;default).</p>
+<p>The views using <tt class="docutils literal">AuditableMixin</tt> should allow only logged in users (or else an
+exception will be thrown). Also, don&#8217;t forget to exclude the <tt class="docutils literal">created_by</tt> and <tt class="docutils literal">modified_by</tt>
+fields from your model form (<tt class="docutils literal">created_on</tt> and <tt class="docutils literal">modified_on</tt> will automatically be&nbsp;excluded).</p>
 </div>
 <div class="section" id="example">
-<h3><a class="toc-backref" href="#id10">Example</a></h3>
-<p>When we run this application and go to the /enter, after logging in with our <span class="caps">LDAP</span> credentials as spapas, we will get the following&nbsp;output:</p>
-<blockquote>
-<p>Username:&nbsp;spapas</p>
-<p>Authorities: [admin,&nbsp;user]</p>
-</blockquote>
+<h2><a class="toc-backref" href="#id7">Example</a></h2>
+<p>Let&#8217;s see a simple example of creating a small django application using the previously defined abstract model and&nbsp;mixin:</p>
+<div class="section" id="models-py">
+<h3><a class="toc-backref" href="#id8">models.py</a></h3>
+<div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.conf</span> <span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span> <span class="nn">django.core.urlresolvers</span> <span class="kn">import</span> <span class="n">reverse</span>
+<span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
+
+<span class="kn">from</span> <span class="nn">auditable.models</span> <span class="kn">import</span> <span class="n">Auditable</span>
+
+
+<span class="k">class</span> <span class="nc">Book</span><span class="p">(</span><span class="n">Auditable</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
+    <span class="n">author</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_absolute_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">reverse</span><span class="p">(</span><span class="s">&quot;book_list&quot;</span><span class="p">)</span>
+</pre></div>
+<p>In the above we suppose that the <tt class="docutils literal">Auditable</tt> abstract model is imported from the
+<tt class="docutils literal">auditable.models</tt> module and that a view named <tt class="docutils literal">book_list</tt> that shows all books&nbsp;exists.</p>
+</div>
+<div class="section" id="forms-py">
+<h3><a class="toc-backref" href="#id9">forms.py</a></h3>
+<div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.forms</span> <span class="kn">import</span> <span class="n">ModelForm</span>
+
+
+<span class="k">class</span> <span class="nc">BookForm</span><span class="p">(</span><span class="n">ModelForm</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">Book</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="s">&#39;author&#39;</span><span class="p">]</span>
+</pre></div>
+<p>Show only <tt class="docutils literal">name</tt> and <tt class="docutils literal">author</tt> fields (and not the auditable fields) in the <tt class="docutils literal">Book ModelForm</tt>.</p>
+</div>
+<div class="section" id="views-py">
+<h3><a class="toc-backref" href="#id10">views.py</a></h3>
+<div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.views.generic.edit</span> <span class="kn">import</span> <span class="n">CreateView</span><span class="p">,</span> <span class="n">UpdateView</span>
+<span class="kn">from</span> <span class="nn">django.views.generic</span> <span class="kn">import</span> <span class="n">ListView</span>
+
+<span class="kn">from</span> <span class="nn">auditable.views</span> <span class="kn">import</span> <span class="n">AuditableMixin</span>
+
+<span class="kn">from</span> <span class="nn">models</span> <span class="kn">import</span> <span class="n">Book</span>
+<span class="kn">from</span> <span class="nn">forms</span> <span class="kn">import</span> <span class="n">BookForm</span>
+
+
+<span class="k">class</span> <span class="nc">BookCreateView</span><span class="p">(</span><span class="n">AuditableMixin</span><span class="p">,</span> <span class="n">CreateView</span><span class="p">):</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Book</span>
+    <span class="n">form_class</span> <span class="o">=</span> <span class="n">BookForm</span>
+
+
+<span class="k">class</span> <span class="nc">BookUpdateView</span><span class="p">(</span><span class="n">AuditableMixin</span><span class="p">,</span> <span class="n">UpdateView</span><span class="p">):</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Book</span>
+    <span class="n">form_class</span> <span class="o">=</span> <span class="n">BookForm</span>
+
+
+<span class="k">class</span> <span class="nc">BookListView</span><span class="p">(</span><span class="n">ListView</span><span class="p">):</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Book</span>
+</pre></div>
+<p>We import the <tt class="docutils literal">AuditableMixin</tt> from <tt class="docutils literal">auditable.views</tt> and make our Create and Update views
+inherit from this mixin also in addition to <tt class="docutils literal">CreateView</tt> and <tt class="docutils literal">UpdateView</tt>. Pay attention that our
+mixin is placed <em>before</em> CreateView in order to call <tt class="docutils literal">form_valid</tt> in the proper order: When multiple
+inheritance is used like this python will check each class from left to right to find the proper method
+and call it. For example, in our <tt class="docutils literal">BookCreateView</tt>, when the <tt class="docutils literal">form_valid</tt> method is called, python
+will first check if <tt class="docutils literal">BookCreateView</tt> has a <tt class="docutils literal">form_valid</tt> method. Since it does not, it will check
+if <tt class="docutils literal">AuditableMixin</tt> has a <tt class="docutils literal">form_valid</tt> method and call it. Now, we are calling the <tt class="docutils literal"><span class="pre">super(...).form_valid()</span></tt> in the
+<tt class="docutils literal">AuditableMixin</tt> <tt class="docutils literal">form_valid</tt>, so the <tt class="docutils literal">form_valid</tt> of <tt class="docutils literal">CreateView</tt> will <em>also</em> be&nbsp;called.</p>
+<p>A simple <tt class="docutils literal">ListView</tt> is also added to just show the info on all&nbsp;books.</p>
+</div>
+<div class="section" id="urls-py">
+<h3><a class="toc-backref" href="#id11">urls.py</a></h3>
+<div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.conf.urls</span> <span class="kn">import</span> <span class="n">patterns</span><span class="p">,</span> <span class="n">include</span><span class="p">,</span> <span class="n">url</span>
+
+<span class="kn">from</span> <span class="nn">views</span> <span class="kn">import</span> <span class="n">BookCreateView</span><span class="p">,</span> <span class="n">BookUpdateView</span><span class="p">,</span> <span class="n">BookListView</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+    <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^accounts/login/$&#39;</span><span class="p">,</span> <span class="s">&#39;django.contrib.auth.views.login&#39;</span><span class="p">,</span> <span class="p">),</span>
+    <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^accounts/logout/$&#39;</span><span class="p">,</span> <span class="s">&#39;django.contrib.auth.views.logout&#39;</span><span class="p">,</span> <span class="p">),</span>
+
+    <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^create/$&#39;</span><span class="p">,</span> <span class="n">BookCreateView</span><span class="o">.</span><span class="n">as_view</span><span class="p">(),</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;create_book&#39;</span><span class="p">),</span>
+    <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^update/(?P&lt;pk&gt;\d+)/$&#39;</span><span class="p">,</span> <span class="n">BookUpdateView</span><span class="o">.</span><span class="n">as_view</span><span class="p">(),</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;update_book&#39;</span><span class="p">),</span>
+    <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^$&#39;</span><span class="p">,</span> <span class="n">BookListView</span><span class="o">.</span><span class="n">as_view</span><span class="p">(),</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;book_list&#39;</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+<p>Just add the previously defined Create/Update/List views along with a login/logout&nbsp;views.</p>
+</div>
+<div class="section" id="templates">
+<h3><a class="toc-backref" href="#id12">templates</a></h3>
+<p>You&#8217;ll need four&nbsp;templates:</p>
+<ul class="simple">
+<li>books/book_list.html: Show the list of&nbsp;books</li>
+<li>books/book_form.html: Show the book editing&nbsp;form</li>
+<li>registration/login.html: Login&nbsp;form</li>
+<li>registration/logout.html: Logout&nbsp;message</li>
+</ul>
+</div>
+</div>
+<div class="section" id="using-django-simple-history">
+<h2><a class="toc-backref" href="#id13">Using&nbsp;django-simple-history</a></h2>
+<p><a class="reference external" href="https://github.com/treyhunner/django-simple-history">django-simple-history</a>  can be used to not only store the user and date of each modification
+but a different version for each modification. To do that, for every model that is registered
+to be used with django-simple-history, it wil create a second table in
+the database hosting all versions (historical records) of that model. As we can understand this is really powerfull
+since we can see exactly what was changed and also do normal <span class="caps">SQL</span> queries on&nbsp;that!</p>
+<div class="section" id="installation">
+<h3><a class="toc-backref" href="#id14">Installation</a></h3>
+<p>To use django-simple-history in a project, after we do a <tt class="docutils literal">pip install <span class="pre">django-simple-history</span></tt>,
+we just need to add it to <tt class="docutils literal">INSTALLED_APPS</tt> and
+add the <tt class="docutils literal">simple_history.middleware.HistoryRequestMiddleware</tt> to the <tt class="docutils literal">MIDDLEWARE_CLASSES</tt> list.</p>
+<p>Finally, to keep the historical records for a model, just add an instace of <tt class="docutils literal">HistoricalRecords</tt> to this&nbsp;model.</p>
+</div>
+<div class="section" id="id1">
+<h3><a class="toc-backref" href="#id15">Example</a></h3>
+<p>For example, our previously defined <tt class="docutils literal">Book</tt> model will be modified like&nbsp;this:</p>
+<div class="highlight"><pre>class SHBook(models.Model):
+    name = models.CharField(max_length=128)
+    author = models.CharField(max_length=128)
+
+    def get_absolute_url(self):
+        return reverse(&quot;shbook_list&quot;)
+
+    history = HistoricalRecords()
+</pre></div>
+<p>When we run <tt class="docutils literal">python manage.py makemigrations</tt> and <tt class="docutils literal">migrate</tt> this, we&#8217;ll see that beyond the table for SHBook, a table for HistoricalSHBook will be&nbsp;created:</p>
+<pre class="code literal-block">
+Migrations for 'sample':
+  0002_historicalshbook_shbook.py:
+    - Create model HistoricalSHBook
+    - Create model SHBook
+</pre>
+<p>Let&#8217;s see the schema of&nbsp;historicalshbook:</p>
+<pre class="code literal-block">
+CREATE TABLE &quot;sample_historicalshbook&quot; (
+    &quot;id&quot; integer NOT NULL,
+    &quot;name&quot; varchar(128) NOT NULL,
+    &quot;author&quot; varchar(128) NOT NULL,
+    &quot;history_id&quot; integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+    &quot;history_date&quot; datetime NOT NULL,
+    &quot;history_type&quot; varchar(1) NOT NULL,
+    &quot;history_user_id&quot; integer NULL REFERENCES &quot;auth_user&quot; (&quot;id&quot;)
+);
+</pre>
+<p>So we see that it has the <em>same</em> fields as with <tt class="docutils literal">SHBook</tt> (<tt class="docutils literal">id, name, author</tt>) with the addition of
+the primary key (<tt class="docutils literal">history_id</tt>) of this historical record, the date and user that did the change
+(<tt class="docutils literal">history_date</tt>, <tt class="docutils literal">history_user_id</tt>) and the type of the record (created / update /&nbsp;delete).</p>
+<p>So, just by adding a <tt class="docutils literal">HistoricalRecords()</tt> attribute to our model definition we&#8217;ll get complete auditing
+for the instance of that&nbsp;model</p>
+</div>
+<div class="section" id="usage">
+<h3><a class="toc-backref" href="#id16">Usage</a></h3>
+<p>To find out information about the historical records we&#8217;ll just use the <tt class="docutils literal">HistoricalRecords()</tt> attribute
+of that&nbsp;model:</p>
+<p>For example, running <tt class="docutils literal">SHBook.history.filter(id=1)</tt> will return all historical records of the book with
+<tt class="docutils literal">id = 1</tt>. For each one of them we have can use the&nbsp;following:</p>
+<ul class="simple">
+<li>get the user that made the change through the <tt class="docutils literal">history_user</tt> attribute</li>
+<li>get the date of the change through the <tt class="docutils literal">history_date</tt> attribute</li>
+<li>get the type of the change through the <tt class="docutils literal">history_type</tt> attribute (and the corresponding <tt class="docutils literal">get_history_type_dispaly</tt>)</li>
+<li>get a model instance as it was then through the <tt class="docutils literal">history_object</tt> attribute (in order to <tt class="docutils literal">save()</tt> it and revert to this&nbsp;version)</li>
+</ul>
+</div>
+</div>
+<div class="section" id="using-django-reversion">
+<h2><a class="toc-backref" href="#id17">Using&nbsp;django-reversion</a></h2>
+<p><a class="reference external" href="https://github.com/etianen/django-reversion">django-reversion</a>  offers more or less the same functionality of django-simple-history by following a different philosophy:
+Instead of creating an extra table holding the history records for each model, it insteads converts all the fields of each model
+to json and stores that <span class="caps">JSON</span> in the database in a text&nbsp;field.</p>
+<p>This has the advantage that no extra tables are created to the database but the disadvantage that you can&#8217;t easily query
+your historical records. So you may choose one or the other depending on your actual&nbsp;requirements.</p>
+<div class="section" id="id2">
+<h3><a class="toc-backref" href="#id18">Installation</a></h3>
+<p>To use django-reversion in a project, after we do a <tt class="docutils literal">pip install <span class="pre">django-reversion</span></tt>,
+we just need to add it to <tt class="docutils literal">INSTALLED_APPS</tt> and
+add the <tt class="docutils literal">reversion.middleware.RevisionMiddleware</tt> to the <tt class="docutils literal">MIDDLEWARE_CLASSES</tt> list.</p>
+<p>In order to save the revisions of a model, you need to register this model to django-reversion. This can be
+done either through the django-admin, by inheriting the admin class of that model from <tt class="docutils literal">reversion.VersionAdmin</tt>
+or, if you don&#8217;t want to use the admin by <tt class="docutils literal">reversion.register</tt> decorator.</p>
+</div>
+<div class="section" id="id3">
+<h3><a class="toc-backref" href="#id19">Example</a></h3>
+<p>To use django-reversion to keep track of changes to <tt class="docutils literal">Book</tt> we can modify it like&nbsp;this:</p>
+<div class="highlight"><pre>@reversion.register
+class RBook(models.Model):
+    name = models.CharField(max_length=128)
+    author = models.CharField(max_length=128)
+
+    def get_absolute_url(self):
+        return reverse(&quot;rbook_list&quot;)
+</pre></div>
+<p>django-reversion uses two tables in the database to keep track of revisions: <tt class="docutils literal">revision</tt> and <tt class="docutils literal">version</tt>. Let&#8217;s
+take a look at their&nbsp;schemata:</p>
+<pre class="code literal-block">
+.schema reversion_revision
+CREATE TABLE &quot;reversion_revision&quot; (
+    &quot;id&quot; integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+    &quot;manager_slug&quot; varchar(200) NOT NULL,
+    &quot;date_created&quot; datetime NOT NULL,
+    &quot;comment&quot; text NOT NULL,
+    &quot;user_id&quot; integer NULL REFERENCES &quot;auth_user&quot; (&quot;id&quot;)
+);
+
+.schema reversion_version
+CREATE TABLE &quot;reversion_version&quot; (
+    &quot;id&quot; integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+    &quot;object_id&quot; text NOT NULL,
+    &quot;object_id_int&quot; integer NULL,
+    &quot;format&quot; varchar(255) NOT NULL,
+    &quot;serialized_data&quot; text NOT NULL,
+    &quot;object_repr&quot; text NOT NULL,
+    &quot;content_type_id&quot; integer NOT NULL REFERENCES &quot;django_content_type&quot; (&quot;id&quot;),
+    &quot;revision_id&quot; integer NOT NULL REFERENCES &quot;reversion_revision&quot; (&quot;id&quot;)
+);
+</pre>
+<p>As we can understand, the <tt class="docutils literal">revision</tt> table holds information like who created this
+revison (<tt class="docutils literal">user_id</tt>) and when (<tt class="docutils literal">date_created</tt>) while the <tt class="docutils literal">version</tt> stores
+a reference to the object that was modified (through a GenericForeignKey) and
+the actual data (in the <tt class="docutils literal">serialized_data</tt> field). By default it uses <span class="caps">JSON</span>
+to serialize the data (the serialization format is in the <tt class="docutils literal">format</tt> field). There&#8217;s
+an one-to-one relation between <tt class="docutils literal">revision</tt> and <tt class="docutils literal">version</tt>.</p>
+<p>If we create an instance of <tt class="docutils literal">RBook</tt> we&#8217;ll see the following in the&nbsp;database:</p>
+<pre class="code literal-block">
+sqlite&gt; select * from reversion_revision;
+1|default|2015-01-21 10:31:25.233000||1
+
+sqlite&gt; select * from reversion_version;
+1|1|1|json|[{&quot;fields&quot;: {&quot;name&quot;: &quot;asdasdasd&quot;, &quot;author&quot;: &quot;asdasd&quot;}, &quot;model&quot;: &quot;sample.rbook&quot;, &quot;pk&quot;: 1}]|RBook object|12|1
+</pre>
+<p><tt class="docutils literal">date_created</tt> and <tt class="docutils literal">user_id</tt> are stored on <tt class="docutils literal">revision</tt> while <tt class="docutils literal">format</tt>, <tt class="docutils literal">serialized_data</tt>, <tt class="docutils literal">content_type_id</tt> and
+<tt class="docutils literal">object_id_int</tt> (the <tt class="docutils literal">GenericForeignKey</tt>) are stored in <tt class="docutils literal">version</tt>.</p>
+</div>
+<div class="section" id="id4">
+<h3><a class="toc-backref" href="#id20">Usage</a></h3>
+<p>To find out information about an object you have to use the <tt class="docutils literal">reversion.get_for_object(object)</tt> method. In order to be
+easily used in templates I recommend creating the following <tt class="docutils literal">get_versions()</tt> method in each model that is registered with&nbsp;django-reversion</p>
+<pre class="code literal-block">
+def get_versions(self):
+    return reversion.get_for_object(self)
+</pre>
+<p>Now, each version has a <tt class="docutils literal">revision</tt> attribute for the corresponding revision and can be used to do the&nbsp;following:</p>
+<ul class="simple">
+<li>get the user that made the change through the <tt class="docutils literal">revision.user</tt> attribute</li>
+<li>get the date of the change through the <tt class="docutils literal">revision.date_created</tt> attribute</li>
+<li>get the values of the object fields as they were in this revision using the <tt class="docutils literal">field_dict</tt> attribute</li>
+<li>get a model instance as it was on that revision using the <tt class="docutils literal">object_version.object</tt> attribute</li>
+<li>revert to that previous version of that object using the <tt class="docutils literal">rever()</tt> method</li>
+</ul>
 </div>
 </div>
 <div class="section" id="conclusion">
-<h2><a class="toc-backref" href="#id11">Conclusion</a></h2>
-<p>In the previous a complete example of configuring a custom authorities populator was represented. Using this configuration we can login through the <span class="caps">LDAP</span> server of our organization but use application specific roles for our logged-in&nbsp;users.</p>
-<!-- font-size: 0.5em;
-vertical-align: top; -->
-<table class="docutils footnote" frame="void" id="id2" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id1">[*]</a></td><td>Which is how spring calls the groups/roles the user belongs to</td></tr>
-</tbody>
-</table>
+<h2><a class="toc-backref" href="#id21">Conclusion</a></h2>
+<p>In the above we say that it is really easy to add basic (<em>who</em> and <em>when</em>) auditing capabilities to your models: You just need to
+inherit your models from the <tt class="docutils literal">Auditable</tt> abstract class and inherit your Create and Update CBVs from <tt class="docutils literal">AuditableMixin</tt>.
+If you want to know exactly <em>what</em> was changed then you have two solutions: django-simple-history to create an extra table for
+each of your models so you&#8217;ll be able to query your historical records (and easily extra aggregates, statistics etc) and
+django-reversion to save each version as a json object, so no extra tables will be&nbsp;created.</p>
+<p>All three solutions for auditing have been implemented in a sample project at <a class="reference external" href="https://github.com/spapas/auditing-sample">https://github.com/spapas/auditing-sample</a>.</p>
+<p>You can clone the project and, preferrably in a virtual environment, install requirements (<tt class="docutils literal">pip install <span class="pre">-r</span> requirements.txt</tt>),
+do a migrate (<tt class="docutils literal">python manage.py migrate</tt> &#8212; uses sqlite3 by default) and run the local development
+server (<tt class="docutils literal">python manage.py ruinserver</tt>).</p>
 </div>
 </div>
   		</article>
   		<article>
 <header>
       <h1 class="entry-title">
-        <a href="http://spapas.github.io/2013/10/08/git-branches/">git branches</a>
+        <a href="http://spapas.github.io/2014/12/16/change-bootstrap-material-primary-color/">Change the primary color of bootstrap material design</a>
       </h1>
-      <p class="meta"><time datetime="2013-10-08T13:20:00" pubdate>Τρι 08 Οκτώβριος 2013</time></p>
+    <p class="meta">
+<time datetime="2014-12-16T16:20:00+02:00" pubdate>Τρι 16 Δεκέμβριος 2014</time>    </p>
 </header>
 
-  <div class="entry-content"><div class="contents topic" id="contents">
-<p class="topic-title first">Contents</p>
-<ul class="simple">
-<li><a class="reference internal" href="#introduction" id="id1">Introduction</a></li>
-<li><a class="reference internal" href="#creating-a-new-git-repository" id="id2">Creating a new git&nbsp;repository</a></li>
-<li><a class="reference internal" href="#branching" id="id3">Branching</a></li>
-<li><a class="reference internal" href="#remote-branches" id="id4">Remote&nbsp;branches</a></li>
-</ul>
+  <div class="entry-content"><div class="section" id="warning-updated-on-05-february-2015">
+<h2>Warning - updated on 05 February&nbsp;2015</h2>
+<p>I recently noticed (to my surprise) that bootstrap-material-design has a not-very-open license
+(<a class="reference external" href="https://github.com/FezVrasta/bootstrap-material-design/blob/master/LICENSE.md">https://github.com/FezVrasta/bootstrap-material-design/blob/master/<span class="caps">LICENSE</span>.md</a>).
+Quoting from&nbsp;there:</p>
+<blockquote>
+You can use this software for free only for no-profit projects. If you&#8217;d like to use this software in a commercial project you may contact the author (Federico Zivolo) of the software and ask for his permission and fulfill his conditions.</blockquote>
+<p>This is a more general comment, but for me, if you want to develop an open source
+project and receive contributions from people not belonging to your company then you
+<em>need</em> to have a real Open Source License like Apache, <span class="caps">MIT</span>, <span class="caps">BSD</span> or <span class="caps">LGPL</span> (no, I don&#8217;t
+consider <span class="caps">GPL</span> to be really <em>open</em>).</p>
+<p>When people are contributing to an open source project they are doing it because most
+of the times they want to use this project and <em>their</em> contributions to their own
+projects which (most probably) are commercial, so people contributing to
+bootstrap-material-design won&#8217;t be able to use it in their own&nbsp;projects!</p>
+<p><strong>After this, I recommend people to avoid contributing to and stop using bootstrap-material-design
+for their own&nbsp;projects.</strong></p>
+<p>Instead, they should either use vanilla bootstrap, or a (<span class="caps">MIT</span> licensed) theme from <a class="reference external" href="https://bootswatch.com/">bootswatch</a>. Also,
+I&#8217;ve noticed (but not used yet) <a class="reference external" href="https://github.com/viewflow/django-material">django-material</a> which seems like a nice solution for django&nbsp;projects.</p>
 </div>
 <div class="section" id="introduction">
-<h2><a class="toc-backref" href="#id1">Introduction</a></h2>
-<p>A <a class="reference external" href="http://git-scm.com/book/en/Git-Branching-What-a-Branch-Is">branch</a> is a very interesting git feature. With this you may have more than one <em>branches</em> in the same repository. The main
-usage of this feature would be to create different versions of your source code to parallel test development of different features.
-When the development of each of these features has been finished then the different versions would need to be combined (or merged) to a
-single version. Of course, merging is not always the result of branching - some branches may exist indefinitely or other may just  be
-deleted without&nbsp;merging.</p>
-<p>I will try to experiment with it and comment on the&nbsp;results.</p>
+<h2>Introduction</h2>
+<p><a class="reference external" href="https://github.com/FezVrasta/bootstrap-material-design">Bootstrap Material Design</a> is a great theme that sits on top of <a class="reference external" href="http://getbootstrap.com/">Bootstrap</a> and transforms it to
+<a class="reference external" href="http://www.google.com/design/spec/material-design/introduction.html">Material Design</a>! The great thing about Bootstrap Material Design is that you just need to include
+its css and js files after your Bootstrap files and&nbsp;&#8230;</p>
+<p>boom! Your page is Material Design&nbsp;compatible!</p>
+<object data="https://google.github.io/material-design-icons/action/svg/ic_thumb_up_24px.svg" type="image/svg+xml">
+</object>
+<p>A nice feature of Bootstrap Material Design is that you can change its default color to a new one (I
+don&#8217;t really like the current - greenish one). This is easy for people with less skills however I
+found it rather challenging when I tried it. That&#8217;s why I will present a step by step tutorial on
+changing the default primary color of the Bootstrap Material Design&nbsp;theme:</p>
 </div>
-<div class="section" id="creating-a-new-git-repository">
-<h2><a class="toc-backref" href="#id2">Creating a new git&nbsp;repository</a></h2>
-<p>Let&#8217;s start by creating a new git&nbsp;repository:</p>
-<pre class="code literal-block">
-D:\&gt;mkdir testgit
-D:\&gt;cd testgit
-D:\testgit&gt;echo contents 11 &gt; file1.txt
-D:\testgit&gt;echo contents 222 &gt; file2.txt
-D:\testgit&gt;echo 3333 &gt; file2.txt
-D:\testgit&gt;copy con file3.txt
-line 1 of file 3
-
-line 3 of file 3
-
-test
-
-line 7 of file 3
-^Z
-       1 files copied.
-
-D:\testgit&gt;git init
-Initialized empty Git repository in D:/testgit/.git/
-D:\testgit&gt;git add .
-D:\testgit&gt;git commit -m Initial
-[master (root-commit) 96ca9af] Initial
- 3 files changed, 9 insertions(+)
- create mode 100644 file1.txt
- create mode 100644 file2.txt
- create mode 100644 file3.txt
-</pre>
-<p>To see the branch we are in we can use the <tt class="docutils literal">git branch</tt> command. Also <tt class="docutils literal">git status</tt> outputs the current&nbsp;branch:</p>
-<pre class="code literal-block">
-D:\testgit&gt;git status
-# On branch master
-nothing to commit, working directory clean
-D:\testgit&gt;git branch
-* master
-</pre>
-<p>So, it seems that when we create a new repository, a &quot;master&quot; branch is&nbsp;created.</p>
+<div class="section" id="step-1-get-the-code">
+<h2>Step 1: Get the&nbsp;code</h2>
+<p>Use git to make a local clone of the project with <tt class="docutils literal">git clone <span class="pre">https://github.com/FezVrasta/bootstrap-material-design.git</span></tt>. This will create a directory
+named <tt class="docutils literal"><span class="pre">bootstrap-material-design</span></tt>. Or you can download the latest version of the code using (<a class="reference external" href="https://github.com/FezVrasta/bootstrap-material-design/archive/master.zip">https://github.com/FezVrasta/bootstrap-material-design/archive/master.zip</a>)
+and unzip it to the <tt class="docutils literal"><span class="pre">bootstrap-material-design</span></tt> directory.</p>
 </div>
-<div class="section" id="branching">
-<h2><a class="toc-backref" href="#id3">Branching</a></h2>
-<p>Lets create a new branch and change our working branch to&nbsp;it:</p>
-<pre class="code literal-block">
-D:\testgit&gt;git branch slave
-D:\testgit&gt;git branch
-* master
-  slave
-D:\testgit&gt;git checkout slave
-Switched to branch 'slave'
-D:\testgit&gt;git branch
-  master
-* slave
-</pre>
-<p>We can see that now the slave branch is the current one. Let&#8217;s do some changes and add commit them to the slave&nbsp;branch:</p>
-<pre class="code literal-block">
-D:\testgit&gt;git branch
-  master
-* slave
-D:\testgit&gt;echo new file1 contents &gt; file1.txt
-D:\testgit&gt;git commit -m &quot;Slave modification&quot;
-[slave b6083ad] Slave modification
- 1 file changed, 1 insertion(+), 1 deletion(-)
-D:\testgit&gt;git checkout master
-Switched to branch 'master'
-D:\testgit&gt;more file1.txt
-contents 11
-D:\testgit&gt;git checkout slave
-Switched to branch 'slave'
-D:\testgit&gt;more file1.txt
-new file1 contents
-</pre>
-<p>So the contents of file1.txt in the branch master is <tt class="docutils literal">contents 11</tt> while the contents of the same file
-in the branch slave is <tt class="docutils literal">new file1 contents</tt>.</p>
-<p>An interested behaviour is what happens with uncommit changes when changing branches. Let&#8217;s try deleting a&nbsp;file:</p>
-<pre class="code literal-block">
-D:\testgit&gt;del file2.txt
-D:\testgit&gt;git status
-# On branch master
-# Changes not staged for commit:
-#   (use &quot;git add/rm &lt;file&gt;...&quot; to update what will be committed)
-#   (use &quot;git checkout -- &lt;file&gt;...&quot; to discard changes in working directory)
-#
-#       deleted:    file2.txt
-#
-no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&quot;)
-D:\testgit&gt;git checkout slave
-D       file2.txt
-Switched to branch 'slave'
-D:\testgit&gt;git status
-# On branch slave
-# Changes not staged for commit:
-#   (use &quot;git add/rm &lt;file&gt;...&quot; to update what will be committed)
-#   (use &quot;git checkout -- &lt;file&gt;...&quot; to discard changes in working directory)
-#
-#       deleted:    file2.txt
-#
-no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&quot;)
-D:\testgit&gt;git add -A
-D:\testgit&gt;git status
-# On branch slave
-# Changes to be committed:
-#   (use &quot;git reset HEAD &lt;file&gt;...&quot; to unstage)
-#
-#       deleted:    file2.txt
-#
-D:\testgit&gt;git checkout master
-D       file2.txt
-Switched to branch 'master'
-D:\testgit&gt;git status
-# On branch master
-# Changes to be committed:
-#   (use &quot;git reset HEAD &lt;file&gt;...&quot; to unstage)
-#
-#       deleted:    file2.txt
-#
-</pre>
-<p>So, our changes are not correlated with a branch until we commit them! Let&#8217;s commit them to the master repository and confirm&nbsp;that:</p>
-<pre class="code literal-block">
-D:\testgit&gt;git commit -m &quot;Deleted file2.txt&quot;
-[master 6f8749d] Deleted file2.txt
- 1 file changed, 1 deletion(-)
- delete mode 100644 file2.txt
-D:\testgit&gt;git status
-# On branch master
-nothing to commit, working directory clean
-D:\testgit&gt;dir file2.txt
-[...]
-File not found
-D:\testgit&gt;git checkout slave
-Switched to branch 'slave'
-D:\testgit&gt;git status
-# On branch slave
-nothing to commit, working directory clean
-D:\testgit&gt;dir file2.txt
-[...]
-08/10/2013  05:59 pm                15 file2.txt
-</pre>
-<p>This is interesting&#8230; Let&#8217;s try modifying the file2.txt (which does not exist to the master&nbsp;branch):</p>
-<pre class="code literal-block">
-D:\testgit&gt;git branch
-  master
-* slave
-D:\testgit&gt;echo new file2 contents &gt; file2.txt
-D:\testgit&gt;git add .
-D:\testgit&gt;git status
-# On branch slave
-# Changes to be committed:
-#   (use &quot;git reset HEAD &lt;file&gt;...&quot; to unstage)
-#
-#       modified:   file2.txt
-#
-D:\testgit&gt;git checkout master
-error: Your local changes to the following files would be overwritten by checkout:
-       file2.txt
-Please, commit your changes or stash them before you can switch branches.
-Aborting
-</pre>
-<p>We won&#8217;t be able to change the current branch until we commit the conflicting&nbsp;change:</p>
-<pre class="code literal-block">
-D:\testgit&gt;git commit -m &quot;Modified file2&quot;
-[slave b5af832] Modified file2
- 1 file changed, 1 insertion(+), 1 deletion(-)
-D:\testgit&gt;git checkout master
-Switched to branch 'master'
-</pre>
+<div class="section" id="step-2-install-node-js-and-npm">
+<h2>Step 2: Install node.js and&nbsp;npm</h2>
+<p>You need to have <a class="reference external" href="http://nodejs.org/">node.js</a> and npm installed in your system - this is something very easy so I won&#8217;t go into any details about this. After you have installed
+both node.js and npm you need to put them in your path so that you&#8217;ll be able to run <tt class="docutils literal">npm <span class="pre">-v</span></tt> without errors and receive something like <tt class="docutils literal">1.4.14</tt>.</p>
 </div>
-<div class="section" id="remote-branches">
-<h2><a class="toc-backref" href="#id4">Remote&nbsp;branches</a></h2>
-<p>For each local repository you can define a number of remote repositories, or <a class="reference external" href="http://git-scm.com/book/en/Git-Basics-Working-with-Remotes">remotes</a> as git calls them.
-When you clone a repository from github.com, your local repository will have one remote, named origin. We will
-try to add the same remote by hand. Let&#8217;s suppose that we have created a repository in github.com named
-testgit. After that we wil&nbsp;issue:</p>
+<div class="section" id="step-3-install-less">
+<h2>Step 3: Install&nbsp;less</h2>
+<p><a class="reference external" href="http://lesscss.org/">less</a> is a <span class="caps">CSS</span> preprocessor in which Bootstrap Material Design has been written. To install it, just enter the command <tt class="docutils literal">npm install <span class="pre">-g</span> less</tt>. After that
+you should have a command named <tt class="docutils literal">lessc</tt> which, when run would output something like: <tt class="docutils literal">lessc 2.1.1 (Less Compiler) [JavaScript]</tt>.</p>
+</div>
+<div class="section" id="step-4-create-the-customizations-files">
+<h2>Step 4: Create the customizations&nbsp;files</h2>
+<p>Go to the directory where you cloned (or unzipped) the Bootstrap Material Design code and create a file named <tt class="docutils literal">custom.less</tt> (so, that file should be
+in the same folder as with <tt class="docutils literal">bower.json</tt>, <tt class="docutils literal">Gruntfile.js</tt> etc) with the following&nbsp;contents:</p>
 <pre class="code literal-block">
-D:\testgit&gt;git remote
-D:\testgit&gt;git remote add origin https://github.com/spapas/testgit.git
-D:\testgit&gt;git remote
-origin
-</pre>
-<p>So no we have one remote named origin that is linked with <a class="reference external" href="https://github.com/spapas/testgit.git">https://github.com/spapas/testgit.git</a>. Let&#8217;s try to push our master
-branch to the origin&nbsp;remote:</p>
-<pre class="code literal-block">
-D:\testgit&gt;git push origin master
-Username for 'https://github.com': spapas
-Password for 'https://spapas&#64;github.com':
-Counting objects: 7, done.
-Delta compression using up to 4 threads.
-Compressing objects: 100% (5/5), done.
-Writing objects: 100% (7/7), 531 bytes, done.
-Total 7 (delta 1), reused 0 (delta 0)
-To https://github.com/spapas/testgit.git
- * [new branch]      master -&gt; master
-D:\testgit&gt;git branch -r
-  master
-* slave
-  remote/origin/master
-</pre>
-<p>We see now that we have <em>three</em> branches. Two local (master slave) and one remote (origin/master).  We will also add the slave remote&nbsp;(origin/slave):</p>
-<pre class="code literal-block">
-D:\testgit&gt;git branch -r
-  origin/master
-  origin/slave
-</pre>
-<p>Let&#8217;s do a change to our local repository and then push them to the&nbsp;remote:</p>
-<pre class="code literal-block">
-D:\testgit&gt;notepad file3.txt
-D:\testgit&gt;git add .
-D:\testgit&gt;git status
-# On branch slave
-# Changes to be committed:
-#   (use &quot;git reset HEAD &lt;file&gt;...&quot; to unstage)
-#
-#       modified:   file3.txt
-#
-D:\testgit&gt;git commit -m &quot;Changed file3.txt&quot;
-[slave ce3b7b9] Changed file3.txt
- 1 file changed, 1 insertion(+), 1 deletion(-)
-D:\testgit&gt;git push origin slave
-Username for 'https://github.com': spapas
-Password for 'https://spapas&#64;github.com':
-Counting objects: 5, done.
-Delta compression using up to 4 threads.
-Compressing objects: 100% (3/3), done.
-Writing objects: 100% (3/3), 299 bytes, done.
-Total 3 (delta 1), reused 0 (delta 0)
-To https://github.com/spapas/testgit.git
-   b5af832..ce3b7b9  slave -&gt; slave
-</pre>
-<p>Everything works as expected. The final thing to test is to try checking out a remote&nbsp;branch:</p>
-<pre class="code literal-block">
-D:\testgit&gt;git checkout master
-Switched to branch 'master'
-D:\testgit&gt;echo new new file1 &gt; file1.txt
-D:\testgit&gt;more file1.txt
- new new file1
-D:\testgit&gt;git checkout origin/master
-M       file1.txt
-Note: checking out 'origin/master'.
+&#64;import &quot;less/material.less&quot;;
 
-You are in 'detached HEAD' state. You can look around, make experimental
-changes and commit them, and you can discard any commits you make in this
-state without impacting any branches by performing another checkout.
-
-If you want to create a new branch to retain commits you create, you may
-do so (now or later) by using -b with the checkout command again. Example:
-
-  git checkout -b new_branch_name
-
-HEAD is now at 6f8749d... Deleted file2.txt
-D:\testgit&gt;git status
-# Not currently on any branch.
-# Changes not staged for commit:
-#   (use &quot;git add &lt;file&gt;...&quot; to update what will be committed)
-#   (use &quot;git checkout -- &lt;file&gt;...&quot; to discard changes in working directory)
-#
-#       modified:   file1.txt
-#
-no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&quot;)
-D:\testgit&gt;more file1.txt
-new new file1
+// Override &#64;primary color with one took from _colors.less
+&#64;primary: &#64;indigo;
 </pre>
-<p>So, it seems that  when we check out the remote branch, we won&#8217;t have any local branches, however the change we did to the file1.txt
-is transfered just like when switching from one local repository to another. We can then add the changes and&nbsp;commit:</p>
-<pre class="code literal-block">
-D:\testgit&gt;git add .
-D:\testgit&gt;git commit
-[detached HEAD 506674c] foo
- 1 file changed, 1 insertion(+), 1 deletion(-)
- D:\testgit&gt;git status
-# Not currently on any branch.
-nothing to commit, working directory clean
-D:\testgit&gt;git branch
-* (no branch)
-  master
-  slave
-</pre>
-<p>So we are working with an unnamed branch! We have to name it to be able to work without&nbsp;problems:</p>
-<pre class="code literal-block">
-D:\testgit&gt;git checkout -b named_branch
-Switched to a new branch 'named_branch'
-D:\testgit&gt;git branch
-  master
-* named_branch
-  slave
-</pre>
-<p>Finally we may push again the named_branch to our remote&nbsp;origin.</p>
+<p>(I wanted to use the indigo color as my primary one - you may of course use whichever color from the ones defined in <tt class="docutils literal">less/_variables.less</tt> you&nbsp;like)</p>
+<p>This file may contain other default values for variables - if I find anything useful I will add it to this post (also please reply with any&nbsp;recommendations).</p>
 </div>
-</div>
-  		</article>
-  		<article>
-<header>
-      <h1 class="entry-title">
-        <a href="http://spapas.github.io/2013/10/07/pelican-static-windows/">Using pelican to generate static sites on windows</a>
-      </h1>
-      <p class="meta"><time datetime="2013-10-07T10:20:00" pubdate>Δευ 07 Οκτώβριος 2013</time></p>
-</header>
-
-  <div class="entry-content"><div class="contents topic" id="contents">
-<p class="topic-title first">Contents</p>
-<ul class="simple">
-<li><a class="reference internal" href="#introduction" id="id1">Introduction</a></li>
-<li><a class="reference internal" href="#installing-pelican-and-generating-a-skeleton-for-your-site" id="id2">Installing pelican and generating a skeleton for your&nbsp;site</a></li>
-<li><a class="reference internal" href="#modifying-pelican-tools-for-windows" id="id3">Modifying pelican tools for&nbsp;windows</a></li>
-<li><a class="reference internal" href="#configuration-of-your-skeleton-site" id="id4">Configuration of your skeleton site</a><ul>
-<li><a class="reference internal" href="#settings" id="id5">Settings</a></li>
-<li><a class="reference internal" href="#themes" id="id6">Themes</a></li>
-<li><a class="reference internal" href="#plugins" id="id7">Plugins</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#hosting-in-github-pages" id="id8">Hosting in github&nbsp;pages</a></li>
-</ul>
-</div>
-<div class="section" id="introduction">
-<h2><a class="toc-backref" href="#id1">Introduction</a></h2>
-<p><a class="reference external" href="http://docs.getpelican.com/en/3.3.0/">Pelican</a> is a great static site generator. A static site generator is a tool that users a number of input files to
-generate a complete html site. No database or server side scripting is needed for the resulting site, that&#8217;s why
-many such sites are hosted on <a class="reference external" href="http://pages.github.com/">github pages</a> (more on this&nbsp;later).</p>
-<p>The input contains a number of html templates, css styles and the actual content of the site which most of the time is written in a
-<a class="reference external" href="http://en.wikipedia.org/wiki/Lightweight_markup_language">lightweight markup language</a> like <a class="reference external" href="http://docutils.sourceforge.net/rst.html">reStructuredText</a> or <a class="reference external" href="http://daringfireball.net/projects/markdown/">Markdown</a>. The static site generator will generate the static pages by
-inserting the content in the appropriate places in the&nbsp;templates.</p>
-<p>In the following sections we will describe the installation of pelican on Windows
-and the creation of the spapas.github.io&nbsp;site.</p>
-</div>
-<div class="section" id="installing-pelican-and-generating-a-skeleton-for-your-site">
-<h2><a class="toc-backref" href="#id2">Installing pelican and generating a skeleton for your&nbsp;site</a></h2>
-<p>The official pelican quickstart can be found in <a class="reference external" href="http://docs.getpelican.com/en/latest/getting_started.html">http://docs.getpelican.com/en/latest/getting_started.html</a></p>
-<p>To install pelican just&nbsp;enter:</p>
-<pre class="code literal-block">
-&gt;pip install pelican
-</pre>
-<p>After installing pelican, I propose creating a parent directory that will
-contain all your pelican sites, along with extra themes and plugins like&nbsp;this:</p>
-<pre class="literal-block">
-pelican/
-  ├── pelican-themes
-  ├── other-pelican-theme
-  ├── spapas.github.io
-  └── other-sites
-</pre>
-<p>After creating the pelican directory just go in it with a command line and run the <tt class="docutils literal"><span class="pre">pelican-quickstart</span></tt> command.
-It will ask you a number of questions, take a look at how I did answer&nbsp;these:</p>
-<pre class="code literal-block">
-pelican&gt;pelican-quickstart
-Welcome to pelican-quickstart v3.2.2.
-
-This script will help you create a new Pelican-based website.
-
-Please answer the following questions so this script can generate the files
-needed by Pelican.
-
-
-&gt; Where do you want to create your new web site? [.] spapas.github.io
-&gt; What will be the title of this web site? Test github.io
-&gt; Who will be the author of this web site? Serafeim
-&gt; What will be the default language of this web site? [en]
-&gt; Do you want to specify a URL prefix? e.g., http://example.com   (Y/n)
-&gt; What is your URL prefix? (see above example; no trailing slash) http://spapas.github.io
-&gt; Do you want to enable article pagination? (Y/n)
-&gt; How many articles per page do you want? [10]
-&gt; Do you want to generate a Makefile to easily manage your website? (Y/n) n
-&gt; Do you want an auto-reload &amp; simpleHTTP script to assist with theme and site development? (Y/n) n
-Done. Your new project is available at C:\progr\py\pelican\spapas.github.io
-</pre>
-<p>After that, you will have a pelican/spapas.github.io folder that will contain the following&nbsp;content:</p>
-<pre class="literal-block">
-spapas.github.io/
-  ├── content
-  ├── output
-  ├── pelicanconf.py
-  └── publishconf.py
-</pre>
-<p>The content folder will contain your content (rst or markdown), the output will contain the generated html after you run pelican for your site.
-The <tt class="docutils literal">pelicanconf.py</tt> will have a number of options for the generation of the development version of your site while the <tt class="docutils literal">publishconf.py</tt> will override some of the options
-of <tt class="docutils literal">pelicanconf.py</tt> before generating the production version of your site that will actually be uploaded to github&nbsp;pages.</p>
-</div>
-<div class="section" id="modifying-pelican-tools-for-windows">
-<h2><a class="toc-backref" href="#id3">Modifying pelican tools for&nbsp;windows</a></h2>
-<p>Pelican uses a Makefile and a unix shell script to generate the static html files and start an http server for development.
-Because I prefer to use windows, I answered no to the questions of generating these when pelican-quickstarte asked me.
-Instead I have included the following files inside the spapas.github.io&nbsp;directory:</p>
-<ul class="simple">
-<li><tt class="docutils literal">pelrun.bat</tt>, to generate the content for your debug site in the output&nbsp;directory:</li>
-</ul>
-<pre class="code literal-block">
-pelican content --debug --autoreload  --output output --settings pelicanconf.py
-</pre>
-<ul class="simple">
-<li><tt class="docutils literal">pelserve.bat</tt>, to localy serve the generated debug&nbsp;site:</li>
-</ul>
-<pre class="code literal-block">
-pushd output
-python -m pelican.server
-popd
-</pre>
-<ul class="simple">
-<li><tt class="docutils literal">pelpub.bat</tt>, to generate the production site in the output&nbsp;directory:</li>
-</ul>
-<pre class="code literal-block">
-pelican content --output output --settings publishconf.py
-</pre>
-<p>Now, when you want to develop your site locally,&nbsp;enter:</p>
-<pre class="code literal-block">
-spapas.github.io&gt;start pelrun.bat
-spapas.github.io&gt;start pelserv.bat
-</pre>
-<p>If everything was ok until now, you can visit <a class="reference external" href="http://127.0.0.1:8000">http://127.0.0.1:8000</a> and will get the following&nbsp;output:</p>
-<img alt="all ok!" src="/images/site1.png" style="width: 780px;" />
-<p>Because of the -r option that is used in <tt class="docutils literal">pelrun.bat</tt> whenever you do a change (for instance when you add an rst file in the content directory)
-it will be discovered and the output will be changed&nbsp;immediately!</p>
-</div>
-<div class="section" id="configuration-of-your-skeleton-site">
-<h2><a class="toc-backref" href="#id4">Configuration of your skeleton&nbsp;site</a></h2>
-<div class="section" id="settings">
-<h3><a class="toc-backref" href="#id5">Settings</a></h3>
-<p>There is a number of settings that you may configure in your site. The pelican settings reference can be found here: <a class="reference external" href="http://docs.getpelican.com/en/latest/settings.html">http://docs.getpelican.com/en/latest/settings.html</a>.
-The pelicanconf.py and publishconf.py for this site can be found&nbsp;here:</p>
-<p><a class="reference external" href="https://github.com/spapas/spapas.github.io/blob/source/pelicanconf.py">https://github.com/spapas/spapas.github.io/blob/source/pelicanconf.py</a>
-<a class="reference external" href="https://github.com/spapas/spapas.github.io/blob/source/publishconf.py">https://github.com/spapas/spapas.github.io/blob/source/publishconf.py</a></p>
-<p>The most important difference is the RELATIVE_URLS directive which must be True to the debug and False to the&nbsp;production.</p>
-</div>
-<div class="section" id="themes">
-<h3><a class="toc-backref" href="#id6">Themes</a></h3>
-<p>Beyond the default pelican theme, you can use configure pelican to use various other themes. To enable them, go to your pelican parent directory and clone the pelican-themes github&nbsp;repository:</p>
-<pre class="code literal-block">
-pelican&gt;git clone https://github.com/getpelican/pelican-themes.git
-</pre>
-<p>After that, you may select your theme from&nbsp;pelicanconf.py:</p>
-<pre class="code literal-block">
-THEME = &quot;../pelican-themes/theme-name&quot;
-</pre>
-<p>In my configuration, I am using the Octopress Theme for Pelican, which you may get from here <a class="reference external" href="https://github.com/duilio/pelican-octopress-theme">https://github.com/duilio/pelican-octopress-theme</a>. Just clone it to your
-pelican directory and refer to it as&nbsp;above.</p>
-</div>
-<div class="section" id="plugins">
-<h3><a class="toc-backref" href="#id7">Plugins</a></h3>
-<p>Pelican has a number of plugins. To enable them, go to your pelican parent directory and clone the pelican-plugins github&nbsp;repository:</p>
-<pre class="code literal-block">
-pelican&gt;git clone https://github.com/getpelican/pelican-plugins.git
-</pre>
-<p>After that, you may add the following two lines to your&nbsp;pelicanconf.py:</p>
-<pre class="code literal-block">
-PLUGIN_PATH = '../pelican-plugins'
-PLUGINS = ['a-plugin']
-</pre>
-</div>
-</div>
-<div class="section" id="hosting-in-github-pages">
-<h2><a class="toc-backref" href="#id8">Hosting in github&nbsp;pages</a></h2>
-<p>To host your static site in github pages you must first of all create a repository named
-username.github.io (for instance spapas.github.io) from&nbsp;github.</p>
-<p>Then, generate your production&nbsp;output:</p>
-<pre class="code literal-block">
-spapas.github.io&gt;pelpub.bat
-</pre>
-<p>Finally, go to your output directory, create a git repository, add everything and push it to your&nbsp;repository:</p>
-<pre class="code literal-block">
-spapas.github.io\output&gt;git init
-spapas.github.io\output&gt;git add .
-spapas.github.io\output&gt;git commit -m Initial
-spapas.github.io\output&gt;git remote add origin https://github.com/spapas/spapas.github.io.git
-spapas.github.io\output&gt;git push master --force
-</pre>
-<p>The &#8212;force is to overwrite any previous versions - you don&#8217;t care about version control on your output (but you want it on your&nbsp;source).</p>
-<p>You can now visit <a class="reference external" href="http://username.github.io">http://username.github.io</a> and see your statically generated site&nbsp;!</p>
-<p>Don&#8217;t forget to add your source to the version control! To do that, add a .gitignore file in your pelican/username.github.io direcory
-containing the&nbsp;following:</p>
-<pre class="code literal-block">
-output
-</pre>
-<p>The above file will ignore the contents of the output directory from version control. After that, do the&nbsp;following:</p>
-<pre class="code literal-block">
-spapas.github.io&gt;git init
-spapas.github.io&gt;git add .
-spapas.github.io&gt;git commit -m Initial
-spapas.github.io&gt;git branch -m master source
-spapas.github.io&gt;git remote add origin https://github.com/spapas/spapas.github.io.git
-spapas.github.io&gt;git push origin source
-</pre>
-<p>The above will rename the master branch to source, will attach the origin remote to <a class="reference external" href="https://github.com/spapas/spapas.github.io.git">https://github.com/spapas/spapas.github.io.git</a> and will push the source
-branch to it. Now you will have two branches in your username.github.io repository. One
-named origin/master that will be your actual site and will be displayed through <a class="reference external" href="http://username.github.io">http://username.github.io</a> and one named origin/source that will contain the source of your&nbsp;site.</p>
-<p>To learn more about branches and remotes you may check out <a class="reference external" href="http://spapas.github.io/2013/10/08/git-branches/">the git branches article</a>.</p>
+<div class="section" id="step-5-create-your-custom-material-css-file">
+<h2>Step 5: Create your custom material css&nbsp;file</h2>
+<p>Finally, run the following command: <tt class="docutils literal">lessc custom.less&nbsp; &gt; <span class="pre">material-custom.css</span></tt>. This will create a file named <tt class="docutils literal"><span class="pre">material-custom.css</span></tt> that contains your
+custom version of Bootstrap Material Design! If you want your <tt class="docutils literal"><span class="pre">material-custom.css</span></tt> to be compressed, add the <tt class="docutils literal"><span class="pre">-x</span></tt> option like this:  <tt class="docutils literal">lessc <span class="pre">-x</span> custom.less&nbsp; &gt; <span class="pre">material-custom.css</span></tt>.</p>
+<p>You may now include <tt class="docutils literal"><span class="pre">material-custom.css</span></tt> instead of <tt class="docutils literal">material.css</tt> (or the minified version of it) to your projects and you&#8217;ll have your own primary&nbsp;color!</p>
 </div>
 </div>
   		</article>
 <div class="pagination">
+    <a class="prev" href="http://spapas.github.io/index3.html">&larr; Older</a>
 
     <a class="next" href="http://spapas.github.io/index.html">Newer &rarr;</a>
   <br />
 </div></div>
 <aside class="sidebar">
   <section>
+  <br />
+  <a href='/feeds/all.atom.xml'>Atom</a> 
+  |
+  <a href='/feeds/all.rss.xml'>RSS</a> 
+  </section>
+  <section>
     <h1>Recent Posts</h1>
     <ul id="recent_posts">
       <li class="post">
-          <a href="http://spapas.github.io/2014/10/23/retrieve-gmail-blocked-attachments/">Retrieving Gmail blocked attachments</a>
+          <a href="http://spapas.github.io/2015/09/08/more-complex-react-flux-example/">A (little more) complex react and flux example</a>
       </li>
       <li class="post">
-          <a href="http://spapas.github.io/2014/09/15/django-non-html-responses/">Django non-HTML responses</a>
+          <a href="http://spapas.github.io/2015/09/01/django-rq-redux/">django-rq redux: advanced techniques and tools</a>
       </li>
       <li class="post">
-          <a href="http://spapas.github.io/2014/06/30/rest-flask-mongodb-heroku/">Implementing a simple, Heroku-hosted REST service using Flask and mongoDB</a>
+          <a href="http://spapas.github.io/2015/07/02/comprehensive-react-flux-tutorial-2/">A comprehensive React and Flux tutorial part 2: Flux</a>
       </li>
       <li class="post">
-          <a href="http://spapas.github.io/2014/04/11/django-generic-formviews-for-objects/">Django generic FormViews for objects</a>
+          <a href="http://spapas.github.io/2015/06/05/comprehensive-react-flux-tutorial/">A comprehensive React and Flux tutorial part 1: React</a>
       </li>
       <li class="post">
-          <a href="http://spapas.github.io/2014/02/13/wagtail-tutorial/">A Wagtail tutorial</a>
+          <a href="http://spapas.github.io/2015/05/27/using-browserify-watchify/">Using browserify and watchify to improve your client-side-javascript workflow</a>
       </li>
     </ul>
   </section>
@@ -1204,9 +1188,11 @@ named origin/master that will be your actual site and will be displayed through 
       
     <h1>Categories</h1>
     <ul id="recent_posts">
+        <li><a href="http://spapas.github.io/category/css.html">css</a></li>
         <li><a href="http://spapas.github.io/category/django.html">django</a></li>
         <li><a href="http://spapas.github.io/category/flask.html">flask</a></li>
         <li><a href="http://spapas.github.io/category/git.html">git</a></li>
+        <li><a href="http://spapas.github.io/category/javascript.html">javascript</a></li>
         <li><a href="http://spapas.github.io/category/pelican.html">pelican</a></li>
         <li><a href="http://spapas.github.io/category/python.html">python</a></li>
         <li><a href="http://spapas.github.io/category/spring.html">spring</a></li>
@@ -1217,16 +1203,19 @@ named origin/master that will be your actual site and will be displayed through 
 
   <section>
   <h1>Tags</h1>
-    <a href="http://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="http://spapas.github.io/tag/google.html">google</a>,    <a href="http://spapas.github.io/tag/spring.html">spring</a>,    <a href="http://spapas.github.io/tag/rest.html">rest</a>,    <a href="http://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="http://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="http://spapas.github.io/tag/git.html">git</a>,    <a href="http://spapas.github.io/tag/java.html">java</a>,    <a href="http://spapas.github.io/tag/flask.html">flask</a>,    <a href="http://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="http://spapas.github.io/tag/forms.html">forms</a>,    <a href="http://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="http://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="http://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="http://spapas.github.io/tag/python.html">python</a>,    <a href="http://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="http://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="http://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="http://spapas.github.io/tag/rst.html">rst</a>,    <a href="http://spapas.github.io/tag/branching.html">branching</a>,    <a href="http://spapas.github.io/tag/github.html">github</a>,    <a href="http://spapas.github.io/tag/windows.html">windows</a>,    <a href="http://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="http://spapas.github.io/tag/django.html">django</a>,    <a href="http://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="http://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="http://spapas.github.io/tag/security.html">security</a>  </section>
+    <a href="http://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="http://spapas.github.io/tag/tasks.html">tasks</a>,    <a href="http://spapas.github.io/tag/less.html">less</a>,    <a href="http://spapas.github.io/tag/spring.html">spring</a>,    <a href="http://spapas.github.io/tag/rest.html">rest</a>,    <a href="http://spapas.github.io/tag/google.html">google</a>,    <a href="http://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="http://spapas.github.io/tag/scheduling.html">scheduling</a>,    <a href="http://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="http://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="http://spapas.github.io/tag/git.html">git</a>,    <a href="http://spapas.github.io/tag/java.html">java</a>,    <a href="http://spapas.github.io/tag/rq.html">rq</a>,    <a href="http://spapas.github.io/tag/uglify.html">uglify</a>,    <a href="http://spapas.github.io/tag/django-rq.html">django-rq</a>,    <a href="http://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="http://spapas.github.io/tag/redis.html">redis</a>,    <a href="http://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="http://spapas.github.io/tag/forms.html">forms</a>,    <a href="http://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="http://spapas.github.io/tag/404.html">404</a>,    <a href="http://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="http://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="http://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="http://spapas.github.io/tag/css.html">css</a>,    <a href="http://spapas.github.io/tag/node.html">node</a>,    <a href="http://spapas.github.io/tag/jobs.html">jobs</a>,    <a href="http://spapas.github.io/tag/watchify.html">watchify</a>,    <a href="http://spapas.github.io/tag/python.html">python</a>,    <a href="http://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="http://spapas.github.io/tag/javascript.html">javascript</a>,    <a href="http://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="http://spapas.github.io/tag/react.html">react</a>,    <a href="http://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="http://spapas.github.io/tag/npm.html">npm</a>,    <a href="http://spapas.github.io/tag/rst.html">rst</a>,    <a href="http://spapas.github.io/tag/generic.html">generic</a>,    <a href="http://spapas.github.io/tag/browserify.html">browserify</a>,    <a href="http://spapas.github.io/tag/branching.html">branching</a>,    <a href="http://spapas.github.io/tag/design.html">design</a>,    <a href="http://spapas.github.io/tag/github.html">github</a>,    <a href="http://spapas.github.io/tag/pusher.html">pusher</a>,    <a href="http://spapas.github.io/tag/windows.html">windows</a>,    <a href="http://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="http://spapas.github.io/tag/django.html">django</a>,    <a href="http://spapas.github.io/tag/flux.html">flux</a>,    <a href="http://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="http://spapas.github.io/tag/error.html">error</a>,    <a href="http://spapas.github.io/tag/debug.html">debug</a>,    <a href="http://spapas.github.io/tag/asynchronous.html">asynchronous</a>,    <a href="http://spapas.github.io/tag/security.html">security</a>,    <a href="http://spapas.github.io/tag/flask.html">flask</a>,    <a href="http://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>  </section>
 
 
 
 </aside>    </div>
   </div>
   <footer role="contentinfo"><p>
-    Copyright &copy;  2013-2014  - Serafeim Papastefanos -
+    Copyright &copy;  2013&ndash;2015  Serafeim Papastefanos &mdash;
   <span class="credit">Powered by <a href="http://getpelican.com">Pelican</a></span>
 </p></footer>
+  <script src="http://spapas.github.io/theme/js/modernizr-2.0.js"></script>
+  <script src="http://spapas.github.io/theme/js/ender.js"></script>
+  <script src="http://spapas.github.io/theme/js/octopress.js" type="text/javascript"></script>
     <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -1234,16 +1223,17 @@ named origin/master that will be your actual site and will be displayed through 
     })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
     ga('create', 'UA-44750952-1', 'auto');
+
     ga('send', 'pageview');
     </script>
-	<script type="text/javascript">
-	  var disqus_shortname = 'spapas-github-io';
-	  (function() {
-	    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-	    dsq.src = "//" + disqus_shortname + '.disqus.com/embed.js';
-	    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-	   })();
-	</script>
+  <script type="text/javascript">
+    var disqus_shortname = 'spapas-github-io';
+    (function() {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = "//" + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+     })();
+  </script>
   <script type="text/javascript">
     (function(){
       var twitterWidgets = document.createElement('script');

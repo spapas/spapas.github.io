@@ -19,6 +19,9 @@ In this post we will see three
 different solution in order to add this functionality in Django: doing it ourselves,
 using django-simple-history and using django-reversion. 
 
+*Update 24/09/2015:* Added a paragraph describing the django-reversion-compare which is
+a great addon for django-reversion that makes finding differences between versions a breeze!
+
 Adding simple auditing functionality ourselves
 ==============================================
 
@@ -376,7 +379,25 @@ Now, each version has a ``revision`` attribute for the corresponding revision an
 * get the date of the change through the ``revision.date_created`` attribute
 * get the values of the object fields as they were in this revision using the ``field_dict`` attribute
 * get a model instance as it was on that revision using the ``object_version.object`` attribute
-* revert to that previous version of that object using the ``rever()`` method
+* revert to that previous version of that object using the ``revert()`` method
+
+Comparing versions with django-reversion-compare
+------------------------------------------------
+
+A great addon for django-version is django-reversion-compare_ which helps you find out differences
+between versions of your objects. When you use django-reversion-compare, you'll be able to select
+two (different) versions of your object and you'll be presented with a list of all the differences
+found in the fields of that object between the two versions. The diff algorithm is smart, so you'll
+be able to easily recognise the changes. 
+
+To use django-reversion-compare, after installing it you should just inherit your admin views from 
+``reversion_compare.admin.CompareVersionAdmin`` (instead of ``reversion.VersionAdmin``) and you'll
+get the reversion-compare views instead of reversion views in the admin for the history of the object.
+
+Also, in case you need to give access to normal, non-admin users to the history of an object (this is
+useful for auditing reasons), you can use the ``reversion_compare.views.HistoryCompareDetailView``
+as a normal ``DetailView`` to create a non-admin history and compare diff view.
+
 
 Conclusion
 ==========
@@ -398,3 +419,4 @@ server (``python manage.py ruinserver``).
 .. _auto_now_add: https://docs.djangoproject.com/en/1.7/ref/models/fields/#django.db.models.DateField.auto_now_add
 .. _django-simple-history: https://github.com/treyhunner/django-simple-history
 .. _django-reversion: https://github.com/etianen/django-reversion
+.. _django-reversion-compare: github.com/jedie/django-reversion-compare

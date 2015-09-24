@@ -258,7 +258,8 @@ Long story short, my proposal is to have a redis.conf *inside* your application 
 application. The options in redis.conf that need to be changed per application
 is the port that this redis instance will bind (this port also needs to be passed to 
 django settings.py) and the pid filename if you daemonize redis -- I recommend using
-a tool like supervisord_ instead so that you won't need any daemonizing and pid files for redis!
+a tool like supervisord_ instead so that you won't need any daemonizing and pid files for 
+each per-app-redis-instance!
 
 Low level debugging
 ===================

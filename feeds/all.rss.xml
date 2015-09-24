@@ -1554,7 +1554,8 @@ of instances in a single&amp;nbsp;server.&lt;/p&gt;
 application. The options in redis.conf that need to be changed per application
 is the port that this redis instance will bind (this port also needs to be passed to
 django settings.py) and the pid filename if you daemonize redis &amp;#8212; I recommend using
-a tool like &lt;a class="reference external" href="http://supervisord.org/"&gt;supervisord&lt;/a&gt; instead so that you won&amp;#8217;t need any daemonizing and pid files for&amp;nbsp;redis!&lt;/p&gt;
+a tool like &lt;a class="reference external" href="http://supervisord.org/"&gt;supervisord&lt;/a&gt; instead so that you won&amp;#8217;t need any daemonizing and pid files for
+each&amp;nbsp;per-app-redis-instance!&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="low-level-debugging"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id8"&gt;Low level&amp;nbsp;debugging&lt;/a&gt;&lt;/h2&gt;
@@ -3770,9 +3771,10 @@ to help readers quickly test the concepts presented&amp;nbsp;here.&lt;/p&gt;
 &lt;li&gt;&lt;a class="reference internal" href="#id2" id="id18"&gt;Installation&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a class="reference internal" href="#id3" id="id19"&gt;Example&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a class="reference internal" href="#id4" id="id20"&gt;Usage&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#comparing-versions-with-django-reversion-compare" id="id21"&gt;Comparing versions with&amp;nbsp;django-reversion-compare&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#conclusion" id="id21"&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#conclusion" id="id22"&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
 &lt;div class="section" id="introduction"&gt;
@@ -3782,6 +3784,8 @@ need to know &lt;em&gt;who&lt;/em&gt; did the change, &lt;em&gt;when&lt;/em&gt; 
 In this post we will see three
 different solution in order to add this functionality in Django: doing it ourselves,
 using django-simple-history and using&amp;nbsp;django-reversion.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Update 24/09/2015:&lt;/em&gt; Added a paragraph describing the django-reversion-compare which is
+a great addon for django-reversion that makes finding differences between versions a&amp;nbsp;breeze!&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="adding-simple-auditing-functionality-ourselves"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id6"&gt;Adding simple auditing functionality&amp;nbsp;ourselves&lt;/a&gt;&lt;/h2&gt;
@@ -4074,12 +4078,26 @@ def get_versions(self):
 &lt;li&gt;get the date of the change through the &lt;tt class="docutils literal"&gt;revision.date_created&lt;/tt&gt; attribute&lt;/li&gt;
 &lt;li&gt;get the values of the object fields as they were in this revision using the &lt;tt class="docutils literal"&gt;field_dict&lt;/tt&gt; attribute&lt;/li&gt;
 &lt;li&gt;get a model instance as it was on that revision using the &lt;tt class="docutils literal"&gt;object_version.object&lt;/tt&gt; attribute&lt;/li&gt;
-&lt;li&gt;revert to that previous version of that object using the &lt;tt class="docutils literal"&gt;rever()&lt;/tt&gt; method&lt;/li&gt;
+&lt;li&gt;revert to that previous version of that object using the &lt;tt class="docutils literal"&gt;revert()&lt;/tt&gt; method&lt;/li&gt;
 &lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="comparing-versions-with-django-reversion-compare"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id21"&gt;Comparing versions with&amp;nbsp;django-reversion-compare&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;A great addon for django-version is &lt;a class="reference external" href="github.com/jedie/django-reversion-compare"&gt;django-reversion-compare&lt;/a&gt; which helps you find out differences
+between versions of your objects. When you use django-reversion-compare, you&amp;#8217;ll be able to select
+two (different) versions of your object and you&amp;#8217;ll be presented with a list of all the differences
+found in the fields of that object between the two versions. The diff algorithm is smart, so you&amp;#8217;ll
+be able to easily recognise the&amp;nbsp;changes.&lt;/p&gt;
+&lt;p&gt;To use django-reversion-compare, after installing it you should just inherit your admin views from
+&lt;tt class="docutils literal"&gt;reversion_compare.admin.CompareVersionAdmin&lt;/tt&gt; (instead of &lt;tt class="docutils literal"&gt;reversion.VersionAdmin&lt;/tt&gt;) and you&amp;#8217;ll
+get the reversion-compare views instead of reversion views in the admin for the history of the&amp;nbsp;object.&lt;/p&gt;
+&lt;p&gt;Also, in case you need to give access to normal, non-admin users to the history of an object (this is
+useful for auditing reasons), you can use the &lt;tt class="docutils literal"&gt;reversion_compare.views.HistoryCompareDetailView&lt;/tt&gt;
+as a normal &lt;tt class="docutils literal"&gt;DetailView&lt;/tt&gt; to create a non-admin history and compare diff&amp;nbsp;view.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="section" id="conclusion"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id21"&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id22"&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;In the above we say that it is really easy to add basic (&lt;em&gt;who&lt;/em&gt; and &lt;em&gt;when&lt;/em&gt;) auditing capabilities to your models: You just need to
 inherit your models from the &lt;tt class="docutils literal"&gt;Auditable&lt;/tt&gt; abstract class and inherit your Create and Update CBVs from &lt;tt class="docutils literal"&gt;AuditableMixin&lt;/tt&gt;.
 If you want to know exactly &lt;em&gt;what&lt;/em&gt; was changed then you have two solutions: django-simple-history to create an extra table for

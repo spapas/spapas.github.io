@@ -4108,27 +4108,7 @@ django-reversion to save each version as a json object, so no extra tables will 
 do a migrate (&lt;tt class="docutils literal"&gt;python manage.py migrate&lt;/tt&gt; &amp;#8212; uses sqlite3 by default) and run the local development
 server (&lt;tt class="docutils literal"&gt;python manage.py ruinserver&lt;/tt&gt;).&lt;/p&gt;
 &lt;/div&gt;
-</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Serafeim Papastefanos</dc:creator><pubDate>Wed, 21 Jan 2015 14:20:00 +0200</pubDate><guid>tag:spapas.github.io,2015-01-21:2015/01/21/django-model-auditing/</guid><category>django</category><category>python</category><category>auditing</category></item><item><title>Change the primary color of bootstrap material design</title><link>http://spapas.github.io/2014/12/16/change-bootstrap-material-primary-color/</link><description>&lt;div class="section" id="warning-updated-on-05-february-2015"&gt;
-&lt;h2&gt;Warning - updated on 05 February&amp;nbsp;2015&lt;/h2&gt;
-&lt;p&gt;I recently noticed (to my surprise) that bootstrap-material-design has a not-very-open license
-(&lt;a class="reference external" href="https://github.com/FezVrasta/bootstrap-material-design/blob/master/LICENSE.md"&gt;https://github.com/FezVrasta/bootstrap-material-design/blob/master/&lt;span class="caps"&gt;LICENSE&lt;/span&gt;.md&lt;/a&gt;).
-Quoting from&amp;nbsp;there:&lt;/p&gt;
-&lt;blockquote&gt;
-You can use this software for free only for no-profit projects. If you&amp;#8217;d like to use this software in a commercial project you may contact the author (Federico Zivolo) of the software and ask for his permission and fulfill his conditions.&lt;/blockquote&gt;
-&lt;p&gt;This is a more general comment, but for me, if you want to develop an open source
-project and receive contributions from people not belonging to your company then you
-&lt;em&gt;need&lt;/em&gt; to have a real Open Source License like Apache, &lt;span class="caps"&gt;MIT&lt;/span&gt;, &lt;span class="caps"&gt;BSD&lt;/span&gt; or &lt;span class="caps"&gt;LGPL&lt;/span&gt; (no, I don&amp;#8217;t
-consider &lt;span class="caps"&gt;GPL&lt;/span&gt; to be really &lt;em&gt;open&lt;/em&gt;).&lt;/p&gt;
-&lt;p&gt;When people are contributing to an open source project they are doing it because most
-of the times they want to use this project and &lt;em&gt;their&lt;/em&gt; contributions to their own
-projects which (most probably) are commercial, so people contributing to
-bootstrap-material-design won&amp;#8217;t be able to use it in their own&amp;nbsp;projects!&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;After this, I recommend people to avoid contributing to and stop using bootstrap-material-design
-for their own&amp;nbsp;projects.&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;Instead, they should either use vanilla bootstrap, or a (&lt;span class="caps"&gt;MIT&lt;/span&gt; licensed) theme from &lt;a class="reference external" href="https://bootswatch.com/"&gt;bootswatch&lt;/a&gt;. Also,
-I&amp;#8217;ve noticed (but not used yet) &lt;a class="reference external" href="https://github.com/viewflow/django-material"&gt;django-material&lt;/a&gt; which seems like a nice solution for django&amp;nbsp;projects.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class="section" id="introduction"&gt;
+</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Serafeim Papastefanos</dc:creator><pubDate>Wed, 21 Jan 2015 14:20:00 +0200</pubDate><guid>tag:spapas.github.io,2015-01-21:2015/01/21/django-model-auditing/</guid><category>django</category><category>python</category><category>auditing</category></item><item><title>Change the primary color of bootstrap material design</title><link>http://spapas.github.io/2014/12/16/change-bootstrap-material-primary-color/</link><description>&lt;div class="section" id="introduction"&gt;
 &lt;h2&gt;Introduction&lt;/h2&gt;
 &lt;p&gt;&lt;a class="reference external" href="https://github.com/FezVrasta/bootstrap-material-design"&gt;Bootstrap Material Design&lt;/a&gt; is a great theme that sits on top of &lt;a class="reference external" href="http://getbootstrap.com/"&gt;Bootstrap&lt;/a&gt; and transforms it to
 &lt;a class="reference external" href="http://www.google.com/design/spec/material-design/introduction.html"&gt;Material Design&lt;/a&gt;! The great thing about Bootstrap Material Design is that you just need to include

@@ -8,31 +8,6 @@ Change the primary color of bootstrap material design
 :author: Serafeim Papastefanos
 :summary: A tutorial to help users change the primary color of Bootstrap material design
 
-Warning - updated on 05 February 2015
--------------------------------------
-
-I recently noticed (to my surprise) that bootstrap-material-design has a not-very-open license 
-(https://github.com/FezVrasta/bootstrap-material-design/blob/master/LICENSE.md).
-Quoting from there:
-
-    You can use this software for free only for no-profit projects. If you'd like to use this software in a commercial project you may contact the author (Federico Zivolo) of the software and ask for his permission and fulfill his conditions.
-    
-This is a more general comment, but for me, if you want to develop an open source
-project and receive contributions from people not belonging to your company then you 
-*need* to have a real Open Source License like Apache, MIT, BSD or LGPL (no, I don't
-consider GPL to be really *open*).
-
-When people are contributing to an open source project they are doing it because most
-of the times they want to use this project and *their* contributions to their own
-projects which (most probably) are commercial, so people contributing to 
-bootstrap-material-design won't be able to use it in their own projects!
-
-**After this, I recommend people to avoid contributing to and stop using bootstrap-material-design 
-for their own projects.**
-
-Instead, they should either use vanilla bootstrap, or a (MIT licensed) theme from bootswatch_. Also,
-I've noticed (but not used yet) `django-material`_ which seems like a nice solution for django projects.
-
 
 Introduction
 ------------

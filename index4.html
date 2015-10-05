@@ -72,6 +72,463 @@
   		<article>
 <header>
       <h1 class="entry-title">
+        <a href="http://spapas.github.io/2014/02/13/wagtail-tutorial/">A Wagtail tutorial</a>
+      </h1>
+    <p class="meta">
+<time datetime="2014-02-13T21:20:00+02:00" pubdate>Πεμ 13 Φεβρουάριος 2014</time>    </p>
+</header>
+
+  <div class="entry-content"><p><a href="http://wagtail.io">Wagtail</a> is a new Open Source <a href="https://www.djangoproject.com">Django</a>-based <span class="caps">CMS</span>. In this 20 minute tutorial we will see how you can create a blog from scratch using Wagtail. If you want to see some more examples of usage please take a look at the <a href="https://github.com/torchbox/wagtaildemo">wagtaildemo</a> GitHub&nbsp;project.</p>
+<p>To follow this tutorial you will need to have <a href="http://python.org/">Python</a> 2.7 installed with a working version of <a href="https://pypi.python.org/pypi/pip">pip</a> and <a href="https://pypi.python.org/pypi/virtualenv">virtualenv</a>.</p>
+<p><strong>Update</strong>: The result of this tutorial has been deployed to <a href="https://www.heroku.com/">Heroku</a>: <a href="http://gentle-refuge-2590.herokuapp.com/">http://gentle-refuge-2590.herokuapp.com/</a> - you may visit the <a href="http://gentle-refuge-2590.herokuapp.com/admin/">admin site</a> and login with root / 123 to play with Wagtail! Please don&#8217;t do anything naughty !!! Also, notice that <a href="https://devcenter.heroku.com/articles/dynos#isolation-and-security">because of how Heroku works</a> you won&#8217;t be able to upload&nbsp;anything.</p>
+<p><strong>Update 08/09/2015: This tutorial has been written during the first days of Wagtail, when documentation and tutorials about it were sparce; right now it should be considered by all accounts obsolete and <em>not</em> be followed! Instead, you should read the official (and very well written) tutorial @ <a href="http://docs.wagtail.io/en/v1.0/getting_started/tutorial.html">http://docs.wagtail.io/en/v1.0/getting_started/tutorial.html</a> in the official Wagtail&nbsp;documentation!</strong></p>
+<h2>Installing the wagtail&nbsp;dependencies</h2>
+<p>It is recomended to create a new virtual environment that will host the wagtail tutorial. After you have changed to the virtual environment you will need to installl the Wagtail requirements. Create a file named <code>requirements.txt</code> containing the&nbsp;following:</p>
+<div class="highlight"><pre>Django==1.6.2
+South==1.0.0
+django-compressor==1.4
+django-modelcluster==0.3
+-e git://github.com/torchbox/wagtail.git#egg=wagtail
+django-taggit==0.11.2
+django-libsass==0.2
+</pre></div>
+
+
+<p>and run
+<code>pip install -r requirements.txt</code>.  If you use Microsoft Windows you <em>will</em> experience problems with Pillow and lxml. Please download the 
+installation executables from https://pypi.python.org/pypi/Pillow/2.3.0 and https://pypi.python.org/pypi/lxml/3.3.1, install 
+them using <code>easy_install Pillow-2.3.0.x-py2.7.exe</code> and <code>easy_install lxml-3.3.1.x-py2.7.exe</code> (from inside your virtual environment) 
+and then install the other requirements. Also please use the latest version of Wagtail (hosted on github) because it has some changes from 
+the pypi (so <em>don&#8217;t</em> do a <code>pip install wagtail</code>).</p>
+<p><strong>Warning:</strong> Unfortuanately, no official binaries for libsass (which is a django-libsass requirement) are (yet) available for Windows. I
+have compiled a version for win32 and python 2.7 (which I use) using the <a href="http://www.confusedbycode.com/articles/compiling-python-modules.html">instructions found here</a>. You can download this version 
+<a href="http://spapas.github.io/images/libsass-0.3.0-cp27-none-win32.whl">as a wheel package</a>. Notice that because libsass was compiled with <span class="caps">VC</span> Express 2013
+you should also install the <a href="http://www.microsoft.com/en-us/download/details.aspx?id=40784">Visual C++ 2013 redistributable</a> package from&nbsp;Microsoft.</p>
+<p><em>Please use it at your own risk&nbsp;!!!</em></p>
+<p>To install <a href="http://pythonwheels.com/">wheels</a> you have to use a version of pip &gt;= 1.4 (so do an <code>easy_install -U pip</code> from your
+virtual environment if you have a previous version) and then you can just do a normal <code>pip install libsass-0.3.0-cp27-none-win32.whl</code>. </p>
+<p><strong>Warning no2:</strong> More unfortuanately, there seem to be <a href="https://github.com/torchbox/wagtail/issues/133">a number of issues</a> with how libsass handles <code>@import</code> statements
+in Windows. Until this is fixed, Windows users are recommened to use the command line (Ruby) sass compiler. To use it, please
+install Ruby in your system and then install sass with <code>gem install sass -v "&gt;=3.3.0alpha" --pre</code>. After that, in the <code>COMPRESS_PRECOMPILERS</code> 
+setting of your <code>settings.py</code> (discussed in the next section), change the line <code>('text/x-scss', 'django_libsass.SassCompiler'),</code> to 
+<code>('text/x-scss', 'sass --scss  {infile} {outfile}'),</code>.</p>
+<h2>Creating and configuring your&nbsp;project</h2>
+<p>Wagtail has to &#8220;live&#8221; inside a normal Django project so you now may create a new Django project by&nbsp;issuing:</p>
+<div class="highlight"><pre>python &lt;PATH_OF_YOUR_VIRTUAL_ENV&gt;/scripts/django-admin.py startproject wagtailtutorial
+</pre></div>
+
+
+<p>If you use Unix you can just run <code>django-admin.py</code> etc however if you try to do the same in windows you
+will find out that windows tries to run the .py file with the python executable that is assigned through
+explorer (which of course is your main python installation) and <em>not</em> through your path! That&#8217;s why
+all our commands will be in the form <code>python script.py</code> to make sure that Windows picks the python
+executable from your path (which, if you&#8217;re inside the virtual enviroment will be the correct&nbsp;one).</p>
+<p>Inside the <code>wagtailtutorial</code> folder you will see a file named <code>manage.py</code> and another folder named <code>wagtailtutorial</code>. Inside this <code>wagtailtutorial</code> folder you will find <code>settings.py</code> and <code>urls.py</code> which need to be&nbsp;changed.</p>
+<p>Starting with <code>urls.py</code>, remove everything and change it like&nbsp;this:</p>
+<div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.conf.urls</span> <span class="kn">import</span> <span class="n">patterns</span><span class="p">,</span> <span class="n">include</span><span class="p">,</span> <span class="n">url</span>
+<span class="kn">from</span> <span class="nn">django.conf.urls.static</span> <span class="kn">import</span> <span class="n">static</span>
+<span class="kn">from</span> <span class="nn">django.views.generic.base</span> <span class="kn">import</span> <span class="n">RedirectView</span>
+<span class="kn">from</span> <span class="nn">django.contrib</span> <span class="kn">import</span> <span class="n">admin</span>
+<span class="kn">from</span> <span class="nn">django.conf</span> <span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+
+<span class="kn">from</span> <span class="nn">wagtail.wagtailcore</span> <span class="kn">import</span> <span class="n">urls</span> <span class="k">as</span> <span class="n">wagtail_urls</span>
+<span class="kn">from</span> <span class="nn">wagtail.wagtailadmin</span> <span class="kn">import</span> <span class="n">urls</span> <span class="k">as</span> <span class="n">wagtailadmin_urls</span>
+<span class="kn">from</span> <span class="nn">wagtail.wagtailimages</span> <span class="kn">import</span> <span class="n">urls</span> <span class="k">as</span> <span class="n">wagtailimages_urls</span>
+<span class="kn">from</span> <span class="nn">wagtail.wagtailembeds</span> <span class="kn">import</span> <span class="n">urls</span> <span class="k">as</span> <span class="n">wagtailembeds_urls</span>
+<span class="kn">from</span> <span class="nn">wagtail.wagtaildocs</span> <span class="kn">import</span> <span class="n">admin_urls</span> <span class="k">as</span> <span class="n">wagtaildocs_admin_urls</span>
+<span class="kn">from</span> <span class="nn">wagtail.wagtaildocs</span> <span class="kn">import</span> <span class="n">urls</span> <span class="k">as</span> <span class="n">wagtaildocs_urls</span>
+<span class="kn">from</span> <span class="nn">wagtail.wagtailsnippets</span> <span class="kn">import</span> <span class="n">urls</span> <span class="k">as</span> <span class="n">wagtailsnippets_urls</span>
+<span class="kn">from</span> <span class="nn">wagtail.wagtailsearch.urls</span> <span class="kn">import</span> <span class="n">frontend</span> <span class="k">as</span> <span class="n">wagtailsearch_frontend_urls</span><span class="p">,</span> <span class="n">admin</span> <span class="k">as</span> <span class="n">wagtailsearch_admin_urls</span>
+<span class="kn">from</span> <span class="nn">wagtail.wagtailusers</span> <span class="kn">import</span> <span class="n">urls</span> <span class="k">as</span> <span class="n">wagtailusers_urls</span>
+<span class="kn">from</span> <span class="nn">wagtail.wagtailredirects</span> <span class="kn">import</span> <span class="n">urls</span> <span class="k">as</span> <span class="n">wagtailredirects_urls</span>
+
+<span class="n">admin</span><span class="o">.</span><span class="n">autodiscover</span><span class="p">()</span>
+
+
+<span class="c"># Signal handlers</span>
+<span class="kn">from</span> <span class="nn">wagtail.wagtailsearch</span> <span class="kn">import</span> <span class="n">register_signal_handlers</span> <span class="k">as</span> <span class="n">wagtailsearch_register_signal_handlers</span>
+<span class="n">wagtailsearch_register_signal_handlers</span><span class="p">()</span>
+
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+    <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^django-admin/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">urls</span><span class="p">)),</span>
+
+    <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^admin/images/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">wagtailimages_urls</span><span class="p">)),</span>
+    <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^admin/embeds/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">wagtailembeds_urls</span><span class="p">)),</span>
+    <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^admin/documents/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">wagtaildocs_admin_urls</span><span class="p">)),</span>
+    <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^admin/snippets/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">wagtailsnippets_urls</span><span class="p">)),</span>
+    <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^admin/search/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">wagtailsearch_admin_urls</span><span class="p">)),</span>
+    <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^admin/users/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">wagtailusers_urls</span><span class="p">)),</span>
+    <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^admin/redirects/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">wagtailredirects_urls</span><span class="p">)),</span>
+    <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^admin/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">wagtailadmin_urls</span><span class="p">)),</span>
+    <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^search/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">wagtailsearch_frontend_urls</span><span class="p">)),</span>
+    <span class="n">url</span><span class="p">(</span><span class="s">r&#39;^documents/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">wagtaildocs_urls</span><span class="p">)),</span>
+
+    <span class="c"># For anything not caught by a more specific rule above, hand over to</span>
+    <span class="c"># Wagtail&#39;s serving mechanism</span>
+    <span class="n">url</span><span class="p">(</span><span class="s">r&#39;&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">wagtail_urls</span><span class="p">)),</span>
+<span class="p">)</span>
+
+
+<span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">django.contrib.staticfiles.urls</span> <span class="kn">import</span> <span class="n">staticfiles_urlpatterns</span>
+
+    <span class="n">urlpatterns</span> <span class="o">+=</span> <span class="n">staticfiles_urlpatterns</span><span class="p">()</span> <span class="c"># tell gunicorn where static files are in dev mode</span>
+    <span class="n">urlpatterns</span> <span class="o">+=</span> <span class="n">static</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">MEDIA_URL</span> <span class="o">+</span> <span class="s">&#39;images/&#39;</span><span class="p">,</span> <span class="n">document_root</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">MEDIA_ROOT</span><span class="p">,</span> <span class="s">&#39;images&#39;</span><span class="p">))</span>
+</pre></div>
+
+
+<p>You can se that there is a signal handler when a searchable thing is added or changed to handle indexing for search, normal django admin is mapped under /django-admin since /admin is use for Wagtail (of course you may map Wagtail wherever you&#8217;d like), inclusion of various wagtail related urls and finally a Wagtail handling everything else. Finally there are some handlers for media and static&nbsp;files.</p>
+<p>After that please change your <code>settings.py</code> like&nbsp;this:</p>
+<div class="highlight"><pre><span class="c"># Django settings for wagtailtutorial project.</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="n">PROJECT_ROOT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s">&#39;..&#39;</span><span class="p">,</span> <span class="s">&#39;..&#39;</span><span class="p">)</span>
+
+<span class="n">DEBUG</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="n">TEMPLATE_DEBUG</span> <span class="o">=</span> <span class="n">DEBUG</span>
+
+<span class="n">ADMINS</span> <span class="o">=</span> <span class="p">()</span>
+<span class="n">MANAGERS</span> <span class="o">=</span> <span class="n">ADMINS</span>
+
+<span class="n">DATABASES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&#39;ENGINE&#39;</span><span class="p">:</span> <span class="s">&#39;django.db.backends.sqlite3&#39;</span><span class="p">,</span>
+        <span class="s">&#39;NAME&#39;</span><span class="p">:</span> <span class="n">PROJECT_ROOT</span><span class="o">+</span><span class="s">&#39;/wagtailtutorial.db&#39;</span><span class="p">,</span>
+        <span class="s">&#39;USER&#39;</span><span class="p">:</span> <span class="s">&#39;&#39;</span><span class="p">,</span>
+        <span class="s">&#39;PASSWORD&#39;</span><span class="p">:</span> <span class="s">&#39;&#39;</span><span class="p">,</span>
+        <span class="s">&#39;HOST&#39;</span><span class="p">:</span> <span class="s">&#39;&#39;</span><span class="p">,</span>  <span class="c"># Set to empty string for localhost.</span>
+        <span class="s">&#39;PORT&#39;</span><span class="p">:</span> <span class="s">&#39;&#39;</span><span class="p">,</span>  <span class="c"># Set to empty string for default.</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">CONN_MAX_AGE</span> <span class="o">=</span> <span class="mi">600</span>  <span class="c"># number of seconds database connections should persist for</span>
+<span class="n">ALLOWED_HOSTS</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">TIME_ZONE</span> <span class="o">=</span> <span class="s">&#39;Europe/London&#39;</span>
+<span class="n">LANGUAGE_CODE</span> <span class="o">=</span> <span class="s">&#39;en-gb&#39;</span>
+<span class="n">SITE_ID</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">USE_I18N</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="n">USE_L10N</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="n">USE_TZ</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="n">MEDIA_ROOT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PROJECT_ROOT</span><span class="p">,</span> <span class="s">&#39;media&#39;</span><span class="p">)</span>
+<span class="n">MEDIA_URL</span> <span class="o">=</span> <span class="s">&#39;/media/&#39;</span>
+<span class="n">STATIC_ROOT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PROJECT_ROOT</span><span class="p">,</span> <span class="s">&#39;static&#39;</span><span class="p">)</span>
+<span class="n">STATIC_URL</span> <span class="o">=</span> <span class="s">&#39;/static/&#39;</span>
+<span class="n">STATICFILES_DIRS</span> <span class="o">=</span> <span class="p">()</span>
+
+<span class="n">STATICFILES_FINDERS</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s">&#39;django.contrib.staticfiles.finders.FileSystemFinder&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.contrib.staticfiles.finders.AppDirectoriesFinder&#39;</span><span class="p">,</span>
+    <span class="s">&#39;compressor.finders.CompressorFinder&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">SECRET_KEY</span> <span class="o">=</span> <span class="s">&#39;wq21wtjo3@d_qfjvd-#td!</span><span class="si">%7g</span><span class="s">fy2updj2z+nev^k$iy%=m4_tr&#39;</span>
+
+<span class="n">TEMPLATE_LOADERS</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s">&#39;django.template.loaders.filesystem.Loader&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.template.loaders.app_directories.Loader&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">MIDDLEWARE_CLASSES</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s">&#39;django.middleware.common.CommonMiddleware&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.contrib.sessions.middleware.SessionMiddleware&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.middleware.csrf.CsrfViewMiddleware&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.contrib.auth.middleware.AuthenticationMiddleware&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.contrib.messages.middleware.MessageMiddleware&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.middleware.clickjacking.XFrameOptionsMiddleware&#39;</span><span class="p">,</span>
+    <span class="s">&#39;wagtail.wagtailcore.middleware.SiteMiddleware&#39;</span><span class="p">,</span>
+    <span class="s">&#39;wagtail.wagtailredirects.middleware.RedirectMiddleware&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">django.conf</span> <span class="kn">import</span> <span class="n">global_settings</span>
+<span class="n">TEMPLATE_CONTEXT_PROCESSORS</span> <span class="o">=</span> <span class="n">global_settings</span><span class="o">.</span><span class="n">TEMPLATE_CONTEXT_PROCESSORS</span> <span class="o">+</span> <span class="p">(</span>
+    <span class="s">&#39;django.core.context_processors.request&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">ROOT_URLCONF</span> <span class="o">=</span> <span class="s">&#39;wagtailtutorial.urls&#39;</span>
+<span class="n">WSGI_APPLICATION</span> <span class="o">=</span> <span class="s">&#39;wagtailtutorial.wsgi.application&#39;</span>
+<span class="n">TEMPLATE_DIRS</span> <span class="o">=</span> <span class="p">()</span>
+
+<span class="n">INSTALLED_APPS</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s">&#39;django.contrib.auth&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.contrib.contenttypes&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.contrib.sessions&#39;</span><span class="p">,</span>
+    <span class="c"># &#39;django.contrib.sites&#39;,  # Wagtail uses its own site management logic</span>
+    <span class="s">&#39;django.contrib.messages&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.contrib.staticfiles&#39;</span><span class="p">,</span>
+
+    <span class="s">&#39;south&#39;</span><span class="p">,</span>
+    <span class="s">&#39;compressor&#39;</span><span class="p">,</span>
+    <span class="s">&#39;taggit&#39;</span><span class="p">,</span>
+    <span class="s">&#39;modelcluster&#39;</span><span class="p">,</span>
+    <span class="s">&#39;django.contrib.admin&#39;</span><span class="p">,</span>
+
+    <span class="s">&#39;wagtail.wagtailcore&#39;</span><span class="p">,</span>
+    <span class="s">&#39;wagtail.wagtailadmin&#39;</span><span class="p">,</span>
+    <span class="s">&#39;wagtail.wagtaildocs&#39;</span><span class="p">,</span>
+    <span class="s">&#39;wagtail.wagtailsnippets&#39;</span><span class="p">,</span>
+    <span class="s">&#39;wagtail.wagtailusers&#39;</span><span class="p">,</span>
+    <span class="s">&#39;wagtail.wagtailimages&#39;</span><span class="p">,</span>
+    <span class="s">&#39;wagtail.wagtailembeds&#39;</span><span class="p">,</span>
+    <span class="s">&#39;wagtail.wagtailsearch&#39;</span><span class="p">,</span>
+    <span class="s">&#39;wagtail.wagtailredirects&#39;</span><span class="p">,</span>
+
+    <span class="s">&#39;tutorial&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">EMAIL_SUBJECT_PREFIX</span> <span class="o">=</span> <span class="s">&#39;[wagtailtutorial] &#39;</span>
+
+<span class="n">INTERNAL_IPS</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="s">&#39;10.0.2.2&#39;</span><span class="p">)</span>
+
+<span class="n">COMPRESS_PRECOMPILERS</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="p">(</span><span class="s">&#39;text/x-scss&#39;</span><span class="p">,</span> <span class="s">&#39;django_libsass.SassCompiler&#39;</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="c"># Auth settings</span>
+<span class="n">LOGIN_URL</span> <span class="o">=</span> <span class="s">&#39;django.contrib.auth.views.login&#39;</span>
+<span class="n">LOGIN_REDIRECT_URL</span> <span class="o">=</span> <span class="s">&#39;wagtailadmin_home&#39;</span>
+
+<span class="n">LOGGING</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&#39;version&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s">&#39;disable_existing_loggers&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+    <span class="s">&#39;filters&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&#39;require_debug_false&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&#39;()&#39;</span><span class="p">:</span> <span class="s">&#39;django.utils.log.RequireDebugFalse&#39;</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s">&#39;handlers&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&#39;mail_admins&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&#39;level&#39;</span><span class="p">:</span> <span class="s">&#39;ERROR&#39;</span><span class="p">,</span>
+            <span class="s">&#39;filters&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;require_debug_false&#39;</span><span class="p">],</span>
+            <span class="s">&#39;class&#39;</span><span class="p">:</span> <span class="s">&#39;django.utils.log.AdminEmailHandler&#39;</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s">&#39;loggers&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&#39;django.request&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&#39;handlers&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;mail_admins&#39;</span><span class="p">],</span>
+            <span class="s">&#39;level&#39;</span><span class="p">:</span> <span class="s">&#39;ERROR&#39;</span><span class="p">,</span>
+            <span class="s">&#39;propagate&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+
+<span class="c"># WAGTAIL SETTINGS</span>
+<span class="n">WAGTAIL_SITE_NAME</span> <span class="o">=</span> <span class="s">&#39;wagtailtutorial&#39;</span>
+
+<span class="c"># Override the search results template for wagtailsearch</span>
+<span class="n">WAGTAILSEARCH_RESULTS_TEMPLATE</span> <span class="o">=</span> <span class="s">&#39;tutorial/search_results.html&#39;</span>
+<span class="n">WAGTAILSEARCH_RESULTS_TEMPLATE_AJAX</span> <span class="o">=</span> <span class="s">&#39;tutorial/includes/search_listing.html&#39;</span>
+
+<span class="n">WAGTAILSEARCH_ES_INDEX</span> <span class="o">=</span> <span class="s">&#39;wagtailtutorial&#39;</span>
+</pre></div>
+
+
+<p>The most important thing to notice is that  the <code>INSTALLED_APPS</code> contains the usual apps from django.*, <a href="http://south.aeracode.org/">south</a> for database migrations, <a href="https://github.com/django-compressor/django-compressor">django-compressor</a> to support compressing static files (and automatic translating from less to css), <a href="https://github.com/alex/django-taggit">django-taggit</a> to add support for tags, and <a href="https://github.com/torchbox/django-modelcluster/">django-modelcluster</a> which adds support from clusters (groups) of models. It also contains the wagtail.* applications and the tutorial application which is where we will create our blog. Also there are two Wagtail related middleware (one to add a site attribute to each request and one to hand redirects), configuring django-compressor to use <code>django_libsass</code> to compile <code>less</code> files, and some other, not so important Wagtail&nbsp;settings.</p>
+<p>So let&#8217;s create the missing tutorial application by&nbsp;issuing:</p>
+<div class="highlight"><pre>python manage.py startapp tutorial
+</pre></div>
+
+
+<p>Now we&#8217;ll have a <code>tutorial</code> folder waiting to define our blog structure inside the <code>wagtailtutorial</code> folder!</p>
+<h2>Checking to see if everything&nbsp;works</h2>
+<p>Before continuing with our blog creation let&#8217;s make sure that everything works, first of all by generating the database&nbsp;schema:</p>
+<div class="highlight"><pre>python manage.py syncdb
+</pre></div>
+
+
+<p>In the superuser question answer yes and add a superuser. Then you can run the migrations - however because there are some problems with the way SQLite3 runs migrations it is recommended to run the migrations in two&nbsp;steps:</p>
+<div class="highlight"><pre>python manage.py migrate <span class="m">0001</span> --all
+python manage.py migrate
+</pre></div>
+
+
+<p>Finally, you now may try&nbsp;a</p>
+<div class="highlight"><pre>python manage.py runserver
+</pre></div>
+
+
+<p>and visit <code>http://127.0.0.1:8000</code>. If everything worked fine you will get&nbsp;a</p>
+<blockquote>
+<p>Welcome to your new Wagtail&nbsp;site!</p>
+</blockquote>
+<p>page &#8212; congratulations&nbsp;!</p>
+<p>The homepage is rather simple (for now!) but you may already navigate to http://127.0.0.1:8000/admin and from there, login to Wagtail admin with the superuser you created earlier. 
+Now you may start experiencing Wagtail&nbsp;! </p>
+<p><img alt="Wagtail admin index" src="http://spapas.github.io/images/wagtail-index.png" /></p>
+<h2>Exploring Wagtail&nbsp;admin</h2>
+<p>When you login to Wagtail admin you will see a menu at the left with the&nbsp;options:</p>
+<ul>
+<li>Explorer is used to actually manage the content of your&nbsp;site</li>
+<li>Search is used for searching through your&nbsp;content</li>
+<li>Images is used to manage your&nbsp;images</li>
+<li>Documents is used to manage your&nbsp;Documents</li>
+<li>Snippets is used for side bars&nbsp;etc</li>
+<li>Users is used for User&nbsp;management</li>
+<li>Redirects is used to redirect to a specific&nbsp;page</li>
+<li>Editors picks is used to promote search&nbsp;results</li>
+</ul>
+<p>Of the previous, the one needing more explanation is Explorer: Clicking it you will see that a label named &#8220;Welcome to your Wagtail site!&#8221; will open. This is the root Page of your site. If you click at it you will go to the actions of this page. The actions you can do here is:
+ - Add Child Page
+ - Edit
+ - View Live
+ - Move
+ - Delete
+ -&nbsp;Unpublish</p>
+<p>The Pages (and more generally the Content) of Wagtail are Django Models that are saved through a Tree hierarchy. However, if you click &#8220;Add Child Page&#8221; you won&#8217;t be able to add anything because you must create your own Page types (we will see how it is done in the next&nbsp;section). </p>
+<p>When you click edit you will be able to edit the parts of the page (each part is a normal Field of the model). Also, you will see that the form is split into two tabs: Content and Promote. In the Content for instance you will see that the &#8220;Welcome to your Wagtail site!&#8221; has only a &#8220;Title&#8221; CharField. These are the fields that will be available to all Pages since &#8220;Welcome to your Wagtail site!&#8221; has a class of <code>Page</code> from which every other page should inherit. After you finish editing a page you may save it as a draft, publish, sent it for moderation (if you don&#8217;t have the rights to publish it)&nbsp;etc.</p>
+<h2>Creating our&nbsp;blog</h2>
+<p>Each of our Page types is a normal Django Model which inherits from <code>Page</code>. Let&#8217;s suppose that our posts should contain a title, a body and a created date. Add the following to <code>tutorials/models.py</code>:</p>
+<div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
+
+<span class="kn">from</span> <span class="nn">wagtail.wagtailcore.models</span> <span class="kn">import</span> <span class="n">Page</span>
+<span class="kn">from</span> <span class="nn">wagtail.wagtailcore.fields</span> <span class="kn">import</span> <span class="n">RichTextField</span>
+<span class="kn">from</span> <span class="nn">wagtail.wagtailadmin.edit_handlers</span> <span class="kn">import</span> <span class="n">FieldPanel</span>    
+
+<span class="k">class</span> <span class="nc">BlogPage</span><span class="p">(</span><span class="n">Page</span><span class="p">):</span>
+    <span class="n">body</span> <span class="o">=</span> <span class="n">RichTextField</span><span class="p">()</span>
+    <span class="n">date</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateField</span><span class="p">(</span><span class="s">&quot;Post date&quot;</span><span class="p">)</span>
+    <span class="n">search_name</span> <span class="o">=</span> <span class="s">&quot;Blog Page&quot;</span>
+
+    <span class="n">indexed_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;body&#39;</span><span class="p">,</span> <span class="p">)</span>
+
+<span class="n">BlogPage</span><span class="o">.</span><span class="n">content_panels</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">FieldPanel</span><span class="p">(</span><span class="s">&#39;title&#39;</span><span class="p">,</span> <span class="n">classname</span><span class="o">=</span><span class="s">&quot;full title&quot;</span><span class="p">),</span>
+    <span class="n">FieldPanel</span><span class="p">(</span><span class="s">&#39;date&#39;</span><span class="p">),</span>
+    <span class="n">FieldPanel</span><span class="p">(</span><span class="s">&#39;body&#39;</span><span class="p">,</span> <span class="n">classname</span><span class="o">=</span><span class="s">&quot;full&quot;</span><span class="p">),</span>
+<span class="p">]</span>
+</pre></div>
+
+
+<p>and run <code>python manage.py syncdb</code> to create the <code>tutorial_blogpage</code> table. </p>
+<p>Now, if you visit again the /admin and click on the &#8220;Add Child Page&#8221; action of &#8220;Welcome to your new Wagtail Site!&#8221; you will see the &#8220;Blog Page&#8221; page and after you click it you will be able to see a form with the Fields you defined <em>and</em> title(title, body, date). The title is a field inherited from Page, along with the fields  in the Promote&nbsp;tab. </p>
+<p>In our declaration of BlogPage we added three <code>FieldPanel</code>s on its content_panes. A <code>FieldPanel</code> is a special edit handler for each Field. That is why when you try to edit the body you will see a rich text toolbar that enables you to not only format text but also embed images, documents and even oembed links. If you hadn&#8217;t included the <code>FieldPanel('body', classname="full")</code> then you wouldn&#8217;t see the rich text&nbsp;editor.</p>
+<p><img alt="Editing pages in Wagtail" src="http://spapas.github.io/images/wagtail-edit-page.png" /></p>
+<p>So now we can add as many posts as we&nbsp;like! </p>
+<p>The time has come to take a look at our fine blog post: After we publish our page we click to the view live action&nbsp;and&#8230; </p>
+<blockquote>
+<p>TemplateDoesNotExist at&nbsp;/hello-world/</p>
+<p>tutorial/blog_page.html</p>
+</blockquote>
+<p>:(</p>
+<p>A template seems to be missing &#8212; actually we have totally forgotten about the presentation of our blog &#8212; we&#8217;ll talk about this in the next section&nbsp;!</p>
+<p>However, before going there we should also create an Index page type collecting our&nbsp;posts. </p>
+<p>For this, we will change our <code>models.py</code> to&nbsp;this:</p>
+<div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
+
+<span class="kn">from</span> <span class="nn">wagtail.wagtailcore.models</span> <span class="kn">import</span> <span class="n">Page</span><span class="p">,</span> <span class="n">Orderable</span>
+<span class="kn">from</span> <span class="nn">wagtail.wagtailcore.fields</span> <span class="kn">import</span> <span class="n">RichTextField</span>
+<span class="kn">from</span> <span class="nn">wagtail.wagtailadmin.edit_handlers</span> <span class="kn">import</span> <span class="n">FieldPanel</span>  <span class="p">,</span><span class="n">MultiFieldPanel</span><span class="p">,</span><span class="n">InlinePanel</span><span class="p">,</span> <span class="n">PageChooserPanel</span>
+<span class="kn">from</span> <span class="nn">modelcluster.fields</span> <span class="kn">import</span> <span class="n">ParentalKey</span>
+
+<span class="k">class</span> <span class="nc">BlogPage</span><span class="p">(</span><span class="n">Page</span><span class="p">):</span>
+    <span class="n">body</span> <span class="o">=</span> <span class="n">RichTextField</span><span class="p">()</span>
+    <span class="n">date</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateField</span><span class="p">(</span><span class="s">&quot;Post date&quot;</span><span class="p">)</span>
+    <span class="n">indexed_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;body&#39;</span><span class="p">,</span> <span class="p">)</span>
+    <span class="n">search_name</span> <span class="o">=</span> <span class="s">&quot;Blog Page&quot;</span>
+
+<span class="n">BlogPage</span><span class="o">.</span><span class="n">content_panels</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">FieldPanel</span><span class="p">(</span><span class="s">&#39;title&#39;</span><span class="p">,</span> <span class="n">classname</span><span class="o">=</span><span class="s">&quot;full title&quot;</span><span class="p">),</span>
+    <span class="n">FieldPanel</span><span class="p">(</span><span class="s">&#39;date&#39;</span><span class="p">),</span>
+    <span class="n">FieldPanel</span><span class="p">(</span><span class="s">&#39;body&#39;</span><span class="p">,</span> <span class="n">classname</span><span class="o">=</span><span class="s">&quot;full&quot;</span><span class="p">),</span>
+<span class="p">]</span>
+
+
+<span class="k">class</span> <span class="nc">LinkFields</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">link_page</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span>
+        <span class="s">&#39;wagtailcore.Page&#39;</span><span class="p">,</span>
+        <span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+        <span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+        <span class="n">related_name</span><span class="o">=</span><span class="s">&#39;+&#39;</span>
+    <span class="p">)</span>
+
+    <span class="n">panels</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">PageChooserPanel</span><span class="p">(</span><span class="s">&#39;link_page&#39;</span><span class="p">),</span>
+    <span class="p">]</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">abstract</span> <span class="o">=</span> <span class="bp">True</span>
+
+<span class="k">class</span> <span class="nc">RelatedLink</span><span class="p">(</span><span class="n">LinkFields</span><span class="p">):</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">,</span> <span class="n">help_text</span><span class="o">=</span><span class="s">&quot;Link title&quot;</span><span class="p">)</span>
+    <span class="n">panels</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">FieldPanel</span><span class="p">(</span><span class="s">&#39;title&#39;</span><span class="p">),</span>
+        <span class="n">MultiFieldPanel</span><span class="p">(</span><span class="n">LinkFields</span><span class="o">.</span><span class="n">panels</span><span class="p">,</span> <span class="s">&quot;Link&quot;</span><span class="p">),</span>
+    <span class="p">]</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">abstract</span> <span class="o">=</span> <span class="bp">True</span>
+
+
+<span class="k">class</span> <span class="nc">BlogIndexPageRelatedLink</span><span class="p">(</span><span class="n">Orderable</span><span class="p">,</span> <span class="n">RelatedLink</span><span class="p">):</span>
+    <span class="n">page</span> <span class="o">=</span> <span class="n">ParentalKey</span><span class="p">(</span><span class="s">&#39;tutorial.BlogIndexPage&#39;</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s">&#39;related_links&#39;</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">BlogIndexPage</span><span class="p">(</span><span class="n">Page</span><span class="p">):</span>
+    <span class="n">intro</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span>
+    <span class="n">indexed_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;body&#39;</span><span class="p">,</span> <span class="p">)</span>
+    <span class="n">search_name</span> <span class="o">=</span> <span class="s">&quot;Blog Index Page&quot;</span>
+
+<span class="n">BlogIndexPage</span><span class="o">.</span><span class="n">content_panels</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">FieldPanel</span><span class="p">(</span><span class="s">&#39;title&#39;</span><span class="p">,</span> <span class="n">classname</span><span class="o">=</span><span class="s">&quot;full title&quot;</span><span class="p">),</span>
+    <span class="n">FieldPanel</span><span class="p">(</span><span class="s">&#39;intro&#39;</span><span class="p">,</span> <span class="n">classname</span><span class="o">=</span><span class="s">&quot;full&quot;</span><span class="p">),</span>
+    <span class="n">InlinePanel</span><span class="p">(</span><span class="n">BlogIndexPage</span><span class="p">,</span> <span class="s">&#39;related_links&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&quot;Related links&quot;</span><span class="p">),</span>
+<span class="p">]</span>    
+</pre></div>
+
+
+<p>The above adds a way to put <code>related_links</code> to a <code>BlogIndexPage</code> &#8212; these related_links are the <code>BlogPage</code>s that actually belong to the blog - so now, we can add a blog index page and add all our blog posts to&nbsp;it!</p>
+<p>Now that we&#8217;ve created the BlogPage and BlogIndexPage pages it&#8217;s time to take a look at how we will actually display our&nbsp;blog&#8230;</p>
+<h2>Creating templates for <em>Page</em>s</h2>
+<p>A normal Django template can be used to display each page type. Wagtail either generates automatically (by seperating underscors with capital letters in camelcase for instance BlogIndexPage -&gt; blog_index_page) or you can use the template class attribute. Let&#8217;s add a <code>templates</code> foler within the <code>tutorial</code> foler and add another folder named <code>tutorial</code> inside <code>templates</code> and ten add a file named <code>blog_index_page.html</code> to <code>templates</code> with the following content (you must have the following hierarchy <code>wagtailtutorial/tutorial/templates/tutorial/blog_index_page.html</code>):</p>
+<div class="highlight"><pre><span class="nt">&lt;html&gt;</span>
+<span class="nt">&lt;body&gt;</span>
+    <span class="nt">&lt;h1&gt;</span>{{ self.title }}<span class="nt">&lt;/h1&gt;</span>
+        Intro: {{ self.intro }}
+        <span class="nt">&lt;hr</span> <span class="nt">/&gt;</span>
+        {% for rl in self.related_links.all %}
+            <span class="nt">&lt;p&gt;</span>{{ rl.title }}: <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">&#39;{{ rl.link_page.url }}&#39;</span><span class="nt">&gt;</span>{{ rl.link_page }}<span class="nt">&lt;/a&gt;&lt;/p&gt;</span>
+        {% endfor %}
+    <span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+</pre></div>
+
+
+<p>So self is the context name of the  BlogPageIndex instance that is used to render this page. Beyond that, it&#8217;s normal&nbsp;django.</p>
+<p><img alt="Rendering the Blog Index" src="http://spapas.github.io/images/wagtail-index-template.png" /></p>
+<p>Now you can view your Blog Index &#8212; however before clicking on a link to also view your posts add the template for your <code>BlogPost</code> (<code>tutorial/blog_page.html</code>):</p>
+<div class="highlight"><pre>{% load rich_text %}
+<span class="nt">&lt;html&gt;</span>
+<span class="nt">&lt;body&gt;</span>
+    <span class="nt">&lt;h1&gt;</span>{{ self.title }}<span class="nt">&lt;/h1&gt;</span>
+        Date: {{ self.date }}
+        {{ self.body | richtext }}
+    <span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>    
+</pre></div>
+
+
+<p>The extra thing here is the <code>richtext</code> filter which renders a <code>RichTextField</code> correctly. Of course the above templates are just examples - check <code>wagtaildemo</code> for a much better template&nbsp;design.</p>
+<p>Woo-hoo &#8212; now I can totally start blogging !!!&nbsp;\o/</p>
+<p>&#8230;</p>
+<p>&#8230;</p>
+<p>But &#8230; when I go to 127.0.0.1:8000 it displays the ugly &#8220;Welcome to your new Wagtail site!&#8221;. I don&#8217;t want to see that any more&nbsp;!!!</p>
+<p>No problemo - check the next section of the tutorial&nbsp;:)</p>
+<h2>Changing your home&nbsp;page</h2>
+<p>Wagtail uses the concept of <em>sites</em> to define groups of pages hosted in the <em>same</em> server. To make more clear what site is, you have to use the good old django admin which can be found at <code>http://127.0.0.1:8000/django-admin/</code>. Check the localhost[default] site entry: You will see that each site has a name, a root page (currently the &#8220;Welcome to your new Wagtail site!&#8221;) and an is_default check. So,  change the root page of the localhost site to your BlogIndexPage and go to <code>http://127.0.0.1:8000/</code> &#8230; Yes ! The blog is alive&nbsp;:)</p>
+<h2>Where to go from&nbsp;here</h2>
+<p>You are now ready to start adding more pages to your blog, adding functionality to it (don&#8217;t forget that everything is just Django models and templates so you can
+change it at will), or even creating a completely different kind of site by adding other Page types. For a more complete site with lots of examples please check 
+<a href="https://github.com/torchbox/wagtaildemo">wagtaildemo</a>. There is
+no complete documentation yet however you&nbsp;can </p>
+<blockquote>
+<p>Use the source&nbsp;Luke!</p>
+</blockquote></div>
+  		</article>
+  		<article>
+<header>
+      <h1 class="entry-title">
         <a href="http://spapas.github.io/2013/12/24/django-dynamic-forms/">Django dynamic forms</a>
       </h1>
     <p class="meta">
@@ -987,204 +1444,8 @@ D:\testgit&gt;git branch
 </div>
 </div>
   		</article>
-  		<article>
-<header>
-      <h1 class="entry-title">
-        <a href="http://spapas.github.io/2013/10/07/pelican-static-windows/">Using pelican to generate static sites on windows</a>
-      </h1>
-    <p class="meta">
-<time datetime="2013-10-07T10:20:00+03:00" pubdate>Δευ 07 Οκτώβριος 2013</time>    </p>
-</header>
-
-  <div class="entry-content"><div class="contents topic" id="contents">
-<p class="topic-title first">Contents</p>
-<ul class="simple">
-<li><a class="reference internal" href="#introduction" id="id1">Introduction</a></li>
-<li><a class="reference internal" href="#installing-pelican-and-generating-a-skeleton-for-your-site" id="id2">Installing pelican and generating a skeleton for your&nbsp;site</a></li>
-<li><a class="reference internal" href="#modifying-pelican-tools-for-windows" id="id3">Modifying pelican tools for&nbsp;windows</a></li>
-<li><a class="reference internal" href="#configuration-of-your-skeleton-site" id="id4">Configuration of your skeleton site</a><ul>
-<li><a class="reference internal" href="#settings" id="id5">Settings</a></li>
-<li><a class="reference internal" href="#themes" id="id6">Themes</a></li>
-<li><a class="reference internal" href="#plugins" id="id7">Plugins</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#hosting-in-github-pages" id="id8">Hosting in github&nbsp;pages</a></li>
-</ul>
-</div>
-<div class="section" id="introduction">
-<h2><a class="toc-backref" href="#id1">Introduction</a></h2>
-<p><a class="reference external" href="http://docs.getpelican.com/en/3.3.0/">Pelican</a> is a great static site generator. A static site generator is a tool that users a number of input files to
-generate a complete html site. No database or server side scripting is needed for the resulting site, that&#8217;s why
-many such sites are hosted on <a class="reference external" href="http://pages.github.com/">github pages</a> (more on this&nbsp;later).</p>
-<p>The input contains a number of html templates, css styles and the actual content of the site which most of the time is written in a
-<a class="reference external" href="http://en.wikipedia.org/wiki/Lightweight_markup_language">lightweight markup language</a> like <a class="reference external" href="http://docutils.sourceforge.net/rst.html">reStructuredText</a> or <a class="reference external" href="http://daringfireball.net/projects/markdown/">Markdown</a>. The static site generator will generate the static pages by
-inserting the content in the appropriate places in the&nbsp;templates.</p>
-<p>In the following sections we will describe the installation of pelican on Windows
-and the creation of the spapas.github.io&nbsp;site.</p>
-</div>
-<div class="section" id="installing-pelican-and-generating-a-skeleton-for-your-site">
-<h2><a class="toc-backref" href="#id2">Installing pelican and generating a skeleton for your&nbsp;site</a></h2>
-<p>The official pelican quickstart can be found in <a class="reference external" href="http://docs.getpelican.com/en/latest/getting_started.html">http://docs.getpelican.com/en/latest/getting_started.html</a></p>
-<p>To install pelican just&nbsp;enter:</p>
-<pre class="code literal-block">
-&gt;pip install pelican
-</pre>
-<p>After installing pelican, I propose creating a parent directory that will
-contain all your pelican sites, along with extra themes and plugins like&nbsp;this:</p>
-<pre class="literal-block">
-pelican/
-  ├── pelican-themes
-  ├── other-pelican-theme
-  ├── spapas.github.io
-  └── other-sites
-</pre>
-<p>After creating the pelican directory just go in it with a command line and run the <tt class="docutils literal"><span class="pre">pelican-quickstart</span></tt> command.
-It will ask you a number of questions, take a look at how I did answer&nbsp;these:</p>
-<pre class="code literal-block">
-pelican&gt;pelican-quickstart
-Welcome to pelican-quickstart v3.2.2.
-
-This script will help you create a new Pelican-based website.
-
-Please answer the following questions so this script can generate the files
-needed by Pelican.
-
-
-&gt; Where do you want to create your new web site? [.] spapas.github.io
-&gt; What will be the title of this web site? Test github.io
-&gt; Who will be the author of this web site? Serafeim
-&gt; What will be the default language of this web site? [en]
-&gt; Do you want to specify a URL prefix? e.g., http://example.com   (Y/n)
-&gt; What is your URL prefix? (see above example; no trailing slash) http://spapas.github.io
-&gt; Do you want to enable article pagination? (Y/n)
-&gt; How many articles per page do you want? [10]
-&gt; Do you want to generate a Makefile to easily manage your website? (Y/n) n
-&gt; Do you want an auto-reload &amp; simpleHTTP script to assist with theme and site development? (Y/n) n
-Done. Your new project is available at C:\progr\py\pelican\spapas.github.io
-</pre>
-<p>After that, you will have a pelican/spapas.github.io folder that will contain the following&nbsp;content:</p>
-<pre class="literal-block">
-spapas.github.io/
-  ├── content
-  ├── output
-  ├── pelicanconf.py
-  └── publishconf.py
-</pre>
-<p>The content folder will contain your content (rst or markdown), the output will contain the generated html after you run pelican for your site.
-The <tt class="docutils literal">pelicanconf.py</tt> will have a number of options for the generation of the development version of your site while the <tt class="docutils literal">publishconf.py</tt> will override some of the options
-of <tt class="docutils literal">pelicanconf.py</tt> before generating the production version of your site that will actually be uploaded to github&nbsp;pages.</p>
-</div>
-<div class="section" id="modifying-pelican-tools-for-windows">
-<h2><a class="toc-backref" href="#id3">Modifying pelican tools for&nbsp;windows</a></h2>
-<p>Pelican uses a Makefile and a unix shell script to generate the static html files and start an http server for development.
-Because I prefer to use windows, I answered no to the questions of generating these when pelican-quickstarte asked me.
-Instead I have included the following files inside the spapas.github.io&nbsp;directory:</p>
-<ul class="simple">
-<li><tt class="docutils literal">pelrun.bat</tt>, to generate the content for your debug site in the output&nbsp;directory:</li>
-</ul>
-<pre class="code literal-block">
-pelican content --debug --autoreload  --output output --settings pelicanconf.py
-</pre>
-<ul class="simple">
-<li><tt class="docutils literal">pelserve.bat</tt>, to localy serve the generated debug&nbsp;site:</li>
-</ul>
-<pre class="code literal-block">
-pushd output
-python -m pelican.server
-popd
-</pre>
-<ul class="simple">
-<li><tt class="docutils literal">pelpub.bat</tt>, to generate the production site in the output&nbsp;directory:</li>
-</ul>
-<pre class="code literal-block">
-pelican content --output output --settings publishconf.py
-</pre>
-<p>Now, when you want to develop your site locally,&nbsp;enter:</p>
-<pre class="code literal-block">
-spapas.github.io&gt;start pelrun.bat
-spapas.github.io&gt;start pelserv.bat
-</pre>
-<p>If everything was ok until now, you can visit <a class="reference external" href="http://127.0.0.1:8000">http://127.0.0.1:8000</a> and will get the following&nbsp;output:</p>
-<img alt="all ok!" src="/images/site1.png" style="width: 780px;" />
-<p>Because of the -r option that is used in <tt class="docutils literal">pelrun.bat</tt> whenever you do a change (for instance when you add an rst file in the content directory)
-it will be discovered and the output will be changed&nbsp;immediately!</p>
-</div>
-<div class="section" id="configuration-of-your-skeleton-site">
-<h2><a class="toc-backref" href="#id4">Configuration of your skeleton&nbsp;site</a></h2>
-<div class="section" id="settings">
-<h3><a class="toc-backref" href="#id5">Settings</a></h3>
-<p>There is a number of settings that you may configure in your site. The pelican settings reference can be found here: <a class="reference external" href="http://docs.getpelican.com/en/latest/settings.html">http://docs.getpelican.com/en/latest/settings.html</a>.
-The pelicanconf.py and publishconf.py for this site can be found&nbsp;here:</p>
-<p><a class="reference external" href="https://github.com/spapas/spapas.github.io/blob/source/pelicanconf.py">https://github.com/spapas/spapas.github.io/blob/source/pelicanconf.py</a>
-<a class="reference external" href="https://github.com/spapas/spapas.github.io/blob/source/publishconf.py">https://github.com/spapas/spapas.github.io/blob/source/publishconf.py</a></p>
-<p>The most important difference is the RELATIVE_URLS directive which must be True to the debug and False to the&nbsp;production.</p>
-</div>
-<div class="section" id="themes">
-<h3><a class="toc-backref" href="#id6">Themes</a></h3>
-<p>Beyond the default pelican theme, you can use configure pelican to use various other themes. To enable them, go to your pelican parent directory and clone the pelican-themes github&nbsp;repository:</p>
-<pre class="code literal-block">
-pelican&gt;git clone https://github.com/getpelican/pelican-themes.git
-</pre>
-<p>After that, you may select your theme from&nbsp;pelicanconf.py:</p>
-<pre class="code literal-block">
-THEME = &quot;../pelican-themes/theme-name&quot;
-</pre>
-<p>In my configuration, I am using the Octopress Theme for Pelican, which you may get from here <a class="reference external" href="https://github.com/duilio/pelican-octopress-theme">https://github.com/duilio/pelican-octopress-theme</a>. Just clone it to your
-pelican directory and refer to it as&nbsp;above.</p>
-</div>
-<div class="section" id="plugins">
-<h3><a class="toc-backref" href="#id7">Plugins</a></h3>
-<p>Pelican has a number of plugins. To enable them, go to your pelican parent directory and clone the pelican-plugins github&nbsp;repository:</p>
-<pre class="code literal-block">
-pelican&gt;git clone https://github.com/getpelican/pelican-plugins.git
-</pre>
-<p>After that, you may add the following two lines to your&nbsp;pelicanconf.py:</p>
-<pre class="code literal-block">
-PLUGIN_PATH = '../pelican-plugins'
-PLUGINS = ['a-plugin']
-</pre>
-</div>
-</div>
-<div class="section" id="hosting-in-github-pages">
-<h2><a class="toc-backref" href="#id8">Hosting in github&nbsp;pages</a></h2>
-<p>To host your static site in github pages you must first of all create a repository named
-username.github.io (for instance spapas.github.io) from&nbsp;github.</p>
-<p>Then, generate your production&nbsp;output:</p>
-<pre class="code literal-block">
-spapas.github.io&gt;pelpub.bat
-</pre>
-<p>Finally, go to your output directory, create a git repository, add everything and push it to your&nbsp;repository:</p>
-<pre class="code literal-block">
-spapas.github.io\output&gt;git init
-spapas.github.io\output&gt;git add .
-spapas.github.io\output&gt;git commit -m Initial
-spapas.github.io\output&gt;git remote add origin https://github.com/spapas/spapas.github.io.git
-spapas.github.io\output&gt;git push origin master --force
-</pre>
-<p>The &#8212;force is to overwrite any previous versions - you don&#8217;t care about version control on your output (but you want it on your&nbsp;source).</p>
-<p>You can now visit <a class="reference external" href="http://username.github.io">http://username.github.io</a> and see your statically generated site&nbsp;!</p>
-<p>Don&#8217;t forget to add your source to the version control! To do that, add a .gitignore file in your pelican/username.github.io direcory
-containing the&nbsp;following:</p>
-<pre class="code literal-block">
-output
-</pre>
-<p>The above file will ignore the contents of the output directory from version control. After that, do the&nbsp;following:</p>
-<pre class="code literal-block">
-spapas.github.io&gt;git init
-spapas.github.io&gt;git add .
-spapas.github.io&gt;git commit -m Initial
-spapas.github.io&gt;git branch -m master source
-spapas.github.io&gt;git remote add origin https://github.com/spapas/spapas.github.io.git
-spapas.github.io&gt;git push origin source
-</pre>
-<p>The above will rename the master branch to source, will attach the origin remote to <a class="reference external" href="https://github.com/spapas/spapas.github.io.git">https://github.com/spapas/spapas.github.io.git</a> and will push the source
-branch to it. Now you will have two branches in your username.github.io repository. One
-named origin/master that will be your actual site and will be displayed through <a class="reference external" href="http://username.github.io">http://username.github.io</a> and one named origin/source that will contain the source of your&nbsp;site.</p>
-<p>To learn more about branches and remotes you may check out <a class="reference external" href="http://spapas.github.io/2013/10/08/git-branches/">the git branches article</a>.</p>
-</div>
-</div>
-  		</article>
 <div class="pagination">
+    <a class="prev" href="http://spapas.github.io/index5.html">&larr; Older</a>
 
     <a class="next" href="http://spapas.github.io/index3.html">Newer &rarr;</a>
   <br />
@@ -1200,6 +1461,9 @@ named origin/master that will be your actual site and will be displayed through 
     <h1>Recent Posts</h1>
     <ul id="recent_posts">
       <li class="post">
+          <a href="http://spapas.github.io/2015/10/05/django-dynamic-tables-similar-models/">Django dynamic tables and filters for similar models</a>
+      </li>
+      <li class="post">
           <a href="http://spapas.github.io/2015/09/08/more-complex-react-flux-example/">A (little more) complex react and flux example</a>
       </li>
       <li class="post">
@@ -1210,9 +1474,6 @@ named origin/master that will be your actual site and will be displayed through 
       </li>
       <li class="post">
           <a href="http://spapas.github.io/2015/06/05/comprehensive-react-flux-tutorial/">A comprehensive React and Flux tutorial part 1: React</a>
-      </li>
-      <li class="post">
-          <a href="http://spapas.github.io/2015/05/27/using-browserify-watchify/">Using browserify and watchify to improve your client-side-javascript workflow</a>
       </li>
     </ul>
   </section>
@@ -1235,7 +1496,7 @@ named origin/master that will be your actual site and will be displayed through 
 
   <section>
   <h1>Tags</h1>
-    <a href="http://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="http://spapas.github.io/tag/tasks.html">tasks</a>,    <a href="http://spapas.github.io/tag/less.html">less</a>,    <a href="http://spapas.github.io/tag/spring.html">spring</a>,    <a href="http://spapas.github.io/tag/rest.html">rest</a>,    <a href="http://spapas.github.io/tag/google.html">google</a>,    <a href="http://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="http://spapas.github.io/tag/scheduling.html">scheduling</a>,    <a href="http://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="http://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="http://spapas.github.io/tag/git.html">git</a>,    <a href="http://spapas.github.io/tag/java.html">java</a>,    <a href="http://spapas.github.io/tag/rq.html">rq</a>,    <a href="http://spapas.github.io/tag/uglify.html">uglify</a>,    <a href="http://spapas.github.io/tag/django-rq.html">django-rq</a>,    <a href="http://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="http://spapas.github.io/tag/redis.html">redis</a>,    <a href="http://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="http://spapas.github.io/tag/forms.html">forms</a>,    <a href="http://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="http://spapas.github.io/tag/404.html">404</a>,    <a href="http://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="http://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="http://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="http://spapas.github.io/tag/css.html">css</a>,    <a href="http://spapas.github.io/tag/node.html">node</a>,    <a href="http://spapas.github.io/tag/jobs.html">jobs</a>,    <a href="http://spapas.github.io/tag/watchify.html">watchify</a>,    <a href="http://spapas.github.io/tag/python.html">python</a>,    <a href="http://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="http://spapas.github.io/tag/javascript.html">javascript</a>,    <a href="http://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="http://spapas.github.io/tag/react.html">react</a>,    <a href="http://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="http://spapas.github.io/tag/npm.html">npm</a>,    <a href="http://spapas.github.io/tag/rst.html">rst</a>,    <a href="http://spapas.github.io/tag/generic.html">generic</a>,    <a href="http://spapas.github.io/tag/browserify.html">browserify</a>,    <a href="http://spapas.github.io/tag/branching.html">branching</a>,    <a href="http://spapas.github.io/tag/design.html">design</a>,    <a href="http://spapas.github.io/tag/github.html">github</a>,    <a href="http://spapas.github.io/tag/pusher.html">pusher</a>,    <a href="http://spapas.github.io/tag/windows.html">windows</a>,    <a href="http://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="http://spapas.github.io/tag/django.html">django</a>,    <a href="http://spapas.github.io/tag/flux.html">flux</a>,    <a href="http://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="http://spapas.github.io/tag/error.html">error</a>,    <a href="http://spapas.github.io/tag/debug.html">debug</a>,    <a href="http://spapas.github.io/tag/asynchronous.html">asynchronous</a>,    <a href="http://spapas.github.io/tag/security.html">security</a>,    <a href="http://spapas.github.io/tag/flask.html">flask</a>,    <a href="http://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>  </section>
+    <a href="http://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="http://spapas.github.io/tag/tasks.html">tasks</a>,    <a href="http://spapas.github.io/tag/less.html">less</a>,    <a href="http://spapas.github.io/tag/spring.html">spring</a>,    <a href="http://spapas.github.io/tag/rest.html">rest</a>,    <a href="http://spapas.github.io/tag/google.html">google</a>,    <a href="http://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="http://spapas.github.io/tag/scheduling.html">scheduling</a>,    <a href="http://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="http://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="http://spapas.github.io/tag/tables.html">tables</a>,    <a href="http://spapas.github.io/tag/git.html">git</a>,    <a href="http://spapas.github.io/tag/java.html">java</a>,    <a href="http://spapas.github.io/tag/rq.html">rq</a>,    <a href="http://spapas.github.io/tag/uglify.html">uglify</a>,    <a href="http://spapas.github.io/tag/django-rq.html">django-rq</a>,    <a href="http://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="http://spapas.github.io/tag/redis.html">redis</a>,    <a href="http://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="http://spapas.github.io/tag/forms.html">forms</a>,    <a href="http://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="http://spapas.github.io/tag/404.html">404</a>,    <a href="http://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="http://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="http://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="http://spapas.github.io/tag/css.html">css</a>,    <a href="http://spapas.github.io/tag/node.html">node</a>,    <a href="http://spapas.github.io/tag/jobs.html">jobs</a>,    <a href="http://spapas.github.io/tag/watchify.html">watchify</a>,    <a href="http://spapas.github.io/tag/python.html">python</a>,    <a href="http://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="http://spapas.github.io/tag/javascript.html">javascript</a>,    <a href="http://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="http://spapas.github.io/tag/react.html">react</a>,    <a href="http://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="http://spapas.github.io/tag/npm.html">npm</a>,    <a href="http://spapas.github.io/tag/rst.html">rst</a>,    <a href="http://spapas.github.io/tag/generic.html">generic</a>,    <a href="http://spapas.github.io/tag/browserify.html">browserify</a>,    <a href="http://spapas.github.io/tag/branching.html">branching</a>,    <a href="http://spapas.github.io/tag/design.html">design</a>,    <a href="http://spapas.github.io/tag/github.html">github</a>,    <a href="http://spapas.github.io/tag/pusher.html">pusher</a>,    <a href="http://spapas.github.io/tag/windows.html">windows</a>,    <a href="http://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="http://spapas.github.io/tag/django.html">django</a>,    <a href="http://spapas.github.io/tag/flux.html">flux</a>,    <a href="http://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="http://spapas.github.io/tag/error.html">error</a>,    <a href="http://spapas.github.io/tag/debug.html">debug</a>,    <a href="http://spapas.github.io/tag/asynchronous.html">asynchronous</a>,    <a href="http://spapas.github.io/tag/security.html">security</a>,    <a href="http://spapas.github.io/tag/flask.html">flask</a>,    <a href="http://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>  </section>
 
 
 

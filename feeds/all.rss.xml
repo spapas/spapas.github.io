@@ -1,5 +1,227 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>/var/</title><link>http://spapas.github.io/</link><description>Various programming stuff</description><atom:link href="http://spapas.github.io/feeds/all.rss.xml" rel="self"></atom:link><lastBuildDate>Tue, 08 Sep 2015 12:55:00 +0300</lastBuildDate><item><title>A (little more) complex react and flux example</title><link>http://spapas.github.io/2015/09/08/more-complex-react-flux-example/</link><description>&lt;div class="contents topic" id="contents"&gt;
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>/var/</title><link>http://spapas.github.io/</link><description>Various programming stuff</description><atom:link href="http://spapas.github.io/feeds/all.rss.xml" rel="self"></atom:link><lastBuildDate>Mon, 05 Oct 2015 14:20:00 +0300</lastBuildDate><item><title>Django dynamic tables and filters for similar models</title><link>http://spapas.github.io/2015/10/05/django-dynamic-tables-similar-models/</link><description>&lt;div class="contents topic" id="contents"&gt;
+&lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id1"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#the-problem-we-ll-solve" id="id2"&gt;The problem we&amp;#8217;ll&amp;nbsp;solve&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#adding-the-dynamic-table" id="id3"&gt;Adding the dynamic&amp;nbsp;table&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#creating-a-dynamic-form-for-filtering" id="id4"&gt;Creating a dynamic form for&amp;nbsp;filtering&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#creating-the-dynamic-cbv" id="id5"&gt;Creating the dynamic &lt;span class="caps"&gt;CBV&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#conclusion" id="id6"&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="introduction"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id1"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;One of my favorite django apps is &lt;a class="reference external" href="https://github.com/bradleyayers/django-tables2"&gt;django-tables2&lt;/a&gt;: It allows you to
+easily create pagination and sorting enabled &lt;span class="caps"&gt;HTML&lt;/span&gt; tables to represent
+your model data using the usual djangonic technique (similar to how
+you &lt;a class="reference external" href="https://docs.djangoproject.com/en/1.8/topics/forms/modelforms/#modelform"&gt;create ModelForms&lt;/a&gt;). I use it to almost all my projects to
+represent the data, along with &lt;a class="reference external" href="https://github.com/alex/django-filter"&gt;django-filter&lt;/a&gt; to create forms
+to filter my model data. I&amp;#8217;ve written &lt;a class="reference external" href="http://stackoverflow.com/questions/13611741/django-tables-column-filtering/15129259#15129259"&gt;a nice &lt;span class="caps"&gt;SO&lt;/span&gt; answer&lt;/a&gt; with
+instructions on how to use django-filter along with&amp;nbsp;django-tables2.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="the-problem-we-ll-solve"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id2"&gt;The problem we&amp;#8217;ll&amp;nbsp;solve&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The main tool django-tables2 offers is a template tag called &lt;tt class="docutils literal"&gt;render_table&lt;/tt&gt;
+that get an instance of a subclass of &lt;tt class="docutils literal"&gt;django_tables2.Table&lt;/tt&gt;
+which contains a description of the table (columns, style etc) along
+with a queryset with the table&amp;#8217;s data and output it to the page. A nice
+extra feature of render_table is that you could pass it just a simple
+django queryset and it will output it without the need to create the
+custom Table class. So you can do something like {% render_table User.objects.all() %}
+and get a quick output of your Users&amp;nbsp;table.&lt;/p&gt;
+&lt;p&gt;In one of my projects I had three models that
+were used for keeping a different type of business log in the database (for auditing reasons)
+and was using the above feature to display these logs to the administrators, just by
+creating a very simple &lt;tt class="docutils literal"&gt;ListView&lt;/tt&gt; (a different one for each Log type) and using the
+&lt;tt class="docutils literal"&gt;render_table&lt;/tt&gt; to display the data. So I&amp;#8217;d created three views like&amp;nbsp;this&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class AuditLogListView(ListView):
+  model = AuditLog
+  context_object_name = 'logs'
+&lt;/pre&gt;
+&lt;p&gt;which all used a single template that contained a line &lt;tt class="docutils literal"&gt;{% render_table logs %}&lt;/tt&gt; to display
+the table (the &lt;tt class="docutils literal"&gt;logs&lt;/tt&gt; context variable contains the list of &lt;tt class="docutils literal"&gt;AuditLog&lt;/tt&gt; s).&lt;/p&gt;
+&lt;p&gt;This was a nice &lt;span class="caps"&gt;DRY&lt;/span&gt; (but quick and dirty solution) that soon was not enough to fulfill the
+needs of the administrators since they neeeded to have default sorting, filtering, hide
+the primary key-id column etc. The obvious solution for that would be to just create three different
+&lt;tt class="docutils literal"&gt;Table&lt;/tt&gt; subclasses that
+would more or less have the same options with only their &lt;tt class="docutils literal"&gt;model&lt;/tt&gt; attributte different. I didn&amp;#8217;t
+like this solution that much since it seemed non-&lt;span class="caps"&gt;DRY&lt;/span&gt; to me and I would instead prefer to
+create a generic &lt;tt class="docutils literal"&gt;Table&lt;/tt&gt; (that wouldn&amp;#8217;t have a &lt;tt class="docutils literal"&gt;model&lt;/tt&gt; attributte) and would just output
+its data with the correct options &amp;#8212; so instead of three &lt;tt class="docutils literal"&gt;Table&lt;/tt&gt; classes I&amp;#8217;d like to create
+just a single one with common options that would display its data (what &lt;tt class="docutils literal"&gt;render_table&lt;/tt&gt; does).&lt;/p&gt;
+&lt;p&gt;Unfortunately, I couldn&amp;#8217;t find a solution to this, since when I ommited the &lt;tt class="docutils literal"&gt;model&lt;/tt&gt; attribute
+from the &lt;tt class="docutils literal"&gt;Table&lt;/tt&gt; subclass nothing was outputed (there was no way to define fields to
+display without also defining the model). An obvious (and &lt;span class="caps"&gt;DRY&lt;/span&gt;) resolution would be to create
+a base &lt;tt class="docutils literal"&gt;Table&lt;/tt&gt; subclass that would define the needed options and create three subclasses
+that would inherit from this class and override only the &lt;tt class="docutils literal"&gt;model&lt;/tt&gt; attribute. This unfortunately was not
+possible becase &lt;a class="reference external" href="http://stackoverflow.com/questions/16696066/django-tables2-dynamically-adding-columns-to-table-not-adding-attrs-to-table/16741665#16741665"&gt;inheritance does not work well with django-tables2&lt;/a&gt;!&lt;/p&gt;
+&lt;p&gt;Furthermore, there&amp;#8217;s the extra hurdle of adding filtering to the above tables so that
+the admin&amp;#8217;s would be able to quickly find a log message - if we wanted to use django-filter
+we&amp;#8217;d need again to create three different subclasses (one for each log model type)
+of &lt;tt class="docutils literal"&gt;django_filter.FilterSet&lt;/tt&gt; since
+django-filter requires you to define the model for which the filter will be&amp;nbsp;created.&lt;/p&gt;
+&lt;p&gt;The best way to resolve such problems is to create your classes dynamically when
+you need &amp;#8216;em. I&amp;#8217;ve already described a way to &lt;a class="reference external" href="http://spapas.github.io/2013/12/24/django-dynamic-forms/"&gt;dynamically create forms in django
+in a previous post&lt;/a&gt;. Below, I&amp;#8217;ll describe
+a similar technique which can be used to create both dynamic tables and filters. Using
+this methodology, you&amp;#8217;ll be able to add a new &lt;span class="caps"&gt;CBV&lt;/span&gt; that displays a table with
+pagination, order and filtering for your model by just inheriting from a base&amp;nbsp;class!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="adding-the-dynamic-table"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id3"&gt;Adding the dynamic&amp;nbsp;table&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;To create the &lt;span class="caps"&gt;DRY&lt;/span&gt; &lt;span class="caps"&gt;CBV&lt;/span&gt; we&amp;#8217;ll use the &lt;a class="reference external" href="http://django-tables2.readthedocs.org/en/latest/pages/generic-mixins.html?highlight=singletableview"&gt;SingleTableView&lt;/a&gt; (&lt;tt class="docutils literal"&gt;django_tables2.SingleTableView&lt;/tt&gt;)
+as a base and override its &lt;tt class="docutils literal"&gt;get_table_class&lt;/tt&gt; method to dynamically create our table class
+using &lt;tt class="docutils literal"&gt;type&lt;/tt&gt;.
+Here&amp;#8217;s how it could be done using a mixin (notice that this mixin should be used in a
+&lt;tt class="docutils literal"&gt;SingleTableView&lt;/tt&gt; to override its &lt;tt class="docutils literal"&gt;get_table_class&lt;/tt&gt; method):&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class AddTableMixin(object, ):
+  table_pagination = {&amp;quot;per_page&amp;quot;: 25}
+
+  def get_table_class(self):
+      def get_table_column(field):
+          if isinstance(field, django.db.models.DateTimeField):
+              return tables.DateColumn(&amp;quot;d/m/Y H:i&amp;quot;)
+          else:
+              return tables.Column()
+
+      attrs = dict(
+          (f.name, get_table_column(f)) for
+          f in self.model._meta.fields if not f.name == 'id'
+      )
+      attrs['Meta'] = type('Meta', (), {'attrs':{&amp;quot;class&amp;quot;:&amp;quot;table&amp;quot;}, &amp;quot;order_by&amp;quot;: (&amp;quot;-created_on&amp;quot;, ) } )
+      klass = type('DTable', (tables.Table, ), attrs)
+
+      return klass
+&lt;/pre&gt;
+&lt;p&gt;Let&amp;#8217;s try to explain the &lt;tt class="docutils literal"&gt;get_table_class&lt;/tt&gt; method: First of all, we&amp;#8217;ve defined a local &lt;tt class="docutils literal"&gt;get_table_column&lt;/tt&gt;
+function that will return a django-tables2 column depending on the field of the model. For example, in
+our case we want to use a &lt;tt class="docutils literal"&gt;django_tables2.DateColumn&lt;/tt&gt; with a specific format when a &lt;tt class="docutils literal"&gt;DateTimeField&lt;/tt&gt; is
+encountered and for all other model fields just use the stock &lt;tt class="docutils literal"&gt;Column&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;After that, we create a dictionary with all the attributes of the model. The &lt;tt class="docutils literal"&gt;self.model&lt;/tt&gt; field will contain
+the model Class, so using its &lt;tt class="docutils literal"&gt;_meta.fields&lt;/tt&gt; will return the defined fields. As we can see, we just use
+a generator expression to create a tuple with the name of the field and its type (using &lt;tt class="docutils literal"&gt;get_table_class&lt;/tt&gt;)
+excluding the &amp;#8216;id&amp;#8217; column. So, attrs will be a dictionary of field names and&amp;nbsp;types.&lt;/p&gt;
+&lt;p&gt;The &lt;tt class="docutils literal"&gt;Meta&lt;/tt&gt; class of this table is crated using &lt;tt class="docutils literal"&gt;type&lt;/tt&gt; which creates a parentless class by defining all its attributes in a dictionary
+and set it as the &lt;tt class="docutils literal"&gt;Meta&lt;/tt&gt; key in the previously defined &lt;tt class="docutils literal"&gt;attrs&lt;/tt&gt; dict. Finally, we create the actual &lt;tt class="docutils literal"&gt;django_tables2.Table&lt;/tt&gt; subclass by
+inheriting from it and passing the &lt;tt class="docutils literal"&gt;attrs&lt;/tt&gt; dict. We&amp;#8217;ll see an example of what &lt;tt class="docutils literal"&gt;get_table_class&lt;/tt&gt; returns&amp;nbsp;later.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="creating-a-dynamic-form-for-filtering"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id4"&gt;Creating a dynamic form for&amp;nbsp;filtering&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Let&amp;#8217;s create another mixin that could be used to create a dynamic &lt;tt class="docutils literal"&gt;django.Form&lt;/tt&gt; subclass to the &lt;span class="caps"&gt;CBV&lt;/span&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class AddFormMixin(object, ):
+  def define_form(self):
+      def get_form_field(f):
+          return forms.CharField(required=False)
+
+      attrs = dict(
+          (f, get_form_field(f)) for
+          f in self.get_form_fields() )
+
+      klass = type('DForm', (forms.Form, ), attrs)
+
+      return klass
+
+  def get_queryset(self):
+      form_class = self.define_form()
+      if self.request.GET:
+          self.form = form_class(self.request.GET)
+      else:
+          self.form = form_class()
+
+      qs = super(AddFormMixin, self).get_queryset()
+
+      if self.form.data and self.form.is_valid():
+          q_objects = Q()
+          for f in self.get_form_fields():
+              q_objects &amp;amp;= Q(**{f+'__icontains':self.form.cleaned_data.get(f, '')})
+
+          qs = qs.filter(q_objects)
+
+      return qs
+
+  def get_context_data(self, **kwargs):
+      ctx = super(AddFormMixin, self).get_context_data(**kwargs)
+      ctx['form'] = self.form
+      return ctx
+&lt;/pre&gt;
+&lt;p&gt;The first method that will be called is the &lt;tt class="docutils literal"&gt;get_queryset&lt;/tt&gt; method that will generate the dynamic form
+using &lt;tt class="docutils literal"&gt;define_form&lt;/tt&gt;. This method has a get_form_fields local function (similar to get_table_fields)
+that can be used to override the types of the fields (or just fallback to a normal CharField) and
+then create the &lt;tt class="docutils literal"&gt;attrs&lt;/tt&gt; dictionary and &lt;tt class="docutils literal"&gt;forms.Form&lt;/tt&gt; subclass in a similar way as the &lt;tt class="docutils literal"&gt;Table&lt;/tt&gt; subclass. Here,
+we don&amp;#8217;t want to create a filter form from all fields of the model as we did on table, so instead
+we&amp;#8217;ll use a &lt;tt class="docutils literal"&gt;get_form_fields&lt;/tt&gt; method that returns the name of the fields that we want to
+use in the filtering form and needs to be defined in each &lt;span class="caps"&gt;CBV&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;The &lt;tt class="docutils literal"&gt;get_queryset&lt;/tt&gt; method is more interesting: First of all, since we are just filtering the
+queryset we&amp;#8217;d need to submit the form with a &lt;tt class="docutils literal"&gt;&lt;span class="caps"&gt;GET&lt;/span&gt;&lt;/tt&gt; (and not a &lt;tt class="docutils literal"&gt;&lt;span class="caps"&gt;POST&lt;/span&gt;&lt;/tt&gt;). We see that if we have
+data to our &lt;tt class="docutils literal"&gt;request.&lt;span class="caps"&gt;GET&lt;/span&gt;&lt;/tt&gt; dictionary we&amp;#8217;ll instantiate the form using this data (or else we&amp;#8217;ll just
+create an empty form). To do the actual filtering, we check if the form is valid and create a &lt;tt class="docutils literal"&gt;django.models.db.Q&lt;/tt&gt; object
+that is used to combine (by &lt;span class="caps"&gt;AND&lt;/span&gt;) the conditions. Each of the individual Q objects that will be combined
+to create the complete one will be created using the line &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;Q(**{f+'__icontains':self.form.cleaned_data.get(f,&lt;/span&gt; &lt;span class="pre"&gt;'')})&lt;/span&gt;&lt;/tt&gt;
+(where f will be the name of the field) which will create a dictionary of the form &lt;tt class="docutils literal"&gt;{'action__icontains': 'test text'}&lt;/tt&gt; and then pass this as a keyword
+argument to the Q (using the &lt;tt class="docutils literal"&gt;**&lt;/tt&gt; mechanism) - this is the only way to pass dynamic kwargs to a&amp;nbsp;function!&lt;/p&gt;
+&lt;p&gt;Finally, the queryset will be filtered using the combined &lt;tt class="docutils literal"&gt;Q&lt;/tt&gt; object we just&amp;nbsp;described.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="creating-the-dynamic-cbv"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt;Creating the dynamic &lt;span class="caps"&gt;CBV&lt;/span&gt;&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Using the above mixins, we can easily create a dynamic &lt;span class="caps"&gt;CBV&lt;/span&gt; with a table and a filter form only by inheriting from the mixins
+and &lt;tt class="docutils literal"&gt;SingleTableView&lt;/tt&gt; and defining the &lt;tt class="docutils literal"&gt;get_form_fields&lt;/tt&gt; method:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class AuditLogListView(AddTableMixin, AddFormMixin, SingleTableView):
+  model = AuditLog
+  context_object_name = 'logs'
+
+  def get_form_fields(self):
+      return ('action','user__username', )
+&lt;/pre&gt;
+&lt;p&gt;Let&amp;#8217;s suppose that the &lt;tt class="docutils literal"&gt;AuditLog&lt;/tt&gt; is defined as&amp;nbsp;following:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class AuditLog(models.Model):
+  created_on = models.DateTimeField( auto_now_add=True, editable=False,)
+  user = models.ForeignKey(settings.AUTH_USER_MODEL, editable=False,)
+  action = models.CharField(max_length=256, editable=False,)
+&lt;/pre&gt;
+&lt;p&gt;Using the above &lt;tt class="docutils literal"&gt;AuditLogListView&lt;/tt&gt;, a dynamic table and a dynamic form will be automaticall created whenever the view is visited.
+The &lt;tt class="docutils literal"&gt;Table&lt;/tt&gt; class will be like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class DTable(tables.Table):
+  created_on = tables.DateColumn(&amp;quot;d/m/Y H:i&amp;quot;)
+  user = tables.Column()
+  action = tables.Column()
+
+  class Meta:
+      attrs = {&amp;quot;class&amp;quot;:&amp;quot;table&amp;quot;}
+      order_by = (&amp;quot;-created_on&amp;quot;, )
+&lt;/pre&gt;
+&lt;p&gt;and the &lt;tt class="docutils literal"&gt;Form&lt;/tt&gt; class like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class DForm(forms.Form):
+  user__username = forms.CharField()
+  action = forms.CharField()
+&lt;/pre&gt;
+&lt;p&gt;An interesting thing to notice is that we can drill down to foreign keys (f.e. &lt;tt class="docutils literal"&gt;user__username&lt;/tt&gt;) to create more interesting filters. Also we could add some more
+methods to be overriden by the implementing class beyond the &lt;tt class="docutils literal"&gt;get_form_fields&lt;/tt&gt;. For example, instead of using &lt;tt class="docutils literal"&gt;self.model._meta.fields&lt;/tt&gt;
+to generate the fields of the table, we could instead use a &lt;tt class="docutils literal"&gt;get_table_fields&lt;/tt&gt; method that would be overriden in the implementing
+classes (and even drill down on foreign keys to display more data on the table using &lt;a class="reference external" href="http://django-tables2.readthedocs.org/en/latest/pages/accessors.html"&gt;accessors&lt;/a&gt;).&lt;/p&gt;
+&lt;p&gt;Or, instead of just passing the the form field names we could also pass their type (instead of using &lt;tt class="docutils literal"&gt;get_form_fields&lt;/tt&gt;) and
+their lookup method (instead of  &lt;tt class="docutils literal"&gt;icontains&lt;/tt&gt;) &amp;#8212; similar to&amp;nbsp;django-filter.&lt;/p&gt;
+&lt;p&gt;Please notice that instead of creating a django form instance for filtering, we could instead create a django-filter instance with
+a similar methodology. However, I preferred to just use a normal django form because it makes the whole process more clear and removes
+a level of abstraction (we just create a &lt;tt class="docutils literal"&gt;django.Form&lt;/tt&gt; subclass while, if we used django-filter we&amp;#8217;d need to create a django-filter subclass
+which would create a &lt;tt class="docutils literal"&gt;django.Form&lt;/tt&gt; subclass)!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="conclusion"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id6"&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Using the above technique we can quickly create a table and filter for a number of Models that all share
+the same properties in the most &lt;span class="caps"&gt;DRY&lt;/span&gt;. This technique of course is useful only for quick CBVs that
+are more or less the same and require little customization. Another interesting thing is that instead of
+creating different &lt;tt class="docutils literal"&gt;SingleTableView&lt;/tt&gt; s we could instead create a single &lt;span class="caps"&gt;CBV&lt;/span&gt; that will get the content type
+of the Model to be viewed as a parameter and retrieve the model (and queryset) from the content&amp;nbsp;type!&lt;/p&gt;
+&lt;/div&gt;
+</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Serafeim Papastefanos</dc:creator><pubDate>Mon, 05 Oct 2015 14:20:00 +0300</pubDate><guid>tag:spapas.github.io,2015-10-05:2015/10/05/django-dynamic-tables-similar-models/</guid><category>django</category><category>python</category><category>forms</category><category>tables</category></item><item><title>A (little more) complex react and flux example</title><link>http://spapas.github.io/2015/09/08/more-complex-react-flux-example/</link><description>&lt;div class="contents topic" id="contents"&gt;
 &lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
 &lt;ul class="simple"&gt;
 &lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id3"&gt;Introduction&lt;/a&gt;&lt;/li&gt;

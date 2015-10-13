@@ -119,6 +119,16 @@ in the same folder as with <tt class="docutils literal">bower.json</tt>, <tt cla
 </pre>
 <p>(I wanted to use the indigo color as my primary one - you may of course use whichever color from the ones defined in <tt class="docutils literal">less/_variables.less</tt> you&nbsp;like)</p>
 <p>This file may contain other default values for variables - if I find anything useful I will add it to this post (also please reply with any&nbsp;recommendations).</p>
+<p><strong>Update 13/10/2015</strong> After a request from commenter Jofferson Ramirez Tiquez, here&#8217;s a custom.less that overrides more colors from <tt class="docutils literal">_variables.css</tt>
+(beyond the primary color, it changes the success color to teal and info and warning to the corresponding hex color&nbsp;values):</p>
+<pre class="code literal-block">
+&#64;import &quot;less/material.less&quot;;
+
+&#64;primary: &#64;indigo;
+&#64;success: &#64;teal;
+&#64;info: #CFD8DC;
+&#64;warning:#455A64;
+</pre>
 </div>
 <div class="section" id="step-5-create-your-custom-material-css-file">
 <h2>Step 5: Create your custom material css&nbsp;file</h2>

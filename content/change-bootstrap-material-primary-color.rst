@@ -64,6 +64,19 @@ in the same folder as with ``bower.json``, ``Gruntfile.js`` etc) with the follow
 
 This file may contain other default values for variables - if I find anything useful I will add it to this post (also please reply with any recommendations).
 
+**Update 13/10/2015** After a request from commenter Jofferson Ramirez Tiquez, here's a custom.less that overrides more colors from ``_variables.css``
+(beyond the primary color, it changes the success color to teal and info and warning to the corresponding hex color values):
+
+.. code:: 
+
+    @import "less/material.less";
+
+    @primary: @indigo;
+    @success: @teal;
+    @info: #CFD8DC;
+    @warning:#455A64;
+    
+
 Step 5: Create your custom material css file
 --------------------------------------------
 

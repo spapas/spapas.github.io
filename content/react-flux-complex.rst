@@ -14,11 +14,11 @@ Introduction
 ------------
 
 In `previous <{filename}react-tutorial.rst>`_
-`two <{filename}react-tutorial.rst>`_ parts of this series, we have seen
+`two <{filename}react-flux-tutorial.rst>`_ parts of this series, we have seen
 how we could implement a
 not-so-simple single page application with full CRUD capabilities
 using react only (in the `first part <{filename}react-tutorial.rst>`_ ) and then how to
-change it to use the flux architecture (in the `second part <{filename}react-tutorial.rst>`_).
+change it to use the flux architecture (in the `second part <{filename}react-flux-tutorial.rst>`_).
 
 In this, third, part, we will
 add some more capabilities to the previous app

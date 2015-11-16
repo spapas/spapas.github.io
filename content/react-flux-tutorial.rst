@@ -77,6 +77,16 @@ as requirements for browserify:
     "react": "^0.13.3",
     "reactify": "^1.1.1"
   }
+  
+Also, in order to be able to use JSX with browserify, will use the reactify_ transform. To apply it to
+your project, change the ``scripts`` of your ``package.json`` to:
+
+.. code::
+
+  "scripts": {
+    "watch": "watchify -v -d static/main.js -t reactify -o static/bundle.js",
+    "build": "browserify static/main.js -t reactify  | uglifyjs -mc warnings=false > static/bundle.js"
+  },
 
 main.js
 ~~~~~~~
@@ -671,3 +681,4 @@ create a simple app, moving to something more complex (and especially debugging 
 .. _bind: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind
 .. _`functions are objects`: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function
 .. _`TodoMVC tutorial`: https://facebook.github.io/flux/docs/todo-list.html
+.. _`reactify`: https://github.com/andreypopp/reactify

@@ -1,5 +1,188 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>/var/</title><link>http://spapas.github.io/</link><description>Various programming stuff</description><atom:link href="http://spapas.github.io/feeds/all.rss.xml" rel="self"></atom:link><lastBuildDate>Mon, 05 Oct 2015 14:20:00 +0300</lastBuildDate><item><title>Django dynamic tables and filters for similar models</title><link>http://spapas.github.io/2015/10/05/django-dynamic-tables-similar-models/</link><description>&lt;div class="contents topic" id="contents"&gt;
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>/var/</title><link>http://spapas.github.io/</link><description>Various programming stuff</description><atom:link href="http://spapas.github.io/feeds/all.rss.xml" rel="self"></atom:link><lastBuildDate>Mon, 16 Nov 2015 14:20:00 +0200</lastBuildDate><item><title>Improve your client-side-javascript workflow more by using ES6</title><link>http://spapas.github.io/2015/11/16/using-browserify-es6/</link><description>&lt;div class="contents topic" id="contents"&gt;
+&lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id1"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#npm-save-save-dev-and-avoiding-global-deps" id="id2"&gt;&lt;span class="caps"&gt;NPM&lt;/span&gt;, &amp;#8212;save, &amp;#8212;save-dev and avoiding global&amp;nbsp;deps&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#using-babel" id="id3"&gt;Using&amp;nbsp;babel&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#integrate-babel-with-browserify" id="id4"&gt;Integrate babel with&amp;nbsp;browserify&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#conclusion" id="id5"&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="introduction"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id1"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;In a &lt;a class="reference external" href="http://spapas.github.io/2015/05/27/using-browserify-watchify/"&gt;previous article&lt;/a&gt;
+we presented a simple workflow to improve your client-side (javascript) workflow
+by including a bunch of tools from the node-js world i.e &lt;a class="reference external" href="http://browserify.org/"&gt;browserify&lt;/a&gt; and
+its friends, &lt;a class="reference external" href="https://github.com/substack/watchify"&gt;watchify&lt;/a&gt; and &lt;a class="reference external" href="https://www.npmjs.com/package/uglify-js"&gt;uglify-js&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Using these tools we were able to properly manage our client side dependencies
+(no more script tags in our html templates) and modularize our code
+(so we could avoid monolithic javascript files that contained all our code).
+Another great improvement to our workflow would be to include &lt;span class="caps"&gt;ES6&lt;/span&gt; to the&amp;nbsp;mix!&lt;/p&gt;
+&lt;p&gt;&lt;span class="caps"&gt;ES6&lt;/span&gt; (or EcmaScript 2015) is more or less &amp;quot;Javascript: &lt;span class="caps"&gt;TNG&lt;/span&gt;&amp;quot;. It has many features
+that greatly improve the readability and writability of javascript code - for instance,
+thick arrows, better classes, better modules, iterators/generators, template strings,
+default function parameters and many others!
+More info on these features and how they could be used can be found on the &lt;a class="reference external" href="https://github.com/lukehoban/es6features"&gt;es6features&lt;/a&gt;&amp;nbsp;repository.&lt;/p&gt;
+&lt;p&gt;Unfortunately, these features are either not supported at all, or they are partially supported
+on current (November 2015) browsers. However all is &lt;em&gt;not&lt;/em&gt; lost yet: Since we already use browserify
+to our client side workflow, we can easily enable it to read source files with &lt;span class="caps"&gt;ES6&lt;/span&gt; syntax
+and transform them to normal javascript using a transformation through the &lt;a class="reference external" href="https://babeljs.io/"&gt;babel&lt;/a&gt;&amp;nbsp;tool.&lt;/p&gt;
+&lt;p&gt;In the following, we&amp;#8217;ll talk a bit more about the node-js package manager (npm) features,
+talk a little about babel and finally
+modify our workflow so that it will be able to use &lt;span class="caps"&gt;ES6&lt;/span&gt;! Please notice that to properly follow this article
+you need to first read the &lt;a class="reference external" href="http://spapas.github.io/2015/05/27/using-browserify-watchify/"&gt;previous one&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="npm-save-save-dev-and-avoiding-global-deps"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id2"&gt;&lt;span class="caps"&gt;NPM&lt;/span&gt;, &amp;#8212;save, &amp;#8212;save-dev and avoiding global&amp;nbsp;deps&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;In the previous article, I had recommended to install the needed tools
+(needed to create the output bundle browserify, watchify, uglify) globally
+using npm install -g package (of course the normal dependencies like moment.js
+would be installed locally).
+This has one advantage and two disadvantages: It
+puts these tools to the path so they can be called immediately (i.e browserify)
+but you will need root access to install a package globally and nothing is
+saved on &lt;tt class="docutils literal"&gt;package.json&lt;/tt&gt; so you don&amp;#8217;t know which packages must be installed
+in order to start developing the&amp;nbsp;project!&lt;/p&gt;
+&lt;p&gt;This could be ok for the introductionary article, however for this one I
+will propose another alternative: Install all the tools &lt;em&gt;locally&lt;/em&gt; using just
+&lt;tt class="docutils literal"&gt;npm install package &lt;span class="pre"&gt;--save&lt;/span&gt;&lt;/tt&gt;. These tools will be put to the &lt;tt class="docutils literal"&gt;node_modules&lt;/tt&gt; folder. They
+&lt;em&gt;will not&lt;/em&gt; be put to the path, but if you want to execute a binary by yourself
+to debug the output, you can find it in &lt;tt class="docutils literal"&gt;node_modules/bin&lt;/tt&gt;, for example,
+for browserify you can run &lt;tt class="docutils literal"&gt;node_modules/bin/browserify&lt;/tt&gt;. Another intersting
+thing is that if you create executable scripts in your &lt;tt class="docutils literal"&gt;package.json&lt;/tt&gt; you
+don&amp;#8217;t actually need to include the full path but the binaries will be&amp;nbsp;found.&lt;/p&gt;
+&lt;p&gt;Another thing I&amp;#8217;d like to discuss here is the difference between &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;--save&lt;/span&gt;&lt;/tt&gt;
+and &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;--save-dev&lt;/span&gt;&lt;/tt&gt; options that can be passed to npm install. If you take
+a look at other guides you&amp;#8217;ll see that people are using &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;--save-dev&lt;/span&gt;&lt;/tt&gt; for
+development dependencies (i.e testing) and &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;--save&lt;/span&gt;&lt;/tt&gt; for normal dependencies.
+The difference is that these dependencies are saved in different places in
+&lt;tt class="docutils literal"&gt;package.json&lt;/tt&gt; and if you run &lt;tt class="docutils literal"&gt;npm install &lt;span class="pre"&gt;--production&lt;/span&gt;&lt;/tt&gt; you&amp;#8217;ll get only
+the normal dependencies (while, if you run &lt;tt class="docutils literal"&gt;npm install&lt;/tt&gt; all dependencies
+will be installed). In these articles, I chose to just use &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;--save&lt;/span&gt;&lt;/tt&gt; everywhere,
+after all the only thing that would be needed for production would be the
+&lt;tt class="docutils literal"&gt;bundle.js&lt;/tt&gt; output&amp;nbsp;file.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="using-babel"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id3"&gt;Using&amp;nbsp;babel&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The &lt;a class="reference external" href="https://babeljs.io/"&gt;babel&lt;/a&gt; library &amp;quot;is a JavaScript compiler&amp;quot;. It gets input files in a variant
+of javascript (for example, &lt;span class="caps"&gt;ES6&lt;/span&gt;) and produces normal javascript files &amp;#8212; something
+like what browserify transforms do. However, what babel does (and I think its
+the only tool that does this) is that it allows you to use &lt;span class="caps"&gt;ES6&lt;/span&gt; features &lt;em&gt;now&lt;/em&gt; by
+transpiling them to normal (&lt;span class="caps"&gt;ES5&lt;/span&gt;) javascript. Also, babel has &lt;a class="reference external" href="https://babeljs.io/docs/plugins/"&gt;various other transforms&lt;/a&gt;,
+including a react transform
+(so you can use this instead of the reactify&amp;nbsp;browserify-transform)!&lt;/p&gt;
+&lt;p&gt;In any case, to be able to use &lt;span class="caps"&gt;ES6&lt;/span&gt;, we&amp;#8217;ll need to install babel and its es6&amp;nbsp;presets:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+npm install  babel babel-preset-es2015 --save
+&lt;/pre&gt;
+&lt;p&gt;If we wanted to also use babel for react we&amp;#8217;d need to install&amp;nbsp;babel-preset-react.&lt;/p&gt;
+&lt;p&gt;To configure babel we can either add a &lt;tt class="docutils literal"&gt;babel&lt;/tt&gt;
+section in our &lt;tt class="docutils literal"&gt;package.json&lt;/tt&gt; or create a new file named .babelrc and put the configuration&amp;nbsp;there.&lt;/p&gt;
+&lt;p&gt;I prefer the first one since we are already using the &lt;tt class="docutils literal"&gt;package.json&lt;/tt&gt;. So add the following attribute
+to your &lt;tt class="docutils literal"&gt;package.json&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;quot;babel&amp;quot;: {
+  &amp;quot;presets&amp;quot;: [
+    &amp;quot;es2015&amp;quot;
+  ]
+}
+&lt;/pre&gt;
+&lt;p&gt;If you wanted to configure it through &lt;tt class="docutils literal"&gt;.babelrc&lt;/tt&gt; then you&amp;#8217;d just copy to it the contents of &lt;tt class="docutils literal"&gt;&amp;quot;babel&amp;quot;&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;To do some tests with babel, you can install its cli (it&amp;#8217;s not included in the babel package) through
+&lt;tt class="docutils literal"&gt;npm install &lt;span class="pre"&gt;babel-cli&lt;/span&gt;&lt;/tt&gt;. Now, you can run &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;node_modules/.bin/babel&lt;/span&gt;&lt;/tt&gt;. For example, create a
+file named &lt;tt class="docutils literal"&gt;testbabel.js&lt;/tt&gt; with the following contents (thick&amp;nbsp;arrow):&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+[1,2,3].forEach(x =&amp;gt; console.log(x) );
+&lt;/pre&gt;
+&lt;p&gt;when you pass it to babel you&amp;#8217;ll see the following&amp;nbsp;output:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;gt;node_modules\.bin\babel testbabel.js
+&amp;quot;use strict&amp;quot;;
+
+[1, 2, 3].forEach(function (x) {
+  return console.log(x);
+});
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="integrate-babel-with-browserify"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id4"&gt;Integrate babel with&amp;nbsp;browserify&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;To call babel from browserify we&amp;#8217;re going to use the &lt;a class="reference external" href="https://github.com/babel/babelify"&gt;babelify&lt;/a&gt; browserify transform which
+actually uses babel to transpile the browserify input. After installing it&amp;nbsp;with&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+npm install babelify --save
+&lt;/pre&gt;
+&lt;p&gt;you need to tell browserify to use it. To do this, you&amp;#8217;ll just pass a -t babelify parameter to
+browserify. So if you run it with the &lt;tt class="docutils literal"&gt;testbabel.js&lt;/tt&gt; file as input you&amp;#8217;ll see the following&amp;nbsp;output:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;gt;node_modules\.bin\browserify -t babelify testbabel.js
+[...] browserify gibberish
+&amp;quot;use strict&amp;quot;;
+
+[1, 2, 3].forEach(function (x) {
+  return console.log(x);
+});
+
+[...] more browserify gibberish
+&lt;/pre&gt;
+&lt;p&gt;yey &amp;#8212; the code is transpiled to &lt;span class="caps"&gt;ES5&lt;/span&gt;!&lt;/p&gt;
+&lt;p&gt;To create a complete project, let&amp;#8217;s add a normal requirement&amp;nbsp;(moment.js):&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+npm install moment --save
+&lt;/pre&gt;
+&lt;p&gt;and a file named &lt;tt class="docutils literal"&gt;src\main.js&lt;/tt&gt; that uses it with &lt;span class="caps"&gt;ES6&lt;/span&gt;&amp;nbsp;syntax:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+import moment from 'moment';
+
+const arr = [1,2,3,4,5];
+arr.forEach(x =&amp;gt; setTimeout(() =&amp;gt; console.log(`Now: ${moment().format(&amp;quot;HH:mm:ss&amp;quot;)}, Later: ${moment().add(x, &amp;quot;days&amp;quot;).format(&amp;quot;L&amp;quot;)}...`), x*1000));
+&lt;/pre&gt;
+&lt;p&gt;To create the output javascript file, we&amp;#8217;ll use the browserify and watchify commands with the
+addition of the -t babelify switch. Here&amp;#8217;s the complete &lt;tt class="docutils literal"&gt;package.json&lt;/tt&gt; for this&amp;nbsp;project:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+{
+  &amp;quot;dependencies&amp;quot;: {
+    &amp;quot;babel&amp;quot;: &amp;quot;^6.1.18&amp;quot;,
+    &amp;quot;babel-preset-es2015&amp;quot;: &amp;quot;^6.1.18&amp;quot;,
+    &amp;quot;babelify&amp;quot;: &amp;quot;^7.2.0&amp;quot;,
+    &amp;quot;browserify&amp;quot;: &amp;quot;^12.0.1&amp;quot;,
+    &amp;quot;moment&amp;quot;: &amp;quot;^2.10.6&amp;quot;,
+    &amp;quot;uglify-js&amp;quot;: &amp;quot;^2.6.0&amp;quot;,
+    &amp;quot;watchify&amp;quot;: &amp;quot;^3.6.1&amp;quot;
+  },
+  &amp;quot;scripts&amp;quot;: {
+    &amp;quot;watch&amp;quot;: &amp;quot;watchify src/main.js -o dist/bundle.js -v -t babelify&amp;quot;,
+    &amp;quot;build&amp;quot;: &amp;quot;browserify src/main.js -t babelify | uglifyjs -mc warnings=false &amp;gt; dist/bundle.js&amp;quot;
+  },
+  &amp;quot;babel&amp;quot;: {
+    &amp;quot;presets&amp;quot;: [
+      &amp;quot;es2015&amp;quot;
+    ]
+  }
+}
+&lt;/pre&gt;
+&lt;p&gt;Running &lt;tt class="docutils literal"&gt;npm run build&lt;/tt&gt; should create a &lt;tt class="docutils literal"&gt;dist/bundle.js&lt;/tt&gt; file. If you include this in an html,
+you should see something like this in the&amp;nbsp;console:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+Now: 13:52:09, Later: 11/17/2015...
+Now: 13:52:10, Later: 11/18/2015...
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="conclusion"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Using the combination of babel and javascript we can easily write &lt;span class="caps"&gt;ES6&lt;/span&gt; code in our modules! This,
+along with the modularization of our code and the management of client-side dependencies should
+make client side development a&amp;nbsp;breeze!&lt;/p&gt;
+&lt;p&gt;Please notice that to keep the presented workflow simple and easy to
+replicate and configure, we have not used any external
+task runners (like gulp or grunt) &amp;#8212; all configuration is kept in a single file (package.json) and
+the whole environment can be replicated just by doing a &lt;tt class="docutils literal"&gt;npm install&lt;/tt&gt;. Of course, the capabilities of
+browserify are not unlimited, so if you wanted to do something more complicated
+(for instance, lint your code before passing it to browserify) you&amp;#8217;d need to use the mentioned
+task runners (or webpack which is the current trend in javascript bundlers and actually replaces
+the task&amp;nbsp;runners).&lt;/p&gt;
+&lt;/div&gt;
+</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Serafeim Papastefanos</dc:creator><pubDate>Mon, 16 Nov 2015 14:20:00 +0200</pubDate><guid>tag:spapas.github.io,2015-11-16:2015/11/16/using-browserify-es6/</guid><category>javascript</category><category>browserify</category><category>node</category><category>npm</category><category>watchify</category><category>generic</category><category>uglify</category><category>babel</category><category>es6</category></item><item><title>Django dynamic tables and filters for similar models</title><link>http://spapas.github.io/2015/10/05/django-dynamic-tables-similar-models/</link><description>&lt;div class="contents topic" id="contents"&gt;
 &lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
 &lt;ul class="simple"&gt;
 &lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id1"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
@@ -263,11 +446,11 @@ of the Model to be viewed as a parameter and retrieve the model (and queryset) f
 &lt;div class="section" id="introduction"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id3"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;In &lt;a class="reference external" href="http://spapas.github.io/2015/06/05/comprehensive-react-flux-tutorial/"&gt;previous&lt;/a&gt;
-&lt;a class="reference external" href="http://spapas.github.io/2015/06/05/comprehensive-react-flux-tutorial/"&gt;two&lt;/a&gt; parts of this series, we have seen
+&lt;a class="reference external" href="http://spapas.github.io/2015/07/02/comprehensive-react-flux-tutorial-2/"&gt;two&lt;/a&gt; parts of this series, we have seen
 how we could implement a
 not-so-simple single page application with full &lt;span class="caps"&gt;CRUD&lt;/span&gt; capabilities
 using react only (in the &lt;a class="reference external" href="http://spapas.github.io/2015/06/05/comprehensive-react-flux-tutorial/"&gt;first part&lt;/a&gt; ) and then how to
-change it to use the flux architecture (in the &lt;a class="reference external" href="http://spapas.github.io/2015/06/05/comprehensive-react-flux-tutorial/"&gt;second part&lt;/a&gt;).&lt;/p&gt;
+change it to use the flux architecture (in the &lt;a class="reference external" href="http://spapas.github.io/2015/07/02/comprehensive-react-flux-tutorial-2/"&gt;second part&lt;/a&gt;).&lt;/p&gt;
 &lt;p&gt;In this, third, part, we will
 add some more capabilities to the previous app
 to prove how easy it is to create complex apps
@@ -1943,6 +2126,14 @@ as requirements for&amp;nbsp;browserify:&lt;/p&gt;
   &amp;quot;react&amp;quot;: &amp;quot;^0.13.3&amp;quot;,
   &amp;quot;reactify&amp;quot;: &amp;quot;^1.1.1&amp;quot;
 }
+&lt;/pre&gt;
+&lt;p&gt;Also, in order to be able to use &lt;span class="caps"&gt;JSX&lt;/span&gt; with browserify, will use the &lt;a class="reference external" href="https://github.com/andreypopp/reactify"&gt;reactify&lt;/a&gt; transform. To apply it to
+your project, change the &lt;tt class="docutils literal"&gt;scripts&lt;/tt&gt; of your &lt;tt class="docutils literal"&gt;package.json&lt;/tt&gt; to:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;quot;scripts&amp;quot;: {
+  &amp;quot;watch&amp;quot;: &amp;quot;watchify -v -d static/main.js -t reactify -o static/bundle.js&amp;quot;,
+  &amp;quot;build&amp;quot;: &amp;quot;browserify static/main.js -t reactify  | uglifyjs -mc warnings=false &amp;gt; static/bundle.js&amp;quot;
+},
 &lt;/pre&gt;
 &lt;div class="section" id="main-js"&gt;
 &lt;h3&gt;&lt;a class="toc-backref" href="#id4"&gt;main.js&lt;/a&gt;&lt;/h3&gt;

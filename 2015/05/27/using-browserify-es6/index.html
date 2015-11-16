@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="google-site-verification" content="5_8DTmIiEq4gFvNAfxAD6TsGOgrMAjp8lQFQvfA6zZc" />
-  <title>Using browserify and watchify to improve your client-side-javascript workflow &mdash; /var/</title>
+  <title>Improve your client-side-javascript workflow more by using ES6 &mdash; /var/</title>
   <meta name="author" content="Serafeim Papastefanos">
 
 
@@ -19,9 +19,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
 
-    <link href="http://spapas.github.io/favicon.png" rel="icon">
+    <link href="../../../../favicon.png" rel="icon">
 
-  <link href="http://spapas.github.io/theme/css/main.css" media="screen, projection"
+  <link href="../../../../theme/css/main.css" media="screen, projection"
         rel="stylesheet" type="text/css">
 
   <link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic"
@@ -32,7 +32,7 @@
 
 <body>
   <header role="banner"><hgroup>
-  <h1><a href="http://spapas.github.io/">/var/</a></h1>
+  <h1><a href="../../../../">/var/</a></h1>
     <h2>Various programming stuff</h2>
 </hgroup></header>
   <nav role="navigation"><ul class="subscription" data-subscription="rss">
@@ -41,31 +41,31 @@
 
 <ul class="main-navigation">
       <li >
-        <a href="http://spapas.github.io/category/css.html">Css</a>
+        <a href="../../../../category/css.html">Css</a>
       </li>
       <li >
-        <a href="http://spapas.github.io/category/django.html">Django</a>
+        <a href="../../../../category/django.html">Django</a>
       </li>
       <li >
-        <a href="http://spapas.github.io/category/flask.html">Flask</a>
+        <a href="../../../../category/flask.html">Flask</a>
       </li>
       <li >
-        <a href="http://spapas.github.io/category/git.html">Git</a>
+        <a href="../../../../category/git.html">Git</a>
       </li>
       <li class="active">
-        <a href="http://spapas.github.io/category/javascript.html">Javascript</a>
+        <a href="../../../../category/javascript.html">Javascript</a>
       </li>
       <li >
-        <a href="http://spapas.github.io/category/pelican.html">Pelican</a>
+        <a href="../../../../category/pelican.html">Pelican</a>
       </li>
       <li >
-        <a href="http://spapas.github.io/category/python.html">Python</a>
+        <a href="../../../../category/python.html">Python</a>
       </li>
       <li >
-        <a href="http://spapas.github.io/category/spring.html">Spring</a>
+        <a href="../../../../category/spring.html">Spring</a>
       </li>
       <li >
-        <a href="http://spapas.github.io/category/wagtail.html">Wagtail</a>
+        <a href="../../../../category/wagtail.html">Wagtail</a>
       </li>
 </ul></nav>
   <div id="main">
@@ -73,7 +73,7 @@
 <div>
   <article class="hentry" role="article">
 <header>
-      <h1 class="entry-title">Using browserify and watchify to improve your client-side-javascript workflow</h1>
+      <h1 class="entry-title">Improve your client-side-javascript workflow more by using ES6</h1>
     <p class="meta">
 <time datetime="2015-05-27T14:20:00+03:00" pubdate>Τετ 27 Μάιος 2015</time>    </p>
 </header>
@@ -81,68 +81,27 @@
   <div class="entry-content"><div class="contents topic" id="contents">
 <p class="topic-title first">Contents</p>
 <ul class="simple">
-<li><a class="reference internal" href="#the-problem" id="id1">The&nbsp;problem</a></li>
-<li><a class="reference internal" href="#the-solution" id="id2">The&nbsp;solution</a></li>
-<li><a class="reference internal" href="#installing-required-tools" id="id3">Installing required&nbsp;tools</a></li>
-<li><a class="reference internal" href="#starting-your-node-js-project" id="id4">Starting your (node.js)&nbsp;project</a></li>
-<li><a class="reference internal" href="#running-browserify-for-the-first-time" id="id5">Running browserify for the first&nbsp;time</a></li>
-<li><a class="reference internal" href="#using-external-libraries" id="id6">Using external&nbsp;libraries</a></li>
-<li><a class="reference internal" href="#introducing-watchify" id="id7">Introducing&nbsp;watchify</a></li>
-<li><a class="reference internal" href="#creating-your-own-modules" id="id8">Creating your own&nbsp;modules</a></li>
-<li><a class="reference internal" href="#uglifying-your-bundle" id="id9">Uglifying your&nbsp;bundle</a></li>
-<li><a class="reference internal" href="#the-client-side-javascript-workflow" id="id10">The client-side javascript&nbsp;workflow</a></li>
-<li><a class="reference internal" href="#conlusion" id="id11">Conlusion</a></li>
+<li><a class="reference internal" href="#introduction" id="id1">Introduction</a></li>
+<li><a class="reference internal" href="#installing-required-tools" id="id2">Installing required&nbsp;tools</a></li>
+<li><a class="reference internal" href="#starting-your-node-js-project" id="id3">Starting your (node.js)&nbsp;project</a></li>
+<li><a class="reference internal" href="#running-browserify-for-the-first-time" id="id4">Running browserify for the first&nbsp;time</a></li>
+<li><a class="reference internal" href="#using-external-libraries" id="id5">Using external&nbsp;libraries</a></li>
+<li><a class="reference internal" href="#introducing-watchify" id="id6">Introducing&nbsp;watchify</a></li>
+<li><a class="reference internal" href="#creating-your-own-modules" id="id7">Creating your own&nbsp;modules</a></li>
+<li><a class="reference internal" href="#uglifying-your-bundle" id="id8">Uglifying your&nbsp;bundle</a></li>
+<li><a class="reference internal" href="#the-client-side-javascript-workflow" id="id9">The client-side javascript&nbsp;workflow</a></li>
+<li><a class="reference internal" href="#conlusion" id="id10">Conlusion</a></li>
 </ul>
 </div>
-<div class="section" id="the-problem">
-<h2><a class="toc-backref" href="#id1">The&nbsp;problem</a></h2>
-<p>Once upon a time, when people started using client-side code to their projects they (mainly
-due to the lack of decent client-side libraries but also because of the <a class="reference external" href="http://en.wikipedia.org/wiki/Not_invented_here"><span class="caps">NIH</span> syndrome</a>)
-were just adding their own code in script nodes or .js files using <tt class="docutils literal">document.getElementById</tt> to manipulate
-the <span class="caps">DOM</span> (good luck checking for all possible browser-edge cases)
-and <tt class="docutils literal">window.XMLHttpRequest</tt> to try doing <span class="caps">AJAX</span>.</p>
-<p>After these dark-times, the
-age of javascript-framework came: prototype, jquery, dojo. These were (and still are)
-some great libraries (even <span class="caps">NIH</span>-sick people used them to handle browser incompatibilities):
-You just downloaded the .js file with the framework, put it inside your project
-static files and added it to your page with a script tag and then filled your client-side
-code with funny $(&#8216;#id&#8217;)&nbsp;symbols!</p>
-<p>Coming to the modern age in client-side development, the number of decent libraries has greatly increased
-and instead of monolithic frameworks there are different libraries for different needs. So instead of
-just downloading a single file and adding the script node for that file to your <span class="caps">HTML</span>, you need to
-download the required javascript files, put them all in your static files directory and then micro-manage
-the script nodes for each of your pages depending on which libraries each page needs! So if you want
-to use (for example) moment.js to your client-side code you need to go to <em>all</em> <span class="caps">HTML</span> pages that use that
-specific client-side code and add a moment.js-script&nbsp;element!</p>
-<p>As can be understood this leads to really ugly situations like people avoiding refactoring their code to use
-external libraries, using a single-global module  with all their client side code, using <span class="caps">CDN</span> to avoid
-downloading the javascript libraries and of course never upgrade their javascript&nbsp;libraries!</p>
-</div>
-<div class="section" id="the-solution">
-<h2><a class="toc-backref" href="#id2">The&nbsp;solution</a></h2>
-<p><a class="reference external" href="http://browserify.org/">browserify</a> and <a class="reference external" href="https://github.com/substack/watchify">watchify</a> are two sister tools from the server-side-javascript (node.js and friends)
-world that greatly improve your javascript workflow: Using them, you no longer need to micro-manage
-your script tags but instead you just declare the libraries each of your client-side modules is
-using - or you can even create your own reusable modules! Also, installing (or updating) javascript
-libraries is as easy as running a single&nbsp;command!</p>
-<p>How are they working? With browserify you create a single <tt class="docutils literal">main.js</tt> for each of your <span class="caps">HTML</span>
-pages and in it you declare its requirements using <a class="reference external" href="https://github.com/substack/browserify-handbook#require">require</a>. You&#8217;ll then pass your <tt class="docutils literal">main.js</tt>
-through browserify and it will create a single file (e.g <tt class="docutils literal">bundle.js</tt>) that contains all the requirements
-(of course each requirement could have other requirements - they&#8217;ll be automatically also
-included in the resulting .js file). That&#8217;s the <em>only</em> file you need to put to the script tag of
-your <span class="caps">HTML</span>! Using watchify, you can <em>watch</em> your <tt class="docutils literal">main.js</tt> for changes (the changes may also
-be in the files included from main.js) and automatically generate the resulting <tt class="docutils literal">bundle.js</tt> so that
-you&#8217;ll just need to hit F5 to refresh and get the new&nbsp;version!</p>
-<p>browserify not only concatenates your javascript libraries to a single bundle but can also transform
-your coffesscript, typescript, jsx etc files to javascrpt and <em>then</em> also add them to the bundle. This
-is possible through a concept called transforms &#8212; there are <a class="reference external" href="https://github.com/substack/node-browserify/wiki/list-of-transforms">a lot of transforms</a> that you can&nbsp;use.</p>
-<p>Below, I will propose a really simple and generic workflow that should cover most of your javascript needs.
-I should mention that I mainly develop django apps and my development machine is running windows, however you
-can easily use exactly the  same workflow from any kind of server-side technology (ruby, python, javascript,
-java, php or even static <span class="caps">HTML</span> pages!) or development machine (windows, linux, osx) - it&#8217;s exactly the&nbsp;same!</p>
+<div class="section" id="introduction">
+<h2><a class="toc-backref" href="#id1">Introduction</a></h2>
+<p>In a <a class="reference external" href="../../../../2015/05/27/using-browserify-watchify/">previous article</a>
+we presented a simple workflow to improve your client-side (javascript) workflow
+by including a bunch of tools from the node-js world, specifically browserify and
+its friends, watchify and&nbsp;uglify.</p>
 </div>
 <div class="section" id="installing-required-tools">
-<h2><a class="toc-backref" href="#id3">Installing required&nbsp;tools</a></h2>
+<h2><a class="toc-backref" href="#id2">Installing required&nbsp;tools</a></h2>
 <p>As already mentioned, you need two node.js tools. Just install them globally using npm (installing
 node.js and npm is really easy - there&#8217;s even <a class="reference external" href="https://nodejs.org/download/">a package for windows</a>):</p>
 <pre class="code literal-block">
@@ -152,7 +111,7 @@ npm install -g browserify watchify
 your command prompt - after that entering <tt class="docutils literal">browserify</tt> or <tt class="docutils literal">watchify</tt> from your command prompt should be&nbsp;working.</p>
 </div>
 <div class="section" id="starting-your-node-js-project">
-<h2><a class="toc-backref" href="#id4">Starting your (node.js)&nbsp;project</a></h2>
+<h2><a class="toc-backref" href="#id3">Starting your (node.js)&nbsp;project</a></h2>
 <p>Although you may already have a project structure, in order to use browserify you&#8217;ll need to
 create a node.js project (project from now on) that needs just two&nbsp;things:</p>
 <ul class="simple">
@@ -169,7 +128,7 @@ please put this file in your version control - the <tt class="docutils literal">
 to the same directory with <tt class="docutils literal">package.json</tt> and should be ignored by your version&nbsp;control.</p>
 </div>
 <div class="section" id="running-browserify-for-the-first-time">
-<h2><a class="toc-backref" href="#id5">Running browserify for the first&nbsp;time</a></h2>
+<h2><a class="toc-backref" href="#id4">Running browserify for the first&nbsp;time</a></h2>
 <p>Not the time has come to create a <tt class="docutils literal">main.js</tt> file. This could be put anywhere you like (based on your project structure) -
 I&#8221; suppose that <tt class="docutils literal">main.js</tt> is inside the <tt class="docutils literal">src/</tt>  folder of your project.
 Just put a <tt class="docutils literal"><span class="pre">console.log(&quot;Hello,</span> world&quot;)</tt> to the <tt class="docutils literal">main.js</tt> for now. To test that everything is working,&nbsp;run:</p>
@@ -186,7 +145,7 @@ Finally, include a script element with that file to your <span class="caps">HTML
 should see &quot;Hello, world&quot; to your javascript console when opening the <span class="caps">HTML</span>&nbsp;file!</p>
 </div>
 <div class="section" id="using-external-libraries">
-<h2><a class="toc-backref" href="#id6">Using external&nbsp;libraries</a></h2>
+<h2><a class="toc-backref" href="#id5">Using external&nbsp;libraries</a></h2>
 <p>To use a library from your main.js you need to install it and get a reference to it through require. Let&#8217;s try to use <a class="reference external" href="http://momentjs.com/">moment.js</a>:
 To install the library&nbsp;run</p>
 <pre class="code literal-block">
@@ -243,7 +202,7 @@ _([1,2,3]).map(function(x) {
 <p>After you create your bundle you should se 2 3 4 in your&nbsp;console!</p>
 </div>
 <div class="section" id="introducing-watchify">
-<h2><a class="toc-backref" href="#id7">Introducing&nbsp;watchify</a></h2>
+<h2><a class="toc-backref" href="#id6">Introducing&nbsp;watchify</a></h2>
 <p>Running browserify <em>every</em> time you change your js files to create the <tt class="docutils literal">bundle.js</tt> feels
 like doing repetitive work - this is where wachify comes to the rescue; watchify is a
 tool that watches your source code and dependencies and when a change is detected it will
@@ -264,7 +223,7 @@ changing main.js and you&#8217;ll see that bundle.js will also be&nbsp;re-writte
 always be re-created when changes are&nbsp;found.</p>
 </div>
 <div class="section" id="creating-your-own-modules">
-<h2><a class="toc-backref" href="#id8">Creating your own&nbsp;modules</a></h2>
+<h2><a class="toc-backref" href="#id7">Creating your own&nbsp;modules</a></h2>
 <p>Using browserify we can create our own modules and <em>require</em> them in other modules using the <tt class="docutils literal">module.exports</tt> mechanism!</p>
 <p>Creating a module is really simple: In a normal javascript file either assign directly to module.exports or
 include all local objects you want to be visible as an attribute to <tt class="docutils literal">module.exports</tt> &#8212; everything
@@ -318,7 +277,7 @@ module.exports['funct'] = funct
 When you refresh your <span class="caps">HTML</span> you should see&nbsp;11!</p>
 </div>
 <div class="section" id="uglifying-your-bundle">
-<h2><a class="toc-backref" href="#id9">Uglifying your&nbsp;bundle</a></h2>
+<h2><a class="toc-backref" href="#id8">Uglifying your&nbsp;bundle</a></h2>
 <p>If had taken a look at the file size of your <tt class="docutils literal">bundle.js</tt> when you&#8217;d included moment.js or underscore.js you&#8217;d see
 that the file size has been greatly increased. Take a peek at <tt class="docutils literal">bundle.js</tt> and you&#8217;ll see why: The contents of the module files
 will be concatenated as they are, without any changes! This may be nice for development / debugging, however for production
@@ -347,7 +306,7 @@ with watchify since watchify cannot output to stdout &#8212; however, as we&#821
 this is not a real&nbsp;problem.</p>
 </div>
 <div class="section" id="the-client-side-javascript-workflow">
-<h2><a class="toc-backref" href="#id10">The client-side javascript&nbsp;workflow</a></h2>
+<h2><a class="toc-backref" href="#id9">The client-side javascript&nbsp;workflow</a></h2>
 <p>The proposed client-side javascript workflow uses two commands, one for the development and one
 for creating the production&nbsp;bundle.</p>
 <p>For the development, we&#8217;ll use watchify since we need to immediately re-create the bundle when a
@@ -379,7 +338,7 @@ we can use that to run these commands. Just add a <tt class="docutils literal">s
 create your production&nbsp;bundle!</p>
 </div>
 <div class="section" id="conlusion">
-<h2><a class="toc-backref" href="#id11">Conlusion</a></h2>
+<h2><a class="toc-backref" href="#id10">Conlusion</a></h2>
 <p>In the above we saw two (three if we include uglifyjs) javascript tools that will greatly improve our
 javascript workflow. Using these we can easily <em>require</em> (import) external javascript libraries to
 our project without any micromanagement of script tags in html files. We also can seperate our own
@@ -404,19 +363,15 @@ be used by the users&#8217;&nbsp;browsers.</p>
     </span>
   </span>
 <time datetime="2015-05-27T14:20:00+03:00" pubdate>Τετ 27 Μάιος 2015</time>  <span class="categories">
-    <a class='category' href='http://spapas.github.io/category/javascript.html'>javascript</a>
+    <a class='category' href='../../../../category/javascript.html'>javascript</a>
   </span>
   <span class="categories">
-    <a class="category" href="http://spapas.github.io/tag/javascript.html">javascript</a>,    <a class="category" href="http://spapas.github.io/tag/browserify.html">browserify</a>,    <a class="category" href="http://spapas.github.io/tag/node.html">node</a>,    <a class="category" href="http://spapas.github.io/tag/npm.html">npm</a>,    <a class="category" href="http://spapas.github.io/tag/watchify.html">watchify</a>,    <a class="category" href="http://spapas.github.io/tag/generic.html">generic</a>,    <a class="category" href="http://spapas.github.io/tag/uglify.html">uglify</a>  </span>
+    <a class="category" href="../../../../tag/javascript.html">javascript</a>,    <a class="category" href="../../../../tag/browserify.html">browserify</a>,    <a class="category" href="../../../../tag/node.html">node</a>,    <a class="category" href="../../../../tag/npm.html">npm</a>,    <a class="category" href="../../../../tag/watchify.html">watchify</a>,    <a class="category" href="../../../../tag/generic.html">generic</a>,    <a class="category" href="../../../../tag/uglify.html">uglify</a>,    <a class="category" href="../../../../tag/es6.html">es6</a>  </span>
 </p><div class="sharing">
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://spapas.github.io/2015/05/27/using-browserify-watchify/" data-via="" data-counturl="http://spapas.github.io/2015/05/27/using-browserify-watchify/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="../../../../2015/05/27/using-browserify-es6/" data-via="" data-counturl="../../../../2015/05/27/using-browserify-es6/" >Tweet</a>
 </div>    </footer>
   </article>
 
-  <section>
-    <h1>Comments</h1>
-    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript></div>
-  </section>
 </div>
 <aside class="sidebar">
   <section>
@@ -429,19 +384,19 @@ be used by the users&#8217;&nbsp;browsers.</p>
     <h1>Recent Posts</h1>
     <ul id="recent_posts">
       <li class="post">
-          <a href="http://spapas.github.io/2015/11/16/using-browserify-es6/">Improve your client-side-javascript workflow more by using ES6</a>
+          <a href="../../../../2015/10/05/django-dynamic-tables-similar-models/">Django dynamic tables and filters for similar models</a>
       </li>
       <li class="post">
-          <a href="http://spapas.github.io/2015/10/05/django-dynamic-tables-similar-models/">Django dynamic tables and filters for similar models</a>
+          <a href="../../../../2015/09/08/more-complex-react-flux-example/">A (little more) complex react and flux example</a>
       </li>
       <li class="post">
-          <a href="http://spapas.github.io/2015/09/08/more-complex-react-flux-example/">A (little more) complex react and flux example</a>
+          <a href="../../../../2015/09/01/django-rq-redux/">django-rq redux: advanced techniques and tools</a>
       </li>
       <li class="post">
-          <a href="http://spapas.github.io/2015/09/01/django-rq-redux/">django-rq redux: advanced techniques and tools</a>
+          <a href="../../../../2015/07/02/comprehensive-react-flux-tutorial-2/">A comprehensive React and Flux tutorial part 2: Flux</a>
       </li>
       <li class="post">
-          <a href="http://spapas.github.io/2015/07/02/comprehensive-react-flux-tutorial-2/">A comprehensive React and Flux tutorial part 2: Flux</a>
+          <a href="../../../../2015/06/05/comprehensive-react-flux-tutorial/">A comprehensive React and Flux tutorial part 1: React</a>
       </li>
     </ul>
   </section>
@@ -449,22 +404,22 @@ be used by the users&#8217;&nbsp;browsers.</p>
       
     <h1>Categories</h1>
     <ul id="recent_posts">
-        <li><a href="http://spapas.github.io/category/css.html">css</a></li>
-        <li><a href="http://spapas.github.io/category/django.html">django</a></li>
-        <li><a href="http://spapas.github.io/category/flask.html">flask</a></li>
-        <li><a href="http://spapas.github.io/category/git.html">git</a></li>
-        <li><a href="http://spapas.github.io/category/javascript.html">javascript</a></li>
-        <li><a href="http://spapas.github.io/category/pelican.html">pelican</a></li>
-        <li><a href="http://spapas.github.io/category/python.html">python</a></li>
-        <li><a href="http://spapas.github.io/category/spring.html">spring</a></li>
-        <li><a href="http://spapas.github.io/category/wagtail.html">wagtail</a></li>
+        <li><a href="../../../../category/css.html">css</a></li>
+        <li><a href="../../../../category/django.html">django</a></li>
+        <li><a href="../../../../category/flask.html">flask</a></li>
+        <li><a href="../../../../category/git.html">git</a></li>
+        <li><a href="../../../../category/javascript.html">javascript</a></li>
+        <li><a href="../../../../category/pelican.html">pelican</a></li>
+        <li><a href="../../../../category/python.html">python</a></li>
+        <li><a href="../../../../category/spring.html">spring</a></li>
+        <li><a href="../../../../category/wagtail.html">wagtail</a></li>
     </ul>
   </section>
  
 
   <section>
   <h1>Tags</h1>
-    <a href="http://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="http://spapas.github.io/tag/tasks.html">tasks</a>,    <a href="http://spapas.github.io/tag/less.html">less</a>,    <a href="http://spapas.github.io/tag/spring.html">spring</a>,    <a href="http://spapas.github.io/tag/rest.html">rest</a>,    <a href="http://spapas.github.io/tag/google.html">google</a>,    <a href="http://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="http://spapas.github.io/tag/scheduling.html">scheduling</a>,    <a href="http://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="http://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="http://spapas.github.io/tag/tables.html">tables</a>,    <a href="http://spapas.github.io/tag/git.html">git</a>,    <a href="http://spapas.github.io/tag/java.html">java</a>,    <a href="http://spapas.github.io/tag/rq.html">rq</a>,    <a href="http://spapas.github.io/tag/uglify.html">uglify</a>,    <a href="http://spapas.github.io/tag/django-rq.html">django-rq</a>,    <a href="http://spapas.github.io/tag/babel.html">babel</a>,    <a href="http://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="http://spapas.github.io/tag/redis.html">redis</a>,    <a href="http://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="http://spapas.github.io/tag/forms.html">forms</a>,    <a href="http://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="http://spapas.github.io/tag/404.html">404</a>,    <a href="http://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="http://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="http://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="http://spapas.github.io/tag/css.html">css</a>,    <a href="http://spapas.github.io/tag/node.html">node</a>,    <a href="http://spapas.github.io/tag/jobs.html">jobs</a>,    <a href="http://spapas.github.io/tag/watchify.html">watchify</a>,    <a href="http://spapas.github.io/tag/python.html">python</a>,    <a href="http://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="http://spapas.github.io/tag/javascript.html">javascript</a>,    <a href="http://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="http://spapas.github.io/tag/react.html">react</a>,    <a href="http://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="http://spapas.github.io/tag/npm.html">npm</a>,    <a href="http://spapas.github.io/tag/rst.html">rst</a>,    <a href="http://spapas.github.io/tag/generic.html">generic</a>,    <a href="http://spapas.github.io/tag/es6.html">es6</a>,    <a href="http://spapas.github.io/tag/browserify.html">browserify</a>,    <a href="http://spapas.github.io/tag/branching.html">branching</a>,    <a href="http://spapas.github.io/tag/design.html">design</a>,    <a href="http://spapas.github.io/tag/github.html">github</a>,    <a href="http://spapas.github.io/tag/pusher.html">pusher</a>,    <a href="http://spapas.github.io/tag/windows.html">windows</a>,    <a href="http://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="http://spapas.github.io/tag/django.html">django</a>,    <a href="http://spapas.github.io/tag/flux.html">flux</a>,    <a href="http://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="http://spapas.github.io/tag/error.html">error</a>,    <a href="http://spapas.github.io/tag/debug.html">debug</a>,    <a href="http://spapas.github.io/tag/asynchronous.html">asynchronous</a>,    <a href="http://spapas.github.io/tag/security.html">security</a>,    <a href="http://spapas.github.io/tag/flask.html">flask</a>,    <a href="http://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>  </section>
+    <a href="../../../../tag/pelican.html">pelican</a>,    <a href="../../../../tag/tasks.html">tasks</a>,    <a href="../../../../tag/less.html">less</a>,    <a href="../../../../tag/spring.html">spring</a>,    <a href="../../../../tag/rest.html">rest</a>,    <a href="../../../../tag/google.html">google</a>,    <a href="../../../../tag/cbv.html">cbv</a>,    <a href="../../../../tag/scheduling.html">scheduling</a>,    <a href="../../../../tag/auditing.html">auditing</a>,    <a href="../../../../tag/static-html.html">static-html</a>,    <a href="../../../../tag/tables.html">tables</a>,    <a href="../../../../tag/git.html">git</a>,    <a href="../../../../tag/java.html">java</a>,    <a href="../../../../tag/rq.html">rq</a>,    <a href="../../../../tag/uglify.html">uglify</a>,    <a href="../../../../tag/django-rq.html">django-rq</a>,    <a href="../../../../tag/nodejs.html">node.js</a>,    <a href="../../../../tag/redis.html">redis</a>,    <a href="../../../../tag/heroku.html">heroku</a>,    <a href="../../../../tag/forms.html">forms</a>,    <a href="../../../../tag/github-pages.html">github-pages</a>,    <a href="../../../../tag/404.html">404</a>,    <a href="../../../../tag/ldap.html">ldap</a>,    <a href="../../../../tag/gmail.html">gmail</a>,    <a href="../../../../tag/spring-security.html">spring-security</a>,    <a href="../../../../tag/css.html">css</a>,    <a href="../../../../tag/node.html">node</a>,    <a href="../../../../tag/jobs.html">jobs</a>,    <a href="../../../../tag/watchify.html">watchify</a>,    <a href="../../../../tag/python.html">python</a>,    <a href="../../../../tag/mongodb.html">mongodb</a>,    <a href="../../../../tag/javascript.html">javascript</a>,    <a href="../../../../tag/authentication.html">authentication</a>,    <a href="../../../../tag/react.html">react</a>,    <a href="../../../../tag/class-based-views.html">class-based-views</a>,    <a href="../../../../tag/npm.html">npm</a>,    <a href="../../../../tag/rst.html">rst</a>,    <a href="../../../../tag/generic.html">generic</a>,    <a href="../../../../tag/es6.html">es6</a>,    <a href="../../../../tag/browserify.html">browserify</a>,    <a href="../../../../tag/branching.html">branching</a>,    <a href="../../../../tag/design.html">design</a>,    <a href="../../../../tag/github.html">github</a>,    <a href="../../../../tag/pusher.html">pusher</a>,    <a href="../../../../tag/windows.html">windows</a>,    <a href="../../../../tag/wagtail.html">wagtail</a>,    <a href="../../../../tag/django.html">django</a>,    <a href="../../../../tag/flux.html">flux</a>,    <a href="../../../../tag/githubio.html">github.io</a>,    <a href="../../../../tag/error.html">error</a>,    <a href="../../../../tag/debug.html">debug</a>,    <a href="../../../../tag/asynchronous.html">asynchronous</a>,    <a href="../../../../tag/security.html">security</a>,    <a href="../../../../tag/flask.html">flask</a>,    <a href="../../../../tag/boostrap-material-design.html">boostrap-material-design</a>  </section>
 
 
 
@@ -474,9 +429,9 @@ be used by the users&#8217;&nbsp;browsers.</p>
     Copyright &copy;  2013&ndash;2015  Serafeim Papastefanos &mdash;
   <span class="credit">Powered by <a href="http://getpelican.com">Pelican</a></span>
 </p></footer>
-  <script src="http://spapas.github.io/theme/js/modernizr-2.0.js"></script>
-  <script src="http://spapas.github.io/theme/js/ender.js"></script>
-  <script src="http://spapas.github.io/theme/js/octopress.js" type="text/javascript"></script>
+  <script src="../../../../theme/js/modernizr-2.0.js"></script>
+  <script src="../../../../theme/js/ender.js"></script>
+  <script src="../../../../theme/js/octopress.js" type="text/javascript"></script>
     <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -487,17 +442,6 @@ be used by the users&#8217;&nbsp;browsers.</p>
 
     ga('send', 'pageview');
     </script>
-  <script type="text/javascript">
-    var disqus_shortname = 'spapas-github-io';
-    var disqus_identifier = '/2015/05/27/using-browserify-watchify/';
-    var disqus_url = 'http://spapas.github.io/2015/05/27/using-browserify-watchify/';
-    var disqus_title = 'Using browserify and watchify to improve your client-side-javascript&nbsp;workflow';
-    (function() {
-      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = "//" + disqus_shortname + '.disqus.com/embed.js';
-      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-     })();
-  </script>
   <script type="text/javascript">
     (function(){
       var twitterWidgets = document.createElement('script');

@@ -5,29 +5,36 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>http://spapas.github.io/index.html</loc>
-<lastmod>2015-10-13T14:33:22-00:00</lastmod>
+<lastmod>2015-11-16T14:59:10-00:00</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://spapas.github.io/archives.html</loc>
-<lastmod>2015-10-13T14:33:22-00:00</lastmod>
+<lastmod>2015-11-16T14:59:10-00:00</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://spapas.github.io/tags.html</loc>
-<lastmod>2015-10-13T14:33:22-00:00</lastmod>
+<lastmod>2015-11-16T14:59:10-00:00</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://spapas.github.io/categories.html</loc>
-<lastmod>2015-10-13T14:33:22-00:00</lastmod>
+<lastmod>2015-11-16T14:59:10-00:00</lastmod>
 <changefreq>weekly</changefreq>
+<priority>0.5</priority>
+</url>
+
+<url>
+<loc>http://spapas.github.io/2015/11/16/using-browserify-es6/</loc>
+<lastmod>2015-11-16T14:20:00+02:00</lastmod>
+<changefreq>monthly</changefreq>
 <priority>0.5</priority>
 </url>
 
@@ -208,7 +215,7 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>http://spapas.github.io/category/javascript.html</loc>
-<lastmod>2015-09-08T12:55:00+01:35</lastmod>
+<lastmod>2015-11-16T14:20:00+01:35</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.5</priority>
 </url>
@@ -341,7 +348,7 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>http://spapas.github.io/tag/uglify.html</loc>
-<lastmod>2015-05-27T14:20:00+01:35</lastmod>
+<lastmod>2015-11-16T14:20:00+01:35</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.5</priority>
 </url>
@@ -349,6 +356,13 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
 <loc>http://spapas.github.io/tag/django-rq.html</loc>
 <lastmod>2015-09-01T14:20:00+01:35</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.5</priority>
+</url>
+
+<url>
+<loc>http://spapas.github.io/tag/babel.html</loc>
+<lastmod>2015-11-16T14:20:00+01:35</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.5</priority>
 </url>
@@ -425,7 +439,7 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>http://spapas.github.io/tag/node.html</loc>
-<lastmod>2015-05-27T14:20:00+01:35</lastmod>
+<lastmod>2015-11-16T14:20:00+01:35</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.5</priority>
 </url>
@@ -439,7 +453,7 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>http://spapas.github.io/tag/watchify.html</loc>
-<lastmod>2015-05-27T14:20:00+01:35</lastmod>
+<lastmod>2015-11-16T14:20:00+01:35</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.5</priority>
 </url>
@@ -460,7 +474,7 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>http://spapas.github.io/tag/javascript.html</loc>
-<lastmod>2015-09-08T12:55:00+01:35</lastmod>
+<lastmod>2015-11-16T14:20:00+01:35</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.5</priority>
 </url>
@@ -488,7 +502,7 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>http://spapas.github.io/tag/npm.html</loc>
-<lastmod>2015-05-27T14:20:00+01:35</lastmod>
+<lastmod>2015-11-16T14:20:00+01:35</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.5</priority>
 </url>
@@ -502,14 +516,21 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>http://spapas.github.io/tag/generic.html</loc>
-<lastmod>2015-05-27T14:20:00+01:35</lastmod>
+<lastmod>2015-11-16T14:20:00+01:35</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.5</priority>
+</url>
+
+<url>
+<loc>http://spapas.github.io/tag/es6.html</loc>
+<lastmod>2015-11-16T14:20:00+01:35</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://spapas.github.io/tag/browserify.html</loc>
-<lastmod>2015-05-27T14:20:00+01:35</lastmod>
+<lastmod>2015-11-16T14:20:00+01:35</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.5</priority>
 </url>
@@ -621,7 +642,7 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>http://spapas.github.io/author/serafeim-papastefanos.html</loc>
-<lastmod>2015-10-05T14:20:00+01:35</lastmod>
+<lastmod>2015-11-16T14:20:00+01:35</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.5</priority>
 </url>

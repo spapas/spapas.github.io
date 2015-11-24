@@ -2,7 +2,7 @@ PDFs in Django: The essential guide
 ###################################
 
 :date: 2015-11-23 14:20
-:tags: pdf, django, reportlab, python, 
+:tags: pdf, django, reportlab, python,
 :category: django
 :slug: pdf-in-django
 :author: Serafeim Papastefanos
@@ -14,13 +14,13 @@ PDFs in Django: The essential guide
 Introduction
 ------------
 
-I've noticed that although it is easy to create PDFs with 
-Python, I've noticed there's no complete guide on how to 
+I've noticed that although it is easy to create PDFs with
+Python, I've noticed there's no complete guide on how to
 integrate these tools with Django and resolve the problems
 that you'll encounter when trying to actually create PDFs
-from your Django web application. 
+from your Django web application.
 
-In this article I will present the solution I use for 
+In this article I will present the solution I use for
 creating PDFs with Django, along with various tips on how to
 solve most of your common requirements. Specifically, here
 are some things that we'll cover:
@@ -40,8 +40,7 @@ The players
 
 We are going to use the following main tools:
 
-* ReportLab_ is an open source python library for creating PDFs. It uses a low-level API that allows "drawing" strings on specific coordinates 
-on the PDF - for people familiar with creating PDFs in Java it is more or less *iText_ for python*. 
+* ReportLab_ is an open source python library for creating PDFs. It uses a low-level API that allows "drawing" strings on specific coordinates  on the PDF - for people familiar with creating PDFs in Java it is more or less *iText_ for python*.
 
 * xhtml2pdf_ (formerly named *pisa*) is an open source library that can convert HTML/CSS pages to PDF using ReportLab.
 
@@ -64,7 +63,6 @@ string:
 
 .. code::
 
-  # -*- coding: utf-8 -*-
   from reportlab.pdfgen import canvas
   import reportlab.rl_config
 
@@ -78,16 +76,16 @@ string:
 
 Save the above in a file named testreportlab1.py. If you run python testreportlab1.py (in an environment that has
 reportlab of cours) you should see no errors and a pdf named ``hello1.pdf`` created. If you open it in your PDF
-reader you'll see a blank page with "Hello World" written in its lower right corner. 
+reader you'll see a blank page with "Hello World" written in its lower right corner.
 
-If you try to add a unicode text, for example "Καλημέρα κόσμε", you should see something like the following:
+If you try to add a unicode text, for example "Καλημέρα ελλάδα", you should see something like the following:
 
 .. image:: /images/hellopdf2.png
-  :alt: Our project
+  :alt: Hello PDF
   :width: 280 px
 
-It seems that the default font that ReportLab uses does not have a good support for accented greek characters 
-since they are missing  (and probably for various other characters). 
+It seems that the default font that ReportLab uses does not have a good support for accented greek characters
+since they are missing  (and probably for various other characters).
 
 To resolve this, we could try changing the font to one that contains the missing symbols. You can find free
 fonts on the internet (for example the `DejaVu` font), or even grab one from your system fonts (in windows,
@@ -96,6 +94,7 @@ your project and crate a file named testreportlab2.py with the following (I am u
 
 .. code::
 
+  # -*- coding: utf-8 -*-
   import reportlab.rl_config
   from reportlab.pdfbase import pdfmetrics
   from reportlab.pdfbase.ttfonts import TTFont
@@ -111,180 +110,185 @@ your project and crate a file named testreportlab2.py with the following (I am u
 
       c.showPage()
       c.save()
-      
+
 The above was just a scratch on the surface of ReportLab, mainly to be confident that
 everything *will* work fine for non-english speaking people! To find out more, you should check the  `ReportLab open-source User Guide`_.
 
-I also have to mention that 
+I also have to mention that
 `the company behind ReportLab`_ offers some great commercial solutions based on ReportLab for creating PDFs (similar to JasperReports_) - check it out
 if you need support or advanced capabilities.
 
 
-NPM, --save, --save-dev and avoiding global deps
-------------------------------------------------
+xhtml2pdf
+=========
 
-In the previous article, I had recommended to install the needed tools 
-(needed to create the output bundle browserify, watchify, uglify) globally
-using npm install -g package (of course the normal dependencies like moment.js
-would be installed locally).
-This has one advantage and two disadvantages: It
-puts these tools to the path so they can be called immediately (i.e browserify)
-but you will need root access to install a package globally and nothing is
-saved on ``package.json`` so you don't know which packages must be installed 
-in order to start developing the project!
+The xhtml2pdf is a really great library that allows you to use html files as a template
+to a PDF. Of course, an html cannot always be converted to a PDF since,
+unfortunately, PDFs *do* have pages.
 
-This could be ok for the introductionary article, however for this one I
-will propose another alternative: Install all the tools *locally* using just
-``npm install package --save``. These tools will be put to the ``node_modules`` folder. They
-*will not* be put to the path, but if you want to execute a binary by yourself
-to debug the output, you can find it in ``node_modules/bin``, for example,
-for browserify you can run ``node_modules/bin/browserify``. Another intersting
-thing is that if you create executable scripts in your ``package.json`` you
-don't actually need to include the full path but the binaries will be found.
-
-Another thing I'd like to discuss here is the difference between ``--save``
-and ``--save-dev`` options that can be passed to npm install. If you take
-a look at other guides you'll see that people are using ``--save-dev`` for
-development dependencies (i.e testing) and ``--save`` for normal dependencies.
-The difference is that these dependencies are saved in different places in
-``package.json`` and if you run ``npm install --production`` you'll get only
-the normal dependencies (while, if you run ``npm install`` all dependencies
-will be installed). In these articles, I chose to just use ``--save`` everywhere,
-after all the only thing that would be needed for production would be the
-``bundle.js`` output file.
+xhtml2pdf has a nice executable script that can be used to test its capabilities. After
+you install it (either globally or to a virtual environment) you should be able to find
+out the executable ``$PYTHON/scripts/xhtml2pdf`` (or ``xhtml2pdf.exe`` if you are in
+Windows) and a corresponding python script @ ``$PYTHON/scripts/xhtml2pdf-script.py``.
 
 
-Using babel
------------
-
-The babel_ library "is a JavaScript compiler". It gets input files in a variant
-of javascript (for example, ES6) and produces normal javascript files -- something
-like what browserify transforms do. However, what babel does (and I think its
-the only tool that does this) is that it allows you to use ES6 features *now* by
-transpiling them to normal (ES5) javascript. Also, babel has `various other transforms`_,
-including a react transform 
-(so you can use this instead of the reactify browserify-transform)!
-
-In any case, to be able to use ES6, we'll need to install babel and its es6 presets:
+Let's try to use xhtml2pdf to explore some of its capabilities. Create a file named
+testxhtml2pdf.html with the following contents and run ``xhtml2pdf testxhtml2pdf.html``:
 
 .. code::
 
-  npm install  babel babel-preset-es2015 --save
-  
-If we wanted to also use babel for react we'd need to install babel-preset-react. 
+    <html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    </head>
+    <body>
+        <h1>Testing xhtml2pdf </h1>
+        <ul>
+            <li><b>Hello, world!</b></li>
+            <li><i>Hello, italics</i></li>
+            <li>Καλημέρα Ελλάδα!</li>
+        </ul>
+        <hr />
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus nulla erat, porttitor ut venenatis eget,
+        tempor et purus. Nullam nec erat vel enim euismod auctor et at nisl. Integer posuere bibendum condimentum. Ut
+        euismod velit ut porttitor condimentum. In ullamcorper nulla at lectus fermentum aliquam. Nunc elementum commodo
+        dui, id pulvinar ex viverra id. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos
+        himenaeos.</p>
 
-To configure babel we can either add a ``babel``
-section in our ``package.json`` or create a new file named .babelrc and put the configuration there.
+        <p>Interdum et malesuada fames ac ante ipsum primis in faucibus. Sed aliquam vitae lectus sit amet accumsan. Morbi
+        nibh urna, condimentum nec volutpat at, lobortis sit amet odio. Etiam quis neque interdum sapien cursus ornare. Cras
+        commodo lacinia sapien nec porta. Suspendisse potenti. Nulla hendrerit dolor et rutrum consectetur.</p>
+        <hr />
+        <img  width="26" height="20" src="data:image/gif;base64,R0lGODlhEAAOALMAAOazToeHh0tLS/7LZv/0jvb29t/f3//Ub//ge8WSLf/
+        rhf/3kdbW1mxsbP//mf///yH5BAAAAAAALAAAAAAQAA4AAARe8L1Ekyky67QZ1hLnjM5UUde0ECwLJoExKcppV0aCcGCmTIHEIUEqjgaORCMxIC6e0C
+        cguWw6aFjsVMkkIr7g77ZKPJjPZqIyd7sJAgVGoEGv2xsBxqNgYPj/gAwXEQA7"  >
+        <hr />
+        <table>
+            <tr>
+                <th>header0</th><th>header1</th><th>header2</th><th>header3</th><th>header4</th><th>header5</th>
+            </tr>
+            <tr>
+                <td>Hello World!!!</td><td>Hello World!!!</td><td>Hello World!!!</td><td>Hello World!!!</td><td>Hello World!!!</td><td>Hello World!!!</td>
+            </tr>
+            <tr>
+                <td>Hello World!!!</td><td>Hello World!!!</td><td>Hello World!!!</td><td>Hello World!!!</td><td>Hello World!!!</td><td>Hello World!!!</td>
+            </tr>
+            <tr>
+                <td>Hello World!!!</td><td>Hello World!!!</td><td>Hello World!!!</td><td>Hello World!!!</td><td>Hello World!!!</td><td>Hello World!!!</td>
+            </tr>
+            <tr>
+                <td>Hello World!!!</td><td>Hello World!!!</td><td>Hello World!!!</td><td>Hello World!!!</td><td>Hello World!!!</td><td>Hello World!!!</td>
+            </tr>
+        </table>
+    </body>
+    </html>
 
-I prefer the first one since we are already using the ``package.json``. So add the following attribute
-to your ``package.json``:
+The result (``testxhtml2pdf.pdf``) should have:
 
-.. code::
+* A nice header (h1)
+* Paragraphs
+* Horizontal lines
+* No support for greek characters (same problem as with reportlab)
+* Images (I am inlining it as a base 64 image)
+* A list
+* A table
 
-  "babel": {
-    "presets": [
-      "es2015"
-    ]
-  }
-
-If you wanted to configure it through ``.babelrc`` then you'd just copy to it the contents of ``"babel"``.
-
-To do some tests with babel, you can install its cli (it's not included in the babel package) through
-``npm install babel-cli``. Now, you can run ``node_modules/.bin/babel``. For example, create a 
-file named ``testbabel.js`` with the following contents (thick arrow):
-
-.. code::
-
-  [1,2,3].forEach(x => console.log(x) );
-  
-when you pass it to babel you'll see the following output:
-
-.. code::
-
-    >node_modules\.bin\babel testbabel.js
-    "use strict";
-
-    [1, 2, 3].forEach(function (x) {
-      return console.log(x);
-    });
-
-
-
-Integrate babel with browserify
--------------------------------
-
-To call babel from browserify we're going to use the babelify_ browserify transform which
-actually uses babel to transpile the browserify input. After installing it with
-
-.. code::
-  
-  npm install babelify --save
-  
-you need to tell browserify to use it. To do this, you'll just pass a -t babelify parameter to
-browserify. So if you run it with the ``testbabel.js`` file as input you'll see the following output:
-
-.. code::
-
-    >node_modules\.bin\browserify -t babelify testbabel.js
-    [...] browserify gibberish 
-    "use strict";
-
-    [1, 2, 3].forEach(function (x) {
-      return console.log(x);
-    });
-
-    [...] more browserify gibberish 
-
-yey -- the code is transpiled to ES5! 
-
-To create a complete project, let's add a normal requirement (moment.js): 
-
-.. code::
-  
-  npm install moment --save
-
-and a file named ``src\main.js`` that uses it with ES6 syntax: 
+Before moving on, I'd like to fix the problem with the greek characters. You should
+set the font to one supporting greek characters, just like you did with ReportLab before.
+This can be done with the help of the ``@font-face`` `css directive`_. So, let's create 
+a file named ``testxhtml2pdf2.html`` with the following contents:
 
 .. code::
 
-  import moment from 'moment';
+    <html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        
+        <style>
+            @font-face {
+                font-family: DejaVuSans;
+                src: url("c:/progr/py/django-pdf-guide/django_pdf_guide/DejaVuSans.ttf");
+            }
 
-  const arr = [1,2,3,4,5];
-  arr.forEach(x => setTimeout(() => console.log(`Now: ${moment().format("HH:mm:ss")}, Later: ${moment().add(x, "days").format("L")}...`), x*1000));
+            body {
+                font-family: DejaVuSans;
+            }
+        </style> 
+    </head>
+    <body>
+        <h1>Δοκιμή του xhtml2pdf </h1>
+        <ul>
+            <li>Καλημέρα Ελλάδα!</li>
+        </ul>
+        
+    </body>
+    </html>
 
-To create the output javascript file, we'll use the browserify and watchify commands with the
-addition of the -t babelify switch. Here's the complete ``package.json`` for this project:
+    
+Before running ``xhtml2pdf testxhtml2pdf2.html``, please make
+sure to change the url of the font file above to the absolute path of that font in your
+local system . As a result, after running xhhtml2pdf 
+you
+should see the unicode characters without problems. 
+
+I have to mention here that I wasn't able to use the font from a relative path, that's
+why I used the absolute one. In case something is not right, try
+running it with the ``-d`` option to output debugging information (something like
+``xhtml2pdf -d testxhtml2pdf2.html``). You must see a line like this one: 
 
 .. code::
 
-    {
-      "dependencies": {
-        "babel": "^6.1.18",
-        "babel-preset-es2015": "^6.1.18",
-        "babelify": "^7.2.0",
-        "browserify": "^12.0.1",
-        "moment": "^2.10.6",
-        "uglify-js": "^2.6.0",
-        "watchify": "^3.6.1"
-      },
-      "scripts": {
-        "watch": "watchify src/main.js -o dist/bundle.js -v -t babelify",
-        "build": "browserify src/main.js -t babelify | uglifyjs -mc warnings=false > dist/bundle.js"
-      },
-      "babel": {
-        "presets": [
-          "es2015"
-        ]
-      }
-    }
+  DEBUG [xhtml2pdf] C:\progr\py\django-pdf-guide\venv\lib\site-packages\xhtml2pdf\context.py line 857: Load font 'c:\\progr\\py\\django-pdf-guide\\django_pdf_guide\\DejaVuSans.ttf'
 
-Running ``npm run build`` should create a ``dist/bundle.js`` file. If you include this in an html,
-you should see something like this in the console: 
+to make sure that the font is actually loaded!
+
+PyPDF2
+======
+
+The PyPDF2 library can be used to extract pages from a PDF to a new one 
+or combine pages from different PDFs to a a new one. A common requirement is 
+to have the first and page of a report as static PDFs, create the contents
+of this report through your app as a PDF and combine all three PDFs (front page,
+content and back page) to the resulting PDF.
+
+Let's see a quick example of combining two PDFs:
 
 .. code::
 
-    Now: 13:52:09, Later: 11/17/2015...
-    Now: 13:52:10, Later: 11/18/2015...
+
+    import sys
+    from PyPDF2 import PdfFileMerger
+
+    if __name__ == '__main__':
+        pdfs = sys.argv[1:]
+
+        if not pdfs or len(pdfs) < 2:
+            exit("Please enter at least two pdfs for merging!")
+
+        merger = PdfFileMerger()
+        
+        for pdf in pdfs:
+            merger.append(fileobj=open(pdf, "rb"))
+            
+        output = open("output.pdf", "wb")
+        merger.write(output)
+        
+The above will try to open all input parameters (as files) and append them to a the output.pdf.
+
+
+
+More advanced xhtml2pdf features
+--------------------------------
+
+Pagination
+==========
+
+Images
+======
+
+Layout
+======
+
 
 
 Conclusion
@@ -292,16 +296,16 @@ Conclusion
 
 Using the combination of babel and javascript we can easily write ES6 code in our modules! This,
 along with the modularization of our code and the management of client-side dependencies should
-make client side development a breeze! 
+make client side development a breeze!
 
 Please notice that to keep the presented workflow simple and easy to
 replicate and configure, we have not used any external
 task runners (like gulp or grunt) -- all configuration is kept in a single file (package.json) and
-the whole environment can be replicated just by doing a ``npm install``. Of course, the capabilities of 
+the whole environment can be replicated just by doing a ``npm install``. Of course, the capabilities of
 browserify are not unlimited, so if you wanted to do something more complicated
 (for instance, lint your code before passing it to browserify) you'd need to use the mentioned
 task runners (or webpack which is the current trend in javascript bundlers and actually replaces
-the task runners). 
+the task runners).
 
 
 .. _ReportLab: https://bitbucket.org/rptlab/reportlab
@@ -315,6 +319,7 @@ the task runners).
 .. _DejaVu: http://dejavu-fonts.org/wiki/Main_Page
 
 .. _`ReportLab open-source User Guide`: http://www.reportlab.com/docs/reportlab-userguide.pdf
+.. _`css directive`: https://github.com/xhtml2pdf/xhtml2pdf/blob/master/doc/usage.rst#fonts
 
 .. _browserify: http://browserify.org/
 .. _babelify: https://github.com/babel/babelify

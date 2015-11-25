@@ -27,10 +27,10 @@ are some things that we'll cover:
 
 * Learn how to create PDFs "by hand"
 * Create PDFs with Django using a normal Djang Template (similar to an HTML page)
-* Create layouts
-* Use styling in your output
-* Embed images to your PDFs
 * Change the fonts of your PDFs
+* Use styling in your output
+* Create layouts
+* Embed images to your PDFs
 * Add page numbers
 * Merge (concatenate) PDFs
 
@@ -195,7 +195,7 @@ The result (``testxhtml2pdf.pdf``) should have:
 
 Before moving on, I'd like to fix the problem with the greek characters. You should
 set the font to one supporting greek characters, just like you did with ReportLab before.
-This can be done with the help of the ``@font-face`` `css directive`_. So, let's create 
+This can be done with the help of the ``@font-face`` `css directive`_. So, let's create
 a file named ``testxhtml2pdf2.html`` with the following contents:
 
 .. code::
@@ -203,7 +203,7 @@ a file named ``testxhtml2pdf2.html`` with the following contents:
     <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        
+
         <style>
             @font-face {
                 font-family: DejaVuSans;
@@ -213,28 +213,28 @@ a file named ``testxhtml2pdf2.html`` with the following contents:
             body {
                 font-family: DejaVuSans;
             }
-        </style> 
+        </style>
     </head>
     <body>
         <h1>Δοκιμή του xhtml2pdf </h1>
         <ul>
             <li>Καλημέρα Ελλάδα!</li>
         </ul>
-        
+
     </body>
     </html>
 
-    
+
 Before running ``xhtml2pdf testxhtml2pdf2.html``, please make
 sure to change the url of the font file above to the absolute path of that font in your
-local system . As a result, after running xhhtml2pdf 
+local system . As a result, after running xhhtml2pdf
 you
-should see the unicode characters without problems. 
+should see the unicode characters without problems.
 
 I have to mention here that I wasn't able to use the font from a relative path, that's
 why I used the absolute one. In case something is not right, try
 running it with the ``-d`` option to output debugging information (something like
-``xhtml2pdf -d testxhtml2pdf2.html``). You must see a line like this one: 
+``xhtml2pdf -d testxhtml2pdf2.html``). You must see a line like this one:
 
 .. code::
 
@@ -245,8 +245,8 @@ to make sure that the font is actually loaded!
 PyPDF2
 ======
 
-The PyPDF2 library can be used to extract pages from a PDF to a new one 
-or combine pages from different PDFs to a a new one. A common requirement is 
+The PyPDF2 library can be used to extract pages from a PDF to a new one
+or combine pages from different PDFs to a a new one. A common requirement is
 to have the first and page of a report as static PDFs, create the contents
 of this report through your app as a PDF and combine all three PDFs (front page,
 content and back page) to the resulting PDF.
@@ -254,7 +254,6 @@ content and back page) to the resulting PDF.
 Let's see a quick example of combining two PDFs:
 
 .. code::
-
 
     import sys
     from PyPDF2 import PdfFileMerger
@@ -266,15 +265,132 @@ Let's see a quick example of combining two PDFs:
             exit("Please enter at least two pdfs for merging!")
 
         merger = PdfFileMerger()
-        
+
         for pdf in pdfs:
             merger.append(fileobj=open(pdf, "rb"))
-            
+
         output = open("output.pdf", "wb")
         merger.write(output)
-        
+
 The above will try to open all input parameters (as files) and append them to a the output.pdf.
 
+
+Django integration
+------------------
+
+To integrate the PDF creation process with django we'll use a simple app with only one model about books.
+
+Using a plain old view
+======================
+
+The simplest case is to just create plain old view to display the PDF. We'll use django-xhtml2pdf along with the
+followig django template:
+
+.. code::
+
+    <html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    </head>
+    <body>
+        <h1>Books</h1>
+        <table>
+            <tr>
+                <th>ID</th><th>Title</th>
+            </tr>
+            {% for book in books %}
+                <tr>
+                    <td>{{ book.id }}</td><td>{{ book.title }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </body>
+    </html>
+
+
+Name it as ``books_plain_old_view.html`` and put it on ``books/templates`` directory. The view that
+returns the above template as PDF is the following:
+
+.. code::
+
+    from django.http import HttpResponse
+    from django_xhtml2pdf.utils import generate_pdf
+
+
+    def books_plain_old_view(request):
+        resp = HttpResponse(content_type='application/pdf')
+        context = {
+            'books': Book.objects.all()
+        }
+        result = generate_pdf('books_plain_old_view.html', file_object=resp, context=context)
+        return result
+
+We just use the ``generate_pdf`` method of django-xhtml2pdf to help us generate the PDF, passing it
+our response object and a context dictionary (containing all books). 
+
+Instead of the simple HTTP response above, we could add a 'Content Disposition' HTTP header to
+our response to suggest a default filename for the file to be saved by adding the line 
+
+.. code::
+
+    resp['Content-Disposition'] = 'attachment; filename="output.pdf"'
+    
+after the definition of ``resp``.
+
+This will have thw extra effect, at least in Chrome and Firefox to show the "Save File" dialog
+when clicking on the link instead of retrieving the PDF and displaying it inside* the browser window.
+
+Using a CBV
+===========
+
+I don't really recommend using plain old Django views - instead I propose to always use Class Based Views
+for their DRYness. The best approach is to create a mixin that would allow any kind of CBV (at least any
+kind of CBV that uses a template) to be rendered in PDF. Here's how we could implement a ``PdfResponseMixin``:
+
+.. code::
+
+    class PdfResponseMixin(object, ):
+        def render_to_response(self, context, **response_kwargs):
+            context=self.get_context_data()
+            template=self.get_template_names()[0]
+            resp = HttpResponse(content_type='application/pdf')
+            result = generate_pdf(template, file_object=resp, context=context)
+            return result
+
+Now, we could use this mixin to create PDF outputting views from any other view! For example, here's how
+we could create a book list in pdf:
+
+.. code::
+
+    class BookPdfListView(PdfResponseMixin, ListView):
+        context_object_name = 'books'
+        model = Book
+
+To display it, you could use the same template as ``books_plain_old_view.html`` (so either add a ``template_name='books_plain_old_view.html'``
+property to the class or copy ``books_plain_old_view.html`` to ``books/book_list.html``).
+
+Also, here's a ``BookPdfDetailView`` that outputs PDF:
+
+.. code::
+
+    class BookPdfDetailView(PdfResponseMixin, DetailView):
+        context_object_name = 'book'
+        model = Book
+
+and a corresponding template (name it ``books/book_detail.html``):
+        
+.. code::
+
+    <html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    </head>
+    <body>
+        <h1>Book Detail</h1>
+        <b>ID</b>: {{ book.id }} <br />
+        <b>Title</b>: {{ book.title }} <br />
+    </body>
+    </html>
 
 
 More advanced xhtml2pdf features

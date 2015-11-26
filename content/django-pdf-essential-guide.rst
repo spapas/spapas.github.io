@@ -278,7 +278,10 @@ The above will try to open all input parameters (as files) and append them to a 
 Django integration
 ------------------
 
-To integrate the PDF creation process with django we'll use a simple app with only one model about books.
+To integrate the PDF creation process with django we'll use a simple app with only one model about books. We are
+going to use the django-xhtml2pdf library -- I recommend installing the latest version (from github
+using something like ``pip install -e git+https://github.com/chrisglass/django-xhtml2pdf.git#egg=django-xhtml2pdf``
+) since the pip package has not been updated in a long time!
 
 Using a plain old view
 ======================
@@ -329,7 +332,9 @@ We just use the ``generate_pdf`` method of django-xhtml2pdf to help us generate 
 our response object and a context dictionary (containing all books). 
 
 Instead of the simple HTTP response above, we could add a 'Content Disposition' HTTP header to
-our response to suggest a default filename for the file to be saved by adding the line 
+our response 
+(or use the django-xhtml2pdf method ``render_to_pdf_response`` instead of ``generate_pdf``)
+to suggest a default filename for the file to be saved by adding the line 
 
 .. code::
 
@@ -369,7 +374,7 @@ we could create a book list in pdf:
 To display it, you could use the same template as ``books_plain_old_view.html`` (so either add a ``template_name='books_plain_old_view.html'``
 property to the class or copy ``books_plain_old_view.html`` to ``books/book_list.html``).
 
-Also, here's a ``BookPdfDetailView`` that outputs PDF:
+Also, as another example, here's a ``BookPdfDetailView`` that outputs PDF:
 
 .. code::
 
@@ -393,35 +398,202 @@ and a corresponding template (name it ``books/book_detail.html``):
     </html>
 
 
+
+How does django-xhtml2pdf loads resources
+=========================================
+
+Before doing more advanced things, we need to understand how ``django-xhtml2pdf`` works and specifically
+how we can refer to things like css, images, fonts etc from our PDF templates. 
+If you check the `utils.py of django-xhtml2pdf`_ you'll see that it uses a function named ``fetch_resources``
+for loading these resources. This function checks to see if the resource starts with ``/MEDIA_URL`` or
+``/STATIC_URL`` and converts it to a local (filesystem) path. For example, if you refer to a font like 
+``/static/font1.ttf`` in your PDF template, ``xhtml2pdf`` will try to load the file ``STATIC_ROOT + /font1.ttf``
+(and if it does not find the file you want to refer to there it will check all ``STATICFILES_DIRS`` enries). 
+
+Thus, you can just put your resources into your ``STATIC_ROOT`` directory and use the ``{% static %}`` 
+template tag to create URL paths for them -- django-xhtml2pdf will convert these to local paths and
+everything will work fine. 
+
+**Please notice that you *need* to have configured ``STATIC_ROOT`` for this to work** -- if ``STATIC_ROOT`` is
+empty (and, for example you use ``static`` directories in your apps) then the described substitution
+mechanism will *not* work.
+
+Using a common style for your PDFs
+==================================
+
+If you need to create a lot of similar PDFs then you'll probably want to 
+use a bunch of common styles for them (same fonts, headers etc). This could be done using
+the ``{% static %}`` trick we saw on the previous section. However, if we include the 
+styling css as a static file then we won't be able to use the static-file-uri-to-local-path
+mechanism described above (since the ``{% static %}`` template tag won't work in static files).
+
+Thankfully, not everything is lost -- Django comes to the rescue!!! We can create a single CSS file
+that would be used by all our PDF templates and *include* it in the templates using the ``{% include %}`` Django
+template tag! Django will think that this will be a normal template and paste its contents where we wanted and
+also execute the templates tags!
+
+We'll see an example of all this in the next section.
+
+Changing the font (to a Unicode enabled one)
+============================================
+
+The time has finally arrived to change the font! It's easy if you know exactly what to do. First of all
+configure your ``STATIC_ROOT`` and ``STATIC_URL`` setting, for example ``STATIC_ROOT = os.path.join(BASE_DIR,'static')``
+and ``STATIC_URL = '/static/'``.
+
+Then, add a template-css file for your fonts in one of your templates directories. I am naming the
+file ``pdfstylefonts.css`` and I've put it to ``books/templates``:
+
+.. code::
+
+    {% load static %}
+    @font-face {
+        font-family: "Calibri";
+        src: url({% static "fonts/calibri.ttf" %});
+    }
+    @font-face {
+        font-family: "Calibri";
+        src: url({% static "fonts/calibrib.ttf" %});
+        font-weight: bold;
+    }
+    @font-face {
+        font-family: "Calibri";
+        src: url({% static "fonts/calibrii.ttf" %});
+        font-style: italic, oblique;
+    }
+    @font-face {
+        font-family: "Calibri";
+        src: url({% static "fonts/calibriz.ttf" %});
+        font-weight: bold;
+        font-style: italic, oblique;
+    }
+
+I am using Calibri family of fonts (copied from c:\windows\fonts) for this -- I've also configured 
+all styles (bold, italic, bold-italic) of this font family to use the correct ttf files. All the
+ttf files have been copied to the directory ``static/fonts/``.
+
+Now, add another css file that will be your global PDF styles. This should be put to the ``static`` directory
+and could be named ``pdfstyle.css``:
+
+.. code::
+    
+    h1 {
+        color: blue;
+    }
+
+    *, html {
+        font-family: "Calibri";
+        font-size:11pt;
+        color: red;
+    }
+
+Next, here's a template that lists all books (and contain some greek characters -- the title of the books also contain
+greek characters) -- I've named it ``book_list_ex.html``:
+    
+.. code::
+
+    {% load static %}
+    <html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <style>
+            {% include "pdfstylefonts.css" %}
+        </style>
+        <link rel='stylesheet' href='{% static "pdfstyle.css" %}'/>
+    </head>
+    <body>
+        <h1>Λίστα βιβλίων</h1>
+        <img src='{% static "pony.png" %}' />
+        <table>
+            <tr>
+                <th>ID</th><th>Title</th><th>Cover</th>
+            </tr>
+            {% for book in books %}
+                <tr>
+                    <td>{{ book.id }}</td><td>{{ book.title }}</td><td><img src='{{ book.cover.url }}' /></td>
+                </tr>
+            {% endfor %}
+        </table>
+    </body>
+    </html>
+    
+You'll see that the ``pdfstylefonts.css`` is included as a Django template (so that ``{% static %}`` will
+work in that file) while ``pdfstyle.css`` is included using ``{% static %}``.
+Als, notice that I've also added a static image (using the ``{% static %}`` tag) and a dynamic (media)
+file to show off how great the url-to-local-path mechanism works. Please notice that for the
+media files to work fine in your development environment you need to configure the
+``MEDIA_URL`` and ``MEDIA_ROOT`` settigns (similar to ``STATIC_URL`` and ``STATIC_ROOT``) and follow the
+`serve files uploaded by a user during development`_ tutorial on Django docs.
+
+Finally, if you configure a PdfResponseMixin ListView like this:
+
+.. code::
+    
+    class BookExPdfListView(PdfResponseMixin, ListView):
+        context_object_name = 'books'
+        model = Book
+        template_name = 'books/book_list_ex.html'
+
+you should see be able to see the correct (calibri) font (defined in ``pdfstylefonts.css``), with unicode characters without problems
+including both the static and user uploaded images and with the styles defined in the pdf stylesheet (``pdfstyle.css``).
+
+
+Concatenating PDFs in Django
+============================
+
+
+Configure Django for debugging PDF creation
+===========================================
+
+If you experience any problems, you can configure xhtml2pdf to output DEBUG information. To do this,
+you may change your django logging configuration like this:
+
+.. code::
+
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+            },
+        },
+        'loggers': {
+            'xhtml2pdf': {
+                'handlers': ['console'],
+                'level': 'DEBUG',
+            }
+        }
+    }
+
+This configuration will keep existing loggers (``'disable_existing_loggers': False,``) and will configure
+``xhtml2pdf`` to log its output to the console, helping us find out why some things won't be working.
+
+
+
 More advanced xhtml2pdf features
 --------------------------------
 
 Pagination
 ==========
 
-Images
-======
-
 Layout
 ======
 
+Page background
+===============
 
+.. code::
+
+    @page {
+        background-image: url({% static "pony.png" %});
+    }
 
 Conclusion
 ----------
 
-Using the combination of babel and javascript we can easily write ES6 code in our modules! This,
-along with the modularization of our code and the management of client-side dependencies should
-make client side development a breeze!
-
-Please notice that to keep the presented workflow simple and easy to
-replicate and configure, we have not used any external
-task runners (like gulp or grunt) -- all configuration is kept in a single file (package.json) and
-the whole environment can be replicated just by doing a ``npm install``. Of course, the capabilities of
-browserify are not unlimited, so if you wanted to do something more complicated
-(for instance, lint your code before passing it to browserify) you'd need to use the mentioned
-task runners (or webpack which is the current trend in javascript bundlers and actually replaces
-the task runners).
+I hope that using the techniques described in this essential guide you'll
+be able to 
 
 
 .. _ReportLab: https://bitbucket.org/rptlab/reportlab
@@ -433,6 +605,8 @@ the task runners).
 .. _iText: http://itextpdf.com/
 .. _JasperReports: http://community.jaspersoft.com/project/jasperreports-library
 .. _DejaVu: http://dejavu-fonts.org/wiki/Main_Page
+.. _`utils.py of django-xhtml2pdf`: https://github.com/chrisglass/django-xhtml2pdf/blob/master/django_xhtml2pdf/utils.py
+.. _`serve files uploaded by a user during development`: https://docs.djangoproject.com/en/1.8/howto/static-files/#serving-files-uploaded-by-a-user-during-development    
 
 .. _`ReportLab open-source User Guide`: http://www.reportlab.com/docs/reportlab-userguide.pdf
 .. _`css directive`: https://github.com/xhtml2pdf/xhtml2pdf/blob/master/doc/usage.rst#fonts

@@ -538,10 +538,6 @@ you should see be able to see the correct (calibri) font (defined in ``pdfstylef
 including both the static and user uploaded images and with the styles defined in the pdf stylesheet (``pdfstyle.css``).
 
 
-Concatenating PDFs in Django
-============================
-
-
 Configure Django for debugging PDF creation
 ===========================================
 
@@ -568,6 +564,73 @@ you may change your django logging configuration like this:
 
 This configuration will keep existing loggers (``'disable_existing_loggers': False,``) and will configure
 ``xhtml2pdf`` to log its output to the console, helping us find out why some things won't be working.
+
+
+
+Concatenating PDFs in Django
+============================
+
+The final section of the PDF-Django-integration is to explain how we can concatenate PDFs in django using PyPDF2. There may be
+some other requirements like extracting pages from PDFs however the most common one as explained before is to just append
+the pages of one PDF after the other -- after all using PyPDF2 is really easy after you get the hang of it.
+
+To be more DRY, I will create a ``CoverPdfResponseMixin`` that will output a PDF *with* a cover. To be *even more* DRY,
+I will refactor ``PdfResponseMixin`` to put some common code in an extra method so that ``CoverPdfResponseMixin`` could inherit from it:
+
+.. code::
+
+    class PdfResponseMixin(object, ):
+        def write_pdf(self, file_object, ):
+            context = self.get_context_data()
+            template = self.get_template_names()[0]
+            generate_pdf(template, file_object=file_object, context=context)
+
+        def render_to_response(self, context, **response_kwargs):
+            resp = HttpResponse(content_type='application/pdf')
+            self.write_pdf(resp)
+            return resp
+            
+            
+    class CoverPdfResponseMixin(PdfResponseMixin, ):
+        cover_pdf = None
+        
+        def render_to_response(self, context, **response_kwargs):
+            merger = PdfFileMerger()
+            merger.append(open(self.cover_pdf, "rb"))
+            
+            pdf_fo = StringIO.StringIO()
+            self.write_pdf(pdf_fo)
+            merger.append(pdf_fo)
+            
+            resp = HttpResponse(content_type='application/pdf')
+            merger.write(resp)
+            return resp
+
+So, ``PdfResponseMixin`` now has a ``write_pdf`` method that gets a file-like object and outputs the PDF there.
+The new mixin, ``CoverPdfResponseMixin`` has a ``cover_pdf`` attribute that should be configured with the filesystem
+path of the cover file. The ``render_to_response`` method now will create a ``PdfFileMerger`` (which is empty
+initially) to which it appends the contents ``cover_pdf``. After that, it creates a file-stream (using StreamIO)
+and uses ``write_pdf`` to create the PDF there and appends that file-stream to the merger. Finally, it writes
+the merger contents to the ``HttpResponse``.
+
+One thing that I've seen is that if you want to concatenate many PDFs with many pages sometimes you'll get
+a strange an error when using ``PdfFileMerger``. I was able to overcome this by reading and appending the pages of each
+PDF to-be-appended one by one using the ``PdfFileReader`` and ``PdfFileWriter`` objects. Here's a small snippet of how
+this could be done: 
+
+.. code::
+
+    pdfs = [] # List of pdfs to be concatenated
+    writer = PdfFileWriter()
+    
+    for pdf in pdfs:
+        reader = PdfFileReader(open(pdf, "rb"))
+        for i in range(reader.getNumPages()):
+            writer.addPage(reader.getPage(i))
+            
+    resp = HttpResponse(content_type='application/pdf')
+    writer.write(resp)
+    return resp
 
 
 

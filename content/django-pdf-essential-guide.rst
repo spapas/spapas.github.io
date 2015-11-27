@@ -723,16 +723,18 @@ Now, for dynamic content you can expect the opposite behavior:
 You *cannot* select to which dynamic frame your content goes, instead the content just just flows to the first dynamic frame it 
 fits! If it does not fit in any dynamic frames in the current page then a new page will be created.
 
-I'd like to present a full example here on the already mentioned project of printing a plastic card. I had two page layouts,
+I'd like to present a full example here on the already mentioned project of printing a plastic card for the books. I had two page layouts,
 one for the front page having a frame with the owner's data and another frame with his photo and one for the back page having
 a barcode. This is a Django template that is used to print not only but a PDF with a group of these cards: 
 
 .. code::
 
-    {% load thumbnail %}
     <html>
     <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <style>
+        {% include "pdfstylefonts.css" %}
+    </style>
     <style type='text/css'>
         @page {
             size: 8.56cm 5.398cm;
@@ -792,28 +794,6 @@ a barcode. This is a Django template that is used to print not only but a PDF wi
             }
         }
 
-        @font-face {
-            font-family: "Calibri";
-            src: url("fonts/calibri.ttf");
-        }
-
-        @font-face {
-            font-family: "Calibri";
-            src: url("fonts/calibrib.ttf");
-            font-weight: bold;
-        }
-        @font-face {
-            font-family: "Calibri";
-            src: url("fonts/calibrii.ttf");
-            font-style: italic;
-        }
-        @font-face {
-            font-family: "Calibri";
-            src: url("fonts/calibriz.ttf");
-            font-weight: bold;
-            font-style: italic;
-        }
-        
         *, html {
             font-family: "Calibri";
             font-size: 8pt;
@@ -827,21 +807,25 @@ a barcode. This is a Django template that is used to print not only but a PDF wi
     </style>
     </head>
     <body>
-        {% for card in cards %}
+        {% for book in books %}
             <div>
                 <! -- Here I print the card data. It fits exactly in the table_frame so ... ->
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus nulla erat, porttitor ut venenatis eget,
-                tempor et purus. Nullam nec erat vel enim euismod auctor et at nisl. Integer posuere bibendum condimentum. Ut
-                euismod velit ut porttitor condimentum. In ullamcorper nulla at lectus fermentum aliquam. Nunc elementum commodo
-                dui, id pulvinar ex viverra id. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos
-                himenaeos.
+                {{ book.title }}<br />
+                Data line 2<br />
+                Data line 3<br />
+                Data line 4<br />
+                Data line 5<br />
+                Data line 6<br />
+                Data line 7<br />
+                Data line 8<br />
+                Data line 9<br />
+                Data line 10<br />
             </div>
             <div>
                 <! -- This photo here will be outputted to the photo_frame -->
-                {% thumbnail card.photo "photo" as thumb %}
-                <img src="{{ thumb.url }}" style='width:1.9cm ; height: 2.2cm ; ' />
+                <img src='{{ book.cover.url }}' style='width:1.9cm ; height: 2.2cm ; ' />
             </div>
-            
+
             <! -- Now the template is chaned to print the back of the card -->
             <pdf:nexttemplate name="back_page" />
             <pdf:nextpage />
@@ -849,7 +833,7 @@ a barcode. This is a Django template that is used to print not only but a PDF wi
             <div >
                 <center>
                     <! -- Print the barcode to the barcode_frame -->
-                    <pdf:barcode value="{{ card.protocol }}" type="code128" humanreadable="1" barwidth="0.43mm" barheight="0.6cm" align="middle" />
+                    <pdf:barcode value="{{ book.id }}" type="code128" humanreadable="1" barwidth="0.43mm" barheight="0.6cm" align="middle" />
                 </center>
             </div>
             <!-- Use the front_page template again for the next card -->
@@ -859,6 +843,11 @@ a barcode. This is a Django template that is used to print not only but a PDF wi
     </body>
     </html>
 
+Notice that I want to print exactly 10 lines in the ``table_frame`` (that's why I use <br /> to go to next line) -- if I had printed
+3-4 lines (for example) then the photo *would fit* in the ``table_frame`` and would be printed there and *not* in the ``photo_frame``! Also,
+another interesting thing is that if I had
+outputed 8-9 lines then the photo wouldn't fit in that small space and would also be printed to the ``photo_frame``.
+    
 Extra stuff
 ===========
 

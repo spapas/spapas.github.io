@@ -631,14 +631,16 @@ then you&amp;#8217;ll see no&amp;nbsp;lines!&lt;/p&gt;
 &lt;p&gt;Now, for dynamic content you can expect the opposite behavior:
 You &lt;em&gt;cannot&lt;/em&gt; select to which dynamic frame your content goes, instead the content just just flows to the first dynamic frame it
 fits! If it does not fit in any dynamic frames in the current page then a new page will be&amp;nbsp;created.&lt;/p&gt;
-&lt;p&gt;I&amp;#8217;d like to present a full example here on the already mentioned project of printing a plastic card. I had two page layouts,
+&lt;p&gt;I&amp;#8217;d like to present a full example here on the already mentioned project of printing a plastic card for the books. I had two page layouts,
 one for the front page having a frame with the owner&amp;#8217;s data and another frame with his photo and one for the back page having
 a barcode. This is a Django template that is used to print not only but a &lt;span class="caps"&gt;PDF&lt;/span&gt; with a group of these&amp;nbsp;cards:&lt;/p&gt;
 &lt;pre class="code literal-block"&gt;
-{% load thumbnail %}
 &amp;lt;html&amp;gt;
 &amp;lt;head&amp;gt;
 &amp;lt;meta http-equiv=&amp;quot;Content-Type&amp;quot; content=&amp;quot;text/html; charset=utf-8&amp;quot; /&amp;gt;
+&amp;lt;style&amp;gt;
+    {% include &amp;quot;pdfstylefonts.css&amp;quot; %}
+&amp;lt;/style&amp;gt;
 &amp;lt;style type='text/css'&amp;gt;
     &amp;#64;page {
         size: 8.56cm 5.398cm;
@@ -698,28 +700,6 @@ a barcode. This is a Django template that is used to print not only but a &lt;sp
         }
     }
 
-    &amp;#64;font-face {
-        font-family: &amp;quot;Calibri&amp;quot;;
-        src: url(&amp;quot;fonts/calibri.ttf&amp;quot;);
-    }
-
-    &amp;#64;font-face {
-        font-family: &amp;quot;Calibri&amp;quot;;
-        src: url(&amp;quot;fonts/calibrib.ttf&amp;quot;);
-        font-weight: bold;
-    }
-    &amp;#64;font-face {
-        font-family: &amp;quot;Calibri&amp;quot;;
-        src: url(&amp;quot;fonts/calibrii.ttf&amp;quot;);
-        font-style: italic;
-    }
-    &amp;#64;font-face {
-        font-family: &amp;quot;Calibri&amp;quot;;
-        src: url(&amp;quot;fonts/calibriz.ttf&amp;quot;);
-        font-weight: bold;
-        font-style: italic;
-    }
-
     *, html {
         font-family: &amp;quot;Calibri&amp;quot;;
         font-size: 8pt;
@@ -733,19 +713,23 @@ a barcode. This is a Django template that is used to print not only but a &lt;sp
 &amp;lt;/style&amp;gt;
 &amp;lt;/head&amp;gt;
 &amp;lt;body&amp;gt;
-    {% for card in cards %}
+    {% for book in books %}
         &amp;lt;div&amp;gt;
             &amp;lt;! -- Here I print the card data. It fits exactly in the table_frame so ... -&amp;gt;
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus nulla erat, porttitor ut venenatis eget,
-            tempor et purus. Nullam nec erat vel enim euismod auctor et at nisl. Integer posuere bibendum condimentum. Ut
-            euismod velit ut porttitor condimentum. In ullamcorper nulla at lectus fermentum aliquam. Nunc elementum commodo
-            dui, id pulvinar ex viverra id. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos
-            himenaeos.
+            {{ book.title }}&amp;lt;br /&amp;gt;
+            Data line 2&amp;lt;br /&amp;gt;
+            Data line 3&amp;lt;br /&amp;gt;
+            Data line 4&amp;lt;br /&amp;gt;
+            Data line 5&amp;lt;br /&amp;gt;
+            Data line 6&amp;lt;br /&amp;gt;
+            Data line 7&amp;lt;br /&amp;gt;
+            Data line 8&amp;lt;br /&amp;gt;
+            Data line 9&amp;lt;br /&amp;gt;
+            Data line 10&amp;lt;br /&amp;gt;
         &amp;lt;/div&amp;gt;
         &amp;lt;div&amp;gt;
             &amp;lt;! -- This photo here will be outputted to the photo_frame --&amp;gt;
-            {% thumbnail card.photo &amp;quot;photo&amp;quot; as thumb %}
-            &amp;lt;img src=&amp;quot;{{ thumb.url }}&amp;quot; style='width:1.9cm ; height: 2.2cm ; ' /&amp;gt;
+            &amp;lt;img src='{{ book.cover.url }}' style='width:1.9cm ; height: 2.2cm ; ' /&amp;gt;
         &amp;lt;/div&amp;gt;
 
         &amp;lt;! -- Now the template is chaned to print the back of the card --&amp;gt;
@@ -755,7 +739,7 @@ a barcode. This is a Django template that is used to print not only but a &lt;sp
         &amp;lt;div &amp;gt;
             &amp;lt;center&amp;gt;
                 &amp;lt;! -- Print the barcode to the barcode_frame --&amp;gt;
-                &amp;lt;pdf:barcode value=&amp;quot;{{ card.protocol }}&amp;quot; type=&amp;quot;code128&amp;quot; humanreadable=&amp;quot;1&amp;quot; barwidth=&amp;quot;0.43mm&amp;quot; barheight=&amp;quot;0.6cm&amp;quot; align=&amp;quot;middle&amp;quot; /&amp;gt;
+                &amp;lt;pdf:barcode value=&amp;quot;{{ book.id }}&amp;quot; type=&amp;quot;code128&amp;quot; humanreadable=&amp;quot;1&amp;quot; barwidth=&amp;quot;0.43mm&amp;quot; barheight=&amp;quot;0.6cm&amp;quot; align=&amp;quot;middle&amp;quot; /&amp;gt;
             &amp;lt;/center&amp;gt;
         &amp;lt;/div&amp;gt;
         &amp;lt;!-- Use the front_page template again for the next card --&amp;gt;
@@ -765,6 +749,10 @@ a barcode. This is a Django template that is used to print not only but a &lt;sp
 &amp;lt;/body&amp;gt;
 &amp;lt;/html&amp;gt;
 &lt;/pre&gt;
+&lt;p&gt;Notice that I want to print exactly 10 lines in the &lt;tt class="docutils literal"&gt;table_frame&lt;/tt&gt; (that&amp;#8217;s why I use &amp;lt;br /&amp;gt; to go to next line) &amp;#8212; if I had printed
+3-4 lines (for example) then the photo &lt;em&gt;would fit&lt;/em&gt; in the &lt;tt class="docutils literal"&gt;table_frame&lt;/tt&gt; and would be printed there and &lt;em&gt;not&lt;/em&gt; in the &lt;tt class="docutils literal"&gt;photo_frame&lt;/tt&gt;! Also,
+another interesting thing is that if I had
+outputed 8-9 lines then the photo wouldn&amp;#8217;t fit in that small space and would also be printed to the &lt;tt class="docutils literal"&gt;photo_frame&lt;/tt&gt;.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="extra-stuff"&gt;
 &lt;h3&gt;&lt;a class="toc-backref" href="#id19"&gt;Extra&amp;nbsp;stuff&lt;/a&gt;&lt;/h3&gt;

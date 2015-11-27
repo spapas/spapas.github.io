@@ -1,8 +1,8 @@
 PDFs in Django: The essential guide
 ###################################
 
-:date: 2015-11-23 14:20
-:tags: pdf, django, reportlab, python,
+:date: 2015-11-27 10:20
+:tags: pdf, django, reportlab, python, xhtml2pdf
 :category: django
 :slug: pdf-in-django
 :author: Serafeim Papastefanos
@@ -15,7 +15,7 @@ Introduction
 ------------
 
 I've noticed that although it is easy to create PDFs with
-Python, I've noticed there's no complete guide on how to
+Python, there's no complete guide on how to
 integrate these tools with Django and resolve the problems
 that you'll encounter when trying to actually create PDFs
 from your Django web application.
@@ -131,7 +131,6 @@ you install it (either globally or to a virtual environment) you should be able 
 out the executable ``$PYTHON/scripts/xhtml2pdf`` (or ``xhtml2pdf.exe`` if you are in
 Windows) and a corresponding python script @ ``$PYTHON/scripts/xhtml2pdf-script.py``.
 
-
 Let's try to use xhtml2pdf to explore some of its capabilities. Create a file named
 testxhtml2pdf.html with the following contents and run ``xhtml2pdf testxhtml2pdf.html``:
 
@@ -183,7 +182,8 @@ testxhtml2pdf.html with the following contents and run ``xhtml2pdf testxhtml2pdf
     </body>
     </html>
 
-The result (``testxhtml2pdf.pdf``) should have:
+Please notice the ``<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />`` in the above HTML -- also it is saved as
+Unicode (Encoding - Covert to UTF-8 in Notepad++). The result (``testxhtml2pdf.pdf``) should have:
 
 * A nice header (h1)
 * Paragraphs
@@ -637,26 +637,276 @@ this could be done:
 More advanced xhtml2pdf features
 --------------------------------
 
-Pagination
+In this section I will present some information on how to use various xhtml2pdf features
+to create the most common required printed document features, for example adding page
+numbers, adding headers and footers etc.
+
+Laying out
 ==========
 
-Layout
-======
+To find out how you can create your pages you should read the 
+`defining page layouts`_ section of the xhtml2pdf manual. There
+you'll see that the basic components of laying out in xhtml2pdf is
+@page to create pages and @frames to create rectangular components
+inside these pages. So each page will have a number of frames 
+inside it. These frames are seperated to static and dynamic. Staticsome
+should be used for things like headers
+and footers (so they'll be the same across all pages) and dynamic will
+contain the main content of the report.
 
-Page background
-===============
+
+For pages you can use any page size you want, not just the specified ones. For example, in one of my 
+projects I wanted to create a PDF print on a normal plastic card, so I'd used the
+following ``size: 8.56cm 5.398cm;``. Also, page templates can be named 
+and you can use different ones in the same PDF (so you could create
+a cover page with a different page template, use it first and then continue
+with the normal pages). To name a tempalte you just use @page template_name {}
+and to change the template use the combination of the following two xhtml2pdf tags:
+
+.. code::
+
+  <pdf:nexttemplate name="back_page" />
+  <pdf:nextpage />
+  
+Now, one thing I've noticed is that you are not able to use a named template for the first
+page of your PDF. So, what I've done is that I create an anonymous (default) page for the
+first page of the report. If I want to *reuse* it in another page, I copy it and name it
+accordingly. I will give an example shortly.
+
+Now, for frames, I recommend using the ``-pdf-frame-border: 1;`` command for debugging where
+they are actually printed. Also, I recommend using a normal ruler and measuring completely
+where you want them to be. For example, for the following frame:
+
+.. code::
+
+    @frame photo_frame {
+            -pdf-frame-border: 1;
+            top:  2.4cm;
+            left: 6.2cm;
+            width: 1.9cm;
+            height: 2.2cm;
+    }
+
+I'd used a ruler to find out that I want it to start 2.4 cm from the top of my page (actually a credit card)
+and 6.2 cm from the left and have a width and height of 1.9 and 2.2 cm.
+
+I recommend naming all frames to be able to distinguish them however I don't think that their name plays
+any other role. However, for static frames you must define the id of the content they will contain using ``-pdf-frame-content``
+in the css and a div with the corresponding id in the PDF template. For example, you could define a frame header like this
+
+.. code::
+
+  @frame header {
+    -pdf-frame-content: headerContent;
+    width: 8in;
+    top: 0.5cm;
+    margin-left: 0.5cm;
+    margin-right: 0.5cm;
+    height: 2cm;
+  }
+
+and its content like this:
+
+.. code::
+
+  <div id='headerContent'>
+    <h1 >
+      Header !
+    </h1>
+  </div>  
+  
+Please notice that if for some reason the stuff you want to put in your static frames does not fit there the frame will
+be totally empty. This means that if you have size for three lines but you want to output five lines in a static frame
+then you'll see no lines!
+
+Now, for dynamic content you can expect the opposite behavior: 
+You *cannot* select to which dynamic frame your content goes, instead the content just just flows to the first dynamic frame it 
+fits! If it does not fit in any dynamic frames in the current page then a new page will be created.
+
+I'd like to present a full example here on the already mentioned project of printing a plastic card. I had two page layouts,
+one for the front page having a frame with the owner's data and another frame with his photo and one for the back page having
+a barcode. This is a Django template that is used to print not only but a PDF with a group of these cards: 
+
+.. code::
+
+    {% load thumbnail %}
+    <html>
+    <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <style type='text/css'>
+        @page {
+            size: 8.56cm 5.398cm;
+            margin: 0.0cm 0.0cm 0.0cm 0.0cm;
+            padding: 0;
+
+            @frame table_frame {
+                /* -pdf-frame-border: 1; */
+                top:  2.4cm;
+                left: 0.4cm;
+                width: 5.5cm;
+                height: 3cm;
+            }
+
+            @frame photo_frame {
+                /* -pdf-frame-border: 1; */
+                top:  2.4cm;
+                left: 6.2cm;
+                width: 1.9cm;
+                height: 2.2cm;
+            }
+        }
+
+        @page front_page {
+            size: 8.56cm 5.398cm;
+            margin: 0.0cm 0.0cm 0.0cm 0.0cm;
+            padding: 0;
+
+            @frame table_frame {
+                /* -pdf-frame-border: 1; */
+                top:  2.4cm;
+                left: 0.4cm;
+                width: 5.5cm;
+                height: 3cm;
+            }
+
+            @frame photo_frame {
+                /* -pdf-frame-border: 1; */
+                top:  2.4cm;
+                left: 6.2cm;
+                width: 1.9cm;
+                height: 2.2cm;
+            }
+        }
+
+        @page back_page {
+            size: 8.56cm 5.398cm;
+            margin: 0.0cm 0.0cm 0.0cm 0.0cm;
+            padding: 0;
+
+            @frame barcode_frame {
+                /* -pdf-frame-border: 1; */
+                top:  3.9cm;
+                left: 1.8cm;
+                width: 4.9cm;
+                height: 1.1cm;
+            }
+        }
+
+        @font-face {
+            font-family: "Calibri";
+            src: url("fonts/calibri.ttf");
+        }
+
+        @font-face {
+            font-family: "Calibri";
+            src: url("fonts/calibrib.ttf");
+            font-weight: bold;
+        }
+        @font-face {
+            font-family: "Calibri";
+            src: url("fonts/calibrii.ttf");
+            font-style: italic;
+        }
+        @font-face {
+            font-family: "Calibri";
+            src: url("fonts/calibriz.ttf");
+            font-weight: bold;
+            font-style: italic;
+        }
+        
+        *, html {
+            font-family: "Calibri";
+            font-size: 8pt;
+            line-height: 80%;
+        }
+
+        .bigger {
+            font-size:9pt;
+            font-weight: bold;
+        }
+    </style>
+    </head>
+    <body>
+        {% for card in cards %}
+            <div>
+                <! -- Here I print the card data. It fits exactly in the table_frame so ... ->
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus nulla erat, porttitor ut venenatis eget,
+                tempor et purus. Nullam nec erat vel enim euismod auctor et at nisl. Integer posuere bibendum condimentum. Ut
+                euismod velit ut porttitor condimentum. In ullamcorper nulla at lectus fermentum aliquam. Nunc elementum commodo
+                dui, id pulvinar ex viverra id. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos
+                himenaeos.
+            </div>
+            <div>
+                <! -- This photo here will be outputted to the photo_frame -->
+                {% thumbnail card.photo "photo" as thumb %}
+                <img src="{{ thumb.url }}" style='width:1.9cm ; height: 2.2cm ; ' />
+            </div>
+            
+            <! -- Now the template is chaned to print the back of the card -->
+            <pdf:nexttemplate name="back_page" />
+            <pdf:nextpage />
+
+            <div >
+                <center>
+                    <! -- Print the barcode to the barcode_frame -->
+                    <pdf:barcode value="{{ card.protocol }}" type="code128" humanreadable="1" barwidth="0.43mm" barheight="0.6cm" align="middle" />
+                </center>
+            </div>
+            <!-- Use the front_page template again for the next card -->
+            <pdf:nexttemplate name="front_page" />
+            <pdf:nextpage />
+        {% endfor %}
+    </body>
+    </html>
+
+Extra stuff
+===========
+
+Some extra things I want to mention concerning xhtml2pdf:
+
+* ``<pdf:pagenumber>`` to output the current page number (please end the line after this tag)
+* ``<pdf:pagecount>`` to output the total page number (please end the line after this tag)
+
+So if you want to print a footer with the pages, I recommend something like this:
+
+.. code::
+
+  <div id='footerContent'>
+    Page <pdf:pagenumber>
+    from <pdf:pagecount>
+    total
+  </div>
+  
+Notice how the lines end after the tags.
+
+* ``<pdf:barcode>``: Output a barcode in your PDF. Here are the possible barcode types: I2of5, Standard39, Extended39, Standard93, Extended93, MSI, Codabar, Code11, FIM, POSTNET, USPS_4State, Code128, EAN13, EAN8, QR.
+
+* You may add a page background image using  the ``background-image`` property of ``@page``.
+
+For example, if you want the templates you create from your development/UAT systems to be different
+than the production ones you could do something like this: 
 
 .. code::
 
     @page {
-        background-image: url({% static "pony.png" %});
+        {% if DEBUG %}
+            background-image: url({% static "debug.png" %});
+        {% endif %}
+        <!-- Other page properties -->
     }
 
 Conclusion
 ----------
 
 I hope that using the techniques described in this essential guide you'll
-be able to 
+be able to create great looking PDF documents from your Django application
+and overcome any difficulties that may arise. If you feel that there's something
+I've not covered properly (and is not covered by the documentation) please comment
+out and I'll be happy to research it a bit and update the article with info.
+
+
+I am using all the above in various production applications for a long time and everything
+is smooth so don't afraid to create PDFs from Django!
 
 
 .. _ReportLab: https://bitbucket.org/rptlab/reportlab
@@ -670,21 +920,7 @@ be able to
 .. _DejaVu: http://dejavu-fonts.org/wiki/Main_Page
 .. _`utils.py of django-xhtml2pdf`: https://github.com/chrisglass/django-xhtml2pdf/blob/master/django_xhtml2pdf/utils.py
 .. _`serve files uploaded by a user during development`: https://docs.djangoproject.com/en/1.8/howto/static-files/#serving-files-uploaded-by-a-user-during-development    
+.. _`defining page layouts`: https://github.com/xhtml2pdf/xhtml2pdf/blob/master/doc/usage.rst#defining-page-layouts
 
 .. _`ReportLab open-source User Guide`: http://www.reportlab.com/docs/reportlab-userguide.pdf
 .. _`css directive`: https://github.com/xhtml2pdf/xhtml2pdf/blob/master/doc/usage.rst#fonts
-
-.. _browserify: http://browserify.org/
-.. _babelify: https://github.com/babel/babelify
-.. _watchify: https://github.com/substack/watchify
-.. _`NIH syndrome`: http://en.wikipedia.org/wiki/Not_invented_here
-.. _require: https://github.com/substack/browserify-handbook#require
-.. _`a package for windows`: https://nodejs.org/download/
-.. _moment.js: http://momentjs.com/
-.. _underscore.js: http://underscorejs.org/
-.. _`a lot of transforms`: https://github.com/substack/node-browserify/wiki/list-of-transforms
-.. _uglify-js: https://www.npmjs.com/package/uglify-js
-.. _fabric: http://www.fabfile.org/
-.. _es6features: https://github.com/lukehoban/es6features
-.. _babel: https://babeljs.io/
-.. _`various other transforms`: https://babeljs.io/docs/plugins/

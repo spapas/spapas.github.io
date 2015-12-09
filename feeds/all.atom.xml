@@ -363,13 +363,18 @@ If you check the &lt;a class="reference external" href="https://github.com/chris
 for loading these resources. This function checks to see if the resource starts with &lt;tt class="docutils literal"&gt;/MEDIA_URL&lt;/tt&gt; or
 &lt;tt class="docutils literal"&gt;/STATIC_URL&lt;/tt&gt; and converts it to a local (filesystem) path. For example, if you refer to a font like
 &lt;tt class="docutils literal"&gt;/static/font1.ttf&lt;/tt&gt; in your &lt;span class="caps"&gt;PDF&lt;/span&gt; template, &lt;tt class="docutils literal"&gt;xhtml2pdf&lt;/tt&gt; will try to load the file &lt;tt class="docutils literal"&gt;STATIC_ROOT + /font1.ttf&lt;/tt&gt;
-(and if it does not find the file you want to refer to there it will check all &lt;tt class="docutils literal"&gt;STATICFILES_DIRS&lt;/tt&gt; enries).&lt;/p&gt;
+(and if it does not find the file you want to refer to there it will check all &lt;tt class="docutils literal"&gt;STATICFILES_DIRS&lt;/tt&gt; entries).&lt;/p&gt;
 &lt;p&gt;Thus, you can just put your resources into your &lt;tt class="docutils literal"&gt;STATIC_ROOT&lt;/tt&gt; directory and use the &lt;tt class="docutils literal"&gt;{% static %}&lt;/tt&gt;
 template tag to create &lt;span class="caps"&gt;URL&lt;/span&gt; paths for them &amp;#8212; django-xhtml2pdf will convert these to local paths and
 everything will work&amp;nbsp;fine.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;Please notice that you *need* to have configured &amp;#8220;STATIC_ROOT&amp;#8220; for this to work&lt;/strong&gt; &amp;#8212; if &lt;tt class="docutils literal"&gt;STATIC_ROOT&lt;/tt&gt; is
 empty (and, for example you use &lt;tt class="docutils literal"&gt;static&lt;/tt&gt; directories in your apps) then the described substitution
-mechanism will &lt;em&gt;not&lt;/em&gt;&amp;nbsp;work.&lt;/p&gt;
+mechanism will &lt;em&gt;not&lt;/em&gt; work. Also, notice that the &lt;tt class="docutils literal"&gt;/static&lt;/tt&gt; directory inside your apps &lt;em&gt;cannot be used&lt;/em&gt;
+for fetch resources like this
+(due to how &lt;tt class="docutils literal"&gt;fetch_resources&lt;/tt&gt; is implemented it only checks if the static resource is contained inside
+the &lt;tt class="docutils literal"&gt;STATIC_ROOT&lt;/tt&gt; or in one of the the &lt;tt class="docutils literal"&gt;STATICFILES_DIRS&lt;/tt&gt;) so be careful to either put the static files
+you need to load from PDFs (fonts, styles and possibly images) to either the &lt;tt class="docutils literal"&gt;STATIC_ROOT&lt;/tt&gt; or the
+one of the &lt;tt class="docutils literal"&gt;STATICFILES_DIRS&lt;/tt&gt;.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="using-a-common-style-for-your-pdfs"&gt;
 &lt;h3&gt;&lt;a class="toc-backref" href="#id13"&gt;Using a common style for your&amp;nbsp;PDFs&lt;/a&gt;&lt;/h3&gt;
@@ -414,7 +419,7 @@ file &lt;tt class="docutils literal"&gt;pdfstylefonts.css&lt;/tt&gt; and I&amp;#
     font-style: italic, oblique;
 }
 &lt;/pre&gt;
-&lt;p&gt;I am using Calibri family of fonts (copied from c:windowsfonts) for this &amp;#8212; I&amp;#8217;ve also configured
+&lt;p&gt;I am using Calibri family of fonts (copied from &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;c:\windows\fonts&lt;/span&gt;&lt;/tt&gt;) for this &amp;#8212; I&amp;#8217;ve also configured
 all styles (bold, italic, bold-italic) of this font family to use the correct ttf files. All the
 ttf files have been copied to the directory &lt;tt class="docutils literal"&gt;static/fonts/&lt;/tt&gt;.&lt;/p&gt;
 &lt;p&gt;Now, add another css file that will be your global &lt;span class="caps"&gt;PDF&lt;/span&gt; styles. This should be put to the &lt;tt class="docutils literal"&gt;static&lt;/tt&gt; directory

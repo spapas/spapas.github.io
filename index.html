@@ -442,13 +442,18 @@ If you check the <a class="reference external" href="https://github.com/chrisgla
 for loading these resources. This function checks to see if the resource starts with <tt class="docutils literal">/MEDIA_URL</tt> or
 <tt class="docutils literal">/STATIC_URL</tt> and converts it to a local (filesystem) path. For example, if you refer to a font like
 <tt class="docutils literal">/static/font1.ttf</tt> in your <span class="caps">PDF</span> template, <tt class="docutils literal">xhtml2pdf</tt> will try to load the file <tt class="docutils literal">STATIC_ROOT + /font1.ttf</tt>
-(and if it does not find the file you want to refer to there it will check all <tt class="docutils literal">STATICFILES_DIRS</tt> enries).</p>
+(and if it does not find the file you want to refer to there it will check all <tt class="docutils literal">STATICFILES_DIRS</tt> entries).</p>
 <p>Thus, you can just put your resources into your <tt class="docutils literal">STATIC_ROOT</tt> directory and use the <tt class="docutils literal">{% static %}</tt>
 template tag to create <span class="caps">URL</span> paths for them &#8212; django-xhtml2pdf will convert these to local paths and
 everything will work&nbsp;fine.</p>
 <p><strong>Please notice that you *need* to have configured &#8220;STATIC_ROOT&#8220; for this to work</strong> &#8212; if <tt class="docutils literal">STATIC_ROOT</tt> is
 empty (and, for example you use <tt class="docutils literal">static</tt> directories in your apps) then the described substitution
-mechanism will <em>not</em>&nbsp;work.</p>
+mechanism will <em>not</em> work. Also, notice that the <tt class="docutils literal">/static</tt> directory inside your apps <em>cannot be used</em>
+for fetch resources like this
+(due to how <tt class="docutils literal">fetch_resources</tt> is implemented it only checks if the static resource is contained inside
+the <tt class="docutils literal">STATIC_ROOT</tt> or in one of the the <tt class="docutils literal">STATICFILES_DIRS</tt>) so be careful to either put the static files
+you need to load from PDFs (fonts, styles and possibly images) to either the <tt class="docutils literal">STATIC_ROOT</tt> or the
+one of the <tt class="docutils literal">STATICFILES_DIRS</tt>.</p>
 </div>
 <div class="section" id="using-a-common-style-for-your-pdfs">
 <h3><a class="toc-backref" href="#id13">Using a common style for your&nbsp;PDFs</a></h3>
@@ -493,7 +498,7 @@ file <tt class="docutils literal">pdfstylefonts.css</tt> and I&#8217;ve put it t
     font-style: italic, oblique;
 }
 </pre>
-<p>I am using Calibri family of fonts (copied from c:windowsfonts) for this &#8212; I&#8217;ve also configured
+<p>I am using Calibri family of fonts (copied from <tt class="docutils literal"><span class="pre">c:\windows\fonts</span></tt>) for this &#8212; I&#8217;ve also configured
 all styles (bold, italic, bold-italic) of this font family to use the correct ttf files. All the
 ttf files have been copied to the directory <tt class="docutils literal">static/fonts/</tt>.</p>
 <p>Now, add another css file that will be your global <span class="caps">PDF</span> styles. This should be put to the <tt class="docutils literal">static</tt> directory

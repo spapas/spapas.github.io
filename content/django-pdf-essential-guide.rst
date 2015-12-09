@@ -342,7 +342,7 @@ to suggest a default filename for the file to be saved by adding the line
     
 after the definition of ``resp``.
 
-This will have thw extra effect, at least in Chrome and Firefox to show the "Save File" dialog
+This will have the extra effect, at least in Chrome and Firefox to show the "Save File" dialog
 when clicking on the link instead of retrieving the PDF and displaying it inside* the browser window.
 
 Using a CBV
@@ -397,6 +397,29 @@ and a corresponding template (name it ``books/book_detail.html``):
     </body>
     </html>
 
+
+To add the content-disposition header and a name for your PDF, you can use the following mixin: 
+
+.. code::
+
+    class PdfResponseMixin(object, ):
+        pdf_name = "output"
+        
+        def get_pdf_name(self):
+            return self.pdf_name
+        
+        def render_to_response(self, context, **response_kwargs):
+            context=self.get_context_data()
+            template=self.get_template_names()[0]
+            resp = HttpResponse(content_type='application/pdf')
+            resp['Content-Disposition'] = 'attachment; filename="{0}.pdf"'.format(self.get_pdf_name())
+            result = generate_pdf(template, file_object=resp, context=context)
+            return result
+
+You see that, in order to havea configurable output name for our PDF and be consistent with the other
+django CBVs, a ``pdf_name`` class attribute and a ``get_pdf_name`` instance method are added. When
+using the above mixin in your classes you can either provide a value for ``pdf_name`` (to use the same for all
+your instances), or override ``get_pdf_name`` to have a dynamic value!
 
 
 How does django-xhtml2pdf loads resources

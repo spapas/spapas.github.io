@@ -309,7 +309,7 @@ to suggest a default filename for the file to be saved by adding the&amp;nbsp;li
 resp['Content-Disposition'] = 'attachment; filename=&amp;quot;output.pdf&amp;quot;'
 &lt;/pre&gt;
 &lt;p&gt;after the definition of &lt;tt class="docutils literal"&gt;resp&lt;/tt&gt;.&lt;/p&gt;
-&lt;p&gt;This will have thw extra effect, at least in Chrome and Firefox to show the &amp;quot;Save File&amp;quot; dialog
+&lt;p&gt;This will have the extra effect, at least in Chrome and Firefox to show the &amp;quot;Save File&amp;quot; dialog
 when clicking on the link instead of retrieving the &lt;span class="caps"&gt;PDF&lt;/span&gt; and displaying it inside* the browser&amp;nbsp;window.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="using-a-cbv"&gt;
@@ -354,6 +354,26 @@ class BookPdfDetailView(PdfResponseMixin, DetailView):
 &amp;lt;/body&amp;gt;
 &amp;lt;/html&amp;gt;
 &lt;/pre&gt;
+&lt;p&gt;To add the content-disposition header and a name for your &lt;span class="caps"&gt;PDF&lt;/span&gt;, you can use the following&amp;nbsp;mixin:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class PdfResponseMixin(object, ):
+    pdf_name = &amp;quot;output&amp;quot;
+
+    def get_pdf_name(self):
+        return self.pdf_name
+
+    def render_to_response(self, context, **response_kwargs):
+        context=self.get_context_data()
+        template=self.get_template_names()[0]
+        resp = HttpResponse(content_type='application/pdf')
+        resp['Content-Disposition'] = 'attachment; filename=&amp;quot;{0}.pdf&amp;quot;'.format(self.get_pdf_name())
+        result = generate_pdf(template, file_object=resp, context=context)
+        return result
+&lt;/pre&gt;
+&lt;p&gt;You see that, in order to havea configurable output name for our &lt;span class="caps"&gt;PDF&lt;/span&gt; and be consistent with the other
+django CBVs, a &lt;tt class="docutils literal"&gt;pdf_name&lt;/tt&gt; class attribute and a &lt;tt class="docutils literal"&gt;get_pdf_name&lt;/tt&gt; instance method are added. When
+using the above mixin in your classes you can either provide a value for &lt;tt class="docutils literal"&gt;pdf_name&lt;/tt&gt; (to use the same for all
+your instances), or override &lt;tt class="docutils literal"&gt;get_pdf_name&lt;/tt&gt; to have a dynamic&amp;nbsp;value!&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="how-does-django-xhtml2pdf-loads-resources"&gt;
 &lt;h3&gt;&lt;a class="toc-backref" href="#id12"&gt;How does django-xhtml2pdf loads&amp;nbsp;resources&lt;/a&gt;&lt;/h3&gt;

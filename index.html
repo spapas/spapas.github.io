@@ -388,7 +388,7 @@ to suggest a default filename for the file to be saved by adding the&nbsp;line</
 resp['Content-Disposition'] = 'attachment; filename=&quot;output.pdf&quot;'
 </pre>
 <p>after the definition of <tt class="docutils literal">resp</tt>.</p>
-<p>This will have thw extra effect, at least in Chrome and Firefox to show the &quot;Save File&quot; dialog
+<p>This will have the extra effect, at least in Chrome and Firefox to show the &quot;Save File&quot; dialog
 when clicking on the link instead of retrieving the <span class="caps">PDF</span> and displaying it inside* the browser&nbsp;window.</p>
 </div>
 <div class="section" id="using-a-cbv">
@@ -433,6 +433,26 @@ class BookPdfDetailView(PdfResponseMixin, DetailView):
 &lt;/body&gt;
 &lt;/html&gt;
 </pre>
+<p>To add the content-disposition header and a name for your <span class="caps">PDF</span>, you can use the following&nbsp;mixin:</p>
+<pre class="code literal-block">
+class PdfResponseMixin(object, ):
+    pdf_name = &quot;output&quot;
+
+    def get_pdf_name(self):
+        return self.pdf_name
+
+    def render_to_response(self, context, **response_kwargs):
+        context=self.get_context_data()
+        template=self.get_template_names()[0]
+        resp = HttpResponse(content_type='application/pdf')
+        resp['Content-Disposition'] = 'attachment; filename=&quot;{0}.pdf&quot;'.format(self.get_pdf_name())
+        result = generate_pdf(template, file_object=resp, context=context)
+        return result
+</pre>
+<p>You see that, in order to havea configurable output name for our <span class="caps">PDF</span> and be consistent with the other
+django CBVs, a <tt class="docutils literal">pdf_name</tt> class attribute and a <tt class="docutils literal">get_pdf_name</tt> instance method are added. When
+using the above mixin in your classes you can either provide a value for <tt class="docutils literal">pdf_name</tt> (to use the same for all
+your instances), or override <tt class="docutils literal">get_pdf_name</tt> to have a dynamic&nbsp;value!</p>
 </div>
 <div class="section" id="how-does-django-xhtml2pdf-loads-resources">
 <h3><a class="toc-backref" href="#id12">How does django-xhtml2pdf loads&nbsp;resources</a></h3>

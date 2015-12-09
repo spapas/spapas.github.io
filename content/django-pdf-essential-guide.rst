@@ -408,15 +408,20 @@ If you check the `utils.py of django-xhtml2pdf`_ you'll see that it uses a funct
 for loading these resources. This function checks to see if the resource starts with ``/MEDIA_URL`` or
 ``/STATIC_URL`` and converts it to a local (filesystem) path. For example, if you refer to a font like 
 ``/static/font1.ttf`` in your PDF template, ``xhtml2pdf`` will try to load the file ``STATIC_ROOT + /font1.ttf``
-(and if it does not find the file you want to refer to there it will check all ``STATICFILES_DIRS`` enries). 
+(and if it does not find the file you want to refer to there it will check all ``STATICFILES_DIRS`` entries). 
 
 Thus, you can just put your resources into your ``STATIC_ROOT`` directory and use the ``{% static %}`` 
 template tag to create URL paths for them -- django-xhtml2pdf will convert these to local paths and
-everything will work fine. 
+everything will work fine.  
 
 **Please notice that you *need* to have configured ``STATIC_ROOT`` for this to work** -- if ``STATIC_ROOT`` is
 empty (and, for example you use ``static`` directories in your apps) then the described substitution
-mechanism will *not* work.
+mechanism will *not* work. Also, notice that the ``/static`` directory inside your apps *cannot be used*
+for fetch resources like this 
+(due to how ``fetch_resources`` is implemented it only checks if the static resource is contained inside
+the ``STATIC_ROOT`` or in one of the the ``STATICFILES_DIRS``) so be careful to either put the static files
+you need to load from PDFs (fonts, styles and possibly images) to either the ``STATIC_ROOT`` or the 
+one of the ``STATICFILES_DIRS``.
 
 Using a common style for your PDFs
 ==================================
@@ -468,7 +473,7 @@ file ``pdfstylefonts.css`` and I've put it to ``books/templates``:
         font-style: italic, oblique;
     }
 
-I am using Calibri family of fonts (copied from c:\windows\fonts) for this -- I've also configured 
+I am using Calibri family of fonts (copied from ``c:\windows\fonts``) for this -- I've also configured 
 all styles (bold, italic, bold-italic) of this font family to use the correct ttf files. All the
 ttf files have been copied to the directory ``static/fonts/``.
 

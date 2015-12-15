@@ -2163,9 +2163,11 @@ create a simple app, moving to something more complex (and especially debugging 
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;li&gt;&lt;a class="reference internal" href="#local-state" id="id14"&gt;Local&amp;nbsp;state&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#conclusion-to-the-first-part" id="id15"&gt;Conclusion to the first&amp;nbsp;part&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#adding-form-validation" id="id15"&gt;Adding form&amp;nbsp;validation&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#conclusion-to-the-first-part" id="id16"&gt;Conclusion to the first&amp;nbsp;part&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;Update 15/12/2015&lt;/strong&gt;: Added some insights for form&amp;nbsp;validation.&lt;/p&gt;
 &lt;div class="section" id="introduction"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id1"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;&lt;a class="reference external" href="https://facebook.github.io/react/"&gt;React&lt;/a&gt; is a rather new library from Facebook for building dynamic components for web pages.
@@ -2668,8 +2670,61 @@ just save it as a property of the global state object in &lt;tt class="docutils 
 correct. What wouldn&amp;#8217;t be correct is if we had two copies of the same information in both the
 states of &lt;tt class="docutils literal"&gt;BookPanel&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;BookForm&lt;/tt&gt;, for example the book id that is&amp;nbsp;edited.&lt;/p&gt;
 &lt;/div&gt;
+&lt;div class="section" id="adding-form-validation"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id15"&gt;Adding form&amp;nbsp;validation&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Commenter Nitish Kumar made a nice comment about how we could do some validating to our form&amp;nbsp;fields.&lt;/p&gt;
+&lt;p&gt;First of all, this adds to the complexity of the application so maybe it would be better to do it in
+the &lt;a class="reference external" href="http://spapas.github.io/2015/07/02/comprehensive-react-flux-tutorial-2/"&gt;flux-architectured version&lt;/a&gt;. However, it&amp;#8217;s not really difficult
+to also have form validation using&amp;nbsp;react-only:&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s what we&amp;nbsp;need:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;A property (or properties) to pass the errors for each form field to the &lt;tt class="docutils literal"&gt;BookForm&lt;/tt&gt; component&lt;/li&gt;
+&lt;li&gt;A way to display the form errors if they exist in &lt;tt class="docutils literal"&gt;BookForm&lt;/tt&gt;&lt;/li&gt;
+&lt;li&gt;Execute an error handler when the form contents change and update the state if there&amp;#8217;s an&amp;nbsp;error&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;As an example, I&amp;#8217;d like to check that the book title is not written in uppercase, so I will add another
+attribute to the &lt;tt class="docutils literal"&gt;book&lt;/tt&gt; propery of &lt;tt class="docutils literal"&gt;BookForm&lt;/tt&gt; called &lt;tt class="docutils literal"&gt;titleError&lt;/tt&gt; and display it if it is defined,
+something like&amp;nbsp;this:&lt;/p&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;{this.props.book.titleError?&amp;lt;div&amp;gt;{this.props.book.titleError}&amp;lt;/div&amp;gt;:null}&lt;/span&gt;&lt;/tt&gt;&lt;/p&gt;
+&lt;p&gt;Now, the &lt;tt class="docutils literal"&gt;handleChange&lt;/tt&gt; method of &lt;tt class="docutils literal"&gt;BookPanel&lt;/tt&gt; should do the actual check and change the sate, so I&amp;#8217;m
+changing it like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+handleChange: function(title, category) {
+    var titleError = undefined;
+    if(title.length &amp;gt; 1 &amp;amp;&amp;amp; title === title.toUpperCase()) {
+        titleError='Please don\'t use only capital letters for book titles';
+    }
+    this.setState({
+        editingBook: {
+            title: title,
+            titleError: titleError,
+            category: category,
+            id: this.state.editingBook.id
+        }
+    });
+},
+&lt;/pre&gt;
+&lt;p&gt;So, the titleError attribute of editingBook will be defined only if there&amp;#8217;s an&amp;nbsp;error.&lt;/p&gt;
+&lt;p&gt;Finally, we must remember to &lt;em&gt;not&lt;/em&gt; create/update the book if there&amp;#8217;s an error so
+we add the following check to the &lt;tt class="docutils literal"&gt;handleSubmitClick&lt;/tt&gt; method:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+if(this.state.editingBook.titleError) {
+    this.setState({
+        message: &amp;quot;Please fix errors!&amp;quot;
+    });
+    return ;
+}
+&lt;/pre&gt;
+&lt;p&gt;The above could be easily generalized for checks on multiple fields. I am not really fond
+of doing the form validation in the &lt;tt class="docutils literal"&gt;BookPanel&lt;/tt&gt; component (I&amp;#8217;d prefer to do it on &lt;tt class="docutils literal"&gt;BookForm&lt;/tt&gt;
+or even better on the corresponding field - if it was a component) however this would mean that
+I&amp;#8217;d need to keep a local state with the error to the &lt;tt class="docutils literal"&gt;BookForm&lt;/tt&gt; (please see the discussion of
+the previous&amp;nbsp;paragraph).&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ve added a new tag named &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;react-only-validation&lt;/span&gt;&lt;/tt&gt; to the &lt;a class="reference external" href="https://github.com/spapas/react-tutorial/"&gt;https://github.com/spapas/react-tutorial/&lt;/a&gt;
+repository that contains the changes to have the&amp;nbsp;validation.&lt;/p&gt;
+&lt;/div&gt;
 &lt;div class="section" id="conclusion-to-the-first-part"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id15"&gt;Conclusion to the first&amp;nbsp;part&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id16"&gt;Conclusion to the first&amp;nbsp;part&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;We just created a not-so-simple React single page application offering &lt;span class="caps"&gt;CRUD&lt;/span&gt; for an object.
 This application of course could be improved by adding a pagination component to the table,
 but I&amp;#8217;m going to leave that as an excersie to the reader: To do that, I propose to create

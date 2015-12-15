@@ -739,9 +739,11 @@ create a simple app, moving to something more complex (and especially debugging 
 </ul>
 </li>
 <li><a class="reference internal" href="#local-state" id="id14">Local&nbsp;state</a></li>
-<li><a class="reference internal" href="#conclusion-to-the-first-part" id="id15">Conclusion to the first&nbsp;part</a></li>
+<li><a class="reference internal" href="#adding-form-validation" id="id15">Adding form&nbsp;validation</a></li>
+<li><a class="reference internal" href="#conclusion-to-the-first-part" id="id16">Conclusion to the first&nbsp;part</a></li>
 </ul>
 </div>
+<p><strong>Update 15/12/2015</strong>: Added some insights for form&nbsp;validation.</p>
 <div class="section" id="introduction">
 <h2><a class="toc-backref" href="#id1">Introduction</a></h2>
 <p><a class="reference external" href="https://facebook.github.io/react/">React</a> is a rather new library from Facebook for building dynamic components for web pages.
@@ -1244,8 +1246,61 @@ just save it as a property of the global state object in <tt class="docutils lit
 correct. What wouldn&#8217;t be correct is if we had two copies of the same information in both the
 states of <tt class="docutils literal">BookPanel</tt> and <tt class="docutils literal">BookForm</tt>, for example the book id that is&nbsp;edited.</p>
 </div>
+<div class="section" id="adding-form-validation">
+<h2><a class="toc-backref" href="#id15">Adding form&nbsp;validation</a></h2>
+<p>Commenter Nitish Kumar made a nice comment about how we could do some validating to our form&nbsp;fields.</p>
+<p>First of all, this adds to the complexity of the application so maybe it would be better to do it in
+the <a class="reference external" href="http://spapas.github.io/2015/07/02/comprehensive-react-flux-tutorial-2/">flux-architectured version</a>. However, it&#8217;s not really difficult
+to also have form validation using&nbsp;react-only:</p>
+<p>Here&#8217;s what we&nbsp;need:</p>
+<ul class="simple">
+<li>A property (or properties) to pass the errors for each form field to the <tt class="docutils literal">BookForm</tt> component</li>
+<li>A way to display the form errors if they exist in <tt class="docutils literal">BookForm</tt></li>
+<li>Execute an error handler when the form contents change and update the state if there&#8217;s an&nbsp;error</li>
+</ul>
+<p>As an example, I&#8217;d like to check that the book title is not written in uppercase, so I will add another
+attribute to the <tt class="docutils literal">book</tt> propery of <tt class="docutils literal">BookForm</tt> called <tt class="docutils literal">titleError</tt> and display it if it is defined,
+something like&nbsp;this:</p>
+<p><tt class="docutils literal"><span class="pre">{this.props.book.titleError?&lt;div&gt;{this.props.book.titleError}&lt;/div&gt;:null}</span></tt></p>
+<p>Now, the <tt class="docutils literal">handleChange</tt> method of <tt class="docutils literal">BookPanel</tt> should do the actual check and change the sate, so I&#8217;m
+changing it like&nbsp;this:</p>
+<pre class="code literal-block">
+handleChange: function(title, category) {
+    var titleError = undefined;
+    if(title.length &gt; 1 &amp;&amp; title === title.toUpperCase()) {
+        titleError='Please don\'t use only capital letters for book titles';
+    }
+    this.setState({
+        editingBook: {
+            title: title,
+            titleError: titleError,
+            category: category,
+            id: this.state.editingBook.id
+        }
+    });
+},
+</pre>
+<p>So, the titleError attribute of editingBook will be defined only if there&#8217;s an&nbsp;error.</p>
+<p>Finally, we must remember to <em>not</em> create/update the book if there&#8217;s an error so
+we add the following check to the <tt class="docutils literal">handleSubmitClick</tt> method:</p>
+<pre class="code literal-block">
+if(this.state.editingBook.titleError) {
+    this.setState({
+        message: &quot;Please fix errors!&quot;
+    });
+    return ;
+}
+</pre>
+<p>The above could be easily generalized for checks on multiple fields. I am not really fond
+of doing the form validation in the <tt class="docutils literal">BookPanel</tt> component (I&#8217;d prefer to do it on <tt class="docutils literal">BookForm</tt>
+or even better on the corresponding field - if it was a component) however this would mean that
+I&#8217;d need to keep a local state with the error to the <tt class="docutils literal">BookForm</tt> (please see the discussion of
+the previous&nbsp;paragraph).</p>
+<p>I&#8217;ve added a new tag named <tt class="docutils literal"><span class="pre">react-only-validation</span></tt> to the <a class="reference external" href="https://github.com/spapas/react-tutorial/">https://github.com/spapas/react-tutorial/</a>
+repository that contains the changes to have the&nbsp;validation.</p>
+</div>
 <div class="section" id="conclusion-to-the-first-part">
-<h2><a class="toc-backref" href="#id15">Conclusion to the first&nbsp;part</a></h2>
+<h2><a class="toc-backref" href="#id16">Conclusion to the first&nbsp;part</a></h2>
 <p>We just created a not-so-simple React single page application offering <span class="caps">CRUD</span> for an object.
 This application of course could be improved by adding a pagination component to the table,
 but I&#8217;m going to leave that as an excersie to the reader: To do that, I propose to create

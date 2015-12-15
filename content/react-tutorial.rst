@@ -10,6 +10,8 @@ A comprehensive React and Flux tutorial part 1: React
 
 .. contents::
 
+**Update 15/12/2015**: Added some insights for form validation.
+
 Introduction
 ------------
 
@@ -565,6 +567,70 @@ just save it as a property of the global state object in ``BookPanel`` -- both s
 correct. What wouldn't be correct is if we had two copies of the same information in both the
 states of ``BookPanel`` and ``BookForm``, for example the book id that is edited.
 
+
+Adding form validation
+----------------------
+
+Commenter Nitish Kumar made a nice comment about how we could do some validating to our form fields.
+
+First of all, this adds to the complexity of the application so maybe it would be better to do it in 
+the `flux-architectured version <{filename}react-flux-tutorial.rst>`_. However, it's not really difficult
+to also have form validation using react-only: 
+
+Here's what we need: 
+
+- A property (or properties) to pass the errors for each form field to the ``BookForm`` component
+- A way to display the form errors if they exist in ``BookForm``
+- Execute an error handler when the form contents change and update the state if there's an error
+
+As an example, I'd like to check that the book title is not written in uppercase, so I will add another
+attribute to the ``book`` propery of ``BookForm`` called ``titleError`` and display it if it is defined,
+something like this:
+
+``{this.props.book.titleError?<div>{this.props.book.titleError}</div>:null}``
+
+Now, the ``handleChange`` method of ``BookPanel`` should do the actual check and change the sate, so I'm 
+changing it like this:
+
+.. code::
+
+    handleChange: function(title, category) {
+        var titleError = undefined;
+        if(title.length > 1 && title === title.toUpperCase()) {
+            titleError='Please don\'t use only capital letters for book titles';
+        }
+        this.setState({
+            editingBook: {
+                title: title,
+                titleError: titleError,
+                category: category,
+                id: this.state.editingBook.id
+            }
+        });
+    },
+
+So, the titleError attribute of editingBook will be defined only if there's an error.
+
+Finally, we must remember to *not* create/update the book if there's an error so 
+we add the following check to the ``handleSubmitClick`` method:
+
+.. code::
+
+    if(this.state.editingBook.titleError) {
+        this.setState({
+            message: "Please fix errors!"
+        });
+        return ;
+    }
+
+The above could be easily generalized for checks on multiple fields. I am not really fond
+of doing the form validation in the ``BookPanel`` component (I'd prefer to do it on ``BookForm``
+or even better on the corresponding field - if it was a component) however this would mean that
+I'd need to keep a local state with the error to the ``BookForm`` (please see the discussion of
+the previous paragraph).
+    
+I've added a new tag named ``react-only-validation`` to the https://github.com/spapas/react-tutorial/
+repository that contains the changes to have the validation.
 
 Conclusion to the first part
 ----------------------------

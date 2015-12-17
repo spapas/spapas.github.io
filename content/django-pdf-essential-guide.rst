@@ -40,7 +40,7 @@ The players
 
 We are going to use the following main tools:
 
-* ReportLab_ is an open source python library for creating PDFs. It uses a low-level API that allows "drawing" strings on specific coordinates  on the PDF - for people familiar with creating PDFs in Java it is more or less *iText_ for python*.
+* ReportLab_ is an open source python library for creating PDFs. It uses a low-level API that allows "drawing" strings on specific coordinates  on the PDF - for people familiar with creating PDFs in Java it is more or less iText_ for python.
 
 * xhtml2pdf_ (formerly named *pisa*) is an open source library that can convert HTML/CSS pages to PDF using ReportLab.
 

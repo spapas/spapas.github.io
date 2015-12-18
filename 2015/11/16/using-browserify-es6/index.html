@@ -151,7 +151,10 @@ the only tool that does this) is that it allows you to use <span class="caps">ES
 transpiling them to normal (<span class="caps">ES5</span>) javascript. Also, babel has <a class="reference external" href="https://babeljs.io/docs/plugins/">various other transforms</a>,
 including a react transform
 (so you can use this instead of the reactify&nbsp;browserify-transform)!</p>
-<p>In any case, to be able to use <span class="caps">ES6</span>, we&#8217;ll need to install babel and its es6&nbsp;presets:</p>
+<p>In any case, to be able to use <span class="caps">ES6</span>, we&#8217;ll need to install babel and its es6 presets
+(don&#8217;t forget that you need to have a <tt class="docutils literal">package.json</tt> for the dependencies to be
+saved so either do an <tt class="docutils literal">npm init</tt> or create a <tt class="docutils literal">package.json</tt> file containing only
+<tt class="docutils literal">{}</tt>):</p>
 <pre class="code literal-block">
 npm install  babel babel-preset-es2015 --save
 </pre>

@@ -225,8 +225,43 @@ named origin/master that will be your actual site and will be displayed through 
 
 To learn more about branches and remotes you may check out `the git branches article <|filename|git-branches.rst>`_.
 
+Publishing changes
+------------------
+
+Whenever you need to publish a new article or do changes to an existing one, you need to do the following:
+
+- Run pelpub.bat to create the new output
+- Add/commit and push changes from your pelican site(source) folder to the source remote
+- Add/commit and push changes from your output folder to the master remote
+
+To help with this, here's a ghdeploy.bat file that does all the above:
+
+.. code::
+
+    call pelpub.bat
+    git add -A
+    git commit -m "Deploying changes"
+    git push origin source
+    pushd output
+    git add -A
+    git commit -m "Deploying changes"
+    git push origin master
+    popd
+    
+If you've followed this far, by running ``pelpub.bat`` you'll need to enter your github repository credentials (twice) and then
+everything (source and master) will be deployed! To make things even better, I propose to use `ssh based authentication`_
+to your github account and add new remote names to your source and master by running the following:
+
+.. code::
+ 
+  git remote add origin2 git@github.com:spapas/spapas.github.io.git
+  
+to your pelican site and the output directories. After you change ghdeploy.bat to use ``origin2`` instead of ``origin`` you'll be
+able to deploy everything with just running it without entering any credentials!
+
 .. _Pelican: http://docs.getpelican.com/en/3.3.0/
 .. _`github pages`: http://pages.github.com/
 .. _`lightweight markup language`: http://en.wikipedia.org/wiki/Lightweight_markup_language
 .. _reStructuredText: http://docutils.sourceforge.net/rst.html
 .. _Markdown: http://daringfireball.net/projects/markdown/
+.. _`ssh based authentication`: https://help.github.com/articles/generating-ssh-keys/

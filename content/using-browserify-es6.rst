@@ -17,17 +17,17 @@ Introduction
 In a `previous article <{filename}using-browserify.rst>`_
 we presented a simple workflow to improve your client-side (javascript) workflow
 by including a bunch of tools from the node-js world i.e browserify_ and
-its friends, watchify_ and uglify-js_. 
+its friends, watchify_ and uglify-js_.
 
 Using these tools we were able to properly manage our client side dependencies
 (no more script tags in our html templates) and modularize our code
-(so we could avoid monolithic javascript files that contained all our code). 
+(so we could avoid monolithic javascript files that contained all our code).
 Another great improvement to our workflow would be to include ES6 to the mix!
 
 ES6 (or EcmaScript 2015) is more or less "Javascript: TNG". It has many features
 that greatly improve the readability and writability of javascript code - for instance,
 thick arrows, better classes, better modules, iterators/generators, template strings,
-default function parameters and many others! 
+default function parameters and many others!
 More info on these features and how they could be used can be found on the es6features_ repository.
 
 Unfortunately, these features are either not supported at all, or they are partially supported
@@ -36,21 +36,21 @@ to our client side workflow, we can easily enable it to read source files with E
 and transform them to normal javascript using a transformation through the babel_ tool.
 
 In the following, we'll talk a bit more about the node-js package manager (npm) features,
-talk a little about babel and finally 
+talk a little about babel and finally
 modify our workflow so that it will be able to use ES6! Please notice that to properly follow this article
 you need to first read the `previous one <{filename}using-browserify.rst>`_.
 
 NPM, --save, --save-dev and avoiding global deps
 ------------------------------------------------
 
-In the previous article, I had recommended to install the needed tools 
+In the previous article, I had recommended to install the needed tools
 (needed to create the output bundle browserify, watchify, uglify) globally
 using npm install -g package (of course the normal dependencies like moment.js
 would be installed locally).
 This has one advantage and two disadvantages: It
 puts these tools to the path so they can be called immediately (i.e browserify)
 but you will need root access to install a package globally and nothing is
-saved on ``package.json`` so you don't know which packages must be installed 
+saved on ``package.json`` so you don't know which packages must be installed
 in order to start developing the project!
 
 This could be ok for the introductionary article, however for this one I
@@ -82,16 +82,19 @@ of javascript (for example, ES6) and produces normal javascript files -- somethi
 like what browserify transforms do. However, what babel does (and I think its
 the only tool that does this) is that it allows you to use ES6 features *now* by
 transpiling them to normal (ES5) javascript. Also, babel has `various other transforms`_,
-including a react transform 
+including a react transform
 (so you can use this instead of the reactify browserify-transform)!
 
-In any case, to be able to use ES6, we'll need to install babel and its es6 presets:
+In any case, to be able to use ES6, we'll need to install babel and its es6 presets
+(don't forget that you need to have a ``package.json`` for the dependencies to be
+saved so either do an ``npm init`` or create a ``package.json`` file containing only
+``{}``):
 
 .. code::
 
   npm install  babel babel-preset-es2015 --save
-  
-If we wanted to also use babel for react we'd need to install babel-preset-react. 
+
+If we wanted to also use babel for react we'd need to install babel-preset-react.
 
 To configure babel we can either add a ``babel``
 section in our ``package.json`` or create a new file named .babelrc and put the configuration there.
@@ -110,13 +113,13 @@ to your ``package.json``:
 If you wanted to configure it through ``.babelrc`` then you'd just copy to it the contents of ``"babel"``.
 
 To do some tests with babel, you can install its cli (it's not included in the babel package) through
-``npm install babel-cli``. Now, you can run ``node_modules/.bin/babel``. For example, create a 
+``npm install babel-cli``. Now, you can run ``node_modules/.bin/babel``. For example, create a
 file named ``testbabel.js`` with the following contents (thick arrow):
 
 .. code::
 
   [1,2,3].forEach(x => console.log(x) );
-  
+
 when you pass it to babel you'll see the following output:
 
 .. code::
@@ -137,33 +140,33 @@ To call babel from browserify we're going to use the babelify_ browserify transf
 actually uses babel to transpile the browserify input. After installing it with
 
 .. code::
-  
+
   npm install babelify --save
-  
+
 you need to tell browserify to use it. To do this, you'll just pass a -t babelify parameter to
 browserify. So if you run it with the ``testbabel.js`` file as input you'll see the following output:
 
 .. code::
 
     >node_modules\.bin\browserify -t babelify testbabel.js
-    [...] browserify gibberish 
+    [...] browserify gibberish
     "use strict";
 
     [1, 2, 3].forEach(function (x) {
       return console.log(x);
     });
 
-    [...] more browserify gibberish 
+    [...] more browserify gibberish
 
-yey -- the code is transpiled to ES5! 
+yey -- the code is transpiled to ES5!
 
-To create a complete project, let's add a normal requirement (moment.js): 
+To create a complete project, let's add a normal requirement (moment.js):
 
 .. code::
-  
+
   npm install moment --save
 
-and a file named ``src\main.js`` that uses it with ES6 syntax: 
+and a file named ``src\main.js`` that uses it with ES6 syntax:
 
 .. code::
 
@@ -199,7 +202,7 @@ addition of the -t babelify switch. Here's the complete ``package.json`` for thi
     }
 
 Running ``npm run build`` should create a ``dist/bundle.js`` file. If you include this in an html,
-you should see something like this in the console: 
+you should see something like this in the console:
 
 .. code::
 
@@ -212,16 +215,16 @@ Conclusion
 
 Using the combination of babel and javascript we can easily write ES6 code in our modules! This,
 along with the modularization of our code and the management of client-side dependencies should
-make client side development a breeze! 
+make client side development a breeze!
 
 Please notice that to keep the presented workflow simple and easy to
 replicate and configure, we have not used any external
 task runners (like gulp or grunt) -- all configuration is kept in a single file (package.json) and
-the whole environment can be replicated just by doing a ``npm install``. Of course, the capabilities of 
+the whole environment can be replicated just by doing a ``npm install``. Of course, the capabilities of
 browserify are not unlimited, so if you wanted to do something more complicated
 (for instance, lint your code before passing it to browserify) you'd need to use the mentioned
 task runners (or webpack which is the current trend in javascript bundlers and actually replaces
-the task runners). 
+the task runners).
 
 
 

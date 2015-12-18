@@ -91,6 +91,7 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#hosting-in-github-pages" id="id8">Hosting in github&nbsp;pages</a></li>
+<li><a class="reference internal" href="#publishing-changes" id="id9">Publishing&nbsp;changes</a></li>
 </ul>
 </div>
 <div class="section" id="introduction">
@@ -263,6 +264,35 @@ spapas.github.io&gt;git push origin source
 branch to it. Now you will have two branches in your username.github.io repository. One
 named origin/master that will be your actual site and will be displayed through <a class="reference external" href="http://username.github.io">http://username.github.io</a> and one named origin/source that will contain the source of your&nbsp;site.</p>
 <p>To learn more about branches and remotes you may check out <a class="reference external" href="http://spapas.github.io/2013/10/08/git-branches/">the git branches article</a>.</p>
+</div>
+<div class="section" id="publishing-changes">
+<h2><a class="toc-backref" href="#id9">Publishing&nbsp;changes</a></h2>
+<p>Whenever you need to publish a new article or do changes to an existing one, you need to do the&nbsp;following:</p>
+<ul class="simple">
+<li>Run pelpub.bat to create the new&nbsp;output</li>
+<li>Add/commit and push changes from your pelican site(source) folder to the source&nbsp;remote</li>
+<li>Add/commit and push changes from your output folder to the master&nbsp;remote</li>
+</ul>
+<p>To help with this, here&#8217;s a ghdeploy.bat file that does all the&nbsp;above:</p>
+<pre class="code literal-block">
+call pelpub.bat
+git add -A
+git commit -m &quot;Deploying changes&quot;
+git push origin source
+pushd output
+git add -A
+git commit -m &quot;Deploying changes&quot;
+git push origin master
+popd
+</pre>
+<p>If you&#8217;ve followed this far, by running <tt class="docutils literal">pelpub.bat</tt> you&#8217;ll need to enter your github repository credentials (twice) and then
+everything (source and master) will be deployed! To make things even better, I propose to use <a class="reference external" href="https://help.github.com/articles/generating-ssh-keys/">ssh based authentication</a>
+to your github account and add new remote names to your source and master by running the&nbsp;following:</p>
+<pre class="code literal-block">
+git remote add origin2 git&#64;github.com:spapas/spapas.github.io.git
+</pre>
+<p>to your pelican site and the output directories. After you change ghdeploy.bat to use <tt class="docutils literal">origin2</tt> instead of <tt class="docutils literal">origin</tt> you&#8217;ll be
+able to deploy everything with just running it without entering any&nbsp;credentials!</p>
 </div>
 </div>
     <footer>

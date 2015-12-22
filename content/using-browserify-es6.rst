@@ -11,6 +11,8 @@ Improve your client-side-javascript workflow more by using ES6
 .. contents::
 
 
+**Update 22/12/2015:** Add section for the object-spread operator.
+
 Introduction
 ------------
 
@@ -210,6 +212,32 @@ you should see something like this in the console:
     Now: 13:52:10, Later: 11/18/2015...
 
 
+The object-spread operator
+--------------------------
+
+Many examples in the internet use the `object spread operator`_ which is `not part of es6`_ so our
+proposed babel configuration does not support it! 
+To be able to use this syntax, we'll need to install the corresponding babel plugin by using
+``npm install babel-plugin-transform-object-rest-spread --save`` and add it to our babel configuration
+in the plugins section, something like this:
+
+.. code ::
+
+    "presets": [
+      "es2015",
+      "react"
+    ],
+    "plugins": [
+      "transform-object-rest-spread"
+    ]
+
+If everything is ok this should be transpiled without errors using ``node_modules\.bin\browserify testbabe.js -t babelify``
+
+.. code ::
+ 
+  let x = {a:1 , b:2 };
+  let y = {...x, c: 3};
+    
 Conclusion
 ----------
 
@@ -242,3 +270,5 @@ the task runners).
 .. _es6features: https://github.com/lukehoban/es6features
 .. _babel: https://babeljs.io/
 .. _`various other transforms`: https://babeljs.io/docs/plugins/
+.. _`not part of es6`: http://stackoverflow.com/questions/31115276/ecmascript-6-spread-operator-in-object-deconstruction-support-in-typescript-and
+.. _`object spread operator`: https://facebook.github.io/react/docs/jsx-spread.html#spread-attributes

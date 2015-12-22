@@ -72,6 +72,220 @@
   		<article>
 <header>
       <h1 class="entry-title">
+        <a href="http://spapas.github.io/2014/09/15/django-non-html-responses/">Django non-HTML responses</a>
+      </h1>
+    <p class="meta">
+<time datetime="2014-09-15T14:20:00+03:00" pubdate>Δευ 15 Σεπτέμβριος 2014</time>    </p>
+</header>
+
+  <div class="entry-content"><div class="contents topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#introduction" id="id1">Introduction</a></li>
+<li><a class="reference internal" href="#how-are-cbvs-rendered" id="id2">How are CBVs&nbsp;rendered</a></li>
+<li><a class="reference internal" href="#rendering-to-non-html" id="id3">Rendering to non-<span class="caps">HTML</span></a></li>
+<li><a class="reference internal" href="#a-non-html-mixin" id="id4">A non-<span class="caps">HTML</span>&nbsp;mixin</a></li>
+<li><a class="reference internal" href="#a-more-complex-example" id="id5">A more complex&nbsp;example</a></li>
+<li><a class="reference internal" href="#conclusion" id="id6">Conclusion</a></li>
+</ul>
+</div>
+<div class="section" id="introduction">
+<h2><a class="toc-backref" href="#id1">Introduction</a></h2>
+<p>I have already written about the many advantages (<span class="caps">DRY</span>!) of using <a class="reference external" href="http://spapas.github.io/2014/04/11/django-generic-formviews-for-objects/">CBVs in a previous article.</a>
+In this article I will present the correct (pythonic) way to allow a normal <span class="caps">CBV</span> to return non-<span class="caps">HTML</span> responses, like <span class="caps">PDF</span>, <span class="caps">CSV</span>, <span class="caps">XSL</span>&nbsp;etc.</p>
+</div>
+<div class="section" id="how-are-cbvs-rendered">
+<h2><a class="toc-backref" href="#id2">How are CBVs&nbsp;rendered</a></h2>
+<p>Before proceeding, we need to understand how CBVs are rendered. By walking through the
+class hierarchy in the <a class="reference external" href="http://ccbv.co.uk/"><span class="caps">CBV</span> inspector</a>, we can see that
+all the normal Django CBVs (DetailView, CreateView, TemplateView etc) are using a mixin
+named <a class="reference external" href="http://ccbv.co.uk/projects/Django/1.7/django.views.generic.base/TemplateResponseMixin/">TemplateResponseMixin</a> which defines a method named <tt class="docutils literal">render_to_response</tt>. This
+is the method that is used for rendering the output of the Views. Let&#8217;s take a look at
+<a class="reference external" href="http://ccbv.co.uk/projects/Django/1.7/django.views.generic.base/TemplateResponseMixin/">how it is defined</a> (I&#8217;ll remove the&nbsp;comments):</p>
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">TemplateResponseMixin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+  <span class="n">template_name</span> <span class="o">=</span> <span class="bp">None</span>
+  <span class="n">response_class</span> <span class="o">=</span> <span class="n">TemplateResponse</span>
+  <span class="n">content_type</span> <span class="o">=</span> <span class="bp">None</span>
+
+  <span class="k">def</span> <span class="nf">render_to_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="o">**</span><span class="n">response_kwargs</span><span class="p">):</span>
+      <span class="n">response_kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s">&#39;content_type&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">content_type</span><span class="p">)</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">response_class</span><span class="p">(</span>
+          <span class="n">request</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">,</span>
+          <span class="n">template</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_template_names</span><span class="p">(),</span>
+          <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">,</span>
+          <span class="o">**</span><span class="n">response_kwargs</span>
+      <span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">get_template_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_name</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+          <span class="k">raise</span> <span class="n">ImproperlyConfigured</span><span class="p">(</span>
+              <span class="s">&quot;TemplateResponseMixin requires either a definition of &quot;</span>
+              <span class="s">&quot;&#39;template_name&#39; or an implementation of &#39;get_template_names()&#39;&quot;</span><span class="p">)</span>
+      <span class="k">else</span><span class="p">:</span>
+          <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">template_name</span><span class="p">]</span>
+</pre></div>
+<p>This method will try to find out which html template should be used to render the View
+(using the  <tt class="docutils literal">get_template_names</tt> method and template_name attribute of the mixin) and
+then render this view by instantiating an instance of the <tt class="docutils literal">TemplateResponse</tt> class
+(as defined in the <tt class="docutils literal">response_class</tt> attribute)
+and passing the request, template, context and other response_args to&nbsp;it.</p>
+<p>The <a class="reference external" href="https://github.com/django/django/blob/master/django/template/response.py">TemplateResponse</a> class which is instantiated in the <tt class="docutils literal">render_to_response</tt> method
+inherits from a normal <tt class="docutils literal">HttpResponse</tt> and is used to render
+the template passed to it as a&nbsp;parameter.</p>
+</div>
+<div class="section" id="rendering-to-non-html">
+<h2><a class="toc-backref" href="#id3">Rendering to non-<span class="caps">HTML</span></a></h2>
+<p>From the previous discussion we can conclude that if your non-<span class="caps">HTML</span> response <em>needs</em>
+a template then you just need to create a subclass of <tt class="docutils literal">TemplateResponse</tt> and
+assign it to the <tt class="docutils literal">response_class</tt> attribute (and also change the <tt class="docutils literal">content_type</tt>
+attribute). On the other hand, if your non-<span class="caps">HTML</span> respond does not need a template
+to be rendered then you have to override <tt class="docutils literal">render_to_response</tt> completely
+(since the template parameter does not need to be passed now) and either define
+a subclass of HttpResponse or do the rendering in the&nbsp;render_to_response.</p>
+<p>Since almost always you won&#8217;t need a template to create a non-<span class="caps">HTML</span> view and because
+I believe that the solution is <span class="caps">DRY</span>-enough by implementing the rendering code to
+the <tt class="docutils literal">render_to_response</tt> method (<em>without</em> subclassing <tt class="docutils literal">HttpResponse</tt>) I will
+implement a mixin that does exactly&nbsp;that.</p>
+<p>Subclassing <tt class="docutils literal">HttpResponse</tt> will not make our design more <span class="caps">DRY</span> because for every
+subclass of <tt class="docutils literal">HttpResponse</tt> the <tt class="docutils literal">render_to_response</tt> method would also need to
+be modified (by subclassing <tt class="docutils literal">TemplateResponseMixin) to instantiate the subclass of ``HttpResponse</tt> with the correct parameters.
+For instance, the existing <tt class="docutils literal">TemplateResponseMixin</tt> cannot be used if the subclass
+of <tt class="docutils literal">HttpResponse</tt> does not take a template as a parameter (solutions like
+passing None to the template parameter are signals of bad&nbsp;design).</p>
+<p>In any case, changing just the <tt class="docutils literal">render_to_response</tt> method using a Mixin is in my opinion the best solution
+to the above problem.
+A <a class="reference external" href="http://stackoverflow.com/questions/533631/what-is-a-mixin-and-why-are-they-useful">Mixin</a> is a simple class that can be used to extend other classes either by overriding functionality of the base class or
+by adding extra features. Django CBVs use various <a class="reference external" href="https://docs.djangoproject.com/en/dev/topics/class-based-views/mixins/">mixins</a> to extend the base Views and add&nbsp;functionality.</p>
+</div>
+<div class="section" id="a-non-html-mixin">
+<h2><a class="toc-backref" href="#id4">A non-<span class="caps">HTML</span>&nbsp;mixin</a></h2>
+<p>So, a basic skeleton for our mixin would be something like&nbsp;this:</p>
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">NonHtmlResponseMixin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">render_to_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="o">**</span><span class="n">response_kwargs</span><span class="p">):</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">content_type</span><span class="o">=</span><span class="s">&#39;text/plain&#39;</span><span class="p">)</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="s">&quot;Hello, world&quot;</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="n">response</span>
+</pre></div>
+<p>The previous mixin overrides the render_to_response method to just return the text &quot;Hello, world&quot;. For instance
+we could define the following&nbsp;class:</p>
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">DummyTextResponseView</span><span class="p">(</span><span class="n">NonHtmlResponseMixin</span><span class="p">,</span> <span class="n">TemplateView</span><span class="p">,):</span>
+  <span class="k">pass</span>
+</pre></div>
+<p>which can be added as a route to <tt class="docutils literal">urls.py</tt> (using the <tt class="docutils literal">as_view</tt> method) and will always return the &quot;Hello, world&quot;&nbsp;text.</p>
+<p>Here&#8217;s something more complicated: A Mixin that can be used along with a DetailView and will output the properties of the
+object as&nbsp;text:</p>
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">TextPropertiesResponseMixin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+  <span class="k">def</span> <span class="nf">render_to_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="o">**</span><span class="n">response_kwargs</span><span class="p">):</span>
+      <span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">content_type</span><span class="o">=</span><span class="s">&#39;text/plain; charset=utf-8&#39;</span><span class="p">)</span>
+      <span class="n">o</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_object</span><span class="p">()</span>
+      <span class="n">o</span><span class="o">.</span><span class="n">_meta</span><span class="o">.</span><span class="n">fields</span>
+      <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">o</span><span class="o">.</span><span class="n">_meta</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span>
+          <span class="n">response</span><span class="o">.</span><span class="n">write</span> <span class="p">(</span><span class="s">u&#39;{0}: {1}</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>  <span class="nb">unicode</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">__dict__</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">))</span> <span class="p">)</span> <span class="p">)</span>
+      <span class="k">return</span> <span class="n">response</span>
+</pre></div>
+<p>and can be used like&nbsp;this</p>
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">TextPropertiesDetailView</span><span class="p">(</span><span class="n">TextPropertiesResponseMixin</span><span class="p">,</span> <span class="n">FooDetailView</span><span class="p">,):</span>
+  <span class="k">pass</span>
+</pre></div>
+<p>The above mixin will use the get_object() method of the DetailView to get the object and then output
+it as text. We can create similar mixins that will integrate with other types of CBVs, for instance
+to export a ListView as an <span class="caps">CSV</span> or generate an png from a DetailView of an Image&nbsp;file.</p>
+</div>
+<div class="section" id="a-more-complex-example">
+<h2><a class="toc-backref" href="#id5">A more complex&nbsp;example</a></h2>
+<p>The previous examples all built upon an existing view (either a TemplateView, a DetailView or a ListView).
+However, an existing view that will fit our requirements won&#8217;t always be available. For instance,
+sometimes I want to export data from my database using a raw <span class="caps">SQL</span> query. Also I&#8217;d like to be able to easily
+export this data as csv or&nbsp;excel.</p>
+<p>First of all, we need to define a view that will inherit from <tt class="docutils literal">View</tt> and export the data as a <span class="caps">CSV</span>:</p>
+<div class="highlight"><pre><span class="kn">import</span> <span class="nn">unicodecsv</span>
+<span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">connection</span>
+<span class="kn">from</span> <span class="nn">django.views.generic</span> <span class="kn">import</span> <span class="n">View</span>
+
+<span class="k">class</span> <span class="nc">CsvRawSqlExportView</span><span class="p">(</span><span class="n">View</span><span class="p">,</span> <span class="p">):</span>
+  <span class="n">sql</span> <span class="o">=</span> <span class="s">&#39;select 1+1&#39;</span>
+  <span class="n">headers</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;res&#39;</span><span class="p">]</span>
+  <span class="n">params</span> <span class="o">=</span> <span class="p">[]</span>
+
+  <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+      <span class="k">def</span> <span class="nf">generate_data</span><span class="p">(</span><span class="n">cursor</span><span class="p">):</span>
+          <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">():</span>
+              <span class="k">yield</span> <span class="n">row</span>
+
+      <span class="n">cursor</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+      <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+      <span class="n">generator</span> <span class="o">=</span> <span class="n">generate_data</span><span class="p">(</span><span class="n">cursor</span><span class="p">)</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">render_to_response</span><span class="p">(</span><span class="n">generator</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">render_to_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">generator</span><span class="p">,</span> <span class="o">**</span><span class="n">response_kwargs</span><span class="p">):</span>
+      <span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">content_type</span><span class="o">=</span><span class="s">&#39;text/plain; charset=utf-8&#39;</span><span class="p">)</span>
+      <span class="n">response</span><span class="p">[</span><span class="s">&#39;Content-Disposition&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;attachment; filename=export.csv&#39;</span>
+      <span class="n">w</span> <span class="o">=</span> <span class="n">unicodecsv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span>
+      <span class="n">w</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">headers</span><span class="p">)</span>
+      <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">generator</span><span class="p">:</span>
+          <span class="n">w</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+      <span class="k">return</span> <span class="n">response</span>
+</pre></div>
+<p>The above View has three attributes:
+* sql, which is a string with the raw sql that will be executed
+* headers, which is an array with the names of each header of the resulting data
+* params, which is an array with parameters that may need to be passed to the&nbsp;query</p>
+<p>The <tt class="docutils literal">get</tt> method executes the query and passes the result to <tt class="docutils literal">render_to_response</tt>
+using a generator.  The <tt class="docutils literal">render_to_response</tt> method instantiates an HttpResponse
+object with the correct attributes and writes the <span class="caps">CSV</span> to the response object using&nbsp;unicodecsv.</p>
+<p>We can now quickly create a route that will export data from the users&nbsp;table:</p>
+<div class="highlight"><pre><span class="n">url</span><span class="p">(</span>
+    <span class="s">r&#39;^raw_export_users/$&#39;</span><span class="p">,</span>
+    <span class="n">views</span><span class="o">.</span><span class="n">CsvRawSqlExportView</span><span class="o">.</span><span class="n">as_view</span><span class="p">(</span>
+        <span class="n">sql</span><span class="o">=</span><span class="s">&#39;select id, username from auth_user&#39;</span><span class="p">,</span>
+        <span class="n">headers</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;id&#39;</span><span class="p">,</span> <span class="s">&#39;username&#39;</span><span class="p">]</span>
+    <span class="p">)</span> <span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s">&#39;raw_export_users&#39;</span>
+<span class="p">),</span>
+</pre></div>
+<p>If instead of <span class="caps">CSV</span> we wanted to export to <span class="caps">XLS</span> (using xlwt), we&#8217;d just need to create a&nbsp;Mixin:</p>
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">XlsRawSqlResponseMixin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+  <span class="k">def</span> <span class="nf">render_to_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">generator</span><span class="p">,</span> <span class="o">**</span><span class="n">response_kwargs</span><span class="p">):</span>
+      <span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">content_type</span><span class="o">=</span><span class="s">&#39;application/ms-excel&#39;</span><span class="p">)</span>
+      <span class="n">response</span><span class="p">[</span><span class="s">&#39;Content-Disposition&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;attachment; filename=export.xls&#39;</span>
+      <span class="n">wb</span> <span class="o">=</span> <span class="n">xlwt</span><span class="o">.</span><span class="n">Workbook</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span>
+      <span class="n">ws</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_sheet</span><span class="p">(</span><span class="s">&quot;data&quot;</span><span class="p">)</span>
+
+      <span class="k">for</span> <span class="n">j</span><span class="p">,</span><span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">headers</span><span class="p">):</span>
+              <span class="n">ws</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">c</span><span class="p">)</span>
+
+      <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">generator</span><span class="p">):</span>
+          <span class="k">for</span> <span class="n">j</span><span class="p">,</span><span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
+              <span class="n">ws</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">c</span><span class="p">)</span>
+
+      <span class="n">wb</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+      <span class="k">return</span> <span class="n">response</span>
+</pre></div>
+<p>and create a View that inherits from <tt class="docutils literal">CsvRawSqlExportView</tt> and uses the above&nbsp;mixin:</p>
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">XlsRawSqlExportView</span><span class="p">(</span> <span class="n">XlsRawSqlResponseMixin</span><span class="p">,</span> <span class="n">CsvRawSqlExportView</span> <span class="p">):</span>
+  <span class="k">pass</span>
+</pre></div>
+<p>and route to that view to get the <span class="caps">XLS</span>:</p>
+<div class="highlight"><pre><span class="n">url</span><span class="p">(</span>
+    <span class="s">r&#39;^raw_export_users/$&#39;</span><span class="p">,</span>
+    <span class="n">views</span><span class="o">.</span><span class="n">XlsRawSqlExportView</span><span class="o">.</span><span class="n">as_view</span><span class="p">(</span>
+        <span class="n">sql</span><span class="o">=</span><span class="s">&#39;select id, username from auth_user&#39;</span><span class="p">,</span>
+        <span class="n">headers</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;id&#39;</span><span class="p">,</span> <span class="s">&#39;username&#39;</span><span class="p">]),</span>
+    <span class="n">name</span><span class="o">=</span><span class="s">&#39;raw_export_users&#39;</span>
+<span class="p">),</span>
+</pre></div>
+</div>
+<div class="section" id="conclusion">
+<h2><a class="toc-backref" href="#id6">Conclusion</a></h2>
+<p>Using the above techniques we can define CBVs that will output their content in various content types
+beyond <span class="caps">HTML</span>. This will help us write write clean and <span class="caps">DRY</span>&nbsp;code.</p>
+</div>
+</div>
+  		</article>
+  		<article>
+<header>
+      <h1 class="entry-title">
         <a href="http://spapas.github.io/2014/06/30/rest-flask-mongodb-heroku/">Implementing a simple, Heroku-hosted REST service using Flask and mongoDB</a>
       </h1>
     <p class="meta">
@@ -1124,174 +1338,6 @@ read from the form to the view for&nbsp;presentation.</p>
 </div>
 </div>
   		</article>
-  		<article>
-<header>
-      <h1 class="entry-title">
-        <a href="http://spapas.github.io/2013/11/05/django-authoritiy-data/">Django authority data</a>
-      </h1>
-    <p class="meta">
-<time datetime="2013-11-05T14:20:00+02:00" pubdate>Τρι 05 Νοέμβριος 2013</time>    </p>
-</header>
-
-  <div class="entry-content"><div class="contents topic" id="contents">
-<p class="topic-title first">Contents</p>
-<ul class="simple">
-<li><a class="reference internal" href="#introduction" id="id1">Introduction</a></li>
-<li><a class="reference internal" href="#defining-authorities" id="id2">Defining authorities</a><ul>
-<li><a class="reference internal" href="#using-groups" id="id3">Using&nbsp;groups</a></li>
-<li><a class="reference internal" href="#by-storing-the-authority-to-the-session" id="id4">By storing the authority to the&nbsp;session</a></li>
-<li><a class="reference internal" href="#by-using-a-custom-user-profile" id="id5">By using a Custom User&nbsp;Profile</a></li>
-<li><a class="reference internal" href="#getting-the-authority-of-the-user-has-to-be-dry" id="id6">Getting the authority of the user has to be <span class="caps">DRY</span></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#adding-authority-data" id="id7">Adding authority&nbsp;data</a></li>
-<li><a class="reference internal" href="#conclusion" id="id8">Conclusion</a></li>
-</ul>
-</div>
-<div class="section" id="introduction">
-<h2><a class="toc-backref" href="#id1">Introduction</a></h2>
-<p>One common requirement in an organization is to separate users in authorities (meaning departments / units / branches etc)
-and each authority have its own data. So users belonging to the &quot;Athens Branch&quot; won&#8217;t be able to
-edit data submitted from users of the &quot;Thessaloniki&nbsp;Branch&quot;.</p>
-<p>This is a special case of the more general row-level-security in which each instance of a domain object will
-have an <span class="caps">ACL</span>. Row-level-security would need a many-to-many relation between object instances and authorities, something
-that would be overkill in our&nbsp;case.</p>
-<p>Authority data is also a more general case of the user-data meaning that each user can have access
-to data that he inserts in the system. Implementing user-data is easy using the techniques we will present&nbsp;below.</p>
-<p>We have to notice that the django permissions do not support our requirements since they define security for all instances of a&nbsp;model.</p>
-</div>
-<div class="section" id="defining-authorities">
-<h2><a class="toc-backref" href="#id2">Defining&nbsp;authorities</a></h2>
-<p>In order to have custom authorities I propose first of all to add an Authority model that would define the authority. Even if
-your authorities only have a name I believe that adding the Authority model would be beneficial.
-Now, there are many ways to separate normal django users (<tt class="docutils literal">django.contrib.auth.models.User</tt>) to&nbsp;authorities:</p>
-<div class="section" id="using-groups">
-<h3><a class="toc-backref" href="#id3">Using&nbsp;groups</a></h3>
-<p>Just define a <tt class="docutils literal">django.contrib.auth.models.Group</tt> for each authority and add the users to the groups you want using the django-admin.
-Your Authority model would have an one-to-one relation with the <tt class="docutils literal">django.contrib.auth.models.Group</tt> so you will be able to find out the other
-information of the authority (since django groups only have&nbsp;names).</p>
-<p>Now you can just get the groups for the user and find out his authorities. This could lead to problems when users belong to django groups
-that are not related to authorities so you must filter these out (for instance by checking which groups actually have a corresponding&nbsp;Authority).</p>
-</div>
-<div class="section" id="by-storing-the-authority-to-the-session">
-<h3><a class="toc-backref" href="#id4">By storing the authority to the&nbsp;session</a></h3>
-<p>When the user logs in you can add an attribute to the session that would save the authority of the user. To do that, you should define
-a custom middleware that checks to see if there is an authority attribute to the session and if not it will do whatever it needs to find it and set it.
-An example is&nbsp;this:</p>
-<pre class="code literal-block">
-class CustomAuthorityMiddleware:
-  def process_request(self, request):
-    if not request.session.get('authority'):
-      authority = get_the_authority(request.user)
-      request.session['authority']=authority
-</pre>
-<p>This way, whenever you want to find out the authority of the user you just check the&nbsp;session.</p>
-</div>
-<div class="section" id="by-using-a-custom-user-profile">
-<h3><a class="toc-backref" href="#id5">By using a Custom User&nbsp;Profile</a></h3>
-<p>Just create a <a class="reference external" href="https://docs.djangoproject.com/en/dev/topics/auth/customizing/#extending-the-existing-user-model">django user profile</a> and add to it a <tt class="docutils literal">ForeignKey</tt> to your Authority&nbsp;model:</p>
-<pre class="code literal-block">
-class Profile(models.Model):
-  user = models.OneToOneField('django.auth.User')
-  authority = models.ForeignKey('authorities.Authority', blank=True, null=True )
-
-class Authority(models.Model):
-  id = models.IntegerField(primary_key = True)
-  name = models.CharField(max_length=64, )
-  auth_type = models.CharField(max_length=16, )
-</pre>
-<p>You can get the authority of the user through <tt class="docutils literal">request.user.profile.authority</tt>.</p>
-</div>
-<div class="section" id="getting-the-authority-of-the-user-has-to-be-dry">
-<h3><a class="toc-backref" href="#id6">Getting the authority of the user has to be <span class="caps">DRY</span></a></h3>
-<p>Whatever method you use to define the authorities of your users you have to remember that it is very
-important to define somewhere a function that will return the authority (or authorities) of a
-user. You need to define a function even in the simple case in which your function would just return <tt class="docutils literal">request.user.profile.authority</tt>.
-This will greatly help you when you wish to add some logic to this, for instance &quot;quickly disable users belonging to Authority X
-or temporary move users from Authority Y to authority&nbsp;Z&quot;.</p>
-<p>Let us suppose that you have defined a <tt class="docutils literal">get_user_authority</tt> function. Also, you need to define a <tt class="docutils literal">has_access</tt> function
-that would decide if a users/request has access to a particular object. This also needs to be <span class="caps">DRY</span>.</p>
-</div>
-</div>
-<div class="section" id="adding-authority-data">
-<h2><a class="toc-backref" href="#id7">Adding authority&nbsp;data</a></h2>
-<p>To define authority data you have to add a field to your model that would define its authority, for instance like&nbsp;this:</p>
-<pre class="code literal-block">
-class AuthorityData(models.Model):
-  authority = models.ForeignKey('authorities.Authority', editable=False,)
-</pre>
-<p>This field should not be editable (at least by your end users) because they shouldn&#8217;t be able to change the authority of the data they&nbsp;insert.</p>
-<p>If you want to have user-data then just add a <tt class="docutils literal"><span class="pre">models.ForeignKey('django.auth.User',</span> editable=False)</tt></p>
-<p>Now, your Create and Update Class Based Views have to pass the request to your forms and also your Detail and Update <span class="caps">CBV</span> should allow only getting
-objects that belong to the authority of the&nbsp;user:</p>
-<pre class="code literal-block">
-class AuthorityDataCreateView(CreateView):
-  model=models.AuthorityData
-
-  def get_form_kwargs(self):
-      kwargs = super(AuthorityDataCreateView, self).get_form_kwargs()
-      kwargs.update({'request': self.request})
-      return kwargs
-
-class AuthorityDataDetailView(DetailView):
-  def get_object(self, queryset=None):
-      obj = super(AuthorityDataDetailView, self).get_object(queryset)
-      if if not user_has_access(obj, self.request):
-          raise Http404(u&quot;Access Denied&quot;)
-      return obj
-
-class AuthorityDataUpdateView(UpdateView):
-  model=models.AuthorityData
-
-  def get_form_kwargs(self):
-      kwargs = super(AuthorityDataUpdateView, self).get_form_kwargs()
-      kwargs.update({'request': self.request})
-      return kwargs
-
-  def get_object(self, queryset=None):
-      obj = super(AuthorityDataUpdateView, self).get_object(queryset)
-      if if not user_has_access(obj, self.request):
-          raise Http404(u&quot;Access Denied&quot;)
-      return obj
-</pre>
-<p>Your ModelForm can now use the request to get the Authority and set it (don&#8217;t forget
-that you should not use <tt class="docutils literal">Meta.exclude</tt> but instead use <tt class="docutils literal">Meta.include</tt>!):</p>
-<pre class="code literal-block">
-class AuthorityDataModelForm(forms.ModelForm):
-    class Meta:
-      model = models.AuthorityData
-      exclude = ('authority',)
-
-    def __init__(self, *args, **kwargs):
-      self.request = kwargs.pop('request', None)
-      super(ActionModelForm, self).__init__(*args, **kwargs)
-
-
-    def save(self, force_insert=False, force_update=False, commit=True):
-      obj = super(AuthorityDataModelForm, self).save(commit=False)
-      if obj:
-          obj.authority = get_user_authority(self.request)
-          obj.save()
-      return obj
-</pre>
-<p>The previous work fine for Create/Detail/Update CBVs but not for ListsViews. List views querysets
-and in general all queries to the object have to be filtered through&nbsp;authority.</p>
-<pre class="code literal-block">
-class AuthorityDataListView(ListView):
-  def get_queryset(self):
-    queryset = super(AuthorityDataModelForm, self).get_queryset()
-    return queryset.filter(authority = get_user_authority(request))
-</pre>
-</div>
-<div class="section" id="conclusion">
-<h2><a class="toc-backref" href="#id8">Conclusion</a></h2>
-<p>Using the above techniques we can define authority (or just user) data. Your AuthorityData should
-have a <tt class="docutils literal">ForeignKey</tt> to your Authority  and you have configure your queries, ModelForms and CBVs
-to use that. If you have more than one models that belong to an authority and want to stay <span class="caps">DRY</span> then you&#8217;d need
-to define all the above as <a class="reference external" href="https://docs.djangoproject.com/en/dev/topics/class-based-views/mixins/">mixins</a>.</p>
-</div>
-</div>
-  		</article>
 <div class="pagination">
     <a class="prev" href="http://spapas.github.io/index5.html">&larr; Older</a>
 
@@ -1309,6 +1355,9 @@ to define all the above as <a class="reference external" href="https://docs.djan
     <h1>Recent Posts</h1>
     <ul id="recent_posts">
       <li class="post">
+          <a href="http://spapas.github.io/2015/12/22/ajax-with-react-fixed-data-table/">Ajax data with Fixed Data Table for React</a>
+      </li>
+      <li class="post">
           <a href="http://spapas.github.io/2015/11/27/pdf-in-django/">PDFs in Django: The essential guide</a>
       </li>
       <li class="post">
@@ -1319,9 +1368,6 @@ to define all the above as <a class="reference external" href="https://docs.djan
       </li>
       <li class="post">
           <a href="http://spapas.github.io/2015/09/08/more-complex-react-flux-example/">A (little more) complex react and flux example</a>
-      </li>
-      <li class="post">
-          <a href="http://spapas.github.io/2015/09/01/django-rq-redux/">django-rq redux: advanced techniques and tools</a>
       </li>
     </ul>
   </section>
@@ -1344,7 +1390,7 @@ to define all the above as <a class="reference external" href="https://docs.djan
 
   <section>
   <h1>Tags</h1>
-    <a href="http://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="http://spapas.github.io/tag/tasks.html">tasks</a>,    <a href="http://spapas.github.io/tag/less.html">less</a>,    <a href="http://spapas.github.io/tag/spring.html">spring</a>,    <a href="http://spapas.github.io/tag/rest.html">rest</a>,    <a href="http://spapas.github.io/tag/google.html">google</a>,    <a href="http://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="http://spapas.github.io/tag/scheduling.html">scheduling</a>,    <a href="http://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="http://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="http://spapas.github.io/tag/tables.html">tables</a>,    <a href="http://spapas.github.io/tag/reportlab.html">reportlab</a>,    <a href="http://spapas.github.io/tag/git.html">git</a>,    <a href="http://spapas.github.io/tag/java.html">java</a>,    <a href="http://spapas.github.io/tag/rq.html">rq</a>,    <a href="http://spapas.github.io/tag/uglify.html">uglify</a>,    <a href="http://spapas.github.io/tag/django-rq.html">django-rq</a>,    <a href="http://spapas.github.io/tag/babel.html">babel</a>,    <a href="http://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="http://spapas.github.io/tag/redis.html">redis</a>,    <a href="http://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="http://spapas.github.io/tag/forms.html">forms</a>,    <a href="http://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="http://spapas.github.io/tag/404.html">404</a>,    <a href="http://spapas.github.io/tag/xhtml2pdf.html">xhtml2pdf</a>,    <a href="http://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="http://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="http://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="http://spapas.github.io/tag/css.html">css</a>,    <a href="http://spapas.github.io/tag/node.html">node</a>,    <a href="http://spapas.github.io/tag/jobs.html">jobs</a>,    <a href="http://spapas.github.io/tag/watchify.html">watchify</a>,    <a href="http://spapas.github.io/tag/python.html">python</a>,    <a href="http://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="http://spapas.github.io/tag/javascript.html">javascript</a>,    <a href="http://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="http://spapas.github.io/tag/react.html">react</a>,    <a href="http://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="http://spapas.github.io/tag/npm.html">npm</a>,    <a href="http://spapas.github.io/tag/pdf.html">pdf</a>,    <a href="http://spapas.github.io/tag/rst.html">rst</a>,    <a href="http://spapas.github.io/tag/generic.html">generic</a>,    <a href="http://spapas.github.io/tag/es6.html">es6</a>,    <a href="http://spapas.github.io/tag/browserify.html">browserify</a>,    <a href="http://spapas.github.io/tag/branching.html">branching</a>,    <a href="http://spapas.github.io/tag/design.html">design</a>,    <a href="http://spapas.github.io/tag/github.html">github</a>,    <a href="http://spapas.github.io/tag/pusher.html">pusher</a>,    <a href="http://spapas.github.io/tag/windows.html">windows</a>,    <a href="http://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="http://spapas.github.io/tag/django.html">django</a>,    <a href="http://spapas.github.io/tag/flux.html">flux</a>,    <a href="http://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="http://spapas.github.io/tag/error.html">error</a>,    <a href="http://spapas.github.io/tag/debug.html">debug</a>,    <a href="http://spapas.github.io/tag/asynchronous.html">asynchronous</a>,    <a href="http://spapas.github.io/tag/security.html">security</a>,    <a href="http://spapas.github.io/tag/flask.html">flask</a>,    <a href="http://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>  </section>
+    <a href="http://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="http://spapas.github.io/tag/tasks.html">tasks</a>,    <a href="http://spapas.github.io/tag/less.html">less</a>,    <a href="http://spapas.github.io/tag/spring.html">spring</a>,    <a href="http://spapas.github.io/tag/rest.html">rest</a>,    <a href="http://spapas.github.io/tag/google.html">google</a>,    <a href="http://spapas.github.io/tag/design.html">design</a>,    <a href="http://spapas.github.io/tag/scheduling.html">scheduling</a>,    <a href="http://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="http://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="http://spapas.github.io/tag/tables.html">tables</a>,    <a href="http://spapas.github.io/tag/reportlab.html">reportlab</a>,    <a href="http://spapas.github.io/tag/git.html">git</a>,    <a href="http://spapas.github.io/tag/java.html">java</a>,    <a href="http://spapas.github.io/tag/rq.html">rq</a>,    <a href="http://spapas.github.io/tag/uglify.html">uglify</a>,    <a href="http://spapas.github.io/tag/django-rq.html">django-rq</a>,    <a href="http://spapas.github.io/tag/babel.html">babel</a>,    <a href="http://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="http://spapas.github.io/tag/redis.html">redis</a>,    <a href="http://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="http://spapas.github.io/tag/fixed-data-tables.html">fixed-data-tables</a>,    <a href="http://spapas.github.io/tag/forms.html">forms</a>,    <a href="http://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="http://spapas.github.io/tag/404.html">404</a>,    <a href="http://spapas.github.io/tag/xhtml2pdf.html">xhtml2pdf</a>,    <a href="http://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="http://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="http://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="http://spapas.github.io/tag/css.html">css</a>,    <a href="http://spapas.github.io/tag/node.html">node</a>,    <a href="http://spapas.github.io/tag/jobs.html">jobs</a>,    <a href="http://spapas.github.io/tag/watchify.html">watchify</a>,    <a href="http://spapas.github.io/tag/python.html">python</a>,    <a href="http://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="http://spapas.github.io/tag/javascript.html">javascript</a>,    <a href="http://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="http://spapas.github.io/tag/react.html">react</a>,    <a href="http://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="http://spapas.github.io/tag/npm.html">npm</a>,    <a href="http://spapas.github.io/tag/pdf.html">pdf</a>,    <a href="http://spapas.github.io/tag/rst.html">rst</a>,    <a href="http://spapas.github.io/tag/generic.html">generic</a>,    <a href="http://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="http://spapas.github.io/tag/es6.html">es6</a>,    <a href="http://spapas.github.io/tag/browserify.html">browserify</a>,    <a href="http://spapas.github.io/tag/branching.html">branching</a>,    <a href="http://spapas.github.io/tag/github.html">github</a>,    <a href="http://spapas.github.io/tag/pusher.html">pusher</a>,    <a href="http://spapas.github.io/tag/windows.html">windows</a>,    <a href="http://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="http://spapas.github.io/tag/django.html">django</a>,    <a href="http://spapas.github.io/tag/flux.html">flux</a>,    <a href="http://spapas.github.io/tag/fixeddatatable.html">FixedDataTable</a>,    <a href="http://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="http://spapas.github.io/tag/error.html">error</a>,    <a href="http://spapas.github.io/tag/debug.html">debug</a>,    <a href="http://spapas.github.io/tag/asynchronous.html">asynchronous</a>,    <a href="http://spapas.github.io/tag/security.html">security</a>,    <a href="http://spapas.github.io/tag/flask.html">flask</a>,    <a href="http://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>  </section>
 
 
 

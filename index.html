@@ -72,6 +72,295 @@
   		<article>
 <header>
       <h1 class="entry-title">
+        <a href="http://spapas.github.io/2015/12/22/ajax-with-react-fixed-data-table/">Ajax data with Fixed Data Table for React</a>
+      </h1>
+    <p class="meta">
+<time datetime="2015-12-22T15:20:00+02:00" pubdate>Τρι 22 Δεκέμβριος 2015</time>    </p>
+</header>
+
+  <div class="entry-content"><div class="contents topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#introduction" id="id1">Introduction</a></li>
+<li><a class="reference internal" href="#our-project" id="id2">Our&nbsp;project</a></li>
+<li><a class="reference internal" href="#how-fixeddatatable-gets-its-data" id="id3">How FixedDataTable gets its&nbsp;data</a></li>
+<li><a class="reference internal" href="#ajaxcell-non-working-version-1" id="id4">AjaxCell: Non working version&nbsp;1</a></li>
+<li><a class="reference internal" href="#ajaxcell-non-working-version-2" id="id5">AjaxCell: Non working version&nbsp;2</a></li>
+<li><a class="reference internal" href="#ajaxcell-non-working-version-3" id="id6">AjaxCell: Non working version&nbsp;3</a></li>
+<li><a class="reference internal" href="#ajaxcell-final-version" id="id7">AjaxCell: Final&nbsp;version</a></li>
+<li><a class="reference internal" href="#the-table-container-component" id="id8">The Table container&nbsp;component</a></li>
+<li><a class="reference internal" href="#some-enchancements" id="id9">Some&nbsp;enchancements</a></li>
+<li><a class="reference internal" href="#conslusion" id="id10">Conslusion</a></li>
+</ul>
+</div>
+<div class="section" id="introduction">
+<h2><a class="toc-backref" href="#id1">Introduction</a></h2>
+<p><a class="reference external" href="https://facebook.github.io/fixed-data-table/">FixedDataTable</a> is a nice React component from Facebook that is used to render tabular data.
+Its main characteristic is that it can handle many rows without sacrificing performance, however
+probably due to this fact I was not able to find any examples for loading data using Ajax - all
+examples I was able to find had the data already loaded (or created on the&nbsp;fly).</p>
+<p>So, although FixedDataTable is able to handle many rows, I am against transfering all of them to the user
+whenever our page loads since at most one page of data will be shown on screen (30 rows or so ?) -
+any other actions (filtering, sorting, aggregate calculations etc) should be done on the&nbsp;server.</p>
+<p>In the following I will present a simple, react-only example with a FixedDataTable that can be
+used with server-side, asynchronous, paginated&nbsp;data.</p>
+</div>
+<div class="section" id="our-project">
+<h2><a class="toc-backref" href="#id2">Our&nbsp;project</a></h2>
+<p>Let&#8217;s see an example of what we&#8217;ll&nbsp;build:</p>
+<img alt="Our project" src="/images/ajax_fixed_data_tables.gif" style="width: 600px;" />
+<p>As a source of the data I&#8217;ve used the <a class="reference external" href="http://swapi.co/">Star Wars <span class="caps">API</span></a> and specifically its <a class="reference external" href="http://swapi.co/documentation#people">People <span class="caps">API</span></a> by issuing
+requests to <a class="reference external" href="http://swapi.co/api/people/?format=json">http://swapi.co/api/people/?format=json</a>. This will return an array of people from the
+star wars universe in <span class="caps">JSON</span> format - the results are paginated with a page size of 10 (and we can switch
+to another page using the extra <tt class="docutils literal">page=</tt> request&nbsp;parameter).</p>
+<p>I will use es6 with the object spread operator (as described in <a class="reference external" href="http://spapas.github.io/2015/11/16/using-browserify-es6/">a previous article</a>)
+to write the code, using a single main.js as a source which will be transpiled to <tt class="docutils literal">dist/bundle.js</tt>.</p>
+<p>The placeholder <span class="caps">HTML</span> for our application&nbsp;is:</p>
+<pre class="code literal-block">
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot; /&gt;
+    &lt;title&gt;Hello Ajax Fixed Data Table!&lt;/title&gt;
+    &lt;link rel=&quot;stylesheet&quot; href='https://cdnjs.cloudflare.com/ajax/libs/fixed-data-table/0.6.0/fixed-data-table.min.css'&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;div id=&quot;main&quot;&gt;&lt;/div&gt;
+    &lt;script type=&quot;text/javascript&quot; src='dist/bundle.js' &gt;&lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+<p>The versions that are used are react 14.3 and fixed-data-table 0.6.0. You can find this project in github &#64;
+<a class="reference external" href="https://github.com/spapas/react-tables">https://github.com/spapas/react-tables</a> &#8212; tag name <tt class="docutils literal"><span class="pre">fixed-data-table-ajax</span></tt>.</p>
+</div>
+<div class="section" id="how-fixeddatatable-gets-its-data">
+<h2><a class="toc-backref" href="#id3">How FixedDataTable gets its&nbsp;data</a></h2>
+<p>The data of a <tt class="docutils literal">FixedDataTable</tt> component is defined through a number of <tt class="docutils literal">Column</tt> components
+and specifically, the <tt class="docutils literal">cell</tt> attribute of that component which sould either return be a static string
+to be displayed in that column or a React component (usually a <tt class="docutils literal">Cell</tt>) that will be displayed in
+that column or even a function that returns a string or a react component. The function (or component)
+passed to <tt class="docutils literal">cell</tt> will have an object with a <tt class="docutils literal">rowIndex</tt> attribute (among others) as a parameter,
+for example the&nbsp;following</p>
+<pre class="code literal-block">
+&lt;Column
+  header={&lt;Cell&gt;Url&lt;/Cell&gt;}
+  cell={props =&gt; props.rowIndex}
+  width={200}
+/&gt;
+</pre>
+<p>will just display the rowIndex for each&nbsp;cell.</p>
+<p>So we can see that for each cell that FixedDataTable wants to display it will use its corresponding
+<tt class="docutils literal">cell</tt> attribute.
+So, a general though if we wanted to support asynchronous, paginated data
+is to check the rowIndex and retrieve the correct page asynchronously.
+This would lead to a difficulty: What should the <tt class="docutils literal">cell</tt> function return? We&#8217;ll try to resolve this
+using an <tt class="docutils literal">AjaxCell</tt> function that should return a react componet to put in the&nbsp;cell:</p>
+</div>
+<div class="section" id="ajaxcell-non-working-version-1">
+<h2><a class="toc-backref" href="#id4">AjaxCell: Non working version&nbsp;1</a></h2>
+<p>A first sketch of an <tt class="docutils literal">`AjaxCell</tt> component could be something like&nbsp;this:</p>
+<pre class="code literal-block">
+// Careful - not working
+const AjaxCell1 = ({rowIndex, col, ...props}) =&gt; {
+    let page = 1;
+    let idx = rowIndex;
+    if(rowIndex&gt;=pageSize) {
+        page = Math.floor(rowIndex / pageSize) + 1;
+        idx = rowIndex % pageSize;
+    }
+    fetch('http://swapi.co/api/people/?format=json&amp;page='+page).then(function(response) {
+        return response.json();
+    }).then(function(j) {
+        // Here we have the result ! But where will it go ?
+    });
+    return /// what ?
+}
+</pre>
+<p>The col attribute will later be used to select the attribute we want to display in this cell.
+The <tt class="docutils literal">page</tt> and <tt class="docutils literal">idx</tt> will have the correct page number and idx inside that page (for example,
+if <tt class="docutils literal">rowIndex</tt> is 33, <tt class="docutils literal">page</tt> will be 4 and idx will be 3. The problem with the above is that
+the fetch function will be called <em>asynchronously</em> so when the AjaxCell returns it will <em>not</em> have
+the results (yet)! So we won&#8217;t be able to render anything&nbsp;:(</p>
+</div>
+<div class="section" id="ajaxcell-non-working-version-2">
+<h2><a class="toc-backref" href="#id5">AjaxCell: Non working version&nbsp;2</a></h2>
+<p>To be able to render <em>something</em>, we could put the results of fetching a page to a <tt class="docutils literal">cache</tt> dictionary &#8212; and only
+fetch that page if it is not inside the <tt class="docutils literal">cache</tt> - if it is inside the cache then we&#8217;ll just return
+the correct&nbsp;value:</p>
+<pre class="code literal-block">
+// Careful - not working correctly
+const cache = {}
+const AjaxCell2 = ({rowIndex, col, forceUpdate, ...props}) =&gt; {
+    let page = 1;
+    let idx = rowIndex;
+    if(rowIndex&gt;=pageSize) {
+        page = Math.floor(rowIndex / pageSize) + 1;
+        idx = rowIndex % pageSize;
+    }
+    if (cache[page]) {
+        return &lt;Cell&gt;{cache[page][idx][col]}&lt;/Cell&gt;
+    } else {
+        console.log(&quot;Loading page &quot; + page);
+        fetch('http://swapi.co/api/people/?format=json&amp;page='+page).then(function(response) {
+            return response.json();
+        }).then(function(j) {
+            cache[page] = j['results'];
+        });
+    }
+    return &lt;Cell&gt;-&lt;/Cell&gt;;
+}
+</pre>
+<p>The above will work, since it will return an empty (<tt class="docutils literal"><span class="pre">&lt;Cell&gt;-&lt;/Cell&gt;</span></tt>) initially but when the
+<tt class="docutils literal">fetch</tt> returns it will set the <tt class="docutils literal">cache</tt> for that page and return the correct value (<tt class="docutils literal"><span class="pre">&lt;Cell&gt;{cache[page][idx][col]}&lt;/Cell&gt;</span></tt>).</p>
+<p>However, as can be understood, when the page first loads it will call <tt class="docutils literal">AjaxCell2</tt> for all visible cells &#8212;
+because fetch is asynchronous and takes time until it returns (and sets the cache for that page), so the
+<tt class="docutils literal">fetch</tt> will be called for <em>all</em>&nbsp;cells!</p>
+</div>
+<div class="section" id="ajaxcell-non-working-version-3">
+<h2><a class="toc-backref" href="#id6">AjaxCell: Non working version&nbsp;3</a></h2>
+<p><tt class="docutils literal">fetch</tt> ing each page multiple times is of course not acceptable, so we&#8217;ll add a <tt class="docutils literal">loading</tt> flag
+and <tt class="docutils literal">fetch</tt> will be called only when this flag is <tt class="docutils literal">false</tt>, like&nbsp;this:</p>
+<pre class="code literal-block">
+// Not ready yet
+const cache = {};
+let loading = false;
+const AjaxCell2 = ({rowIndex, col, ...props}) =&gt; {
+    let page = 1;
+    let idx = rowIndex;
+    if(rowIndex&gt;=pageSize) {
+        page = Math.floor(rowIndex / pageSize) + 1;
+        idx = rowIndex % pageSize;
+    }
+    if (cache[page]) {
+        return &lt;Cell&gt;{cache[page][idx][col]}&lt;/Cell&gt;
+    } else if(!loading) {
+        console.log(&quot;Loading page &quot; + page);
+        loading = true;
+
+        fetch('http://swapi.co/api/people/?format=json&amp;page='+page).then(function(response) {
+            return response.json();
+        }).then(function(j) {
+            cache[page] = j['results'];
+            loading = false;
+        });
+    }
+    return &lt;Cell&gt;-&lt;/Cell&gt;;
+}
+</pre>
+<p>This works much better - the cells are rendered correctly and each page is loaded only once. However, if for example
+I tried to move to the end of the table quickly, I would see some cells that are always loading (they never get their correct value). This is because
+there is no way to know that the fetch function has actually completed in order to update with the latest (correct) value of that
+cell and will contain the stale placeholder (<tt class="docutils literal"><span class="pre">&lt;Cell&gt;-&lt;/Cell&gt;</span></tt>)&nbsp;value.</p>
+</div>
+<div class="section" id="ajaxcell-final-version">
+<h2><a class="toc-backref" href="#id7">AjaxCell: Final&nbsp;version</a></h2>
+<p>To clear the stale data we need to do an update to the table data
+when each fetch is finished &#8212; this should be done by a callback that will be passed to the <tt class="docutils literal">AjaxCell</tt>, like&nbsp;this:</p>
+<pre class="code literal-block">
+const cache = {};
+let loading = false;
+const AjaxCell = ({rowIndex, col, forceUpdate, ...props}) =&gt; {
+    let page = 1;
+    let idx = rowIndex;
+    if(rowIndex&gt;=pageSize) {
+        page = Math.floor(rowIndex / pageSize) + 1;
+        idx = rowIndex % pageSize;
+    }
+    if (cache[page]) {
+        return &lt;Cell&gt;{cache[page][idx][col]}&lt;/Cell&gt;
+    } else if(!loading) {
+        console.log(&quot;Loading page &quot; + page);
+        loading = true;
+
+        fetch('http://swapi.co/api/people/?format=json&amp;page='+page).then(function(response) {
+            return response.json();
+        }).then(function(j) {
+            cache[page] = j['results'];
+            loading = false;
+            forceUpdate();
+        });
+    }
+    return loadingCell;
+}
+</pre>
+<p>So we pass a forceUpdate callback as a property which is called when a fetch is finished. This may
+result to some not needed updates to the table (since we would do a fetch + forceUpdate for non-displayed
+data) but we can now be positive that when the data is loaded the table will be updated to dispaly&nbsp;it.</p>
+</div>
+<div class="section" id="the-table-container-component">
+<h2><a class="toc-backref" href="#id8">The Table container&nbsp;component</a></h2>
+<p>Finally, the component that contains the table is the&nbsp;following:</p>
+<pre class="code literal-block">
+class TableContainer extends React.Component {
+    render() {
+        return &lt;Table
+            rowHeight={30} rowsCount={87} width={600} height={200} headerHeight={30}&gt;
+
+            &lt;Column
+              header={&lt;Cell&gt;Name&lt;/Cell&gt;}
+              cell={ &lt;AjaxCell col='name' forceUpdate={this.forceUpdate.bind(this)} /&gt; }
+              width={200}
+            /&gt;
+            &lt;Column
+              header={&lt;Cell&gt;Birth Year&lt;/Cell&gt;}
+              cell={ &lt;AjaxCell col='birth_year' forceUpdate={this.forceUpdate.bind(this)} /&gt; }
+              width={200}
+            /&gt;
+            &lt;Column
+              header={&lt;Cell&gt;Url&lt;/Cell&gt;}
+              cell={ &lt;AjaxCell col='url' forceUpdate={this.forceUpdate.bind(this)} /&gt; }
+              width={200}
+            /&gt;
+
+        &lt;/Table&gt;
+    }
+}
+</pre>
+<p>I&#8217;ve made it a component in order to be able to bind the <tt class="docutils literal">forceUpdate</tt> method of the component to and
+<tt class="docutils literal">this</tt> and pass it to the <tt class="docutils literal">forceUpdate</tt> parameter to the <tt class="docutils literal">AjaxCell</tt> component. I&#8217;ve hard-coded
+the rowsCount value &#8212; instead we should have done an initial fetch to the first page of the <span class="caps">API</span> to get
+the total number of rows and only after that fetch had returned display the <tt class="docutils literal">&lt;Table&gt;</tt> component (left
+as an exercise to the&nbsp;reader).</p>
+</div>
+<div class="section" id="some-enchancements">
+<h2><a class="toc-backref" href="#id9">Some&nbsp;enchancements</a></h2>
+<p>Instead of displaying <tt class="docutils literal"><span class="pre">&lt;Cell&gt;-&lt;/Cell&gt;</span></tt> (or <tt class="docutils literal">&lt;/Cell&gt;</tt>) when the page loads, I propose to define a
+cell with an embedded spinner,&nbsp;like</p>
+<pre class="code literal-block">
+const loadingCell = &lt;Cell&gt;
+    &lt;img width=&quot;16&quot; height=&quot;16&quot; alt=&quot;star&quot; src=&quot;data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==&quot; /&gt;
+&lt;/Cell&gt;
+</pre>
+<p>and return this&nbsp;instead.</p>
+<p>Also, if your <span class="caps">REST</span> <span class="caps">API</span> returns too fast and you&#8217;d like to see what would happen if the server request took too long to return, you could
+change fetch like&nbsp;this</p>
+<pre class="code literal-block">
+fetch('http://swapi.co/api/people/?format=json&amp;page='+page).then(function(response) {
+    return response.json();
+}).then(function(j) {
+    setTimeout( () =&gt; {
+        cache[page] = j['results'];
+        loading = false;
+        forceUpdate();
+    }, 1000);
+});
+</pre>
+<p>to add a 1 second&nbsp;delay.</p>
+</div>
+<div class="section" id="conslusion">
+<h2><a class="toc-backref" href="#id10">Conslusion</a></h2>
+<p>The above is a just a proof of concept of using FixedDataTable with asynchronously loaded server-side data.
+This of course could be used for small projects (I am already using it for an internal project) but I recommend
+using the <a class="reference external" href="http://spapas.github.io/2015/07/02/comprehensive-react-flux-tutorial-2/">flux architecture</a> for more complex projects. What this more or
+less means is that a store component
+should be developed that will actually keep the data for each row, and a <tt class="docutils literal">fetchCompleted</tt> action should be
+dispatched when the <tt class="docutils literal">fetch</tt> is finished instead of calling <tt class="docutils literal">forceUpdate</tt> directly.</p>
+</div>
+</div>
+  		</article>
+  		<article>
+<header>
+      <h1 class="entry-title">
         <a href="http://spapas.github.io/2015/11/27/pdf-in-django/">PDFs in Django: The essential guide</a>
       </h1>
     <p class="meta">
@@ -2698,337 +2987,6 @@ to research and implement&nbsp;it!</p>
 </div>
 </div>
   		</article>
-  		<article>
-<header>
-      <h1 class="entry-title">
-        <a href="http://spapas.github.io/2015/09/01/django-rq-redux/">django-rq redux: advanced techniques and tools</a>
-      </h1>
-    <p class="meta">
-<time datetime="2015-09-01T14:20:00+03:00" pubdate>Τρι 01 Σεπτέμβριος 2015</time>    </p>
-</header>
-
-  <div class="entry-content"><div class="contents topic" id="contents">
-<p class="topic-title first">Contents</p>
-<ul class="simple">
-<li><a class="reference internal" href="#introduction" id="id1">Introduction</a></li>
-<li><a class="reference internal" href="#displaying-your-task-progress" id="id2">Displaying your task&nbsp;progress</a></li>
-<li><a class="reference internal" href="#displaying-your-queue-statistics" id="id3">Displaying your queue&nbsp;statistics</a></li>
-<li><a class="reference internal" href="#making-sure-that-workers-for-your-queue-are-actually-running" id="id4">Making sure that workers for your queue are actually&nbsp;running</a></li>
-<li><a class="reference internal" href="#checking-how-many-jobs-are-in-the-queue" id="id5">Checking how many jobs are in the&nbsp;queue</a></li>
-<li><a class="reference internal" href="#better-exception-handling" id="id6">Better exception&nbsp;handling</a></li>
-<li><a class="reference internal" href="#multiple-django-apps-single-redis-db" id="id7">Multiple django-apps, single redis&nbsp;db</a></li>
-<li><a class="reference internal" href="#low-level-debugging" id="id8">Low level&nbsp;debugging</a></li>
-<li><a class="reference internal" href="#conclusion" id="id9">Conclusion</a></li>
-</ul>
-</div>
-<div class="section" id="introduction">
-<h2><a class="toc-backref" href="#id1">Introduction</a></h2>
-<p>In the <a class="reference external" href="http://spapas.github.io/2015/01/27/async-tasks-with-django-rq/">previous django-rq article</a>
-we presented a quick introduction to asynchronous job queues and created a
-small (but complete) project that used rq and django-rq to implement asynchronous
-job queues in a django&nbsp;project.</p>
-<p>In this article, we will present some more advanced techniques and tools
-for improving the capabilities of our asynchronous tasks and
-integrate them to the <a class="reference external" href="https://github.com/spapas/django-test-rq">https://github.com/spapas/django-test-rq</a> project (please
-checkout tag django-rq-redux
-<tt class="docutils literal">git checkout <span class="pre">django-rq-redux</span></tt>)</p>
-</div>
-<div class="section" id="displaying-your-task-progress">
-<h2><a class="toc-backref" href="#id2">Displaying your task&nbsp;progress</a></h2>
-<p>Sometimes, especially for long-running tasks it is useful to let
-the user (task initiator) know what is the status of each task he&#8217;s started. For this,
-I recommend creating a task-description model that will hold the required information for this
-task with more or less the following fields (please also check <tt class="docutils literal">LongTask</tt> model of&nbsp;django-test-rq):</p>
-<pre class="code literal-block">
-class LongTask(models.Model):
-  created_on = models.DateTimeField(auto_now_add=True)
-  name = models.CharField(max_length=128, help_text='Enter a unique name for the task',)
-  progress = models.PositiveIntegerField(default=0)
-  result = models.CharField(max_length=128, blank=True, null=True)
-</pre>
-<p>Now, when the view that starts the task is <tt class="docutils literal"><span class="caps">POST</span></tt> ed, you&#8217;ll first create
-the <tt class="docutils literal">LongTask</tt> model instance with a result of <tt class="docutils literal">'<span class="caps">QUEUED</span>'</tt> and a progress
-of 0 (and a name that identifies your task) and then you&#8217;ll start the real task
-asynchronously by passing the LongTask instance, something like this (also check
-<tt class="docutils literal">LongTaskCreateView</tt>):</p>
-<pre class="code literal-block">
-long_task = LongTask.objects.create(...)
-long_runnig_task.delay(long_task)
-</pre>
-<p>In your asynchronous job, the first thing you&#8217;ll need to do is to set its result
-to &#8216;<span class="caps">STARTED</span>&#8217; and save it so that the user will immediately see when he&#8217;s job is
-actually started. Also, if you can estimate its progress, you can update its
-progress value with the current value so that the user will know how close he
-is to finishing. Finally, when the job finished (or if it throws an expectable
-exception) you&#8217;ll update its status accordingly. Here&#8217;s an example of my
-long_running_task that just waits for the specifid amount of&nbsp;seconds:</p>
-<pre class="code literal-block">
-&#64;job('django-test-rq-low')
-def long_runnig_task(task):
-  job = get_current_job()
-  task.job_id = job.get_id()
-
-  task.result = 'STARTED'
-
-  duration_in_second_persentages = task.duration*1.0 / 100
-  for i in range(100):
-      task.progress = i
-      task.save()
-      print task.progress
-      time.sleep(duration_in_second_persentages)
-
-  task.result = 'FINISHED'
-  task.save()
-  return task.result
-</pre>
-<p>To have proper feedback I propose to have your task-description model instance
-created by the view that starts the asynchronous task and <em>not</em> by the
-actual task! This is important since the worker may be full so the asynchronous
-task will need a lot of time until is actually started (or maybe there are no
-running workers - more on this later) and the user will not be able to see
-his task instance anywhere (unless of course you provide him access to the actual task
-queue but I don&#8217;t recommend&nbsp;this).</p>
-</div>
-<div class="section" id="displaying-your-queue-statistics">
-<h2><a class="toc-backref" href="#id3">Displaying your queue&nbsp;statistics</a></h2>
-<p>django-rq has a really nice dashboard with a lot of queue statistics (
-instructions here
-<a class="reference external" href="https://github.com/ui/django-rq#queue-statistics">https://github.com/ui/django-rq#queue-statistics</a> and also on django-test-rq
-project) which I recommend to always&nbsp;enable.</p>
-<p>Also, there&#8217;s the individual use <a class="reference external" href="https://github.com/brutasse/django-rq-dashboard">django-rq-dashboard</a> project that could
-be installed to display some more statistics, however the only extra
-statistic that you can see throuh django-rq-dashboard is the status of
-your scheduled jobs so I don&#8217;t recommend installing it if you don&#8217;t
-use&nbsp;scheduling.</p>
-</div>
-<div class="section" id="making-sure-that-workers-for-your-queue-are-actually-running">
-<h2><a class="toc-backref" href="#id4">Making sure that workers for your queue are actually&nbsp;running</a></h2>
-<p>Using the django-rq dashboard you can make sure that all queues
-have at least one worker. However, sometimes workers fail, or
-maybe you&#8217;ve forgotten to start your workers or not configured
-your application correctly (this happens to me all the time for
-test/uat projects). So, for tasks that you want to display feedback
-to the user, you can easily add a check to make sure that there are
-active workers using the following&nbsp;code:</p>
-<pre class="code literal-block">
-from rq import Worker
-import django_rq
-
-redis_conn = django_rq.get_connection('default')
-if len([
-    x for x in Worker.all(connection=redis_conn)
-        if 'django-test-rq-low' in x.queue_names()
-]) == 0:
-    # Error -- no workers
-</pre>
-<p>With <tt class="docutils literal">Worker.all()</tt> you get all workers for a connection and the <tt class="docutils literal">queue_names()</tt>
-method returns the names that each worker serves. So we check that we have at least one
-worker for that&nbsp;queue.</p>
-<p>This check can be added when the job is started and display a feedback error
-to the user (check example in&nbsp;django-test-rq).</p>
-<p>For quick tasks (for example sending emails etc) you should not display anything
-to the user even if no workers are running (since the task <em>will</em> be queued and
-will be executed eventually when the workers are started) but instead send an email to the administrators
-so that they will start the&nbsp;workers.</p>
-</div>
-<div class="section" id="checking-how-many-jobs-are-in-the-queue">
-<h2><a class="toc-backref" href="#id5">Checking how many jobs are in the&nbsp;queue</a></h2>
-<p>To find out programatically how many jobs are actually in the queue (and display a message
-if the queue has too many jobs etc) you&#8217;ll need to use the <tt class="docutils literal">Queue</tt> class, something like&nbsp;this:</p>
-<pre class="code literal-block">
-from rq import Queue
-
-redis_conn = django_rq.get_connection('default')
-queue = Queue('django-test-rq-default', connection=redis_conn)
-print queue.name
-print len(queue.jobs)
-</pre>
-</div>
-<div class="section" id="better-exception-handling">
-<h2><a class="toc-backref" href="#id6">Better exception&nbsp;handling</a></h2>
-<p>When a job fails, rq will put it in a failed jobs queue and finish with it. You (as administrator)
-won&#8217;t get any feedback and the user (unless he has access to that failed jobs queue) won&#8217;t be
-able to do anything aboutt this&nbsp;job.</p>
-<p>In almost all cases you can&#8217;t rely only on this behavior but instead you have to
-<a class="reference external" href="http://python-rq.org/docs/exceptions/">install a custom exception handler</a>. Using the custom exception handler you can
-do whatever you want for each failed job. For instance, you can create a new instance
-of a <tt class="docutils literal">FailedTask</tt> model which will have information about the failure and the
-original task allow the user (or administrator) to restart the failed task after
-he&#8217;s fixed the error&nbsp;conditions.</p>
-<p>Or, if you want to be informed when a job is failed, you can just send an email
-to <tt class="docutils literal"><span class="caps">ADMINS</span></tt> and fall back to the default behavior to enqueue the failed task the
-failed jobs queue (since job exception handlers can be&nbsp;chained).</p>
-<p>A simple management command that starts a worker for a specific queue and installs
-a custom exception handler&nbsp;follows:</p>
-<pre class="code literal-block">
-from django.conf import settings
-from django.core.management.base import BaseCommand
-
-import django_rq
-from rq import Queue, Worker
-
-def my_handler(job, *exc_info):
-    print &quot;FAILURE&quot;
-    print job
-    print exc_info
-
-class Command(BaseCommand):
-    def handle(self, *args, **options):
-        redis_conn = django_rq.get_connection('default')
-
-        q = Queue(settings.DJANGO_TEST_RQ_LOW_QUEUE, connection=redis_conn)
-        worker = Worker([q], exc_handler=my_handler, connection=redis_conn)
-        worker.work()
-</pre>
-<p>This handler is for demonstration purposes since it just prints a message to the console
-(so please do not use&nbsp;it)!</p>
-</div>
-<div class="section" id="multiple-django-apps-single-redis-db">
-<h2><a class="toc-backref" href="#id7">Multiple django-apps, single redis&nbsp;db</a></h2>
-<p>One thing to keep in mind is that the only thing that seperates the queues are
-their name. If you have many django applications that define a &quot;default&quot; (or &quot;low&quot;, &quot;hight&quot; etc)
-and they all use the <em>same</em> redis database to store their queue, the workers
-of each application won&#8217;t know which jobs belong to them and they&#8217;ll end up
-dequeuing the wrong job types. This will lead to an exception or, if you
-are really unlucky to a very nasty&nbsp;bug!</p>
-<p>To avoid this, you can either use a different redis database (not database server)
-for each of your apps or add a prefix with the name of your app to your queue&nbsp;names:</p>
-<p>Each redis database server can host a number of databases that are identified
-by a number (that&#8217;s what the /0 you see in <tt class="docutils literal"><span class="pre">redis://127.0.0.1:6379/0</span></tt> means)
-and each one of them has a totally different keyspace. So, if you use /0 in an
-application and /1 in another application, you&#8217;ll have no problems. This solution
-has the disadvantage that you need to be really careful to use different database
-numbers for your projects and also the number of possible databases that redis
-can use is limited by a configuration file (so if you reach the maximum you&#8217;ll
-need to also increase that&nbsp;number)!</p>
-<p>Instead of this, you can avoid using the &#8216;default&#8217; queue, and use queues that
-contain your application name in their name, for example, for the sample project
-you could create something like &#8216;django-test-rq-default&#8217;, &#8216;django-test-rq-low&#8217;,
-&#8216;django-test-rq-high&#8217; etc. You need to configure the extra queues by adding them
-to the <tt class="docutils literal">RQ_QUEUES</tt> dictionary (check settings.py of django-test-rq) and then
-put the jobs to these queues using for example the job decorator
-(<tt class="docutils literal"><span class="pre">&#64;job('django-test-rq-default')</span></tt>)
-and run your workers so that they will retrieve jobs from these queues
-(<tt class="docutils literal">python manage.py rqworker <span class="pre">django-test-rq-default</span></tt>) and not the
-default one (which may contain jobs of other&nbsp;applications).</p>
-<p>If you use the default queue, and because you&#8217;ll need to use its name to
-many places, I recommend to add a (f.i) <tt class="docutils literal">QUEUE_NAME = <span class="pre">'django-test-rq-default'</span></tt>
-setting and use this instead of just a string to be totally <span class="caps">DRY</span>.</p>
-<p><strong>Update 13/09/2015</strong>: Please notice that using a <em>single</em> redis database server
-(either with multiple numeric databases or in the same database using a keyword
-in keys to differentiate the apps) <a class="reference external" href="https://redislabs.com/blog/benchmark-shared-vs-dedicated-redis-instances#.VfUl0xHtmko">is not recommended</a> as commenter
-Itamar Haber pointed out to&nbsp;me!</p>
-<p>This is because for speed reasons redis uses a single thread to handle all requests
-(regardless if they are in the same or different numerical databases), so all
-resources may be used by a single, redis hungry, application and leave all others to&nbsp;starve!</p>
-<p>Therefore, the recommended solution is to have a <em>different redis</em> server for each different
-application. This does not mean that you need to have different servers, just to run
-different instances of redis binding to different <span class="caps">IP</span> ports. Redis uses very little
-resourecs when it is idle (<a class="reference external" href="http://redis.io/topics/faq">empty instance uses ~ 1 <span class="caps">MB</span> <span class="caps">RAM</span></a>) so you can run a lot
-of instances in a single&nbsp;server.</p>
-<p>Long story short, my proposal is to have a redis.conf <em>inside</em> your application root tree
-(next to manage.py and requirements.txt) which has the redis options for each
-application. The options in redis.conf that need to be changed per application
-is the port that this redis instance will bind (this port also needs to be passed to
-django settings.py) and the pid filename if you daemonize redis &#8212; I recommend using
-a tool like <a class="reference external" href="http://supervisord.org/">supervisord</a> instead so that you won&#8217;t need any daemonizing and pid files for
-each&nbsp;per-app-redis-instance!</p>
-</div>
-<div class="section" id="low-level-debugging">
-<h2><a class="toc-backref" href="#id8">Low level&nbsp;debugging</a></h2>
-<p>In this section I&#8217;ll present some commands that you can issue to your redis
-server using a simple telnet connection to get various info about your queues. You
-probably will never need to issue these commands to actually debug, but they
-will answer some of your (scientific) questions! In the following, <tt class="docutils literal">&gt;</tt> is
-things I type, <tt class="docutils literal">#</tt> are comments, <tt class="docutils literal"><span class="pre">[...]</span></tt> is more output and everything else is the output I&nbsp;get:</p>
-<pre class="code literal-block">
-&gt; telnet 127.0.0.1 6379
-
-# You won't see anything at first but you'll be connected and you can try typing things
-
-&gt; INFO
-
-$1020
-redis_version:2.4.10
-redis_git_sha1:00000000
-# [...]
-db0:keys=83,expires=2
-db1:keys=26,expires=1 # My redis server has two databases
-
-# Now you'll see what you type!
-
-&gt; SELECT 1
-+ OK # Now queries will be issued to database 1
-&gt; SELECT 0
-+ OK # Now queries will be issued to database 0
-
-KEYS rq* # List all rq related queues
-*25
-$43
-rq:job:1d7afa32-3f90-4502-912f-d58eaa049fb1
-$43
-rq:queue:django-test-rq-low
-$43
-[...]
-
-&gt; SMEMBERS rq:workers # See workers
-*1
-$26
-rq:worker:SERAFEIM-PC.6892
-
-&gt; LRANGE rq:queue:django-test-rq-low 0 100 # Check queued jobs
-*2
-$36
-def896f4-84cb-4833-be6a-54d917f05271
-$36
-53cb1367-2fb5-46b3-99b2-7680397203b9
-
-&gt; HGETALL rq:job:def896f4-84cb-4833-be6a-54d917f05271 # Get info about this job
-*16
-$6
-status
-$6
-queued
-$11
-description
-$57
-tasks.tasks.long_runnig_task(&lt;LongTask: LongTask object&gt;)
-$10
-created_at
-$20
-2015-09-01T09:04:38Z
-$7
-timeout
-$3
-180
-$6
-origin
-$18
-django-test-rq-low
-$11
-enqueued_at
-$20
-2015-09-01T09:04:38Z
-$4
-data
-$409
-[...] # data is the pickled parameters passed to the job !
-
-&gt; HGET rq:job:def896f4-84cb-4833-be6a-54d917f05271 status # Get only status
-$6
-queued
-</pre>
-<p>For more info on querying redis you can check the <a class="reference external" href="http://redis.io/documentation">redis documentation</a> and especially
-<a class="reference external" href="http://redis.io/topics/data-types">http://redis.io/topics/data-types</a> and <a class="reference external" href="http://redis.io/commands">http://redis.io/commands</a>.</p>
-</div>
-<div class="section" id="conclusion">
-<h2><a class="toc-backref" href="#id9">Conclusion</a></h2>
-<p>Using some of the above techniques will help you in your asynchronous
-task adventures with rq. I&#8217;ll try to keep this article updated with
-any new techniques or tools I find in the&nbsp;future!</p>
-</div>
-</div>
-  		</article>
 <div class="pagination">
     <a class="prev" href="http://spapas.github.io/index2.html">&larr; Older</a>
 
@@ -3045,6 +3003,9 @@ any new techniques or tools I find in the&nbsp;future!</p>
     <h1>Recent Posts</h1>
     <ul id="recent_posts">
       <li class="post">
+          <a href="http://spapas.github.io/2015/12/22/ajax-with-react-fixed-data-table/">Ajax data with Fixed Data Table for React</a>
+      </li>
+      <li class="post">
           <a href="http://spapas.github.io/2015/11/27/pdf-in-django/">PDFs in Django: The essential guide</a>
       </li>
       <li class="post">
@@ -3055,9 +3016,6 @@ any new techniques or tools I find in the&nbsp;future!</p>
       </li>
       <li class="post">
           <a href="http://spapas.github.io/2015/09/08/more-complex-react-flux-example/">A (little more) complex react and flux example</a>
-      </li>
-      <li class="post">
-          <a href="http://spapas.github.io/2015/09/01/django-rq-redux/">django-rq redux: advanced techniques and tools</a>
       </li>
     </ul>
   </section>
@@ -3080,7 +3038,7 @@ any new techniques or tools I find in the&nbsp;future!</p>
 
   <section>
   <h1>Tags</h1>
-    <a href="http://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="http://spapas.github.io/tag/tasks.html">tasks</a>,    <a href="http://spapas.github.io/tag/less.html">less</a>,    <a href="http://spapas.github.io/tag/spring.html">spring</a>,    <a href="http://spapas.github.io/tag/rest.html">rest</a>,    <a href="http://spapas.github.io/tag/google.html">google</a>,    <a href="http://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="http://spapas.github.io/tag/scheduling.html">scheduling</a>,    <a href="http://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="http://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="http://spapas.github.io/tag/tables.html">tables</a>,    <a href="http://spapas.github.io/tag/reportlab.html">reportlab</a>,    <a href="http://spapas.github.io/tag/git.html">git</a>,    <a href="http://spapas.github.io/tag/java.html">java</a>,    <a href="http://spapas.github.io/tag/rq.html">rq</a>,    <a href="http://spapas.github.io/tag/uglify.html">uglify</a>,    <a href="http://spapas.github.io/tag/django-rq.html">django-rq</a>,    <a href="http://spapas.github.io/tag/babel.html">babel</a>,    <a href="http://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="http://spapas.github.io/tag/redis.html">redis</a>,    <a href="http://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="http://spapas.github.io/tag/forms.html">forms</a>,    <a href="http://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="http://spapas.github.io/tag/404.html">404</a>,    <a href="http://spapas.github.io/tag/xhtml2pdf.html">xhtml2pdf</a>,    <a href="http://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="http://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="http://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="http://spapas.github.io/tag/css.html">css</a>,    <a href="http://spapas.github.io/tag/node.html">node</a>,    <a href="http://spapas.github.io/tag/jobs.html">jobs</a>,    <a href="http://spapas.github.io/tag/watchify.html">watchify</a>,    <a href="http://spapas.github.io/tag/python.html">python</a>,    <a href="http://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="http://spapas.github.io/tag/javascript.html">javascript</a>,    <a href="http://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="http://spapas.github.io/tag/react.html">react</a>,    <a href="http://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="http://spapas.github.io/tag/npm.html">npm</a>,    <a href="http://spapas.github.io/tag/pdf.html">pdf</a>,    <a href="http://spapas.github.io/tag/rst.html">rst</a>,    <a href="http://spapas.github.io/tag/generic.html">generic</a>,    <a href="http://spapas.github.io/tag/es6.html">es6</a>,    <a href="http://spapas.github.io/tag/browserify.html">browserify</a>,    <a href="http://spapas.github.io/tag/branching.html">branching</a>,    <a href="http://spapas.github.io/tag/design.html">design</a>,    <a href="http://spapas.github.io/tag/github.html">github</a>,    <a href="http://spapas.github.io/tag/pusher.html">pusher</a>,    <a href="http://spapas.github.io/tag/windows.html">windows</a>,    <a href="http://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="http://spapas.github.io/tag/django.html">django</a>,    <a href="http://spapas.github.io/tag/flux.html">flux</a>,    <a href="http://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="http://spapas.github.io/tag/error.html">error</a>,    <a href="http://spapas.github.io/tag/debug.html">debug</a>,    <a href="http://spapas.github.io/tag/asynchronous.html">asynchronous</a>,    <a href="http://spapas.github.io/tag/security.html">security</a>,    <a href="http://spapas.github.io/tag/flask.html">flask</a>,    <a href="http://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>  </section>
+    <a href="http://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="http://spapas.github.io/tag/tasks.html">tasks</a>,    <a href="http://spapas.github.io/tag/less.html">less</a>,    <a href="http://spapas.github.io/tag/spring.html">spring</a>,    <a href="http://spapas.github.io/tag/rest.html">rest</a>,    <a href="http://spapas.github.io/tag/google.html">google</a>,    <a href="http://spapas.github.io/tag/design.html">design</a>,    <a href="http://spapas.github.io/tag/scheduling.html">scheduling</a>,    <a href="http://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="http://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="http://spapas.github.io/tag/tables.html">tables</a>,    <a href="http://spapas.github.io/tag/reportlab.html">reportlab</a>,    <a href="http://spapas.github.io/tag/git.html">git</a>,    <a href="http://spapas.github.io/tag/java.html">java</a>,    <a href="http://spapas.github.io/tag/rq.html">rq</a>,    <a href="http://spapas.github.io/tag/uglify.html">uglify</a>,    <a href="http://spapas.github.io/tag/django-rq.html">django-rq</a>,    <a href="http://spapas.github.io/tag/babel.html">babel</a>,    <a href="http://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="http://spapas.github.io/tag/redis.html">redis</a>,    <a href="http://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="http://spapas.github.io/tag/fixed-data-tables.html">fixed-data-tables</a>,    <a href="http://spapas.github.io/tag/forms.html">forms</a>,    <a href="http://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="http://spapas.github.io/tag/404.html">404</a>,    <a href="http://spapas.github.io/tag/xhtml2pdf.html">xhtml2pdf</a>,    <a href="http://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="http://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="http://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="http://spapas.github.io/tag/css.html">css</a>,    <a href="http://spapas.github.io/tag/node.html">node</a>,    <a href="http://spapas.github.io/tag/jobs.html">jobs</a>,    <a href="http://spapas.github.io/tag/watchify.html">watchify</a>,    <a href="http://spapas.github.io/tag/python.html">python</a>,    <a href="http://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="http://spapas.github.io/tag/javascript.html">javascript</a>,    <a href="http://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="http://spapas.github.io/tag/react.html">react</a>,    <a href="http://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="http://spapas.github.io/tag/npm.html">npm</a>,    <a href="http://spapas.github.io/tag/pdf.html">pdf</a>,    <a href="http://spapas.github.io/tag/rst.html">rst</a>,    <a href="http://spapas.github.io/tag/generic.html">generic</a>,    <a href="http://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="http://spapas.github.io/tag/es6.html">es6</a>,    <a href="http://spapas.github.io/tag/browserify.html">browserify</a>,    <a href="http://spapas.github.io/tag/branching.html">branching</a>,    <a href="http://spapas.github.io/tag/github.html">github</a>,    <a href="http://spapas.github.io/tag/pusher.html">pusher</a>,    <a href="http://spapas.github.io/tag/windows.html">windows</a>,    <a href="http://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="http://spapas.github.io/tag/django.html">django</a>,    <a href="http://spapas.github.io/tag/flux.html">flux</a>,    <a href="http://spapas.github.io/tag/fixeddatatable.html">FixedDataTable</a>,    <a href="http://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="http://spapas.github.io/tag/error.html">error</a>,    <a href="http://spapas.github.io/tag/debug.html">debug</a>,    <a href="http://spapas.github.io/tag/asynchronous.html">asynchronous</a>,    <a href="http://spapas.github.io/tag/security.html">security</a>,    <a href="http://spapas.github.io/tag/flask.html">flask</a>,    <a href="http://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>  </section>
 
 
 

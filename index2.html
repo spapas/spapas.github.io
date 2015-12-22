@@ -72,6 +72,337 @@
   		<article>
 <header>
       <h1 class="entry-title">
+        <a href="http://spapas.github.io/2015/09/01/django-rq-redux/">django-rq redux: advanced techniques and tools</a>
+      </h1>
+    <p class="meta">
+<time datetime="2015-09-01T14:20:00+03:00" pubdate>Τρι 01 Σεπτέμβριος 2015</time>    </p>
+</header>
+
+  <div class="entry-content"><div class="contents topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#introduction" id="id1">Introduction</a></li>
+<li><a class="reference internal" href="#displaying-your-task-progress" id="id2">Displaying your task&nbsp;progress</a></li>
+<li><a class="reference internal" href="#displaying-your-queue-statistics" id="id3">Displaying your queue&nbsp;statistics</a></li>
+<li><a class="reference internal" href="#making-sure-that-workers-for-your-queue-are-actually-running" id="id4">Making sure that workers for your queue are actually&nbsp;running</a></li>
+<li><a class="reference internal" href="#checking-how-many-jobs-are-in-the-queue" id="id5">Checking how many jobs are in the&nbsp;queue</a></li>
+<li><a class="reference internal" href="#better-exception-handling" id="id6">Better exception&nbsp;handling</a></li>
+<li><a class="reference internal" href="#multiple-django-apps-single-redis-db" id="id7">Multiple django-apps, single redis&nbsp;db</a></li>
+<li><a class="reference internal" href="#low-level-debugging" id="id8">Low level&nbsp;debugging</a></li>
+<li><a class="reference internal" href="#conclusion" id="id9">Conclusion</a></li>
+</ul>
+</div>
+<div class="section" id="introduction">
+<h2><a class="toc-backref" href="#id1">Introduction</a></h2>
+<p>In the <a class="reference external" href="http://spapas.github.io/2015/01/27/async-tasks-with-django-rq/">previous django-rq article</a>
+we presented a quick introduction to asynchronous job queues and created a
+small (but complete) project that used rq and django-rq to implement asynchronous
+job queues in a django&nbsp;project.</p>
+<p>In this article, we will present some more advanced techniques and tools
+for improving the capabilities of our asynchronous tasks and
+integrate them to the <a class="reference external" href="https://github.com/spapas/django-test-rq">https://github.com/spapas/django-test-rq</a> project (please
+checkout tag django-rq-redux
+<tt class="docutils literal">git checkout <span class="pre">django-rq-redux</span></tt>)</p>
+</div>
+<div class="section" id="displaying-your-task-progress">
+<h2><a class="toc-backref" href="#id2">Displaying your task&nbsp;progress</a></h2>
+<p>Sometimes, especially for long-running tasks it is useful to let
+the user (task initiator) know what is the status of each task he&#8217;s started. For this,
+I recommend creating a task-description model that will hold the required information for this
+task with more or less the following fields (please also check <tt class="docutils literal">LongTask</tt> model of&nbsp;django-test-rq):</p>
+<pre class="code literal-block">
+class LongTask(models.Model):
+  created_on = models.DateTimeField(auto_now_add=True)
+  name = models.CharField(max_length=128, help_text='Enter a unique name for the task',)
+  progress = models.PositiveIntegerField(default=0)
+  result = models.CharField(max_length=128, blank=True, null=True)
+</pre>
+<p>Now, when the view that starts the task is <tt class="docutils literal"><span class="caps">POST</span></tt> ed, you&#8217;ll first create
+the <tt class="docutils literal">LongTask</tt> model instance with a result of <tt class="docutils literal">'<span class="caps">QUEUED</span>'</tt> and a progress
+of 0 (and a name that identifies your task) and then you&#8217;ll start the real task
+asynchronously by passing the LongTask instance, something like this (also check
+<tt class="docutils literal">LongTaskCreateView</tt>):</p>
+<pre class="code literal-block">
+long_task = LongTask.objects.create(...)
+long_runnig_task.delay(long_task)
+</pre>
+<p>In your asynchronous job, the first thing you&#8217;ll need to do is to set its result
+to &#8216;<span class="caps">STARTED</span>&#8217; and save it so that the user will immediately see when he&#8217;s job is
+actually started. Also, if you can estimate its progress, you can update its
+progress value with the current value so that the user will know how close he
+is to finishing. Finally, when the job finished (or if it throws an expectable
+exception) you&#8217;ll update its status accordingly. Here&#8217;s an example of my
+long_running_task that just waits for the specifid amount of&nbsp;seconds:</p>
+<pre class="code literal-block">
+&#64;job('django-test-rq-low')
+def long_runnig_task(task):
+  job = get_current_job()
+  task.job_id = job.get_id()
+
+  task.result = 'STARTED'
+
+  duration_in_second_persentages = task.duration*1.0 / 100
+  for i in range(100):
+      task.progress = i
+      task.save()
+      print task.progress
+      time.sleep(duration_in_second_persentages)
+
+  task.result = 'FINISHED'
+  task.save()
+  return task.result
+</pre>
+<p>To have proper feedback I propose to have your task-description model instance
+created by the view that starts the asynchronous task and <em>not</em> by the
+actual task! This is important since the worker may be full so the asynchronous
+task will need a lot of time until is actually started (or maybe there are no
+running workers - more on this later) and the user will not be able to see
+his task instance anywhere (unless of course you provide him access to the actual task
+queue but I don&#8217;t recommend&nbsp;this).</p>
+</div>
+<div class="section" id="displaying-your-queue-statistics">
+<h2><a class="toc-backref" href="#id3">Displaying your queue&nbsp;statistics</a></h2>
+<p>django-rq has a really nice dashboard with a lot of queue statistics (
+instructions here
+<a class="reference external" href="https://github.com/ui/django-rq#queue-statistics">https://github.com/ui/django-rq#queue-statistics</a> and also on django-test-rq
+project) which I recommend to always&nbsp;enable.</p>
+<p>Also, there&#8217;s the individual use <a class="reference external" href="https://github.com/brutasse/django-rq-dashboard">django-rq-dashboard</a> project that could
+be installed to display some more statistics, however the only extra
+statistic that you can see throuh django-rq-dashboard is the status of
+your scheduled jobs so I don&#8217;t recommend installing it if you don&#8217;t
+use&nbsp;scheduling.</p>
+</div>
+<div class="section" id="making-sure-that-workers-for-your-queue-are-actually-running">
+<h2><a class="toc-backref" href="#id4">Making sure that workers for your queue are actually&nbsp;running</a></h2>
+<p>Using the django-rq dashboard you can make sure that all queues
+have at least one worker. However, sometimes workers fail, or
+maybe you&#8217;ve forgotten to start your workers or not configured
+your application correctly (this happens to me all the time for
+test/uat projects). So, for tasks that you want to display feedback
+to the user, you can easily add a check to make sure that there are
+active workers using the following&nbsp;code:</p>
+<pre class="code literal-block">
+from rq import Worker
+import django_rq
+
+redis_conn = django_rq.get_connection('default')
+if len([
+    x for x in Worker.all(connection=redis_conn)
+        if 'django-test-rq-low' in x.queue_names()
+]) == 0:
+    # Error -- no workers
+</pre>
+<p>With <tt class="docutils literal">Worker.all()</tt> you get all workers for a connection and the <tt class="docutils literal">queue_names()</tt>
+method returns the names that each worker serves. So we check that we have at least one
+worker for that&nbsp;queue.</p>
+<p>This check can be added when the job is started and display a feedback error
+to the user (check example in&nbsp;django-test-rq).</p>
+<p>For quick tasks (for example sending emails etc) you should not display anything
+to the user even if no workers are running (since the task <em>will</em> be queued and
+will be executed eventually when the workers are started) but instead send an email to the administrators
+so that they will start the&nbsp;workers.</p>
+</div>
+<div class="section" id="checking-how-many-jobs-are-in-the-queue">
+<h2><a class="toc-backref" href="#id5">Checking how many jobs are in the&nbsp;queue</a></h2>
+<p>To find out programatically how many jobs are actually in the queue (and display a message
+if the queue has too many jobs etc) you&#8217;ll need to use the <tt class="docutils literal">Queue</tt> class, something like&nbsp;this:</p>
+<pre class="code literal-block">
+from rq import Queue
+
+redis_conn = django_rq.get_connection('default')
+queue = Queue('django-test-rq-default', connection=redis_conn)
+print queue.name
+print len(queue.jobs)
+</pre>
+</div>
+<div class="section" id="better-exception-handling">
+<h2><a class="toc-backref" href="#id6">Better exception&nbsp;handling</a></h2>
+<p>When a job fails, rq will put it in a failed jobs queue and finish with it. You (as administrator)
+won&#8217;t get any feedback and the user (unless he has access to that failed jobs queue) won&#8217;t be
+able to do anything aboutt this&nbsp;job.</p>
+<p>In almost all cases you can&#8217;t rely only on this behavior but instead you have to
+<a class="reference external" href="http://python-rq.org/docs/exceptions/">install a custom exception handler</a>. Using the custom exception handler you can
+do whatever you want for each failed job. For instance, you can create a new instance
+of a <tt class="docutils literal">FailedTask</tt> model which will have information about the failure and the
+original task allow the user (or administrator) to restart the failed task after
+he&#8217;s fixed the error&nbsp;conditions.</p>
+<p>Or, if you want to be informed when a job is failed, you can just send an email
+to <tt class="docutils literal"><span class="caps">ADMINS</span></tt> and fall back to the default behavior to enqueue the failed task the
+failed jobs queue (since job exception handlers can be&nbsp;chained).</p>
+<p>A simple management command that starts a worker for a specific queue and installs
+a custom exception handler&nbsp;follows:</p>
+<pre class="code literal-block">
+from django.conf import settings
+from django.core.management.base import BaseCommand
+
+import django_rq
+from rq import Queue, Worker
+
+def my_handler(job, *exc_info):
+    print &quot;FAILURE&quot;
+    print job
+    print exc_info
+
+class Command(BaseCommand):
+    def handle(self, *args, **options):
+        redis_conn = django_rq.get_connection('default')
+
+        q = Queue(settings.DJANGO_TEST_RQ_LOW_QUEUE, connection=redis_conn)
+        worker = Worker([q], exc_handler=my_handler, connection=redis_conn)
+        worker.work()
+</pre>
+<p>This handler is for demonstration purposes since it just prints a message to the console
+(so please do not use&nbsp;it)!</p>
+</div>
+<div class="section" id="multiple-django-apps-single-redis-db">
+<h2><a class="toc-backref" href="#id7">Multiple django-apps, single redis&nbsp;db</a></h2>
+<p>One thing to keep in mind is that the only thing that seperates the queues are
+their name. If you have many django applications that define a &quot;default&quot; (or &quot;low&quot;, &quot;hight&quot; etc)
+and they all use the <em>same</em> redis database to store their queue, the workers
+of each application won&#8217;t know which jobs belong to them and they&#8217;ll end up
+dequeuing the wrong job types. This will lead to an exception or, if you
+are really unlucky to a very nasty&nbsp;bug!</p>
+<p>To avoid this, you can either use a different redis database (not database server)
+for each of your apps or add a prefix with the name of your app to your queue&nbsp;names:</p>
+<p>Each redis database server can host a number of databases that are identified
+by a number (that&#8217;s what the /0 you see in <tt class="docutils literal"><span class="pre">redis://127.0.0.1:6379/0</span></tt> means)
+and each one of them has a totally different keyspace. So, if you use /0 in an
+application and /1 in another application, you&#8217;ll have no problems. This solution
+has the disadvantage that you need to be really careful to use different database
+numbers for your projects and also the number of possible databases that redis
+can use is limited by a configuration file (so if you reach the maximum you&#8217;ll
+need to also increase that&nbsp;number)!</p>
+<p>Instead of this, you can avoid using the &#8216;default&#8217; queue, and use queues that
+contain your application name in their name, for example, for the sample project
+you could create something like &#8216;django-test-rq-default&#8217;, &#8216;django-test-rq-low&#8217;,
+&#8216;django-test-rq-high&#8217; etc. You need to configure the extra queues by adding them
+to the <tt class="docutils literal">RQ_QUEUES</tt> dictionary (check settings.py of django-test-rq) and then
+put the jobs to these queues using for example the job decorator
+(<tt class="docutils literal"><span class="pre">&#64;job('django-test-rq-default')</span></tt>)
+and run your workers so that they will retrieve jobs from these queues
+(<tt class="docutils literal">python manage.py rqworker <span class="pre">django-test-rq-default</span></tt>) and not the
+default one (which may contain jobs of other&nbsp;applications).</p>
+<p>If you use the default queue, and because you&#8217;ll need to use its name to
+many places, I recommend to add a (f.i) <tt class="docutils literal">QUEUE_NAME = <span class="pre">'django-test-rq-default'</span></tt>
+setting and use this instead of just a string to be totally <span class="caps">DRY</span>.</p>
+<p><strong>Update 13/09/2015</strong>: Please notice that using a <em>single</em> redis database server
+(either with multiple numeric databases or in the same database using a keyword
+in keys to differentiate the apps) <a class="reference external" href="https://redislabs.com/blog/benchmark-shared-vs-dedicated-redis-instances#.VfUl0xHtmko">is not recommended</a> as commenter
+Itamar Haber pointed out to&nbsp;me!</p>
+<p>This is because for speed reasons redis uses a single thread to handle all requests
+(regardless if they are in the same or different numerical databases), so all
+resources may be used by a single, redis hungry, application and leave all others to&nbsp;starve!</p>
+<p>Therefore, the recommended solution is to have a <em>different redis</em> server for each different
+application. This does not mean that you need to have different servers, just to run
+different instances of redis binding to different <span class="caps">IP</span> ports. Redis uses very little
+resourecs when it is idle (<a class="reference external" href="http://redis.io/topics/faq">empty instance uses ~ 1 <span class="caps">MB</span> <span class="caps">RAM</span></a>) so you can run a lot
+of instances in a single&nbsp;server.</p>
+<p>Long story short, my proposal is to have a redis.conf <em>inside</em> your application root tree
+(next to manage.py and requirements.txt) which has the redis options for each
+application. The options in redis.conf that need to be changed per application
+is the port that this redis instance will bind (this port also needs to be passed to
+django settings.py) and the pid filename if you daemonize redis &#8212; I recommend using
+a tool like <a class="reference external" href="http://supervisord.org/">supervisord</a> instead so that you won&#8217;t need any daemonizing and pid files for
+each&nbsp;per-app-redis-instance!</p>
+</div>
+<div class="section" id="low-level-debugging">
+<h2><a class="toc-backref" href="#id8">Low level&nbsp;debugging</a></h2>
+<p>In this section I&#8217;ll present some commands that you can issue to your redis
+server using a simple telnet connection to get various info about your queues. You
+probably will never need to issue these commands to actually debug, but they
+will answer some of your (scientific) questions! In the following, <tt class="docutils literal">&gt;</tt> is
+things I type, <tt class="docutils literal">#</tt> are comments, <tt class="docutils literal"><span class="pre">[...]</span></tt> is more output and everything else is the output I&nbsp;get:</p>
+<pre class="code literal-block">
+&gt; telnet 127.0.0.1 6379
+
+# You won't see anything at first but you'll be connected and you can try typing things
+
+&gt; INFO
+
+$1020
+redis_version:2.4.10
+redis_git_sha1:00000000
+# [...]
+db0:keys=83,expires=2
+db1:keys=26,expires=1 # My redis server has two databases
+
+# Now you'll see what you type!
+
+&gt; SELECT 1
++ OK # Now queries will be issued to database 1
+&gt; SELECT 0
++ OK # Now queries will be issued to database 0
+
+KEYS rq* # List all rq related queues
+*25
+$43
+rq:job:1d7afa32-3f90-4502-912f-d58eaa049fb1
+$43
+rq:queue:django-test-rq-low
+$43
+[...]
+
+&gt; SMEMBERS rq:workers # See workers
+*1
+$26
+rq:worker:SERAFEIM-PC.6892
+
+&gt; LRANGE rq:queue:django-test-rq-low 0 100 # Check queued jobs
+*2
+$36
+def896f4-84cb-4833-be6a-54d917f05271
+$36
+53cb1367-2fb5-46b3-99b2-7680397203b9
+
+&gt; HGETALL rq:job:def896f4-84cb-4833-be6a-54d917f05271 # Get info about this job
+*16
+$6
+status
+$6
+queued
+$11
+description
+$57
+tasks.tasks.long_runnig_task(&lt;LongTask: LongTask object&gt;)
+$10
+created_at
+$20
+2015-09-01T09:04:38Z
+$7
+timeout
+$3
+180
+$6
+origin
+$18
+django-test-rq-low
+$11
+enqueued_at
+$20
+2015-09-01T09:04:38Z
+$4
+data
+$409
+[...] # data is the pickled parameters passed to the job !
+
+&gt; HGET rq:job:def896f4-84cb-4833-be6a-54d917f05271 status # Get only status
+$6
+queued
+</pre>
+<p>For more info on querying redis you can check the <a class="reference external" href="http://redis.io/documentation">redis documentation</a> and especially
+<a class="reference external" href="http://redis.io/topics/data-types">http://redis.io/topics/data-types</a> and <a class="reference external" href="http://redis.io/commands">http://redis.io/commands</a>.</p>
+</div>
+<div class="section" id="conclusion">
+<h2><a class="toc-backref" href="#id9">Conclusion</a></h2>
+<p>Using some of the above techniques will help you in your asynchronous
+task adventures with rq. I&#8217;ll try to keep this article updated with
+any new techniques or tools I find in the&nbsp;future!</p>
+</div>
+</div>
+  		</article>
+  		<article>
+<header>
+      <h1 class="entry-title">
         <a href="http://spapas.github.io/2015/07/02/comprehensive-react-flux-tutorial-2/">A comprehensive React and Flux tutorial part 2: Flux</a>
       </h1>
     <p class="meta">
@@ -1674,164 +2005,6 @@ pattern for django&#8217;s default 404 view - just  add the following to your <t
 <p>You&#8217;ll then be able to see your 404 page by visiting the defined <span class="caps">URL</span>!</p>
 </div>
   		</article>
-  		<article>
-<header>
-      <h1 class="entry-title">
-        <a href="http://spapas.github.io/2015/02/06/python-pusher-rest/">Calling the REST API of Pusher from python</a>
-      </h1>
-    <p class="meta">
-<time datetime="2015-02-06T12:20:00+02:00" pubdate>Παρ 06 Φεβρουάριος 2015</time>    </p>
-</header>
-
-  <div class="entry-content"><div class="section" id="introduction">
-<h2>Introduction</h2>
-<p><a class="reference external" href="https://pusher.com/">Pusher</a> is one of the best real time frameworks right now. Using it you can add real time
-events in your projects without the need to configure and use <span class="caps">HTTP</span> servers that support
-real-time events in your environment. I used it recently in a project and it worked really
-good, having a very simple <span class="caps">API</span> and a nice interface for debugging your&nbsp;requests.</p>
-<p>The only problem I&#8217;ve found was that the <a class="reference external" href="https://github.com/pusher/pusher_client_python">Pusher python <span class="caps">API</span></a> misses some features that
-the APIs for other languages have, specifically finding out the users on a presence&nbsp;channel.</p>
-<p>Pusher supports real-time events through the use of &quot;channels&quot;. Each pusher client will
-subscribe to a channel and receive messages that are sent to that channel. A special kind
-of channel are presence channels which keep a list of their subscribers. You can query the
-<a class="reference external" href="https://pusher.com/docs/rest_api">Pusher <span class="caps">REST</span> <span class="caps">API</span></a> (or f.e the Pusher Javascript <span class="caps">API</span>) to find out the names of the users
-in a presence channel - however this is <em>not</em> currently possible with the python <span class="caps">API</span>.</p>
-<p>Unfortuanately, calling the Pusher <span class="caps">REST</span> <span class="caps">API</span> is <em>not</em> so easy, since it needs a complicated
-singining of each request, so I&#8217;ve written this post to help developers that need to call
-this <span class="caps">API</span> from python (to get the users of a presence channel or for any other method the
-<span class="caps">REST</span> <span class="caps">API</span>&nbsp;supports).</p>
-</div>
-<div class="section" id="signing-the-request">
-<h2>Signing the&nbsp;request</h2>
-<p>Quoting from the <a class="reference external" href="https://pusher.com/docs/rest_api">Pusher <span class="caps">REST</span> <span class="caps">API</span></a>, to sign a request we need a signature,&nbsp;which:</p>
-<blockquote>
-<p>The signature is a <span class="caps">HMAC</span> <span class="caps">SHA256</span> hex digest. This is generated by signing a string made up of the following components concatenated with newline characters&nbsp;\n:</p>
-<ul class="simple">
-<li>The uppercase request method (e.g. <span class="caps">POST</span>)</li>
-<li>The request path (e.g.&nbsp;/some/resource)</li>
-<li>The query parameters sorted by key, with keys converted to lowercase, then joined as in the query string. Note that the string must not be url escaped (e.g. given the keys auth_key: foo, Name: Something else, you get auth_key=foo&amp;name=Something&nbsp;else)</li>
-</ul>
-</blockquote>
-<p>So, we need to create a string and then sign it using our Pusher api_key and secret. To help with this, we create a <tt class="docutils literal">Token</tt>
-class which will be initialzed with out pusher key/secret and correctly sign a&nbsp;string:</p>
-<div class="highlight"><pre><span class="k">class</span> <span class="nc">Token</span><span class="p">(</span><span class="nb">object</span><span class="p">,):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">secret</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">key</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">secret</span> <span class="o">=</span> <span class="n">secret</span>
-
-    <span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">string</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">hmac</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">secret</span><span class="p">,</span> <span class="n">string</span><span class="p">,</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
-</pre></div>
-<p>It uses the <tt class="docutils literal">hmac</tt> and <tt class="docutils literal">hashlib</tt> python&nbsp;modules.</p>
-</div>
-<div class="section" id="generating-the-complete-query-string">
-<h2>Generating the complete query&nbsp;string</h2>
-<p>We can now create a function that will sign a request using an instance of the above&nbsp;token:</p>
-<div class="highlight"><pre><span class="k">def</span> <span class="nf">create_signed_query_string</span><span class="p">(</span><span class="n">token</span><span class="p">,</span> <span class="n">partial_path</span><span class="p">,</span> <span class="n">request_params</span><span class="p">):</span>
-    <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s">&#39;auth_key&#39;</span><span class="p">:</span> <span class="n">token</span><span class="o">.</span><span class="n">key</span><span class="p">,</span>
-        <span class="s">&#39;auth_timestamp&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()),</span>
-        <span class="s">&#39;auth_version&#39;</span><span class="p">:</span> <span class="s">&#39;1.0&#39;</span>
-    <span class="p">}</span>
-    <span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">request_params</span><span class="p">)</span>
-    <span class="n">keys</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="p">)</span>
-    <span class="n">params_list</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
-        <span class="n">params_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s">&#39;{0}={1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">params</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="p">)</span>
-
-    <span class="n">query_string</span> <span class="o">=</span> <span class="s">&#39;&amp;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">params_list</span><span class="p">)</span>
-
-    <span class="n">sign_data</span> <span class="o">=</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;GET&#39;</span><span class="p">,</span> <span class="n">partial_path</span><span class="p">,</span> <span class="n">query_string</span><span class="p">])</span>
-    <span class="n">query_string</span> <span class="o">+=</span> <span class="s">&#39;&amp;auth_signature=&#39;</span> <span class="o">+</span> <span class="n">token</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">sign_data</span><span class="p">);</span>
-    <span class="k">return</span> <span class="n">query_string</span>
-</pre></div>
-<p><tt class="docutils literal">create_signed_query_string</tt> receives an instance of a <tt class="docutils literal">Token</tt>, the path that we want to request
-without the server part (for example <tt class="docutils literal"><span class="pre">/apps/33/users/my-channel</span></tt>)  and a dictionary of
-request parameters. It then adds three extra fields to the request parameters (<tt class="docutils literal">auth_key, auth_timestamp, auth_version</tt>)
-and creates a list of these parameters in the <tt class="docutils literal">key=value</tt> form, where the keys are alphabetically sorted.
-After that it joins the above <tt class="docutils literal">key=value</tt> parameters using <tt class="docutils literal">&amp;</tt> to create the <tt class="docutils literal">query_string</tt> and then it creates the string to be signed (<tt class="docutils literal">sign_data</tt>)
-by concatenating the <span class="caps">HTTP</span> methdo (<span class="caps">GET</span>) with the path and the <tt class="docutils literal">query_string</tt>. Finally, it appends the signing result as an extra
-query parameter named (<tt class="docutils literal">auth_signature</tt>).</p>
-</div>
-<div class="section" id="requesting-the-users-of-the-presence-channel">
-<h2>Requesting the users of the presence&nbsp;channel</h2>
-<p>The <tt class="docutils literal">create_signed_query_string</tt> can now be used to get the users of a presence channel like&nbsp;this:</p>
-<div class="highlight"><pre><span class="k">def</span> <span class="nf">get_users</span><span class="p">(</span><span class="n">app_id</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">secret</span><span class="p">,</span> <span class="n">channel</span><span class="p">):</span>
-    <span class="n">partial_path</span> <span class="o">=</span>  <span class="s">&#39;/apps/{0}/channels/{1}/users&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">app_id</span><span class="p">,</span> <span class="n">channel</span><span class="p">)</span>
-    <span class="n">token</span> <span class="o">=</span> <span class="n">Token</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">secret</span><span class="p">)</span>
-    <span class="n">qs</span> <span class="o">=</span> <span class="n">create_signed_query_string</span><span class="p">(</span><span class="n">token</span><span class="p">,</span> <span class="n">partial_path</span><span class="p">,</span> <span class="p">{})</span>
-    <span class="n">full_path</span> <span class="o">=</span> <span class="s">&#39;http://api.pusherapp.com/{0}?{1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">partial_path</span><span class="p">,</span> <span class="n">qs</span><span class="p">)</span>
-    <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">full_path</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">text</span>
-</pre></div>
-<p>The <tt class="docutils literal">get_users</tt> function will generate the path of the pusher <span class="caps">REST</span> <span class="caps">API</span> (using
-our pusher app_id and channel name) and initialize a signing <tt class="docutils literal">Token</tt> using
-the pusher key and secret. It will then pass the previous to <tt class="docutils literal">create_signed_query_string</tt>
-to generate the complete <tt class="docutils literal">query_string</tt> and generate the <tt class="docutils literal">full_path</tt> to which
-a simple <span class="caps">HTTP</span> <span class="caps">GET</span> request is issued. The result will be a <span class="caps">JSON</span> list of the users in the
-presence&nbsp;channel.</p>
-</div>
-<div class="section" id="complete-example">
-<h2>Complete&nbsp;example</h2>
-<p>A complete example of getting the presence users of a channel is the&nbsp;following:</p>
-<div class="highlight"><pre><span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">import</span> <span class="nn">hashlib</span>
-<span class="kn">import</span> <span class="nn">hmac</span>
-<span class="kn">import</span> <span class="nn">requests</span>
-
-<span class="n">app_id</span> <span class="o">=</span> <span class="s">&#39;pusher_app_id&#39;</span>
-<span class="n">key</span> <span class="o">=</span> <span class="s">&#39;pusher_key&#39;</span>
-<span class="n">secret</span> <span class="o">=</span> <span class="s">&#39;pusher_secret&#39;</span>
-<span class="n">channel</span> <span class="o">=</span> <span class="s">&#39;pusher_presence_channel&#39;</span>
-
-
-<span class="k">class</span> <span class="nc">Token</span><span class="p">(</span><span class="nb">object</span><span class="p">,):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">secret</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">key</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">secret</span> <span class="o">=</span> <span class="n">secret</span>
-
-    <span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">string</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">hmac</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">secret</span><span class="p">,</span> <span class="n">string</span><span class="p">,</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
-
-
-<span class="k">def</span> <span class="nf">create_signed_query_string</span><span class="p">(</span><span class="n">token</span><span class="p">,</span> <span class="n">partial_path</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">request_params</span><span class="p">):</span>
-    <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s">&#39;auth_key&#39;</span><span class="p">:</span> <span class="n">token</span><span class="o">.</span><span class="n">key</span><span class="p">,</span>
-        <span class="s">&#39;auth_timestamp&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()),</span>
-        <span class="s">&#39;auth_version&#39;</span><span class="p">:</span> <span class="s">&#39;1.0&#39;</span>
-    <span class="p">}</span>
-    <span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">request_params</span><span class="p">)</span>
-    <span class="n">keys</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="p">)</span>
-    <span class="n">params_list</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
-        <span class="n">params_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s">&#39;{0}={1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">params</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="p">)</span>
-
-    <span class="n">query_string</span> <span class="o">=</span> <span class="s">&#39;&amp;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">params_list</span><span class="p">)</span>
-
-    <span class="n">sign_data</span> <span class="o">=</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">method</span><span class="p">,</span> <span class="n">partial_path</span><span class="p">,</span> <span class="n">query_string</span><span class="p">])</span>
-    <span class="n">query_string</span> <span class="o">+=</span> <span class="s">&#39;&amp;auth_signature=&#39;</span> <span class="o">+</span> <span class="n">token</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">sign_data</span><span class="p">);</span>
-    <span class="k">return</span> <span class="n">query_string</span>
-
-
-<span class="k">def</span> <span class="nf">get_users</span><span class="p">(</span><span class="n">channel</span><span class="p">):</span>
-    <span class="n">partial_path</span> <span class="o">=</span>  <span class="s">&#39;/apps/{0}/channels/{1}/users&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">app_id</span><span class="p">,</span> <span class="n">channel</span><span class="p">)</span>
-    <span class="n">token</span> <span class="o">=</span> <span class="n">Token</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">secret</span><span class="p">)</span>
-    <span class="n">qs</span> <span class="o">=</span>  <span class="n">create_signed_query_string</span><span class="p">(</span><span class="n">token</span><span class="p">,</span> <span class="n">partial_path</span><span class="p">,</span> <span class="s">&#39;GET&#39;</span> <span class="p">{})</span>
-    <span class="n">full_path</span> <span class="o">=</span> <span class="s">&#39;http://api.pusherapp.com/{0}?{1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">partial_path</span><span class="p">,</span> <span class="n">qs</span><span class="p">)</span>
-    <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">full_path</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">text</span>
-
-<span class="k">print</span> <span class="n">get_users</span><span class="p">(</span><span class="n">channel</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="section" id="conclusion">
-<h2>Conclusion</h2>
-<p>With the above we are able to not only easily get the users of a Pusher presence
-channel in python but to also call any method we want from the Pusher <span class="caps">REST</span> <span class="caps">API</span> by implementing a function
-similar to  <tt class="docutils literal">get_users</tt>.</p>
-</div>
-</div>
-  		</article>
 <div class="pagination">
     <a class="prev" href="http://spapas.github.io/index3.html">&larr; Older</a>
 
@@ -1849,6 +2022,9 @@ similar to  <tt class="docutils literal">get_users</tt>.</p>
     <h1>Recent Posts</h1>
     <ul id="recent_posts">
       <li class="post">
+          <a href="http://spapas.github.io/2015/12/22/ajax-with-react-fixed-data-table/">Ajax data with Fixed Data Table for React</a>
+      </li>
+      <li class="post">
           <a href="http://spapas.github.io/2015/11/27/pdf-in-django/">PDFs in Django: The essential guide</a>
       </li>
       <li class="post">
@@ -1859,9 +2035,6 @@ similar to  <tt class="docutils literal">get_users</tt>.</p>
       </li>
       <li class="post">
           <a href="http://spapas.github.io/2015/09/08/more-complex-react-flux-example/">A (little more) complex react and flux example</a>
-      </li>
-      <li class="post">
-          <a href="http://spapas.github.io/2015/09/01/django-rq-redux/">django-rq redux: advanced techniques and tools</a>
       </li>
     </ul>
   </section>
@@ -1884,7 +2057,7 @@ similar to  <tt class="docutils literal">get_users</tt>.</p>
 
   <section>
   <h1>Tags</h1>
-    <a href="http://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="http://spapas.github.io/tag/tasks.html">tasks</a>,    <a href="http://spapas.github.io/tag/less.html">less</a>,    <a href="http://spapas.github.io/tag/spring.html">spring</a>,    <a href="http://spapas.github.io/tag/rest.html">rest</a>,    <a href="http://spapas.github.io/tag/google.html">google</a>,    <a href="http://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="http://spapas.github.io/tag/scheduling.html">scheduling</a>,    <a href="http://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="http://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="http://spapas.github.io/tag/tables.html">tables</a>,    <a href="http://spapas.github.io/tag/reportlab.html">reportlab</a>,    <a href="http://spapas.github.io/tag/git.html">git</a>,    <a href="http://spapas.github.io/tag/java.html">java</a>,    <a href="http://spapas.github.io/tag/rq.html">rq</a>,    <a href="http://spapas.github.io/tag/uglify.html">uglify</a>,    <a href="http://spapas.github.io/tag/django-rq.html">django-rq</a>,    <a href="http://spapas.github.io/tag/babel.html">babel</a>,    <a href="http://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="http://spapas.github.io/tag/redis.html">redis</a>,    <a href="http://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="http://spapas.github.io/tag/forms.html">forms</a>,    <a href="http://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="http://spapas.github.io/tag/404.html">404</a>,    <a href="http://spapas.github.io/tag/xhtml2pdf.html">xhtml2pdf</a>,    <a href="http://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="http://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="http://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="http://spapas.github.io/tag/css.html">css</a>,    <a href="http://spapas.github.io/tag/node.html">node</a>,    <a href="http://spapas.github.io/tag/jobs.html">jobs</a>,    <a href="http://spapas.github.io/tag/watchify.html">watchify</a>,    <a href="http://spapas.github.io/tag/python.html">python</a>,    <a href="http://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="http://spapas.github.io/tag/javascript.html">javascript</a>,    <a href="http://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="http://spapas.github.io/tag/react.html">react</a>,    <a href="http://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="http://spapas.github.io/tag/npm.html">npm</a>,    <a href="http://spapas.github.io/tag/pdf.html">pdf</a>,    <a href="http://spapas.github.io/tag/rst.html">rst</a>,    <a href="http://spapas.github.io/tag/generic.html">generic</a>,    <a href="http://spapas.github.io/tag/es6.html">es6</a>,    <a href="http://spapas.github.io/tag/browserify.html">browserify</a>,    <a href="http://spapas.github.io/tag/branching.html">branching</a>,    <a href="http://spapas.github.io/tag/design.html">design</a>,    <a href="http://spapas.github.io/tag/github.html">github</a>,    <a href="http://spapas.github.io/tag/pusher.html">pusher</a>,    <a href="http://spapas.github.io/tag/windows.html">windows</a>,    <a href="http://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="http://spapas.github.io/tag/django.html">django</a>,    <a href="http://spapas.github.io/tag/flux.html">flux</a>,    <a href="http://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="http://spapas.github.io/tag/error.html">error</a>,    <a href="http://spapas.github.io/tag/debug.html">debug</a>,    <a href="http://spapas.github.io/tag/asynchronous.html">asynchronous</a>,    <a href="http://spapas.github.io/tag/security.html">security</a>,    <a href="http://spapas.github.io/tag/flask.html">flask</a>,    <a href="http://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>  </section>
+    <a href="http://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="http://spapas.github.io/tag/tasks.html">tasks</a>,    <a href="http://spapas.github.io/tag/less.html">less</a>,    <a href="http://spapas.github.io/tag/spring.html">spring</a>,    <a href="http://spapas.github.io/tag/rest.html">rest</a>,    <a href="http://spapas.github.io/tag/google.html">google</a>,    <a href="http://spapas.github.io/tag/design.html">design</a>,    <a href="http://spapas.github.io/tag/scheduling.html">scheduling</a>,    <a href="http://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="http://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="http://spapas.github.io/tag/tables.html">tables</a>,    <a href="http://spapas.github.io/tag/reportlab.html">reportlab</a>,    <a href="http://spapas.github.io/tag/git.html">git</a>,    <a href="http://spapas.github.io/tag/java.html">java</a>,    <a href="http://spapas.github.io/tag/rq.html">rq</a>,    <a href="http://spapas.github.io/tag/uglify.html">uglify</a>,    <a href="http://spapas.github.io/tag/django-rq.html">django-rq</a>,    <a href="http://spapas.github.io/tag/babel.html">babel</a>,    <a href="http://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="http://spapas.github.io/tag/redis.html">redis</a>,    <a href="http://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="http://spapas.github.io/tag/fixed-data-tables.html">fixed-data-tables</a>,    <a href="http://spapas.github.io/tag/forms.html">forms</a>,    <a href="http://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="http://spapas.github.io/tag/404.html">404</a>,    <a href="http://spapas.github.io/tag/xhtml2pdf.html">xhtml2pdf</a>,    <a href="http://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="http://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="http://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="http://spapas.github.io/tag/css.html">css</a>,    <a href="http://spapas.github.io/tag/node.html">node</a>,    <a href="http://spapas.github.io/tag/jobs.html">jobs</a>,    <a href="http://spapas.github.io/tag/watchify.html">watchify</a>,    <a href="http://spapas.github.io/tag/python.html">python</a>,    <a href="http://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="http://spapas.github.io/tag/javascript.html">javascript</a>,    <a href="http://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="http://spapas.github.io/tag/react.html">react</a>,    <a href="http://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="http://spapas.github.io/tag/npm.html">npm</a>,    <a href="http://spapas.github.io/tag/pdf.html">pdf</a>,    <a href="http://spapas.github.io/tag/rst.html">rst</a>,    <a href="http://spapas.github.io/tag/generic.html">generic</a>,    <a href="http://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="http://spapas.github.io/tag/es6.html">es6</a>,    <a href="http://spapas.github.io/tag/browserify.html">browserify</a>,    <a href="http://spapas.github.io/tag/branching.html">branching</a>,    <a href="http://spapas.github.io/tag/github.html">github</a>,    <a href="http://spapas.github.io/tag/pusher.html">pusher</a>,    <a href="http://spapas.github.io/tag/windows.html">windows</a>,    <a href="http://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="http://spapas.github.io/tag/django.html">django</a>,    <a href="http://spapas.github.io/tag/flux.html">flux</a>,    <a href="http://spapas.github.io/tag/fixeddatatable.html">FixedDataTable</a>,    <a href="http://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="http://spapas.github.io/tag/error.html">error</a>,    <a href="http://spapas.github.io/tag/debug.html">debug</a>,    <a href="http://spapas.github.io/tag/asynchronous.html">asynchronous</a>,    <a href="http://spapas.github.io/tag/security.html">security</a>,    <a href="http://spapas.github.io/tag/flask.html">flask</a>,    <a href="http://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>  </section>
 
 
 

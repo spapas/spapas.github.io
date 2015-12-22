@@ -1,5 +1,283 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>/var/</title><link href="http://spapas.github.io/" rel="alternate"></link><link href="http://spapas.github.io/feeds/all.atom.xml" rel="self"></link><id>http://spapas.github.io/</id><updated>2015-11-27T10:20:00+02:00</updated><entry><title>PDFs in Django: The essential guide</title><link href="http://spapas.github.io/2015/11/27/pdf-in-django/" rel="alternate"></link><updated>2015-11-27T10:20:00+02:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2015-11-27:2015/11/27/pdf-in-django/</id><summary type="html">&lt;div class="contents topic" id="contents"&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>/var/</title><link href="http://spapas.github.io/" rel="alternate"></link><link href="http://spapas.github.io/feeds/all.atom.xml" rel="self"></link><id>http://spapas.github.io/</id><updated>2015-12-22T15:20:00+02:00</updated><entry><title>Ajax data with Fixed Data Table for React</title><link href="http://spapas.github.io/2015/12/22/ajax-with-react-fixed-data-table/" rel="alternate"></link><updated>2015-12-22T15:20:00+02:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2015-12-22:2015/12/22/ajax-with-react-fixed-data-table/</id><summary type="html">&lt;div class="contents topic" id="contents"&gt;
+&lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id1"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#our-project" id="id2"&gt;Our&amp;nbsp;project&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#how-fixeddatatable-gets-its-data" id="id3"&gt;How FixedDataTable gets its&amp;nbsp;data&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#ajaxcell-non-working-version-1" id="id4"&gt;AjaxCell: Non working version&amp;nbsp;1&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#ajaxcell-non-working-version-2" id="id5"&gt;AjaxCell: Non working version&amp;nbsp;2&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#ajaxcell-non-working-version-3" id="id6"&gt;AjaxCell: Non working version&amp;nbsp;3&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#ajaxcell-final-version" id="id7"&gt;AjaxCell: Final&amp;nbsp;version&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#the-table-container-component" id="id8"&gt;The Table container&amp;nbsp;component&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#some-enchancements" id="id9"&gt;Some&amp;nbsp;enchancements&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#conslusion" id="id10"&gt;Conslusion&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="introduction"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id1"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://facebook.github.io/fixed-data-table/"&gt;FixedDataTable&lt;/a&gt; is a nice React component from Facebook that is used to render tabular data.
+Its main characteristic is that it can handle many rows without sacrificing performance, however
+probably due to this fact I was not able to find any examples for loading data using Ajax - all
+examples I was able to find had the data already loaded (or created on the&amp;nbsp;fly).&lt;/p&gt;
+&lt;p&gt;So, although FixedDataTable is able to handle many rows, I am against transfering all of them to the user
+whenever our page loads since at most one page of data will be shown on screen (30 rows or so ?) -
+any other actions (filtering, sorting, aggregate calculations etc) should be done on the&amp;nbsp;server.&lt;/p&gt;
+&lt;p&gt;In the following I will present a simple, react-only example with a FixedDataTable that can be
+used with server-side, asynchronous, paginated&amp;nbsp;data.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="our-project"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id2"&gt;Our&amp;nbsp;project&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Let&amp;#8217;s see an example of what we&amp;#8217;ll&amp;nbsp;build:&lt;/p&gt;
+&lt;img alt="Our project" src="/images/ajax_fixed_data_tables.gif" style="width: 600px;" /&gt;
+&lt;p&gt;As a source of the data I&amp;#8217;ve used the &lt;a class="reference external" href="http://swapi.co/"&gt;Star Wars &lt;span class="caps"&gt;API&lt;/span&gt;&lt;/a&gt; and specifically its &lt;a class="reference external" href="http://swapi.co/documentation#people"&gt;People &lt;span class="caps"&gt;API&lt;/span&gt;&lt;/a&gt; by issuing
+requests to &lt;a class="reference external" href="http://swapi.co/api/people/?format=json"&gt;http://swapi.co/api/people/?format=json&lt;/a&gt;. This will return an array of people from the
+star wars universe in &lt;span class="caps"&gt;JSON&lt;/span&gt; format - the results are paginated with a page size of 10 (and we can switch
+to another page using the extra &lt;tt class="docutils literal"&gt;page=&lt;/tt&gt; request&amp;nbsp;parameter).&lt;/p&gt;
+&lt;p&gt;I will use es6 with the object spread operator (as described in &lt;a class="reference external" href="http://spapas.github.io/2015/11/16/using-browserify-es6/"&gt;a previous article&lt;/a&gt;)
+to write the code, using a single main.js as a source which will be transpiled to &lt;tt class="docutils literal"&gt;dist/bundle.js&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;The placeholder &lt;span class="caps"&gt;HTML&lt;/span&gt; for our application&amp;nbsp;is:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;lt;!DOCTYPE html&amp;gt;
+&amp;lt;html&amp;gt;
+  &amp;lt;head&amp;gt;
+    &amp;lt;meta charset=&amp;quot;UTF-8&amp;quot; /&amp;gt;
+    &amp;lt;title&amp;gt;Hello Ajax Fixed Data Table!&amp;lt;/title&amp;gt;
+    &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href='https://cdnjs.cloudflare.com/ajax/libs/fixed-data-table/0.6.0/fixed-data-table.min.css'&amp;gt;
+  &amp;lt;/head&amp;gt;
+  &amp;lt;body&amp;gt;
+    &amp;lt;div id=&amp;quot;main&amp;quot;&amp;gt;&amp;lt;/div&amp;gt;
+    &amp;lt;script type=&amp;quot;text/javascript&amp;quot; src='dist/bundle.js' &amp;gt;&amp;lt;/script&amp;gt;
+  &amp;lt;/body&amp;gt;
+&amp;lt;/html&amp;gt;
+&lt;/pre&gt;
+&lt;p&gt;The versions that are used are react 14.3 and fixed-data-table 0.6.0. You can find this project in github &amp;#64;
+&lt;a class="reference external" href="https://github.com/spapas/react-tables"&gt;https://github.com/spapas/react-tables&lt;/a&gt; &amp;#8212; tag name &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;fixed-data-table-ajax&lt;/span&gt;&lt;/tt&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="how-fixeddatatable-gets-its-data"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id3"&gt;How FixedDataTable gets its&amp;nbsp;data&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The data of a &lt;tt class="docutils literal"&gt;FixedDataTable&lt;/tt&gt; component is defined through a number of &lt;tt class="docutils literal"&gt;Column&lt;/tt&gt; components
+and specifically, the &lt;tt class="docutils literal"&gt;cell&lt;/tt&gt; attribute of that component which sould either return be a static string
+to be displayed in that column or a React component (usually a &lt;tt class="docutils literal"&gt;Cell&lt;/tt&gt;) that will be displayed in
+that column or even a function that returns a string or a react component. The function (or component)
+passed to &lt;tt class="docutils literal"&gt;cell&lt;/tt&gt; will have an object with a &lt;tt class="docutils literal"&gt;rowIndex&lt;/tt&gt; attribute (among others) as a parameter,
+for example the&amp;nbsp;following&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;lt;Column
+  header={&amp;lt;Cell&amp;gt;Url&amp;lt;/Cell&amp;gt;}
+  cell={props =&amp;gt; props.rowIndex}
+  width={200}
+/&amp;gt;
+&lt;/pre&gt;
+&lt;p&gt;will just display the rowIndex for each&amp;nbsp;cell.&lt;/p&gt;
+&lt;p&gt;So we can see that for each cell that FixedDataTable wants to display it will use its corresponding
+&lt;tt class="docutils literal"&gt;cell&lt;/tt&gt; attribute.
+So, a general though if we wanted to support asynchronous, paginated data
+is to check the rowIndex and retrieve the correct page asynchronously.
+This would lead to a difficulty: What should the &lt;tt class="docutils literal"&gt;cell&lt;/tt&gt; function return? We&amp;#8217;ll try to resolve this
+using an &lt;tt class="docutils literal"&gt;AjaxCell&lt;/tt&gt; function that should return a react componet to put in the&amp;nbsp;cell:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="ajaxcell-non-working-version-1"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id4"&gt;AjaxCell: Non working version&amp;nbsp;1&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;A first sketch of an &lt;tt class="docutils literal"&gt;`AjaxCell&lt;/tt&gt; component could be something like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+// Careful - not working
+const AjaxCell1 = ({rowIndex, col, ...props}) =&amp;gt; {
+    let page = 1;
+    let idx = rowIndex;
+    if(rowIndex&amp;gt;=pageSize) {
+        page = Math.floor(rowIndex / pageSize) + 1;
+        idx = rowIndex % pageSize;
+    }
+    fetch('http://swapi.co/api/people/?format=json&amp;amp;page='+page).then(function(response) {
+        return response.json();
+    }).then(function(j) {
+        // Here we have the result ! But where will it go ?
+    });
+    return /// what ?
+}
+&lt;/pre&gt;
+&lt;p&gt;The col attribute will later be used to select the attribute we want to display in this cell.
+The &lt;tt class="docutils literal"&gt;page&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;idx&lt;/tt&gt; will have the correct page number and idx inside that page (for example,
+if &lt;tt class="docutils literal"&gt;rowIndex&lt;/tt&gt; is 33, &lt;tt class="docutils literal"&gt;page&lt;/tt&gt; will be 4 and idx will be 3. The problem with the above is that
+the fetch function will be called &lt;em&gt;asynchronously&lt;/em&gt; so when the AjaxCell returns it will &lt;em&gt;not&lt;/em&gt; have
+the results (yet)! So we won&amp;#8217;t be able to render anything&amp;nbsp;:(&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="ajaxcell-non-working-version-2"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt;AjaxCell: Non working version&amp;nbsp;2&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;To be able to render &lt;em&gt;something&lt;/em&gt;, we could put the results of fetching a page to a &lt;tt class="docutils literal"&gt;cache&lt;/tt&gt; dictionary &amp;#8212; and only
+fetch that page if it is not inside the &lt;tt class="docutils literal"&gt;cache&lt;/tt&gt; - if it is inside the cache then we&amp;#8217;ll just return
+the correct&amp;nbsp;value:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+// Careful - not working correctly
+const cache = {}
+const AjaxCell2 = ({rowIndex, col, forceUpdate, ...props}) =&amp;gt; {
+    let page = 1;
+    let idx = rowIndex;
+    if(rowIndex&amp;gt;=pageSize) {
+        page = Math.floor(rowIndex / pageSize) + 1;
+        idx = rowIndex % pageSize;
+    }
+    if (cache[page]) {
+        return &amp;lt;Cell&amp;gt;{cache[page][idx][col]}&amp;lt;/Cell&amp;gt;
+    } else {
+        console.log(&amp;quot;Loading page &amp;quot; + page);
+        fetch('http://swapi.co/api/people/?format=json&amp;amp;page='+page).then(function(response) {
+            return response.json();
+        }).then(function(j) {
+            cache[page] = j['results'];
+        });
+    }
+    return &amp;lt;Cell&amp;gt;-&amp;lt;/Cell&amp;gt;;
+}
+&lt;/pre&gt;
+&lt;p&gt;The above will work, since it will return an empty (&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;&amp;lt;Cell&amp;gt;-&amp;lt;/Cell&amp;gt;&lt;/span&gt;&lt;/tt&gt;) initially but when the
+&lt;tt class="docutils literal"&gt;fetch&lt;/tt&gt; returns it will set the &lt;tt class="docutils literal"&gt;cache&lt;/tt&gt; for that page and return the correct value (&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;&amp;lt;Cell&amp;gt;{cache[page][idx][col]}&amp;lt;/Cell&amp;gt;&lt;/span&gt;&lt;/tt&gt;).&lt;/p&gt;
+&lt;p&gt;However, as can be understood, when the page first loads it will call &lt;tt class="docutils literal"&gt;AjaxCell2&lt;/tt&gt; for all visible cells &amp;#8212;
+because fetch is asynchronous and takes time until it returns (and sets the cache for that page), so the
+&lt;tt class="docutils literal"&gt;fetch&lt;/tt&gt; will be called for &lt;em&gt;all&lt;/em&gt;&amp;nbsp;cells!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="ajaxcell-non-working-version-3"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id6"&gt;AjaxCell: Non working version&amp;nbsp;3&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;fetch&lt;/tt&gt; ing each page multiple times is of course not acceptable, so we&amp;#8217;ll add a &lt;tt class="docutils literal"&gt;loading&lt;/tt&gt; flag
+and &lt;tt class="docutils literal"&gt;fetch&lt;/tt&gt; will be called only when this flag is &lt;tt class="docutils literal"&gt;false&lt;/tt&gt;, like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+// Not ready yet
+const cache = {};
+let loading = false;
+const AjaxCell2 = ({rowIndex, col, ...props}) =&amp;gt; {
+    let page = 1;
+    let idx = rowIndex;
+    if(rowIndex&amp;gt;=pageSize) {
+        page = Math.floor(rowIndex / pageSize) + 1;
+        idx = rowIndex % pageSize;
+    }
+    if (cache[page]) {
+        return &amp;lt;Cell&amp;gt;{cache[page][idx][col]}&amp;lt;/Cell&amp;gt;
+    } else if(!loading) {
+        console.log(&amp;quot;Loading page &amp;quot; + page);
+        loading = true;
+
+        fetch('http://swapi.co/api/people/?format=json&amp;amp;page='+page).then(function(response) {
+            return response.json();
+        }).then(function(j) {
+            cache[page] = j['results'];
+            loading = false;
+        });
+    }
+    return &amp;lt;Cell&amp;gt;-&amp;lt;/Cell&amp;gt;;
+}
+&lt;/pre&gt;
+&lt;p&gt;This works much better - the cells are rendered correctly and each page is loaded only once. However, if for example
+I tried to move to the end of the table quickly, I would see some cells that are always loading (they never get their correct value). This is because
+there is no way to know that the fetch function has actually completed in order to update with the latest (correct) value of that
+cell and will contain the stale placeholder (&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;&amp;lt;Cell&amp;gt;-&amp;lt;/Cell&amp;gt;&lt;/span&gt;&lt;/tt&gt;)&amp;nbsp;value.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="ajaxcell-final-version"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id7"&gt;AjaxCell: Final&amp;nbsp;version&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;To clear the stale data we need to do an update to the table data
+when each fetch is finished &amp;#8212; this should be done by a callback that will be passed to the &lt;tt class="docutils literal"&gt;AjaxCell&lt;/tt&gt;, like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+const cache = {};
+let loading = false;
+const AjaxCell = ({rowIndex, col, forceUpdate, ...props}) =&amp;gt; {
+    let page = 1;
+    let idx = rowIndex;
+    if(rowIndex&amp;gt;=pageSize) {
+        page = Math.floor(rowIndex / pageSize) + 1;
+        idx = rowIndex % pageSize;
+    }
+    if (cache[page]) {
+        return &amp;lt;Cell&amp;gt;{cache[page][idx][col]}&amp;lt;/Cell&amp;gt;
+    } else if(!loading) {
+        console.log(&amp;quot;Loading page &amp;quot; + page);
+        loading = true;
+
+        fetch('http://swapi.co/api/people/?format=json&amp;amp;page='+page).then(function(response) {
+            return response.json();
+        }).then(function(j) {
+            cache[page] = j['results'];
+            loading = false;
+            forceUpdate();
+        });
+    }
+    return loadingCell;
+}
+&lt;/pre&gt;
+&lt;p&gt;So we pass a forceUpdate callback as a property which is called when a fetch is finished. This may
+result to some not needed updates to the table (since we would do a fetch + forceUpdate for non-displayed
+data) but we can now be positive that when the data is loaded the table will be updated to dispaly&amp;nbsp;it.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="the-table-container-component"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id8"&gt;The Table container&amp;nbsp;component&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Finally, the component that contains the table is the&amp;nbsp;following:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class TableContainer extends React.Component {
+    render() {
+        return &amp;lt;Table
+            rowHeight={30} rowsCount={87} width={600} height={200} headerHeight={30}&amp;gt;
+
+            &amp;lt;Column
+              header={&amp;lt;Cell&amp;gt;Name&amp;lt;/Cell&amp;gt;}
+              cell={ &amp;lt;AjaxCell col='name' forceUpdate={this.forceUpdate.bind(this)} /&amp;gt; }
+              width={200}
+            /&amp;gt;
+            &amp;lt;Column
+              header={&amp;lt;Cell&amp;gt;Birth Year&amp;lt;/Cell&amp;gt;}
+              cell={ &amp;lt;AjaxCell col='birth_year' forceUpdate={this.forceUpdate.bind(this)} /&amp;gt; }
+              width={200}
+            /&amp;gt;
+            &amp;lt;Column
+              header={&amp;lt;Cell&amp;gt;Url&amp;lt;/Cell&amp;gt;}
+              cell={ &amp;lt;AjaxCell col='url' forceUpdate={this.forceUpdate.bind(this)} /&amp;gt; }
+              width={200}
+            /&amp;gt;
+
+        &amp;lt;/Table&amp;gt;
+    }
+}
+&lt;/pre&gt;
+&lt;p&gt;I&amp;#8217;ve made it a component in order to be able to bind the &lt;tt class="docutils literal"&gt;forceUpdate&lt;/tt&gt; method of the component to and
+&lt;tt class="docutils literal"&gt;this&lt;/tt&gt; and pass it to the &lt;tt class="docutils literal"&gt;forceUpdate&lt;/tt&gt; parameter to the &lt;tt class="docutils literal"&gt;AjaxCell&lt;/tt&gt; component. I&amp;#8217;ve hard-coded
+the rowsCount value &amp;#8212; instead we should have done an initial fetch to the first page of the &lt;span class="caps"&gt;API&lt;/span&gt; to get
+the total number of rows and only after that fetch had returned display the &lt;tt class="docutils literal"&gt;&amp;lt;Table&amp;gt;&lt;/tt&gt; component (left
+as an exercise to the&amp;nbsp;reader).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="some-enchancements"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id9"&gt;Some&amp;nbsp;enchancements&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Instead of displaying &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;&amp;lt;Cell&amp;gt;-&amp;lt;/Cell&amp;gt;&lt;/span&gt;&lt;/tt&gt; (or &lt;tt class="docutils literal"&gt;&amp;lt;/Cell&amp;gt;&lt;/tt&gt;) when the page loads, I propose to define a
+cell with an embedded spinner,&amp;nbsp;like&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+const loadingCell = &amp;lt;Cell&amp;gt;
+    &amp;lt;img width=&amp;quot;16&amp;quot; height=&amp;quot;16&amp;quot; alt=&amp;quot;star&amp;quot; src=&amp;quot;data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==&amp;quot; /&amp;gt;
+&amp;lt;/Cell&amp;gt;
+&lt;/pre&gt;
+&lt;p&gt;and return this&amp;nbsp;instead.&lt;/p&gt;
+&lt;p&gt;Also, if your &lt;span class="caps"&gt;REST&lt;/span&gt; &lt;span class="caps"&gt;API&lt;/span&gt; returns too fast and you&amp;#8217;d like to see what would happen if the server request took too long to return, you could
+change fetch like&amp;nbsp;this&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+fetch('http://swapi.co/api/people/?format=json&amp;amp;page='+page).then(function(response) {
+    return response.json();
+}).then(function(j) {
+    setTimeout( () =&amp;gt; {
+        cache[page] = j['results'];
+        loading = false;
+        forceUpdate();
+    }, 1000);
+});
+&lt;/pre&gt;
+&lt;p&gt;to add a 1 second&amp;nbsp;delay.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="conslusion"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id10"&gt;Conslusion&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The above is a just a proof of concept of using FixedDataTable with asynchronously loaded server-side data.
+This of course could be used for small projects (I am already using it for an internal project) but I recommend
+using the &lt;a class="reference external" href="http://spapas.github.io/2015/07/02/comprehensive-react-flux-tutorial-2/"&gt;flux architecture&lt;/a&gt; for more complex projects. What this more or
+less means is that a store component
+should be developed that will actually keep the data for each row, and a &lt;tt class="docutils literal"&gt;fetchCompleted&lt;/tt&gt; action should be
+dispatched when the &lt;tt class="docutils literal"&gt;fetch&lt;/tt&gt; is finished instead of calling &lt;tt class="docutils literal"&gt;forceUpdate&lt;/tt&gt; directly.&lt;/p&gt;
+&lt;/div&gt;
+</summary><category term="javascript"></category><category term="react"></category><category term="fixed-data-tables"></category><category term="FixedDataTable"></category></entry><entry><title>PDFs in Django: The essential guide</title><link href="http://spapas.github.io/2015/11/27/pdf-in-django/" rel="alternate"></link><updated>2015-11-27T10:20:00+02:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2015-11-27:2015/11/27/pdf-in-django/</id><summary type="html">&lt;div class="contents topic" id="contents"&gt;
 &lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
 &lt;ul class="simple"&gt;
 &lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id4"&gt;Introduction&lt;/a&gt;&lt;/li&gt;

@@ -6,9 +6,11 @@
 &lt;li&gt;&lt;a class="reference internal" href="#npm-save-save-dev-and-avoiding-global-deps" id="id2"&gt;&lt;span class="caps"&gt;NPM&lt;/span&gt;, &amp;#8212;save, &amp;#8212;save-dev and avoiding global&amp;nbsp;deps&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a class="reference internal" href="#using-babel" id="id3"&gt;Using&amp;nbsp;babel&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a class="reference internal" href="#integrate-babel-with-browserify" id="id4"&gt;Integrate babel with&amp;nbsp;browserify&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#conclusion" id="id5"&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#the-object-spread-operator" id="id5"&gt;The object-spread&amp;nbsp;operator&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#conclusion" id="id6"&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;Update 22/12/2015:&lt;/strong&gt; Add section for the object-spread&amp;nbsp;operator.&lt;/p&gt;
 &lt;div class="section" id="introduction"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id1"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;In a &lt;a class="reference external" href="http://spapas.github.io/2015/05/27/using-browserify-watchify/"&gt;previous article&lt;/a&gt;
@@ -171,8 +173,30 @@ Now: 13:52:09, Later: 11/17/2015...
 Now: 13:52:10, Later: 11/18/2015...
 &lt;/pre&gt;
 &lt;/div&gt;
+&lt;div class="section" id="the-object-spread-operator"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt;The object-spread&amp;nbsp;operator&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Many examples in the internet use the &lt;a class="reference external" href="https://facebook.github.io/react/docs/jsx-spread.html#spread-attributes"&gt;object spread operator&lt;/a&gt; which is &lt;a class="reference external" href="http://stackoverflow.com/questions/31115276/ecmascript-6-spread-operator-in-object-deconstruction-support-in-typescript-and"&gt;not part of es6&lt;/a&gt; so our
+proposed babel configuration does not support it!
+To be able to use this syntax, we&amp;#8217;ll need to install the corresponding babel plugin by using
+&lt;tt class="docutils literal"&gt;npm install &lt;span class="pre"&gt;babel-plugin-transform-object-rest-spread&lt;/span&gt; &lt;span class="pre"&gt;--save&lt;/span&gt;&lt;/tt&gt; and add it to our babel configuration
+in the plugins section, something like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;quot;presets&amp;quot;: [
+  &amp;quot;es2015&amp;quot;,
+  &amp;quot;react&amp;quot;
+],
+&amp;quot;plugins&amp;quot;: [
+  &amp;quot;transform-object-rest-spread&amp;quot;
+]
+&lt;/pre&gt;
+&lt;p&gt;If everything is ok this should be transpiled without errors using &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;node_modules\.bin\browserify&lt;/span&gt; testbabe.js &lt;span class="pre"&gt;-t&lt;/span&gt; babelify&lt;/tt&gt;&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+let x = {a:1 , b:2 };
+let y = {...x, c: 3};
+&lt;/pre&gt;
+&lt;/div&gt;
 &lt;div class="section" id="conclusion"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id6"&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;Using the combination of babel and javascript we can easily write &lt;span class="caps"&gt;ES6&lt;/span&gt; code in our modules! This,
 along with the modularization of our code and the management of client-side dependencies should
 make client side development a&amp;nbsp;breeze!&lt;/p&gt;

@@ -85,9 +85,11 @@
 <li><a class="reference internal" href="#npm-save-save-dev-and-avoiding-global-deps" id="id2"><span class="caps">NPM</span>, &#8212;save, &#8212;save-dev and avoiding global&nbsp;deps</a></li>
 <li><a class="reference internal" href="#using-babel" id="id3">Using&nbsp;babel</a></li>
 <li><a class="reference internal" href="#integrate-babel-with-browserify" id="id4">Integrate babel with&nbsp;browserify</a></li>
-<li><a class="reference internal" href="#conclusion" id="id5">Conclusion</a></li>
+<li><a class="reference internal" href="#the-object-spread-operator" id="id5">The object-spread&nbsp;operator</a></li>
+<li><a class="reference internal" href="#conclusion" id="id6">Conclusion</a></li>
 </ul>
 </div>
+<p><strong>Update 22/12/2015:</strong> Add section for the object-spread&nbsp;operator.</p>
 <div class="section" id="introduction">
 <h2><a class="toc-backref" href="#id1">Introduction</a></h2>
 <p>In a <a class="reference external" href="http://spapas.github.io/2015/05/27/using-browserify-watchify/">previous article</a>
@@ -250,8 +252,30 @@ Now: 13:52:09, Later: 11/17/2015...
 Now: 13:52:10, Later: 11/18/2015...
 </pre>
 </div>
+<div class="section" id="the-object-spread-operator">
+<h2><a class="toc-backref" href="#id5">The object-spread&nbsp;operator</a></h2>
+<p>Many examples in the internet use the <a class="reference external" href="https://facebook.github.io/react/docs/jsx-spread.html#spread-attributes">object spread operator</a> which is <a class="reference external" href="http://stackoverflow.com/questions/31115276/ecmascript-6-spread-operator-in-object-deconstruction-support-in-typescript-and">not part of es6</a> so our
+proposed babel configuration does not support it!
+To be able to use this syntax, we&#8217;ll need to install the corresponding babel plugin by using
+<tt class="docutils literal">npm install <span class="pre">babel-plugin-transform-object-rest-spread</span> <span class="pre">--save</span></tt> and add it to our babel configuration
+in the plugins section, something like&nbsp;this:</p>
+<pre class="code literal-block">
+&quot;presets&quot;: [
+  &quot;es2015&quot;,
+  &quot;react&quot;
+],
+&quot;plugins&quot;: [
+  &quot;transform-object-rest-spread&quot;
+]
+</pre>
+<p>If everything is ok this should be transpiled without errors using <tt class="docutils literal"><span class="pre">node_modules\.bin\browserify</span> testbabe.js <span class="pre">-t</span> babelify</tt></p>
+<pre class="code literal-block">
+let x = {a:1 , b:2 };
+let y = {...x, c: 3};
+</pre>
+</div>
 <div class="section" id="conclusion">
-<h2><a class="toc-backref" href="#id5">Conclusion</a></h2>
+<h2><a class="toc-backref" href="#id6">Conclusion</a></h2>
 <p>Using the combination of babel and javascript we can easily write <span class="caps">ES6</span> code in our modules! This,
 along with the modularization of our code and the management of client-side dependencies should
 make client side development a&nbsp;breeze!</p>

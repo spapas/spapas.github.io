@@ -1853,7 +1853,7 @@ learn &lt;a class="reference external" href="http://spapas.github.io/2015/05/27/
 &lt;/div&gt;
 &lt;div class="section" id="flux-components"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id2"&gt;Flux&amp;nbsp;components&lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;To implement the Flux architecture, an application needs to have at least a store and about&amp;nbsp;dispatcher.&lt;/p&gt;
+&lt;p&gt;To implement the Flux architecture, an application needs to have at least a store and a&amp;nbsp;dispatcher.&lt;/p&gt;
 &lt;p&gt;The store is the central place of truth for the application and the dispacher is the central
 place of communications. The store should hold the
 state (and any models/DAOs) of the application and notify the react components when this state is changed. Also,

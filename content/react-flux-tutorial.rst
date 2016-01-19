@@ -31,7 +31,7 @@ learn `how to use browserify here <{filename}using-browserify.rst>`_.
 Flux components
 ---------------
 
-To implement the Flux architecture, an application needs to have at least a store and about
+To implement the Flux architecture, an application needs to have at least a store and a
 dispatcher.
 
 The store is the central place of truth for the application and the dispacher is the central

@@ -1534,44 +1534,44 @@ of the Model to be viewed as a parameter and retrieve the model (and queryset) f
 </summary><category term="django"></category><category term="python"></category><category term="forms"></category><category term="tables"></category></entry><entry><title>A (little more) complex react and flux example</title><link href="http://spapas.github.io/2015/09/08/more-complex-react-flux-example/" rel="alternate"></link><updated>2015-09-08T12:55:00+03:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2015-09-08:2015/09/08/more-complex-react-flux-example/</id><summary type="html">&lt;div class="contents topic" id="contents"&gt;
 &lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
 &lt;ul class="simple"&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id3"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#more-about-flux-components" id="id4"&gt;More about Flux&amp;nbsp;components&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#explaining-the-application-components" id="id5"&gt;Explaining the application&amp;nbsp;components&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#reusable-application-components" id="id6"&gt;Reusable application components&lt;/a&gt;&lt;ul&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#dropdown-react-js" id="id7"&gt;DropDown.react.js&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#id1" id="id8"&gt;DropDown.react.js&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#pagingpanel-react-js" id="id9"&gt;PagingPanel.react.js&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#searchpanel-react-js" id="id10"&gt;SearchPanel.react.js&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#messagepanel" id="id11"&gt;MessagePanel&lt;/a&gt;&lt;ul&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#messagepanel-react-js" id="id12"&gt;MessagePanel.react.js&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#messagestore-js" id="id13"&gt;MessageStore.js&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#messageactions" id="id14"&gt;MessageActions&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id2"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#more-about-flux-components" id="id3"&gt;More about Flux&amp;nbsp;components&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#explaining-the-application-components" id="id4"&gt;Explaining the application&amp;nbsp;components&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#reusable-application-components" id="id5"&gt;Reusable application components&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#dropdown-react-js" id="id6"&gt;DropDown.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#datepicker-react-js" id="id7"&gt;DatePicker.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#pagingpanel-react-js" id="id8"&gt;PagingPanel.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#searchpanel-react-js" id="id9"&gt;SearchPanel.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#messagepanel" id="id10"&gt;MessagePanel&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#messagepanel-react-js" id="id11"&gt;MessagePanel.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#messagestore-js" id="id12"&gt;MessageStore.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#messageactions" id="id13"&gt;MessageActions&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
 &lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#non-reusable-application-components" id="id15"&gt;Non-reusable application components&lt;/a&gt;&lt;ul&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#booktable-react-js" id="id16"&gt;BookTable.react.js&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#authordialog-react-js" id="id17"&gt;AuthorDialog.react.js&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#authorpanel-react-js" id="id18"&gt;AuthorPanel.react.js&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#statpanel-react-js" id="id19"&gt;StatPanel.react.js&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#bookform-react-js" id="id20"&gt;BookForm.react.js&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#bookpanel-react-js" id="id21"&gt;BookPanel.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#non-reusable-application-components" id="id14"&gt;Non-reusable application components&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#booktable-react-js" id="id15"&gt;BookTable.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#authordialog-react-js" id="id16"&gt;AuthorDialog.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#authorpanel-react-js" id="id17"&gt;AuthorPanel.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#statpanel-react-js" id="id18"&gt;StatPanel.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#bookform-react-js" id="id19"&gt;BookForm.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#bookpanel-react-js" id="id20"&gt;BookPanel.react.js&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#the-actions" id="id22"&gt;The&amp;nbsp;Actions&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#the-stores" id="id23"&gt;The Stores&lt;/a&gt;&lt;ul&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#id2" id="id24"&gt;MessageStore.js&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#authorstore-js" id="id25"&gt;AuthorStore.js&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#categorystore-js" id="id26"&gt;CategoryStore.js&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#bookstore-js" id="id27"&gt;BookStore.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#the-actions" id="id21"&gt;The&amp;nbsp;Actions&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#the-stores" id="id22"&gt;The Stores&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#id1" id="id23"&gt;MessageStore.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#authorstore-js" id="id24"&gt;AuthorStore.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#categorystore-js" id="id25"&gt;CategoryStore.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#bookstore-js" id="id26"&gt;BookStore.js&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#conclusion" id="id28"&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#conclusion" id="id27"&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
 &lt;div class="section" id="introduction"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id3"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id2"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;In &lt;a class="reference external" href="http://spapas.github.io/2015/06/05/comprehensive-react-flux-tutorial/"&gt;previous&lt;/a&gt;
 &lt;a class="reference external" href="http://spapas.github.io/2015/07/02/comprehensive-react-flux-tutorial-2/"&gt;two&lt;/a&gt; parts of this series, we have seen
 how we could implement a
@@ -1613,7 +1613,7 @@ a bunch of techniques such&amp;nbsp;as:&lt;/p&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
 &lt;div class="section" id="more-about-flux-components"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id4"&gt;More about Flux&amp;nbsp;components&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id3"&gt;More about Flux&amp;nbsp;components&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;Before delving into the source code of the above application, I&amp;#8217;d like to
 make crystal what is the proposed way to call methods in the flux chain
 and which types of components can include other types of components. Let&amp;#8217;s
@@ -1736,7 +1736,7 @@ we want to make the component reusable (more on this&amp;nbsp;later).&lt;/p&gt;
 child components (a BookTable depends on a BookTableRow&amp;nbsp;etc).&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="explaining-the-application-components"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt;Explaining the application&amp;nbsp;components&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id4"&gt;Explaining the application&amp;nbsp;components&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;There are a lot of components that are needed for
 the above application. A bird&amp;#8217;s eye view of the components
 and their hierarchies can be seen on the following&amp;nbsp;figure:&lt;/p&gt;
@@ -1746,7 +1746,7 @@ by other applications and after that the components that are specifically
 implemented for our book/author single page&amp;nbsp;application.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="reusable-application-components"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id6"&gt;Reusable application&amp;nbsp;components&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt;Reusable application&amp;nbsp;components&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;We can see that beyond the specific components (&lt;tt class="docutils literal"&gt;BookPanel&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;BookTable&lt;/tt&gt; etc)
 there&amp;#8217;s a bunch of more general components (&lt;tt class="docutils literal"&gt;DropDown&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;DatePicker&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;PagingPanel&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;SearchPanel&lt;/tt&gt;,
 &lt;tt class="docutils literal"&gt;MessagePanel&lt;/tt&gt;) that have names like they could be used by other applications (for example every application
@@ -1754,7 +1754,7 @@ that wants to implement a DropDown could use our component) and not only by the
 Book-Author application. Let&amp;#8217;s take a quick look at these components and if they
 are actually&amp;nbsp;reusable:&lt;/p&gt;
 &lt;div class="section" id="dropdown-react-js"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id7"&gt;DropDown.react.js&lt;/a&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id6"&gt;DropDown.react.js&lt;/a&gt;&lt;/h3&gt;
 &lt;pre class="code literal-block"&gt;
 var React = require('react');
 
@@ -1796,8 +1796,8 @@ would be to pass an identifier as a property for each dropdown and the dropdown 
 dropdown action and passing this identifier &amp;#8212; however I think that actually passing the callback is
 easier and makes the code much more&amp;nbsp;readable.&lt;/p&gt;
 &lt;/div&gt;
-&lt;div class="section" id="id1"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id8"&gt;DropDown.react.js&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="section" id="datepicker-react-js"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id7"&gt;DatePicker.react.js&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;The datepicker component has more or less the same structure as with the dropdown: It needs one parameter
 for its current value (&lt;tt class="docutils literal"&gt;props.value&lt;/tt&gt;) and another as the callback to the function when the date is
 changed (once again this is required to have a reusable&amp;nbsp;component):&lt;/p&gt;
@@ -1830,7 +1830,7 @@ the component is mounted, we get its &lt;span class="caps"&gt;DOM&lt;/span&gt; c
 convert it to a datepicker. We also set its change function to be the passed&amp;nbsp;callback.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="pagingpanel-react-js"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id9"&gt;PagingPanel.react.js&lt;/a&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id8"&gt;PagingPanel.react.js&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;The paging panel is not actually a reusable component because it requires BookActions
 (to handle next and previous page clicks) - so
 it can&amp;#8217;t be used by Authors (if authors was a table that is). However, we can easily
@@ -1875,7 +1875,7 @@ module.exports.PagingPanel = PagingPanel;
 &lt;p&gt;and just displayd the current page along with buttons to go to the next or previous page (if these buttons should be visible of&amp;nbsp;course).&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="searchpanel-react-js"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id10"&gt;SearchPanel.react.js&lt;/a&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id9"&gt;SearchPanel.react.js&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;The SearchPanel is another panel that could be reusable if we&amp;#8217;d passed a callbeck instead of calling the &lt;tt class="docutils literal"&gt;BookActions.search&lt;/tt&gt;
 action directly. The promise behavior has been explained in the previous posts and is needed to buffer the queries to the
 server when a user types his search&amp;nbsp;query.&lt;/p&gt;
@@ -1940,14 +1940,14 @@ this consistent behavior (we&amp;#8217;d need to add two actions, one to handle 
 and another to handle the timeout firing &amp;#8212; making everythimg much more&amp;nbsp;complicated).&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="messagepanel"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id11"&gt;MessagePanel&lt;/a&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id10"&gt;MessagePanel&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;The MessagePanel is really interesting because it is a reusable component that actually has its own action and store module! This
 component can be reused in &lt;em&gt;different&lt;/em&gt; applications that need to display message but &lt;em&gt;not&lt;/em&gt; on the same application (because a single state
 is kept for all messages). If we wanted to use a different MessagePanel for Books or Authors then we&amp;#8217;d need to keep both in the
 state &lt;em&gt;and&lt;/em&gt; also it to the action to differentiate between messages for author and for book. Instead, by keeping a single Messages
 state for both Books and Authors we have a much more simple&amp;nbsp;version.&lt;/p&gt;
 &lt;div class="section" id="messagepanel-react-js"&gt;
-&lt;h4&gt;&lt;a class="toc-backref" href="#id12"&gt;MessagePanel.react.js&lt;/a&gt;&lt;/h4&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#id11"&gt;MessagePanel.react.js&lt;/a&gt;&lt;/h4&gt;
 &lt;p&gt;The MessagePanel component has a local state which responds to changes on MessageStore. When the
 state of MessageStore is changed the MessagePanel will be re-rendered with the new&amp;nbsp;message.&lt;/p&gt;
 &lt;pre class="code literal-block"&gt;
@@ -1982,7 +1982,7 @@ module.exports.MessagePanel = MessagePanel;
 &lt;/pre&gt;
 &lt;/div&gt;
 &lt;div class="section" id="messagestore-js"&gt;
-&lt;h4&gt;&lt;a class="toc-backref" href="#id13"&gt;MessageStore.js&lt;/a&gt;&lt;/h4&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#id12"&gt;MessageStore.js&lt;/a&gt;&lt;/h4&gt;
 &lt;p&gt;The MessageStore has a (private) state containing a &lt;tt class="docutils literal"&gt;message&lt;/tt&gt; that gets updated
 only when the ccorresponding action is dispached. The store has a single state
 for all messages - it doesn&amp;#8217;t care if the messages are for books or&amp;nbsp;authors.&lt;/p&gt;
@@ -2025,7 +2025,7 @@ module.exports.MessageStore = MessageStore;
 &lt;/pre&gt;
 &lt;/div&gt;
 &lt;div class="section" id="messageactions"&gt;
-&lt;h4&gt;&lt;a class="toc-backref" href="#id14"&gt;MessageActions&lt;/a&gt;&lt;/h4&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#id13"&gt;MessageActions&lt;/a&gt;&lt;/h4&gt;
 &lt;p&gt;Finally, there are two actions that are defined for the MessageStore: One for adding
 an ok message and one for adding an error message - both of which have the same
 message type (but pass a different color&amp;nbsp;parameter).&lt;/p&gt;
@@ -2060,13 +2060,13 @@ module.exports.MessageActions = MessageActions;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="section" id="non-reusable-application-components"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id15"&gt;Non-reusable application&amp;nbsp;components&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id14"&gt;Non-reusable application&amp;nbsp;components&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;I don&amp;#8217;t want to discuss the source code for all the non-reusable components since some of them
 are more or less the same with the previous version and are easy to understand just by
 checking the source code (BookTableRow and ButtonPanel). However, I&amp;#8217;ll
 discuss the other, more complex components starting from the inside of the&amp;nbsp;react-onion:&lt;/p&gt;
 &lt;div class="section" id="booktable-react-js"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id16"&gt;BookTable.react.js&lt;/a&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id15"&gt;BookTable.react.js&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;I want to display this component to discuss how sorting is implemented: Each column has a key which,
 when passed to django-rest-framework will sort the results based on that key (the &lt;tt class="docutils literal"&gt;__&lt;/tt&gt; does a
 join so by &lt;tt class="docutils literal"&gt;author__last_name&lt;/tt&gt; we mean that we want to sort by the last_name field of the author
@@ -2130,7 +2130,7 @@ of the function to the same object and only do the parameter&amp;nbsp;passing.&l
 either a + (for ascending) or - (for descending) in front of the column&amp;nbsp;title.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="authordialog-react-js"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id17"&gt;AuthorDialog.react.js&lt;/a&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id16"&gt;AuthorDialog.react.js&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;This is a handmade pop-up dialog that gets displayed when a new author is added (the + button is clicked)
 using only css to center it on the screen when it is displayed.
 We can see that it is either visible on invisible based on the &lt;tt class="docutils literal"&gt;showDialog&lt;/tt&gt; input property which actually
@@ -2179,7 +2179,7 @@ module.exports.AuthorDialog = AuthorDialog ;
 &lt;/pre&gt;
 &lt;/div&gt;
 &lt;div class="section" id="authorpanel-react-js"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id18"&gt;AuthorPanel.react.js&lt;/a&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id17"&gt;AuthorPanel.react.js&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;The AuthorPanel displays the author select DropDown along with the + (add author) and
 - (delete author) buttons. It also contains the AuthorDialog which will be displayed
 or not depending on the value of the &lt;tt class="docutils literal"&gt;showDialog&lt;/tt&gt; property.&lt;/p&gt;
@@ -2238,7 +2238,7 @@ module.exports.AuthorPanel = AuthorPanel;
 &lt;/ul&gt;
 &lt;/div&gt;
 &lt;div class="section" id="statpanel-react-js"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id19"&gt;StatPanel.react.js&lt;/a&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id18"&gt;StatPanel.react.js&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;The StatPanel is an interesting, read-only component that displays the number of
 authors and books. This component requests updates from both the &lt;tt class="docutils literal"&gt;BookStore&lt;/tt&gt; and
 &lt;tt class="docutils literal"&gt;AuthorStore&lt;/tt&gt; - when their state is updated the component will be re-rendered
@@ -2302,7 +2302,7 @@ could be achieved with just a single change listener that would
 get both the books and&amp;nbsp;authors.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="bookform-react-js"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id20"&gt;BookForm.react.js&lt;/a&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id19"&gt;BookForm.react.js&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;The BookForm is one of the most complex panels of this application (along with BookPanel) because
 it actually contains a bunch of other panels and has some callbacks for them to&amp;nbsp;use.&lt;/p&gt;
 &lt;p&gt;We can see that, as explained before, when the current book form values are changed (through callbacks) the change_book action will be&amp;nbsp;called.&lt;/p&gt;
@@ -2404,7 +2404,7 @@ the local state. The book that is edited is just passed as a property - actually
 property that this component needs to&amp;nbsp;work.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="bookpanel-react-js"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id21"&gt;BookPanel.react.js&lt;/a&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id20"&gt;BookPanel.react.js&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;Finally, BookPanel is the last component we&amp;#8217;ll talk about. This is the central component
 of the application - however we&amp;#8217;ll see that it is not very complex (since most user interaction
 is performed in other components). This component just listens on changes in the BookStore state
@@ -2466,7 +2466,7 @@ module.exports.BookPanel = BookPanel ;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="section" id="the-actions"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id22"&gt;The&amp;nbsp;Actions&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id21"&gt;The&amp;nbsp;Actions&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;All actions are rather simple components without other dependencies as we&amp;#8217;ve already discussed. They
 just define &amp;quot;actions&amp;quot; (which are simple functions) that create the correct parameter object type and pass it
 to the dispatcher. The only attribute that is required for this object is the &lt;tt class="docutils literal"&gt;actionType&lt;/tt&gt; that
@@ -2474,7 +2474,7 @@ should get a value from the constants. I won&amp;#8217;t go into any more detail
 the source code and all your questions will be&amp;nbsp;resolved.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="the-stores"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id23"&gt;The&amp;nbsp;Stores&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id22"&gt;The&amp;nbsp;Stores&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;First of all, all stores are defined through the following code that is already discussed in the previous&amp;nbsp;part:&lt;/p&gt;
 &lt;pre class="code literal-block"&gt;
 var MessageStore = $.extend({}, EventEmitter.prototype, {
@@ -2502,8 +2502,8 @@ will be notified (their callback will be called) and will use
 to re-render and display the changes to the&amp;nbsp;store.&lt;/p&gt;
 &lt;p&gt;Let&amp;#8217;s now discuss the four stores defined &amp;#8212; I will include only the parts of each file that are
 actually interesting, for everything else &lt;em&gt;use the source Luke&lt;/em&gt;!&lt;/p&gt;
-&lt;div class="section" id="id2"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id24"&gt;MessageStore.js&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="section" id="id1"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id23"&gt;MessageStore.js&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;A very simple store that goes together with MessagePanel and MessageActions. It just keeps a state with
 the current message object and just changes this message when the MESSAGE_ADD message
 type is dispatched. After changing the message, the listeners (only one in this case) will be notified to
@@ -2525,7 +2525,7 @@ MessageStore.dispatchToken = AppDispatcher.register(function(action) {
 &lt;/pre&gt;
 &lt;/div&gt;
 &lt;div class="section" id="authorstore-js"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id25"&gt;AuthorStore.js&lt;/a&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id24"&gt;AuthorStore.js&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;Here we see that the local state has an array of the authors and a &lt;tt class="docutils literal"&gt;showDialog&lt;/tt&gt; flag that
 controls the state of the add author popup. For the &lt;tt class="docutils literal"&gt;AUTHOR_ADD&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;HIDE_ADD_AUTHOR&lt;/tt&gt;
 cases of the dispatch we just change the state of this flag and emit the change; the &lt;tt class="docutils literal"&gt;BookForm&lt;/tt&gt;
@@ -2628,7 +2628,7 @@ AuthorStore.dispatchToken = AppDispatcher.register(function(action) {
 &lt;/pre&gt;
 &lt;/div&gt;
 &lt;div class="section" id="categorystore-js"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id26"&gt;CategoryStore.js&lt;/a&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id25"&gt;CategoryStore.js&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;The CategoryStore has an interesting functionality concerning the load_subcategory
 function. This function is called whenever a book is changed (so its category form field
 may be changed and the subcategories may be reloaded based on this category) or is edited
@@ -2707,7 +2707,7 @@ CategoryStore.dispatchToken = AppDispatcher.register(function(action) {
 &lt;/pre&gt;
 &lt;/div&gt;
 &lt;div class="section" id="bookstore-js"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id27"&gt;BookStore.js&lt;/a&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id26"&gt;BookStore.js&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;Here, beyond the book-related functionality we have also implemented the
 &lt;span class="caps"&gt;URL&lt;/span&gt; updating. The getUrlParameter that returns the value of a &lt;span class="caps"&gt;URL&lt;/span&gt; parameter has been taken from
 &lt;a class="reference external" href="http://stackoverflow.com/questions/19491336/get-url-parameter-jquery"&gt;http://stackoverflow.com/questions/19491336/get-url-parameter-jquery&lt;/a&gt;. Depending on the url parameters, we set some initial properties of
@@ -2851,7 +2851,7 @@ BookStore.dispatchToken = AppDispatcher.register(function(action) {
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="section" id="conclusion"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id28"&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id27"&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;The application presented here has a number of techniques that will help
 you when you actually try to create a more complex react flux application.
 I hope that in the whole three part series I&amp;#8217;ve thoroughly explained the

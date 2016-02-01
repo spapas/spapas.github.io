@@ -272,8 +272,8 @@ would be to pass an identifier as a property for each dropdown and the dropdown 
 dropdown action and passing this identifier -- however I think that actually passing the callback is
 easier and makes the code much more readable.
 
-DropDown.react.js
-=================
+DatePicker.react.js
+===================
 
 The datepicker component has more or less the same structure as with the dropdown: It needs one parameter
 for its current value (``props.value``) and another as the callback to the function when the date is

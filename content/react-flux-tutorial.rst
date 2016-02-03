@@ -17,7 +17,7 @@ In the `first part of this series <{filename}react-tutorial.rst>`_ we implemente
 not-so-simple one page application with full CRUD capabilities. In this part, we will
 modify that application to make it use the Flux architecture. The full source code can
 be found at https://github.com/spapas/react-tutorial (tag name react-flux). In the 
-In `next part, <{filename}react-flux-complex.rst>`_ we will create an even more complex application
+`next part, <{filename}react-flux-complex.rst>`_ we will create an even more complex application
 using react/flux!
 
 I recommend reading Facebook's `Flux overview`_ before reading this article -- please

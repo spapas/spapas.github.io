@@ -43,14 +43,194 @@ It has three basic concepts:
 - One (and only one) **state**: It is an object that keeps the *global* state of your application. Everything has to be in that object, both data and ui.
 - A bunch of **actions**: These are objects that are created/dispatched when something happens (ui interaction, server response etc) with a mandatory property (their type) and a number of optional properties that define the data that accompanies each action.
 - One (and only one) **reducer**: It is a function that retrieves the current state and an action and creates the resulting state. One very important thing to keep in mind is that the reducer *must not* mutate the state but return *a new object when something changes*.
+- One (and only one) **store**: It is an object that is created by redux and is used as a glue between the state, the reducer and the components
 
 The general idea/flow is:
 
 - Something (let's call it event) happens (i.e a user clicks a button, a timeout is fired, an ajax request responds)
-- An action describing that event is created and dispatched (i.e passed to the reducer along with the current state)
+- An action describing that event is created and dispatched (i.e passed to the reducer along with the current state) through the store
 - The reducer is called with the current state object and the action as parameters
 - The reducer checks the type of the action and, depending on the action type and any other properties this action has, creates a new state object
-- The new state is applied to all components
+- The store applies the new state to all components
+
+One thing we can see from the above is that redux is not react-only (although its general architecture fits perfectly with react) but
+could be also used with different view frameworks, or even with *no view framework*!
+
+A simple example
+================
+
+I've implemented a very simple redux example @ jsfiddle_ that increases and decreases
+a number using two buttons to support the above: 
+
+Its html is: 
+
+.. code::
+
+  <div id='state_container'>0</div>
+  <button onclick='increase()'>+</button>
+  <button onclick='decrease()'>-</button>
+
+while its javascript (es6) code is:
+
+.. code:: 
+
+  let reducer = (state=0, action) => {
+    switch (action.type) {
+      case 'INCREASE': return state+1
+      case 'DECREASE': return state-1
+      default: return state
+    }
+  }
+  let store = Redux.createStore(reducer)
+  let unsubscribe = store.subscribe(() => 
+    document.getElementById('state_container').innerHTML = store.getState()
+  )
+  window.increase = e => store.dispatch({
+    type: 'INCREASE'
+  })
+
+  window.decrease = e => store.dispatch({
+    type: 'DECREASE'
+  })
+
+The HTML just displays a div which keeps the current number value
+and two buttons that call the increase and decrease functions.
+
+Now, for the javascript, we create a reducer function that
+gets the previous state value (which initially is the number 0) and the
+action that is dispatched. It checks if the action type is 'INCREASE'
+or 'DECREASE' and correspondigly increases or decreases the state,
+which is just the number.
+
+We then create a store which gets the reducer as its only parameter
+and call its subscribe method passing a callback. This callback will be
+called whenever the state is changed - in our case, we'll just update
+the div with the current number from the state. Finally, the increase
+and decrease methods will just dispatch the corresponding action.
+
+The flow of the data when the increase button is clicked is the following:
+
+- button.onClick
+- increase()
+- store.dispatch({type: 'INCREASE' })
+- reducer(current_state, {type: 'INCREASE'})
+- callback()
+- value is updated
+
+
+Having one and only one store/state makes the flow of the data crystal and
+resolves some of the dillemas I had when using the original Flux architecture!
+Some people may argue that although a single reducer function is nice for
+the above simple demo, having a huge (spaghetti-like) switch statement in
+your reducer is not a very good practice - thankfully redux has a bunch
+of tools that will presented later and greatly help on this (seperating the
+reducing logic, using different modules etc).
+
+Interlude: So what's a reducer?
+===============================
+
+I'd like to talk a bit about the "reducer", mainly for people not familiar with
+functional programming (although people writing Javascript *should* be familiar
+with functional programming since Javascript has functional features). 
+
+In any case, one basic concept of functional programming is the concept of
+"map-reduce". Mapping means calling a function (let's call it mapper)
+for all elements of a list and creating a new list with the output of each 
+individual call. So, a mapper gets only one parameter, the current value of
+the list. For example the "double" mapper, defined like
+``let double = x => x*2`` would "map" the list ``[1,2,3]`` to ``[2,4,6]``.
+
+Reducing means calling a function (let's call it *reducer*) for all elements
+of a list and creating a single value that accumulates the result of each 
+individual call. This can be done because the reducer gets *two* parameters,
+the accumulated value of the list until now and the current value of the list.
+Also, when doing a reduce we need to define a starting value for the accumulator.
+For example, the "sum" reducer, defined like ``let sum = (s=0, x) => s+x``, 
+(which as an initial value of 0), would "reduce" the list ``[1,2,3]`` to ``6`` by calling:
+
+.. code::
+
+  tmp1 = sum(0, 1); // tmp1 = 1
+  tmp2 = sum(tmp1, 2); // tmp2 = 3
+  result = sum(tmp2, 3); // result = 6
+
+So, a redux reducer is *actually* a (rather complex) functional reducer, getting the current
+state (as the accumulated value) and each individual action as the value and
+returns the new state which is the result of applying this action to the state!
+
+
+What about react-redux?
+=======================
+
+React-redux is a rather simple framework that offers two helpful utilities for integrating
+redux with React:
+
+- A ``connect`` function that "connects" React components to the redux store. This function (among others) retrieves a callback parameter that defines properties that will be passed (magically) to that component and each one will be mapped to state properties.
+- A ``Provider`` component. This is a parent component that can be used to (magically) pass the store to its children components.
+
+This will be made more clear with `another jsfiddle`_ that will convert the previous example to React and
+react-redux! The html is just ``<div id='container'></div>`` while the es6/jsx code is:
+
+.. code::
+
+  let reducer = (state=0, action) => {
+    switch (action.type) {
+      case 'INCREASE': return state+1
+      case 'DECREASE': return state-1
+      default: return state
+    }
+  }
+
+  let store = Redux.createStore(reducer)
+
+  class RootComponent extends React.Component {
+    render() {
+      let {number, dispatch} = this.props
+      return <div>
+        <div>{number}</div>
+        <button onClick={e=>dispatch({
+          type: 'INCREASE'
+        })}>+</button>
+        <button onClick={e=>dispatch({
+          type: 'DECREASE'
+        })}>-</button>
+      </div>
+    }
+  }
+
+  const ConnectedRootComponent = ReactRedux.connect(state => {
+    return {
+      number: state
+    }
+  })(RootComponent)
+
+  ReactDOM.render(
+    <ReactRedux.Provider store={store}>
+      <ConnectedRootComponent />
+    </ReactRedux.Provider>,
+    document.getElementById('container')
+  )
+
+As we can see, the reducer and store are the same as the non-react version. What is new is 
+that I've added a React RootComponent that has two properties, one named number (with the current state)
+and one named dispatch that will dispatch an action through the store. 
+
+Now, using react-redux's ``connect`` function we create a new component, ``ConnnectedRootComponent`` 
+that *has* the dispatch property and the attributes of state we define (in our example, we just map
+the number property to the *whole* state since the state is just a number). Now, in order for
+the ``ConnectedRootComponent`` to *actually* have these properties, it must be enclosed in a ``<Provider>``
+parent component that will (magically) pass them to this component. 
+
+Of course, in our example, we could avoid using react-redux altogether, by passing the store directly
+to <RootComponent>, however the added-value of react-redux is that using ``connect`` and ``Provider`` we could pass dispatch and
+state properties to deep inside our component hierarchy without the need to explicitly pass the store
+to each individual component. Please be warned that this does not mean that you should connect everything
+so that everything will have access to the global state and be able to dispatch actions. You should be very
+careful to connect only the components that are really need to be connected and pass dispatch and state as
+properties to their children. This is absolutely necessary if you want to crate re-usable components and 
+easily testable components and of course to be as DRY as possible. I'll discuss this a little more when
+describign the sample project
+
 
 Our project
 -----------
@@ -96,3 +276,5 @@ dispatched when the ``fetch`` is finished instead of calling ``forceUpdate`` dir
 .. _react-router-redux: https://github.com/rackt/react-router-redux
 .. _redux-form: https://github.com/erikras/redux-form
 .. _redux-thunk: https://github.com/gaearon/redux-thunk
+.. _jsfiddle: https://jsfiddle.net/8aba3sp6/
+.. _`another jsfiddle`: https://jsfiddle.net/8aba3sp6/1/

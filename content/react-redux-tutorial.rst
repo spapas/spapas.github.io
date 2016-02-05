@@ -212,24 +212,56 @@ react-redux! The html is just ``<div id='container'></div>`` while the es6/jsx c
   )
 
 As we can see, the reducer and store are the same as the non-react version. What is new is 
-that I've added a React RootComponent that has two properties, one named number (with the current state)
-and one named dispatch that will dispatch an action through the store. 
+that I've added a React ``RootComponent`` that has two properties, one named ``number``
+and one named ``dispatch`` that can be used to dispatch an action through the store. But how this
+component retrieves these properties?
 
-Now, using react-redux's ``connect`` function we create a new component, ``ConnnectedRootComponent`` 
-that *has* the dispatch property and the attributes of state we define (in our example, we just map
-the number property to the *whole* state since the state is just a number). Now, in order for
-the ``ConnectedRootComponent`` to *actually* have these properties, it must be enclosed in a ``<Provider>``
-parent component that will (magically) pass them to this component. 
+Using react-redux's ``connect`` function we create a new component, ``ConnnectedRootComponent`` 
+that *has* the ``dispatch`` property and the state slice we define (in our example, we just map
+the number property to the *whole* state since the state is just a number). The ``connect()`` function
+could be called with various arguments. Here we only pass the first one which is usually named ``mapStateToProps`` 
+and should return the mapping between state attributes and component properties, ie it should return the
+state slice that this component will display and be notified when changes. If we did not pass ``mapStateToProps``
+then the ConnectedComponent would only have the ``dispatch`` as a property. Also, beyond ``mapStateToProps``
+there are a bunch of other arguments that can be passed to connect however I won't use them in this
+tutorial. One commonly used is the second parameter, named ``mapDispatchToProps`` that ..........
+................................................
+
+Now, in order for
+the ``ConnectedRootComponent`` to *actually* have these properties that we passed through connect, it must 
+be enclosed in a ``<Provider>`` parent component that will (magically) pass them to this component. Notice
+that this is recursive so if we had something
+
+.. code::
+
+  <Provider store={store}>
+    <Component1>
+      <Component2>
+        <ConnectedComponent>
+        </ConnectedComponent>
+      </Component2>
+    </Component1>
+  </Provider>
+
+the ``<ConnectedComponent>`` would still get the props (dispatch + state slice) we mentioned above.
 
 Of course, in our example, we could avoid using react-redux altogether, by passing the store directly
-to <RootComponent>, however the added-value of react-redux is that using ``connect`` and ``Provider`` we could pass dispatch and
-state properties to deep inside our component hierarchy without the need to explicitly pass the store
-to each individual component. Please be warned that this does not mean that you should connect everything
+to ``<RootComponent>`` and subscibing to the store changes from the ``RootComponent``'s ``componentWillMount`` method, 
+however the added-value of react-redux is that using ``connect`` and ``Provider`` we could pass dispatch and
+state slices deep inside our component hierarchy without the need to explicitly pass the store
+to each individual component and also that react-redux will make optimizations so that the
+each connected component will be re-rendered only when needed (depending on the state slice it uses)
+and not for every state change. Please be warned that this does not mean that you should connect everything
 so that everything will have access to the global state and be able to dispatch actions. You should be very
-careful to connect only the components that are really need to be connected and pass dispatch and state as
-properties to their children. This is absolutely necessary if you want to crate re-usable components and 
-easily testable components and of course to be as DRY as possible. I'll discuss this a little more when
-describign the sample project
+careful to connect only the components that really need to be connected (redux calls them container components) 
+and use ``mapStateToProps`` to  and pass dispatch and state as
+properties to their children (which are called presentational components). Also, each connected component should receive *only* the part of the global state it
+needs and *not* everything (so that each particular component will update only when needed and not for
+every state update).
+
+The above is absolutely necessary if you want to crate re-usable (DRY) and
+easily testable components. I'll discuss this a little more when
+describng the sample project. 
 
 
 Our project

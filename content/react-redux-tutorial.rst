@@ -322,5 +322,5 @@ dispatched when the ``fetch`` is finished instead of calling ``forceUpdate`` dir
 .. _redux-form: https://github.com/erikras/redux-form
 .. _redux-thunk: https://github.com/gaearon/redux-thunk
 .. _jsfiddle: https://jsfiddle.net/8aba3sp6/
-.. _`another jsfiddle`: https://jsfiddle.net/8aba3sp6/1/
+.. _`another jsfiddle`: https://jsfiddle.net/8aba3sp6/2/
 .. _`react-redux documentation`: https://github.com/rackt/react-redux/blob/master/docs/api.md#connectmapstatetoprops-mapdispatchtoprops-mergeprops-options

@@ -173,43 +173,49 @@ react-redux! The html is just ``<div id='container'></div>`` while the es6/jsx c
 
 .. code::
 
-  let reducer = (state=0, action) => {
-    switch (action.type) {
-      case 'INCREASE': return state+1
-      case 'DECREASE': return state-1
-      default: return state
+    let reducer = (state=0, action) => {
+      switch (action.type) {
+        case 'INCREASE': return state+1
+        case 'DECREASE': return state-1
+        default: return state
+      }
     }
-  }
 
-  let store = Redux.createStore(reducer)
+    let store = Redux.createStore(reducer)
 
-  class RootComponent extends React.Component {
-    render() {
-      let {number, dispatch} = this.props
-      return <div>
-        <div>{number}</div>
-        <button onClick={e=>dispatch({
-          type: 'INCREASE'
-        })}>+</button>
-        <button onClick={e=>dispatch({
-          type: 'DECREASE'
-        })}>-</button>
-      </div>
+    class RootComponent extends React.Component {
+      render() {
+        let {number, increase, decrease} = this.props
+        return <div>
+          <div>{number}</div>
+          <button onClick={e=>increase()}>+</button>
+          <button onClick={e=>decrease()}> - </button>
+        </div>
+      }
     }
-  }
 
-  const ConnectedRootComponent = ReactRedux.connect(state => {
-    return {
+    let mapStateToProps = state => ({
       number: state
-    }
-  })(RootComponent)
+    })
 
-  ReactDOM.render(
-    <ReactRedux.Provider store={store}>
-      <ConnectedRootComponent />
-    </ReactRedux.Provider>,
-    document.getElementById('container')
-  )
+    let mapDispatchToProps = dispatch => ({
+      increase: () => dispatch({type: 'INCREASE'}),
+      decrease: () => dispatch({type: 'DECREASE'})
+    })
+
+    const ConnectedRootComponent = ReactRedux.connect(
+        mapStateToProps, mapDispatchToProps
+    )(RootComponent)
+
+    ReactDOM.render(
+      <ReactRedux.Provider store={store}>
+        <ConnectedRootComponent />
+      </ReactRedux.Provider>,
+      document.getElementById('container')
+    )
+
+
+
 
 As we can see, the reducer and store are the same as the non-react version. What is new is 
 that I've added a React ``RootComponent`` that has two properties, one named ``number``
@@ -217,15 +223,19 @@ and one named ``dispatch`` that can be used to dispatch an action through the st
 component retrieves these properties?
 
 Using react-redux's ``connect`` function we create a new component, ``ConnnectedRootComponent`` 
-that *has* the ``dispatch`` property and the state slice we define (in our example, we just map
-the number property to the *whole* state since the state is just a number). The ``connect()`` function
-could be called with various arguments. Here we only pass the first one which is usually named ``mapStateToProps`` 
-and should return the mapping between state attributes and component properties, ie it should return the
-state slice that this component will display and be notified when changes. If we did not pass ``mapStateToProps``
-then the ConnectedComponent would only have the ``dispatch`` as a property. Also, beyond ``mapStateToProps``
-there are a bunch of other arguments that can be passed to connect however I won't use them in this
-tutorial. One commonly used is the second parameter, named ``mapDispatchToProps`` that ..........
-................................................
+which is a new component with the redux-enabled functionality. The ``connect()`` function takes
+a bunch of optional arguments. I won't go into much detail since its a little complex (the `react-redux documentation`_
+is clear enough), however in our example we have defined two objects named ``mapStateToProps`` and ``mapDispatchToProps``
+which are passed to ``connect``. 
+
+The ``mapStateToProps`` is a function that will be called whenever the store's state 
+changes and should return an object whose attributes will be passed to the connected component. In our example,
+an object with a number attribute having the current state (which don't forget that is just a number) as its value - 
+that's why we can extract the ``number`` attribute from ``this.props`` when rendering. 
+
+The ``mapDispatchToProps`` as we use it, once again returns an object whose attributes will be passed to the connected component.
+The difference between this object and the one returned from ``mapStateToProps`` is that the ``mapDispatchToProps`` attributes
+call actions (using the provided dispatch) while the ``mapStateToProps`` are state values. 
 
 Now, in order for
 the ``ConnectedRootComponent`` to *actually* have these properties that we passed through connect, it must 
@@ -255,13 +265,16 @@ and not for every state change. Please be warned that this does not mean that yo
 so that everything will have access to the global state and be able to dispatch actions. You should be very
 careful to connect only the components that really need to be connected (redux calls them container components) 
 and use ``mapStateToProps`` to  and pass dispatch and state as
-properties to their children (which are called presentational components). Also, each connected component should receive *only* the part of the global state it
-needs and *not* everything (so that each particular component will update only when needed and not for
-every state update).
-
-The above is absolutely necessary if you want to crate re-usable (DRY) and
+properties to their children (which are called presentational components). Also, each connected component should receive only 
+the part of the global state it
+needs and not everything (so that each particular component will update only when needed and not for
+every state update). The above is absolutely necessary if you want to crate re-usable (DRY) and
 easily testable components. I'll discuss this a little more when
-describng the sample project. 
+describing the sample project. 
+
+Finally, notice how easy it is to create reusable container components using ``mapStateToProps`` and ``mapDispatchToProps``:
+Both the way the component gets its state and calls its actions are defined through these two objects so you can create
+as many connected objects as you want by passing different ``mapStateToProps`` and ``mapDispatchToProps``. 
 
 
 Our project
@@ -310,3 +323,4 @@ dispatched when the ``fetch`` is finished instead of calling ``forceUpdate`` dir
 .. _redux-thunk: https://github.com/gaearon/redux-thunk
 .. _jsfiddle: https://jsfiddle.net/8aba3sp6/
 .. _`another jsfiddle`: https://jsfiddle.net/8aba3sp6/1/
+.. _`react-redux documentation`: https://github.com/rackt/react-redux/blob/master/docs/api.md#connectmapstatetoprops-mapdispatchtoprops-mergeprops-options

@@ -13,7 +13,7 @@ To follow this tutorial you will need to have [Python] 2.7 installed with a work
 
 **Update**: The result of this tutorial has been deployed to [Heroku]: [http://gentle-refuge-2590.herokuapp.com/] - you may visit the [admin site] and login with root / 123 to play with Wagtail! Please don't do anything naughty !!! Also, notice that [because of how Heroku works] you won't be able to upload anything.
 
-**Update 08/09/2015: This tutorial has been written during the first days of Wagtail, when documentation and tutorials about it were sparce; right now it should be considered by all accounts obsolete and *not* be followed! Instead, you should read the official (and very well written) tutorial @ [http://docs.wagtail.io/en/v1.0/getting_started/tutorial.html] in the official Wagtail documentation!**
+**Update 08/09/2015: This tutorial has been written during the first days of Wagtail, when documentation and tutorials about it were sparce; right now it should be considered by all accounts obsolete and *not* be followed! Instead, you should read the official (and very well written) tutorial @ http://docs.wagtail.io/en/latest/getting_started/tutorial.html] in the official Wagtail documentation!**
 
 Installing the wagtail dependencies
 -----------------------------------
@@ -547,4 +547,4 @@ no complete documentation yet however you can
 [wheels]:http://pythonwheels.com/
 [a number of issues]:https://github.com/torchbox/wagtail/issues/133
 [Visual C++ 2013 redistributable]:http://www.microsoft.com/en-us/download/details.aspx?id=40784
-[http://docs.wagtail.io/en/v1.0/getting_started/tutorial.html]: http://docs.wagtail.io/en/v1.0/getting_started/tutorial.html
+[http://docs.wagtail.io/en/latest/getting_started/tutorial.html]: http://docs.wagtail.io/en/latest/getting_started/tutorial.html

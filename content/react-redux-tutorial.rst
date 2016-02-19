@@ -1,7 +1,7 @@
 A comprehensive react-redux tutorial
 ####################################
 
-:date: 2016-02-03 15:20
+:date: 2016-02-19 15:20
 :tags: javascript, react, redux, react-redux, django, redux-thunk, redux-form, react-router, react-router-redux, react-notification, history es6, babel, babelify, browserify, watchify, uglify, boilerplate
 :category: javascript
 :slug: react-redux-tutorial
@@ -42,13 +42,14 @@ It has three basic concepts:
 
 - One (and only one) **state**: It is an object that keeps the *global* state of your application. Everything has to be in that object, both data and ui.
 - A bunch of **actions**: These are objects that are created/dispatched when something happens (ui interaction, server response etc) with a mandatory property (their type) and a number of optional properties that define the data that accompanies each action.
+- A bunch of **action creators**: These are very simple functions that create action objects. Usually, there are as many action creators as actions (unless you use react-thunk).
 - One (and only one) **reducer**: It is a function that retrieves the current state and an action and creates the resulting state. One very important thing to keep in mind is that the reducer *must not* mutate the state but return *a new object when something changes*.
 - One (and only one) **store**: It is an object that is created by redux and is used as a glue between the state, the reducer and the components
 
 The general idea/flow is:
 
 - Something (let's call it event) happens (i.e a user clicks a button, a timeout is fired, an ajax request responds)
-- An action describing that event is created and dispatched (i.e passed to the reducer along with the current state) through the store
+- An action describing that event is created by its the corresponding action creator and dispatched (i.e passed to the reducer along with the current state) through the store
 - The reducer is called with the current state object and the action as parameters
 - The reducer checks the type of the action and, depending on the action type and any other properties this action has, creates a new state object
 - The store applies the new state to all components
@@ -59,8 +60,10 @@ could be also used with different view frameworks, or even with *no view framewo
 A simple example
 ================
 
-I've implemented a very simple redux example @ jsfiddle_ that increases and decreases
+I've implemented a very simple redux example @ jsfiddle that increases and decreases
 a number using two buttons to support the above: 
+
+.. jsfiddle:: 8aba3sp6
 
 Its html is: 
 
@@ -108,15 +111,29 @@ called whenever the state is changed - in our case, we'll just update
 the div with the current number from the state. Finally, the increase
 and decrease methods will just dispatch the corresponding action.
 
+Please notice that in the above example I didn't use action creators for
+simplicity. For completeness, the action creator for increase would be something like 
+
+.. code::
+  
+  const increaseCreator = () => {
+    type: 'INCREASE'
+  }
+  
+i.e it would just return an ``INCREASE`` action and ``window.increase``
+would be ``window.increase = e => store.dispatch(increaseCreator())``. Notice that
+the ``increaseCreator`` *is* called so that ``dispatch`` will receive the resulting
+action object as a parameter.
+
 The flow of the data when the increase button is clicked is the following:
 
-- button.onClick
-- increase()
-- store.dispatch({type: 'INCREASE' })
-- reducer(current_state, {type: 'INCREASE'})
-- callback()
+- ``button.onClick``
+- ``increase()``
+- ``increaseCreator()`` (if we used action creators - this a param to ``dispatch`` so it will be called first)
+- ``store.dispatch({type: 'INCREASE' })``
+- ``reducer(current_state, {type: 'INCREASE'})``
+- ``callback()``
 - value is updated
-
 
 Having one and only one store/state makes the flow of the data crystal and
 resolves some of the dillemas I had when using the original Flux architecture!
@@ -158,18 +175,26 @@ So, a redux reducer is *actually* a (rather complex) functional reducer, getting
 state (as the accumulated value) and each individual action as the value and
 returns the new state which is the result of applying this action to the state!
 
-
 What about react-redux?
 =======================
 
 React-redux is a rather simple framework that offers two helpful utilities for integrating
 redux with React:
 
-- A ``connect`` function that "connects" React components to the redux store. This function (among others) retrieves a callback parameter that defines properties that will be passed (magically) to that component and each one will be mapped to state properties.
-- A ``Provider`` component. This is a parent component that can be used to (magically) pass the store to its children components.
+- A ``connect`` function that "connects" React components to the redux store. This function (among others) retrieves a callback parameter that defines properties that will be passed to that component and each one will be (magically) mapped to state properties.
+- A ``Provider`` component. This is a parent component that can be used to (magically) pass the store properties to its children components.
 
-This will be made more clear with `another jsfiddle`_ that will convert the previous example to React and
-react-redux! The html is just ``<div id='container'></div>`` while the es6/jsx code is:
+Please notice that nothing actually magical happens when the store properties are passed to the children 
+components through ``connect`` and ``Provider``, this is accomplished through the `react context`_ feature
+that allows you to "pass data through the component tree without having to pass the props down manually 
+at every level".
+
+This will be made more clear with another jsfiddle that will convert the previous example to React and
+react-redux:
+
+.. jsfiddle:: 8aba3sp6/2
+
+The html is just ``<div id='container'></div>`` while the es6/jsx code is:
 
 .. code::
 
@@ -216,7 +241,6 @@ react-redux! The html is just ``<div id='container'></div>`` while the es6/jsx c
 
 
 
-
 As we can see, the reducer and store are the same as the non-react version. What is new is 
 that I've added a React ``RootComponent`` that has two properties, one named ``number``
 and one named ``dispatch`` that can be used to dispatch an action through the store. But how this
@@ -239,7 +263,7 @@ call actions (using the provided dispatch) while the ``mapStateToProps`` are sta
 
 Now, in order for
 the ``ConnectedRootComponent`` to *actually* have these properties that we passed through connect, it must 
-be enclosed in a ``<Provider>`` parent component that will (magically) pass them to this component. Notice
+be enclosed in a ``<Provider>`` parent component. Notice
 that this is recursive so if we had something
 
 .. code::
@@ -280,7 +304,8 @@ as many connected objects as you want by passing different ``mapStateToProps`` a
 Our project
 -----------
 
-Let's see an example of what we'll build:
+After this rather lengthy introduction to redux and react-redux we may move on to our
+project. First of all, let's see an example of what we'll actually build here:
 
 .. image:: /images/ajax_fixed_data_tables.gif
   :alt: Our project
@@ -293,13 +318,80 @@ Other libraries used
 React (and redux) have a big ecosystem of great libraries. Some of these have been used
 for this project and will also be discussed:
   
-- redux-thunk_: This is a *really* important add-on for redux that creates actions that can call other actions, or actions that can be called (dispatched) asynchronosuly. *Do not* use redux without it, especially if you want to use Ajax!
+- redux-thunk_: This is a nice add-on for redux that generalizes action creators.
 - redux-form_: A better way to use forms with react and redux. Always use it if you have non-trivial forms.
 - react-router_: A library to create routes for single page applications with React
 - react-router-redux_ (ex redux-simple-router): This library will help integrating react-router with redux
 - history_: This is used bt react-router to crete the page history (so that back forward etc work)
 - react-notification_: A simple react component to display notifications
+
+The triplet react-router, react-router-redux and history needs to be used for projects that 
+enable client side routing. The redux-form is really useful if you have non-trivial forms
+in your projects - you may skip it if you don't use forms or for example you use a form for 
+searching/filtering with a single input. react-notification just displays notifications,
+you can easily exchange it with other similar components or create your own. 
+
+react-thunk?
+============
+
+Now, about redux-thunk. I won't go into much detail here, you can read more in this `great SO answer`_,
+however I'd like to point out here that **everything that can be done with redux-thunk
+can also be done without it**.
+
+A thunk allows you to create action creators that don't only return 
+action objects but are more general, something like this: 
+
+.. code::
+
+  const thunkAction = () => {
+    return (dispatch, getState) => {
+      // here you may 
+      // dispatch other actions (more than one) using the provided dispatch() parameter
+      // or
+      // check the current state using the getState() parameter and do conditional dispatches
+      // or 
+      // call functions asynchronously so that these will use the provided 
+      // dispatch function when they return
+    }
+  }
   
+The usual use case for redux-thunk is for asynchronous calls, for example let's say
+that we wanted to retrieve data through ajax. If we don't want to use redux thunk,
+then we need to create a normal function that gets dispatch as an argument, something
+like this:
+
+.. code::
+
+  import {showLoadingAction, hideLoadingAction, showDataAction } from './actions'
+
+  const getData = () => {
+    dispatch(showLoadingAction())
+    $.get(data_url, data => {
+        dispatch(hideLoadingAction())
+        dispatch(showDataAction(data))
+    })
+  }
+
+The main problem with this approach is that the getData functions *is not*
+a real action creator (like ``showLoadingAction``, ``hideLoadingAction`` and ``showDataAction``)
+since it actually returns nothing so you'll need to remember to call it directly
+and pass it dispatch *instead of* passing its return value to dispatch!
+
+If however we used thunk, then we'd have something like this:
+
+.. code::
+
+  const getDataThunk = (dispatch) => {
+    return (dispatch, getState) => {
+      dispatch(showLoadingAction())
+      $.get(data_url, data => {
+          dispatch(hideLoadingAction())
+          dispatch(showDataAction(data))
+      })
+    }
+  }
+  
+Now, this is a real action which will be called using dispatch(getDataThunk())
   
 Conslusion
 ----------
@@ -321,6 +413,6 @@ dispatched when the ``fetch`` is finished instead of calling ``forceUpdate`` dir
 .. _react-router-redux: https://github.com/rackt/react-router-redux
 .. _redux-form: https://github.com/erikras/redux-form
 .. _redux-thunk: https://github.com/gaearon/redux-thunk
-.. _jsfiddle: https://jsfiddle.net/8aba3sp6/
-.. _`another jsfiddle`: https://jsfiddle.net/8aba3sp6/2/
 .. _`react-redux documentation`: https://github.com/rackt/react-redux/blob/master/docs/api.md#connectmapstatetoprops-mapdispatchtoprops-mergeprops-options
+.. _`react context`: https://facebook.github.io/react/docs/context.html
+.. _`great SO answer`: http://stackoverflow.com/a/35415559/119071

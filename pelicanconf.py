@@ -45,7 +45,10 @@ TWITTER_TWEET_BUTTON=True
 GOOGLE_UNIVERSAL_ANALYTICS='UA-44750952-1'
 
 PLUGIN_PATHS = ['../pelican-plugins']
-PLUGINS=['sitemap',]
+PLUGINS = [
+    'sitemap',
+    'pelican_jsfiddle',
+]
 
 SITEMAP = {
     'format': 'xml',

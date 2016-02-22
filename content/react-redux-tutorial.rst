@@ -23,12 +23,15 @@ This introduction will also serve as an opinionated (my opinion) boilerplate
 project for creating react-redux Single Page Applications. I have used Django
 as the back end however you could use any server-side framework you like,
 the only thing Django does is offering a bunch of REST APIs from django-rest-framework.
+I have also used ``browserify`` to pack the client-side code -- I prefer it
+from webpack as I find it much easier, clear and less-magical, and, since it fills all my
+needs I don't see any reason to take the webpack pill.
 
 All client side code is written in ES6 javascript using the latest trends -- I will
 try to explain anything I feel that is not very clear.
 
-Before continuing, I have to mention that I won't go into detail on how redux and
-react-redux work but I will concentrate on the correct integration between them and
+Before continuing, I have to mention that although I will provide an introduction to redux, 
+I will concentrate on the correct integration between redux, react-redux and
 React in a complex, production level application. So, before reading the rest of
 this article please make sure that you've read the introduction and basics sections
 of `redux documentation`_ and watch the `getting started with redux`_ from the 
@@ -313,7 +316,7 @@ project. First of all, let's see an example of what we'll actually build here:
 
 
 Other libraries used
---------------------
+====================
 
 React (and redux) have a big ecosystem of great libraries. Some of these have been used
 for this project and will also be discussed:
@@ -355,8 +358,8 @@ action objects but are more general, something like this:
     }
   }
   
-The usual use case for redux-thunk is for asynchronous calls, for example let's say
-that we wanted to retrieve data through ajax. If we don't want to use redux thunk,
+Let's say that we wanted to implement an asynchronous, ajax call. 
+If we don't want to use redux thunk,
 then we need to create a normal function that gets dispatch as an argument, something
 like this:
 
@@ -364,7 +367,7 @@ like this:
 
   import {showLoadingAction, hideLoadingAction, showDataAction } from './actions'
 
-  const getData = () => {
+  const getData = (dispatch) => {
     dispatch(showLoadingAction())
     $.get(data_url, data => {
         dispatch(hideLoadingAction())
@@ -381,7 +384,7 @@ If however we used thunk, then we'd have something like this:
 
 .. code::
 
-  const getDataThunk = (dispatch) => {
+  const getDataThunk = () => {
     return (dispatch, getState) => {
       dispatch(showLoadingAction())
       $.get(data_url, data => {
@@ -391,8 +394,334 @@ If however we used thunk, then we'd have something like this:
     }
   }
   
-Now, this is a real action which will be called using dispatch(getDataThunk())
+Now, this can be used like a normal action (i.e it can be called using ``dispatch(getDataThunk())``).
+That's more or less the main advantage of redux-thunk: You are able to create thunk action creators that 
+can be called like normal can do more complex things than just returning action objects. I have to repeat
+again that everything that you be done with thunk action creators, can also be done with normal functions
+that get ``dispatch`` as a paremeter - the advantage of thunk action creators is that you don't need to
+remember if an action creator needs to be called through ``disaptch(actionCreator())`` 
+or ``actionCreator(dispatch)``.
   
+In this tutorial you'll see heavy use of redux-thunk. This is just my personal preference - you may
+use it less or not at all (however, if you've configured your project to use redux-thunk then I propose
+to go all the way and use it all the time for those more complex action creators).
+
+Explaining the application
+--------------------------
+
+In the following paragraphs we'll see together the structure and source code of
+this application. I'll try to go into as much detail as possible in order to solve
+any questions you may have (I know I had many when I tried setting up everything for
+the first time). I'll skip imports and non-interesting ccomponents - after all the
+code can be found @ https://github.com/spapas/react-tutorial/. 
+We'll use a top down approach, starting from the main component where the routes
+are defined and the application is mounted to the DOM:
+
+main.js
+=======
+
+This module is used as an entry point for browserify (i.e we call browserify with
+``browserify main.js -o bundle.js`` ) and uses components defined elsewhere to
+create he basic structure of our application. Let's take a look at the important
+part of it:
+ 
+.. code::
+
+    const About = () => {
+        return <div>
+            <h2>About</h2>
+            <Link to="/">Home</Link>
+        </div>
+    }
+
+    render((
+        <Provider store={store}>
+            <Router history={history}>
+                <Route path="/" component={App}>
+                    <IndexRoute component={BookPanel}/>
+                    <Route path="/book_create/" component={BookForm} />
+                    <Route path="/book_update/:id" component={BookForm} />
+                    
+                    <Route path="/authors/" component={AuthorPanel} />
+                    <Route path="/author_create/" component={AuthorForm} />
+                    <Route path="/author_update/:id" component={AuthorForm} />
+                    
+                    <Route path="/about" component={About}/>
+                    <Route path="*" component={NoMatch}/>
+                </Route>
+            </Router>
+        </Provider>
+      ), document.getElementById('content')
+    )
+
+We can see the well-known ``render`` function from ReactDOM that gets a component
+and a DOM element to mount it to. The domponent we provide to render is the ``Provider``
+from react-redux we talked about before in order to enable all children components
+to use ``connect`` to have access to the store properties and dispatch. This is the usual
+approact with react-redux: The outer component should be the ``Provider``.
+
+The ``Provider`` component gets one parameter which is the store that redux will use. We 
+have initialized our store in a different module which I will present below.
+
+Inside the ``Provider`` we are defining a ``Router`` from ``react-router``. This should
+be the parent component inside which all client-side routes of our appliccation are defined.
+The ``Router`` gets a ``history`` parameter which is initialized elsewhere.
+
+Now, inside ``Router`` we are defining the actual routes of this application. As we see,
+there's a parent ``Route`` that is connnected to the ``App`` component which actually
+contains everything else. The parent route contains an ``IndexRoute`` whose corresponding
+component (``BookPanel``) is called
+when no route is defined and a bunch of normal ``Route`` components whose
+components are called when the url matches their part. Notice how we pass parameters
+to urls (e.g ``/book_update/:id``) and the match-all route 
+(``<Route path="*" component={NoMatch}/>``). 
+
+Finally as an example of a routed-to component, notice the ``About`` component
+which is rendered when the route is ``/about``. This is just a normal react component that-
+will be rendered *inside* the ``App`` component -
+the ``Link`` is a ``react-router`` component that renders a link to a defined route.
+
+store.js
+========
+
+The ``store.js`` module contains the definition of the global store of our application
+(which is passed to the ``Provider``).
+Here, we also define the ``history`` object we pass to the parent ``Router``.
+
+.. code::
+
+    import { reducer as formReducer } from 'redux-form';
+
+    import createHistory from 'history/lib/createHashHistory'
+
+    // Opt-out of persistent state, not recommended.
+    // https://github.com/reactjs/history/blob/master/docs/HashHistoryCaveats.md
+    export const history = createHistory({
+        queryKey: false
+    });
+
+    const reducer = combineReducers(Object.assign({}, { 
+            books, 
+            notification,
+            ui,
+            categories,
+            authors,
+        }, {
+            routing: routeReducer
+        }, {
+            form: formReducer     
+        })
+    )
+
+    const reduxRouterMiddleware = syncHistory(history)
+
+    const store = createStore(reducer, applyMiddleware(
+        thunk, reduxRouterMiddleware
+    ));
+    
+    export default store
+
+First of all, we see that our ``history`` object is of type HashHistory
+(`more info about history types`_) and I've also opted out of using
+``queryKey``. If I hadn't used the ``queryKey: false`` configuration
+then there'd be a ``?_k=ckuvup`` query parameter in the URL. Now, this
+parameter is actually useful (it stores location state *not* present
+in the URL for example POST form data) but I don't need it for this
+example (and generally I prefer clean URLS) - but if you don't like
+the behavior of your history then go ahead and add it.
+
+Also, notice that I've used ``HashHistory`` which will append a ``#``
+to the URL and the client-side URL will come after that, so all
+URLs will be under (for example) ``/index.html`` like ``/index.html#/authors``.
+Now, the react-router 
+documentation recommends using ``BrowserHistory`` which uses *normal* 
+urls -- so instead of ``/index.html#/authors`` we'll see ``/authors``. 
+The problem with ``BrowserHistory`` is that you'll need to configure correctly
+your HTTP server so that it will translate every URL (/foo) to the same
+URL under ``/index.html`` (``/index.html#/foo``). In my case, I don't think
+that configuring your HTTP server is worth the trouble and also I do really
+prefer using ``#`` for client-side urls! This is a common patter, recognised
+by everybody and even without the HTTP server-configuration part I'd still
+prefer ``HashHistory`` - of course this is just my opinion, feel free to use
+``BrowserHistory`` if you don't like the hash ``#``!
+
+Now, the next block of code (``combineReducers``) generates the most important
+part of our store, the reducer! The ``combineReducers`` function is provided
+by redux and is a helper function that helps you in ... combining reducers!
+As you see, I've combined the reducers defined in this application 
+``(books, notification, ui, categories, authors)`` with the reducers 
+of ``react-router-redux`` and ``redux-form``. I'll talk a bit in the next
+interlude on what does combining reducers is.
+
+The remaining of the code generates the ``store``: First of all, a middleware
+(please see next interlude for more)
+is created with ``syncHistory`` that allows actions to call history methods
+(so that when the URL is changed through actions they will be reflected to the
+history). Then, the ``createStoreWithMiddleware`` function is called to generate 
+the store that will be passed to the ``Provider``. This functions takes the 
+reducer as a parameter along with any store enchancers that we'd like to
+apply. A store enchancer is a function that modifies the store. The only
+store enchanccer that we use now is the output of the 
+``applyMiddleware`` function that combines the two middlewares we've defined (one is for
+redux thunk, the other is for ``syncHistory``).
+            
+Interlude: Combining reducers
+=============================
+
+So, what does the ``combineReducers`` function do? As we've already seen,
+the reducer is a simple function that gets the current state and an
+action as parameters and returns the next state (which is the result of applying
+the action to the state). The reducer will have a big switch statement that
+checks the type of the action and returns the correct new state. Unfortunately,
+this switch statement may get way too large and unmaintainable for large projects.
+
+That's where combining reducers comes to the rescue: Instead of having one big,
+monolithic reducer for all the parts of our application, we can break it to individual
+reducers depending only on specific parts of the state object. What this means is
+that if we have for example a state tree like this:
+
+.. code::
+
+  {
+    'data': {},
+    'ui': {}
+  }
+  
+with actions that manipulate either data or ui, we could create two indivdual reducers,
+one that would manipulate the data, and one for the ui. These reducers would get *only* 
+the slice of the state that they are interested to, so the ``dataReducer`` will get 
+only the ``data`` part of the state tree and the ``uiReducer`` will get only the ``ui``
+part of the state tree. 
+
+To *combine* these reducers the ``combineReducers`` function should be used. This function
+gets an object with the name of the state part for each sub-reducer as keys and that sub-reducer
+as values and returns returns a reducer function that passes the action along with 
+the correct state slice to each of the sub-reducers and creates the global state object by
+combining the output of each sub-reducer. 
+
+For example, the combine reducers function could be something like this:
+
+.. code::
+
+  const combineReducers2 = o => {
+    return (state={}, action) => {
+        const mapped = Object.keys(o).map(k => (
+            {
+                key: k,
+                slice: o[k](state[k], action)
+            }
+        ))
+        const reduced = mapped.reduce((s, x)=>{
+            s[x['key']]=x['slice']
+            return s
+        }, {})
+        
+        return reduced;
+    }
+  }
+
+The above function gets an object (``o``) with state slices and sub-reducers 
+as input and returns a function that:
+
+* Creates an array (``mapped``) of objects with two attributes: ``key`` for each key of ``o`` and ``slice`` after applying the sub-reducer to the corresponding state slice
+* Reduces and returns the above array (``reduced``) to a single object that has keys for each state slice and the resulting state slice as values
+
+To show-off the ES6 code (and my most sadistic tendencies), 
+the above code could be also writen like this:
+
+.. code::
+
+    const combineReducers3 = o => (state={}, action) => Object.keys(o).map(k => [
+        k, o[k](state[k], action)
+    ]).reduce((s, x) => Object.assign(s, {
+        [x[0]]: x[1]
+    }), {})
+
+
+    
+Interlude: Middlewares
+======================
+
+A redux middleware is `rather difficult to explain`_ technically but easier to explain
+conceptually: What it does it that it can be used to extend the store's dispatch by providing
+extra functionality. We've already seen such functionality, the ability to use
+thunk action creators (for action creators that don't return the next state object).
+
+If you take a look at the ``createStore`` function, you'll see that
+its second parameter is called ``enhancer``. When ``enhancer`` 
+is a function (like in our case where it is the 
+result of ``applyMiddleware``) its return value
+is ``enhancer(createStore(...))`` so it calls the result of ``applyMiddleware``
+with the store as parameter. 
+
+Now, what does ``applyMiddleware``? It gets a variable (using the spread ``...`` operator)
+number of functions (let's call them middleware) as input and returns 
+*another* function  (this is the ``enhancer``) that gets a store as an input and 
+returns the same store with its ``dispatch`` method modified so that it
+calls each middleware and passes the result to the next. So, in our case the
+resulting store's dispatch function would be something like:
+
+.. code::
+    
+    (action) => reduxRouterMiddleware(thunk(dispatch(action)))
+
+Now, a middleware function looks should look like this:
+
+.. code::
+
+  const middleware = store => next => action => {
+    // 
+  }
+
+it returns a function that gets the ``store`` as input
+and returns another function. This returned function
+gets ``next`` as an input. What is next? It's just the
+next ``dispatch`` function to be called. So the first middleware will have the original
+store's ``dispatch`` as its ``next`` parameter, the second middleware will have the
+result of passing the store's ``dispatch`` from the first middleware, etc. Something like
+this: ``middleware2Dispatch(next=middleware1Dispatch(next=storeDispatch))``. 
+
+Another
+explanation of the above is that a middleware: 
+
+* is a function (that gets a store as input) that returns 
+* another function (that gets the next dispatcher to be called as input) that returns
+* another function (that gets an action as input) which is 
+* the dispatcher modified by this middleware
+
+Let's take a look at the thunk middleware to actually see what it looks like: 
+
+.. code::
+
+    function thunkMiddleware({ dispatch, getState }) {
+      return next => action =>
+        typeof action === 'function' ?
+          action(dispatch, getState) :
+          next(action);
+    }
+    
+So, it gets the store as an input and returns a function that gets ``next`` (i.e
+the next dispatcher to be called) as input. This function returns *another function*
+(the modified ``dispatch``). Since this function is a dispatcher, it will get 
+an ``action`` as an input and if that action 
+is a function it calls this function passing it dispatch (remember how we
+said if we didn't want to use thunk then we'd just create normal functions
+to which we'd pass the dispatch as a parameter - that's what it does here!). 
+If this action is not a function
+(so it is a normal object) it just returns ``dispatch(action)`` to dispatch it.
+
+Finally, we'll create a simple middleware that will output the action type and the 
+state for every dispatch:
+
+.. code::
+
+  const logStateMiddleware = ({dispatch, getState}) => next => action => {
+    console.log(action.type, getState())
+    next(action)
+  }
+  
+just put it in the applyMiddleware parameter list and observe all state changes!
+    
 Conslusion
 ----------
 
@@ -416,3 +745,5 @@ dispatched when the ``fetch`` is finished instead of calling ``forceUpdate`` dir
 .. _`react-redux documentation`: https://github.com/rackt/react-redux/blob/master/docs/api.md#connectmapstatetoprops-mapdispatchtoprops-mergeprops-options
 .. _`react context`: https://facebook.github.io/react/docs/context.html
 .. _`great SO answer`: http://stackoverflow.com/a/35415559/119071
+.. _`more info about history types`: https://github.com/reactjs/react-router/blob/latest/docs/guides/Histories.md#hashhistory
+.. _`rather difficult to explain`: http://redux.js.org/docs/advanced/Middleware.html

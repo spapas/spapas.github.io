@@ -962,7 +962,9 @@ functions that not necessarily return actions but can be "dispatcher") - please 
 discussion about redux-thunk on a previous paragraph.
 
 First of all, there's a bunch of some simple action creators that just return
-the corresponding action object and set its parameters: 
+the corresponding action object with the correct parameters: 
+
+# TODO: FIX NAMES FOR ALL
 
 .. code::
 
@@ -990,7 +992,132 @@ the corresponding action object and set its parameters:
     showErrorNotification(message) for 'SHOW_NOTIFICATION', (type: error)
     hideNotification() for 'CLEAR_NOTIFICATION'
 
+The following two are thunk action creators that are called when either the
+user sorting or the search/filtering parameters of the displayed books are changed:
 
+.. code::
+
+    export function changeSearchAndLoadBooks(search) {
+        return (dispatch, getState) => {
+            dispatch(changeSearch(search))
+            history.push( {
+                search: formatUrl(getState().books)
+            } )
+            dispatch(loadBooks())
+        }
+    }
+
+    export function toggleSortingAndLoadBooks(sorting) {
+        return (dispatch, getState) => {
+            dispatch(toggleSorting(sorting))
+            history.push( {
+                search: formatUrl(getState().books)
+            } )
+            dispatch(loadBooks())
+        }
+    }
+
+Notice that these are thunk action creators (they return a function) and
+the important thing that they do is that they call two other action creators
+(``toggleSorting`` or ``changeSearch`` and ``loadBooks``) and they update the
+URL using ``history.push``. The ``history`` object is the one we created in
+the ``store.js`` and its ``push`` method changes the displayed URL. This
+method uses a location `uses a location descriptor`_ that contains
+an attribute for the path name and an attribute for the query parameters
+- in or case we just want to update the query parameters (i.e ``#/url/?search=query1&sorting=query2``),
+so we pass an obect with only the ``search`` attribute. The ``formatUrl`` function, to
+which the books state slice is passsed,
+is a rather simple function
+that checks if either the sorting or the search should exist in th URL and
+returns the full URL. This function is contained in the ``util/formatters.s`` module.
+
+The following thunk action creators are used for asynchronous, ajax queries:
+
+.. code::
+    
+    export function loadBooks(page=1) {
+        return (dispatch, getState) => {
+            let state = getState();
+            let { page, sorting, search } = state.books
+            let url = `//127.0.0.1:8000/api/books/?format=json&page=${page}`;
+            if(sorting) {
+                url+=`&ordering=${sorting}`
+            }
+            if(search) {
+                url+=`&search=${search}`
+            }
+            dispatch(loadingChangedAction(true));
+            $.get(url, data => {
+                setTimeout(() => {
+                    dispatch(showBooksResultAction(data));
+                    dispatch(loadingChangedAction(false));
+                }, 1000);
+            });
+        }
+    }
+
+
+    export function loadBookAction(id) {
+        return (dispatch, getState) => {
+            let url = `//127.0.0.1:8000/api/books/${id}/?format=json`;
+            dispatch(loadingChangedAction(true));
+            $.get(url, function(data) {
+                dispatch(showBookResultAction(data));
+                dispatch(loadingChangedAction(false));
+                dispatch(loadSubCategories(data.category));
+            });
+        }
+    }
+
+    export function loadAuthors(page=1) {
+        return (dispatch, getState) => {
+            let url = `//127.0.0.1:8000/api/authors/?format=json&page=${page}`;
+            dispatch(loadingChangedAction(true));
+            $.get(url, data => {
+                setTimeout(() => {
+                    dispatch(showAuthorsResultAction(data));
+                    dispatch(loadingChangedAction(false));
+                }, 1000);
+            });
+        }
+    }
+
+
+    export function loadAuthorAction(id) {
+        return (dispatch, getState) => {
+            let url = `//127.0.0.1:8000/api/authors/${id}/?format=json`;
+            dispatch(loadingChangedAction(true));
+            $.get(url, function(data) {
+                dispatch(showAuthorResultAction(data));
+                dispatch(loadingChangedAction(false));
+            });
+        }
+    }
+
+    export function loadCategories() {
+        return (dispatch, getState) => {
+            let url = '//127.0.0.1:8000/api/categories/?format=json';
+
+            $.get(url, data => {
+                dispatch(showCategoriesResultAction(data));
+            });
+        }
+    }
+
+    export function loadSubCategories(category) {
+        return (dispatch, getState) => {
+            
+            if(!category) {
+                dispatch(showSubCategoriesResultAction([]));
+                return 
+            }
+            let url = `//127.0.0.1:8000/api/subcategories/?format=json&category=${category}`;
+
+            $.get(url, data => {
+                dispatch(showSubCategoriesResultAction(data));
+            });
+        }
+    }
 
 
 Conslusion
@@ -1018,3 +1145,4 @@ dispatched when the ``fetch`` is finished instead of calling ``forceUpdate`` dir
 .. _`great SO answer`: http://stackoverflow.com/a/35415559/119071
 .. _`more info about history types`: https://github.com/reactjs/react-router/blob/latest/docs/guides/Histories.md#hashhistory
 .. _`rather difficult to explain`: http://redux.js.org/docs/advanced/Middleware.html
+.. _`uses a location descriptor`: https://github.com/reactjs/history/blob/master/docs/Location.md#location-descriptors

@@ -45,7 +45,7 @@ It has three basic concepts:
 
 - One (and only one) **state**: It is an object that keeps the *global* state of your application. Everything has to be in that object, both data and ui.
 - A bunch of **actions**: These are objects that are created/dispatched when something happens (ui interaction, server response etc) with a mandatory property (their type) and a number of optional properties that define the data that accompanies each action.
-- A bunch of **action creators**: These are very simple functions that create action objects. Usually, there are as many action creators as actions (unless you use react-thunk).
+- A bunch of **action creators**: These are very simple functions that create action objects. Usually, there are as many action creators as actions (unless you use redux-thunk).
 - One (and only one) **reducer**: It is a function that retrieves the current state and an action and creates the resulting state. One very important thing to keep in mind is that the reducer *must not* mutate the state but return *a new object when something changes*.
 - One (and only one) **store**: It is an object that is created by redux and is used as a glue between the state, the reducer and the components
 
@@ -340,7 +340,7 @@ in your projects - you may skip it if you don't use forms or for example you use
 searching/filtering with a single input. react-notification just displays notifications,
 you can easily exchange it with other similar components or create your own. 
 
-react-thunk?
+redux-thunk?
 ============
 
 Now, about redux-thunk. I won't go into much detail here, you can read more in this `great SO answer`_,
@@ -950,7 +950,49 @@ into detail about it.
 actions.js
 ----------
 
+The ``actions.js`` module should probably have been named ``action_creators.s`` since
+it actually contains redux action creators. Also, a common practice is create a folder
+named ``actions`` and put there individual modules that contain action creators for
+the sub-reducers (in our case, for example there would be ``books.js``, ``authors.s`` etc).
+
+In any case, for simplicity I chose to just use a module named ``actions.js`` and put
+everything there. One important thing to keep in mind is that ``actions.js`` contains both
+normal action creators (i.e functions that return actions and should be "dispatched") *and* thunk action creators (i.e
+functions that not necessarily return actions but can be "dispatcher") - please see the
+discussion about redux-thunk on a previous paragraph.
+
+First of all, there's a bunch of some simple action creators that just return
+the corresponding action object and set its parameters: 
+
+.. code::
+
+    showBooksResultAction(books) for "SHOW_BOOKS",
+    showBookResultAction(book) for "SHOW_BOOK",
+    addBookResultAction(book) for "ADD_BOOK",
+    updateBookResultAction(book) for "UPDATE_BOOK",
+    deleteBookResultAction(id) for "DELETE_BOOK",
     
+    showAuthorsResultAction(authors) for "SHOW_AUTHORS",
+    showAuthorResultAction(author) for "SHOW_AUTHOR",
+    addAuthorResultAction(author) for "ADD_AUTHOR",
+    updateAuthorResultAction(author) for "UPDATE_AUTHOR",
+    deleteAuthorResultAction(id) "DELETE_AUTHOR",
+        
+
+    showCategoriesResultAction(categories) for "SHOW_CATEGORIES",
+    showSubCategoriesResultAction(subcategories) for "SHOW_SUBCATEGORIES",
+    loadingChangedAction(isLoading) for "IS_LOADING",
+    submittingChangedAction(isSubmitting) for "IS_SUBMITTING",
+    toggleSorting(sorting) for "TOGGLE_SORTING",
+    changePage(page) for "CHANGE_PAGE",
+    changeSearch(search) for 'CHANGE_SEARCH',
+    showSuccessNotification(message) for 'SHOW_NOTIFICATION' (type: success),
+    showErrorNotification(message) for 'SHOW_NOTIFICATION', (type: error)
+    hideNotification() for 'CLEAR_NOTIFICATION'
+
+
+
+
 Conslusion
 ----------
 

@@ -176,7 +176,13 @@ For example, the "sum" reducer, defined like ``let sum = (s=0, x) => s+x``,
 
 So, a redux reducer is *actually* a (rather complex) functional reducer, getting the current
 state (as the accumulated value) and each individual action as the value and
-returns the new state which is the result of applying this action to the state!
+returning the new state which is the result of applying this action to the state!
+
+Three extra things to make sure about your redux reducers is that 
+
+- they should have an initial value (with the initial state of the application) 
+- they must not not mutate (change) the state object but instead create and return a new one
+- always return a valid state as a result
 
 What about react-redux?
 =======================
@@ -413,7 +419,7 @@ In the following paragraphs we'll see together the structure and source code of
 this application. I'll try to go into as much detail as possible in order to solve
 any questions you may have (I know I had many when I tried setting up everything for
 the first time). I'll skip imports and non-interesting ccomponents - after all the
-code can be found @ https://github.com/spapas/react-tutorial/. 
+complete source code can be found @ https://github.com/spapas/react-tutorial/. 
 We'll use a top down approach, starting from the main component where the routes
 are defined and the application is mounted to the DOM:
 
@@ -500,6 +506,34 @@ Here, we also define the ``history`` object we pass to the parent ``Router``.
         queryKey: false
     });
 
+    
+First of all, we see that our ``history`` object is of type HashHistory
+(`more info about history types`_) and I've also opted out of using
+``queryKey``. If I hadn't used the ``queryKey: false`` configuration
+then there'd be a ``?_k=ckuvup`` query parameter in the URL. Now, this
+parameter is actually useful (it stores location state *not* present
+in the URL for example POST form data) but I don't need it for this
+example (and generally I prefer clean URLS) - but if you don't like
+the behavior of your history then go ahead and add it.
+
+Also, notice that I've used ``HashHistory`` which will append a ``#``
+to the URL and the client-side URL will come after that, so all
+URLs will be under (for example) ``/index.html`` like ``/index.html#/authors``.
+The react-router 
+documentation recommends using ``BrowserHistory`` which uses normal (clean)
+urls -- so instead of ``/index.html#/authors`` we'd see ``/authors`` if we'd
+used ``BrowserHistory``. 
+The problem with ``BrowserHistory`` is that you'll need to configure correctly
+your HTTP server so that it will translate every URL (/foo) to the same
+URL under ``/index.html`` (``/index.html#/foo``). In my case, I don't think
+that configuring your HTTP server is worth the trouble and also I do really
+prefer using ``#`` for client-side urls! This is a common patter, recognised
+by everybody and even without the HTTP server-configuration part I'd still
+prefer ``HashHistory`` - of course this is just my opinion, feel free to use
+``BrowserHistory`` if you don't like the hash ``#``!
+
+.. code::
+
     const reducer = combineReducers(Object.assign({}, { 
             books, 
             notification,
@@ -521,31 +555,7 @@ Here, we also define the ``history`` object we pass to the parent ``Router``.
     
     export default store
 
-First of all, we see that our ``history`` object is of type HashHistory
-(`more info about history types`_) and I've also opted out of using
-``queryKey``. If I hadn't used the ``queryKey: false`` configuration
-then there'd be a ``?_k=ckuvup`` query parameter in the URL. Now, this
-parameter is actually useful (it stores location state *not* present
-in the URL for example POST form data) but I don't need it for this
-example (and generally I prefer clean URLS) - but if you don't like
-the behavior of your history then go ahead and add it.
-
-Also, notice that I've used ``HashHistory`` which will append a ``#``
-to the URL and the client-side URL will come after that, so all
-URLs will be under (for example) ``/index.html`` like ``/index.html#/authors``.
-Now, the react-router 
-documentation recommends using ``BrowserHistory`` which uses *normal* 
-urls -- so instead of ``/index.html#/authors`` we'll see ``/authors``. 
-The problem with ``BrowserHistory`` is that you'll need to configure correctly
-your HTTP server so that it will translate every URL (/foo) to the same
-URL under ``/index.html`` (``/index.html#/foo``). In my case, I don't think
-that configuring your HTTP server is worth the trouble and also I do really
-prefer using ``#`` for client-side urls! This is a common patter, recognised
-by everybody and even without the HTTP server-configuration part I'd still
-prefer ``HashHistory`` - of course this is just my opinion, feel free to use
-``BrowserHistory`` if you don't like the hash ``#``!
-
-Now, the next block of code (``combineReducers``) generates the most important
+The next block of code from ``store.js`` generates the most important
 part of our store, the reducer! The ``combineReducers`` function is provided
 by redux and is a helper function that helps you in ... combining reducers!
 As you see, I've combined the reducers defined in this application 
@@ -608,7 +618,7 @@ For example, the combine reducers function could be something like this:
         const mapped = Object.keys(o).map(k => (
             {
                 key: k,
-                slice: o[k](state[k], action)
+                slice: o[k](state[k], action) // call k sub-reducer and get result
             }
         ))
         const reduced = mapped.reduce((s, x)=>{
@@ -721,6 +731,225 @@ state for every dispatch:
   }
   
 just put it in the applyMiddleware parameter list and observe all state changes!
+    
+reducers.js
+-----------
+
+This module contains the definition for our own defined sub-reducers that we combined
+in the previous paragraph (``books, notification, ui, categories, authors``) to create
+the global reducer of the application. I've put everything in a single file, however
+it is more common to create a ``reducers`` directory and put every sub-reducer inside it
+as a different module. Let's start reviewing the code of the ``reducers.js`` module:
+
+.. code::
+
+    export const notification = (state={}, action) => {
+        // ...
+    }
+
+    export const ui = (state={}, action) => {
+        // ...
+    }
+    
+The ``notification`` and `ui` are two sub-reducers that control the state of the notification popup and if 
+the application is loading / is submitting. I won't go into much detal about
+them, they are really simple.
+
+Now we'll see the reducer that handles books. Before understanding the actual reducer, I will present
+the initial value of the books state slice:
+
+.. code::
+
+    //http://stackoverflow.com/a/5158301/119071
+    function getParameterByName(name) {
+        var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.hash);
+        return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+    }
+
+    const BOOKS_INITIAL = {
+        rows: [],
+        count: 0,
+        page: 1,
+        sorting: getParameterByName('sorting'),
+        search: getParameterByName('search'),
+        book: {},
+    }
+    
+As we see, the ``BOOK_INITIAL``
+constant is used to setup an initial state for the books slice of the global state. The ``BOOKS_INITIAL`` 
+attributs are:
+
+* ``rows``: The rows of the book table
+* ``count``: The number of rows that are displayed
+* ``page``: The current page we are on
+* ``sorting``: User-defined sorting
+* ``search``: User-search / filtering
+* ``book``: The data of the book to be edited/displayed
+
+The ``BOOK_INITIAL`` constant
+gets the ``sorting`` and the ``search`` initial values from the URL to allow these parameters
+to be initialized from the URL (so that using a url like ``#?search=foo`` will show all books
+containing ``foo``). To get the parameters from the URL I'm using the ``getParameterByName``
+function. Now, the actual reducer is:
+
+.. code::
+    
+    export const books = (state=BOOKS_INITIAL, action) => {
+        let idx = 0;
+        switch (action.type) {
+            case 'SHOW_BOOKS':
+                return Object.assign({}, state, {
+                    rows: action.books.results,
+                    count: action.books.count,
+                });
+                break;
+            case 'SHOW_BOOK':
+                return Object.assign({}, state, {
+                    book: action.book
+                });
+                break;
+            case 'CHANGE_PAGE':
+                return Object.assign({}, state, {
+                    page: action.page
+                });
+                break;
+            case 'TOGGLE_SORTING':
+                return Object.assign({}, state, {
+                    sorting: (state.sorting==action.sorting)?('-'+action.sorting):action.sorting
+                });
+                break;
+            case 'CHANGE_SEARCH':
+                return Object.assign({}, state, {
+                    search: action.search
+                });
+                break;
+            case 'ADD_BOOK':
+                return Object.assign({}, state, {
+                    book: action.book,
+                    count: state.count+1,
+                    rows: [
+                        ...state.rows,
+                        action.book,
+                    ]
+                });
+            case 'UPDATE_BOOK':
+                idx = state.rows.findIndex( r => r.id === action.book.id)
+                if(idx==-1) {
+                    return Object.assign({}, state, {
+                        book: action.book
+                    });
+                } else {
+                    return Object.assign({}, state, {
+                        book: action.book,
+                        rows: [
+                            ...state.rows.slice(0, idx),
+                            action.book,
+                            ...state.rows.slice(idx+1),
+                        ]
+                    });
+                }
+                break;
+            case 'DELETE_BOOK':
+                idx = state.rows.findIndex( r => r.id == action.id)
+                if(idx==-1) {
+                    return Object.assign({}, state, {
+                        book: undefined
+                    });
+                } else {
+                    return Object.assign({}, state, {
+                        book: undefined, 
+                        count: state.count-1,
+                        rows: [
+                            ...state.rows.slice(0, idx),
+                            ...state.rows.slice(idx+1),
+                        ]
+                    });
+                }
+                break;
+
+        }
+        return state;
+    }
+    
+
+
+The books subreducer handles the ``SHOW_BOOKS, SHOW_BOOK, CHANGE_PAGE, TOGGLE_SORTING`` and ``CHANGE_SEARCH``
+actions by retrieving the paramaters of these actions and returning a new books-state-slice object with the correctl
+parameters. To achieve this, the ``Object.assign()`` method is used. This method is defined like this
+``Object.assign(target, ...sources)``. Its first parameter is an object (a new, empty object) while the rest
+parameters (``sources``) are other objects whose properties will be assigned ``target``. The rightmost members of 
+``sources`` overwrite the previous ones if they have the same names. So, for example the code
+
+.. code::
+
+    Object.assign({}, state, {
+        rows: action.books.results,
+        count: action.books.count,
+    });
+
+creates a new object which will have all the properties of the current ``state`` with the exception of the
+``rows`` and ``count`` attributes which will get their values from the ``action``. This is a common idiom in 
+redux and you are going to see it all the time so please make sure that you grok it before continuing. Also,
+notice that the new state is a new, empty object in which all the attributes of the new state are copied - this is because
+the old state cannot be mutated.
+
+The ``ADD_BOOK`` action is a little more complicated: This action will be dispached when a new book is added with
+the data of that new book as a parameter (``action.book``). In order to make everything easier, I just append the new
+book to the end of the current page and increase the count number (I also set the new book to be the ``book`` attribute
+of the state). This means that the newly created book will not go to its correct place (based on the ordering) and
+that the visible items will be more than the ajax page coun (also notice that if you add another book then the visible
+items will also be increased by one more). This is not a problem (for me) since if the user changes page or does a search
+everything will fall back to its place. However, if you don't like it there are two solutions, one easier and one more
+difficult:
+
+* Easier solution: When adding a book just *invalidate* (make undefined) the ``books`` state attribute. This will result in an ajax call to reload the books and everything will be in place. However the user may not see the newly added book if it does not fall to the currently selected page (and there'd be an extra, unnecessary ajax call)
+* Harder solution: Well, depending on the sorting you may check if the current books should be displayed or not on the current page and push it to its correct place (and remove the last item of ``rows`` so that count is not increased). Once again, the newly book may no be displayed at all if it does not belong to the correct page
+
+The ``UPDATE_BOOK`` and ``DELETE_BOOK`` actions are even more complex. I'll explain update, delete is more or less
+the same (with the difference that update has the updated book as an action parameter while delete has only its id
+as an acton parameter): First of all we check if the updated book is currently displayed (if one of the books of
+``rows`` has the same ``id`` as the updated book). If the book is not displayed then only the current edited book
+is set to the new state. However, if it is displayed then it would need to be updated because the ``rows`` array
+does not know anything about the updated values of the book! 
+
+So, inside the ``else`` branch, the ``idx`` variable will hold its current index and the ``rows`` attribute of the new state will get the following value:
+
+.. code::
+
+    [
+        ...state.rows.slice(0, idx),
+        action.book,
+        ...state.rows.slice(idx+1),
+    ]
+
+The ``...`` spread operator expands an array so, for example ``[ ...[1,2,3] ]`` would be like ``[1,2,3]``
+and the ``slice`` method gets two parameters and returns a copy of the array elements between them. Using
+this knowledge, we can understand that the above code returns an array (``[]``) that contains the books of
+``rows`` from the first to the updated one (not including the updated one), the updated book (which we get
+from ``action``) and the rest of the books of ``rows`` (after the updated one). 
+
+The code for the ``authors`` and ``categories`` sub-reducers does not have any surprises so I won't go
+into detail about it.
+
+
+    const AUTHORS_INITIAL = {
+        // ... 
+    }
+    export const authors = (state=AUTHORS_INITIAL, action) => {
+        // ... 
+    }
+
+    const CATEGORIES_INITIAL = {
+        // ... 
+    }
+
+    export const categories = (state=CATEGORIES_INITIAL, action) => {
+        // ... 
+    }
+
+actions.js
+----------
+
     
 Conslusion
 ----------

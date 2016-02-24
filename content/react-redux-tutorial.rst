@@ -1152,8 +1152,197 @@ and if not it will just set the displayed subcategories to and empty list (by di
 ``showSubCategoriesResult([])``). If the category is not empty, it will retrieve asynchronously the
 subcategories of the passed category.
 
-app.js
-======
+components/app.js
+=================
+
+We'll now start explaining the actual react components (modified to be used through redux of course).
+The parent of all other components is the ``App`` which, as we've already seen in ``main.js`` it
+is connected with the parent route:
+
+.. code::
+
+    class App extends React.Component {
+
+        render() {
+            const { isLoading } = this.props.ui;
+            return <div>
+
+                {this.props.children}
+
+                <NotificationContainer />
+                <LoadingContainer isLoading={isLoading} />
+
+                <br />
+
+                <StatPanel bookLength={this.props.books.count} authorLength={this.props.authors.rows.length} />
+                <Link className='button' to="/">Books</Link>
+                <Link className='button' to="/authors/">Authors</Link>
+
+            </div>
+        }
+
+        componentDidMount() {
+            let { loadBooks, loadAuthors } = this.props;
+            
+            if(this.props.books.rows.length==0) {
+                loadBooks();
+            }
+            if(this.props.authors.rows.length==0) {
+                loadAuthors();
+            }
+        }
+    }
+
+    const mapStateToProps = state => ({
+        books:state.books,
+        authors:state.authors,
+        ui:state.ui,
+    })
+
+    const mapDispatchToProps = dispatch => bindActionCreators({ 
+        loadBooks, loadAuthors 
+    }, dispatch)
+
+
+    export default connect(mapStateToProps, mapDispatchToProps)(App);
+
+As we can see, there's an internal component (named ``App``) but we export the ``connect``ed component. This
+connected component uses mapStateToProps for defining the state attributes that should be passed as properties
+to the componnt (``state.{books, authors, ui}``) and ``mapDispatchToProps`` for defining the ``props`` methods that will
+dispatch actions. To make ``mapDispatchToProps`` more compact I've used the ``bindActionCreators`` method from redux.
+This method gets an object whose values are action creators and the ``dispatch`` (from store) and returns an object
+whose values are the dispatch-enabled corresponding action creators. So, in our case
+the returned object would be something like:
+
+.. code::
+    
+    {
+        loadBooks: () => dispatch(loadBooks()),
+        loadAuthors: () => dispatch(loadAuthors()),
+    }
+
+This object of course could be created by hand, however bindActionCreators would be really useful if we wanted
+to dispatch lots of actions in a component (or if we had seperated our action creators to different modules) --
+we could for example do something like this:
+
+.. code::
+
+    import * as actions from '../actions'
+    
+    const mapDispatchToProps = dispatch => bindActionCreators(actions, dispatch)
+    
+The ``import *`` statemenet will create an object named item that will have all the exported actions and then
+``bindActionCreators`` will return an object that dispatches these actions -- passing this ``mapDispatchToProps``
+to connect will allow your component to call every action and automatically dispatch it. 
+    
+The internal component returns a ``<div />`` containing, among others ``{this.props.children}`` - this
+will be provided by rendering the child routes. It also renders a ``NotificationContainer`` to render the notifications, a 
+``LoadingContainer`` to display a css "loading" spinner and a ``StatPanel`` to display some stats about books and
+authors. It also renders two Links one for the books table and one for the authors table.
+
+Beyond these, when the component is mounted it checks if the authors and books have been loaded and if not, it
+dispatches the ``loadBooks`` and ``loadAuthors`` actions (remember, because we used ``mapDispatchToProps`` by
+calling these methods from ``props`` they'll be automatically dspatched).
+
+Let's take a quick look at the three small components that are contained in ``App``
+
+components/notification.js
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This component is responsible for displaying a notification if there's an active one.
+It also defines an internal component and exports a connected version of it, passing it the
+``notification`` slice of the state tree and an ``onHide`` method that dispatches the
+``hidNotification`` action. 
+
+When the internal component is rendered, it checks to see if the notification should be
+displayed (``isActive`` will be true if there's an actual message) and select the color
+of the background. Finally, it passes this information along with some styling 
+to the real ``Notification``  component from ``react-notification``.
+
+.. code::
+
+    const NotificationContainer = (props) => {
+        let { message, notification_type } = props.notification;
+        let { onHide } = props;
+        let isActive = message?true:false;
+        let color;
+
+        switch(notification_type) {
+            case 'SUCCESS':
+                color = colors.success
+                break;
+            case 'ERROR':
+                color = colors.danger
+                break;
+            case 'INFO':
+                color = colors.info
+                break;
+        }
+        
+        return <Notification
+            isActive={isActive}
+            message={message?message:''}
+            dismissAfter={5000}
+            onDismiss={ ()=>onHide() }
+            action='X'
+            onClick={ ()=>onHide() }
+            style={{
+                bar: {
+                    background: color,
+                    color: 'black',
+                    fontSize: '2rem',
+                },
+                active: {
+                    left: '3rem',
+                },
+                action: {
+                    color: '#FFCCBC',
+                    fontSize: '3rem',
+                    border: '1 pt solid black'
+                }
+            }}
+        />
+    }
+
+
+    let mapStateToProps = state => ({
+        notification: state.notification
+    })
+
+    let mapDispatchToProps = dispatch => ({
+        onHide: () => {
+            dispatch(hideNotification())
+        }
+    })	
+
+    export default connect(mapStateToProps, mapDispatchToProps)(NotificationContainer);
+    
+Please notice that although I've implemented this as a connected component this is not the only
+way to do it!
+
+ 
+components/loading.js
+~~~~~~~~~~~~~~~~~~~~~
+
+This is a really simple component: If the ``isLoading`` parameter is true, display a ``div`` with the ``loading`` class:
+
+.. code::
+
+    export default ({isLoading}) => <div>
+        {isLoading?<div className="loading">Loading&#8230;</div>:null}
+    </div>
+    
+The important thing here is what the ``loading`` class does to display the spinner - I'm leaving it to you to check 
+it at ``static/cssloader.css`` (this is not my css code - I've copied it from http://codepen.io/MattIn4D/pen/LiKFC ).
+
+
+components/StatPanel.js
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Another very simple component - just display the number of books and authors from the passed parameter.
+
+
+
     
 Conslusion
 ----------

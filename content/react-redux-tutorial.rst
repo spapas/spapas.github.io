@@ -249,7 +249,6 @@ The html is just ``<div id='container'></div>`` while the es6/jsx code is:
     )
 
 
-
 As we can see, the reducer and store are the same as the non-react version. What is new is 
 that I've added a React ``RootComponent`` that has two properties, one named ``number``
 and one named ``dispatch`` that can be used to dispatch an action through the store. But how this
@@ -555,6 +554,10 @@ prefer ``HashHistory`` - of course this is just my opinion, feel free to use
     
     export default store
 
+Please notice above that the ``Object.assign`` method is used - I'll talk about
+it later --  however, another common ES6 idiom that I've used is that when you define
+an object you can change  ``{ x: x }`` to ``{ x }``.
+    
 The next block of code from ``store.js`` generates the most important
 part of our store, the reducer! The ``combineReducers`` function is provided
 by redux and is a helper function that helps you in ... combining reducers!
@@ -576,7 +579,7 @@ store enchanccer that we use now is the output of the
 redux thunk, the other is for ``syncHistory``).
             
 Interlude: Combining reducers
-=============================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 So, what does the ``combineReducers`` function do? As we've already seen,
 the reducer is a simple function that gets the current state and an
@@ -596,6 +599,8 @@ that if we have for example a state tree like this:
     'data': {},
     'ui': {}
   }
+  
+  
   
 with actions that manipulate either data or ui, we could create two indivdual reducers,
 one that would manipulate the data, and one for the ui. These reducers would get *only* 
@@ -650,7 +655,7 @@ the above code could be also writen like this:
 
     
 Interlude: Middlewares
-======================
+~~~~~~~~~~~~~~~~~~~~~~
 
 A redux middleware is `rather difficult to explain`_ technically but easier to explain
 conceptually: What it does it that it can be used to extend the store's dispatch by providing
@@ -731,9 +736,9 @@ state for every dispatch:
   }
   
 just put it in the applyMiddleware parameter list and observe all state changes!
-    
+
 reducers.js
------------
+===========
 
 This module contains the definition for our own defined sub-reducers that we combined
 in the previous paragraph (``books, notification, ui, categories, authors``) to create
@@ -931,6 +936,7 @@ from ``action``) and the rest of the books of ``rows`` (after the updated one).
 The code for the ``authors`` and ``categories`` sub-reducers does not have any surprises so I won't go
 into detail about it.
 
+.. code::
 
     const AUTHORS_INITIAL = {
         // ... 
@@ -946,9 +952,34 @@ into detail about it.
     export const categories = (state=CATEGORIES_INITIAL, action) => {
         // ... 
     }
+    
+
+The global state tree
+~~~~~~~~~~~~~~~~~~~~~
+
+As we've already seen, the global reducer is created through ``combineReducers``
+which retrieves an object with our defined reducers and two reducers from
+the react-router-redux and redux-form libraries. This means, that the global 
+state object will be something like this:
+
+.. code::
+
+  {
+    books: {},
+    notification: {},
+    ui: {},
+    categories: {},
+    authors: {},
+    routing: {},
+    form: {},
+  }
+
+We won't see this object anywhere because each sub-reducer will get its corresponding
+slice of that object.
+    
 
 actions.js
-----------
+==========
 
 The ``actions.js`` module should probably have been named ``action_creators.s`` since
 it actually contains redux action creators. Also, a common practice is create a folder
@@ -962,29 +993,33 @@ functions that not necessarily return actions but can be "dispatcher") - please 
 discussion about redux-thunk on a previous paragraph.
 
 First of all, there's a bunch of some simple action creators that just return
-the corresponding action object with the correct parameters: 
-
-# TODO: FIX NAMES FOR ALL
+the corresponding action object with the correct parameters. Notice that
+the action creators that end in ``*Result`` are called when an 
+(async) ajax request returns, for example ``showBooksResult`` will be
+called when the book loading has returned and pass its result data to
+the reducer. The other action creators change various parts of the state
+object, for example ``loadingChanged`` will create an action that when
+dispatched it will set ``ui.isLoading`` attribute
+to the action parameter.
 
 .. code::
 
-    showBooksResultAction(books) for "SHOW_BOOKS",
-    showBookResultAction(book) for "SHOW_BOOK",
-    addBookResultAction(book) for "ADD_BOOK",
-    updateBookResultAction(book) for "UPDATE_BOOK",
-    deleteBookResultAction(id) for "DELETE_BOOK",
+    showBooksResult(books) for "SHOW_BOOKS",
+    showBookResult(book) for "SHOW_BOOK",
+    addBookResult(book) for "ADD_BOOK",
+    updateBookResult(book) for "UPDATE_BOOK",
+    deleteBookResult(id) for "DELETE_BOOK",
     
-    showAuthorsResultAction(authors) for "SHOW_AUTHORS",
-    showAuthorResultAction(author) for "SHOW_AUTHOR",
-    addAuthorResultAction(author) for "ADD_AUTHOR",
-    updateAuthorResultAction(author) for "UPDATE_AUTHOR",
-    deleteAuthorResultAction(id) "DELETE_AUTHOR",
+    showAuthorsResult(authors) for "SHOW_AUTHORS",
+    showAuthorResult(author) for "SHOW_AUTHOR",
+    addAuthorResult(author) for "ADD_AUTHOR",
+    updateAuthorResult(author) for "UPDATE_AUTHOR",
+    deleteAuthorResult(id) "DELETE_AUTHOR",
         
-
-    showCategoriesResultAction(categories) for "SHOW_CATEGORIES",
-    showSubCategoriesResultAction(subcategories) for "SHOW_SUBCATEGORIES",
-    loadingChangedAction(isLoading) for "IS_LOADING",
-    submittingChangedAction(isSubmitting) for "IS_SUBMITTING",
+    showCategoriesResult(categories) for "SHOW_CATEGORIES",
+    showSubCategoriesResult(subcategories) for "SHOW_SUBCATEGORIES",
+    loadingChanged(isLoading) for "IS_LOADING",
+    submittingChanged(isSubmitting) for "IS_SUBMITTING",
     toggleSorting(sorting) for "TOGGLE_SORTING",
     changePage(page) for "CHANGE_PAGE",
     changeSearch(search) for 'CHANGE_SEARCH',
@@ -1046,11 +1081,11 @@ The following thunk action creators are used for asynchronous, ajax queries:
             if(search) {
                 url+=`&search=${search}`
             }
-            dispatch(loadingChangedAction(true));
+            dispatch(loadingChanged(true));
             $.get(url, data => {
                 setTimeout(() => {
-                    dispatch(showBooksResultAction(data));
-                    dispatch(loadingChangedAction(false));
+                    dispatch(showBooksResult(data));
+                    dispatch(loadingChanged(false));
                 }, 1000);
             });
         }
@@ -1060,66 +1095,66 @@ The following thunk action creators are used for asynchronous, ajax queries:
     export function loadBookAction(id) {
         return (dispatch, getState) => {
             let url = `//127.0.0.1:8000/api/books/${id}/?format=json`;
-            dispatch(loadingChangedAction(true));
+            dispatch(loadingChanged(true));
             $.get(url, function(data) {
-                dispatch(showBookResultAction(data));
-                dispatch(loadingChangedAction(false));
+                dispatch(showBookResult(data));
+                dispatch(loadingChanged(false));
                 dispatch(loadSubCategories(data.category));
             });
         }
     }
 
     export function loadAuthors(page=1) {
-        return (dispatch, getState) => {
-            let url = `//127.0.0.1:8000/api/authors/?format=json&page=${page}`;
-            dispatch(loadingChangedAction(true));
-            $.get(url, data => {
-                setTimeout(() => {
-                    dispatch(showAuthorsResultAction(data));
-                    dispatch(loadingChangedAction(false));
-                }, 1000);
-            });
-        }
+        // similar to loadBooks
     }
 
 
-    export function loadAuthorAction(id) {
-        return (dispatch, getState) => {
-            let url = `//127.0.0.1:8000/api/authors/${id}/?format=json`;
-            dispatch(loadingChangedAction(true));
-            $.get(url, function(data) {
-                dispatch(showAuthorResultAction(data));
-                dispatch(loadingChangedAction(false));
-            });
-        }
+    export function loadAuthor(id) {
+        // similar to loadBook
     }
 
     export function loadCategories() {
-        return (dispatch, getState) => {
-            let url = '//127.0.0.1:8000/api/categories/?format=json';
-
-            $.get(url, data => {
-                dispatch(showCategoriesResultAction(data));
-            });
-        }
+        // similar to loadBooks
     }
 
     export function loadSubCategories(category) {
         return (dispatch, getState) => {
             
             if(!category) {
-                dispatch(showSubCategoriesResultAction([]));
+                dispatch(showSubCategoriesResult([]));
                 return 
             }
             let url = `//127.0.0.1:8000/api/subcategories/?format=json&category=${category}`;
 
             $.get(url, data => {
-                dispatch(showSubCategoriesResultAction(data));
+                dispatch(showSubCategoriesResult(data));
             });
         }
     }
 
+The ``loadBooks`` thunk action creator creates the URL parameters that should
+be passed to the REST API using the ``getState()`` method that returns the current state.
+It then dispatches the ``loadingChanged`` action so that the ``ui.isLoading`` will be
+changed to true. After that it asynchronously calls the load books REST API and returns.
+Since this is a thunk action there's no problem that nothing is returned. When the 
+ajax call returns it will dispatch the ``showBooksResult``, passing the book data to
+change the state with the loaded book data and the ``loadingChanged`` to hide the loading
+graph.
 
+The ``loadBook`` is more or less the same - however here only a single book's data will
+be loaded. When this book is loaded the ``loadSubCategories`` action will also be dispatched,
+passing it the loaded book's category (so that the correct subcategories based on the category
+will be displayed to the form).
+
+I won't go into any detail about the other thunk action creators, they are simpler than those
+we've already described, except ``loadSubCategories``: This one, checks if there's a category
+and if not it will just set the displayed subcategories to and empty list (by dispatching
+``showSubCategoriesResult([])``). If the category is not empty, it will retrieve asynchronously the
+subcategories of the passed category.
+
+app.js
+======
+    
 Conslusion
 ----------
 

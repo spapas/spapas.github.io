@@ -1139,7 +1139,11 @@ changed to true. After that it asynchronously calls the load books REST API and 
 Since this is a thunk action there's no problem that nothing is returned. When the 
 ajax call returns it will dispatch the ``showBooksResult``, passing the book data to
 change the state with the loaded book data and the ``loadingChanged`` to hide the loading
-graph.
+graph. Also, please notice that I've put the return of the ajax call inside a ``setTimeout``
+to emulate a 1 second delay and be able to see the loading spinner. Also, I may have used
+setTImeout in some other places to make sure to be able to emulate server-side delays. 
+
+*Please don't forget to remove these ``setTimeout``s from your code!*
 
 The ``loadBook`` is more or less the same - however here only a single book's data will
 be loaded. When this book is loaded the ``loadSubCategories`` action will also be dispatched,
@@ -1317,8 +1321,40 @@ to the real ``Notification``  component from ``react-notification``.
 
     export default connect(mapStateToProps, mapDispatchToProps)(NotificationContainer);
     
+Creating a re-usable notification
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
 Please notice that although I've implemented this as a connected component this is not the only
-way to do it!
+way to do it! Actually, probably my implementation is less-reusable from the others I will propose... 
+
+In any case, instead of implementing ``NotificationContainer`` as a connected component we could
+have implemented it as a normal, non connected component that would receive two properties: 
+the ``notification`` slice of state and an ``onHide`` function that would dispatch 
+``hideNotification``. Doing this would be very easy, just change 
+``App`` so that its ``mapDispatchToProps`` would also return the ``notification`` slice of 
+the state - and pass this slice as a property to the ``NotificationContainer``. Also, the 
+``onHide`` method should have been also defined in the ``mapDispatchToProps`` of ``App`` and
+passed as a property to ``NotificationContainer``. Notice that this makes ``NotificationContainer``
+a reusable component since we could pass anything we wanted as the ``notification`` object and
+``onHide`` method.
+
+Also, if we needed to implement ``NotificationContainer`` as a connected object but we still
+needed it to be reusable we'd then export the non-connected ``NotificationContainer`` 
+and create a bunch of ``ConnectedNotificationContainer`` that would 
+define ``mapStateToProps`` and ``mapDispatchToProps``
+and export the connected component. This way, each ``ConnecteNotificationContainer`` would
+receive a different state slice and a different ``onHide`` method, for example we may had
+different notifications for books and different notifications for authors. Notice that this
+approach, i.e create a reusable non-connected component and use it to create connected
+components by defining their ``mapStateToProps`` and ``mapDispatchToProps`` is the 
+approach proposed by react-redux to create components.
+
+Finally, one last comment on this approach that will clarify 
+the purpose of  ``mapStateToProps`` and
+``mapDispatchToProps`` is that these two functions are dual (mirror): 
+
+* Using ``mapStateToProps`` we define which parts of the state will actually be passed to the component (= read the state).
+* Using ``mapDispatchToProps`` we define the actions which will be dispatched by the component (= change/write the state)
 
  
 components/loading.js
@@ -1341,8 +1377,182 @@ components/StatPanel.js
 
 Another very simple component - just display the number of books and authors from the passed parameter.
 
+components/BookPanel.js
+=======================
+
+Continuing our top-down approach on exploring the project, we'll now talk 
+about the ``BookPanel`` component which is displayed by the ``IndexRoute``.
+Before talking about the actual component, I'd like to present a 
+the ``getCols`` function that is used to create an array of the columns
+that will be displayed by the ``Table`` we render in this panel. 
+
+As we can see, the ``getCols`` gets one parameter which is the sort method -- 
+this method gets a string and uses it to toggle sorting by this string.
+Each column, has up to four parameters: 
+
+* A ``key`` which is the attribute  of the ``row`` object to display
+* A ``title`` which is the column title
+* A ``format`` which may be used to display the value of that column and
+* A ``sorting`` which is a function that will be called when the column title is clicked (so that the sorting is changed ) - this attribute is created using the ``sort_method``
+
+We'll see how these attributes are used by the ``Table`` in the corresponding section.
+
+.. code::
+
+    const getCols = sort_method => [
+        {
+            key: 'id',
+            label: 'ID',
+            format: x=><Link to={`/book_update/${x.id}/`}>{x.id}</Link>,
+            sorting: sort_method('id')
+        },
+        {key: 'title', label: 'Title', sorting: sort_method('title')},
+        {key: 'category_name', label: 'Category', sorting: sort_method('subcategory__name')},
+        {key: 'publish_date', label: 'Publish date', sorting: sort_method('publish_date')},
+        {key: 'author_name', label: 'Author', sorting: sort_method('author__last_name')},
+    ]
+    
+
+The actual ``BookPanel`` is a connected component - we need to use connect because we can't
+actually pass properties or ``dispatch`` to this component since it is
+rendered through a route (and not as a child of another component), so it
+must be connected to the store through ``connect``. We pass the ``books`` state
+slice as a property using ``mapStateToProps`` and use the same techique as 
+before in ``App``  with
+``bindActionCreators`` to create auto-dispatchable actions.
+
+As we can see, after retrieving the needed properties from the ``books`` state slice
+and the actions to dispatch, we define an ``onSearchChanged`` function that will be 
+passed to the ``BookSearchPanel`` to be called when the search query is changed.
+
+After that, the ``sort_method`` is defined: Please notice the ``sort_method`` is
+a function that gets a ``key`` parameter and returns another function that 
+dispatches ``toggleSortingAndLoadBooks`` with that ``key``. This is the 
+parameter that is passed to ``getCols``. So, for example for the ``id``,
+the result of the ``sort_method`` would be the following function:
+``() => toggleSortingAndLoadBooks('id')``.
+
+Finally, we see that the ``BookPanel`` renders the following:
+
+* A ``BookSearchPanel`` passing it the ``search`` property and the ``onSearchChanged`` action
+* A ``Link`` to create a new book
+* A ``Table`` passing it the ``sorting`` and ``rows`` parameters and the ``cols`` constant we just defined
+* A ``PagingPanel`` passing it the total number of books (``count``), the current page (``page``) and two methods ``onNextPage`` and ``onPreviousPage`` that will be called when switch to the next or previous page.
+
+As we can see, the ``onNextPage`` and ``onPreviousPage`` dispach the ``changePage`` action passing it
+the page to change to and reload the books by dispatch ``loadBooks``. Instead of this we could create
+a ``changePageAndLoadBooks`` thunk action creator that would call these two methods when dispatched
+(similarly to how ``changeSearchAndLoadBooks`` and ``toggleSortingAndLoadBooks`` have been implemented).
+    
+.. code::
+
+    class BookPanel extends React.Component {
+        render() {
+            const { rows, count, page, sorting, search } = this.props.books;
+            const { loadBooks, changePage, toggleSortingAndLoadBooks, changeSearchAndLoadBooks  } = this.props;
+            
+            const onSearchChanged = query => changeSearchAndLoadBooks(query)
+            const sort_method = key => () => toggleSortingAndLoadBooks(key)
+            const cols = getCols(sort_method)
+
+            return <div>
+                <BookSearchPanel search={search} onSearchChanged={onSearchChanged} />
+                <div className="row">
+                    <div className="twelve columns">
+                        <h3>Book list <Link className='button button-primary' style={{fontSize:'1em'}} to="/book_create/">+</Link></h3>
+                        <Table sorting={sorting} cols={cols} rows={rows} />
+                    </div>
+                </div>
+                <PagingPanel count={count} page={page} onNextPage={() => {
+                    changePage(page+1);
+                    loadBooks()
+                }} onPreviousPage={ () => {
+                    changePage(page-1);
+                    loadBooks()
+                }} />
+            </div>
+        }
+    }
+
+    const mapStateToProps = state => ({
+        books:state.books,
+    })
+
+    const mapDispatchToProps = dispatch => bindActionCreators({ 
+        loadBooks, changePage, toggleSortingAndLoadBooks, changeSearchAndLoadBooks 
+    }, dispatch)
+
+    export default connect(mapStateToProps, mapDispatchToProps)(BookPanel);
+
+components/BookSearchPanel.js
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``BookSearchPanel`` is a component used for searching books. What
+is interesting about this component is that it has internal state (i.e 
+state that is not reflected to the global search tree). Notice that this
+is an ES6 class component:
+
+* It extends ``React.Component`` instead of using ``React.CreateClass``
+* It has a constructor that initializes the local state instead of implementing ``getInitialState``
+* It does not automatically bind the methods to ``this`` so we do it in the constructor (or else ``this`` would be undefined in ``onSearchChange`` and ``onClearSearch``)
+
+So, what happens
+here? We render an HTML ``input`` element and call ``this.onSearchChange``
+method. This method retrieves the current value of te input (using ``this.refs``)
+and, if the previous change was more than 400 ms ago, it sets the local
+state and calls the provided
+(through ``props``) ``onSearchChanged`` method that will dispatch the
+``changeSearchAndLoadBooks`` action with the current value as a parameter. 
+The whole thing with the ``ths.promise`` and ``clearInterval`` is to make
+sure that the provided ``onSearchChanged`` will not be called too often.
 
 
+.. code::
+
+    export default class SearchPanel extends React.Component {
+        constructor() {
+            super()
+            this.onSearchChange = this.onSearchChange.bind(this)
+            this.onClearSearch = this.onClearSearch.bind(this)
+            this.state = {}
+        }
+        
+        render() {
+            return (
+                <div className="row">
+                    <div className="one-fourth column">
+                        Filter: &nbsp;
+                        <input ref='search' name='search' type='text' defaultValue={this.props.search} value={this.state.search} onChange={this.onSearchChange } />
+                        {(this.state.search||this.props.search)?<button onClick={this.onClearSearch} >x</button>:''}
+                    </div>
+                </div>
+            )
+        }
+        
+        onSearchChange() {
+            let query = ReactDOM.findDOMNode(this.refs.search).value;
+            if (this.promise) {
+                clearInterval(this.promise)
+            }
+            this.setState({
+                search: query
+            });
+            this.promise = setTimeout(() => this.props.onSearchChanged(query), 400);
+        }
+        
+        onClearSearch() {
+            this.setState({
+                search: ''
+            });
+            this.props.onSearchChanged(undefined) 
+            
+        }
+    }
+
+
+Finally when there's a search query a  ``x`` button will be displayed which, when 
+clicked the search local state will be cleared 
+and the provided ``onSearchChanged`` will be called with an empty query.
     
 Conslusion
 ----------

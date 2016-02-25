@@ -1210,8 +1210,14 @@ is connected with the parent route:
 
     export default connect(mapStateToProps, mapDispatchToProps)(App);
 
-As we can see, there's an internal component (named ``App``) but we export the ``connect``ed component. This
-connected component uses mapStateToProps for defining the state attributes that should be passed as properties
+As we can see, there's an internal component (named ``App``) but we export the ``connect``ed component. 
+One interesting thing to notice is that ``App`` is an ES6 class based react component (i.e it extends
+from ``React.Component`` -- I'll talk a bit about these components while taking a look at 
+the ``BookSearchPanel`` which has some more interesting features).
+
+Concerning the exported, 
+connected component, it 
+uses ``mapStateToProps`` for defining the state attributes that should be passed as properties
 to the componnt (``state.{books, authors, ui}``) and ``mapDispatchToProps`` for defining the ``props`` methods that will
 dispatch actions. To make ``mapDispatchToProps`` more compact I've used the ``bindActionCreators`` method from redux.
 This method gets an object whose values are action creators and the ``dispatch`` (from store) and returns an object
@@ -1308,7 +1314,6 @@ to the real ``Notification``  component from ``react-notification``.
         />
     }
 
-
     let mapStateToProps = state => ({
         notification: state.notification
     })
@@ -1371,6 +1376,13 @@ This is a really simple component: If the ``isLoading`` parameter is true, displ
 The important thing here is what the ``loading`` class does to display the spinner - I'm leaving it to you to check 
 it at ``static/cssloader.css`` (this is not my css code - I've copied it from http://codepen.io/MattIn4D/pen/LiKFC ).
 
+Also, please notice that in this module we just export a function, taking an object which
+has an ``isLoading`` attribute as a parameter. That's a functional react component: A
+function that gets a ``params`` object as an input and implements the render method,
+returning a component. Using functional components is recommended for reasons that
+are far too obvious - you should use class based components only when absolutely
+necessary (i.e when the component needs to keep some local state or when it needs
+to do stuff on ``componentWillMount``).
 
 components/StatPanel.js
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -1545,15 +1557,173 @@ sure that the provided ``onSearchChanged`` will not be called too often.
                 search: ''
             });
             this.props.onSearchChanged(undefined) 
-            
         }
     }
 
+Let's take a closer look at the ``<input>`` element:
 
-Finally when there's a search query a  ``x`` button will be displayed which, when 
+.. code::
+
+    <input ref='search' name='search' type='text' defaultValue={this.props.search} value={this.state.search} onChange={this.onSearchChange } />
+    
+The ``ref`` property is used to reference this element using ``ReactDOM.findDOMNode`` - that's
+one possible way to retrieve the value of this object. Another way would be to add an ``event``
+parameter to ``onSearchChange`` - this parameter would receive the DOM event of the change so
+the value of the element could be retrieved using ``event.target.value``. 
+
+The difference between the ``defaultValue`` and ``value`` parameters is really important: The
+``defaultValue`` is just the initial value of this specific input and it will be equal to
+``props.search``. On the other hand, the ``value`` parameter is the current value of 
+the element and will be equal to the ``state.search``. When the user types in the input,
+the ``onSearchChange`` will be called which will *always* change the ``state.search`` - or 
+else the change wouldn't be reflected to the user! 
+
+Finally concerning the clear search query button, 
+when there's a search query a  ``x`` button will be displayed which, when 
 clicked the search local state will be cleared 
 and the provided ``onSearchChanged`` will be called with an empty query.
+
+components/Table.js
+~~~~~~~~~~~~~~~~~~~
+
+The ``Table`` is a reusable, functional react component that is used for both books and authors. 
+
+First of all, we define a formatHeader function that is used to format the
+table header: This function gets an object with key and label as parameters (which
+is the column to be formated) and a sorting parameter (which is the current table's
+sorting) and returns the label with a ``'+'`` in front of it if the sorting is ascending
+by this column or a ``'-'`` if the sorting is descending by this column or just the
+label if this column is not used for sorting:
+
+.. code::
+        
+    const formatHeader = ({key, label}, sorting) => (sorting==key)?('+'+label):(
+        (sorting=='-'+key)?('-'+label):label
+    )
+
+The ``Table``
+is a functional component that uses the props we mentioned before when talking about 
+``BookPanel``. When it is rendered, the headers of the table are constructed by
+applying a map method on the items of the ``cols`` attribute. Remember that map
+will apply a function to all items of a list and return a new list with the results.
+
+In our case, the mapper 
+checks if each column has a ``sorting`` attribute and if yes it 
+creates a clickable header that calls ``sorting`` when clicked and is
+formatted with ``formatHeader`` (remember ``sort_method`` we talked about
+in ``BookPanel``). If there's no ``sorting`` for that column it just 
+displays the column header.
+
+The rows of the table are created using two maps, one that maps the ``rows``
+which, for each row maps ``cols`` to get the individual values for this row and column.
     
+.. code::    
+
+    export default (props) => {
+        const headers = props.cols.map(col => <th key={col.key}>
+            {col.sorting?<a href='#' onClick={e => {
+                e.preventDefault();
+                col.sorting()
+            }}>	
+                {formatHeader(col, props.sorting)}
+            </a>:col.label
+            }
+        </th>)
+        const rows = props.rows.map(row => <tr key={row.id}>
+            {
+                props.cols.map(col => <td key={col.key}>
+                    {(col.format?col.format(row):row[col.key])}
+                </td>)
+            }
+        </tr>)
+            
+        return <table>
+            <thead>
+                <tr>
+                    {headers}
+                </tr>
+            </thead>
+            <tbody>
+                {rows}
+            </tbody>
+        </table>
+    }
+
+Please notice that the ``const headers`` and ``rows`` we've defined are there just
+for clarity - we could instead put them directly inside the ``return``ed ``<table>``
+and have a cool, totally *functional function*! 
+
+components/PagingPanel.js
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Another functional component - this retrieves ``params`` with the 
+attributes ``page``, ``page_size``, ``count``, ``onNextPage``,
+``onPreviousPage`` and, after finding out the total number of pages
+it renders the current page number and the total pages number along
+with two buttons that will execute the ``onNextPage`` and ``onPreviousPage``
+that are passed as properties (these methods will dispatch the changePage and
+loadBooks actions as we've already seen in ``BookPanel``). One thing to notice
+here is that the next and previous page buttons will only be rendered if 
+we are not in the first or last page (so if there's only one page you won't
+see any buttons).
+
+.. code::
+
+    export default ({page=1, page_size=5, count, onNextPage, onPreviousPage, ...props}) => {
+        const total_pages = Math.ceil(count / page_size);
+        
+        return <div className="row">
+            {page==1?null:<button onClick={e => {
+                e.preventDefault();
+                onPreviousPage();
+            }}>&lt;</button>}
+            &nbsp; Page {page} of {total_pages} &nbsp; 
+            {page==total_pages?null:<button onClick={e => {
+                e.preventDefault();
+                onNextPage();
+            }}>&gt;</button>}
+        </div>
+    }
+
+Interlude: A more functional component
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+How could we make ``PagingPanel`` more functional (i.e how could we remove the
+``const total_pages`` definition) ? The easy way would be to just substitute it
+with its definition inside the returned ``<div>`` however we'd need to substitute it *two* times 
+so we'd loose our precious DRYness! So we'd need to think of another way.
+
+People from the django world will be familiar with the  `with template tag`_. This tag
+is used in django templates to assign a complex value to a constant and use this value
+instead of the complex value. Something like this
+
+.. code::
+    
+    {% with simple=a.complex|calculation %}
+        In here I can just use {{ simple }} instead of {{ a.complex|calculation }}!
+    {% endwith %}
+
+Having such a concept in ES6 would be ideal for our case! I am not sure if something
+like ``with`` actually exists, however we can really easy emulate it with a function,
+something like this:
+
+.. code::
+
+    export default ({page=1, page_size=5, count, onNextPage, onPreviousPage, ...props}) => ( 
+        total_pages => <div className="row">
+            {page==1?null:<button onClick={e => { /* ... */ }}>&lt;</button>}
+            &nbsp; Page {page} of {total_pages} &nbsp; 
+            {page==total_pages?null:<button onClick={e => { /* ... */ }}>&gt;</button>}
+        </div>
+    )(Math.ceil(count / page_size))
+    
+We define a function that gets ``total_pages`` as a parameter and returns *another function* (
+which is the actual render method of the ``PagingPanel``) and *call the outer function* 
+passing it the value we want to give to ``total_pages``. This way, the ``total_pages`` will
+have a value in the inner function! 
+
+Now ``PagingPanel`` is also a completely functional function component!
+
 Conslusion
 ----------
 
@@ -1580,3 +1750,4 @@ dispatched when the ``fetch`` is finished instead of calling ``forceUpdate`` dir
 .. _`more info about history types`: https://github.com/reactjs/react-router/blob/latest/docs/guides/Histories.md#hashhistory
 .. _`rather difficult to explain`: http://redux.js.org/docs/advanced/Middleware.html
 .. _`uses a location descriptor`: https://github.com/reactjs/history/blob/master/docs/Location.md#location-descriptors
+.. _`with template tag`: https://docs.djangoproject.com/es/1.9/ref/templates/builtins/#with

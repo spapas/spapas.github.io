@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="google-site-verification" content="5_8DTmIiEq4gFvNAfxAD6TsGOgrMAjp8lQFQvfA6zZc" />
+  <title>/var/</title>
+  <meta name="author" content="Serafeim Papastefanos">
+
+
+
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+    <link href="http://spapas.github.io/favicon.png" rel="icon">
+
+  <link href="http://spapas.github.io/theme/css/main.css" media="screen, projection"
+        rel="stylesheet" type="text/css">
+
+  <link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic"
+        rel="stylesheet" type="text/css">
+  <link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic"
+        rel="stylesheet" type="text/css">
+</head>
+
+<body>
+  <header role="banner"><hgroup>
+  <h1><a href="http://spapas.github.io/">/var/</a></h1>
+    <h2>Various programming stuff</h2>
+</hgroup></header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+</ul>
+
+
+<ul class="main-navigation">
+      <li >
+        <a href="http://spapas.github.io/category/css.html">Css</a>
+      </li>
+      <li >
+        <a href="http://spapas.github.io/category/django.html">Django</a>
+      </li>
+      <li >
+        <a href="http://spapas.github.io/category/flask.html">Flask</a>
+      </li>
+      <li >
+        <a href="http://spapas.github.io/category/git.html">Git</a>
+      </li>
+      <li >
+        <a href="http://spapas.github.io/category/javascript.html">Javascript</a>
+      </li>
+      <li >
+        <a href="http://spapas.github.io/category/pelican.html">Pelican</a>
+      </li>
+      <li >
+        <a href="http://spapas.github.io/category/python.html">Python</a>
+      </li>
+      <li >
+        <a href="http://spapas.github.io/category/spring.html">Spring</a>
+      </li>
+      <li >
+        <a href="http://spapas.github.io/category/wagtail.html">Wagtail</a>
+      </li>
+</ul></nav>
+  <div id="main">
+    <div id="content">
+<div class="blog-index">
+  		<article>
+<header>
+      <h1 class="entry-title">
+        <a href="http://spapas.github.io/2013/11/05/django-authoritiy-data/">Django authority data</a>
+      </h1>
+    <p class="meta">
+<time datetime="2013-11-05T14:20:00+02:00" pubdate>Τρι 05 Νοέμβριος 2013</time>    </p>
+</header>
+
+  <div class="entry-content"><div class="contents topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#introduction" id="id1">Introduction</a></li>
+<li><a class="reference internal" href="#defining-authorities" id="id2">Defining authorities</a><ul>
+<li><a class="reference internal" href="#using-groups" id="id3">Using&nbsp;groups</a></li>
+<li><a class="reference internal" href="#by-storing-the-authority-to-the-session" id="id4">By storing the authority to the&nbsp;session</a></li>
+<li><a class="reference internal" href="#by-using-a-custom-user-profile" id="id5">By using a Custom User&nbsp;Profile</a></li>
+<li><a class="reference internal" href="#getting-the-authority-of-the-user-has-to-be-dry" id="id6">Getting the authority of the user has to be <span class="caps">DRY</span></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#adding-authority-data" id="id7">Adding authority&nbsp;data</a></li>
+<li><a class="reference internal" href="#conclusion" id="id8">Conclusion</a></li>
+</ul>
+</div>
+<div class="section" id="introduction">
+<h2><a class="toc-backref" href="#id1">Introduction</a></h2>
+<p>One common requirement in an organization is to separate users in authorities (meaning departments / units / branches etc)
+and each authority have its own data. So users belonging to the &quot;Athens Branch&quot; won&#8217;t be able to
+edit data submitted from users of the &quot;Thessaloniki&nbsp;Branch&quot;.</p>
+<p>This is a special case of the more general row-level-security in which each instance of a domain object will
+have an <span class="caps">ACL</span>. Row-level-security would need a many-to-many relation between object instances and authorities, something
+that would be overkill in our&nbsp;case.</p>
+<p>Authority data is also a more general case of the user-data meaning that each user can have access
+to data that he inserts in the system. Implementing user-data is easy using the techniques we will present&nbsp;below.</p>
+<p>We have to notice that the django permissions do not support our requirements since they define security for all instances of a&nbsp;model.</p>
+</div>
+<div class="section" id="defining-authorities">
+<h2><a class="toc-backref" href="#id2">Defining&nbsp;authorities</a></h2>
+<p>In order to have custom authorities I propose first of all to add an Authority model that would define the authority. Even if
+your authorities only have a name I believe that adding the Authority model would be beneficial.
+Now, there are many ways to separate normal django users (<tt class="docutils literal">django.contrib.auth.models.User</tt>) to&nbsp;authorities:</p>
+<div class="section" id="using-groups">
+<h3><a class="toc-backref" href="#id3">Using&nbsp;groups</a></h3>
+<p>Just define a <tt class="docutils literal">django.contrib.auth.models.Group</tt> for each authority and add the users to the groups you want using the django-admin.
+Your Authority model would have an one-to-one relation with the <tt class="docutils literal">django.contrib.auth.models.Group</tt> so you will be able to find out the other
+information of the authority (since django groups only have&nbsp;names).</p>
+<p>Now you can just get the groups for the user and find out his authorities. This could lead to problems when users belong to django groups
+that are not related to authorities so you must filter these out (for instance by checking which groups actually have a corresponding&nbsp;Authority).</p>
+</div>
+<div class="section" id="by-storing-the-authority-to-the-session">
+<h3><a class="toc-backref" href="#id4">By storing the authority to the&nbsp;session</a></h3>
+<p>When the user logs in you can add an attribute to the session that would save the authority of the user. To do that, you should define
+a custom middleware that checks to see if there is an authority attribute to the session and if not it will do whatever it needs to find it and set it.
+An example is&nbsp;this:</p>
+<pre class="code literal-block">
+class CustomAuthorityMiddleware:
+  def process_request(self, request):
+    if not request.session.get('authority'):
+      authority = get_the_authority(request.user)
+      request.session['authority']=authority
+</pre>
+<p>This way, whenever you want to find out the authority of the user you just check the&nbsp;session.</p>
+</div>
+<div class="section" id="by-using-a-custom-user-profile">
+<h3><a class="toc-backref" href="#id5">By using a Custom User&nbsp;Profile</a></h3>
+<p>Just create a <a class="reference external" href="https://docs.djangoproject.com/en/dev/topics/auth/customizing/#extending-the-existing-user-model">django user profile</a> and add to it a <tt class="docutils literal">ForeignKey</tt> to your Authority&nbsp;model:</p>
+<pre class="code literal-block">
+class Profile(models.Model):
+  user = models.OneToOneField('django.auth.User')
+  authority = models.ForeignKey('authorities.Authority', blank=True, null=True )
+
+class Authority(models.Model):
+  id = models.IntegerField(primary_key = True)
+  name = models.CharField(max_length=64, )
+  auth_type = models.CharField(max_length=16, )
+</pre>
+<p>You can get the authority of the user through <tt class="docutils literal">request.user.profile.authority</tt>.</p>
+</div>
+<div class="section" id="getting-the-authority-of-the-user-has-to-be-dry">
+<h3><a class="toc-backref" href="#id6">Getting the authority of the user has to be <span class="caps">DRY</span></a></h3>
+<p>Whatever method you use to define the authorities of your users you have to remember that it is very
+important to define somewhere a function that will return the authority (or authorities) of a
+user. You need to define a function even in the simple case in which your function would just return <tt class="docutils literal">request.user.profile.authority</tt>.
+This will greatly help you when you wish to add some logic to this, for instance &quot;quickly disable users belonging to Authority X
+or temporary move users from Authority Y to authority&nbsp;Z&quot;.</p>
+<p>Let us suppose that you have defined a <tt class="docutils literal">get_user_authority</tt> function. Also, you need to define a <tt class="docutils literal">has_access</tt> function
+that would decide if a users/request has access to a particular object. This also needs to be <span class="caps">DRY</span>.</p>
+</div>
+</div>
+<div class="section" id="adding-authority-data">
+<h2><a class="toc-backref" href="#id7">Adding authority&nbsp;data</a></h2>
+<p>To define authority data you have to add a field to your model that would define its authority, for instance like&nbsp;this:</p>
+<pre class="code literal-block">
+class AuthorityData(models.Model):
+  authority = models.ForeignKey('authorities.Authority', editable=False,)
+</pre>
+<p>This field should not be editable (at least by your end users) because they shouldn&#8217;t be able to change the authority of the data they&nbsp;insert.</p>
+<p>If you want to have user-data then just add a <tt class="docutils literal"><span class="pre">models.ForeignKey('django.auth.User',</span> editable=False)</tt></p>
+<p>Now, your Create and Update Class Based Views have to pass the request to your forms and also your Detail and Update <span class="caps">CBV</span> should allow only getting
+objects that belong to the authority of the&nbsp;user:</p>
+<pre class="code literal-block">
+class AuthorityDataCreateView(CreateView):
+  model=models.AuthorityData
+
+  def get_form_kwargs(self):
+      kwargs = super(AuthorityDataCreateView, self).get_form_kwargs()
+      kwargs.update({'request': self.request})
+      return kwargs
+
+class AuthorityDataDetailView(DetailView):
+  def get_object(self, queryset=None):
+      obj = super(AuthorityDataDetailView, self).get_object(queryset)
+      if if not user_has_access(obj, self.request):
+          raise Http404(u&quot;Access Denied&quot;)
+      return obj
+
+class AuthorityDataUpdateView(UpdateView):
+  model=models.AuthorityData
+
+  def get_form_kwargs(self):
+      kwargs = super(AuthorityDataUpdateView, self).get_form_kwargs()
+      kwargs.update({'request': self.request})
+      return kwargs
+
+  def get_object(self, queryset=None):
+      obj = super(AuthorityDataUpdateView, self).get_object(queryset)
+      if if not user_has_access(obj, self.request):
+          raise Http404(u&quot;Access Denied&quot;)
+      return obj
+</pre>
+<p>Your ModelForm can now use the request to get the Authority and set it (don&#8217;t forget
+that you should not use <tt class="docutils literal">Meta.exclude</tt> but instead use <tt class="docutils literal">Meta.include</tt>!):</p>
+<pre class="code literal-block">
+class AuthorityDataModelForm(forms.ModelForm):
+    class Meta:
+      model = models.AuthorityData
+      exclude = ('authority',)
+
+    def __init__(self, *args, **kwargs):
+      self.request = kwargs.pop('request', None)
+      super(ActionModelForm, self).__init__(*args, **kwargs)
+
+
+    def save(self, force_insert=False, force_update=False, commit=True):
+      obj = super(AuthorityDataModelForm, self).save(commit=False)
+      if obj:
+          obj.authority = get_user_authority(self.request)
+          obj.save()
+      return obj
+</pre>
+<p>The previous work fine for Create/Detail/Update CBVs but not for ListsViews. List views querysets
+and in general all queries to the object have to be filtered through&nbsp;authority.</p>
+<pre class="code literal-block">
+class AuthorityDataListView(ListView):
+  def get_queryset(self):
+    queryset = super(AuthorityDataModelForm, self).get_queryset()
+    return queryset.filter(authority = get_user_authority(request))
+</pre>
+</div>
+<div class="section" id="conclusion">
+<h2><a class="toc-backref" href="#id8">Conclusion</a></h2>
+<p>Using the above techniques we can define authority (or just user) data. Your AuthorityData should
+have a <tt class="docutils literal">ForeignKey</tt> to your Authority  and you have configure your queries, ModelForms and CBVs
+to use that. If you have more than one models that belong to an authority and want to stay <span class="caps">DRY</span> then you&#8217;d need
+to define all the above as <a class="reference external" href="https://docs.djangoproject.com/en/dev/topics/class-based-views/mixins/">mixins</a>.</p>
+</div>
+</div>
+  		</article>
+  		<article>
+<header>
+      <h1 class="entry-title">
+        <a href="http://spapas.github.io/2013/10/14/spring-ldap-custom-authorities/">Using custom authorities with spring-security LDAP authentication</a>
+      </h1>
+    <p class="meta">
+<time datetime="2013-10-14T08:55:00+03:00" pubdate>Δευ 14 Οκτώβριος 2013</time>    </p>
+</header>
+
+  <div class="entry-content"><div class="contents topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#introduction" id="id3">Introduction</a></li>
+<li><a class="reference internal" href="#a-basic-spring-security-setup" id="id4">A basic spring security&nbsp;setup</a></li>
+<li><a class="reference internal" href="#spring-security-ldap-with-custom-authorities" id="id5">Spring security <span class="caps">LDAP</span> with custom authorities</a><ul>
+<li><a class="reference internal" href="#contextsource" id="id6">contextSource</a></li>
+<li><a class="reference internal" href="#usersearch" id="id7">userSearch</a></li>
+<li><a class="reference internal" href="#ldapauthprovider" id="id8">ldapAuthProvider</a></li>
+<li><a class="reference internal" href="#customldapauthoritiespopulator" id="id9">CustomLdapAuthoritiesPopulator</a></li>
+<li><a class="reference internal" href="#example" id="id10">Example</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#conclusion" id="id11">Conclusion</a></li>
+</ul>
+</div>
+<div class="section" id="introduction">
+<h2><a class="toc-backref" href="#id3">Introduction</a></h2>
+<p>One very useful component of the <a class="reference external" href="http://spring.io/">spring</a> java framework is <a class="reference external" href="http://projects.spring.io/spring-security/">spring-security</a> since it allows consistent usage of various security providers for
+authentication and authorization. Although I&#8217;ve found a great number of basic spring-security tutorials on the internet, I wasn&#8217;t able to find a complete solution for my own&nbsp;requirements:</p>
+<p>Logging in with <span class="caps">LDAP</span> but configuring the authorities <a class="footnote-reference" href="#id2" id="id1">[*]</a> of the logged in user with the help of a custom method and not through <span class="caps">LDAP</span>.</p>
+<p>I think that the above is a common requirement in many organizations: There is a central <span class="caps">LDAP</span> repository in which the usernames and passwords of the users are stored, but the groups of the users are not stored there. Or maybe the groups that are actually stored in the <span class="caps">LDAP</span> cannot be transformed easily to application specific groups for each&nbsp;application.</p>
+<p>You may find the working spring project that uses ldap and a custom groups populator here: <a class="reference external" href="https://github.com/spapas/SpringLdapCustomAuthorities/">https://github.com/spapas/SpringLdapCustomAuthorities/</a></p>
+</div>
+<div class="section" id="a-basic-spring-security-setup">
+<h2><a class="toc-backref" href="#id4">A basic spring security&nbsp;setup</a></h2>
+<p>I&#8217;ve created a very basic setup for spring-security for a spring-mvc project. Please take a look here for a more thorough explanation of a simple spring-security project <a class="reference external" href="http://www.mkyong.com/spring-security/spring-security-hello-world-example/">http://www.mkyong.com/spring-security/spring-security-hello-world-example/</a> and here <a class="reference external" href="http://www.codeproject.com/Articles/253901/Getting-Started-Spring-Security">http://www.codeproject.com/Articles/253901/Getting-Started-Spring-Security</a> for a great explanation of the various spring-security&nbsp;classes.</p>
+<p>In my setup there is a controller that defines two mappings, the &quot;/&quot; which is the homepage that has a link to the &quot;/enter&quot; and the &quot;/enter&quot; which is an internal page in which only authorized users have access. When the user clicks on &quot;enter&quot; he will be represented with a login form first. If the use logs in successfully, the enter.jsp will list the username and the authorities of the logged in user through the following spring-security&nbsp;tags:</p>
+<div class="highlight"><pre><span class="k">&lt;%@</span> <span class="n">taglib</span> <span class="n">prefix</span><span class="o">=</span><span class="s">&quot;sec&quot;</span> <span class="n">uri</span><span class="o">=</span><span class="s">&quot;http://www.springframework.org/security/tags&quot;</span> <span class="k">%&gt;</span>
+[...]
+Username: <span class="nt">&lt;sec:authentication</span> <span class="na">property=</span><span class="s">&quot;principal.username&quot;</span> <span class="nt">/&gt;&lt;br</span> <span class="nt">/&gt;</span>
+Authorities: <span class="nt">&lt;sec:authentication</span> <span class="na">property=</span><span class="s">&quot;principal.authorities&quot;</span><span class="nt">/&gt;&lt;br</span> <span class="nt">/&gt;</span>
+</pre></div>
+<p>The authentication provider is an in memory service in which the username, password and authorities of each user are defined in the <span class="caps">XML</span>. So this is a simple spring-security example that can be found in a number of places on the internet. The security rules, login form and the authentication provider are configured with the following <tt class="docutils literal"><span class="pre">security-config.xml</span></tt>:</p>
+<div class="highlight"><pre><span class="nt">&lt;beans:beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/security&quot;</span>
+   <span class="na">xmlns:beans=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
+   <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+   <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://www.springframework.org/schema/beans</span>
+<span class="s">                   http://www.springframework.org/schema/beans/spring-beans-3.1.xsd</span>
+<span class="s">                   http://www.springframework.org/schema/security</span>
+<span class="s">                   http://www.springframework.org/schema/security/spring-security-3.1.xsd&quot;</span><span class="nt">&gt;</span>
+
+   <span class="nt">&lt;http</span> <span class="na">pattern=</span><span class="s">&quot;/static/**&quot;</span> <span class="na">security=</span><span class="s">&quot;none&quot;</span> <span class="nt">/&gt;</span>
+
+   <span class="nt">&lt;http</span> <span class="na">use-expressions=</span><span class="s">&quot;true&quot;</span><span class="nt">&gt;</span>
+       <span class="nt">&lt;intercept-url</span> <span class="na">pattern=</span><span class="s">&quot;/&quot;</span> <span class="na">access=</span><span class="s">&quot;permitAll&quot;</span> <span class="nt">/&gt;</span>
+       <span class="nt">&lt;intercept-url</span> <span class="na">pattern=</span><span class="s">&quot;/enter&quot;</span> <span class="na">access=</span><span class="s">&quot;hasRole(&#39;user&#39;)&quot;</span> <span class="nt">/&gt;</span>
+       <span class="nt">&lt;intercept-url</span> <span class="na">pattern=</span><span class="s">&quot;/**&quot;</span> <span class="na">access=</span><span class="s">&quot;denyAll&quot;</span> <span class="nt">/&gt;</span>
+       <span class="nt">&lt;form-login</span> <span class="na">default-target-url=</span><span class="s">&quot;/&quot;</span> <span class="nt">/&gt;</span>
+       <span class="nt">&lt;logout</span>  <span class="na">logout-success-url=</span><span class="s">&quot;/&quot;</span> <span class="nt">/&gt;</span>
+   <span class="nt">&lt;/http&gt;</span>
+
+   <span class="nt">&lt;authentication-manager&gt;</span>
+       <span class="nt">&lt;authentication-provider&gt;</span>
+           <span class="nt">&lt;user-service&gt;</span>
+               <span class="nt">&lt;user</span> <span class="na">name=</span><span class="s">&quot;spapas&quot;</span> <span class="na">password=</span><span class="s">&quot;123&quot;</span> <span class="na">authorities=</span><span class="s">&quot;admin, user, nonldap&quot;</span> <span class="nt">/&gt;</span>
+               <span class="nt">&lt;user</span> <span class="na">name=</span><span class="s">&quot;serafeim&quot;</span> <span class="na">password=</span><span class="s">&quot;123&quot;</span> <span class="na">authorities=</span><span class="s">&quot;user&quot;</span> <span class="nt">/&gt;</span>
+           <span class="nt">&lt;/user-service&gt;</span>
+       <span class="nt">&lt;/authentication-provider&gt;</span>
+   <span class="nt">&lt;/authentication-manager&gt;</span>
+
+<span class="nt">&lt;/beans:beans&gt;</span>
+</pre></div>
+<p>When we run this application and go to the /enter, we will get the following&nbsp;output:</p>
+<blockquote>
+<p>Username:&nbsp;spapas</p>
+<p>Authorities: [admin, nonldap,&nbsp;user]</p>
+</blockquote>
+</div>
+<div class="section" id="spring-security-ldap-with-custom-authorities">
+<h2><a class="toc-backref" href="#id5">Spring security <span class="caps">LDAP</span> with custom&nbsp;authorities</a></h2>
+<p>The previous application can be modified to login through <span class="caps">LDAP</span> and get the authorities from a custom class. The main differences are in the <tt class="docutils literal">pom.xml</tt> which adsd the <tt class="docutils literal"><span class="pre">spring-security-ldap</span></tt> dependency, the addition of a <tt class="docutils literal">CustomLdapAuthoritiesPopulator.java</tt> which does the actual mapping of username to authority and various changes to the <tt class="docutils literal"><span class="pre">security-config.xml</span></tt>.</p>
+<p>As you will see we had to define our security beans mainly using spring beans and not using the various elements from security namespace like <tt class="docutils literal"><span class="pre">&lt;ldap-server&gt;</span></tt> and <tt class="docutils literal"><span class="pre">&lt;ldap-authentication-provder&gt;</span></tt>. For a good tutorial on using these elements and ldap in spring security in general check these out: <a class="reference external" href="http://docs.spring.io/spring-security/site/docs/3.1.x/reference/ldap.html">http://docs.spring.io/spring-security/site/docs/3.1.x/reference/ldap.html</a> and <a class="reference external" href="http://krams915.blogspot.gr/2011/01/spring-security-mvc-using-ldap.html">http://krams915.blogspot.gr/2011/01/spring-security-mvc-using-ldap.html</a>.</p>
+<div class="highlight"><pre><span class="nt">&lt;beans:beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/security&quot;</span>
+   <span class="na">xmlns:beans=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
+   <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+   <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://www.springframework.org/schema/beans</span>
+<span class="s">                   http://www.springframework.org/schema/beans/spring-beans-3.1.xsd</span>
+<span class="s">                   http://www.springframework.org/schema/security</span>
+<span class="s">                   http://www.springframework.org/schema/security/spring-security-3.1.xsd&quot;</span><span class="nt">&gt;</span>
+
+   <span class="nt">&lt;http</span> <span class="na">pattern=</span><span class="s">&quot;/static/**&quot;</span> <span class="na">security=</span><span class="s">&quot;none&quot;</span> <span class="nt">/&gt;</span>
+
+   <span class="nt">&lt;http</span> <span class="na">use-expressions=</span><span class="s">&quot;true&quot;</span> <span class="nt">&gt;</span>
+     <span class="nt">&lt;intercept-url</span> <span class="na">pattern=</span><span class="s">&quot;/&quot;</span> <span class="na">access=</span><span class="s">&quot;permitAll&quot;</span> <span class="nt">/&gt;</span>
+     <span class="nt">&lt;intercept-url</span> <span class="na">pattern=</span><span class="s">&quot;/enter&quot;</span> <span class="na">access=</span><span class="s">&quot;hasRole(&#39;user&#39;)&quot;</span> <span class="nt">/&gt;</span>
+     <span class="nt">&lt;intercept-url</span> <span class="na">pattern=</span><span class="s">&quot;/**&quot;</span> <span class="na">access=</span><span class="s">&quot;denyAll&quot;</span> <span class="nt">/&gt;</span>
+     <span class="nt">&lt;form-login</span> <span class="na">default-target-url=</span><span class="s">&quot;/&quot;</span> <span class="nt">/&gt;</span>
+     <span class="nt">&lt;logout</span>  <span class="na">logout-success-url=</span><span class="s">&quot;/&quot;</span> <span class="nt">/&gt;</span>
+   <span class="nt">&lt;/http&gt;</span>
+
+   <span class="nt">&lt;beans:bean</span> <span class="na">id=</span><span class="s">&quot;contextSource&quot;</span>
+         <span class="na">class=</span><span class="s">&quot;org.springframework.security.ldap.DefaultSpringSecurityContextSource&quot;</span><span class="nt">&gt;</span>
+     <span class="nt">&lt;beans:constructor-arg</span> <span class="na">value=</span><span class="s">&quot;ldap://login.serafeim.gr:389/dc=serafeim,dc=gr&quot;</span><span class="nt">/&gt;</span>
+     <span class="nt">&lt;beans:property</span> <span class="na">name=</span><span class="s">&quot;anonymousReadOnly&quot;</span> <span class="na">value=</span><span class="s">&quot;true&quot;</span><span class="nt">/&gt;</span>
+   <span class="nt">&lt;/beans:bean&gt;</span>
+
+   <span class="nt">&lt;beans:bean</span>
+         <span class="na">id=</span><span class="s">&quot;userSearch&quot;</span>
+         <span class="na">class=</span><span class="s">&quot;org.springframework.security.ldap.search.FilterBasedLdapUserSearch&quot;</span><span class="nt">&gt;</span>
+     <span class="nt">&lt;beans:constructor-arg</span> <span class="na">index=</span><span class="s">&quot;0&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span><span class="nt">/&gt;</span>
+     <span class="nt">&lt;beans:constructor-arg</span> <span class="na">index=</span><span class="s">&quot;1&quot;</span> <span class="na">value=</span><span class="s">&quot;(uid={0})&quot;</span><span class="nt">/&gt;</span>
+     <span class="nt">&lt;beans:constructor-arg</span> <span class="na">index=</span><span class="s">&quot;2&quot;</span> <span class="na">ref=</span><span class="s">&quot;contextSource&quot;</span> <span class="nt">/&gt;</span>
+   <span class="nt">&lt;/beans:bean&gt;</span>
+
+   <span class="nt">&lt;beans:bean</span>
+         <span class="na">id=</span><span class="s">&quot;ldapAuthProvider&quot;</span>
+         <span class="na">class=</span><span class="s">&quot;org.springframework.security.ldap.authentication.LdapAuthenticationProvider&quot;</span><span class="nt">&gt;</span>
+     <span class="nt">&lt;beans:constructor-arg&gt;</span>
+       <span class="nt">&lt;beans:bean</span> <span class="na">class=</span><span class="s">&quot;org.springframework.security.ldap.authentication.BindAuthenticator&quot;</span><span class="nt">&gt;</span>
+         <span class="nt">&lt;beans:constructor-arg</span> <span class="na">ref=</span><span class="s">&quot;contextSource&quot;</span><span class="nt">/&gt;</span>
+         <span class="nt">&lt;beans:property</span> <span class="na">name=</span><span class="s">&quot;userSearch&quot;</span> <span class="na">ref=</span><span class="s">&quot;userSearch&quot;</span> <span class="nt">/&gt;</span>
+         <span class="c">&lt;!--</span>
+<span class="c">         &lt;beans:property name=&quot;userDnPatterns&quot;&gt;</span>
+<span class="c">           &lt;beans:list&gt;&lt;beans:value&gt;uid={0},ou=People&lt;/beans:value&gt;&lt;/beans:list&gt;</span>
+<span class="c">         &lt;/beans:property&gt;</span>
+<span class="c">         --&gt;</span>
+       <span class="nt">&lt;/beans:bean&gt;</span>
+     <span class="nt">&lt;/beans:constructor-arg&gt;</span>
+     <span class="nt">&lt;beans:constructor-arg&gt;</span>
+       <span class="nt">&lt;beans:bean</span> <span class="na">class=</span><span class="s">&quot;gr.serafeim.springldapcustom.CustomLdapAuthoritiesPopulator&quot;</span> <span class="nt">/&gt;</span>
+     <span class="nt">&lt;/beans:constructor-arg&gt;</span>
+   <span class="nt">&lt;/beans:bean&gt;</span>
+
+   <span class="nt">&lt;authentication-manager&gt;</span>
+     <span class="nt">&lt;authentication-provider</span> <span class="na">ref=</span><span class="s">&quot;ldapAuthProvider&quot;</span> <span class="nt">/&gt;</span>
+   <span class="nt">&lt;/authentication-manager&gt;</span>
+
+<span class="nt">&lt;/beans:beans&gt;</span>
+</pre></div>
+<p>So, in the above configuration we&#8217;ve defined three spring beans: <tt class="docutils literal">contextSource</tt>, <tt class="docutils literal">userSearch</tt> and <tt class="docutils literal">ldapAuthProvider</tt>. The <tt class="docutils literal"><span class="pre">&lt;authentication-manager&gt;</span></tt> element uses the <tt class="docutils literal">ldapAuthProvider</tt> as an authentication provider. Below we will explain these&nbsp;beans:</p>
+<div class="section" id="contextsource">
+<h3><a class="toc-backref" href="#id6">contextSource</a></h3>
+<p>The contextSource bean defines the actual <span class="caps">LDAP</span> server that we are going to connect to. It has the class <tt class="docutils literal">o.s.s.ldap.DefaultSpringSecurityContextSource</tt>. This will need to be passed to other beans that would need to connect to the server for a number of operations. We pass to it the url of our <span class="caps">LDAP</span> server and set its <tt class="docutils literal">anonymousReadOnly</tt> property to true. The <tt class="docutils literal">anonymousReadOnly</tt> defines if we can anonymously connect to our <span class="caps">LDAP</span> server in order to perform the search operation below. If we cannot connect anonymously then we have to set its <tt class="docutils literal">userDn</tt> and <tt class="docutils literal">password</tt> properties.</p>
+<p>A very interesting question is if the <tt class="docutils literal"><span class="pre">&lt;ldap-server&gt;</span></tt> element of the spring security namespace is related to <tt class="docutils literal">the o.s.s.ldap.DefaultSpringSecurityContextSource</tt> like our <tt class="docutils literal">contextSource</tt>. To find out, we need to check the <tt class="docutils literal">o.s.s.config.SecurityNamespaceHandler</tt> class of the <tt class="docutils literal"><span class="pre">spring-security-config.jar</span></tt>. In there we see the <tt class="docutils literal">loadParsers</tt> method which has the line: <tt class="docutils literal">parsers.put(Elements.LDAP_SERVER, new <span class="pre">LdapServerBeanDefinitionParser());</span></tt>. The constant <tt class="docutils literal">o.s.s.config.Elements.LDAP_SERVER</tt> has the value of <tt class="docutils literal"><span class="pre">&quot;ldap-server&quot;</span></tt> as expected, so we need to see what does the class <tt class="docutils literal">o.s.s.config.ldap.LdapServerBeanDefinitionParser</tt> do. This class has a parse() method that receives the xml that was used to instantiate the <tt class="docutils literal"><span class="pre">&lt;ldap-server&gt;</span></tt> element and, depending an on the actualy configuration, instantiates a bean of the class <tt class="docutils literal">o.s.s.ldap.DefaultSpringSecurityContextSource</tt> with an id of <tt class="docutils literal">o.s.s.securityContextSource</tt> that will be used by the other elements in the security namespace&nbsp;!</p>
+<p>This actually solves another question I had concerning the following&nbsp;error:</p>
+<blockquote>
+No bean named &#8216;org.springframework.security.authenticationManager&#8217; is defined: Did you forget to add a gobal &lt;authentication-manager&gt; element to your configuration (with child &lt;authentication-provider&gt;  elements)? Alternatively you can use the authentication-manager-ref attribute on your &lt;http&gt; and &lt;global-method-security&gt; elements.</blockquote>
+<p>What happens is that when spring-security-configuration encounters an <tt class="docutils literal"><span class="pre">&lt;authentication-manager&gt;</span></tt> it will instantiate a bean named <tt class="docutils literal">o.s.s.authenticationManager</tt>  having the class
+<tt class="docutils literal">o.s.s.authentication.ProviderManager</tt> and will create and pass to it a <tt class="docutils literal">providers</tt> list with all the authentication providers that are defined inside the <tt class="docutils literal"><span class="pre">&lt;authentication-manager&gt;</span></tt> element with <tt class="docutils literal"><span class="pre">&lt;authentication-provider&gt;</span></tt> nodes. So, if you encounter the above error, the problem is that for some reason your <tt class="docutils literal"><span class="pre">&lt;authentication-manager&gt;</span></tt> is not configured correctly, so no <tt class="docutils literal">o.s.s.authenticatioManager</tt> bean is&nbsp;created!</p>
+</div>
+<div class="section" id="usersearch">
+<h3><a class="toc-backref" href="#id7">userSearch</a></h3>
+<p>The <tt class="docutils literal">userSearch</tt> bean is needed if we don&#8217;t know exactly where our users are stored in the <span class="caps">LDAP</span> directory so we will use this bean as a search filter. If we do know our user tree then we won&#8217;t need this bean at all as will be explained later. It has the class <tt class="docutils literal">o.s.s.ldap.search.FilterBasedLdapUserSearch</tt> and gets three constructor parameters: <tt class="docutils literal">searchBase</tt>, <tt class="docutils literal">searchFilter</tt> and <tt class="docutils literal">contextSource</tt>. The <tt class="docutils literal">searchBase</tt> is from where in the <span class="caps">LDAP</span> tree to start searching (empty in our case), the <tt class="docutils literal">searchFilter</tt> defines where is the username (uid in our case) and the <tt class="docutils literal">contextSource</tt> has been defined&nbsp;before.</p>
+</div>
+<div class="section" id="ldapauthprovider">
+<h3><a class="toc-backref" href="#id8">ldapAuthProvider</a></h3>
+<p>This is the actual <tt class="docutils literal"><span class="pre">authentication-provider</span></tt> that the spring-security <tt class="docutils literal"><span class="pre">authentication-manager</span></tt> is going to use. It is an instance of class <tt class="docutils literal">o.s.s.ldap.authentication.LdapAuthenticationProvider</tt> which has two main properties: An <tt class="docutils literal">o.s.s.ldap.authentication.LdapAuthenticator</tt> implementation and an <tt class="docutils literal">o.s.s.ldap.userdetails.LdapAuthoritiesPopulator</tt> implementation. The first interface defines an <tt class="docutils literal">authenticate</tt> method and is used to actually authenticate the user with the <span class="caps">LDAP</span> server. The second interface defines a <tt class="docutils literal">getGrantedAuthorities</tt> which returns the roles for the authenticated user. The LdapAuthoritiesPopulator parameter is actually optional (so we can use <span class="caps">LDAP</span> to authenticate only the users) and we can provide our own implementation to have custom authorities for our application. That is exactly what we&#8217;ve done&nbsp;here.</p>
+<p>The two arguments used to initialize the ldapAuthProvoder are one instance of <tt class="docutils literal">o.s.s.ldap.authentication.BindAuthenticator</tt> which is a simple authenticator that tries to bind with the given credentials to the <span class="caps">LDAP</span> server to check the credentials and one instance of a custom class named <tt class="docutils literal">g.s.s.CustomLdapAuthoritiesPopulator</tt> which is the actual implementation of the custom roles provider. The <tt class="docutils literal">BindAuthenticator</tt> gets the <tt class="docutils literal">contextSource</tt> as a constructor parameter and its <tt class="docutils literal">userSearch</tt> property is set with the <tt class="docutils literal">userSearch</tt> bean defined previously. If we instead knew the actual place of the users, we could use the commented out <tt class="docutils literal">userDnPatterns</tt> property which takes a list of possible places in the <span class="caps">LDAP</span> catalog which will be checked for the&nbsp;username.</p>
+</div>
+<div class="section" id="customldapauthoritiespopulator">
+<h3><a class="toc-backref" href="#id9">CustomLdapAuthoritiesPopulator</a></h3>
+<p>The <tt class="docutils literal">CustomLdapAuthoritiesPopulator</tt> just needs to implement the <tt class="docutils literal">LdapAuthoritiesPopulator</tt> interface. Here&#8217;s our&nbsp;implmentation:</p>
+<div class="highlight"><pre><span class="kn">package</span> <span class="n">gr</span><span class="o">.</span><span class="na">serafeim</span><span class="o">.</span><span class="na">springldapcustom</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.util.Collection</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.HashSet</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.ldap.core.DirContextOperations</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.security.core.GrantedAuthority</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.security.core.authority.SimpleGrantedAuthority</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.stereotype.Component</span><span class="o">;</span>
+
+<span class="nd">@Component</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">CustomLdapAuthoritiesPopulator</span> <span class="kd">implements</span> <span class="n">LdapAuthoritiesPopulator</span> <span class="o">{</span>
+       <span class="nd">@Override</span>
+       <span class="kd">public</span> <span class="n">Collection</span><span class="o">&lt;?</span> <span class="kd">extends</span> <span class="n">GrantedAuthority</span><span class="o">&gt;</span> <span class="n">getGrantedAuthorities</span><span class="o">(</span>
+                       <span class="n">DirContextOperations</span> <span class="n">userData</span><span class="o">,</span> <span class="n">String</span> <span class="n">username</span><span class="o">)</span> <span class="o">{</span>
+               <span class="n">Collection</span><span class="o">&lt;</span><span class="n">GrantedAuthority</span><span class="o">&gt;</span> <span class="n">gas</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashSet</span><span class="o">&lt;</span><span class="n">GrantedAuthority</span><span class="o">&gt;();</span>
+               <span class="k">if</span><span class="o">(</span><span class="n">username</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="s">&quot;spapas&quot;</span><span class="o">))</span> <span class="o">{</span>
+                       <span class="n">gas</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="k">new</span> <span class="n">SimpleGrantedAuthority</span><span class="o">(</span><span class="s">&quot;admin&quot;</span><span class="o">));</span>
+               <span class="o">}</span>
+               <span class="n">gas</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="k">new</span> <span class="n">SimpleGrantedAuthority</span><span class="o">(</span><span class="s">&quot;user&quot;</span><span class="o">));</span>
+               <span class="k">return</span> <span class="n">gas</span><span class="o">;</span>
+       <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+<p>The <tt class="docutils literal">getGrantedAuthorities</tt> just checks the username and add another role if it is a specific one. Of course here we would autowire our user roles repository and query the database to get the roles of the user, however I&#8217;m not going to do that for the case of&nbsp;simplicity.</p>
+</div>
+<div class="section" id="example">
+<h3><a class="toc-backref" href="#id10">Example</a></h3>
+<p>When we run this application and go to the /enter, after logging in with our <span class="caps">LDAP</span> credentials as spapas, we will get the following&nbsp;output:</p>
+<blockquote>
+<p>Username:&nbsp;spapas</p>
+<p>Authorities: [admin,&nbsp;user]</p>
+</blockquote>
+</div>
+</div>
+<div class="section" id="conclusion">
+<h2><a class="toc-backref" href="#id11">Conclusion</a></h2>
+<p>In the previous a complete example of configuring a custom authorities populator was represented. Using this configuration we can login through the <span class="caps">LDAP</span> server of our organization but use application specific roles for our logged-in&nbsp;users.</p>
+<!-- font-size: 0.5em;
+vertical-align: top; -->
+<table class="docutils footnote" frame="void" id="id2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[*]</a></td><td>Which is how spring calls the groups/roles the user belongs to</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+  		</article>
+  		<article>
+<header>
+      <h1 class="entry-title">
+        <a href="http://spapas.github.io/2013/10/08/git-branches/">git branches</a>
+      </h1>
+    <p class="meta">
+<time datetime="2013-10-08T13:20:00+03:00" pubdate>Τρι 08 Οκτώβριος 2013</time>    </p>
+</header>
+
+  <div class="entry-content"><div class="contents topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#introduction" id="id1">Introduction</a></li>
+<li><a class="reference internal" href="#creating-a-new-git-repository" id="id2">Creating a new git&nbsp;repository</a></li>
+<li><a class="reference internal" href="#branching" id="id3">Branching</a></li>
+<li><a class="reference internal" href="#remote-branches" id="id4">Remote&nbsp;branches</a></li>
+</ul>
+</div>
+<div class="section" id="introduction">
+<h2><a class="toc-backref" href="#id1">Introduction</a></h2>
+<p>A <a class="reference external" href="http://git-scm.com/book/en/Git-Branching-What-a-Branch-Is">branch</a> is a very interesting git feature. With this you may have more than one <em>branches</em> in the same repository. The main
+usage of this feature would be to create different versions of your source code to parallel test development of different features.
+When the development of each of these features has been finished then the different versions would need to be combined (or merged) to a
+single version. Of course, merging is not always the result of branching - some branches may exist indefinitely or other may just  be
+deleted without&nbsp;merging.</p>
+<p>I will try to experiment with it and comment on the&nbsp;results.</p>
+</div>
+<div class="section" id="creating-a-new-git-repository">
+<h2><a class="toc-backref" href="#id2">Creating a new git&nbsp;repository</a></h2>
+<p>Let&#8217;s start by creating a new git&nbsp;repository:</p>
+<pre class="code literal-block">
+D:\&gt;mkdir testgit
+D:\&gt;cd testgit
+D:\testgit&gt;echo contents 11 &gt; file1.txt
+D:\testgit&gt;echo contents 222 &gt; file2.txt
+D:\testgit&gt;echo 3333 &gt; file2.txt
+D:\testgit&gt;copy con file3.txt
+line 1 of file 3
+
+line 3 of file 3
+
+test
+
+line 7 of file 3
+^Z
+       1 files copied.
+
+D:\testgit&gt;git init
+Initialized empty Git repository in D:/testgit/.git/
+D:\testgit&gt;git add .
+D:\testgit&gt;git commit -m Initial
+[master (root-commit) 96ca9af] Initial
+ 3 files changed, 9 insertions(+)
+ create mode 100644 file1.txt
+ create mode 100644 file2.txt
+ create mode 100644 file3.txt
+</pre>
+<p>To see the branch we are in we can use the <tt class="docutils literal">git branch</tt> command. Also <tt class="docutils literal">git status</tt> outputs the current&nbsp;branch:</p>
+<pre class="code literal-block">
+D:\testgit&gt;git status
+# On branch master
+nothing to commit, working directory clean
+D:\testgit&gt;git branch
+* master
+</pre>
+<p>So, it seems that when we create a new repository, a &quot;master&quot; branch is&nbsp;created.</p>
+</div>
+<div class="section" id="branching">
+<h2><a class="toc-backref" href="#id3">Branching</a></h2>
+<p>Lets create a new branch and change our working branch to&nbsp;it:</p>
+<pre class="code literal-block">
+D:\testgit&gt;git branch slave
+D:\testgit&gt;git branch
+* master
+  slave
+D:\testgit&gt;git checkout slave
+Switched to branch 'slave'
+D:\testgit&gt;git branch
+  master
+* slave
+</pre>
+<p>We can see that now the slave branch is the current one. Let&#8217;s do some changes and add commit them to the slave&nbsp;branch:</p>
+<pre class="code literal-block">
+D:\testgit&gt;git branch
+  master
+* slave
+D:\testgit&gt;echo new file1 contents &gt; file1.txt
+D:\testgit&gt;git commit -m &quot;Slave modification&quot;
+[slave b6083ad] Slave modification
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+D:\testgit&gt;git checkout master
+Switched to branch 'master'
+D:\testgit&gt;more file1.txt
+contents 11
+D:\testgit&gt;git checkout slave
+Switched to branch 'slave'
+D:\testgit&gt;more file1.txt
+new file1 contents
+</pre>
+<p>So the contents of file1.txt in the branch master is <tt class="docutils literal">contents 11</tt> while the contents of the same file
+in the branch slave is <tt class="docutils literal">new file1 contents</tt>.</p>
+<p>An interested behaviour is what happens with uncommit changes when changing branches. Let&#8217;s try deleting a&nbsp;file:</p>
+<pre class="code literal-block">
+D:\testgit&gt;del file2.txt
+D:\testgit&gt;git status
+# On branch master
+# Changes not staged for commit:
+#   (use &quot;git add/rm &lt;file&gt;...&quot; to update what will be committed)
+#   (use &quot;git checkout -- &lt;file&gt;...&quot; to discard changes in working directory)
+#
+#       deleted:    file2.txt
+#
+no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&quot;)
+D:\testgit&gt;git checkout slave
+D       file2.txt
+Switched to branch 'slave'
+D:\testgit&gt;git status
+# On branch slave
+# Changes not staged for commit:
+#   (use &quot;git add/rm &lt;file&gt;...&quot; to update what will be committed)
+#   (use &quot;git checkout -- &lt;file&gt;...&quot; to discard changes in working directory)
+#
+#       deleted:    file2.txt
+#
+no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&quot;)
+D:\testgit&gt;git add -A
+D:\testgit&gt;git status
+# On branch slave
+# Changes to be committed:
+#   (use &quot;git reset HEAD &lt;file&gt;...&quot; to unstage)
+#
+#       deleted:    file2.txt
+#
+D:\testgit&gt;git checkout master
+D       file2.txt
+Switched to branch 'master'
+D:\testgit&gt;git status
+# On branch master
+# Changes to be committed:
+#   (use &quot;git reset HEAD &lt;file&gt;...&quot; to unstage)
+#
+#       deleted:    file2.txt
+#
+</pre>
+<p>So, our changes are not correlated with a branch until we commit them! Let&#8217;s commit them to the master repository and confirm&nbsp;that:</p>
+<pre class="code literal-block">
+D:\testgit&gt;git commit -m &quot;Deleted file2.txt&quot;
+[master 6f8749d] Deleted file2.txt
+ 1 file changed, 1 deletion(-)
+ delete mode 100644 file2.txt
+D:\testgit&gt;git status
+# On branch master
+nothing to commit, working directory clean
+D:\testgit&gt;dir file2.txt
+[...]
+File not found
+D:\testgit&gt;git checkout slave
+Switched to branch 'slave'
+D:\testgit&gt;git status
+# On branch slave
+nothing to commit, working directory clean
+D:\testgit&gt;dir file2.txt
+[...]
+08/10/2013  05:59 pm                15 file2.txt
+</pre>
+<p>This is interesting&#8230; Let&#8217;s try modifying the file2.txt (which does not exist to the master&nbsp;branch):</p>
+<pre class="code literal-block">
+D:\testgit&gt;git branch
+  master
+* slave
+D:\testgit&gt;echo new file2 contents &gt; file2.txt
+D:\testgit&gt;git add .
+D:\testgit&gt;git status
+# On branch slave
+# Changes to be committed:
+#   (use &quot;git reset HEAD &lt;file&gt;...&quot; to unstage)
+#
+#       modified:   file2.txt
+#
+D:\testgit&gt;git checkout master
+error: Your local changes to the following files would be overwritten by checkout:
+       file2.txt
+Please, commit your changes or stash them before you can switch branches.
+Aborting
+</pre>
+<p>We won&#8217;t be able to change the current branch until we commit the conflicting&nbsp;change:</p>
+<pre class="code literal-block">
+D:\testgit&gt;git commit -m &quot;Modified file2&quot;
+[slave b5af832] Modified file2
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+D:\testgit&gt;git checkout master
+Switched to branch 'master'
+</pre>
+</div>
+<div class="section" id="remote-branches">
+<h2><a class="toc-backref" href="#id4">Remote&nbsp;branches</a></h2>
+<p>For each local repository you can define a number of remote repositories, or <a class="reference external" href="http://git-scm.com/book/en/Git-Basics-Working-with-Remotes">remotes</a> as git calls them.
+When you clone a repository from github.com, your local repository will have one remote, named origin. We will
+try to add the same remote by hand. Let&#8217;s suppose that we have created a repository in github.com named
+testgit. After that we wil&nbsp;issue:</p>
+<pre class="code literal-block">
+D:\testgit&gt;git remote
+D:\testgit&gt;git remote add origin https://github.com/spapas/testgit.git
+D:\testgit&gt;git remote
+origin
+</pre>
+<p>So no we have one remote named origin that is linked with <a class="reference external" href="https://github.com/spapas/testgit.git">https://github.com/spapas/testgit.git</a>. Let&#8217;s try to push our master
+branch to the origin&nbsp;remote:</p>
+<pre class="code literal-block">
+D:\testgit&gt;git push origin master
+Username for 'https://github.com': spapas
+Password for 'https://spapas&#64;github.com':
+Counting objects: 7, done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (5/5), done.
+Writing objects: 100% (7/7), 531 bytes, done.
+Total 7 (delta 1), reused 0 (delta 0)
+To https://github.com/spapas/testgit.git
+ * [new branch]      master -&gt; master
+D:\testgit&gt;git branch -r
+  master
+* slave
+  remote/origin/master
+</pre>
+<p>We see now that we have <em>three</em> branches. Two local (master slave) and one remote (origin/master).  We will also add the slave remote&nbsp;(origin/slave):</p>
+<pre class="code literal-block">
+D:\testgit&gt;git branch -r
+  origin/master
+  origin/slave
+</pre>
+<p>Let&#8217;s do a change to our local repository and then push them to the&nbsp;remote:</p>
+<pre class="code literal-block">
+D:\testgit&gt;notepad file3.txt
+D:\testgit&gt;git add .
+D:\testgit&gt;git status
+# On branch slave
+# Changes to be committed:
+#   (use &quot;git reset HEAD &lt;file&gt;...&quot; to unstage)
+#
+#       modified:   file3.txt
+#
+D:\testgit&gt;git commit -m &quot;Changed file3.txt&quot;
+[slave ce3b7b9] Changed file3.txt
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+D:\testgit&gt;git push origin slave
+Username for 'https://github.com': spapas
+Password for 'https://spapas&#64;github.com':
+Counting objects: 5, done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (3/3), done.
+Writing objects: 100% (3/3), 299 bytes, done.
+Total 3 (delta 1), reused 0 (delta 0)
+To https://github.com/spapas/testgit.git
+   b5af832..ce3b7b9  slave -&gt; slave
+</pre>
+<p>Everything works as expected. The final thing to test is to try checking out a remote&nbsp;branch:</p>
+<pre class="code literal-block">
+D:\testgit&gt;git checkout master
+Switched to branch 'master'
+D:\testgit&gt;echo new new file1 &gt; file1.txt
+D:\testgit&gt;more file1.txt
+ new new file1
+D:\testgit&gt;git checkout origin/master
+M       file1.txt
+Note: checking out 'origin/master'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by performing another checkout.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -b with the checkout command again. Example:
+
+  git checkout -b new_branch_name
+
+HEAD is now at 6f8749d... Deleted file2.txt
+D:\testgit&gt;git status
+# Not currently on any branch.
+# Changes not staged for commit:
+#   (use &quot;git add &lt;file&gt;...&quot; to update what will be committed)
+#   (use &quot;git checkout -- &lt;file&gt;...&quot; to discard changes in working directory)
+#
+#       modified:   file1.txt
+#
+no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&quot;)
+D:\testgit&gt;more file1.txt
+new new file1
+</pre>
+<p>So, it seems that  when we check out the remote branch, we won&#8217;t have any local branches, however the change we did to the file1.txt
+is transfered just like when switching from one local repository to another. We can then add the changes and&nbsp;commit:</p>
+<pre class="code literal-block">
+D:\testgit&gt;git add .
+D:\testgit&gt;git commit
+[detached HEAD 506674c] foo
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+ D:\testgit&gt;git status
+# Not currently on any branch.
+nothing to commit, working directory clean
+D:\testgit&gt;git branch
+* (no branch)
+  master
+  slave
+</pre>
+<p>So we are working with an unnamed branch! We have to name it to be able to work without&nbsp;problems:</p>
+<pre class="code literal-block">
+D:\testgit&gt;git checkout -b named_branch
+Switched to a new branch 'named_branch'
+D:\testgit&gt;git branch
+  master
+* named_branch
+  slave
+</pre>
+<p>Finally we may push again the named_branch to our remote&nbsp;origin.</p>
+</div>
+</div>
+  		</article>
+  		<article>
+<header>
+      <h1 class="entry-title">
+        <a href="http://spapas.github.io/2013/10/07/pelican-static-windows/">Using pelican to generate static sites on windows</a>
+      </h1>
+    <p class="meta">
+<time datetime="2013-10-07T10:20:00+03:00" pubdate>Δευ 07 Οκτώβριος 2013</time>    </p>
+</header>
+
+  <div class="entry-content"><div class="contents topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#introduction" id="id1">Introduction</a></li>
+<li><a class="reference internal" href="#installing-pelican-and-generating-a-skeleton-for-your-site" id="id2">Installing pelican and generating a skeleton for your&nbsp;site</a></li>
+<li><a class="reference internal" href="#modifying-pelican-tools-for-windows" id="id3">Modifying pelican tools for&nbsp;windows</a></li>
+<li><a class="reference internal" href="#configuration-of-your-skeleton-site" id="id4">Configuration of your skeleton site</a><ul>
+<li><a class="reference internal" href="#settings" id="id5">Settings</a></li>
+<li><a class="reference internal" href="#themes" id="id6">Themes</a></li>
+<li><a class="reference internal" href="#plugins" id="id7">Plugins</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#hosting-in-github-pages" id="id8">Hosting in github&nbsp;pages</a></li>
+<li><a class="reference internal" href="#publishing-changes" id="id9">Publishing&nbsp;changes</a></li>
+</ul>
+</div>
+<div class="section" id="introduction">
+<h2><a class="toc-backref" href="#id1">Introduction</a></h2>
+<p><a class="reference external" href="http://docs.getpelican.com/en/3.3.0/">Pelican</a> is a great static site generator. A static site generator is a tool that users a number of input files to
+generate a complete html site. No database or server side scripting is needed for the resulting site, that&#8217;s why
+many such sites are hosted on <a class="reference external" href="http://pages.github.com/">github pages</a> (more on this&nbsp;later).</p>
+<p>The input contains a number of html templates, css styles and the actual content of the site which most of the time is written in a
+<a class="reference external" href="http://en.wikipedia.org/wiki/Lightweight_markup_language">lightweight markup language</a> like <a class="reference external" href="http://docutils.sourceforge.net/rst.html">reStructuredText</a> or <a class="reference external" href="http://daringfireball.net/projects/markdown/">Markdown</a>. The static site generator will generate the static pages by
+inserting the content in the appropriate places in the&nbsp;templates.</p>
+<p>In the following sections we will describe the installation of pelican on Windows
+and the creation of the spapas.github.io&nbsp;site.</p>
+</div>
+<div class="section" id="installing-pelican-and-generating-a-skeleton-for-your-site">
+<h2><a class="toc-backref" href="#id2">Installing pelican and generating a skeleton for your&nbsp;site</a></h2>
+<p>The official pelican quickstart can be found in <a class="reference external" href="http://docs.getpelican.com/en/latest/getting_started.html">http://docs.getpelican.com/en/latest/getting_started.html</a></p>
+<p>To install pelican just&nbsp;enter:</p>
+<pre class="code literal-block">
+&gt;pip install pelican
+</pre>
+<p>After installing pelican, I propose creating a parent directory that will
+contain all your pelican sites, along with extra themes and plugins like&nbsp;this:</p>
+<pre class="literal-block">
+pelican/
+  ├── pelican-themes
+  ├── other-pelican-theme
+  ├── spapas.github.io
+  └── other-sites
+</pre>
+<p>After creating the pelican directory just go in it with a command line and run the <tt class="docutils literal"><span class="pre">pelican-quickstart</span></tt> command.
+It will ask you a number of questions, take a look at how I did answer&nbsp;these:</p>
+<pre class="code literal-block">
+pelican&gt;pelican-quickstart
+Welcome to pelican-quickstart v3.2.2.
+
+This script will help you create a new Pelican-based website.
+
+Please answer the following questions so this script can generate the files
+needed by Pelican.
+
+
+&gt; Where do you want to create your new web site? [.] spapas.github.io
+&gt; What will be the title of this web site? Test github.io
+&gt; Who will be the author of this web site? Serafeim
+&gt; What will be the default language of this web site? [en]
+&gt; Do you want to specify a URL prefix? e.g., http://example.com   (Y/n)
+&gt; What is your URL prefix? (see above example; no trailing slash) http://spapas.github.io
+&gt; Do you want to enable article pagination? (Y/n)
+&gt; How many articles per page do you want? [10]
+&gt; Do you want to generate a Makefile to easily manage your website? (Y/n) n
+&gt; Do you want an auto-reload &amp; simpleHTTP script to assist with theme and site development? (Y/n) n
+Done. Your new project is available at C:\progr\py\pelican\spapas.github.io
+</pre>
+<p>After that, you will have a pelican/spapas.github.io folder that will contain the following&nbsp;content:</p>
+<pre class="literal-block">
+spapas.github.io/
+  ├── content
+  ├── output
+  ├── pelicanconf.py
+  └── publishconf.py
+</pre>
+<p>The content folder will contain your content (rst or markdown), the output will contain the generated html after you run pelican for your site.
+The <tt class="docutils literal">pelicanconf.py</tt> will have a number of options for the generation of the development version of your site while the <tt class="docutils literal">publishconf.py</tt> will override some of the options
+of <tt class="docutils literal">pelicanconf.py</tt> before generating the production version of your site that will actually be uploaded to github&nbsp;pages.</p>
+</div>
+<div class="section" id="modifying-pelican-tools-for-windows">
+<h2><a class="toc-backref" href="#id3">Modifying pelican tools for&nbsp;windows</a></h2>
+<p>Pelican uses a Makefile and a unix shell script to generate the static html files and start an http server for development.
+Because I prefer to use windows, I answered no to the questions of generating these when pelican-quickstarte asked me.
+Instead I have included the following files inside the spapas.github.io&nbsp;directory:</p>
+<ul class="simple">
+<li><tt class="docutils literal">pelrun.bat</tt>, to generate the content for your debug site in the output&nbsp;directory:</li>
+</ul>
+<pre class="code literal-block">
+pelican content --debug --autoreload  --output output --settings pelicanconf.py
+</pre>
+<ul class="simple">
+<li><tt class="docutils literal">pelserve.bat</tt>, to localy serve the generated debug&nbsp;site:</li>
+</ul>
+<pre class="code literal-block">
+pushd output
+python -m pelican.server
+popd
+</pre>
+<ul class="simple">
+<li><tt class="docutils literal">pelpub.bat</tt>, to generate the production site in the output&nbsp;directory:</li>
+</ul>
+<pre class="code literal-block">
+pelican content --output output --settings publishconf.py
+</pre>
+<p>Now, when you want to develop your site locally,&nbsp;enter:</p>
+<pre class="code literal-block">
+spapas.github.io&gt;start pelrun.bat
+spapas.github.io&gt;start pelserv.bat
+</pre>
+<p>If everything was ok until now, you can visit <a class="reference external" href="http://127.0.0.1:8000">http://127.0.0.1:8000</a> and will get the following&nbsp;output:</p>
+<img alt="all ok!" src="/images/site1.png" style="width: 780px;" />
+<p>Because of the -r option that is used in <tt class="docutils literal">pelrun.bat</tt> whenever you do a change (for instance when you add an rst file in the content directory)
+it will be discovered and the output will be changed&nbsp;immediately!</p>
+</div>
+<div class="section" id="configuration-of-your-skeleton-site">
+<h2><a class="toc-backref" href="#id4">Configuration of your skeleton&nbsp;site</a></h2>
+<div class="section" id="settings">
+<h3><a class="toc-backref" href="#id5">Settings</a></h3>
+<p>There is a number of settings that you may configure in your site. The pelican settings reference can be found here: <a class="reference external" href="http://docs.getpelican.com/en/latest/settings.html">http://docs.getpelican.com/en/latest/settings.html</a>.
+The pelicanconf.py and publishconf.py for this site can be found&nbsp;here:</p>
+<p><a class="reference external" href="https://github.com/spapas/spapas.github.io/blob/source/pelicanconf.py">https://github.com/spapas/spapas.github.io/blob/source/pelicanconf.py</a>
+<a class="reference external" href="https://github.com/spapas/spapas.github.io/blob/source/publishconf.py">https://github.com/spapas/spapas.github.io/blob/source/publishconf.py</a></p>
+<p>The most important difference is the RELATIVE_URLS directive which must be True to the debug and False to the&nbsp;production.</p>
+</div>
+<div class="section" id="themes">
+<h3><a class="toc-backref" href="#id6">Themes</a></h3>
+<p>Beyond the default pelican theme, you can use configure pelican to use various other themes. To enable them, go to your pelican parent directory and clone the pelican-themes github&nbsp;repository:</p>
+<pre class="code literal-block">
+pelican&gt;git clone https://github.com/getpelican/pelican-themes.git
+</pre>
+<p>After that, you may select your theme from&nbsp;pelicanconf.py:</p>
+<pre class="code literal-block">
+THEME = &quot;../pelican-themes/theme-name&quot;
+</pre>
+<p>In my configuration, I am using the Octopress Theme for Pelican, which you may get from here <a class="reference external" href="https://github.com/duilio/pelican-octopress-theme">https://github.com/duilio/pelican-octopress-theme</a>. Just clone it to your
+pelican directory and refer to it as&nbsp;above.</p>
+</div>
+<div class="section" id="plugins">
+<h3><a class="toc-backref" href="#id7">Plugins</a></h3>
+<p>Pelican has a number of plugins. To enable them, go to your pelican parent directory and clone the pelican-plugins github&nbsp;repository:</p>
+<pre class="code literal-block">
+pelican&gt;git clone https://github.com/getpelican/pelican-plugins.git
+</pre>
+<p>After that, you may add the following two lines to your&nbsp;pelicanconf.py:</p>
+<pre class="code literal-block">
+PLUGIN_PATH = '../pelican-plugins'
+PLUGINS = ['a-plugin']
+</pre>
+</div>
+</div>
+<div class="section" id="hosting-in-github-pages">
+<h2><a class="toc-backref" href="#id8">Hosting in github&nbsp;pages</a></h2>
+<p>To host your static site in github pages you must first of all create a repository named
+username.github.io (for instance spapas.github.io) from&nbsp;github.</p>
+<p>Then, generate your production&nbsp;output:</p>
+<pre class="code literal-block">
+spapas.github.io&gt;pelpub.bat
+</pre>
+<p>Finally, go to your output directory, create a git repository, add everything and push it to your&nbsp;repository:</p>
+<pre class="code literal-block">
+spapas.github.io\output&gt;git init
+spapas.github.io\output&gt;git add .
+spapas.github.io\output&gt;git commit -m Initial
+spapas.github.io\output&gt;git remote add origin https://github.com/spapas/spapas.github.io.git
+spapas.github.io\output&gt;git push origin master --force
+</pre>
+<p>The &#8212;force is to overwrite any previous versions - you don&#8217;t care about version control on your output (but you want it on your&nbsp;source).</p>
+<p>You can now visit <a class="reference external" href="http://username.github.io">http://username.github.io</a> and see your statically generated site&nbsp;!</p>
+<p>Don&#8217;t forget to add your source to the version control! To do that, add a .gitignore file in your pelican/username.github.io direcory
+containing the&nbsp;following:</p>
+<pre class="code literal-block">
+output
+</pre>
+<p>The above file will ignore the contents of the output directory from version control. After that, do the&nbsp;following:</p>
+<pre class="code literal-block">
+spapas.github.io&gt;git init
+spapas.github.io&gt;git add .
+spapas.github.io&gt;git commit -m Initial
+spapas.github.io&gt;git branch -m master source
+spapas.github.io&gt;git remote add origin https://github.com/spapas/spapas.github.io.git
+spapas.github.io&gt;git push origin source
+</pre>
+<p>The above will rename the master branch to source, will attach the origin remote to <a class="reference external" href="https://github.com/spapas/spapas.github.io.git">https://github.com/spapas/spapas.github.io.git</a> and will push the source
+branch to it. Now you will have two branches in your username.github.io repository. One
+named origin/master that will be your actual site and will be displayed through <a class="reference external" href="http://username.github.io">http://username.github.io</a> and one named origin/source that will contain the source of your&nbsp;site.</p>
+<p>To learn more about branches and remotes you may check out <a class="reference external" href="http://spapas.github.io/2013/10/08/git-branches/">the git branches article</a>.</p>
+</div>
+<div class="section" id="publishing-changes">
+<h2><a class="toc-backref" href="#id9">Publishing&nbsp;changes</a></h2>
+<p>Whenever you need to publish a new article or do changes to an existing one, you need to do the&nbsp;following:</p>
+<ul class="simple">
+<li>Run pelpub.bat to create the new&nbsp;output</li>
+<li>Add/commit and push changes from your pelican site(source) folder to the source&nbsp;remote</li>
+<li>Add/commit and push changes from your output folder to the master&nbsp;remote</li>
+</ul>
+<p>To help with this, here&#8217;s a ghdeploy.bat file that does all the&nbsp;above:</p>
+<pre class="code literal-block">
+call pelpub.bat
+git add -A
+git commit -m &quot;Deploying changes&quot;
+git push origin source
+pushd output
+git add -A
+git commit -m &quot;Deploying changes&quot;
+git push origin master
+popd
+</pre>
+<p>If you&#8217;ve followed this far, by running <tt class="docutils literal">pelpub.bat</tt> you&#8217;ll need to enter your github repository credentials (twice) and then
+everything (source and master) will be deployed! To make things even better, I propose to use <a class="reference external" href="https://help.github.com/articles/generating-ssh-keys/">ssh based authentication</a>
+to your github account and add new remote names to your source and master by running the&nbsp;following:</p>
+<pre class="code literal-block">
+git remote add origin2 git&#64;github.com:spapas/spapas.github.io.git
+</pre>
+<p>to your pelican site and the output directories. After you change ghdeploy.bat to use <tt class="docutils literal">origin2</tt> instead of <tt class="docutils literal">origin</tt> you&#8217;ll be
+able to deploy everything with just running it without entering any&nbsp;credentials!</p>
+</div>
+</div>
+  		</article>
+<div class="pagination">
+
+    <a class="next" href="http://spapas.github.io/index4.html">Newer &rarr;</a>
+  <br />
+</div></div>
+<aside class="sidebar">
+  <section>
+  <br />
+  <a href='/feeds/all.atom.xml'>Atom</a> 
+  |
+  <a href='/feeds/all.rss.xml'>RSS</a> 
+  </section>
+  <section>
+    <h1>Recent Posts</h1>
+    <ul id="recent_posts">
+      <li class="post">
+          <a href="http://spapas.github.io/2015/12/22/ajax-with-react-fixed-data-table/">Ajax data with Fixed Data Table for React</a>
+      </li>
+      <li class="post">
+          <a href="http://spapas.github.io/2015/11/27/pdf-in-django/">PDFs in Django: The essential guide</a>
+      </li>
+      <li class="post">
+          <a href="http://spapas.github.io/2015/11/16/using-browserify-es6/">Improve your client-side-javascript workflow more by using ES6</a>
+      </li>
+      <li class="post">
+          <a href="http://spapas.github.io/2015/10/05/django-dynamic-tables-similar-models/">Django dynamic tables and filters for similar models</a>
+      </li>
+      <li class="post">
+          <a href="http://spapas.github.io/2015/09/08/more-complex-react-flux-example/">A (little more) complex react and flux example</a>
+      </li>
+    </ul>
+  </section>
+  <section>
+      
+    <h1>Categories</h1>
+    <ul id="recent_posts">
+        <li><a href="http://spapas.github.io/category/css.html">css</a></li>
+        <li><a href="http://spapas.github.io/category/django.html">django</a></li>
+        <li><a href="http://spapas.github.io/category/flask.html">flask</a></li>
+        <li><a href="http://spapas.github.io/category/git.html">git</a></li>
+        <li><a href="http://spapas.github.io/category/javascript.html">javascript</a></li>
+        <li><a href="http://spapas.github.io/category/pelican.html">pelican</a></li>
+        <li><a href="http://spapas.github.io/category/python.html">python</a></li>
+        <li><a href="http://spapas.github.io/category/spring.html">spring</a></li>
+        <li><a href="http://spapas.github.io/category/wagtail.html">wagtail</a></li>
+    </ul>
+  </section>
+ 
+
+  <section>
+  <h1>Tags</h1>
+    <a href="http://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="http://spapas.github.io/tag/tasks.html">tasks</a>,    <a href="http://spapas.github.io/tag/less.html">less</a>,    <a href="http://spapas.github.io/tag/spring.html">spring</a>,    <a href="http://spapas.github.io/tag/rest.html">rest</a>,    <a href="http://spapas.github.io/tag/google.html">google</a>,    <a href="http://spapas.github.io/tag/design.html">design</a>,    <a href="http://spapas.github.io/tag/scheduling.html">scheduling</a>,    <a href="http://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="http://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="http://spapas.github.io/tag/tables.html">tables</a>,    <a href="http://spapas.github.io/tag/reportlab.html">reportlab</a>,    <a href="http://spapas.github.io/tag/git.html">git</a>,    <a href="http://spapas.github.io/tag/java.html">java</a>,    <a href="http://spapas.github.io/tag/rq.html">rq</a>,    <a href="http://spapas.github.io/tag/uglify.html">uglify</a>,    <a href="http://spapas.github.io/tag/django-rq.html">django-rq</a>,    <a href="http://spapas.github.io/tag/babel.html">babel</a>,    <a href="http://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="http://spapas.github.io/tag/redis.html">redis</a>,    <a href="http://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="http://spapas.github.io/tag/fixed-data-tables.html">fixed-data-tables</a>,    <a href="http://spapas.github.io/tag/forms.html">forms</a>,    <a href="http://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="http://spapas.github.io/tag/404.html">404</a>,    <a href="http://spapas.github.io/tag/xhtml2pdf.html">xhtml2pdf</a>,    <a href="http://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="http://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="http://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="http://spapas.github.io/tag/css.html">css</a>,    <a href="http://spapas.github.io/tag/node.html">node</a>,    <a href="http://spapas.github.io/tag/jobs.html">jobs</a>,    <a href="http://spapas.github.io/tag/watchify.html">watchify</a>,    <a href="http://spapas.github.io/tag/python.html">python</a>,    <a href="http://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="http://spapas.github.io/tag/javascript.html">javascript</a>,    <a href="http://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="http://spapas.github.io/tag/react.html">react</a>,    <a href="http://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="http://spapas.github.io/tag/npm.html">npm</a>,    <a href="http://spapas.github.io/tag/pdf.html">pdf</a>,    <a href="http://spapas.github.io/tag/rst.html">rst</a>,    <a href="http://spapas.github.io/tag/generic.html">generic</a>,    <a href="http://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="http://spapas.github.io/tag/es6.html">es6</a>,    <a href="http://spapas.github.io/tag/browserify.html">browserify</a>,    <a href="http://spapas.github.io/tag/branching.html">branching</a>,    <a href="http://spapas.github.io/tag/github.html">github</a>,    <a href="http://spapas.github.io/tag/pusher.html">pusher</a>,    <a href="http://spapas.github.io/tag/windows.html">windows</a>,    <a href="http://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="http://spapas.github.io/tag/django.html">django</a>,    <a href="http://spapas.github.io/tag/flux.html">flux</a>,    <a href="http://spapas.github.io/tag/fixeddatatable.html">FixedDataTable</a>,    <a href="http://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="http://spapas.github.io/tag/error.html">error</a>,    <a href="http://spapas.github.io/tag/debug.html">debug</a>,    <a href="http://spapas.github.io/tag/asynchronous.html">asynchronous</a>,    <a href="http://spapas.github.io/tag/security.html">security</a>,    <a href="http://spapas.github.io/tag/flask.html">flask</a>,    <a href="http://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>  </section>
+
+
+
+</aside>    </div>
+  </div>
+  <footer role="contentinfo"><p>
+    Copyright &copy;  2013&ndash;2015  Serafeim Papastefanos &mdash;
+  <span class="credit">Powered by <a href="http://getpelican.com">Pelican</a></span>
+</p></footer>
+  <script src="http://spapas.github.io/theme/js/modernizr-2.0.js"></script>
+  <script src="http://spapas.github.io/theme/js/ender.js"></script>
+  <script src="http://spapas.github.io/theme/js/octopress.js" type="text/javascript"></script>
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-44750952-1', 'auto');
+
+    ga('send', 'pageview');
+    </script>
+  <script type="text/javascript">
+    var disqus_shortname = 'spapas-github-io';
+    (function() {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = "//" + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+     })();
+  </script>
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+</body>
+</html>

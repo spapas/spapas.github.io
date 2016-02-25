@@ -1,51 +1,1583 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>/var/</title><link href="http://spapas.github.io/" rel="alternate"></link><link href="http://spapas.github.io/feeds/all.atom.xml" rel="self"></link><id>http://spapas.github.io/</id><updated>2015-09-08T12:55:00+03:00</updated><entry><title>A (little more) complex react and flux example</title><link href="http://spapas.github.io/2015/09/08/more-complex-react-flux-example/" rel="alternate"></link><updated>2015-09-08T12:55:00+03:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2015-09-08:2015/09/08/more-complex-react-flux-example/</id><summary type="html">&lt;div class="contents topic" id="contents"&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>/var/</title><link href="http://spapas.github.io/" rel="alternate"></link><link href="http://spapas.github.io/feeds/all.atom.xml" rel="self"></link><id>http://spapas.github.io/</id><updated>2015-12-22T15:20:00+02:00</updated><entry><title>Ajax data with Fixed Data Table for React</title><link href="http://spapas.github.io/2015/12/22/ajax-with-react-fixed-data-table/" rel="alternate"></link><updated>2015-12-22T15:20:00+02:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2015-12-22:2015/12/22/ajax-with-react-fixed-data-table/</id><summary type="html">&lt;div class="contents topic" id="contents"&gt;
 &lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
 &lt;ul class="simple"&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id3"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#more-about-flux-components" id="id4"&gt;More about Flux&amp;nbsp;components&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#explaining-the-application-components" id="id5"&gt;Explaining the application&amp;nbsp;components&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#reusable-application-components" id="id6"&gt;Reusable application components&lt;/a&gt;&lt;ul&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#dropdown-react-js" id="id7"&gt;DropDown.react.js&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#id1" id="id8"&gt;DropDown.react.js&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#pagingpanel-react-js" id="id9"&gt;PagingPanel.react.js&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#searchpanel-react-js" id="id10"&gt;SearchPanel.react.js&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#messagepanel" id="id11"&gt;MessagePanel&lt;/a&gt;&lt;ul&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#messagepanel-react-js" id="id12"&gt;MessagePanel.react.js&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#messagestore-js" id="id13"&gt;MessageStore.js&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#messageactions" id="id14"&gt;MessageActions&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#non-reusable-application-components" id="id15"&gt;Non-reusable application components&lt;/a&gt;&lt;ul&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#booktable-react-js" id="id16"&gt;BookTable.react.js&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#authordialog-react-js" id="id17"&gt;AuthorDialog.react.js&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#authorpanel-react-js" id="id18"&gt;AuthorPanel.react.js&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#statpanel-react-js" id="id19"&gt;StatPanel.react.js&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#bookform-react-js" id="id20"&gt;BookForm.react.js&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#bookpanel-react-js" id="id21"&gt;BookPanel.react.js&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#the-actions" id="id22"&gt;The&amp;nbsp;Actions&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#the-stores" id="id23"&gt;The Stores&lt;/a&gt;&lt;ul&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#id2" id="id24"&gt;MessageStore.js&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#authorstore-js" id="id25"&gt;AuthorStore.js&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#categorystore-js" id="id26"&gt;CategoryStore.js&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#bookstore-js" id="id27"&gt;BookStore.js&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#conclusion" id="id28"&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id1"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#our-project" id="id2"&gt;Our&amp;nbsp;project&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#how-fixeddatatable-gets-its-data" id="id3"&gt;How FixedDataTable gets its&amp;nbsp;data&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#ajaxcell-non-working-version-1" id="id4"&gt;AjaxCell: Non working version&amp;nbsp;1&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#ajaxcell-non-working-version-2" id="id5"&gt;AjaxCell: Non working version&amp;nbsp;2&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#ajaxcell-non-working-version-3" id="id6"&gt;AjaxCell: Non working version&amp;nbsp;3&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#ajaxcell-final-version" id="id7"&gt;AjaxCell: Final&amp;nbsp;version&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#the-table-container-component" id="id8"&gt;The Table container&amp;nbsp;component&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#some-enchancements" id="id9"&gt;Some&amp;nbsp;enchancements&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#conslusion" id="id10"&gt;Conslusion&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
 &lt;div class="section" id="introduction"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id3"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id1"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://facebook.github.io/fixed-data-table/"&gt;FixedDataTable&lt;/a&gt; is a nice React component from Facebook that is used to render tabular data.
+Its main characteristic is that it can handle many rows without sacrificing performance, however
+probably due to this fact I was not able to find any examples for loading data using Ajax - all
+examples I was able to find had the data already loaded (or created on the&amp;nbsp;fly).&lt;/p&gt;
+&lt;p&gt;So, although FixedDataTable is able to handle many rows, I am against transfering all of them to the user
+whenever our page loads since at most one page of data will be shown on screen (30 rows or so ?) -
+any other actions (filtering, sorting, aggregate calculations etc) should be done on the&amp;nbsp;server.&lt;/p&gt;
+&lt;p&gt;In the following I will present a simple, react-only example with a FixedDataTable that can be
+used with server-side, asynchronous, paginated&amp;nbsp;data.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="our-project"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id2"&gt;Our&amp;nbsp;project&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Let&amp;#8217;s see an example of what we&amp;#8217;ll&amp;nbsp;build:&lt;/p&gt;
+&lt;img alt="Our project" src="/images/ajax_fixed_data_tables.gif" style="width: 600px;" /&gt;
+&lt;p&gt;As a source of the data I&amp;#8217;ve used the &lt;a class="reference external" href="http://swapi.co/"&gt;Star Wars &lt;span class="caps"&gt;API&lt;/span&gt;&lt;/a&gt; and specifically its &lt;a class="reference external" href="http://swapi.co/documentation#people"&gt;People &lt;span class="caps"&gt;API&lt;/span&gt;&lt;/a&gt; by issuing
+requests to &lt;a class="reference external" href="http://swapi.co/api/people/?format=json"&gt;http://swapi.co/api/people/?format=json&lt;/a&gt;. This will return an array of people from the
+star wars universe in &lt;span class="caps"&gt;JSON&lt;/span&gt; format - the results are paginated with a page size of 10 (and we can switch
+to another page using the extra &lt;tt class="docutils literal"&gt;page=&lt;/tt&gt; request&amp;nbsp;parameter).&lt;/p&gt;
+&lt;p&gt;I will use es6 with the object spread operator (as described in &lt;a class="reference external" href="http://spapas.github.io/2015/11/16/using-browserify-es6/"&gt;a previous article&lt;/a&gt;)
+to write the code, using a single main.js as a source which will be transpiled to &lt;tt class="docutils literal"&gt;dist/bundle.js&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;The placeholder &lt;span class="caps"&gt;HTML&lt;/span&gt; for our application&amp;nbsp;is:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;lt;!DOCTYPE html&amp;gt;
+&amp;lt;html&amp;gt;
+  &amp;lt;head&amp;gt;
+    &amp;lt;meta charset=&amp;quot;UTF-8&amp;quot; /&amp;gt;
+    &amp;lt;title&amp;gt;Hello Ajax Fixed Data Table!&amp;lt;/title&amp;gt;
+    &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href='https://cdnjs.cloudflare.com/ajax/libs/fixed-data-table/0.6.0/fixed-data-table.min.css'&amp;gt;
+  &amp;lt;/head&amp;gt;
+  &amp;lt;body&amp;gt;
+    &amp;lt;div id=&amp;quot;main&amp;quot;&amp;gt;&amp;lt;/div&amp;gt;
+    &amp;lt;script type=&amp;quot;text/javascript&amp;quot; src='dist/bundle.js' &amp;gt;&amp;lt;/script&amp;gt;
+  &amp;lt;/body&amp;gt;
+&amp;lt;/html&amp;gt;
+&lt;/pre&gt;
+&lt;p&gt;The versions that are used are react 14.3 and fixed-data-table 0.6.0. You can find this project in github &amp;#64;
+&lt;a class="reference external" href="https://github.com/spapas/react-tables"&gt;https://github.com/spapas/react-tables&lt;/a&gt; &amp;#8212; tag name &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;fixed-data-table-ajax&lt;/span&gt;&lt;/tt&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="how-fixeddatatable-gets-its-data"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id3"&gt;How FixedDataTable gets its&amp;nbsp;data&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The data of a &lt;tt class="docutils literal"&gt;FixedDataTable&lt;/tt&gt; component is defined through a number of &lt;tt class="docutils literal"&gt;Column&lt;/tt&gt; components
+and specifically, the &lt;tt class="docutils literal"&gt;cell&lt;/tt&gt; attribute of that component which sould either return be a static string
+to be displayed in that column or a React component (usually a &lt;tt class="docutils literal"&gt;Cell&lt;/tt&gt;) that will be displayed in
+that column or even a function that returns a string or a react component. The function (or component)
+passed to &lt;tt class="docutils literal"&gt;cell&lt;/tt&gt; will have an object with a &lt;tt class="docutils literal"&gt;rowIndex&lt;/tt&gt; attribute (among others) as a parameter,
+for example the&amp;nbsp;following&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;lt;Column
+  header={&amp;lt;Cell&amp;gt;Url&amp;lt;/Cell&amp;gt;}
+  cell={props =&amp;gt; props.rowIndex}
+  width={200}
+/&amp;gt;
+&lt;/pre&gt;
+&lt;p&gt;will just display the rowIndex for each&amp;nbsp;cell.&lt;/p&gt;
+&lt;p&gt;So we can see that for each cell that FixedDataTable wants to display it will use its corresponding
+&lt;tt class="docutils literal"&gt;cell&lt;/tt&gt; attribute.
+So, a general though if we wanted to support asynchronous, paginated data
+is to check the rowIndex and retrieve the correct page asynchronously.
+This would lead to a difficulty: What should the &lt;tt class="docutils literal"&gt;cell&lt;/tt&gt; function return? We&amp;#8217;ll try to resolve this
+using an &lt;tt class="docutils literal"&gt;AjaxCell&lt;/tt&gt; function that should return a react componet to put in the&amp;nbsp;cell:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="ajaxcell-non-working-version-1"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id4"&gt;AjaxCell: Non working version&amp;nbsp;1&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;A first sketch of an &lt;tt class="docutils literal"&gt;`AjaxCell&lt;/tt&gt; component could be something like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+// Careful - not working
+const AjaxCell1 = ({rowIndex, col, ...props}) =&amp;gt; {
+    let page = 1;
+    let idx = rowIndex;
+    if(rowIndex&amp;gt;=pageSize) {
+        page = Math.floor(rowIndex / pageSize) + 1;
+        idx = rowIndex % pageSize;
+    }
+    fetch('http://swapi.co/api/people/?format=json&amp;amp;page='+page).then(function(response) {
+        return response.json();
+    }).then(function(j) {
+        // Here we have the result ! But where will it go ?
+    });
+    return /// what ?
+}
+&lt;/pre&gt;
+&lt;p&gt;The col attribute will later be used to select the attribute we want to display in this cell.
+The &lt;tt class="docutils literal"&gt;page&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;idx&lt;/tt&gt; will have the correct page number and idx inside that page (for example,
+if &lt;tt class="docutils literal"&gt;rowIndex&lt;/tt&gt; is 33, &lt;tt class="docutils literal"&gt;page&lt;/tt&gt; will be 4 and idx will be 3. The problem with the above is that
+the fetch function will be called &lt;em&gt;asynchronously&lt;/em&gt; so when the AjaxCell returns it will &lt;em&gt;not&lt;/em&gt; have
+the results (yet)! So we won&amp;#8217;t be able to render anything&amp;nbsp;:(&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="ajaxcell-non-working-version-2"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt;AjaxCell: Non working version&amp;nbsp;2&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;To be able to render &lt;em&gt;something&lt;/em&gt;, we could put the results of fetching a page to a &lt;tt class="docutils literal"&gt;cache&lt;/tt&gt; dictionary &amp;#8212; and only
+fetch that page if it is not inside the &lt;tt class="docutils literal"&gt;cache&lt;/tt&gt; - if it is inside the cache then we&amp;#8217;ll just return
+the correct&amp;nbsp;value:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+// Careful - not working correctly
+const cache = {}
+const AjaxCell2 = ({rowIndex, col, forceUpdate, ...props}) =&amp;gt; {
+    let page = 1;
+    let idx = rowIndex;
+    if(rowIndex&amp;gt;=pageSize) {
+        page = Math.floor(rowIndex / pageSize) + 1;
+        idx = rowIndex % pageSize;
+    }
+    if (cache[page]) {
+        return &amp;lt;Cell&amp;gt;{cache[page][idx][col]}&amp;lt;/Cell&amp;gt;
+    } else {
+        console.log(&amp;quot;Loading page &amp;quot; + page);
+        fetch('http://swapi.co/api/people/?format=json&amp;amp;page='+page).then(function(response) {
+            return response.json();
+        }).then(function(j) {
+            cache[page] = j['results'];
+        });
+    }
+    return &amp;lt;Cell&amp;gt;-&amp;lt;/Cell&amp;gt;;
+}
+&lt;/pre&gt;
+&lt;p&gt;The above will work, since it will return an empty (&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;&amp;lt;Cell&amp;gt;-&amp;lt;/Cell&amp;gt;&lt;/span&gt;&lt;/tt&gt;) initially but when the
+&lt;tt class="docutils literal"&gt;fetch&lt;/tt&gt; returns it will set the &lt;tt class="docutils literal"&gt;cache&lt;/tt&gt; for that page and return the correct value (&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;&amp;lt;Cell&amp;gt;{cache[page][idx][col]}&amp;lt;/Cell&amp;gt;&lt;/span&gt;&lt;/tt&gt;).&lt;/p&gt;
+&lt;p&gt;However, as can be understood, when the page first loads it will call &lt;tt class="docutils literal"&gt;AjaxCell2&lt;/tt&gt; for all visible cells &amp;#8212;
+because fetch is asynchronous and takes time until it returns (and sets the cache for that page), so the
+&lt;tt class="docutils literal"&gt;fetch&lt;/tt&gt; will be called for &lt;em&gt;all&lt;/em&gt;&amp;nbsp;cells!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="ajaxcell-non-working-version-3"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id6"&gt;AjaxCell: Non working version&amp;nbsp;3&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;fetch&lt;/tt&gt; ing each page multiple times is of course not acceptable, so we&amp;#8217;ll add a &lt;tt class="docutils literal"&gt;loading&lt;/tt&gt; flag
+and &lt;tt class="docutils literal"&gt;fetch&lt;/tt&gt; will be called only when this flag is &lt;tt class="docutils literal"&gt;false&lt;/tt&gt;, like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+// Not ready yet
+const cache = {};
+let loading = false;
+const AjaxCell2 = ({rowIndex, col, ...props}) =&amp;gt; {
+    let page = 1;
+    let idx = rowIndex;
+    if(rowIndex&amp;gt;=pageSize) {
+        page = Math.floor(rowIndex / pageSize) + 1;
+        idx = rowIndex % pageSize;
+    }
+    if (cache[page]) {
+        return &amp;lt;Cell&amp;gt;{cache[page][idx][col]}&amp;lt;/Cell&amp;gt;
+    } else if(!loading) {
+        console.log(&amp;quot;Loading page &amp;quot; + page);
+        loading = true;
+
+        fetch('http://swapi.co/api/people/?format=json&amp;amp;page='+page).then(function(response) {
+            return response.json();
+        }).then(function(j) {
+            cache[page] = j['results'];
+            loading = false;
+        });
+    }
+    return &amp;lt;Cell&amp;gt;-&amp;lt;/Cell&amp;gt;;
+}
+&lt;/pre&gt;
+&lt;p&gt;This works much better - the cells are rendered correctly and each page is loaded only once. However, if for example
+I tried to move to the end of the table quickly, I would see some cells that are always loading (they never get their correct value). This is because
+there is no way to know that the fetch function has actually completed in order to update with the latest (correct) value of that
+cell and will contain the stale placeholder (&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;&amp;lt;Cell&amp;gt;-&amp;lt;/Cell&amp;gt;&lt;/span&gt;&lt;/tt&gt;)&amp;nbsp;value.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="ajaxcell-final-version"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id7"&gt;AjaxCell: Final&amp;nbsp;version&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;To clear the stale data we need to do an update to the table data
+when each fetch is finished &amp;#8212; this should be done by a callback that will be passed to the &lt;tt class="docutils literal"&gt;AjaxCell&lt;/tt&gt;, like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+const cache = {};
+let loading = false;
+const AjaxCell = ({rowIndex, col, forceUpdate, ...props}) =&amp;gt; {
+    let page = 1;
+    let idx = rowIndex;
+    if(rowIndex&amp;gt;=pageSize) {
+        page = Math.floor(rowIndex / pageSize) + 1;
+        idx = rowIndex % pageSize;
+    }
+    if (cache[page]) {
+        return &amp;lt;Cell&amp;gt;{cache[page][idx][col]}&amp;lt;/Cell&amp;gt;
+    } else if(!loading) {
+        console.log(&amp;quot;Loading page &amp;quot; + page);
+        loading = true;
+
+        fetch('http://swapi.co/api/people/?format=json&amp;amp;page='+page).then(function(response) {
+            return response.json();
+        }).then(function(j) {
+            cache[page] = j['results'];
+            loading = false;
+            forceUpdate();
+        });
+    }
+    return loadingCell;
+}
+&lt;/pre&gt;
+&lt;p&gt;So we pass a forceUpdate callback as a property which is called when a fetch is finished. This may
+result to some not needed updates to the table (since we would do a fetch + forceUpdate for non-displayed
+data) but we can now be positive that when the data is loaded the table will be updated to dispaly&amp;nbsp;it.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="the-table-container-component"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id8"&gt;The Table container&amp;nbsp;component&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Finally, the component that contains the table is the&amp;nbsp;following:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class TableContainer extends React.Component {
+    render() {
+        return &amp;lt;Table
+            rowHeight={30} rowsCount={87} width={600} height={200} headerHeight={30}&amp;gt;
+
+            &amp;lt;Column
+              header={&amp;lt;Cell&amp;gt;Name&amp;lt;/Cell&amp;gt;}
+              cell={ &amp;lt;AjaxCell col='name' forceUpdate={this.forceUpdate.bind(this)} /&amp;gt; }
+              width={200}
+            /&amp;gt;
+            &amp;lt;Column
+              header={&amp;lt;Cell&amp;gt;Birth Year&amp;lt;/Cell&amp;gt;}
+              cell={ &amp;lt;AjaxCell col='birth_year' forceUpdate={this.forceUpdate.bind(this)} /&amp;gt; }
+              width={200}
+            /&amp;gt;
+            &amp;lt;Column
+              header={&amp;lt;Cell&amp;gt;Url&amp;lt;/Cell&amp;gt;}
+              cell={ &amp;lt;AjaxCell col='url' forceUpdate={this.forceUpdate.bind(this)} /&amp;gt; }
+              width={200}
+            /&amp;gt;
+
+        &amp;lt;/Table&amp;gt;
+    }
+}
+&lt;/pre&gt;
+&lt;p&gt;I&amp;#8217;ve made it a component in order to be able to bind the &lt;tt class="docutils literal"&gt;forceUpdate&lt;/tt&gt; method of the component to and
+&lt;tt class="docutils literal"&gt;this&lt;/tt&gt; and pass it to the &lt;tt class="docutils literal"&gt;forceUpdate&lt;/tt&gt; parameter to the &lt;tt class="docutils literal"&gt;AjaxCell&lt;/tt&gt; component. I&amp;#8217;ve hard-coded
+the rowsCount value &amp;#8212; instead we should have done an initial fetch to the first page of the &lt;span class="caps"&gt;API&lt;/span&gt; to get
+the total number of rows and only after that fetch had returned display the &lt;tt class="docutils literal"&gt;&amp;lt;Table&amp;gt;&lt;/tt&gt; component (left
+as an exercise to the&amp;nbsp;reader).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="some-enchancements"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id9"&gt;Some&amp;nbsp;enchancements&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Instead of displaying &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;&amp;lt;Cell&amp;gt;-&amp;lt;/Cell&amp;gt;&lt;/span&gt;&lt;/tt&gt; (or &lt;tt class="docutils literal"&gt;&amp;lt;/Cell&amp;gt;&lt;/tt&gt;) when the page loads, I propose to define a
+cell with an embedded spinner,&amp;nbsp;like&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+const loadingCell = &amp;lt;Cell&amp;gt;
+    &amp;lt;img width=&amp;quot;16&amp;quot; height=&amp;quot;16&amp;quot; alt=&amp;quot;star&amp;quot; src=&amp;quot;data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==&amp;quot; /&amp;gt;
+&amp;lt;/Cell&amp;gt;
+&lt;/pre&gt;
+&lt;p&gt;and return this&amp;nbsp;instead.&lt;/p&gt;
+&lt;p&gt;Also, if your &lt;span class="caps"&gt;REST&lt;/span&gt; &lt;span class="caps"&gt;API&lt;/span&gt; returns too fast and you&amp;#8217;d like to see what would happen if the server request took too long to return, you could
+change fetch like&amp;nbsp;this&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+fetch('http://swapi.co/api/people/?format=json&amp;amp;page='+page).then(function(response) {
+    return response.json();
+}).then(function(j) {
+    setTimeout( () =&amp;gt; {
+        cache[page] = j['results'];
+        loading = false;
+        forceUpdate();
+    }, 1000);
+});
+&lt;/pre&gt;
+&lt;p&gt;to add a 1 second&amp;nbsp;delay.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="conslusion"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id10"&gt;Conslusion&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The above is a just a proof of concept of using FixedDataTable with asynchronously loaded server-side data.
+This of course could be used for small projects (I am already using it for an internal project) but I recommend
+using the &lt;a class="reference external" href="http://spapas.github.io/2015/07/02/comprehensive-react-flux-tutorial-2/"&gt;flux architecture&lt;/a&gt; for more complex projects. What this more or
+less means is that a store component
+should be developed that will actually keep the data for each row, and a &lt;tt class="docutils literal"&gt;fetchCompleted&lt;/tt&gt; action should be
+dispatched when the &lt;tt class="docutils literal"&gt;fetch&lt;/tt&gt; is finished instead of calling &lt;tt class="docutils literal"&gt;forceUpdate&lt;/tt&gt; directly.&lt;/p&gt;
+&lt;/div&gt;
+</summary><category term="javascript"></category><category term="react"></category><category term="fixed-data-tables"></category><category term="FixedDataTable"></category></entry><entry><title>PDFs in Django: The essential guide</title><link href="http://spapas.github.io/2015/11/27/pdf-in-django/" rel="alternate"></link><updated>2015-11-27T10:20:00+02:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2015-11-27:2015/11/27/pdf-in-django/</id><summary type="html">&lt;div class="contents topic" id="contents"&gt;
+&lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id4"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#the-players" id="id5"&gt;The players&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#reportlab" id="id6"&gt;ReportLab&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#xhtml2pdf" id="id7"&gt;xhtml2pdf&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#pypdf2" id="id8"&gt;PyPDF2&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#django-integration" id="id9"&gt;Django integration&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#using-a-plain-old-view" id="id10"&gt;Using a plain old&amp;nbsp;view&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#using-a-cbv" id="id11"&gt;Using a &lt;span class="caps"&gt;CBV&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#how-does-django-xhtml2pdf-loads-resources" id="id12"&gt;How does django-xhtml2pdf loads&amp;nbsp;resources&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#using-a-common-style-for-your-pdfs" id="id13"&gt;Using a common style for your&amp;nbsp;PDFs&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#changing-the-font-to-a-unicode-enabled-one" id="id14"&gt;Changing the font (to a Unicode enabled&amp;nbsp;one)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#configure-django-for-debugging-pdf-creation" id="id15"&gt;Configure Django for debugging &lt;span class="caps"&gt;PDF&lt;/span&gt;&amp;nbsp;creation&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#concatenating-pdfs-in-django" id="id16"&gt;Concatenating PDFs in&amp;nbsp;Django&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#more-advanced-xhtml2pdf-features" id="id17"&gt;More advanced xhtml2pdf features&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#laying-out" id="id18"&gt;Laying&amp;nbsp;out&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#extra-stuff" id="id19"&gt;Extra&amp;nbsp;stuff&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#conclusion" id="id20"&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="introduction"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id4"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;I&amp;#8217;ve noticed that although it is easy to create PDFs with
+Python, there&amp;#8217;s no complete guide on how to
+integrate these tools with Django and resolve the problems
+that you&amp;#8217;ll encounter when trying to actually create PDFs
+from your Django web&amp;nbsp;application.&lt;/p&gt;
+&lt;p&gt;In this article I will present the solution I use for
+creating PDFs with Django, along with various tips on how to
+solve most of your common requirements. Specifically, here
+are some things that we&amp;#8217;ll&amp;nbsp;cover:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Learn how to create PDFs &amp;quot;by&amp;nbsp;hand&amp;quot;&lt;/li&gt;
+&lt;li&gt;Create PDFs with Django using a normal Djang Template (similar to an &lt;span class="caps"&gt;HTML&lt;/span&gt;&amp;nbsp;page)&lt;/li&gt;
+&lt;li&gt;Change the fonts of your&amp;nbsp;PDFs&lt;/li&gt;
+&lt;li&gt;Use styling in your&amp;nbsp;output&lt;/li&gt;
+&lt;li&gt;Create&amp;nbsp;layouts&lt;/li&gt;
+&lt;li&gt;Embed images to your&amp;nbsp;PDFs&lt;/li&gt;
+&lt;li&gt;Add page&amp;nbsp;numbers&lt;/li&gt;
+&lt;li&gt;Merge (concatenate)&amp;nbsp;PDFs&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="the-players"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt;The&amp;nbsp;players&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;We are going to use the following main&amp;nbsp;tools:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference external" href="https://bitbucket.org/rptlab/reportlab"&gt;ReportLab&lt;/a&gt; is an open source python library for creating PDFs. It uses a low-level &lt;span class="caps"&gt;API&lt;/span&gt; that allows &amp;quot;drawing&amp;quot; strings on specific coordinates  on the &lt;span class="caps"&gt;PDF&lt;/span&gt; - for people familiar with creating PDFs in Java it is more or less &lt;a class="reference external" href="http://itextpdf.com/"&gt;iText&lt;/a&gt; for&amp;nbsp;python.&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="https://github.com/chrisglass/xhtml2pdf"&gt;xhtml2pdf&lt;/a&gt; (formerly named &lt;em&gt;pisa&lt;/em&gt;) is an open source library that can convert &lt;span class="caps"&gt;HTML&lt;/span&gt;/&lt;span class="caps"&gt;CSS&lt;/span&gt; pages to &lt;span class="caps"&gt;PDF&lt;/span&gt; using&amp;nbsp;ReportLab.&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="https://github.com/chrisglass/django-xhtml2pdf"&gt;django-xhtml2pdf&lt;/a&gt; is a wrapper around xhtml2pdf that makes integration with Django&amp;nbsp;easier.&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="https://github.com/mstamy2/PyPDF2"&gt;PyPDF2&lt;/a&gt; is an open source tool of that can split, merge and transform pages of &lt;span class="caps"&gt;PDF&lt;/span&gt;&amp;nbsp;files.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I&amp;#8217;ve created a &lt;a class="reference external" href="https://github.com/spapas/django-pdf-guide"&gt;django project&lt;/a&gt; &lt;a class="reference external" href="https://github.com/spapas/django-pdf-guide"&gt;https://github.com/spapas/django-pdf-guide&lt;/a&gt; with everything covered here. Please clone it,
+install its requirements and play with it to see how everything works&amp;nbsp;!&lt;/p&gt;
+&lt;p&gt;Before integrating the above tools to a Django project, I&amp;#8217;d like to describe them individually a bit more. Any files
+I mention below will be included in this&amp;nbsp;project.&lt;/p&gt;
+&lt;div class="section" id="reportlab"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id6"&gt;ReportLab&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;ReportLab offers a really low &lt;span class="caps"&gt;API&lt;/span&gt; for creating PDFs. It is something like having a &lt;tt class="docutils literal"&gt;canvas.drawString()&lt;/tt&gt; method (for
+people familiar with drawing APIs) for your &lt;span class="caps"&gt;PDF&lt;/span&gt; page. Let&amp;#8217;s take a look at an example, creating a &lt;span class="caps"&gt;PDF&lt;/span&gt; with a simple&amp;nbsp;string:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+from reportlab.pdfgen import canvas
+import reportlab.rl_config
+
+
+if __name__ == '__main__':
+    reportlab.rl_config.warnOnMissingFontGlyphs = 0
+    c = canvas.Canvas(&amp;quot;./hello1.pdf&amp;quot;,)
+    c.drawString(100, 100, &amp;quot;Hello World&amp;quot;)
+    c.showPage()
+    c.save()
+&lt;/pre&gt;
+&lt;p&gt;Save the above in a file named testreportlab1.py. If you run python testreportlab1.py (in an environment that has
+reportlab of cours) you should see no errors and a pdf named &lt;tt class="docutils literal"&gt;hello1.pdf&lt;/tt&gt; created. If you open it in your &lt;span class="caps"&gt;PDF&lt;/span&gt;
+reader you&amp;#8217;ll see a blank page with &amp;quot;Hello World&amp;quot; written in its lower right&amp;nbsp;corner.&lt;/p&gt;
+&lt;p&gt;If you try to add a unicode text, for example &amp;quot;Καλημέρα ελλάδα&amp;quot;, you should see something like the&amp;nbsp;following:&lt;/p&gt;
+&lt;img alt="Hello PDF" src="/images/hellopdf2.png" style="width: 280px;" /&gt;
+&lt;p&gt;It seems that the default font that ReportLab uses does not have a good support for accented greek characters
+since they are missing  (and probably for various other&amp;nbsp;characters).&lt;/p&gt;
+&lt;p&gt;To resolve this, we could try changing the font to one that contains the missing symbols. You can find free
+fonts on the internet (for example the &lt;cite&gt;DejaVu&lt;/cite&gt; font), or even grab one from your system fonts (in windows,
+check out &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;c:\windows\fonts\&lt;/span&gt;&lt;/tt&gt;). In any case, just copy the ttf file of your font inside the folder of
+your project and crate a file named testreportlab2.py with the following (I am using the DejaVuSans&amp;nbsp;font):&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+# -*- coding: utf-8 -*-
+import reportlab.rl_config
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+
+
+if __name__ == '__main__':
+    c = canvas.Canvas(&amp;quot;./hello2.pdf&amp;quot;,)
+    reportlab.rl_config.warnOnMissingFontGlyphs = 0
+    pdfmetrics.registerFont(TTFont('DejaVuSans', 'DejaVuSans.ttf'))
+
+    c.setFont('DejaVuSans', 22)
+    c.drawString(100, 100, u&amp;quot;Καλημέρα ελλάδα.&amp;quot;)
+
+    c.showPage()
+    c.save()
+&lt;/pre&gt;
+&lt;p&gt;The above was just a scratch on the surface of ReportLab, mainly to be confident that
+everything &lt;em&gt;will&lt;/em&gt; work fine for non-english speaking people! To find out more, you should check the  &lt;a class="reference external" href="http://www.reportlab.com/docs/reportlab-userguide.pdf"&gt;ReportLab open-source User Guide&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;I also have to mention that
+&lt;a class="reference external" href="http://reportlab.com/"&gt;the company behind ReportLab&lt;/a&gt; offers some great commercial solutions based on ReportLab for creating PDFs (similar to &lt;a class="reference external" href="http://community.jaspersoft.com/project/jasperreports-library"&gt;JasperReports&lt;/a&gt;) - check it out
+if you need support or advanced&amp;nbsp;capabilities.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="xhtml2pdf"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id7"&gt;xhtml2pdf&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The xhtml2pdf is a really great library that allows you to use html files as a template
+to a &lt;span class="caps"&gt;PDF&lt;/span&gt;. Of course, an html cannot always be converted to a &lt;span class="caps"&gt;PDF&lt;/span&gt; since,
+unfortunately, PDFs &lt;em&gt;do&lt;/em&gt; have&amp;nbsp;pages.&lt;/p&gt;
+&lt;p&gt;xhtml2pdf has a nice executable script that can be used to test its capabilities. After
+you install it (either globally or to a virtual environment) you should be able to find
+out the executable &lt;tt class="docutils literal"&gt;$&lt;span class="caps"&gt;PYTHON&lt;/span&gt;/scripts/xhtml2pdf&lt;/tt&gt; (or &lt;tt class="docutils literal"&gt;xhtml2pdf.exe&lt;/tt&gt; if you are in
+Windows) and a corresponding python script &amp;#64; &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;$&lt;span class="caps"&gt;PYTHON&lt;/span&gt;/scripts/xhtml2pdf-script.py&lt;/span&gt;&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;Let&amp;#8217;s try to use xhtml2pdf to explore some of its capabilities. Create a file named
+testxhtml2pdf.html with the following contents and run &lt;tt class="docutils literal"&gt;xhtml2pdf testxhtml2pdf.html&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;lt;html&amp;gt;
+&amp;lt;head&amp;gt;
+    &amp;lt;meta http-equiv=&amp;quot;Content-Type&amp;quot; content=&amp;quot;text/html; charset=utf-8&amp;quot; /&amp;gt;
+&amp;lt;/head&amp;gt;
+&amp;lt;body&amp;gt;
+    &amp;lt;h1&amp;gt;Testing xhtml2pdf &amp;lt;/h1&amp;gt;
+    &amp;lt;ul&amp;gt;
+        &amp;lt;li&amp;gt;&amp;lt;b&amp;gt;Hello, world!&amp;lt;/b&amp;gt;&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;&amp;lt;i&amp;gt;Hello, italics&amp;lt;/i&amp;gt;&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;Καλημέρα Ελλάδα!&amp;lt;/li&amp;gt;
+    &amp;lt;/ul&amp;gt;
+    &amp;lt;hr /&amp;gt;
+    &amp;lt;p&amp;gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus nulla erat, porttitor ut venenatis eget,
+    tempor et purus. Nullam nec erat vel enim euismod auctor et at nisl. Integer posuere bibendum condimentum. Ut
+    euismod velit ut porttitor condimentum. In ullamcorper nulla at lectus fermentum aliquam. Nunc elementum commodo
+    dui, id pulvinar ex viverra id. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos
+    himenaeos.&amp;lt;/p&amp;gt;
+
+    &amp;lt;p&amp;gt;Interdum et malesuada fames ac ante ipsum primis in faucibus. Sed aliquam vitae lectus sit amet accumsan. Morbi
+    nibh urna, condimentum nec volutpat at, lobortis sit amet odio. Etiam quis neque interdum sapien cursus ornare. Cras
+    commodo lacinia sapien nec porta. Suspendisse potenti. Nulla hendrerit dolor et rutrum consectetur.&amp;lt;/p&amp;gt;
+    &amp;lt;hr /&amp;gt;
+    &amp;lt;img  width=&amp;quot;26&amp;quot; height=&amp;quot;20&amp;quot; src=&amp;quot;data:image/gif;base64,R0lGODlhEAAOALMAAOazToeHh0tLS/7LZv/0jvb29t/f3//Ub//ge8WSLf/
+    rhf/3kdbW1mxsbP//mf///yH5BAAAAAAALAAAAAAQAA4AAARe8L1Ekyky67QZ1hLnjM5UUde0ECwLJoExKcppV0aCcGCmTIHEIUEqjgaORCMxIC6e0C
+    cguWw6aFjsVMkkIr7g77ZKPJjPZqIyd7sJAgVGoEGv2xsBxqNgYPj/gAwXEQA7&amp;quot;  &amp;gt;
+    &amp;lt;hr /&amp;gt;
+    &amp;lt;table&amp;gt;
+        &amp;lt;tr&amp;gt;
+            &amp;lt;th&amp;gt;header0&amp;lt;/th&amp;gt;&amp;lt;th&amp;gt;header1&amp;lt;/th&amp;gt;&amp;lt;th&amp;gt;header2&amp;lt;/th&amp;gt;&amp;lt;th&amp;gt;header3&amp;lt;/th&amp;gt;&amp;lt;th&amp;gt;header4&amp;lt;/th&amp;gt;&amp;lt;th&amp;gt;header5&amp;lt;/th&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;tr&amp;gt;
+            &amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;tr&amp;gt;
+            &amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;tr&amp;gt;
+            &amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;tr&amp;gt;
+            &amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;
+        &amp;lt;/tr&amp;gt;
+    &amp;lt;/table&amp;gt;
+&amp;lt;/body&amp;gt;
+&amp;lt;/html&amp;gt;
+&lt;/pre&gt;
+&lt;p&gt;Please notice the &lt;tt class="docutils literal"&gt;&amp;lt;meta &lt;span class="pre"&gt;http-equiv=&amp;quot;Content-Type&amp;quot;&lt;/span&gt; &lt;span class="pre"&gt;content=&amp;quot;text/html;&lt;/span&gt; &lt;span class="pre"&gt;charset=utf-8&amp;quot;&lt;/span&gt; /&amp;gt;&lt;/tt&gt; in the above &lt;span class="caps"&gt;HTML&lt;/span&gt; &amp;#8212; also it is saved as
+Unicode (Encoding - Covert to &lt;span class="caps"&gt;UTF&lt;/span&gt;-8 in Notepad++). The result (&lt;tt class="docutils literal"&gt;testxhtml2pdf.pdf&lt;/tt&gt;) should&amp;nbsp;have:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;A nice header&amp;nbsp;(h1)&lt;/li&gt;
+&lt;li&gt;Paragraphs&lt;/li&gt;
+&lt;li&gt;Horizontal&amp;nbsp;lines&lt;/li&gt;
+&lt;li&gt;No support for greek characters (same problem as with&amp;nbsp;reportlab)&lt;/li&gt;
+&lt;li&gt;Images (I am inlining it as a base 64&amp;nbsp;image)&lt;/li&gt;
+&lt;li&gt;A&amp;nbsp;list&lt;/li&gt;
+&lt;li&gt;A&amp;nbsp;table&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Before moving on, I&amp;#8217;d like to fix the problem with the greek characters. You should
+set the font to one supporting greek characters, just like you did with ReportLab before.
+This can be done with the help of the &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;&amp;#64;font-face&lt;/span&gt;&lt;/tt&gt; &lt;a class="reference external" href="https://github.com/xhtml2pdf/xhtml2pdf/blob/master/doc/usage.rst#fonts"&gt;css directive&lt;/a&gt;. So, let&amp;#8217;s create
+a file named &lt;tt class="docutils literal"&gt;testxhtml2pdf2.html&lt;/tt&gt; with the following&amp;nbsp;contents:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;lt;html&amp;gt;
+&amp;lt;head&amp;gt;
+    &amp;lt;meta http-equiv=&amp;quot;Content-Type&amp;quot; content=&amp;quot;text/html; charset=utf-8&amp;quot; /&amp;gt;
+
+    &amp;lt;style&amp;gt;
+        &amp;#64;font-face {
+            font-family: DejaVuSans;
+            src: url(&amp;quot;c:/progr/py/django-pdf-guide/django_pdf_guide/DejaVuSans.ttf&amp;quot;);
+        }
+
+        body {
+            font-family: DejaVuSans;
+        }
+    &amp;lt;/style&amp;gt;
+&amp;lt;/head&amp;gt;
+&amp;lt;body&amp;gt;
+    &amp;lt;h1&amp;gt;Δοκιμή του xhtml2pdf &amp;lt;/h1&amp;gt;
+    &amp;lt;ul&amp;gt;
+        &amp;lt;li&amp;gt;Καλημέρα Ελλάδα!&amp;lt;/li&amp;gt;
+    &amp;lt;/ul&amp;gt;
+
+&amp;lt;/body&amp;gt;
+&amp;lt;/html&amp;gt;
+&lt;/pre&gt;
+&lt;p&gt;Before running &lt;tt class="docutils literal"&gt;xhtml2pdf testxhtml2pdf2.html&lt;/tt&gt;, please make
+sure to change the url of the font file above to the absolute path of that font in your
+local system . As a result, after running xhhtml2pdf
+you
+should see the unicode characters without&amp;nbsp;problems.&lt;/p&gt;
+&lt;p&gt;I have to mention here that I wasn&amp;#8217;t able to use the font from a relative path, that&amp;#8217;s
+why I used the absolute one. In case something is not right, try
+running it with the &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;-d&lt;/span&gt;&lt;/tt&gt; option to output debugging information (something like
+&lt;tt class="docutils literal"&gt;xhtml2pdf &lt;span class="pre"&gt;-d&lt;/span&gt; testxhtml2pdf2.html&lt;/tt&gt;). You must see a line like this&amp;nbsp;one:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+DEBUG [xhtml2pdf] C:\progr\py\django-pdf-guide\venv\lib\site-packages\xhtml2pdf\context.py line 857: Load font 'c:\\progr\\py\\django-pdf-guide\\django_pdf_guide\\DejaVuSans.ttf'
+&lt;/pre&gt;
+&lt;p&gt;to make sure that the font is actually&amp;nbsp;loaded!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="pypdf2"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id8"&gt;PyPDF2&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The PyPDF2 library can be used to extract pages from a &lt;span class="caps"&gt;PDF&lt;/span&gt; to a new one
+or combine pages from different PDFs to a a new one. A common requirement is
+to have the first and page of a report as static PDFs, create the contents
+of this report through your app as a &lt;span class="caps"&gt;PDF&lt;/span&gt; and combine all three PDFs (front page,
+content and back page) to the resulting &lt;span class="caps"&gt;PDF&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;Let&amp;#8217;s see a quick example of combining two&amp;nbsp;PDFs:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+import sys
+from PyPDF2 import PdfFileMerger
+
+if __name__ == '__main__':
+    pdfs = sys.argv[1:]
+
+    if not pdfs or len(pdfs) &amp;lt; 2:
+        exit(&amp;quot;Please enter at least two pdfs for merging!&amp;quot;)
+
+    merger = PdfFileMerger()
+
+    for pdf in pdfs:
+        merger.append(fileobj=open(pdf, &amp;quot;rb&amp;quot;))
+
+    output = open(&amp;quot;output.pdf&amp;quot;, &amp;quot;wb&amp;quot;)
+    merger.write(output)
+&lt;/pre&gt;
+&lt;p&gt;The above will try to open all input parameters (as files) and append them to a the&amp;nbsp;output.pdf.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="django-integration"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id9"&gt;Django&amp;nbsp;integration&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;To integrate the &lt;span class="caps"&gt;PDF&lt;/span&gt; creation process with django we&amp;#8217;ll use a simple app with only one model about books. We are
+going to use the django-xhtml2pdf library &amp;#8212; I recommend installing the latest version (from github
+using something like &lt;tt class="docutils literal"&gt;pip install &lt;span class="pre"&gt;-e&lt;/span&gt; &lt;span class="pre"&gt;git+https://github.com/chrisglass/django-xhtml2pdf.git#egg=django-xhtml2pdf&lt;/span&gt;&lt;/tt&gt;
+) since the pip package has not been updated in a long&amp;nbsp;time!&lt;/p&gt;
+&lt;div class="section" id="using-a-plain-old-view"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id10"&gt;Using a plain old&amp;nbsp;view&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The simplest case is to just create plain old view to display the &lt;span class="caps"&gt;PDF&lt;/span&gt;. We&amp;#8217;ll use django-xhtml2pdf along with the
+followig django&amp;nbsp;template:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;lt;html&amp;gt;
+&amp;lt;head&amp;gt;
+    &amp;lt;meta http-equiv=&amp;quot;Content-Type&amp;quot; content=&amp;quot;text/html; charset=utf-8&amp;quot; /&amp;gt;
+&amp;lt;/head&amp;gt;
+&amp;lt;body&amp;gt;
+    &amp;lt;h1&amp;gt;Books&amp;lt;/h1&amp;gt;
+    &amp;lt;table&amp;gt;
+        &amp;lt;tr&amp;gt;
+            &amp;lt;th&amp;gt;ID&amp;lt;/th&amp;gt;&amp;lt;th&amp;gt;Title&amp;lt;/th&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        {% for book in books %}
+            &amp;lt;tr&amp;gt;
+                &amp;lt;td&amp;gt;{{ book.id }}&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;{{ book.title }}&amp;lt;/td&amp;gt;
+            &amp;lt;/tr&amp;gt;
+        {% endfor %}
+    &amp;lt;/table&amp;gt;
+&amp;lt;/body&amp;gt;
+&amp;lt;/html&amp;gt;
+&lt;/pre&gt;
+&lt;p&gt;Name it as &lt;tt class="docutils literal"&gt;books_plain_old_view.html&lt;/tt&gt; and put it on &lt;tt class="docutils literal"&gt;books/templates&lt;/tt&gt; directory. The view that
+returns the above template as &lt;span class="caps"&gt;PDF&lt;/span&gt; is the&amp;nbsp;following:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+from django.http import HttpResponse
+from django_xhtml2pdf.utils import generate_pdf
+
+
+def books_plain_old_view(request):
+    resp = HttpResponse(content_type='application/pdf')
+    context = {
+        'books': Book.objects.all()
+    }
+    result = generate_pdf('books_plain_old_view.html', file_object=resp, context=context)
+    return result
+&lt;/pre&gt;
+&lt;p&gt;We just use the &lt;tt class="docutils literal"&gt;generate_pdf&lt;/tt&gt; method of django-xhtml2pdf to help us generate the &lt;span class="caps"&gt;PDF&lt;/span&gt;, passing it
+our response object and a context dictionary (containing all&amp;nbsp;books).&lt;/p&gt;
+&lt;p&gt;Instead of the simple &lt;span class="caps"&gt;HTTP&lt;/span&gt; response above, we could add a &amp;#8216;Content Disposition&amp;#8217; &lt;span class="caps"&gt;HTTP&lt;/span&gt; header to
+our response
+(or use the django-xhtml2pdf method &lt;tt class="docutils literal"&gt;render_to_pdf_response&lt;/tt&gt; instead of &lt;tt class="docutils literal"&gt;generate_pdf&lt;/tt&gt;)
+to suggest a default filename for the file to be saved by adding the&amp;nbsp;line&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+resp['Content-Disposition'] = 'attachment; filename=&amp;quot;output.pdf&amp;quot;'
+&lt;/pre&gt;
+&lt;p&gt;after the definition of &lt;tt class="docutils literal"&gt;resp&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;This will have the extra effect, at least in Chrome and Firefox to show the &amp;quot;Save File&amp;quot; dialog
+when clicking on the link instead of retrieving the &lt;span class="caps"&gt;PDF&lt;/span&gt; and displaying it inside* the browser&amp;nbsp;window.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="using-a-cbv"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id11"&gt;Using a &lt;span class="caps"&gt;CBV&lt;/span&gt;&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;I don&amp;#8217;t really recommend using plain old Django views - instead I propose to always use Class Based Views
+for their DRYness. The best approach is to create a mixin that would allow any kind of &lt;span class="caps"&gt;CBV&lt;/span&gt; (at least any
+kind of &lt;span class="caps"&gt;CBV&lt;/span&gt; that uses a template) to be rendered in &lt;span class="caps"&gt;PDF&lt;/span&gt;. Here&amp;#8217;s how we could implement a &lt;tt class="docutils literal"&gt;PdfResponseMixin&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class PdfResponseMixin(object, ):
+    def render_to_response(self, context, **response_kwargs):
+        context=self.get_context_data()
+        template=self.get_template_names()[0]
+        resp = HttpResponse(content_type='application/pdf')
+        result = generate_pdf(template, file_object=resp, context=context)
+        return result
+&lt;/pre&gt;
+&lt;p&gt;Now, we could use this mixin to create &lt;span class="caps"&gt;PDF&lt;/span&gt; outputting views from any other view! For example, here&amp;#8217;s how
+we could create a book list in&amp;nbsp;pdf:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class BookPdfListView(PdfResponseMixin, ListView):
+    context_object_name = 'books'
+    model = Book
+&lt;/pre&gt;
+&lt;p&gt;To display it, you could use the same template as &lt;tt class="docutils literal"&gt;books_plain_old_view.html&lt;/tt&gt; (so either add a &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;template_name='books_plain_old_view.html'&lt;/span&gt;&lt;/tt&gt;
+property to the class or copy &lt;tt class="docutils literal"&gt;books_plain_old_view.html&lt;/tt&gt; to &lt;tt class="docutils literal"&gt;books/book_list.html&lt;/tt&gt;).&lt;/p&gt;
+&lt;p&gt;Also, as another example, here&amp;#8217;s a &lt;tt class="docutils literal"&gt;BookPdfDetailView&lt;/tt&gt; that outputs &lt;span class="caps"&gt;PDF&lt;/span&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class BookPdfDetailView(PdfResponseMixin, DetailView):
+    context_object_name = 'book'
+    model = Book
+&lt;/pre&gt;
+&lt;p&gt;and a corresponding template (name it &lt;tt class="docutils literal"&gt;books/book_detail.html&lt;/tt&gt;):&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;lt;html&amp;gt;
+&amp;lt;head&amp;gt;
+    &amp;lt;meta http-equiv=&amp;quot;Content-Type&amp;quot; content=&amp;quot;text/html; charset=utf-8&amp;quot; /&amp;gt;
+&amp;lt;/head&amp;gt;
+&amp;lt;body&amp;gt;
+    &amp;lt;h1&amp;gt;Book Detail&amp;lt;/h1&amp;gt;
+    &amp;lt;b&amp;gt;ID&amp;lt;/b&amp;gt;: {{ book.id }} &amp;lt;br /&amp;gt;
+    &amp;lt;b&amp;gt;Title&amp;lt;/b&amp;gt;: {{ book.title }} &amp;lt;br /&amp;gt;
+&amp;lt;/body&amp;gt;
+&amp;lt;/html&amp;gt;
+&lt;/pre&gt;
+&lt;p&gt;To add the content-disposition header and a name for your &lt;span class="caps"&gt;PDF&lt;/span&gt;, you can use the following&amp;nbsp;mixin:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class PdfResponseMixin(object, ):
+    pdf_name = &amp;quot;output&amp;quot;
+
+    def get_pdf_name(self):
+        return self.pdf_name
+
+    def render_to_response(self, context, **response_kwargs):
+        context=self.get_context_data()
+        template=self.get_template_names()[0]
+        resp = HttpResponse(content_type='application/pdf')
+        resp['Content-Disposition'] = 'attachment; filename=&amp;quot;{0}.pdf&amp;quot;'.format(self.get_pdf_name())
+        result = generate_pdf(template, file_object=resp, context=context)
+        return result
+&lt;/pre&gt;
+&lt;p&gt;You see that, in order to havea configurable output name for our &lt;span class="caps"&gt;PDF&lt;/span&gt; and be consistent with the other
+django CBVs, a &lt;tt class="docutils literal"&gt;pdf_name&lt;/tt&gt; class attribute and a &lt;tt class="docutils literal"&gt;get_pdf_name&lt;/tt&gt; instance method are added. When
+using the above mixin in your classes you can either provide a value for &lt;tt class="docutils literal"&gt;pdf_name&lt;/tt&gt; (to use the same for all
+your instances), or override &lt;tt class="docutils literal"&gt;get_pdf_name&lt;/tt&gt; to have a dynamic&amp;nbsp;value!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="how-does-django-xhtml2pdf-loads-resources"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id12"&gt;How does django-xhtml2pdf loads&amp;nbsp;resources&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Before doing more advanced things, we need to understand how &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;django-xhtml2pdf&lt;/span&gt;&lt;/tt&gt; works and specifically
+how we can refer to things like css, images, fonts etc from our &lt;span class="caps"&gt;PDF&lt;/span&gt; templates.
+If you check the &lt;a class="reference external" href="https://github.com/chrisglass/django-xhtml2pdf/blob/master/django_xhtml2pdf/utils.py"&gt;utils.py of django-xhtml2pdf&lt;/a&gt; you&amp;#8217;ll see that it uses a function named &lt;tt class="docutils literal"&gt;fetch_resources&lt;/tt&gt;
+for loading these resources. This function checks to see if the resource starts with &lt;tt class="docutils literal"&gt;/MEDIA_URL&lt;/tt&gt; or
+&lt;tt class="docutils literal"&gt;/STATIC_URL&lt;/tt&gt; and converts it to a local (filesystem) path. For example, if you refer to a font like
+&lt;tt class="docutils literal"&gt;/static/font1.ttf&lt;/tt&gt; in your &lt;span class="caps"&gt;PDF&lt;/span&gt; template, &lt;tt class="docutils literal"&gt;xhtml2pdf&lt;/tt&gt; will try to load the file &lt;tt class="docutils literal"&gt;STATIC_ROOT + /font1.ttf&lt;/tt&gt;
+(and if it does not find the file you want to refer to there it will check all &lt;tt class="docutils literal"&gt;STATICFILES_DIRS&lt;/tt&gt; entries).&lt;/p&gt;
+&lt;p&gt;Thus, you can just put your resources into your &lt;tt class="docutils literal"&gt;STATIC_ROOT&lt;/tt&gt; directory and use the &lt;tt class="docutils literal"&gt;{% static %}&lt;/tt&gt;
+template tag to create &lt;span class="caps"&gt;URL&lt;/span&gt; paths for them &amp;#8212; django-xhtml2pdf will convert these to local paths and
+everything will work&amp;nbsp;fine.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Please notice that you *need* to have configured &amp;#8220;STATIC_ROOT&amp;#8220; for this to work&lt;/strong&gt; &amp;#8212; if &lt;tt class="docutils literal"&gt;STATIC_ROOT&lt;/tt&gt; is
+empty (and, for example you use &lt;tt class="docutils literal"&gt;static&lt;/tt&gt; directories in your apps) then the described substitution
+mechanism will &lt;em&gt;not&lt;/em&gt; work. Also, notice that the &lt;tt class="docutils literal"&gt;/static&lt;/tt&gt; directory inside your apps &lt;em&gt;cannot be used&lt;/em&gt;
+for fetch resources like this
+(due to how &lt;tt class="docutils literal"&gt;fetch_resources&lt;/tt&gt; is implemented it only checks if the static resource is contained inside
+the &lt;tt class="docutils literal"&gt;STATIC_ROOT&lt;/tt&gt; or in one of the the &lt;tt class="docutils literal"&gt;STATICFILES_DIRS&lt;/tt&gt;) so be careful to either put the static files
+you need to load from PDFs (fonts, styles and possibly images) to either the &lt;tt class="docutils literal"&gt;STATIC_ROOT&lt;/tt&gt; or the
+one of the &lt;tt class="docutils literal"&gt;STATICFILES_DIRS&lt;/tt&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="using-a-common-style-for-your-pdfs"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id13"&gt;Using a common style for your&amp;nbsp;PDFs&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;If you need to create a lot of similar PDFs then you&amp;#8217;ll probably want to
+use a bunch of common styles for them (same fonts, headers etc). This could be done using
+the &lt;tt class="docutils literal"&gt;{% static %}&lt;/tt&gt; trick we saw on the previous section. However, if we include the
+styling css as a static file then we won&amp;#8217;t be able to use the static-file-uri-to-local-path
+mechanism described above (since the &lt;tt class="docutils literal"&gt;{% static %}&lt;/tt&gt; template tag won&amp;#8217;t work in static&amp;nbsp;files).&lt;/p&gt;
+&lt;p&gt;Thankfully, not everything is lost &amp;#8212; Django comes to the rescue!!! We can create a single &lt;span class="caps"&gt;CSS&lt;/span&gt; file
+that would be used by all our &lt;span class="caps"&gt;PDF&lt;/span&gt; templates and &lt;em&gt;include&lt;/em&gt; it in the templates using the &lt;tt class="docutils literal"&gt;{% include %}&lt;/tt&gt; Django
+template tag! Django will think that this will be a normal template and paste its contents where we wanted and
+also execute the templates&amp;nbsp;tags!&lt;/p&gt;
+&lt;p&gt;We&amp;#8217;ll see an example of all this in the next&amp;nbsp;section.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="changing-the-font-to-a-unicode-enabled-one"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id14"&gt;Changing the font (to a Unicode enabled&amp;nbsp;one)&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The time has finally arrived to change the font! It&amp;#8217;s easy if you know exactly what to do. First of all
+configure your &lt;tt class="docutils literal"&gt;STATIC_ROOT&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;STATIC_URL&lt;/tt&gt; setting, for example &lt;tt class="docutils literal"&gt;STATIC_ROOT = &lt;span class="pre"&gt;os.path.join(BASE_DIR,'static')&lt;/span&gt;&lt;/tt&gt;
+and &lt;tt class="docutils literal"&gt;STATIC_URL = '/static/'&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;Then, add a template-css file for your fonts in one of your templates directories. I am naming the
+file &lt;tt class="docutils literal"&gt;pdfstylefonts.css&lt;/tt&gt; and I&amp;#8217;ve put it to &lt;tt class="docutils literal"&gt;books/templates&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+{% load static %}
+&amp;#64;font-face {
+    font-family: &amp;quot;Calibri&amp;quot;;
+    src: url({% static &amp;quot;fonts/calibri.ttf&amp;quot; %});
+}
+&amp;#64;font-face {
+    font-family: &amp;quot;Calibri&amp;quot;;
+    src: url({% static &amp;quot;fonts/calibrib.ttf&amp;quot; %});
+    font-weight: bold;
+}
+&amp;#64;font-face {
+    font-family: &amp;quot;Calibri&amp;quot;;
+    src: url({% static &amp;quot;fonts/calibrii.ttf&amp;quot; %});
+    font-style: italic, oblique;
+}
+&amp;#64;font-face {
+    font-family: &amp;quot;Calibri&amp;quot;;
+    src: url({% static &amp;quot;fonts/calibriz.ttf&amp;quot; %});
+    font-weight: bold;
+    font-style: italic, oblique;
+}
+&lt;/pre&gt;
+&lt;p&gt;I am using Calibri family of fonts (copied from &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;c:\windows\fonts&lt;/span&gt;&lt;/tt&gt;) for this &amp;#8212; I&amp;#8217;ve also configured
+all styles (bold, italic, bold-italic) of this font family to use the correct ttf files. All the
+ttf files have been copied to the directory &lt;tt class="docutils literal"&gt;static/fonts/&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;Now, add another css file that will be your global &lt;span class="caps"&gt;PDF&lt;/span&gt; styles. This should be put to the &lt;tt class="docutils literal"&gt;static&lt;/tt&gt; directory
+and could be named &lt;tt class="docutils literal"&gt;pdfstyle.css&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+h1 {
+    color: blue;
+}
+
+*, html {
+    font-family: &amp;quot;Calibri&amp;quot;;
+    font-size:11pt;
+    color: red;
+}
+&lt;/pre&gt;
+&lt;p&gt;Next, here&amp;#8217;s a template that lists all books (and contain some greek characters &amp;#8212; the title of the books also contain
+greek characters) &amp;#8212; I&amp;#8217;ve named it &lt;tt class="docutils literal"&gt;book_list_ex.html&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+{% load static %}
+&amp;lt;html&amp;gt;
+&amp;lt;head&amp;gt;
+    &amp;lt;meta http-equiv=&amp;quot;Content-Type&amp;quot; content=&amp;quot;text/html; charset=utf-8&amp;quot; /&amp;gt;
+    &amp;lt;style&amp;gt;
+        {% include &amp;quot;pdfstylefonts.css&amp;quot; %}
+    &amp;lt;/style&amp;gt;
+    &amp;lt;link rel='stylesheet' href='{% static &amp;quot;pdfstyle.css&amp;quot; %}'/&amp;gt;
+&amp;lt;/head&amp;gt;
+&amp;lt;body&amp;gt;
+    &amp;lt;h1&amp;gt;Λίστα βιβλίων&amp;lt;/h1&amp;gt;
+    &amp;lt;img src='{% static &amp;quot;pony.png&amp;quot; %}' /&amp;gt;
+    &amp;lt;table&amp;gt;
+        &amp;lt;tr&amp;gt;
+            &amp;lt;th&amp;gt;ID&amp;lt;/th&amp;gt;&amp;lt;th&amp;gt;Title&amp;lt;/th&amp;gt;&amp;lt;th&amp;gt;Cover&amp;lt;/th&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        {% for book in books %}
+            &amp;lt;tr&amp;gt;
+                &amp;lt;td&amp;gt;{{ book.id }}&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;{{ book.title }}&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;&amp;lt;img src='{{ book.cover.url }}' /&amp;gt;&amp;lt;/td&amp;gt;
+            &amp;lt;/tr&amp;gt;
+        {% endfor %}
+    &amp;lt;/table&amp;gt;
+&amp;lt;/body&amp;gt;
+&amp;lt;/html&amp;gt;
+&lt;/pre&gt;
+&lt;p&gt;You&amp;#8217;ll see that the &lt;tt class="docutils literal"&gt;pdfstylefonts.css&lt;/tt&gt; is included as a Django template (so that &lt;tt class="docutils literal"&gt;{% static %}&lt;/tt&gt; will
+work in that file) while &lt;tt class="docutils literal"&gt;pdfstyle.css&lt;/tt&gt; is included using &lt;tt class="docutils literal"&gt;{% static %}&lt;/tt&gt;.
+Als, notice that I&amp;#8217;ve also added a static image (using the &lt;tt class="docutils literal"&gt;{% static %}&lt;/tt&gt; tag) and a dynamic (media)
+file to show off how great the url-to-local-path mechanism works. Please notice that for the
+media files to work fine in your development environment you need to configure the
+&lt;tt class="docutils literal"&gt;MEDIA_URL&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;MEDIA_ROOT&lt;/tt&gt; settigns (similar to &lt;tt class="docutils literal"&gt;STATIC_URL&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;STATIC_ROOT&lt;/tt&gt;) and follow the
+&lt;a class="reference external" href="https://docs.djangoproject.com/en/1.8/howto/static-files/#serving-files-uploaded-by-a-user-during-development"&gt;serve files uploaded by a user during development&lt;/a&gt; tutorial on Django&amp;nbsp;docs.&lt;/p&gt;
+&lt;p&gt;Finally, if you configure a PdfResponseMixin ListView like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class BookExPdfListView(PdfResponseMixin, ListView):
+    context_object_name = 'books'
+    model = Book
+    template_name = 'books/book_list_ex.html'
+&lt;/pre&gt;
+&lt;p&gt;you should see be able to see the correct (calibri) font (defined in &lt;tt class="docutils literal"&gt;pdfstylefonts.css&lt;/tt&gt;), with unicode characters without problems
+including both the static and user uploaded images and with the styles defined in the pdf stylesheet (&lt;tt class="docutils literal"&gt;pdfstyle.css&lt;/tt&gt;).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="configure-django-for-debugging-pdf-creation"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id15"&gt;Configure Django for debugging &lt;span class="caps"&gt;PDF&lt;/span&gt;&amp;nbsp;creation&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;If you experience any problems, you can configure xhtml2pdf to output &lt;span class="caps"&gt;DEBUG&lt;/span&gt; information. To do this,
+you may change your django logging configuration like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'xhtml2pdf': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        }
+    }
+}
+&lt;/pre&gt;
+&lt;p&gt;This configuration will keep existing loggers (&lt;tt class="docutils literal"&gt;'disable_existing_loggers': False,&lt;/tt&gt;) and will configure
+&lt;tt class="docutils literal"&gt;xhtml2pdf&lt;/tt&gt; to log its output to the console, helping us find out why some things won&amp;#8217;t be&amp;nbsp;working.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="concatenating-pdfs-in-django"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id16"&gt;Concatenating PDFs in&amp;nbsp;Django&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The final section of the &lt;span class="caps"&gt;PDF&lt;/span&gt;-Django-integration is to explain how we can concatenate PDFs in django using PyPDF2. There may be
+some other requirements like extracting pages from PDFs however the most common one as explained before is to just append
+the pages of one &lt;span class="caps"&gt;PDF&lt;/span&gt; after the other &amp;#8212; after all using PyPDF2 is really easy after you get the hang of&amp;nbsp;it.&lt;/p&gt;
+&lt;p&gt;To be more &lt;span class="caps"&gt;DRY&lt;/span&gt;, I will create a &lt;tt class="docutils literal"&gt;CoverPdfResponseMixin&lt;/tt&gt; that will output a &lt;span class="caps"&gt;PDF&lt;/span&gt; &lt;em&gt;with&lt;/em&gt; a cover. To be &lt;em&gt;even more&lt;/em&gt; &lt;span class="caps"&gt;DRY&lt;/span&gt;,
+I will refactor &lt;tt class="docutils literal"&gt;PdfResponseMixin&lt;/tt&gt; to put some common code in an extra method so that &lt;tt class="docutils literal"&gt;CoverPdfResponseMixin&lt;/tt&gt; could inherit from&amp;nbsp;it:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class PdfResponseMixin(object, ):
+    def write_pdf(self, file_object, ):
+        context = self.get_context_data()
+        template = self.get_template_names()[0]
+        generate_pdf(template, file_object=file_object, context=context)
+
+    def render_to_response(self, context, **response_kwargs):
+        resp = HttpResponse(content_type='application/pdf')
+        self.write_pdf(resp)
+        return resp
+
+
+class CoverPdfResponseMixin(PdfResponseMixin, ):
+    cover_pdf = None
+
+    def render_to_response(self, context, **response_kwargs):
+        merger = PdfFileMerger()
+        merger.append(open(self.cover_pdf, &amp;quot;rb&amp;quot;))
+
+        pdf_fo = StringIO.StringIO()
+        self.write_pdf(pdf_fo)
+        merger.append(pdf_fo)
+
+        resp = HttpResponse(content_type='application/pdf')
+        merger.write(resp)
+        return resp
+&lt;/pre&gt;
+&lt;p&gt;So, &lt;tt class="docutils literal"&gt;PdfResponseMixin&lt;/tt&gt; now has a &lt;tt class="docutils literal"&gt;write_pdf&lt;/tt&gt; method that gets a file-like object and outputs the &lt;span class="caps"&gt;PDF&lt;/span&gt; there.
+The new mixin, &lt;tt class="docutils literal"&gt;CoverPdfResponseMixin&lt;/tt&gt; has a &lt;tt class="docutils literal"&gt;cover_pdf&lt;/tt&gt; attribute that should be configured with the filesystem
+path of the cover file. The &lt;tt class="docutils literal"&gt;render_to_response&lt;/tt&gt; method now will create a &lt;tt class="docutils literal"&gt;PdfFileMerger&lt;/tt&gt; (which is empty
+initially) to which it appends the contents &lt;tt class="docutils literal"&gt;cover_pdf&lt;/tt&gt;. After that, it creates a file-stream (using StreamIO)
+and uses &lt;tt class="docutils literal"&gt;write_pdf&lt;/tt&gt; to create the &lt;span class="caps"&gt;PDF&lt;/span&gt; there and appends that file-stream to the merger. Finally, it writes
+the merger contents to the &lt;tt class="docutils literal"&gt;HttpResponse&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;One thing that I&amp;#8217;ve seen is that if you want to concatenate many PDFs with many pages sometimes you&amp;#8217;ll get
+a strange an error when using &lt;tt class="docutils literal"&gt;PdfFileMerger&lt;/tt&gt;. I was able to overcome this by reading and appending the pages of each
+&lt;span class="caps"&gt;PDF&lt;/span&gt; to-be-appended one by one using the &lt;tt class="docutils literal"&gt;PdfFileReader&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;PdfFileWriter&lt;/tt&gt; objects. Here&amp;#8217;s a small snippet of how
+this could be&amp;nbsp;done:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+pdfs = [] # List of pdfs to be concatenated
+writer = PdfFileWriter()
+
+for pdf in pdfs:
+    reader = PdfFileReader(open(pdf, &amp;quot;rb&amp;quot;))
+    for i in range(reader.getNumPages()):
+        writer.addPage(reader.getPage(i))
+
+resp = HttpResponse(content_type='application/pdf')
+writer.write(resp)
+return resp
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="more-advanced-xhtml2pdf-features"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id17"&gt;More advanced xhtml2pdf&amp;nbsp;features&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;In this section I will present some information on how to use various xhtml2pdf features
+to create the most common required printed document features, for example adding page
+numbers, adding headers and footers&amp;nbsp;etc.&lt;/p&gt;
+&lt;div class="section" id="laying-out"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id18"&gt;Laying&amp;nbsp;out&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;To find out how you can create your pages you should read the
+&lt;a class="reference external" href="https://github.com/xhtml2pdf/xhtml2pdf/blob/master/doc/usage.rst#defining-page-layouts"&gt;defining page layouts&lt;/a&gt; section of the xhtml2pdf manual. There
+you&amp;#8217;ll see that the basic components of laying out in xhtml2pdf is
+&amp;#64;page to create pages and &amp;#64;frames to create rectangular components
+inside these pages. So each page will have a number of frames
+inside it. These frames are seperated to static and dynamic. Staticsome
+should be used for things like headers
+and footers (so they&amp;#8217;ll be the same across all pages) and dynamic will
+contain the main content of the&amp;nbsp;report.&lt;/p&gt;
+&lt;p&gt;For pages you can use any page size you want, not just the specified ones. For example, in one of my
+projects I wanted to create a &lt;span class="caps"&gt;PDF&lt;/span&gt; print on a normal plastic card, so I&amp;#8217;d used the
+following &lt;tt class="docutils literal"&gt;size: 8.56cm 5.398cm;&lt;/tt&gt;. Also, page templates can be named
+and you can use different ones in the same &lt;span class="caps"&gt;PDF&lt;/span&gt; (so you could create
+a cover page with a different page template, use it first and then continue
+with the normal pages). To name a tempalte you just use &amp;#64;page template_name {}
+and to change the template use the combination of the following two xhtml2pdf&amp;nbsp;tags:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;lt;pdf:nexttemplate name=&amp;quot;back_page&amp;quot; /&amp;gt;
+&amp;lt;pdf:nextpage /&amp;gt;
+&lt;/pre&gt;
+&lt;p&gt;Now, one thing I&amp;#8217;ve noticed is that you are not able to use a named template for the first
+page of your &lt;span class="caps"&gt;PDF&lt;/span&gt;. So, what I&amp;#8217;ve done is that I create an anonymous (default) page for the
+first page of the report. If I want to &lt;em&gt;reuse&lt;/em&gt; it in another page, I copy it and name it
+accordingly. I will give an example&amp;nbsp;shortly.&lt;/p&gt;
+&lt;p&gt;Now, for frames, I recommend using the &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;-pdf-frame-border:&lt;/span&gt; 1;&lt;/tt&gt; command for debugging where
+they are actually printed. Also, I recommend using a normal ruler and measuring completely
+where you want them to be. For example, for the following&amp;nbsp;frame:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;#64;frame photo_frame {
+        -pdf-frame-border: 1;
+        top:  2.4cm;
+        left: 6.2cm;
+        width: 1.9cm;
+        height: 2.2cm;
+}
+&lt;/pre&gt;
+&lt;p&gt;I&amp;#8217;d used a ruler to find out that I want it to start 2.4 cm from the top of my page (actually a credit card)
+and 6.2 cm from the left and have a width and height of 1.9 and 2.2&amp;nbsp;cm.&lt;/p&gt;
+&lt;p&gt;I recommend naming all frames to be able to distinguish them however I don&amp;#8217;t think that their name plays
+any other role. However, for static frames you must define the id of the content they will contain using &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;-pdf-frame-content&lt;/span&gt;&lt;/tt&gt;
+in the css and a div with the corresponding id in the &lt;span class="caps"&gt;PDF&lt;/span&gt; template. For example, you could define a frame header like&amp;nbsp;this&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;#64;frame header {
+  -pdf-frame-content: headerContent;
+  width: 8in;
+  top: 0.5cm;
+  margin-left: 0.5cm;
+  margin-right: 0.5cm;
+  height: 2cm;
+}
+&lt;/pre&gt;
+&lt;p&gt;and its content like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;lt;div id='headerContent'&amp;gt;
+  &amp;lt;h1 &amp;gt;
+    Header !
+  &amp;lt;/h1&amp;gt;
+&amp;lt;/div&amp;gt;
+&lt;/pre&gt;
+&lt;p&gt;Please notice that if for some reason the stuff you want to put in your static frames does not fit there the frame will
+be totally empty. This means that if you have size for three lines but you want to output five lines in a static frame
+then you&amp;#8217;ll see no&amp;nbsp;lines!&lt;/p&gt;
+&lt;p&gt;Now, for dynamic content you can expect the opposite behavior:
+You &lt;em&gt;cannot&lt;/em&gt; select to which dynamic frame your content goes, instead the content just just flows to the first dynamic frame it
+fits! If it does not fit in any dynamic frames in the current page then a new page will be&amp;nbsp;created.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;d like to present a full example here on the already mentioned project of printing a plastic card for the books. I had two page layouts,
+one for the front page having a frame with the owner&amp;#8217;s data and another frame with his photo and one for the back page having
+a barcode. This is a Django template that is used to print not only but a &lt;span class="caps"&gt;PDF&lt;/span&gt; with a group of these&amp;nbsp;cards:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;lt;html&amp;gt;
+&amp;lt;head&amp;gt;
+&amp;lt;meta http-equiv=&amp;quot;Content-Type&amp;quot; content=&amp;quot;text/html; charset=utf-8&amp;quot; /&amp;gt;
+&amp;lt;style&amp;gt;
+    {% include &amp;quot;pdfstylefonts.css&amp;quot; %}
+&amp;lt;/style&amp;gt;
+&amp;lt;style type='text/css'&amp;gt;
+    &amp;#64;page {
+        size: 8.56cm 5.398cm;
+        margin: 0.0cm 0.0cm 0.0cm 0.0cm;
+        padding: 0;
+
+        &amp;#64;frame table_frame {
+            /* -pdf-frame-border: 1; */
+            top:  2.4cm;
+            left: 0.4cm;
+            width: 5.5cm;
+            height: 3cm;
+        }
+
+        &amp;#64;frame photo_frame {
+            /* -pdf-frame-border: 1; */
+            top:  2.4cm;
+            left: 6.2cm;
+            width: 1.9cm;
+            height: 2.2cm;
+        }
+    }
+
+    &amp;#64;page front_page {
+        size: 8.56cm 5.398cm;
+        margin: 0.0cm 0.0cm 0.0cm 0.0cm;
+        padding: 0;
+
+        &amp;#64;frame table_frame {
+            /* -pdf-frame-border: 1; */
+            top:  2.4cm;
+            left: 0.4cm;
+            width: 5.5cm;
+            height: 3cm;
+        }
+
+        &amp;#64;frame photo_frame {
+            /* -pdf-frame-border: 1; */
+            top:  2.4cm;
+            left: 6.2cm;
+            width: 1.9cm;
+            height: 2.2cm;
+        }
+    }
+
+    &amp;#64;page back_page {
+        size: 8.56cm 5.398cm;
+        margin: 0.0cm 0.0cm 0.0cm 0.0cm;
+        padding: 0;
+
+        &amp;#64;frame barcode_frame {
+            /* -pdf-frame-border: 1; */
+            top:  3.9cm;
+            left: 1.8cm;
+            width: 4.9cm;
+            height: 1.1cm;
+        }
+    }
+
+    *, html {
+        font-family: &amp;quot;Calibri&amp;quot;;
+        font-size: 8pt;
+        line-height: 80%;
+    }
+
+    .bigger {
+        font-size:9pt;
+        font-weight: bold;
+    }
+&amp;lt;/style&amp;gt;
+&amp;lt;/head&amp;gt;
+&amp;lt;body&amp;gt;
+    {% for book in books %}
+        &amp;lt;div&amp;gt;
+            &amp;lt;! -- Here I print the card data. It fits exactly in the table_frame so ... -&amp;gt;
+            {{ book.title }}&amp;lt;br /&amp;gt;
+            Data line 2&amp;lt;br /&amp;gt;
+            Data line 3&amp;lt;br /&amp;gt;
+            Data line 4&amp;lt;br /&amp;gt;
+            Data line 5&amp;lt;br /&amp;gt;
+            Data line 6&amp;lt;br /&amp;gt;
+            Data line 7&amp;lt;br /&amp;gt;
+            Data line 8&amp;lt;br /&amp;gt;
+            Data line 9&amp;lt;br /&amp;gt;
+            Data line 10&amp;lt;br /&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;div&amp;gt;
+            &amp;lt;! -- This photo here will be outputted to the photo_frame --&amp;gt;
+            &amp;lt;img src='{{ book.cover.url }}' style='width:1.9cm ; height: 2.2cm ; ' /&amp;gt;
+        &amp;lt;/div&amp;gt;
+
+        &amp;lt;! -- Now the template is chaned to print the back of the card --&amp;gt;
+        &amp;lt;pdf:nexttemplate name=&amp;quot;back_page&amp;quot; /&amp;gt;
+        &amp;lt;pdf:nextpage /&amp;gt;
+
+        &amp;lt;div &amp;gt;
+            &amp;lt;center&amp;gt;
+                &amp;lt;! -- Print the barcode to the barcode_frame --&amp;gt;
+                &amp;lt;pdf:barcode value=&amp;quot;{{ book.id }}&amp;quot; type=&amp;quot;code128&amp;quot; humanreadable=&amp;quot;1&amp;quot; barwidth=&amp;quot;0.43mm&amp;quot; barheight=&amp;quot;0.6cm&amp;quot; align=&amp;quot;middle&amp;quot; /&amp;gt;
+            &amp;lt;/center&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;!-- Use the front_page template again for the next card --&amp;gt;
+        &amp;lt;pdf:nexttemplate name=&amp;quot;front_page&amp;quot; /&amp;gt;
+        &amp;lt;pdf:nextpage /&amp;gt;
+    {% endfor %}
+&amp;lt;/body&amp;gt;
+&amp;lt;/html&amp;gt;
+&lt;/pre&gt;
+&lt;p&gt;Notice that I want to print exactly 10 lines in the &lt;tt class="docutils literal"&gt;table_frame&lt;/tt&gt; (that&amp;#8217;s why I use &amp;lt;br /&amp;gt; to go to next line) &amp;#8212; if I had printed
+3-4 lines (for example) then the photo &lt;em&gt;would fit&lt;/em&gt; in the &lt;tt class="docutils literal"&gt;table_frame&lt;/tt&gt; and would be printed there and &lt;em&gt;not&lt;/em&gt; in the &lt;tt class="docutils literal"&gt;photo_frame&lt;/tt&gt;! Also,
+another interesting thing is that if I had
+outputed 8-9 lines then the photo wouldn&amp;#8217;t fit in that small space and would also be printed to the &lt;tt class="docutils literal"&gt;photo_frame&lt;/tt&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="extra-stuff"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id19"&gt;Extra&amp;nbsp;stuff&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Some extra things I want to mention concerning&amp;nbsp;xhtml2pdf:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;&amp;lt;pdf:pagenumber&amp;gt;&lt;/tt&gt; to output the current page number (please end the line after this&amp;nbsp;tag)&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;&amp;lt;pdf:pagecount&amp;gt;&lt;/tt&gt; to output the total page number (please end the line after this&amp;nbsp;tag)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;So if you want to print a footer with the pages, I recommend something like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;lt;div id='footerContent'&amp;gt;
+  Page &amp;lt;pdf:pagenumber&amp;gt;
+  from &amp;lt;pdf:pagecount&amp;gt;
+  total
+&amp;lt;/div&amp;gt;
+&lt;/pre&gt;
+&lt;p&gt;Notice how the lines end after the&amp;nbsp;tags.&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;&amp;lt;pdf:barcode&amp;gt;&lt;/tt&gt;: Output a barcode in your &lt;span class="caps"&gt;PDF&lt;/span&gt;. Here are the possible barcode types: I2of5, Standard39, Extended39, Standard93, Extended93, &lt;span class="caps"&gt;MSI&lt;/span&gt;, Codabar, Code11, &lt;span class="caps"&gt;FIM&lt;/span&gt;, &lt;span class="caps"&gt;POSTNET&lt;/span&gt;, USPS_4State, Code128, &lt;span class="caps"&gt;EAN13&lt;/span&gt;, &lt;span class="caps"&gt;EAN8&lt;/span&gt;, &lt;span class="caps"&gt;QR&lt;/span&gt;.&lt;/li&gt;
+&lt;li&gt;You may add a page background image using  the &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;background-image&lt;/span&gt;&lt;/tt&gt; property of &lt;tt class="docutils literal"&gt;&amp;#64;page&lt;/tt&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;For example, if you want the templates you create from your development/&lt;span class="caps"&gt;UAT&lt;/span&gt; systems to be different
+than the production ones you could do something like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;#64;page {
+    {% if DEBUG %}
+        background-image: url({% static &amp;quot;debug.png&amp;quot; %});
+    {% endif %}
+    &amp;lt;!-- Other page properties --&amp;gt;
+}
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="conclusion"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id20"&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;I hope that using the techniques described in this essential guide you&amp;#8217;ll
+be able to create great looking &lt;span class="caps"&gt;PDF&lt;/span&gt; documents from your Django application
+and overcome any difficulties that may arise. If you feel that there&amp;#8217;s something
+I&amp;#8217;ve not covered properly (and is not covered by the documentation) please comment
+out and I&amp;#8217;ll be happy to research it a bit and update the article with&amp;nbsp;info.&lt;/p&gt;
+&lt;p&gt;I am using all the above in various production applications for a long time and everything
+is smooth so don&amp;#8217;t afraid to create PDFs from&amp;nbsp;Django!&lt;/p&gt;
+&lt;/div&gt;
+</summary><category term="pdf"></category><category term="django"></category><category term="reportlab"></category><category term="python"></category><category term="xhtml2pdf"></category></entry><entry><title>Improve your client-side-javascript workflow more by using ES6</title><link href="http://spapas.github.io/2015/11/16/using-browserify-es6/" rel="alternate"></link><updated>2015-11-16T14:20:00+02:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2015-11-16:2015/11/16/using-browserify-es6/</id><summary type="html">&lt;div class="contents topic" id="contents"&gt;
+&lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id1"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#npm-save-save-dev-and-avoiding-global-deps" id="id2"&gt;&lt;span class="caps"&gt;NPM&lt;/span&gt;, &amp;#8212;save, &amp;#8212;save-dev and avoiding global&amp;nbsp;deps&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#using-babel" id="id3"&gt;Using&amp;nbsp;babel&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#integrate-babel-with-browserify" id="id4"&gt;Integrate babel with&amp;nbsp;browserify&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#the-object-spread-operator" id="id5"&gt;The object-spread&amp;nbsp;operator&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#conclusion" id="id6"&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;Update 22/12/2015:&lt;/strong&gt; Add section for the object-spread&amp;nbsp;operator.&lt;/p&gt;
+&lt;div class="section" id="introduction"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id1"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;In a &lt;a class="reference external" href="http://spapas.github.io/2015/05/27/using-browserify-watchify/"&gt;previous article&lt;/a&gt;
+we presented a simple workflow to improve your client-side (javascript) workflow
+by including a bunch of tools from the node-js world i.e &lt;a class="reference external" href="http://browserify.org/"&gt;browserify&lt;/a&gt; and
+its friends, &lt;a class="reference external" href="https://github.com/substack/watchify"&gt;watchify&lt;/a&gt; and &lt;a class="reference external" href="https://www.npmjs.com/package/uglify-js"&gt;uglify-js&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Using these tools we were able to properly manage our client side dependencies
+(no more script tags in our html templates) and modularize our code
+(so we could avoid monolithic javascript files that contained all our code).
+Another great improvement to our workflow would be to include &lt;span class="caps"&gt;ES6&lt;/span&gt; to the&amp;nbsp;mix!&lt;/p&gt;
+&lt;p&gt;&lt;span class="caps"&gt;ES6&lt;/span&gt; (or EcmaScript 2015) is more or less &amp;quot;Javascript: &lt;span class="caps"&gt;TNG&lt;/span&gt;&amp;quot;. It has many features
+that greatly improve the readability and writability of javascript code - for instance,
+thick arrows, better classes, better modules, iterators/generators, template strings,
+default function parameters and many others!
+More info on these features and how they could be used can be found on the &lt;a class="reference external" href="https://github.com/lukehoban/es6features"&gt;es6features&lt;/a&gt;&amp;nbsp;repository.&lt;/p&gt;
+&lt;p&gt;Unfortunately, these features are either not supported at all, or they are partially supported
+on current (November 2015) browsers. However all is &lt;em&gt;not&lt;/em&gt; lost yet: Since we already use browserify
+to our client side workflow, we can easily enable it to read source files with &lt;span class="caps"&gt;ES6&lt;/span&gt; syntax
+and transform them to normal javascript using a transformation through the &lt;a class="reference external" href="https://babeljs.io/"&gt;babel&lt;/a&gt;&amp;nbsp;tool.&lt;/p&gt;
+&lt;p&gt;In the following, we&amp;#8217;ll talk a bit more about the node-js package manager (npm) features,
+talk a little about babel and finally
+modify our workflow so that it will be able to use &lt;span class="caps"&gt;ES6&lt;/span&gt;! Please notice that to properly follow this article
+you need to first read the &lt;a class="reference external" href="http://spapas.github.io/2015/05/27/using-browserify-watchify/"&gt;previous one&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="npm-save-save-dev-and-avoiding-global-deps"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id2"&gt;&lt;span class="caps"&gt;NPM&lt;/span&gt;, &amp;#8212;save, &amp;#8212;save-dev and avoiding global&amp;nbsp;deps&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;In the previous article, I had recommended to install the needed tools
+(needed to create the output bundle browserify, watchify, uglify) globally
+using npm install -g package (of course the normal dependencies like moment.js
+would be installed locally).
+This has one advantage and two disadvantages: It
+puts these tools to the path so they can be called immediately (i.e browserify)
+but you will need root access to install a package globally and nothing is
+saved on &lt;tt class="docutils literal"&gt;package.json&lt;/tt&gt; so you don&amp;#8217;t know which packages must be installed
+in order to start developing the&amp;nbsp;project!&lt;/p&gt;
+&lt;p&gt;This could be ok for the introductionary article, however for this one I
+will propose another alternative: Install all the tools &lt;em&gt;locally&lt;/em&gt; using just
+&lt;tt class="docutils literal"&gt;npm install package &lt;span class="pre"&gt;--save&lt;/span&gt;&lt;/tt&gt;. These tools will be put to the &lt;tt class="docutils literal"&gt;node_modules&lt;/tt&gt; folder. They
+&lt;em&gt;will not&lt;/em&gt; be put to the path, but if you want to execute a binary by yourself
+to debug the output, you can find it in &lt;tt class="docutils literal"&gt;node_modules/bin&lt;/tt&gt;, for example,
+for browserify you can run &lt;tt class="docutils literal"&gt;node_modules/bin/browserify&lt;/tt&gt;. Another intersting
+thing is that if you create executable scripts in your &lt;tt class="docutils literal"&gt;package.json&lt;/tt&gt; you
+don&amp;#8217;t actually need to include the full path but the binaries will be&amp;nbsp;found.&lt;/p&gt;
+&lt;p&gt;Another thing I&amp;#8217;d like to discuss here is the difference between &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;--save&lt;/span&gt;&lt;/tt&gt;
+and &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;--save-dev&lt;/span&gt;&lt;/tt&gt; options that can be passed to npm install. If you take
+a look at other guides you&amp;#8217;ll see that people are using &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;--save-dev&lt;/span&gt;&lt;/tt&gt; for
+development dependencies (i.e testing) and &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;--save&lt;/span&gt;&lt;/tt&gt; for normal dependencies.
+The difference is that these dependencies are saved in different places in
+&lt;tt class="docutils literal"&gt;package.json&lt;/tt&gt; and if you run &lt;tt class="docutils literal"&gt;npm install &lt;span class="pre"&gt;--production&lt;/span&gt;&lt;/tt&gt; you&amp;#8217;ll get only
+the normal dependencies (while, if you run &lt;tt class="docutils literal"&gt;npm install&lt;/tt&gt; all dependencies
+will be installed). In these articles, I chose to just use &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;--save&lt;/span&gt;&lt;/tt&gt; everywhere,
+after all the only thing that would be needed for production would be the
+&lt;tt class="docutils literal"&gt;bundle.js&lt;/tt&gt; output&amp;nbsp;file.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="using-babel"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id3"&gt;Using&amp;nbsp;babel&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The &lt;a class="reference external" href="https://babeljs.io/"&gt;babel&lt;/a&gt; library &amp;quot;is a JavaScript compiler&amp;quot;. It gets input files in a variant
+of javascript (for example, &lt;span class="caps"&gt;ES6&lt;/span&gt;) and produces normal javascript files &amp;#8212; something
+like what browserify transforms do. However, what babel does (and I think its
+the only tool that does this) is that it allows you to use &lt;span class="caps"&gt;ES6&lt;/span&gt; features &lt;em&gt;now&lt;/em&gt; by
+transpiling them to normal (&lt;span class="caps"&gt;ES5&lt;/span&gt;) javascript. Also, babel has &lt;a class="reference external" href="https://babeljs.io/docs/plugins/"&gt;various other transforms&lt;/a&gt;,
+including a react transform
+(so you can use this instead of the reactify&amp;nbsp;browserify-transform)!&lt;/p&gt;
+&lt;p&gt;In any case, to be able to use &lt;span class="caps"&gt;ES6&lt;/span&gt;, we&amp;#8217;ll need to install babel and its es6 presets
+(don&amp;#8217;t forget that you need to have a &lt;tt class="docutils literal"&gt;package.json&lt;/tt&gt; for the dependencies to be
+saved so either do an &lt;tt class="docutils literal"&gt;npm init&lt;/tt&gt; or create a &lt;tt class="docutils literal"&gt;package.json&lt;/tt&gt; file containing only
+&lt;tt class="docutils literal"&gt;{}&lt;/tt&gt;):&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+npm install  babel babel-preset-es2015 --save
+&lt;/pre&gt;
+&lt;p&gt;If we wanted to also use babel for react we&amp;#8217;d need to install&amp;nbsp;babel-preset-react.&lt;/p&gt;
+&lt;p&gt;To configure babel we can either add a &lt;tt class="docutils literal"&gt;babel&lt;/tt&gt;
+section in our &lt;tt class="docutils literal"&gt;package.json&lt;/tt&gt; or create a new file named .babelrc and put the configuration&amp;nbsp;there.&lt;/p&gt;
+&lt;p&gt;I prefer the first one since we are already using the &lt;tt class="docutils literal"&gt;package.json&lt;/tt&gt;. So add the following attribute
+to your &lt;tt class="docutils literal"&gt;package.json&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;quot;babel&amp;quot;: {
+  &amp;quot;presets&amp;quot;: [
+    &amp;quot;es2015&amp;quot;
+  ]
+}
+&lt;/pre&gt;
+&lt;p&gt;If you wanted to configure it through &lt;tt class="docutils literal"&gt;.babelrc&lt;/tt&gt; then you&amp;#8217;d just copy to it the contents of &lt;tt class="docutils literal"&gt;&amp;quot;babel&amp;quot;&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;To do some tests with babel, you can install its cli (it&amp;#8217;s not included in the babel package) through
+&lt;tt class="docutils literal"&gt;npm install &lt;span class="pre"&gt;babel-cli&lt;/span&gt;&lt;/tt&gt;. Now, you can run &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;node_modules/.bin/babel&lt;/span&gt;&lt;/tt&gt;. For example, create a
+file named &lt;tt class="docutils literal"&gt;testbabel.js&lt;/tt&gt; with the following contents (thick&amp;nbsp;arrow):&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+[1,2,3].forEach(x =&amp;gt; console.log(x) );
+&lt;/pre&gt;
+&lt;p&gt;when you pass it to babel you&amp;#8217;ll see the following&amp;nbsp;output:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;gt;node_modules\.bin\babel testbabel.js
+&amp;quot;use strict&amp;quot;;
+
+[1, 2, 3].forEach(function (x) {
+  return console.log(x);
+});
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="integrate-babel-with-browserify"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id4"&gt;Integrate babel with&amp;nbsp;browserify&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;To call babel from browserify we&amp;#8217;re going to use the &lt;a class="reference external" href="https://github.com/babel/babelify"&gt;babelify&lt;/a&gt; browserify transform which
+actually uses babel to transpile the browserify input. After installing it&amp;nbsp;with&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+npm install babelify --save
+&lt;/pre&gt;
+&lt;p&gt;you need to tell browserify to use it. To do this, you&amp;#8217;ll just pass a -t babelify parameter to
+browserify. So if you run it with the &lt;tt class="docutils literal"&gt;testbabel.js&lt;/tt&gt; file as input you&amp;#8217;ll see the following&amp;nbsp;output:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;gt;node_modules\.bin\browserify -t babelify testbabel.js
+[...] browserify gibberish
+&amp;quot;use strict&amp;quot;;
+
+[1, 2, 3].forEach(function (x) {
+  return console.log(x);
+});
+
+[...] more browserify gibberish
+&lt;/pre&gt;
+&lt;p&gt;yey &amp;#8212; the code is transpiled to &lt;span class="caps"&gt;ES5&lt;/span&gt;!&lt;/p&gt;
+&lt;p&gt;To create a complete project, let&amp;#8217;s add a normal requirement&amp;nbsp;(moment.js):&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+npm install moment --save
+&lt;/pre&gt;
+&lt;p&gt;and a file named &lt;tt class="docutils literal"&gt;src\main.js&lt;/tt&gt; that uses it with &lt;span class="caps"&gt;ES6&lt;/span&gt;&amp;nbsp;syntax:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+import moment from 'moment';
+
+const arr = [1,2,3,4,5];
+arr.forEach(x =&amp;gt; setTimeout(() =&amp;gt; console.log(`Now: ${moment().format(&amp;quot;HH:mm:ss&amp;quot;)}, Later: ${moment().add(x, &amp;quot;days&amp;quot;).format(&amp;quot;L&amp;quot;)}...`), x*1000));
+&lt;/pre&gt;
+&lt;p&gt;To create the output javascript file, we&amp;#8217;ll use the browserify and watchify commands with the
+addition of the -t babelify switch. Here&amp;#8217;s the complete &lt;tt class="docutils literal"&gt;package.json&lt;/tt&gt; for this&amp;nbsp;project:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+{
+  &amp;quot;dependencies&amp;quot;: {
+    &amp;quot;babel&amp;quot;: &amp;quot;^6.1.18&amp;quot;,
+    &amp;quot;babel-preset-es2015&amp;quot;: &amp;quot;^6.1.18&amp;quot;,
+    &amp;quot;babelify&amp;quot;: &amp;quot;^7.2.0&amp;quot;,
+    &amp;quot;browserify&amp;quot;: &amp;quot;^12.0.1&amp;quot;,
+    &amp;quot;moment&amp;quot;: &amp;quot;^2.10.6&amp;quot;,
+    &amp;quot;uglify-js&amp;quot;: &amp;quot;^2.6.0&amp;quot;,
+    &amp;quot;watchify&amp;quot;: &amp;quot;^3.6.1&amp;quot;
+  },
+  &amp;quot;scripts&amp;quot;: {
+    &amp;quot;watch&amp;quot;: &amp;quot;watchify src/main.js -o dist/bundle.js -v -t babelify&amp;quot;,
+    &amp;quot;build&amp;quot;: &amp;quot;browserify src/main.js -t babelify | uglifyjs -mc warnings=false &amp;gt; dist/bundle.js&amp;quot;
+  },
+  &amp;quot;babel&amp;quot;: {
+    &amp;quot;presets&amp;quot;: [
+      &amp;quot;es2015&amp;quot;
+    ]
+  }
+}
+&lt;/pre&gt;
+&lt;p&gt;Running &lt;tt class="docutils literal"&gt;npm run build&lt;/tt&gt; should create a &lt;tt class="docutils literal"&gt;dist/bundle.js&lt;/tt&gt; file. If you include this in an html,
+you should see something like this in the&amp;nbsp;console:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+Now: 13:52:09, Later: 11/17/2015...
+Now: 13:52:10, Later: 11/18/2015...
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="the-object-spread-operator"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt;The object-spread&amp;nbsp;operator&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Many examples in the internet use the &lt;a class="reference external" href="https://facebook.github.io/react/docs/jsx-spread.html#spread-attributes"&gt;object spread operator&lt;/a&gt; which is &lt;a class="reference external" href="http://stackoverflow.com/questions/31115276/ecmascript-6-spread-operator-in-object-deconstruction-support-in-typescript-and"&gt;not part of es6&lt;/a&gt; so our
+proposed babel configuration does not support it!
+To be able to use this syntax, we&amp;#8217;ll need to install the corresponding babel plugin by using
+&lt;tt class="docutils literal"&gt;npm install &lt;span class="pre"&gt;babel-plugin-transform-object-rest-spread&lt;/span&gt; &lt;span class="pre"&gt;--save&lt;/span&gt;&lt;/tt&gt; and add it to our babel configuration
+in the plugins section, something like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;quot;presets&amp;quot;: [
+  &amp;quot;es2015&amp;quot;,
+  &amp;quot;react&amp;quot;
+],
+&amp;quot;plugins&amp;quot;: [
+  &amp;quot;transform-object-rest-spread&amp;quot;
+]
+&lt;/pre&gt;
+&lt;p&gt;If everything is ok this should be transpiled without errors using &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;node_modules\.bin\browserify&lt;/span&gt; testbabe.js &lt;span class="pre"&gt;-t&lt;/span&gt; babelify&lt;/tt&gt;&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+let x = {a:1 , b:2 };
+let y = {...x, c: 3};
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="conclusion"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id6"&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Using the combination of babel and javascript we can easily write &lt;span class="caps"&gt;ES6&lt;/span&gt; code in our modules! This,
+along with the modularization of our code and the management of client-side dependencies should
+make client side development a&amp;nbsp;breeze!&lt;/p&gt;
+&lt;p&gt;Please notice that to keep the presented workflow simple and easy to
+replicate and configure, we have not used any external
+task runners (like gulp or grunt) &amp;#8212; all configuration is kept in a single file (package.json) and
+the whole environment can be replicated just by doing a &lt;tt class="docutils literal"&gt;npm install&lt;/tt&gt;. Of course, the capabilities of
+browserify are not unlimited, so if you wanted to do something more complicated
+(for instance, lint your code before passing it to browserify) you&amp;#8217;d need to use the mentioned
+task runners (or webpack which is the current trend in javascript bundlers and actually replaces
+the task&amp;nbsp;runners).&lt;/p&gt;
+&lt;/div&gt;
+</summary><category term="javascript"></category><category term="browserify"></category><category term="node"></category><category term="npm"></category><category term="watchify"></category><category term="generic"></category><category term="uglify"></category><category term="babel"></category><category term="es6"></category></entry><entry><title>Django dynamic tables and filters for similar models</title><link href="http://spapas.github.io/2015/10/05/django-dynamic-tables-similar-models/" rel="alternate"></link><updated>2015-10-05T14:20:00+03:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2015-10-05:2015/10/05/django-dynamic-tables-similar-models/</id><summary type="html">&lt;div class="contents topic" id="contents"&gt;
+&lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id1"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#the-problem-we-ll-solve" id="id2"&gt;The problem we&amp;#8217;ll&amp;nbsp;solve&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#adding-the-dynamic-table" id="id3"&gt;Adding the dynamic&amp;nbsp;table&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#creating-a-dynamic-form-for-filtering" id="id4"&gt;Creating a dynamic form for&amp;nbsp;filtering&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#creating-the-dynamic-cbv" id="id5"&gt;Creating the dynamic &lt;span class="caps"&gt;CBV&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#conclusion" id="id6"&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="introduction"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id1"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;One of my favorite django apps is &lt;a class="reference external" href="https://github.com/bradleyayers/django-tables2"&gt;django-tables2&lt;/a&gt;: It allows you to
+easily create pagination and sorting enabled &lt;span class="caps"&gt;HTML&lt;/span&gt; tables to represent
+your model data using the usual djangonic technique (similar to how
+you &lt;a class="reference external" href="https://docs.djangoproject.com/en/1.8/topics/forms/modelforms/#modelform"&gt;create ModelForms&lt;/a&gt;). I use it to almost all my projects to
+represent the data, along with &lt;a class="reference external" href="https://github.com/alex/django-filter"&gt;django-filter&lt;/a&gt; to create forms
+to filter my model data. I&amp;#8217;ve written &lt;a class="reference external" href="http://stackoverflow.com/questions/13611741/django-tables-column-filtering/15129259#15129259"&gt;a nice &lt;span class="caps"&gt;SO&lt;/span&gt; answer&lt;/a&gt; with
+instructions on how to use django-filter along with&amp;nbsp;django-tables2.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="the-problem-we-ll-solve"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id2"&gt;The problem we&amp;#8217;ll&amp;nbsp;solve&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The main tool django-tables2 offers is a template tag called &lt;tt class="docutils literal"&gt;render_table&lt;/tt&gt;
+that get an instance of a subclass of &lt;tt class="docutils literal"&gt;django_tables2.Table&lt;/tt&gt;
+which contains a description of the table (columns, style etc) along
+with a queryset with the table&amp;#8217;s data and output it to the page. A nice
+extra feature of render_table is that you could pass it just a simple
+django queryset and it will output it without the need to create the
+custom Table class. So you can do something like {% render_table User.objects.all() %}
+and get a quick output of your Users&amp;nbsp;table.&lt;/p&gt;
+&lt;p&gt;In one of my projects I had three models that
+were used for keeping a different type of business log in the database (for auditing reasons)
+and was using the above feature to display these logs to the administrators, just by
+creating a very simple &lt;tt class="docutils literal"&gt;ListView&lt;/tt&gt; (a different one for each Log type) and using the
+&lt;tt class="docutils literal"&gt;render_table&lt;/tt&gt; to display the data. So I&amp;#8217;d created three views like&amp;nbsp;this&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class AuditLogListView(ListView):
+  model = AuditLog
+  context_object_name = 'logs'
+&lt;/pre&gt;
+&lt;p&gt;which all used a single template that contained a line &lt;tt class="docutils literal"&gt;{% render_table logs %}&lt;/tt&gt; to display
+the table (the &lt;tt class="docutils literal"&gt;logs&lt;/tt&gt; context variable contains the list of &lt;tt class="docutils literal"&gt;AuditLog&lt;/tt&gt; s).&lt;/p&gt;
+&lt;p&gt;This was a nice &lt;span class="caps"&gt;DRY&lt;/span&gt; (but quick and dirty solution) that soon was not enough to fulfill the
+needs of the administrators since they neeeded to have default sorting, filtering, hide
+the primary key-id column etc. The obvious solution for that would be to just create three different
+&lt;tt class="docutils literal"&gt;Table&lt;/tt&gt; subclasses that
+would more or less have the same options with only their &lt;tt class="docutils literal"&gt;model&lt;/tt&gt; attributte different. I didn&amp;#8217;t
+like this solution that much since it seemed non-&lt;span class="caps"&gt;DRY&lt;/span&gt; to me and I would instead prefer to
+create a generic &lt;tt class="docutils literal"&gt;Table&lt;/tt&gt; (that wouldn&amp;#8217;t have a &lt;tt class="docutils literal"&gt;model&lt;/tt&gt; attributte) and would just output
+its data with the correct options &amp;#8212; so instead of three &lt;tt class="docutils literal"&gt;Table&lt;/tt&gt; classes I&amp;#8217;d like to create
+just a single one with common options that would display its data (what &lt;tt class="docutils literal"&gt;render_table&lt;/tt&gt; does).&lt;/p&gt;
+&lt;p&gt;Unfortunately, I couldn&amp;#8217;t find a solution to this, since when I ommited the &lt;tt class="docutils literal"&gt;model&lt;/tt&gt; attribute
+from the &lt;tt class="docutils literal"&gt;Table&lt;/tt&gt; subclass nothing was outputed (there was no way to define fields to
+display without also defining the model). An obvious (and &lt;span class="caps"&gt;DRY&lt;/span&gt;) resolution would be to create
+a base &lt;tt class="docutils literal"&gt;Table&lt;/tt&gt; subclass that would define the needed options and create three subclasses
+that would inherit from this class and override only the &lt;tt class="docutils literal"&gt;model&lt;/tt&gt; attribute. This unfortunately was not
+possible becase &lt;a class="reference external" href="http://stackoverflow.com/questions/16696066/django-tables2-dynamically-adding-columns-to-table-not-adding-attrs-to-table/16741665#16741665"&gt;inheritance does not work well with django-tables2&lt;/a&gt;!&lt;/p&gt;
+&lt;p&gt;Furthermore, there&amp;#8217;s the extra hurdle of adding filtering to the above tables so that
+the admin&amp;#8217;s would be able to quickly find a log message - if we wanted to use django-filter
+we&amp;#8217;d need again to create three different subclasses (one for each log model type)
+of &lt;tt class="docutils literal"&gt;django_filter.FilterSet&lt;/tt&gt; since
+django-filter requires you to define the model for which the filter will be&amp;nbsp;created.&lt;/p&gt;
+&lt;p&gt;The best way to resolve such problems is to create your classes dynamically when
+you need &amp;#8216;em. I&amp;#8217;ve already described a way to &lt;a class="reference external" href="http://spapas.github.io/2013/12/24/django-dynamic-forms/"&gt;dynamically create forms in django
+in a previous post&lt;/a&gt;. Below, I&amp;#8217;ll describe
+a similar technique which can be used to create both dynamic tables and filters. Using
+this methodology, you&amp;#8217;ll be able to add a new &lt;span class="caps"&gt;CBV&lt;/span&gt; that displays a table with
+pagination, order and filtering for your model by just inheriting from a base&amp;nbsp;class!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="adding-the-dynamic-table"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id3"&gt;Adding the dynamic&amp;nbsp;table&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;To create the &lt;span class="caps"&gt;DRY&lt;/span&gt; &lt;span class="caps"&gt;CBV&lt;/span&gt; we&amp;#8217;ll use the &lt;a class="reference external" href="http://django-tables2.readthedocs.org/en/latest/pages/generic-mixins.html?highlight=singletableview"&gt;SingleTableView&lt;/a&gt; (&lt;tt class="docutils literal"&gt;django_tables2.SingleTableView&lt;/tt&gt;)
+as a base and override its &lt;tt class="docutils literal"&gt;get_table_class&lt;/tt&gt; method to dynamically create our table class
+using &lt;tt class="docutils literal"&gt;type&lt;/tt&gt;.
+Here&amp;#8217;s how it could be done using a mixin (notice that this mixin should be used in a
+&lt;tt class="docutils literal"&gt;SingleTableView&lt;/tt&gt; to override its &lt;tt class="docutils literal"&gt;get_table_class&lt;/tt&gt; method):&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class AddTableMixin(object, ):
+  table_pagination = {&amp;quot;per_page&amp;quot;: 25}
+
+  def get_table_class(self):
+      def get_table_column(field):
+          if isinstance(field, django.db.models.DateTimeField):
+              return tables.DateColumn(&amp;quot;d/m/Y H:i&amp;quot;)
+          else:
+              return tables.Column()
+
+      attrs = dict(
+          (f.name, get_table_column(f)) for
+          f in self.model._meta.fields if not f.name == 'id'
+      )
+      attrs['Meta'] = type('Meta', (), {'attrs':{&amp;quot;class&amp;quot;:&amp;quot;table&amp;quot;}, &amp;quot;order_by&amp;quot;: (&amp;quot;-created_on&amp;quot;, ) } )
+      klass = type('DTable', (tables.Table, ), attrs)
+
+      return klass
+&lt;/pre&gt;
+&lt;p&gt;Let&amp;#8217;s try to explain the &lt;tt class="docutils literal"&gt;get_table_class&lt;/tt&gt; method: First of all, we&amp;#8217;ve defined a local &lt;tt class="docutils literal"&gt;get_table_column&lt;/tt&gt;
+function that will return a django-tables2 column depending on the field of the model. For example, in
+our case we want to use a &lt;tt class="docutils literal"&gt;django_tables2.DateColumn&lt;/tt&gt; with a specific format when a &lt;tt class="docutils literal"&gt;DateTimeField&lt;/tt&gt; is
+encountered and for all other model fields just use the stock &lt;tt class="docutils literal"&gt;Column&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;After that, we create a dictionary with all the attributes of the model. The &lt;tt class="docutils literal"&gt;self.model&lt;/tt&gt; field will contain
+the model Class, so using its &lt;tt class="docutils literal"&gt;_meta.fields&lt;/tt&gt; will return the defined fields. As we can see, we just use
+a generator expression to create a tuple with the name of the field and its type (using &lt;tt class="docutils literal"&gt;get_table_class&lt;/tt&gt;)
+excluding the &amp;#8216;id&amp;#8217; column. So, attrs will be a dictionary of field names and&amp;nbsp;types.&lt;/p&gt;
+&lt;p&gt;The &lt;tt class="docutils literal"&gt;Meta&lt;/tt&gt; class of this table is crated using &lt;tt class="docutils literal"&gt;type&lt;/tt&gt; which creates a parentless class by defining all its attributes in a dictionary
+and set it as the &lt;tt class="docutils literal"&gt;Meta&lt;/tt&gt; key in the previously defined &lt;tt class="docutils literal"&gt;attrs&lt;/tt&gt; dict. Finally, we create the actual &lt;tt class="docutils literal"&gt;django_tables2.Table&lt;/tt&gt; subclass by
+inheriting from it and passing the &lt;tt class="docutils literal"&gt;attrs&lt;/tt&gt; dict. We&amp;#8217;ll see an example of what &lt;tt class="docutils literal"&gt;get_table_class&lt;/tt&gt; returns&amp;nbsp;later.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="creating-a-dynamic-form-for-filtering"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id4"&gt;Creating a dynamic form for&amp;nbsp;filtering&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Let&amp;#8217;s create another mixin that could be used to create a dynamic &lt;tt class="docutils literal"&gt;django.Form&lt;/tt&gt; subclass to the &lt;span class="caps"&gt;CBV&lt;/span&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class AddFormMixin(object, ):
+  def define_form(self):
+      def get_form_field(f):
+          return forms.CharField(required=False)
+
+      attrs = dict(
+          (f, get_form_field(f)) for
+          f in self.get_form_fields() )
+
+      klass = type('DForm', (forms.Form, ), attrs)
+
+      return klass
+
+  def get_queryset(self):
+      form_class = self.define_form()
+      if self.request.GET:
+          self.form = form_class(self.request.GET)
+      else:
+          self.form = form_class()
+
+      qs = super(AddFormMixin, self).get_queryset()
+
+      if self.form.data and self.form.is_valid():
+          q_objects = Q()
+          for f in self.get_form_fields():
+              q_objects &amp;amp;= Q(**{f+'__icontains':self.form.cleaned_data.get(f, '')})
+
+          qs = qs.filter(q_objects)
+
+      return qs
+
+  def get_context_data(self, **kwargs):
+      ctx = super(AddFormMixin, self).get_context_data(**kwargs)
+      ctx['form'] = self.form
+      return ctx
+&lt;/pre&gt;
+&lt;p&gt;The first method that will be called is the &lt;tt class="docutils literal"&gt;get_queryset&lt;/tt&gt; method that will generate the dynamic form
+using &lt;tt class="docutils literal"&gt;define_form&lt;/tt&gt;. This method has a get_form_fields local function (similar to get_table_fields)
+that can be used to override the types of the fields (or just fallback to a normal CharField) and
+then create the &lt;tt class="docutils literal"&gt;attrs&lt;/tt&gt; dictionary and &lt;tt class="docutils literal"&gt;forms.Form&lt;/tt&gt; subclass in a similar way as the &lt;tt class="docutils literal"&gt;Table&lt;/tt&gt; subclass. Here,
+we don&amp;#8217;t want to create a filter form from all fields of the model as we did on table, so instead
+we&amp;#8217;ll use a &lt;tt class="docutils literal"&gt;get_form_fields&lt;/tt&gt; method that returns the name of the fields that we want to
+use in the filtering form and needs to be defined in each &lt;span class="caps"&gt;CBV&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;The &lt;tt class="docutils literal"&gt;get_queryset&lt;/tt&gt; method is more interesting: First of all, since we are just filtering the
+queryset we&amp;#8217;d need to submit the form with a &lt;tt class="docutils literal"&gt;&lt;span class="caps"&gt;GET&lt;/span&gt;&lt;/tt&gt; (and not a &lt;tt class="docutils literal"&gt;&lt;span class="caps"&gt;POST&lt;/span&gt;&lt;/tt&gt;). We see that if we have
+data to our &lt;tt class="docutils literal"&gt;request.&lt;span class="caps"&gt;GET&lt;/span&gt;&lt;/tt&gt; dictionary we&amp;#8217;ll instantiate the form using this data (or else we&amp;#8217;ll just
+create an empty form). To do the actual filtering, we check if the form is valid and create a &lt;tt class="docutils literal"&gt;django.models.db.Q&lt;/tt&gt; object
+that is used to combine (by &lt;span class="caps"&gt;AND&lt;/span&gt;) the conditions. Each of the individual Q objects that will be combined
+to create the complete one will be created using the line &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;Q(**{f+'__icontains':self.form.cleaned_data.get(f,&lt;/span&gt; &lt;span class="pre"&gt;'')})&lt;/span&gt;&lt;/tt&gt;
+(where f will be the name of the field) which will create a dictionary of the form &lt;tt class="docutils literal"&gt;{'action__icontains': 'test text'}&lt;/tt&gt; and then pass this as a keyword
+argument to the Q (using the &lt;tt class="docutils literal"&gt;**&lt;/tt&gt; mechanism) - this is the only way to pass dynamic kwargs to a&amp;nbsp;function!&lt;/p&gt;
+&lt;p&gt;Finally, the queryset will be filtered using the combined &lt;tt class="docutils literal"&gt;Q&lt;/tt&gt; object we just&amp;nbsp;described.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="creating-the-dynamic-cbv"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt;Creating the dynamic &lt;span class="caps"&gt;CBV&lt;/span&gt;&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Using the above mixins, we can easily create a dynamic &lt;span class="caps"&gt;CBV&lt;/span&gt; with a table and a filter form only by inheriting from the mixins
+and &lt;tt class="docutils literal"&gt;SingleTableView&lt;/tt&gt; and defining the &lt;tt class="docutils literal"&gt;get_form_fields&lt;/tt&gt; method:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class AuditLogListView(AddTableMixin, AddFormMixin, SingleTableView):
+  model = AuditLog
+  context_object_name = 'logs'
+
+  def get_form_fields(self):
+      return ('action','user__username', )
+&lt;/pre&gt;
+&lt;p&gt;Let&amp;#8217;s suppose that the &lt;tt class="docutils literal"&gt;AuditLog&lt;/tt&gt; is defined as&amp;nbsp;following:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class AuditLog(models.Model):
+  created_on = models.DateTimeField( auto_now_add=True, editable=False,)
+  user = models.ForeignKey(settings.AUTH_USER_MODEL, editable=False,)
+  action = models.CharField(max_length=256, editable=False,)
+&lt;/pre&gt;
+&lt;p&gt;Using the above &lt;tt class="docutils literal"&gt;AuditLogListView&lt;/tt&gt;, a dynamic table and a dynamic form will be automaticall created whenever the view is visited.
+The &lt;tt class="docutils literal"&gt;Table&lt;/tt&gt; class will be like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class DTable(tables.Table):
+  created_on = tables.DateColumn(&amp;quot;d/m/Y H:i&amp;quot;)
+  user = tables.Column()
+  action = tables.Column()
+
+  class Meta:
+      attrs = {&amp;quot;class&amp;quot;:&amp;quot;table&amp;quot;}
+      order_by = (&amp;quot;-created_on&amp;quot;, )
+&lt;/pre&gt;
+&lt;p&gt;and the &lt;tt class="docutils literal"&gt;Form&lt;/tt&gt; class like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class DForm(forms.Form):
+  user__username = forms.CharField()
+  action = forms.CharField()
+&lt;/pre&gt;
+&lt;p&gt;An interesting thing to notice is that we can drill down to foreign keys (f.e. &lt;tt class="docutils literal"&gt;user__username&lt;/tt&gt;) to create more interesting filters. Also we could add some more
+methods to be overriden by the implementing class beyond the &lt;tt class="docutils literal"&gt;get_form_fields&lt;/tt&gt;. For example, instead of using &lt;tt class="docutils literal"&gt;self.model._meta.fields&lt;/tt&gt;
+to generate the fields of the table, we could instead use a &lt;tt class="docutils literal"&gt;get_table_fields&lt;/tt&gt; method that would be overriden in the implementing
+classes (and even drill down on foreign keys to display more data on the table using &lt;a class="reference external" href="http://django-tables2.readthedocs.org/en/latest/pages/accessors.html"&gt;accessors&lt;/a&gt;).&lt;/p&gt;
+&lt;p&gt;Or, instead of just passing the the form field names we could also pass their type (instead of using &lt;tt class="docutils literal"&gt;get_form_fields&lt;/tt&gt;) and
+their lookup method (instead of  &lt;tt class="docutils literal"&gt;icontains&lt;/tt&gt;) &amp;#8212; similar to&amp;nbsp;django-filter.&lt;/p&gt;
+&lt;p&gt;Please notice that instead of creating a django form instance for filtering, we could instead create a django-filter instance with
+a similar methodology. However, I preferred to just use a normal django form because it makes the whole process more clear and removes
+a level of abstraction (we just create a &lt;tt class="docutils literal"&gt;django.Form&lt;/tt&gt; subclass while, if we used django-filter we&amp;#8217;d need to create a django-filter subclass
+which would create a &lt;tt class="docutils literal"&gt;django.Form&lt;/tt&gt; subclass)!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="conclusion"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id6"&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Using the above technique we can quickly create a table and filter for a number of Models that all share
+the same properties in the most &lt;span class="caps"&gt;DRY&lt;/span&gt;. This technique of course is useful only for quick CBVs that
+are more or less the same and require little customization. Another interesting thing is that instead of
+creating different &lt;tt class="docutils literal"&gt;SingleTableView&lt;/tt&gt; s we could instead create a single &lt;span class="caps"&gt;CBV&lt;/span&gt; that will get the content type
+of the Model to be viewed as a parameter and retrieve the model (and queryset) from the content&amp;nbsp;type!&lt;/p&gt;
+&lt;/div&gt;
+</summary><category term="django"></category><category term="python"></category><category term="forms"></category><category term="tables"></category></entry><entry><title>A (little more) complex react and flux example</title><link href="http://spapas.github.io/2015/09/08/more-complex-react-flux-example/" rel="alternate"></link><updated>2015-09-08T12:55:00+03:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2015-09-08:2015/09/08/more-complex-react-flux-example/</id><summary type="html">&lt;div class="contents topic" id="contents"&gt;
+&lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id2"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#more-about-flux-components" id="id3"&gt;More about Flux&amp;nbsp;components&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#explaining-the-application-components" id="id4"&gt;Explaining the application&amp;nbsp;components&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#reusable-application-components" id="id5"&gt;Reusable application components&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#dropdown-react-js" id="id6"&gt;DropDown.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#datepicker-react-js" id="id7"&gt;DatePicker.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#pagingpanel-react-js" id="id8"&gt;PagingPanel.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#searchpanel-react-js" id="id9"&gt;SearchPanel.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#messagepanel" id="id10"&gt;MessagePanel&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#messagepanel-react-js" id="id11"&gt;MessagePanel.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#messagestore-js" id="id12"&gt;MessageStore.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#messageactions" id="id13"&gt;MessageActions&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#non-reusable-application-components" id="id14"&gt;Non-reusable application components&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#booktable-react-js" id="id15"&gt;BookTable.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#authordialog-react-js" id="id16"&gt;AuthorDialog.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#authorpanel-react-js" id="id17"&gt;AuthorPanel.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#statpanel-react-js" id="id18"&gt;StatPanel.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#bookform-react-js" id="id19"&gt;BookForm.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#bookpanel-react-js" id="id20"&gt;BookPanel.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#the-actions" id="id21"&gt;The&amp;nbsp;Actions&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#the-stores" id="id22"&gt;The Stores&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#id1" id="id23"&gt;MessageStore.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#authorstore-js" id="id24"&gt;AuthorStore.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#categorystore-js" id="id25"&gt;CategoryStore.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#bookstore-js" id="id26"&gt;BookStore.js&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#conclusion" id="id27"&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="introduction"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id2"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;In &lt;a class="reference external" href="http://spapas.github.io/2015/06/05/comprehensive-react-flux-tutorial/"&gt;previous&lt;/a&gt;
-&lt;a class="reference external" href="http://spapas.github.io/2015/06/05/comprehensive-react-flux-tutorial/"&gt;two&lt;/a&gt; parts of this series, we have seen
+&lt;a class="reference external" href="http://spapas.github.io/2015/07/02/comprehensive-react-flux-tutorial-2/"&gt;two&lt;/a&gt; parts of this series, we have seen
 how we could implement a
 not-so-simple single page application with full &lt;span class="caps"&gt;CRUD&lt;/span&gt; capabilities
 using react only (in the &lt;a class="reference external" href="http://spapas.github.io/2015/06/05/comprehensive-react-flux-tutorial/"&gt;first part&lt;/a&gt; ) and then how to
-change it to use the flux architecture (in the &lt;a class="reference external" href="http://spapas.github.io/2015/06/05/comprehensive-react-flux-tutorial/"&gt;second part&lt;/a&gt;).&lt;/p&gt;
+change it to use the flux architecture (in the &lt;a class="reference external" href="http://spapas.github.io/2015/07/02/comprehensive-react-flux-tutorial-2/"&gt;second part&lt;/a&gt;).&lt;/p&gt;
 &lt;p&gt;In this, third, part, we will
 add some more capabilities to the previous app
 to prove how easy it is to create complex apps
@@ -81,7 +1613,7 @@ a bunch of techniques such&amp;nbsp;as:&lt;/p&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
 &lt;div class="section" id="more-about-flux-components"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id4"&gt;More about Flux&amp;nbsp;components&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id3"&gt;More about Flux&amp;nbsp;components&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;Before delving into the source code of the above application, I&amp;#8217;d like to
 make crystal what is the proposed way to call methods in the flux chain
 and which types of components can include other types of components. Let&amp;#8217;s
@@ -204,7 +1736,7 @@ we want to make the component reusable (more on this&amp;nbsp;later).&lt;/p&gt;
 child components (a BookTable depends on a BookTableRow&amp;nbsp;etc).&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="explaining-the-application-components"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt;Explaining the application&amp;nbsp;components&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id4"&gt;Explaining the application&amp;nbsp;components&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;There are a lot of components that are needed for
 the above application. A bird&amp;#8217;s eye view of the components
 and their hierarchies can be seen on the following&amp;nbsp;figure:&lt;/p&gt;
@@ -214,7 +1746,7 @@ by other applications and after that the components that are specifically
 implemented for our book/author single page&amp;nbsp;application.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="reusable-application-components"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id6"&gt;Reusable application&amp;nbsp;components&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt;Reusable application&amp;nbsp;components&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;We can see that beyond the specific components (&lt;tt class="docutils literal"&gt;BookPanel&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;BookTable&lt;/tt&gt; etc)
 there&amp;#8217;s a bunch of more general components (&lt;tt class="docutils literal"&gt;DropDown&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;DatePicker&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;PagingPanel&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;SearchPanel&lt;/tt&gt;,
 &lt;tt class="docutils literal"&gt;MessagePanel&lt;/tt&gt;) that have names like they could be used by other applications (for example every application
@@ -222,7 +1754,7 @@ that wants to implement a DropDown could use our component) and not only by the
 Book-Author application. Let&amp;#8217;s take a quick look at these components and if they
 are actually&amp;nbsp;reusable:&lt;/p&gt;
 &lt;div class="section" id="dropdown-react-js"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id7"&gt;DropDown.react.js&lt;/a&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id6"&gt;DropDown.react.js&lt;/a&gt;&lt;/h3&gt;
 &lt;pre class="code literal-block"&gt;
 var React = require('react');
 
@@ -264,8 +1796,8 @@ would be to pass an identifier as a property for each dropdown and the dropdown 
 dropdown action and passing this identifier &amp;#8212; however I think that actually passing the callback is
 easier and makes the code much more&amp;nbsp;readable.&lt;/p&gt;
 &lt;/div&gt;
-&lt;div class="section" id="id1"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id8"&gt;DropDown.react.js&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="section" id="datepicker-react-js"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id7"&gt;DatePicker.react.js&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;The datepicker component has more or less the same structure as with the dropdown: It needs one parameter
 for its current value (&lt;tt class="docutils literal"&gt;props.value&lt;/tt&gt;) and another as the callback to the function when the date is
 changed (once again this is required to have a reusable&amp;nbsp;component):&lt;/p&gt;
@@ -298,7 +1830,7 @@ the component is mounted, we get its &lt;span class="caps"&gt;DOM&lt;/span&gt; c
 convert it to a datepicker. We also set its change function to be the passed&amp;nbsp;callback.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="pagingpanel-react-js"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id9"&gt;PagingPanel.react.js&lt;/a&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id8"&gt;PagingPanel.react.js&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;The paging panel is not actually a reusable component because it requires BookActions
 (to handle next and previous page clicks) - so
 it can&amp;#8217;t be used by Authors (if authors was a table that is). However, we can easily
@@ -343,7 +1875,7 @@ module.exports.PagingPanel = PagingPanel;
 &lt;p&gt;and just displayd the current page along with buttons to go to the next or previous page (if these buttons should be visible of&amp;nbsp;course).&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="searchpanel-react-js"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id10"&gt;SearchPanel.react.js&lt;/a&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id9"&gt;SearchPanel.react.js&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;The SearchPanel is another panel that could be reusable if we&amp;#8217;d passed a callbeck instead of calling the &lt;tt class="docutils literal"&gt;BookActions.search&lt;/tt&gt;
 action directly. The promise behavior has been explained in the previous posts and is needed to buffer the queries to the
 server when a user types his search&amp;nbsp;query.&lt;/p&gt;
@@ -408,14 +1940,14 @@ this consistent behavior (we&amp;#8217;d need to add two actions, one to handle 
 and another to handle the timeout firing &amp;#8212; making everythimg much more&amp;nbsp;complicated).&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="messagepanel"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id11"&gt;MessagePanel&lt;/a&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id10"&gt;MessagePanel&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;The MessagePanel is really interesting because it is a reusable component that actually has its own action and store module! This
 component can be reused in &lt;em&gt;different&lt;/em&gt; applications that need to display message but &lt;em&gt;not&lt;/em&gt; on the same application (because a single state
 is kept for all messages). If we wanted to use a different MessagePanel for Books or Authors then we&amp;#8217;d need to keep both in the
 state &lt;em&gt;and&lt;/em&gt; also it to the action to differentiate between messages for author and for book. Instead, by keeping a single Messages
 state for both Books and Authors we have a much more simple&amp;nbsp;version.&lt;/p&gt;
 &lt;div class="section" id="messagepanel-react-js"&gt;
-&lt;h4&gt;&lt;a class="toc-backref" href="#id12"&gt;MessagePanel.react.js&lt;/a&gt;&lt;/h4&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#id11"&gt;MessagePanel.react.js&lt;/a&gt;&lt;/h4&gt;
 &lt;p&gt;The MessagePanel component has a local state which responds to changes on MessageStore. When the
 state of MessageStore is changed the MessagePanel will be re-rendered with the new&amp;nbsp;message.&lt;/p&gt;
 &lt;pre class="code literal-block"&gt;
@@ -450,7 +1982,7 @@ module.exports.MessagePanel = MessagePanel;
 &lt;/pre&gt;
 &lt;/div&gt;
 &lt;div class="section" id="messagestore-js"&gt;
-&lt;h4&gt;&lt;a class="toc-backref" href="#id13"&gt;MessageStore.js&lt;/a&gt;&lt;/h4&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#id12"&gt;MessageStore.js&lt;/a&gt;&lt;/h4&gt;
 &lt;p&gt;The MessageStore has a (private) state containing a &lt;tt class="docutils literal"&gt;message&lt;/tt&gt; that gets updated
 only when the ccorresponding action is dispached. The store has a single state
 for all messages - it doesn&amp;#8217;t care if the messages are for books or&amp;nbsp;authors.&lt;/p&gt;
@@ -493,7 +2025,7 @@ module.exports.MessageStore = MessageStore;
 &lt;/pre&gt;
 &lt;/div&gt;
 &lt;div class="section" id="messageactions"&gt;
-&lt;h4&gt;&lt;a class="toc-backref" href="#id14"&gt;MessageActions&lt;/a&gt;&lt;/h4&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#id13"&gt;MessageActions&lt;/a&gt;&lt;/h4&gt;
 &lt;p&gt;Finally, there are two actions that are defined for the MessageStore: One for adding
 an ok message and one for adding an error message - both of which have the same
 message type (but pass a different color&amp;nbsp;parameter).&lt;/p&gt;
@@ -528,13 +2060,13 @@ module.exports.MessageActions = MessageActions;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="section" id="non-reusable-application-components"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id15"&gt;Non-reusable application&amp;nbsp;components&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id14"&gt;Non-reusable application&amp;nbsp;components&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;I don&amp;#8217;t want to discuss the source code for all the non-reusable components since some of them
 are more or less the same with the previous version and are easy to understand just by
 checking the source code (BookTableRow and ButtonPanel). However, I&amp;#8217;ll
 discuss the other, more complex components starting from the inside of the&amp;nbsp;react-onion:&lt;/p&gt;
 &lt;div class="section" id="booktable-react-js"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id16"&gt;BookTable.react.js&lt;/a&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id15"&gt;BookTable.react.js&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;I want to display this component to discuss how sorting is implemented: Each column has a key which,
 when passed to django-rest-framework will sort the results based on that key (the &lt;tt class="docutils literal"&gt;__&lt;/tt&gt; does a
 join so by &lt;tt class="docutils literal"&gt;author__last_name&lt;/tt&gt; we mean that we want to sort by the last_name field of the author
@@ -598,7 +2130,7 @@ of the function to the same object and only do the parameter&amp;nbsp;passing.&l
 either a + (for ascending) or - (for descending) in front of the column&amp;nbsp;title.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="authordialog-react-js"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id17"&gt;AuthorDialog.react.js&lt;/a&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id16"&gt;AuthorDialog.react.js&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;This is a handmade pop-up dialog that gets displayed when a new author is added (the + button is clicked)
 using only css to center it on the screen when it is displayed.
 We can see that it is either visible on invisible based on the &lt;tt class="docutils literal"&gt;showDialog&lt;/tt&gt; input property which actually
@@ -647,7 +2179,7 @@ module.exports.AuthorDialog = AuthorDialog ;
 &lt;/pre&gt;
 &lt;/div&gt;
 &lt;div class="section" id="authorpanel-react-js"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id18"&gt;AuthorPanel.react.js&lt;/a&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id17"&gt;AuthorPanel.react.js&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;The AuthorPanel displays the author select DropDown along with the + (add author) and
 - (delete author) buttons. It also contains the AuthorDialog which will be displayed
 or not depending on the value of the &lt;tt class="docutils literal"&gt;showDialog&lt;/tt&gt; property.&lt;/p&gt;
@@ -706,7 +2238,7 @@ module.exports.AuthorPanel = AuthorPanel;
 &lt;/ul&gt;
 &lt;/div&gt;
 &lt;div class="section" id="statpanel-react-js"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id19"&gt;StatPanel.react.js&lt;/a&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id18"&gt;StatPanel.react.js&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;The StatPanel is an interesting, read-only component that displays the number of
 authors and books. This component requests updates from both the &lt;tt class="docutils literal"&gt;BookStore&lt;/tt&gt; and
 &lt;tt class="docutils literal"&gt;AuthorStore&lt;/tt&gt; - when their state is updated the component will be re-rendered
@@ -770,7 +2302,7 @@ could be achieved with just a single change listener that would
 get both the books and&amp;nbsp;authors.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="bookform-react-js"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id20"&gt;BookForm.react.js&lt;/a&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id19"&gt;BookForm.react.js&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;The BookForm is one of the most complex panels of this application (along with BookPanel) because
 it actually contains a bunch of other panels and has some callbacks for them to&amp;nbsp;use.&lt;/p&gt;
 &lt;p&gt;We can see that, as explained before, when the current book form values are changed (through callbacks) the change_book action will be&amp;nbsp;called.&lt;/p&gt;
@@ -872,7 +2404,7 @@ the local state. The book that is edited is just passed as a property - actually
 property that this component needs to&amp;nbsp;work.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="bookpanel-react-js"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id21"&gt;BookPanel.react.js&lt;/a&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id20"&gt;BookPanel.react.js&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;Finally, BookPanel is the last component we&amp;#8217;ll talk about. This is the central component
 of the application - however we&amp;#8217;ll see that it is not very complex (since most user interaction
 is performed in other components). This component just listens on changes in the BookStore state
@@ -934,7 +2466,7 @@ module.exports.BookPanel = BookPanel ;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="section" id="the-actions"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id22"&gt;The&amp;nbsp;Actions&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id21"&gt;The&amp;nbsp;Actions&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;All actions are rather simple components without other dependencies as we&amp;#8217;ve already discussed. They
 just define &amp;quot;actions&amp;quot; (which are simple functions) that create the correct parameter object type and pass it
 to the dispatcher. The only attribute that is required for this object is the &lt;tt class="docutils literal"&gt;actionType&lt;/tt&gt; that
@@ -942,7 +2474,7 @@ should get a value from the constants. I won&amp;#8217;t go into any more detail
 the source code and all your questions will be&amp;nbsp;resolved.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="the-stores"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id23"&gt;The&amp;nbsp;Stores&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id22"&gt;The&amp;nbsp;Stores&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;First of all, all stores are defined through the following code that is already discussed in the previous&amp;nbsp;part:&lt;/p&gt;
 &lt;pre class="code literal-block"&gt;
 var MessageStore = $.extend({}, EventEmitter.prototype, {
@@ -970,8 +2502,8 @@ will be notified (their callback will be called) and will use
 to re-render and display the changes to the&amp;nbsp;store.&lt;/p&gt;
 &lt;p&gt;Let&amp;#8217;s now discuss the four stores defined &amp;#8212; I will include only the parts of each file that are
 actually interesting, for everything else &lt;em&gt;use the source Luke&lt;/em&gt;!&lt;/p&gt;
-&lt;div class="section" id="id2"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id24"&gt;MessageStore.js&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="section" id="id1"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id23"&gt;MessageStore.js&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;A very simple store that goes together with MessagePanel and MessageActions. It just keeps a state with
 the current message object and just changes this message when the MESSAGE_ADD message
 type is dispatched. After changing the message, the listeners (only one in this case) will be notified to
@@ -993,7 +2525,7 @@ MessageStore.dispatchToken = AppDispatcher.register(function(action) {
 &lt;/pre&gt;
 &lt;/div&gt;
 &lt;div class="section" id="authorstore-js"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id25"&gt;AuthorStore.js&lt;/a&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id24"&gt;AuthorStore.js&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;Here we see that the local state has an array of the authors and a &lt;tt class="docutils literal"&gt;showDialog&lt;/tt&gt; flag that
 controls the state of the add author popup. For the &lt;tt class="docutils literal"&gt;AUTHOR_ADD&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;HIDE_ADD_AUTHOR&lt;/tt&gt;
 cases of the dispatch we just change the state of this flag and emit the change; the &lt;tt class="docutils literal"&gt;BookForm&lt;/tt&gt;
@@ -1096,7 +2628,7 @@ AuthorStore.dispatchToken = AppDispatcher.register(function(action) {
 &lt;/pre&gt;
 &lt;/div&gt;
 &lt;div class="section" id="categorystore-js"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id26"&gt;CategoryStore.js&lt;/a&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id25"&gt;CategoryStore.js&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;The CategoryStore has an interesting functionality concerning the load_subcategory
 function. This function is called whenever a book is changed (so its category form field
 may be changed and the subcategories may be reloaded based on this category) or is edited
@@ -1175,7 +2707,7 @@ CategoryStore.dispatchToken = AppDispatcher.register(function(action) {
 &lt;/pre&gt;
 &lt;/div&gt;
 &lt;div class="section" id="bookstore-js"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id27"&gt;BookStore.js&lt;/a&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id26"&gt;BookStore.js&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;Here, beyond the book-related functionality we have also implemented the
 &lt;span class="caps"&gt;URL&lt;/span&gt; updating. The getUrlParameter that returns the value of a &lt;span class="caps"&gt;URL&lt;/span&gt; parameter has been taken from
 &lt;a class="reference external" href="http://stackoverflow.com/questions/19491336/get-url-parameter-jquery"&gt;http://stackoverflow.com/questions/19491336/get-url-parameter-jquery&lt;/a&gt;. Depending on the url parameters, we set some initial properties of
@@ -1319,7 +2851,7 @@ BookStore.dispatchToken = AppDispatcher.register(function(action) {
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="section" id="conclusion"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id28"&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id27"&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;The application presented here has a number of techniques that will help
 you when you actually try to create a more complex react flux application.
 I hope that in the whole three part series I&amp;#8217;ve thoroughly explained the
@@ -1554,7 +3086,8 @@ of instances in a single&amp;nbsp;server.&lt;/p&gt;
 application. The options in redis.conf that need to be changed per application
 is the port that this redis instance will bind (this port also needs to be passed to
 django settings.py) and the pid filename if you daemonize redis &amp;#8212; I recommend using
-a tool like &lt;a class="reference external" href="http://supervisord.org/"&gt;supervisord&lt;/a&gt; instead so that you won&amp;#8217;t need any daemonizing and pid files for&amp;nbsp;redis!&lt;/p&gt;
+a tool like &lt;a class="reference external" href="http://supervisord.org/"&gt;supervisord&lt;/a&gt; instead so that you won&amp;#8217;t need any daemonizing and pid files for
+each&amp;nbsp;per-app-redis-instance!&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="low-level-debugging"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id8"&gt;Low level&amp;nbsp;debugging&lt;/a&gt;&lt;/h2&gt;
@@ -1684,7 +3217,7 @@ learn &lt;a class="reference external" href="http://spapas.github.io/2015/05/27/
 &lt;/div&gt;
 &lt;div class="section" id="flux-components"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id2"&gt;Flux&amp;nbsp;components&lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;To implement the Flux architecture, an application needs to have at least a store and about&amp;nbsp;dispatcher.&lt;/p&gt;
+&lt;p&gt;To implement the Flux architecture, an application needs to have at least a store and a&amp;nbsp;dispatcher.&lt;/p&gt;
 &lt;p&gt;The store is the central place of truth for the application and the dispacher is the central
 place of communications. The store should hold the
 state (and any models/DAOs) of the application and notify the react components when this state is changed. Also,
@@ -1720,6 +3253,14 @@ as requirements for&amp;nbsp;browserify:&lt;/p&gt;
   &amp;quot;react&amp;quot;: &amp;quot;^0.13.3&amp;quot;,
   &amp;quot;reactify&amp;quot;: &amp;quot;^1.1.1&amp;quot;
 }
+&lt;/pre&gt;
+&lt;p&gt;Also, in order to be able to use &lt;span class="caps"&gt;JSX&lt;/span&gt; with browserify, will use the &lt;a class="reference external" href="https://github.com/andreypopp/reactify"&gt;reactify&lt;/a&gt; transform. To apply it to
+your project, change the &lt;tt class="docutils literal"&gt;scripts&lt;/tt&gt; of your &lt;tt class="docutils literal"&gt;package.json&lt;/tt&gt; to:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;quot;scripts&amp;quot;: {
+  &amp;quot;watch&amp;quot;: &amp;quot;watchify -v -d static/main.js -t reactify -o static/bundle.js&amp;quot;,
+  &amp;quot;build&amp;quot;: &amp;quot;browserify static/main.js -t reactify  | uglifyjs -mc warnings=false &amp;gt; static/bundle.js&amp;quot;
+},
 &lt;/pre&gt;
 &lt;div class="section" id="main-js"&gt;
 &lt;h3&gt;&lt;a class="toc-backref" href="#id4"&gt;main.js&lt;/a&gt;&lt;/h3&gt;
@@ -2291,9 +3832,11 @@ create a simple app, moving to something more complex (and especially debugging 
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;li&gt;&lt;a class="reference internal" href="#local-state" id="id14"&gt;Local&amp;nbsp;state&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#conclusion-to-the-first-part" id="id15"&gt;Conclusion to the first&amp;nbsp;part&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#adding-form-validation" id="id15"&gt;Adding form&amp;nbsp;validation&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#conclusion-to-the-first-part" id="id16"&gt;Conclusion to the first&amp;nbsp;part&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;Update 15/12/2015&lt;/strong&gt;: Added some insights for form&amp;nbsp;validation.&lt;/p&gt;
 &lt;div class="section" id="introduction"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id1"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;&lt;a class="reference external" href="https://facebook.github.io/react/"&gt;React&lt;/a&gt; is a rather new library from Facebook for building dynamic components for web pages.
@@ -2796,8 +4339,61 @@ just save it as a property of the global state object in &lt;tt class="docutils 
 correct. What wouldn&amp;#8217;t be correct is if we had two copies of the same information in both the
 states of &lt;tt class="docutils literal"&gt;BookPanel&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;BookForm&lt;/tt&gt;, for example the book id that is&amp;nbsp;edited.&lt;/p&gt;
 &lt;/div&gt;
+&lt;div class="section" id="adding-form-validation"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id15"&gt;Adding form&amp;nbsp;validation&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Commenter Nitish Kumar made a nice comment about how we could do some validating to our form&amp;nbsp;fields.&lt;/p&gt;
+&lt;p&gt;First of all, this adds to the complexity of the application so maybe it would be better to do it in
+the &lt;a class="reference external" href="http://spapas.github.io/2015/07/02/comprehensive-react-flux-tutorial-2/"&gt;flux-architectured version&lt;/a&gt;. However, it&amp;#8217;s not really difficult
+to also have form validation using&amp;nbsp;react-only:&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s what we&amp;nbsp;need:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;A property (or properties) to pass the errors for each form field to the &lt;tt class="docutils literal"&gt;BookForm&lt;/tt&gt; component&lt;/li&gt;
+&lt;li&gt;A way to display the form errors if they exist in &lt;tt class="docutils literal"&gt;BookForm&lt;/tt&gt;&lt;/li&gt;
+&lt;li&gt;Execute an error handler when the form contents change and update the state if there&amp;#8217;s an&amp;nbsp;error&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;As an example, I&amp;#8217;d like to check that the book title is not written in uppercase, so I will add another
+attribute to the &lt;tt class="docutils literal"&gt;book&lt;/tt&gt; propery of &lt;tt class="docutils literal"&gt;BookForm&lt;/tt&gt; called &lt;tt class="docutils literal"&gt;titleError&lt;/tt&gt; and display it if it is defined,
+something like&amp;nbsp;this:&lt;/p&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;{this.props.book.titleError?&amp;lt;div&amp;gt;{this.props.book.titleError}&amp;lt;/div&amp;gt;:null}&lt;/span&gt;&lt;/tt&gt;&lt;/p&gt;
+&lt;p&gt;Now, the &lt;tt class="docutils literal"&gt;handleChange&lt;/tt&gt; method of &lt;tt class="docutils literal"&gt;BookPanel&lt;/tt&gt; should do the actual check and change the sate, so I&amp;#8217;m
+changing it like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+handleChange: function(title, category) {
+    var titleError = undefined;
+    if(title.length &amp;gt; 1 &amp;amp;&amp;amp; title === title.toUpperCase()) {
+        titleError='Please don\'t use only capital letters for book titles';
+    }
+    this.setState({
+        editingBook: {
+            title: title,
+            titleError: titleError,
+            category: category,
+            id: this.state.editingBook.id
+        }
+    });
+},
+&lt;/pre&gt;
+&lt;p&gt;So, the titleError attribute of editingBook will be defined only if there&amp;#8217;s an&amp;nbsp;error.&lt;/p&gt;
+&lt;p&gt;Finally, we must remember to &lt;em&gt;not&lt;/em&gt; create/update the book if there&amp;#8217;s an error so
+we add the following check to the &lt;tt class="docutils literal"&gt;handleSubmitClick&lt;/tt&gt; method:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+if(this.state.editingBook.titleError) {
+    this.setState({
+        message: &amp;quot;Please fix errors!&amp;quot;
+    });
+    return ;
+}
+&lt;/pre&gt;
+&lt;p&gt;The above could be easily generalized for checks on multiple fields. I am not really fond
+of doing the form validation in the &lt;tt class="docutils literal"&gt;BookPanel&lt;/tt&gt; component (I&amp;#8217;d prefer to do it on &lt;tt class="docutils literal"&gt;BookForm&lt;/tt&gt;
+or even better on the corresponding field - if it was a component) however this would mean that
+I&amp;#8217;d need to keep a local state with the error to the &lt;tt class="docutils literal"&gt;BookForm&lt;/tt&gt; (please see the discussion of
+the previous&amp;nbsp;paragraph).&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ve added a new tag named &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;react-only-validation&lt;/span&gt;&lt;/tt&gt; to the &lt;a class="reference external" href="https://github.com/spapas/react-tutorial/"&gt;https://github.com/spapas/react-tutorial/&lt;/a&gt;
+repository that contains the changes to have the&amp;nbsp;validation.&lt;/p&gt;
+&lt;/div&gt;
 &lt;div class="section" id="conclusion-to-the-first-part"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id15"&gt;Conclusion to the first&amp;nbsp;part&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id16"&gt;Conclusion to the first&amp;nbsp;part&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;We just created a not-so-simple React single page application offering &lt;span class="caps"&gt;CRUD&lt;/span&gt; for an object.
 This application of course could be improved by adding a pagination component to the table,
 but I&amp;#8217;m going to leave that as an excersie to the reader: To do that, I propose to create
@@ -3770,9 +5366,10 @@ to help readers quickly test the concepts presented&amp;nbsp;here.&lt;/p&gt;
 &lt;li&gt;&lt;a class="reference internal" href="#id2" id="id18"&gt;Installation&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a class="reference internal" href="#id3" id="id19"&gt;Example&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a class="reference internal" href="#id4" id="id20"&gt;Usage&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#comparing-versions-with-django-reversion-compare" id="id21"&gt;Comparing versions with&amp;nbsp;django-reversion-compare&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#conclusion" id="id21"&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#conclusion" id="id22"&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
 &lt;div class="section" id="introduction"&gt;
@@ -3782,6 +5379,8 @@ need to know &lt;em&gt;who&lt;/em&gt; did the change, &lt;em&gt;when&lt;/em&gt; 
 In this post we will see three
 different solution in order to add this functionality in Django: doing it ourselves,
 using django-simple-history and using&amp;nbsp;django-reversion.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Update 24/09/2015:&lt;/em&gt; Added a paragraph describing the django-reversion-compare which is
+a great addon for django-reversion that makes finding differences between versions a&amp;nbsp;breeze!&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="adding-simple-auditing-functionality-ourselves"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id6"&gt;Adding simple auditing functionality&amp;nbsp;ourselves&lt;/a&gt;&lt;/h2&gt;
@@ -4074,12 +5673,26 @@ def get_versions(self):
 &lt;li&gt;get the date of the change through the &lt;tt class="docutils literal"&gt;revision.date_created&lt;/tt&gt; attribute&lt;/li&gt;
 &lt;li&gt;get the values of the object fields as they were in this revision using the &lt;tt class="docutils literal"&gt;field_dict&lt;/tt&gt; attribute&lt;/li&gt;
 &lt;li&gt;get a model instance as it was on that revision using the &lt;tt class="docutils literal"&gt;object_version.object&lt;/tt&gt; attribute&lt;/li&gt;
-&lt;li&gt;revert to that previous version of that object using the &lt;tt class="docutils literal"&gt;rever()&lt;/tt&gt; method&lt;/li&gt;
+&lt;li&gt;revert to that previous version of that object using the &lt;tt class="docutils literal"&gt;revert()&lt;/tt&gt; method&lt;/li&gt;
 &lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="comparing-versions-with-django-reversion-compare"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id21"&gt;Comparing versions with&amp;nbsp;django-reversion-compare&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;A great addon for django-version is &lt;a class="reference external" href="github.com/jedie/django-reversion-compare"&gt;django-reversion-compare&lt;/a&gt; which helps you find out differences
+between versions of your objects. When you use django-reversion-compare, you&amp;#8217;ll be able to select
+two (different) versions of your object and you&amp;#8217;ll be presented with a list of all the differences
+found in the fields of that object between the two versions. The diff algorithm is smart, so you&amp;#8217;ll
+be able to easily recognise the&amp;nbsp;changes.&lt;/p&gt;
+&lt;p&gt;To use django-reversion-compare, after installing it you should just inherit your admin views from
+&lt;tt class="docutils literal"&gt;reversion_compare.admin.CompareVersionAdmin&lt;/tt&gt; (instead of &lt;tt class="docutils literal"&gt;reversion.VersionAdmin&lt;/tt&gt;) and you&amp;#8217;ll
+get the reversion-compare views instead of reversion views in the admin for the history of the&amp;nbsp;object.&lt;/p&gt;
+&lt;p&gt;Also, in case you need to give access to normal, non-admin users to the history of an object (this is
+useful for auditing reasons), you can use the &lt;tt class="docutils literal"&gt;reversion_compare.views.HistoryCompareDetailView&lt;/tt&gt;
+as a normal &lt;tt class="docutils literal"&gt;DetailView&lt;/tt&gt; to create a non-admin history and compare diff&amp;nbsp;view.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="section" id="conclusion"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id21"&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id22"&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;In the above we say that it is really easy to add basic (&lt;em&gt;who&lt;/em&gt; and &lt;em&gt;when&lt;/em&gt;) auditing capabilities to your models: You just need to
 inherit your models from the &lt;tt class="docutils literal"&gt;Auditable&lt;/tt&gt; abstract class and inherit your Create and Update CBVs from &lt;tt class="docutils literal"&gt;AuditableMixin&lt;/tt&gt;.
 If you want to know exactly &lt;em&gt;what&lt;/em&gt; was changed then you have two solutions: django-simple-history to create an extra table for
@@ -4090,27 +5703,7 @@ django-reversion to save each version as a json object, so no extra tables will 
 do a migrate (&lt;tt class="docutils literal"&gt;python manage.py migrate&lt;/tt&gt; &amp;#8212; uses sqlite3 by default) and run the local development
 server (&lt;tt class="docutils literal"&gt;python manage.py ruinserver&lt;/tt&gt;).&lt;/p&gt;
 &lt;/div&gt;
-</summary><category term="django"></category><category term="python"></category><category term="auditing"></category></entry><entry><title>Change the primary color of bootstrap material design</title><link href="http://spapas.github.io/2014/12/16/change-bootstrap-material-primary-color/" rel="alternate"></link><updated>2014-12-16T16:20:00+02:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2014-12-16:2014/12/16/change-bootstrap-material-primary-color/</id><summary type="html">&lt;div class="section" id="warning-updated-on-05-february-2015"&gt;
-&lt;h2&gt;Warning - updated on 05 February&amp;nbsp;2015&lt;/h2&gt;
-&lt;p&gt;I recently noticed (to my surprise) that bootstrap-material-design has a not-very-open license
-(&lt;a class="reference external" href="https://github.com/FezVrasta/bootstrap-material-design/blob/master/LICENSE.md"&gt;https://github.com/FezVrasta/bootstrap-material-design/blob/master/&lt;span class="caps"&gt;LICENSE&lt;/span&gt;.md&lt;/a&gt;).
-Quoting from&amp;nbsp;there:&lt;/p&gt;
-&lt;blockquote&gt;
-You can use this software for free only for no-profit projects. If you&amp;#8217;d like to use this software in a commercial project you may contact the author (Federico Zivolo) of the software and ask for his permission and fulfill his conditions.&lt;/blockquote&gt;
-&lt;p&gt;This is a more general comment, but for me, if you want to develop an open source
-project and receive contributions from people not belonging to your company then you
-&lt;em&gt;need&lt;/em&gt; to have a real Open Source License like Apache, &lt;span class="caps"&gt;MIT&lt;/span&gt;, &lt;span class="caps"&gt;BSD&lt;/span&gt; or &lt;span class="caps"&gt;LGPL&lt;/span&gt; (no, I don&amp;#8217;t
-consider &lt;span class="caps"&gt;GPL&lt;/span&gt; to be really &lt;em&gt;open&lt;/em&gt;).&lt;/p&gt;
-&lt;p&gt;When people are contributing to an open source project they are doing it because most
-of the times they want to use this project and &lt;em&gt;their&lt;/em&gt; contributions to their own
-projects which (most probably) are commercial, so people contributing to
-bootstrap-material-design won&amp;#8217;t be able to use it in their own&amp;nbsp;projects!&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;After this, I recommend people to avoid contributing to and stop using bootstrap-material-design
-for their own&amp;nbsp;projects.&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;Instead, they should either use vanilla bootstrap, or a (&lt;span class="caps"&gt;MIT&lt;/span&gt; licensed) theme from &lt;a class="reference external" href="https://bootswatch.com/"&gt;bootswatch&lt;/a&gt;. Also,
-I&amp;#8217;ve noticed (but not used yet) &lt;a class="reference external" href="https://github.com/viewflow/django-material"&gt;django-material&lt;/a&gt; which seems like a nice solution for django&amp;nbsp;projects.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class="section" id="introduction"&gt;
+</summary><category term="django"></category><category term="python"></category><category term="auditing"></category></entry><entry><title>Change the primary color of bootstrap material design</title><link href="http://spapas.github.io/2014/12/16/change-bootstrap-material-primary-color/" rel="alternate"></link><updated>2014-12-16T16:20:00+02:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2014-12-16:2014/12/16/change-bootstrap-material-primary-color/</id><summary type="html">&lt;div class="section" id="introduction"&gt;
 &lt;h2&gt;Introduction&lt;/h2&gt;
 &lt;p&gt;&lt;a class="reference external" href="https://github.com/FezVrasta/bootstrap-material-design"&gt;Bootstrap Material Design&lt;/a&gt; is a great theme that sits on top of &lt;a class="reference external" href="http://getbootstrap.com/"&gt;Bootstrap&lt;/a&gt; and transforms it to
 &lt;a class="reference external" href="http://www.google.com/design/spec/material-design/introduction.html"&gt;Material Design&lt;/a&gt;! The great thing about Bootstrap Material Design is that you just need to include
@@ -4151,6 +5744,16 @@ in the same folder as with &lt;tt class="docutils literal"&gt;bower.json&lt;/tt&
 &lt;/pre&gt;
 &lt;p&gt;(I wanted to use the indigo color as my primary one - you may of course use whichever color from the ones defined in &lt;tt class="docutils literal"&gt;less/_variables.less&lt;/tt&gt; you&amp;nbsp;like)&lt;/p&gt;
 &lt;p&gt;This file may contain other default values for variables - if I find anything useful I will add it to this post (also please reply with any&amp;nbsp;recommendations).&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Update 13/10/2015&lt;/strong&gt; After a request from commenter Jofferson Ramirez Tiquez, here&amp;#8217;s a custom.less that overrides more colors from &lt;tt class="docutils literal"&gt;_variables.css&lt;/tt&gt;
+(beyond the primary color, it changes the success color to teal and info and warning to the corresponding hex color&amp;nbsp;values):&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;#64;import &amp;quot;less/material.less&amp;quot;;
+
+&amp;#64;primary: &amp;#64;indigo;
+&amp;#64;success: &amp;#64;teal;
+&amp;#64;info: #CFD8DC;
+&amp;#64;warning:#455A64;
+&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div class="section" id="step-5-create-your-custom-material-css-file"&gt;
 &lt;h2&gt;Step 5: Create your custom material css&amp;nbsp;file&lt;/h2&gt;
@@ -6109,6 +7712,7 @@ D:\testgit&amp;gt;git branch
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;li&gt;&lt;a class="reference internal" href="#hosting-in-github-pages" id="id8"&gt;Hosting in github&amp;nbsp;pages&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#publishing-changes" id="id9"&gt;Publishing&amp;nbsp;changes&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
 &lt;div class="section" id="introduction"&gt;
@@ -6281,5 +7885,34 @@ spapas.github.io&amp;gt;git push origin source
 branch to it. Now you will have two branches in your username.github.io repository. One
 named origin/master that will be your actual site and will be displayed through &lt;a class="reference external" href="http://username.github.io"&gt;http://username.github.io&lt;/a&gt; and one named origin/source that will contain the source of your&amp;nbsp;site.&lt;/p&gt;
 &lt;p&gt;To learn more about branches and remotes you may check out &lt;a class="reference external" href="http://spapas.github.io/2013/10/08/git-branches/"&gt;the git branches article&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="publishing-changes"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id9"&gt;Publishing&amp;nbsp;changes&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Whenever you need to publish a new article or do changes to an existing one, you need to do the&amp;nbsp;following:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Run pelpub.bat to create the new&amp;nbsp;output&lt;/li&gt;
+&lt;li&gt;Add/commit and push changes from your pelican site(source) folder to the source&amp;nbsp;remote&lt;/li&gt;
+&lt;li&gt;Add/commit and push changes from your output folder to the master&amp;nbsp;remote&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;To help with this, here&amp;#8217;s a ghdeploy.bat file that does all the&amp;nbsp;above:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+call pelpub.bat
+git add -A
+git commit -m &amp;quot;Deploying changes&amp;quot;
+git push origin source
+pushd output
+git add -A
+git commit -m &amp;quot;Deploying changes&amp;quot;
+git push origin master
+popd
+&lt;/pre&gt;
+&lt;p&gt;If you&amp;#8217;ve followed this far, by running &lt;tt class="docutils literal"&gt;pelpub.bat&lt;/tt&gt; you&amp;#8217;ll need to enter your github repository credentials (twice) and then
+everything (source and master) will be deployed! To make things even better, I propose to use &lt;a class="reference external" href="https://help.github.com/articles/generating-ssh-keys/"&gt;ssh based authentication&lt;/a&gt;
+to your github account and add new remote names to your source and master by running the&amp;nbsp;following:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+git remote add origin2 git&amp;#64;github.com:spapas/spapas.github.io.git
+&lt;/pre&gt;
+&lt;p&gt;to your pelican site and the output directories. After you change ghdeploy.bat to use &lt;tt class="docutils literal"&gt;origin2&lt;/tt&gt; instead of &lt;tt class="docutils literal"&gt;origin&lt;/tt&gt; you&amp;#8217;ll be
+able to deploy everything with just running it without entering any&amp;nbsp;credentials!&lt;/p&gt;
 &lt;/div&gt;
 </summary><category term="static-html"></category><category term="github.io"></category><category term="github"></category><category term="pelican"></category><category term="windows"></category><category term="python"></category><category term="github-pages"></category><category term="rst"></category></entry></feed>

@@ -1458,32 +1458,30 @@ a ``changePageAndLoadBooks`` thunk action creator that would call these two meth
     
 .. code::
 
-    class BookPanel extends React.Component {
-        render() {
-            const { rows, count, page, sorting, search } = this.props.books;
-            const { loadBooks, changePage, toggleSortingAndLoadBooks, changeSearchAndLoadBooks  } = this.props;
-            
-            const onSearchChanged = query => changeSearchAndLoadBooks(query)
-            const sort_method = key => () => toggleSortingAndLoadBooks(key)
-            const cols = getCols(sort_method)
+    const BookPanel = (props) => {
+        const { rows, count, page, sorting, search } = props.books;
+        const { loadBooks, changePage, toggleSortingAndLoadBooks, changeSearchAndLoadBooks  } = props;
+        
+        const onSearchChanged = query => changeSearchAndLoadBooks(query)
+        const sort_method = key => () => toggleSortingAndLoadBooks(key)
+        const cols = getCols(sort_method)
 
-            return <div>
-                <BookSearchPanel search={search} onSearchChanged={onSearchChanged} />
-                <div className="row">
-                    <div className="twelve columns">
-                        <h3>Book list <Link className='button button-primary' style={{fontSize:'1em'}} to="/book_create/">+</Link></h3>
-                        <Table sorting={sorting} cols={cols} rows={rows} />
-                    </div>
+        return <div>
+            <BookSearchPanel search={search} onSearchChanged={onSearchChanged} />
+            <div className="row">
+                <div className="twelve columns">
+                    <h3>Book list <Link className='button button-primary' style={{fontSize:'1em'}} to="/book_create/">+</Link></h3>
+                    <Table sorting={sorting} cols={cols} rows={rows} />
                 </div>
-                <PagingPanel count={count} page={page} onNextPage={() => {
-                    changePage(page+1);
-                    loadBooks()
-                }} onPreviousPage={ () => {
-                    changePage(page-1);
-                    loadBooks()
-                }} />
             </div>
-        }
+            <PagingPanel count={count} page={page} onNextPage={() => {
+                changePage(page+1);
+                loadBooks()
+            }} onPreviousPage={ () => {
+                changePage(page-1);
+                loadBooks()
+            }} />
+        </div>
     }
 
     const mapStateToProps = state => ({
@@ -1723,6 +1721,230 @@ passing it the value we want to give to ``total_pages``. This way, the ``total_p
 have a value in the inner function! 
 
 Now ``PagingPanel`` is also a completely functional function component!
+
+components/BookForm
+===================
+
+The last book-related component is ``BookForm``. This component is used to both create and update
+a book. It also has a delete button for removing books. To decide if this is a create or an
+update form, it relies on the parameter passed from the route - remember how the two routes have
+been defined in ``main.js``:
+
+.. code::
+
+    <Route path="/book_create/" component={BookForm} />
+    <Route path="/book_update/:id" component={BookForm} />
+
+So the difference between create and update is that update will contain the ``id`` of the book to be
+updated in the url. This (along with any other url parameters) is passed by react-router as a property
+through an object named ``params`` to the ``BookForm`` component, so, when updating the ``props.params.id``
+should have a value.
+
+The ``BookForm`` is a connected component, however because it is also a redux-form, a special
+method (``reduxForm``) is used to connect the component and pass the form-related props to the component:
+
+.. code:: 
+
+    const mapStateToProps = (state, props) => {
+        let initial = {}
+        const { book } = state.books
+        
+        if(props.params.id && book) {
+            initial = book
+        }
+
+        return {
+            book: state.books.book,
+            categories: state.categories,
+            authors: state.authors,
+            ui: state.ui,
+            initialValues: initial,
+        }
+    };
+
+    export default reduxForm({
+        form: 'bookForm',
+        fields: ['title', 'category', 'subcategory', 'publish_date', 'author' ],
+        validate
+    }, mapStateToProps)(BookForm);
+    
+The ``mapStateToProps`` contains a bunch of required things from the state (we need
+the current ``book`` that is edited, the ``categories`` to select from, the ``authors`` to also
+select from and the ``ui`` to find out if submitting has finished). Beyond these, we see
+that there's an ``initialValues`` attribute to the object returned from ``mapStateToProps``. This
+attribute should be an object with valus to initialize the form fields. So if our form has 
+fields named ``title`` and ``category`` the ``initial`` object should also have ``title`` and
+``category`` attributes so that the form fields would be initialized. In our case, we just
+check if the ``props.params.id`` method is defined and the to-be-updated book has been loaded
+to the state and assign the to-be-updated ``book`` to ``initialValues``.
+
+The ``reduxForm`` method is used to ``connect`` the form component: Beyond the usual 
+``mapStateToProps`` and ``mapDispatchToProps`` (we don't use ``mapDispatchToProps`` here),
+it retrieves a required parameter which is the object used to initialize the form: This
+object should have 
+
+* A ``form`` attribute with the name of the form. This must be unique among all forms in your application
+* A ``fields`` string array with the names of the form fields
+* A optional ``validate`` attribute that is a function that will be called when the form fields are changed 
+
+The validate functon gets an object with the field names with their corresponding values as attributes and 
+should return another object with the field names that have an error and the error message. In our case,
+we want the ``title`` to be required, so the ``validate`` is:
+
+.. code::
+
+    const validate = values => {
+        const errors = {};
+        if (!values.title) {
+            errors.title = 'Required';
+        }
+        return errors;
+    }
+
+This validate function is called *whenever a form field is changed* so, depending on the implementation
+of course, the error messages will be displayed and hidden as the user types in the fields. Please notice
+that when the user starts typing in a field in an empty form, this field may be valid but all other
+fields will be empty - to avoid displaying an error message for fields that the user has not been yet
+been able to modify, then we have to use a the ``touched`` property of each field -- only display the
+field's error message if this field has been ``touched``. When the form is submitted all fields are
+changed to ``touched`` so all error messages will be displayed.
+
+The internal ``BookForm`` is an ES6 class based component that needs to do some things
+when the ``componentDidMount`` method is called:
+
+* Check if the categories have been loaded - if not dispatch the ``loadCategories`` action
+* Check if the this is an update and if yes, check to see if the to-be-updated book needs to be loaded and, if it needs dispatch ``loadBook`` with the book's id
+
+.. code::
+
+    class BookForm extends React.Component {
+    
+        componentDidMount() {
+            if(this.props.categories.categories.length==0) {
+                this.props.dispatch(loadCategories());
+            }
+            
+            if (this.props.params.id) {
+                if(!this.props.book || this.props.book.id != this.props.params.id) {
+                    this.props.dispatch(loadBook(this.props.params.id));
+                }
+            } else {
+                // New book 
+            }
+        }
+
+        render() {
+            const {fields: {
+                title, category, subcategory, publish_date, author
+            }, handleSubmit, dispatch } = this.props;
+            const { id } = this.props.params;
+            const { isSubmitting } = this.props.ui;
+            const { categories, subcategories } = this.props.categories;
+            const authors = this.props.authors.rows;
+            
+            const tsubmit = submit.bind(undefined,id);
+            const dsubmit = del.bind(undefined,id, dispatch);
+
+            return <form   onSubmit={handleSubmit(tsubmit) }>
+                <div className='row'>
+                    <div className='six columns'>
+                        <Input label='Title' field={title} />
+                    </div>
+                </div>
+                <div className='row'>
+                    <div className='six columns'>
+                        <Select label='Category' field={category} options={categories} onChange={ event => {
+                            category.onChange(event);
+                            dispatch(loadSubCategories(event.target.value))
+                        }}/>
+                    </div>
+                    <div className='six columns'>
+                        <Select label='Subcategory' field={subcategory} options={subcategories} />
+                    </div>
+                </div>
+                
+                <div className='row'>
+                    <div className='six columns'>
+                        <label forHtml='publish_date'>Publish Date</label>
+                        <DatePicker className="u-full-width" {...publish_date} />
+                    </div>
+                    <div className='six columns'>
+                        <label forHtml='author'>Author</label>
+                        <select type='text' className="u-full-width" {...author} >
+                            <option></option>
+                            {authors.map(a => <option value={a.id} key={a.id} >{a.last_name} {a.first_name}</option>)}
+                        </select>
+                    </div>
+                </div>
+                
+                <button disabled={isSubmitting} className='button button-primary' onClick={handleSubmit(tsubmit)}>
+                    Save
+                </button> 
+                {id?<button disabled={isSubmitting} type='button' className='button button-primary' style={{backgroundColor: danger}} onClick={dsubmit}>
+                    Delete
+                </button>:null}
+            </form>
+        }
+    };
+
+The ``render`` method of ``BookForm`` ...........
+    
+.. code::
+
+    const submit = (id, values, dispatch) => {
+        let url = '//127.0.0.1:8000/api/books/'
+        let type = 'POST'
+
+        if(id) {
+            url = `//127.0.0.1:8000/api/books/${id}/`
+            type = 'PUT'
+        }
+        
+        dispatch(submittingChanged(true))
+        
+        $.ajax({
+            type,
+            url,
+            data: values,
+            success: (d) => {
+                dispatch(submittingChanged(false))
+                dispatch(showSuccessNotification('Success!'))
+                if(id) {
+                    dispatch(updateBookResult(d))
+                } else {
+                    dispatch(addBookResult(d))
+                }
+                dispatch(routeActions.push('/'));
+
+            },
+            error: (d) => {
+                dispatch(submittingChanged(false))
+                console.log(d);
+                dispatch(showErrorNotification(`Error (${d.status} - ${d.statusText}) while saving: ${d.responseText}` ))
+            }
+        });
+    };
+
+    const del = (id, dispatch) => {
+        const url = `//127.0.0.1:8000/api/books/${id}/`
+        const type='DELETE';
+        $.ajax({
+            type,
+            url,
+            success: (d) => {
+                
+                dispatch(showSuccessNotification('Success!'))
+                dispatch(deleteBookResult(id))
+                dispatch(routeActions.push('/'));
+
+            },
+            error: (d) => {
+                dispatch(showErrorNotification(`Error (${d.status} - ${d.statusText}) while saving: ${d.responseText}` ))
+            }
+        });
+    };
+
+
 
 Conslusion
 ----------

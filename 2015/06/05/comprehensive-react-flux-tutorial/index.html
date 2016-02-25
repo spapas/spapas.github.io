@@ -99,9 +99,11 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#local-state" id="id14">Local&nbsp;state</a></li>
-<li><a class="reference internal" href="#conclusion-to-the-first-part" id="id15">Conclusion to the first&nbsp;part</a></li>
+<li><a class="reference internal" href="#adding-form-validation" id="id15">Adding form&nbsp;validation</a></li>
+<li><a class="reference internal" href="#conclusion-to-the-first-part" id="id16">Conclusion to the first&nbsp;part</a></li>
 </ul>
 </div>
+<p><strong>Update 15/12/2015</strong>: Added some insights for form&nbsp;validation.</p>
 <div class="section" id="introduction">
 <h2><a class="toc-backref" href="#id1">Introduction</a></h2>
 <p><a class="reference external" href="https://facebook.github.io/react/">React</a> is a rather new library from Facebook for building dynamic components for web pages.
@@ -604,8 +606,61 @@ just save it as a property of the global state object in <tt class="docutils lit
 correct. What wouldn&#8217;t be correct is if we had two copies of the same information in both the
 states of <tt class="docutils literal">BookPanel</tt> and <tt class="docutils literal">BookForm</tt>, for example the book id that is&nbsp;edited.</p>
 </div>
+<div class="section" id="adding-form-validation">
+<h2><a class="toc-backref" href="#id15">Adding form&nbsp;validation</a></h2>
+<p>Commenter Nitish Kumar made a nice comment about how we could do some validating to our form&nbsp;fields.</p>
+<p>First of all, this adds to the complexity of the application so maybe it would be better to do it in
+the <a class="reference external" href="http://spapas.github.io/2015/07/02/comprehensive-react-flux-tutorial-2/">flux-architectured version</a>. However, it&#8217;s not really difficult
+to also have form validation using&nbsp;react-only:</p>
+<p>Here&#8217;s what we&nbsp;need:</p>
+<ul class="simple">
+<li>A property (or properties) to pass the errors for each form field to the <tt class="docutils literal">BookForm</tt> component</li>
+<li>A way to display the form errors if they exist in <tt class="docutils literal">BookForm</tt></li>
+<li>Execute an error handler when the form contents change and update the state if there&#8217;s an&nbsp;error</li>
+</ul>
+<p>As an example, I&#8217;d like to check that the book title is not written in uppercase, so I will add another
+attribute to the <tt class="docutils literal">book</tt> propery of <tt class="docutils literal">BookForm</tt> called <tt class="docutils literal">titleError</tt> and display it if it is defined,
+something like&nbsp;this:</p>
+<p><tt class="docutils literal"><span class="pre">{this.props.book.titleError?&lt;div&gt;{this.props.book.titleError}&lt;/div&gt;:null}</span></tt></p>
+<p>Now, the <tt class="docutils literal">handleChange</tt> method of <tt class="docutils literal">BookPanel</tt> should do the actual check and change the sate, so I&#8217;m
+changing it like&nbsp;this:</p>
+<pre class="code literal-block">
+handleChange: function(title, category) {
+    var titleError = undefined;
+    if(title.length &gt; 1 &amp;&amp; title === title.toUpperCase()) {
+        titleError='Please don\'t use only capital letters for book titles';
+    }
+    this.setState({
+        editingBook: {
+            title: title,
+            titleError: titleError,
+            category: category,
+            id: this.state.editingBook.id
+        }
+    });
+},
+</pre>
+<p>So, the titleError attribute of editingBook will be defined only if there&#8217;s an&nbsp;error.</p>
+<p>Finally, we must remember to <em>not</em> create/update the book if there&#8217;s an error so
+we add the following check to the <tt class="docutils literal">handleSubmitClick</tt> method:</p>
+<pre class="code literal-block">
+if(this.state.editingBook.titleError) {
+    this.setState({
+        message: &quot;Please fix errors!&quot;
+    });
+    return ;
+}
+</pre>
+<p>The above could be easily generalized for checks on multiple fields. I am not really fond
+of doing the form validation in the <tt class="docutils literal">BookPanel</tt> component (I&#8217;d prefer to do it on <tt class="docutils literal">BookForm</tt>
+or even better on the corresponding field - if it was a component) however this would mean that
+I&#8217;d need to keep a local state with the error to the <tt class="docutils literal">BookForm</tt> (please see the discussion of
+the previous&nbsp;paragraph).</p>
+<p>I&#8217;ve added a new tag named <tt class="docutils literal"><span class="pre">react-only-validation</span></tt> to the <a class="reference external" href="https://github.com/spapas/react-tutorial/">https://github.com/spapas/react-tutorial/</a>
+repository that contains the changes to have the&nbsp;validation.</p>
+</div>
 <div class="section" id="conclusion-to-the-first-part">
-<h2><a class="toc-backref" href="#id15">Conclusion to the first&nbsp;part</a></h2>
+<h2><a class="toc-backref" href="#id16">Conclusion to the first&nbsp;part</a></h2>
 <p>We just created a not-so-simple React single page application offering <span class="caps">CRUD</span> for an object.
 This application of course could be improved by adding a pagination component to the table,
 but I&#8217;m going to leave that as an excersie to the reader: To do that, I propose to create
@@ -656,19 +711,19 @@ complex client-side&nbsp;applications!</p>
     <h1>Recent Posts</h1>
     <ul id="recent_posts">
       <li class="post">
+          <a href="http://spapas.github.io/2015/12/22/ajax-with-react-fixed-data-table/">Ajax data with Fixed Data Table for React</a>
+      </li>
+      <li class="post">
+          <a href="http://spapas.github.io/2015/11/27/pdf-in-django/">PDFs in Django: The essential guide</a>
+      </li>
+      <li class="post">
+          <a href="http://spapas.github.io/2015/11/16/using-browserify-es6/">Improve your client-side-javascript workflow more by using ES6</a>
+      </li>
+      <li class="post">
+          <a href="http://spapas.github.io/2015/10/05/django-dynamic-tables-similar-models/">Django dynamic tables and filters for similar models</a>
+      </li>
+      <li class="post">
           <a href="http://spapas.github.io/2015/09/08/more-complex-react-flux-example/">A (little more) complex react and flux example</a>
-      </li>
-      <li class="post">
-          <a href="http://spapas.github.io/2015/09/01/django-rq-redux/">django-rq redux: advanced techniques and tools</a>
-      </li>
-      <li class="post">
-          <a href="http://spapas.github.io/2015/07/02/comprehensive-react-flux-tutorial-2/">A comprehensive React and Flux tutorial part 2: Flux</a>
-      </li>
-      <li class="post">
-          <a href="http://spapas.github.io/2015/06/05/comprehensive-react-flux-tutorial/">A comprehensive React and Flux tutorial part 1: React</a>
-      </li>
-      <li class="post">
-          <a href="http://spapas.github.io/2015/05/27/using-browserify-watchify/">Using browserify and watchify to improve your client-side-javascript workflow</a>
       </li>
     </ul>
   </section>
@@ -691,7 +746,7 @@ complex client-side&nbsp;applications!</p>
 
   <section>
   <h1>Tags</h1>
-    <a href="http://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="http://spapas.github.io/tag/tasks.html">tasks</a>,    <a href="http://spapas.github.io/tag/less.html">less</a>,    <a href="http://spapas.github.io/tag/spring.html">spring</a>,    <a href="http://spapas.github.io/tag/rest.html">rest</a>,    <a href="http://spapas.github.io/tag/google.html">google</a>,    <a href="http://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="http://spapas.github.io/tag/scheduling.html">scheduling</a>,    <a href="http://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="http://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="http://spapas.github.io/tag/git.html">git</a>,    <a href="http://spapas.github.io/tag/java.html">java</a>,    <a href="http://spapas.github.io/tag/rq.html">rq</a>,    <a href="http://spapas.github.io/tag/uglify.html">uglify</a>,    <a href="http://spapas.github.io/tag/django-rq.html">django-rq</a>,    <a href="http://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="http://spapas.github.io/tag/redis.html">redis</a>,    <a href="http://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="http://spapas.github.io/tag/forms.html">forms</a>,    <a href="http://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="http://spapas.github.io/tag/404.html">404</a>,    <a href="http://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="http://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="http://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="http://spapas.github.io/tag/css.html">css</a>,    <a href="http://spapas.github.io/tag/node.html">node</a>,    <a href="http://spapas.github.io/tag/jobs.html">jobs</a>,    <a href="http://spapas.github.io/tag/watchify.html">watchify</a>,    <a href="http://spapas.github.io/tag/python.html">python</a>,    <a href="http://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="http://spapas.github.io/tag/javascript.html">javascript</a>,    <a href="http://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="http://spapas.github.io/tag/react.html">react</a>,    <a href="http://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="http://spapas.github.io/tag/npm.html">npm</a>,    <a href="http://spapas.github.io/tag/rst.html">rst</a>,    <a href="http://spapas.github.io/tag/generic.html">generic</a>,    <a href="http://spapas.github.io/tag/browserify.html">browserify</a>,    <a href="http://spapas.github.io/tag/branching.html">branching</a>,    <a href="http://spapas.github.io/tag/design.html">design</a>,    <a href="http://spapas.github.io/tag/github.html">github</a>,    <a href="http://spapas.github.io/tag/pusher.html">pusher</a>,    <a href="http://spapas.github.io/tag/windows.html">windows</a>,    <a href="http://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="http://spapas.github.io/tag/django.html">django</a>,    <a href="http://spapas.github.io/tag/flux.html">flux</a>,    <a href="http://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="http://spapas.github.io/tag/error.html">error</a>,    <a href="http://spapas.github.io/tag/debug.html">debug</a>,    <a href="http://spapas.github.io/tag/asynchronous.html">asynchronous</a>,    <a href="http://spapas.github.io/tag/security.html">security</a>,    <a href="http://spapas.github.io/tag/flask.html">flask</a>,    <a href="http://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>  </section>
+    <a href="http://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="http://spapas.github.io/tag/tasks.html">tasks</a>,    <a href="http://spapas.github.io/tag/less.html">less</a>,    <a href="http://spapas.github.io/tag/spring.html">spring</a>,    <a href="http://spapas.github.io/tag/rest.html">rest</a>,    <a href="http://spapas.github.io/tag/google.html">google</a>,    <a href="http://spapas.github.io/tag/design.html">design</a>,    <a href="http://spapas.github.io/tag/scheduling.html">scheduling</a>,    <a href="http://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="http://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="http://spapas.github.io/tag/tables.html">tables</a>,    <a href="http://spapas.github.io/tag/reportlab.html">reportlab</a>,    <a href="http://spapas.github.io/tag/git.html">git</a>,    <a href="http://spapas.github.io/tag/java.html">java</a>,    <a href="http://spapas.github.io/tag/rq.html">rq</a>,    <a href="http://spapas.github.io/tag/uglify.html">uglify</a>,    <a href="http://spapas.github.io/tag/django-rq.html">django-rq</a>,    <a href="http://spapas.github.io/tag/babel.html">babel</a>,    <a href="http://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="http://spapas.github.io/tag/redis.html">redis</a>,    <a href="http://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="http://spapas.github.io/tag/fixed-data-tables.html">fixed-data-tables</a>,    <a href="http://spapas.github.io/tag/forms.html">forms</a>,    <a href="http://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="http://spapas.github.io/tag/404.html">404</a>,    <a href="http://spapas.github.io/tag/xhtml2pdf.html">xhtml2pdf</a>,    <a href="http://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="http://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="http://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="http://spapas.github.io/tag/css.html">css</a>,    <a href="http://spapas.github.io/tag/node.html">node</a>,    <a href="http://spapas.github.io/tag/jobs.html">jobs</a>,    <a href="http://spapas.github.io/tag/watchify.html">watchify</a>,    <a href="http://spapas.github.io/tag/python.html">python</a>,    <a href="http://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="http://spapas.github.io/tag/javascript.html">javascript</a>,    <a href="http://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="http://spapas.github.io/tag/react.html">react</a>,    <a href="http://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="http://spapas.github.io/tag/npm.html">npm</a>,    <a href="http://spapas.github.io/tag/pdf.html">pdf</a>,    <a href="http://spapas.github.io/tag/rst.html">rst</a>,    <a href="http://spapas.github.io/tag/generic.html">generic</a>,    <a href="http://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="http://spapas.github.io/tag/es6.html">es6</a>,    <a href="http://spapas.github.io/tag/browserify.html">browserify</a>,    <a href="http://spapas.github.io/tag/branching.html">branching</a>,    <a href="http://spapas.github.io/tag/github.html">github</a>,    <a href="http://spapas.github.io/tag/pusher.html">pusher</a>,    <a href="http://spapas.github.io/tag/windows.html">windows</a>,    <a href="http://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="http://spapas.github.io/tag/django.html">django</a>,    <a href="http://spapas.github.io/tag/flux.html">flux</a>,    <a href="http://spapas.github.io/tag/fixeddatatable.html">FixedDataTable</a>,    <a href="http://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="http://spapas.github.io/tag/error.html">error</a>,    <a href="http://spapas.github.io/tag/debug.html">debug</a>,    <a href="http://spapas.github.io/tag/asynchronous.html">asynchronous</a>,    <a href="http://spapas.github.io/tag/security.html">security</a>,    <a href="http://spapas.github.io/tag/flask.html">flask</a>,    <a href="http://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>  </section>
 
 
 

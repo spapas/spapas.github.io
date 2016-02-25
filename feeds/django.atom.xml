@@ -1,5 +1,1049 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>/var/</title><link href="http://spapas.github.io/" rel="alternate"></link><link href="http://spapas.github.io/feeds/django.atom.xml" rel="self"></link><id>http://spapas.github.io/</id><updated>2015-09-01T14:20:00+03:00</updated><entry><title>django-rq redux: advanced techniques and tools</title><link href="http://spapas.github.io/2015/09/01/django-rq-redux/" rel="alternate"></link><updated>2015-09-01T14:20:00+03:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2015-09-01:2015/09/01/django-rq-redux/</id><summary type="html">&lt;div class="contents topic" id="contents"&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>/var/</title><link href="http://spapas.github.io/" rel="alternate"></link><link href="http://spapas.github.io/feeds/django.atom.xml" rel="self"></link><id>http://spapas.github.io/</id><updated>2015-11-27T10:20:00+02:00</updated><entry><title>PDFs in Django: The essential guide</title><link href="http://spapas.github.io/2015/11/27/pdf-in-django/" rel="alternate"></link><updated>2015-11-27T10:20:00+02:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2015-11-27:2015/11/27/pdf-in-django/</id><summary type="html">&lt;div class="contents topic" id="contents"&gt;
+&lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id4"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#the-players" id="id5"&gt;The players&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#reportlab" id="id6"&gt;ReportLab&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#xhtml2pdf" id="id7"&gt;xhtml2pdf&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#pypdf2" id="id8"&gt;PyPDF2&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#django-integration" id="id9"&gt;Django integration&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#using-a-plain-old-view" id="id10"&gt;Using a plain old&amp;nbsp;view&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#using-a-cbv" id="id11"&gt;Using a &lt;span class="caps"&gt;CBV&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#how-does-django-xhtml2pdf-loads-resources" id="id12"&gt;How does django-xhtml2pdf loads&amp;nbsp;resources&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#using-a-common-style-for-your-pdfs" id="id13"&gt;Using a common style for your&amp;nbsp;PDFs&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#changing-the-font-to-a-unicode-enabled-one" id="id14"&gt;Changing the font (to a Unicode enabled&amp;nbsp;one)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#configure-django-for-debugging-pdf-creation" id="id15"&gt;Configure Django for debugging &lt;span class="caps"&gt;PDF&lt;/span&gt;&amp;nbsp;creation&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#concatenating-pdfs-in-django" id="id16"&gt;Concatenating PDFs in&amp;nbsp;Django&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#more-advanced-xhtml2pdf-features" id="id17"&gt;More advanced xhtml2pdf features&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#laying-out" id="id18"&gt;Laying&amp;nbsp;out&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#extra-stuff" id="id19"&gt;Extra&amp;nbsp;stuff&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#conclusion" id="id20"&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="introduction"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id4"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;I&amp;#8217;ve noticed that although it is easy to create PDFs with
+Python, there&amp;#8217;s no complete guide on how to
+integrate these tools with Django and resolve the problems
+that you&amp;#8217;ll encounter when trying to actually create PDFs
+from your Django web&amp;nbsp;application.&lt;/p&gt;
+&lt;p&gt;In this article I will present the solution I use for
+creating PDFs with Django, along with various tips on how to
+solve most of your common requirements. Specifically, here
+are some things that we&amp;#8217;ll&amp;nbsp;cover:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Learn how to create PDFs &amp;quot;by&amp;nbsp;hand&amp;quot;&lt;/li&gt;
+&lt;li&gt;Create PDFs with Django using a normal Djang Template (similar to an &lt;span class="caps"&gt;HTML&lt;/span&gt;&amp;nbsp;page)&lt;/li&gt;
+&lt;li&gt;Change the fonts of your&amp;nbsp;PDFs&lt;/li&gt;
+&lt;li&gt;Use styling in your&amp;nbsp;output&lt;/li&gt;
+&lt;li&gt;Create&amp;nbsp;layouts&lt;/li&gt;
+&lt;li&gt;Embed images to your&amp;nbsp;PDFs&lt;/li&gt;
+&lt;li&gt;Add page&amp;nbsp;numbers&lt;/li&gt;
+&lt;li&gt;Merge (concatenate)&amp;nbsp;PDFs&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="the-players"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt;The&amp;nbsp;players&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;We are going to use the following main&amp;nbsp;tools:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference external" href="https://bitbucket.org/rptlab/reportlab"&gt;ReportLab&lt;/a&gt; is an open source python library for creating PDFs. It uses a low-level &lt;span class="caps"&gt;API&lt;/span&gt; that allows &amp;quot;drawing&amp;quot; strings on specific coordinates  on the &lt;span class="caps"&gt;PDF&lt;/span&gt; - for people familiar with creating PDFs in Java it is more or less &lt;a class="reference external" href="http://itextpdf.com/"&gt;iText&lt;/a&gt; for&amp;nbsp;python.&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="https://github.com/chrisglass/xhtml2pdf"&gt;xhtml2pdf&lt;/a&gt; (formerly named &lt;em&gt;pisa&lt;/em&gt;) is an open source library that can convert &lt;span class="caps"&gt;HTML&lt;/span&gt;/&lt;span class="caps"&gt;CSS&lt;/span&gt; pages to &lt;span class="caps"&gt;PDF&lt;/span&gt; using&amp;nbsp;ReportLab.&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="https://github.com/chrisglass/django-xhtml2pdf"&gt;django-xhtml2pdf&lt;/a&gt; is a wrapper around xhtml2pdf that makes integration with Django&amp;nbsp;easier.&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="https://github.com/mstamy2/PyPDF2"&gt;PyPDF2&lt;/a&gt; is an open source tool of that can split, merge and transform pages of &lt;span class="caps"&gt;PDF&lt;/span&gt;&amp;nbsp;files.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I&amp;#8217;ve created a &lt;a class="reference external" href="https://github.com/spapas/django-pdf-guide"&gt;django project&lt;/a&gt; &lt;a class="reference external" href="https://github.com/spapas/django-pdf-guide"&gt;https://github.com/spapas/django-pdf-guide&lt;/a&gt; with everything covered here. Please clone it,
+install its requirements and play with it to see how everything works&amp;nbsp;!&lt;/p&gt;
+&lt;p&gt;Before integrating the above tools to a Django project, I&amp;#8217;d like to describe them individually a bit more. Any files
+I mention below will be included in this&amp;nbsp;project.&lt;/p&gt;
+&lt;div class="section" id="reportlab"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id6"&gt;ReportLab&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;ReportLab offers a really low &lt;span class="caps"&gt;API&lt;/span&gt; for creating PDFs. It is something like having a &lt;tt class="docutils literal"&gt;canvas.drawString()&lt;/tt&gt; method (for
+people familiar with drawing APIs) for your &lt;span class="caps"&gt;PDF&lt;/span&gt; page. Let&amp;#8217;s take a look at an example, creating a &lt;span class="caps"&gt;PDF&lt;/span&gt; with a simple&amp;nbsp;string:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+from reportlab.pdfgen import canvas
+import reportlab.rl_config
+
+
+if __name__ == '__main__':
+    reportlab.rl_config.warnOnMissingFontGlyphs = 0
+    c = canvas.Canvas(&amp;quot;./hello1.pdf&amp;quot;,)
+    c.drawString(100, 100, &amp;quot;Hello World&amp;quot;)
+    c.showPage()
+    c.save()
+&lt;/pre&gt;
+&lt;p&gt;Save the above in a file named testreportlab1.py. If you run python testreportlab1.py (in an environment that has
+reportlab of cours) you should see no errors and a pdf named &lt;tt class="docutils literal"&gt;hello1.pdf&lt;/tt&gt; created. If you open it in your &lt;span class="caps"&gt;PDF&lt;/span&gt;
+reader you&amp;#8217;ll see a blank page with &amp;quot;Hello World&amp;quot; written in its lower right&amp;nbsp;corner.&lt;/p&gt;
+&lt;p&gt;If you try to add a unicode text, for example &amp;quot;Καλημέρα ελλάδα&amp;quot;, you should see something like the&amp;nbsp;following:&lt;/p&gt;
+&lt;img alt="Hello PDF" src="/images/hellopdf2.png" style="width: 280px;" /&gt;
+&lt;p&gt;It seems that the default font that ReportLab uses does not have a good support for accented greek characters
+since they are missing  (and probably for various other&amp;nbsp;characters).&lt;/p&gt;
+&lt;p&gt;To resolve this, we could try changing the font to one that contains the missing symbols. You can find free
+fonts on the internet (for example the &lt;cite&gt;DejaVu&lt;/cite&gt; font), or even grab one from your system fonts (in windows,
+check out &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;c:\windows\fonts\&lt;/span&gt;&lt;/tt&gt;). In any case, just copy the ttf file of your font inside the folder of
+your project and crate a file named testreportlab2.py with the following (I am using the DejaVuSans&amp;nbsp;font):&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+# -*- coding: utf-8 -*-
+import reportlab.rl_config
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+
+
+if __name__ == '__main__':
+    c = canvas.Canvas(&amp;quot;./hello2.pdf&amp;quot;,)
+    reportlab.rl_config.warnOnMissingFontGlyphs = 0
+    pdfmetrics.registerFont(TTFont('DejaVuSans', 'DejaVuSans.ttf'))
+
+    c.setFont('DejaVuSans', 22)
+    c.drawString(100, 100, u&amp;quot;Καλημέρα ελλάδα.&amp;quot;)
+
+    c.showPage()
+    c.save()
+&lt;/pre&gt;
+&lt;p&gt;The above was just a scratch on the surface of ReportLab, mainly to be confident that
+everything &lt;em&gt;will&lt;/em&gt; work fine for non-english speaking people! To find out more, you should check the  &lt;a class="reference external" href="http://www.reportlab.com/docs/reportlab-userguide.pdf"&gt;ReportLab open-source User Guide&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;I also have to mention that
+&lt;a class="reference external" href="http://reportlab.com/"&gt;the company behind ReportLab&lt;/a&gt; offers some great commercial solutions based on ReportLab for creating PDFs (similar to &lt;a class="reference external" href="http://community.jaspersoft.com/project/jasperreports-library"&gt;JasperReports&lt;/a&gt;) - check it out
+if you need support or advanced&amp;nbsp;capabilities.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="xhtml2pdf"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id7"&gt;xhtml2pdf&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The xhtml2pdf is a really great library that allows you to use html files as a template
+to a &lt;span class="caps"&gt;PDF&lt;/span&gt;. Of course, an html cannot always be converted to a &lt;span class="caps"&gt;PDF&lt;/span&gt; since,
+unfortunately, PDFs &lt;em&gt;do&lt;/em&gt; have&amp;nbsp;pages.&lt;/p&gt;
+&lt;p&gt;xhtml2pdf has a nice executable script that can be used to test its capabilities. After
+you install it (either globally or to a virtual environment) you should be able to find
+out the executable &lt;tt class="docutils literal"&gt;$&lt;span class="caps"&gt;PYTHON&lt;/span&gt;/scripts/xhtml2pdf&lt;/tt&gt; (or &lt;tt class="docutils literal"&gt;xhtml2pdf.exe&lt;/tt&gt; if you are in
+Windows) and a corresponding python script &amp;#64; &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;$&lt;span class="caps"&gt;PYTHON&lt;/span&gt;/scripts/xhtml2pdf-script.py&lt;/span&gt;&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;Let&amp;#8217;s try to use xhtml2pdf to explore some of its capabilities. Create a file named
+testxhtml2pdf.html with the following contents and run &lt;tt class="docutils literal"&gt;xhtml2pdf testxhtml2pdf.html&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;lt;html&amp;gt;
+&amp;lt;head&amp;gt;
+    &amp;lt;meta http-equiv=&amp;quot;Content-Type&amp;quot; content=&amp;quot;text/html; charset=utf-8&amp;quot; /&amp;gt;
+&amp;lt;/head&amp;gt;
+&amp;lt;body&amp;gt;
+    &amp;lt;h1&amp;gt;Testing xhtml2pdf &amp;lt;/h1&amp;gt;
+    &amp;lt;ul&amp;gt;
+        &amp;lt;li&amp;gt;&amp;lt;b&amp;gt;Hello, world!&amp;lt;/b&amp;gt;&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;&amp;lt;i&amp;gt;Hello, italics&amp;lt;/i&amp;gt;&amp;lt;/li&amp;gt;
+        &amp;lt;li&amp;gt;Καλημέρα Ελλάδα!&amp;lt;/li&amp;gt;
+    &amp;lt;/ul&amp;gt;
+    &amp;lt;hr /&amp;gt;
+    &amp;lt;p&amp;gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus nulla erat, porttitor ut venenatis eget,
+    tempor et purus. Nullam nec erat vel enim euismod auctor et at nisl. Integer posuere bibendum condimentum. Ut
+    euismod velit ut porttitor condimentum. In ullamcorper nulla at lectus fermentum aliquam. Nunc elementum commodo
+    dui, id pulvinar ex viverra id. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos
+    himenaeos.&amp;lt;/p&amp;gt;
+
+    &amp;lt;p&amp;gt;Interdum et malesuada fames ac ante ipsum primis in faucibus. Sed aliquam vitae lectus sit amet accumsan. Morbi
+    nibh urna, condimentum nec volutpat at, lobortis sit amet odio. Etiam quis neque interdum sapien cursus ornare. Cras
+    commodo lacinia sapien nec porta. Suspendisse potenti. Nulla hendrerit dolor et rutrum consectetur.&amp;lt;/p&amp;gt;
+    &amp;lt;hr /&amp;gt;
+    &amp;lt;img  width=&amp;quot;26&amp;quot; height=&amp;quot;20&amp;quot; src=&amp;quot;data:image/gif;base64,R0lGODlhEAAOALMAAOazToeHh0tLS/7LZv/0jvb29t/f3//Ub//ge8WSLf/
+    rhf/3kdbW1mxsbP//mf///yH5BAAAAAAALAAAAAAQAA4AAARe8L1Ekyky67QZ1hLnjM5UUde0ECwLJoExKcppV0aCcGCmTIHEIUEqjgaORCMxIC6e0C
+    cguWw6aFjsVMkkIr7g77ZKPJjPZqIyd7sJAgVGoEGv2xsBxqNgYPj/gAwXEQA7&amp;quot;  &amp;gt;
+    &amp;lt;hr /&amp;gt;
+    &amp;lt;table&amp;gt;
+        &amp;lt;tr&amp;gt;
+            &amp;lt;th&amp;gt;header0&amp;lt;/th&amp;gt;&amp;lt;th&amp;gt;header1&amp;lt;/th&amp;gt;&amp;lt;th&amp;gt;header2&amp;lt;/th&amp;gt;&amp;lt;th&amp;gt;header3&amp;lt;/th&amp;gt;&amp;lt;th&amp;gt;header4&amp;lt;/th&amp;gt;&amp;lt;th&amp;gt;header5&amp;lt;/th&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;tr&amp;gt;
+            &amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;tr&amp;gt;
+            &amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;tr&amp;gt;
+            &amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        &amp;lt;tr&amp;gt;
+            &amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;Hello World!!!&amp;lt;/td&amp;gt;
+        &amp;lt;/tr&amp;gt;
+    &amp;lt;/table&amp;gt;
+&amp;lt;/body&amp;gt;
+&amp;lt;/html&amp;gt;
+&lt;/pre&gt;
+&lt;p&gt;Please notice the &lt;tt class="docutils literal"&gt;&amp;lt;meta &lt;span class="pre"&gt;http-equiv=&amp;quot;Content-Type&amp;quot;&lt;/span&gt; &lt;span class="pre"&gt;content=&amp;quot;text/html;&lt;/span&gt; &lt;span class="pre"&gt;charset=utf-8&amp;quot;&lt;/span&gt; /&amp;gt;&lt;/tt&gt; in the above &lt;span class="caps"&gt;HTML&lt;/span&gt; &amp;#8212; also it is saved as
+Unicode (Encoding - Covert to &lt;span class="caps"&gt;UTF&lt;/span&gt;-8 in Notepad++). The result (&lt;tt class="docutils literal"&gt;testxhtml2pdf.pdf&lt;/tt&gt;) should&amp;nbsp;have:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;A nice header&amp;nbsp;(h1)&lt;/li&gt;
+&lt;li&gt;Paragraphs&lt;/li&gt;
+&lt;li&gt;Horizontal&amp;nbsp;lines&lt;/li&gt;
+&lt;li&gt;No support for greek characters (same problem as with&amp;nbsp;reportlab)&lt;/li&gt;
+&lt;li&gt;Images (I am inlining it as a base 64&amp;nbsp;image)&lt;/li&gt;
+&lt;li&gt;A&amp;nbsp;list&lt;/li&gt;
+&lt;li&gt;A&amp;nbsp;table&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Before moving on, I&amp;#8217;d like to fix the problem with the greek characters. You should
+set the font to one supporting greek characters, just like you did with ReportLab before.
+This can be done with the help of the &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;&amp;#64;font-face&lt;/span&gt;&lt;/tt&gt; &lt;a class="reference external" href="https://github.com/xhtml2pdf/xhtml2pdf/blob/master/doc/usage.rst#fonts"&gt;css directive&lt;/a&gt;. So, let&amp;#8217;s create
+a file named &lt;tt class="docutils literal"&gt;testxhtml2pdf2.html&lt;/tt&gt; with the following&amp;nbsp;contents:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;lt;html&amp;gt;
+&amp;lt;head&amp;gt;
+    &amp;lt;meta http-equiv=&amp;quot;Content-Type&amp;quot; content=&amp;quot;text/html; charset=utf-8&amp;quot; /&amp;gt;
+
+    &amp;lt;style&amp;gt;
+        &amp;#64;font-face {
+            font-family: DejaVuSans;
+            src: url(&amp;quot;c:/progr/py/django-pdf-guide/django_pdf_guide/DejaVuSans.ttf&amp;quot;);
+        }
+
+        body {
+            font-family: DejaVuSans;
+        }
+    &amp;lt;/style&amp;gt;
+&amp;lt;/head&amp;gt;
+&amp;lt;body&amp;gt;
+    &amp;lt;h1&amp;gt;Δοκιμή του xhtml2pdf &amp;lt;/h1&amp;gt;
+    &amp;lt;ul&amp;gt;
+        &amp;lt;li&amp;gt;Καλημέρα Ελλάδα!&amp;lt;/li&amp;gt;
+    &amp;lt;/ul&amp;gt;
+
+&amp;lt;/body&amp;gt;
+&amp;lt;/html&amp;gt;
+&lt;/pre&gt;
+&lt;p&gt;Before running &lt;tt class="docutils literal"&gt;xhtml2pdf testxhtml2pdf2.html&lt;/tt&gt;, please make
+sure to change the url of the font file above to the absolute path of that font in your
+local system . As a result, after running xhhtml2pdf
+you
+should see the unicode characters without&amp;nbsp;problems.&lt;/p&gt;
+&lt;p&gt;I have to mention here that I wasn&amp;#8217;t able to use the font from a relative path, that&amp;#8217;s
+why I used the absolute one. In case something is not right, try
+running it with the &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;-d&lt;/span&gt;&lt;/tt&gt; option to output debugging information (something like
+&lt;tt class="docutils literal"&gt;xhtml2pdf &lt;span class="pre"&gt;-d&lt;/span&gt; testxhtml2pdf2.html&lt;/tt&gt;). You must see a line like this&amp;nbsp;one:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+DEBUG [xhtml2pdf] C:\progr\py\django-pdf-guide\venv\lib\site-packages\xhtml2pdf\context.py line 857: Load font 'c:\\progr\\py\\django-pdf-guide\\django_pdf_guide\\DejaVuSans.ttf'
+&lt;/pre&gt;
+&lt;p&gt;to make sure that the font is actually&amp;nbsp;loaded!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="pypdf2"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id8"&gt;PyPDF2&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The PyPDF2 library can be used to extract pages from a &lt;span class="caps"&gt;PDF&lt;/span&gt; to a new one
+or combine pages from different PDFs to a a new one. A common requirement is
+to have the first and page of a report as static PDFs, create the contents
+of this report through your app as a &lt;span class="caps"&gt;PDF&lt;/span&gt; and combine all three PDFs (front page,
+content and back page) to the resulting &lt;span class="caps"&gt;PDF&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;Let&amp;#8217;s see a quick example of combining two&amp;nbsp;PDFs:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+import sys
+from PyPDF2 import PdfFileMerger
+
+if __name__ == '__main__':
+    pdfs = sys.argv[1:]
+
+    if not pdfs or len(pdfs) &amp;lt; 2:
+        exit(&amp;quot;Please enter at least two pdfs for merging!&amp;quot;)
+
+    merger = PdfFileMerger()
+
+    for pdf in pdfs:
+        merger.append(fileobj=open(pdf, &amp;quot;rb&amp;quot;))
+
+    output = open(&amp;quot;output.pdf&amp;quot;, &amp;quot;wb&amp;quot;)
+    merger.write(output)
+&lt;/pre&gt;
+&lt;p&gt;The above will try to open all input parameters (as files) and append them to a the&amp;nbsp;output.pdf.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="django-integration"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id9"&gt;Django&amp;nbsp;integration&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;To integrate the &lt;span class="caps"&gt;PDF&lt;/span&gt; creation process with django we&amp;#8217;ll use a simple app with only one model about books. We are
+going to use the django-xhtml2pdf library &amp;#8212; I recommend installing the latest version (from github
+using something like &lt;tt class="docutils literal"&gt;pip install &lt;span class="pre"&gt;-e&lt;/span&gt; &lt;span class="pre"&gt;git+https://github.com/chrisglass/django-xhtml2pdf.git#egg=django-xhtml2pdf&lt;/span&gt;&lt;/tt&gt;
+) since the pip package has not been updated in a long&amp;nbsp;time!&lt;/p&gt;
+&lt;div class="section" id="using-a-plain-old-view"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id10"&gt;Using a plain old&amp;nbsp;view&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The simplest case is to just create plain old view to display the &lt;span class="caps"&gt;PDF&lt;/span&gt;. We&amp;#8217;ll use django-xhtml2pdf along with the
+followig django&amp;nbsp;template:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;lt;html&amp;gt;
+&amp;lt;head&amp;gt;
+    &amp;lt;meta http-equiv=&amp;quot;Content-Type&amp;quot; content=&amp;quot;text/html; charset=utf-8&amp;quot; /&amp;gt;
+&amp;lt;/head&amp;gt;
+&amp;lt;body&amp;gt;
+    &amp;lt;h1&amp;gt;Books&amp;lt;/h1&amp;gt;
+    &amp;lt;table&amp;gt;
+        &amp;lt;tr&amp;gt;
+            &amp;lt;th&amp;gt;ID&amp;lt;/th&amp;gt;&amp;lt;th&amp;gt;Title&amp;lt;/th&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        {% for book in books %}
+            &amp;lt;tr&amp;gt;
+                &amp;lt;td&amp;gt;{{ book.id }}&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;{{ book.title }}&amp;lt;/td&amp;gt;
+            &amp;lt;/tr&amp;gt;
+        {% endfor %}
+    &amp;lt;/table&amp;gt;
+&amp;lt;/body&amp;gt;
+&amp;lt;/html&amp;gt;
+&lt;/pre&gt;
+&lt;p&gt;Name it as &lt;tt class="docutils literal"&gt;books_plain_old_view.html&lt;/tt&gt; and put it on &lt;tt class="docutils literal"&gt;books/templates&lt;/tt&gt; directory. The view that
+returns the above template as &lt;span class="caps"&gt;PDF&lt;/span&gt; is the&amp;nbsp;following:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+from django.http import HttpResponse
+from django_xhtml2pdf.utils import generate_pdf
+
+
+def books_plain_old_view(request):
+    resp = HttpResponse(content_type='application/pdf')
+    context = {
+        'books': Book.objects.all()
+    }
+    result = generate_pdf('books_plain_old_view.html', file_object=resp, context=context)
+    return result
+&lt;/pre&gt;
+&lt;p&gt;We just use the &lt;tt class="docutils literal"&gt;generate_pdf&lt;/tt&gt; method of django-xhtml2pdf to help us generate the &lt;span class="caps"&gt;PDF&lt;/span&gt;, passing it
+our response object and a context dictionary (containing all&amp;nbsp;books).&lt;/p&gt;
+&lt;p&gt;Instead of the simple &lt;span class="caps"&gt;HTTP&lt;/span&gt; response above, we could add a &amp;#8216;Content Disposition&amp;#8217; &lt;span class="caps"&gt;HTTP&lt;/span&gt; header to
+our response
+(or use the django-xhtml2pdf method &lt;tt class="docutils literal"&gt;render_to_pdf_response&lt;/tt&gt; instead of &lt;tt class="docutils literal"&gt;generate_pdf&lt;/tt&gt;)
+to suggest a default filename for the file to be saved by adding the&amp;nbsp;line&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+resp['Content-Disposition'] = 'attachment; filename=&amp;quot;output.pdf&amp;quot;'
+&lt;/pre&gt;
+&lt;p&gt;after the definition of &lt;tt class="docutils literal"&gt;resp&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;This will have the extra effect, at least in Chrome and Firefox to show the &amp;quot;Save File&amp;quot; dialog
+when clicking on the link instead of retrieving the &lt;span class="caps"&gt;PDF&lt;/span&gt; and displaying it inside* the browser&amp;nbsp;window.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="using-a-cbv"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id11"&gt;Using a &lt;span class="caps"&gt;CBV&lt;/span&gt;&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;I don&amp;#8217;t really recommend using plain old Django views - instead I propose to always use Class Based Views
+for their DRYness. The best approach is to create a mixin that would allow any kind of &lt;span class="caps"&gt;CBV&lt;/span&gt; (at least any
+kind of &lt;span class="caps"&gt;CBV&lt;/span&gt; that uses a template) to be rendered in &lt;span class="caps"&gt;PDF&lt;/span&gt;. Here&amp;#8217;s how we could implement a &lt;tt class="docutils literal"&gt;PdfResponseMixin&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class PdfResponseMixin(object, ):
+    def render_to_response(self, context, **response_kwargs):
+        context=self.get_context_data()
+        template=self.get_template_names()[0]
+        resp = HttpResponse(content_type='application/pdf')
+        result = generate_pdf(template, file_object=resp, context=context)
+        return result
+&lt;/pre&gt;
+&lt;p&gt;Now, we could use this mixin to create &lt;span class="caps"&gt;PDF&lt;/span&gt; outputting views from any other view! For example, here&amp;#8217;s how
+we could create a book list in&amp;nbsp;pdf:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class BookPdfListView(PdfResponseMixin, ListView):
+    context_object_name = 'books'
+    model = Book
+&lt;/pre&gt;
+&lt;p&gt;To display it, you could use the same template as &lt;tt class="docutils literal"&gt;books_plain_old_view.html&lt;/tt&gt; (so either add a &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;template_name='books_plain_old_view.html'&lt;/span&gt;&lt;/tt&gt;
+property to the class or copy &lt;tt class="docutils literal"&gt;books_plain_old_view.html&lt;/tt&gt; to &lt;tt class="docutils literal"&gt;books/book_list.html&lt;/tt&gt;).&lt;/p&gt;
+&lt;p&gt;Also, as another example, here&amp;#8217;s a &lt;tt class="docutils literal"&gt;BookPdfDetailView&lt;/tt&gt; that outputs &lt;span class="caps"&gt;PDF&lt;/span&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class BookPdfDetailView(PdfResponseMixin, DetailView):
+    context_object_name = 'book'
+    model = Book
+&lt;/pre&gt;
+&lt;p&gt;and a corresponding template (name it &lt;tt class="docutils literal"&gt;books/book_detail.html&lt;/tt&gt;):&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;lt;html&amp;gt;
+&amp;lt;head&amp;gt;
+    &amp;lt;meta http-equiv=&amp;quot;Content-Type&amp;quot; content=&amp;quot;text/html; charset=utf-8&amp;quot; /&amp;gt;
+&amp;lt;/head&amp;gt;
+&amp;lt;body&amp;gt;
+    &amp;lt;h1&amp;gt;Book Detail&amp;lt;/h1&amp;gt;
+    &amp;lt;b&amp;gt;ID&amp;lt;/b&amp;gt;: {{ book.id }} &amp;lt;br /&amp;gt;
+    &amp;lt;b&amp;gt;Title&amp;lt;/b&amp;gt;: {{ book.title }} &amp;lt;br /&amp;gt;
+&amp;lt;/body&amp;gt;
+&amp;lt;/html&amp;gt;
+&lt;/pre&gt;
+&lt;p&gt;To add the content-disposition header and a name for your &lt;span class="caps"&gt;PDF&lt;/span&gt;, you can use the following&amp;nbsp;mixin:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class PdfResponseMixin(object, ):
+    pdf_name = &amp;quot;output&amp;quot;
+
+    def get_pdf_name(self):
+        return self.pdf_name
+
+    def render_to_response(self, context, **response_kwargs):
+        context=self.get_context_data()
+        template=self.get_template_names()[0]
+        resp = HttpResponse(content_type='application/pdf')
+        resp['Content-Disposition'] = 'attachment; filename=&amp;quot;{0}.pdf&amp;quot;'.format(self.get_pdf_name())
+        result = generate_pdf(template, file_object=resp, context=context)
+        return result
+&lt;/pre&gt;
+&lt;p&gt;You see that, in order to havea configurable output name for our &lt;span class="caps"&gt;PDF&lt;/span&gt; and be consistent with the other
+django CBVs, a &lt;tt class="docutils literal"&gt;pdf_name&lt;/tt&gt; class attribute and a &lt;tt class="docutils literal"&gt;get_pdf_name&lt;/tt&gt; instance method are added. When
+using the above mixin in your classes you can either provide a value for &lt;tt class="docutils literal"&gt;pdf_name&lt;/tt&gt; (to use the same for all
+your instances), or override &lt;tt class="docutils literal"&gt;get_pdf_name&lt;/tt&gt; to have a dynamic&amp;nbsp;value!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="how-does-django-xhtml2pdf-loads-resources"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id12"&gt;How does django-xhtml2pdf loads&amp;nbsp;resources&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Before doing more advanced things, we need to understand how &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;django-xhtml2pdf&lt;/span&gt;&lt;/tt&gt; works and specifically
+how we can refer to things like css, images, fonts etc from our &lt;span class="caps"&gt;PDF&lt;/span&gt; templates.
+If you check the &lt;a class="reference external" href="https://github.com/chrisglass/django-xhtml2pdf/blob/master/django_xhtml2pdf/utils.py"&gt;utils.py of django-xhtml2pdf&lt;/a&gt; you&amp;#8217;ll see that it uses a function named &lt;tt class="docutils literal"&gt;fetch_resources&lt;/tt&gt;
+for loading these resources. This function checks to see if the resource starts with &lt;tt class="docutils literal"&gt;/MEDIA_URL&lt;/tt&gt; or
+&lt;tt class="docutils literal"&gt;/STATIC_URL&lt;/tt&gt; and converts it to a local (filesystem) path. For example, if you refer to a font like
+&lt;tt class="docutils literal"&gt;/static/font1.ttf&lt;/tt&gt; in your &lt;span class="caps"&gt;PDF&lt;/span&gt; template, &lt;tt class="docutils literal"&gt;xhtml2pdf&lt;/tt&gt; will try to load the file &lt;tt class="docutils literal"&gt;STATIC_ROOT + /font1.ttf&lt;/tt&gt;
+(and if it does not find the file you want to refer to there it will check all &lt;tt class="docutils literal"&gt;STATICFILES_DIRS&lt;/tt&gt; entries).&lt;/p&gt;
+&lt;p&gt;Thus, you can just put your resources into your &lt;tt class="docutils literal"&gt;STATIC_ROOT&lt;/tt&gt; directory and use the &lt;tt class="docutils literal"&gt;{% static %}&lt;/tt&gt;
+template tag to create &lt;span class="caps"&gt;URL&lt;/span&gt; paths for them &amp;#8212; django-xhtml2pdf will convert these to local paths and
+everything will work&amp;nbsp;fine.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Please notice that you *need* to have configured &amp;#8220;STATIC_ROOT&amp;#8220; for this to work&lt;/strong&gt; &amp;#8212; if &lt;tt class="docutils literal"&gt;STATIC_ROOT&lt;/tt&gt; is
+empty (and, for example you use &lt;tt class="docutils literal"&gt;static&lt;/tt&gt; directories in your apps) then the described substitution
+mechanism will &lt;em&gt;not&lt;/em&gt; work. Also, notice that the &lt;tt class="docutils literal"&gt;/static&lt;/tt&gt; directory inside your apps &lt;em&gt;cannot be used&lt;/em&gt;
+for fetch resources like this
+(due to how &lt;tt class="docutils literal"&gt;fetch_resources&lt;/tt&gt; is implemented it only checks if the static resource is contained inside
+the &lt;tt class="docutils literal"&gt;STATIC_ROOT&lt;/tt&gt; or in one of the the &lt;tt class="docutils literal"&gt;STATICFILES_DIRS&lt;/tt&gt;) so be careful to either put the static files
+you need to load from PDFs (fonts, styles and possibly images) to either the &lt;tt class="docutils literal"&gt;STATIC_ROOT&lt;/tt&gt; or the
+one of the &lt;tt class="docutils literal"&gt;STATICFILES_DIRS&lt;/tt&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="using-a-common-style-for-your-pdfs"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id13"&gt;Using a common style for your&amp;nbsp;PDFs&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;If you need to create a lot of similar PDFs then you&amp;#8217;ll probably want to
+use a bunch of common styles for them (same fonts, headers etc). This could be done using
+the &lt;tt class="docutils literal"&gt;{% static %}&lt;/tt&gt; trick we saw on the previous section. However, if we include the
+styling css as a static file then we won&amp;#8217;t be able to use the static-file-uri-to-local-path
+mechanism described above (since the &lt;tt class="docutils literal"&gt;{% static %}&lt;/tt&gt; template tag won&amp;#8217;t work in static&amp;nbsp;files).&lt;/p&gt;
+&lt;p&gt;Thankfully, not everything is lost &amp;#8212; Django comes to the rescue!!! We can create a single &lt;span class="caps"&gt;CSS&lt;/span&gt; file
+that would be used by all our &lt;span class="caps"&gt;PDF&lt;/span&gt; templates and &lt;em&gt;include&lt;/em&gt; it in the templates using the &lt;tt class="docutils literal"&gt;{% include %}&lt;/tt&gt; Django
+template tag! Django will think that this will be a normal template and paste its contents where we wanted and
+also execute the templates&amp;nbsp;tags!&lt;/p&gt;
+&lt;p&gt;We&amp;#8217;ll see an example of all this in the next&amp;nbsp;section.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="changing-the-font-to-a-unicode-enabled-one"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id14"&gt;Changing the font (to a Unicode enabled&amp;nbsp;one)&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The time has finally arrived to change the font! It&amp;#8217;s easy if you know exactly what to do. First of all
+configure your &lt;tt class="docutils literal"&gt;STATIC_ROOT&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;STATIC_URL&lt;/tt&gt; setting, for example &lt;tt class="docutils literal"&gt;STATIC_ROOT = &lt;span class="pre"&gt;os.path.join(BASE_DIR,'static')&lt;/span&gt;&lt;/tt&gt;
+and &lt;tt class="docutils literal"&gt;STATIC_URL = '/static/'&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;Then, add a template-css file for your fonts in one of your templates directories. I am naming the
+file &lt;tt class="docutils literal"&gt;pdfstylefonts.css&lt;/tt&gt; and I&amp;#8217;ve put it to &lt;tt class="docutils literal"&gt;books/templates&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+{% load static %}
+&amp;#64;font-face {
+    font-family: &amp;quot;Calibri&amp;quot;;
+    src: url({% static &amp;quot;fonts/calibri.ttf&amp;quot; %});
+}
+&amp;#64;font-face {
+    font-family: &amp;quot;Calibri&amp;quot;;
+    src: url({% static &amp;quot;fonts/calibrib.ttf&amp;quot; %});
+    font-weight: bold;
+}
+&amp;#64;font-face {
+    font-family: &amp;quot;Calibri&amp;quot;;
+    src: url({% static &amp;quot;fonts/calibrii.ttf&amp;quot; %});
+    font-style: italic, oblique;
+}
+&amp;#64;font-face {
+    font-family: &amp;quot;Calibri&amp;quot;;
+    src: url({% static &amp;quot;fonts/calibriz.ttf&amp;quot; %});
+    font-weight: bold;
+    font-style: italic, oblique;
+}
+&lt;/pre&gt;
+&lt;p&gt;I am using Calibri family of fonts (copied from &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;c:\windows\fonts&lt;/span&gt;&lt;/tt&gt;) for this &amp;#8212; I&amp;#8217;ve also configured
+all styles (bold, italic, bold-italic) of this font family to use the correct ttf files. All the
+ttf files have been copied to the directory &lt;tt class="docutils literal"&gt;static/fonts/&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;Now, add another css file that will be your global &lt;span class="caps"&gt;PDF&lt;/span&gt; styles. This should be put to the &lt;tt class="docutils literal"&gt;static&lt;/tt&gt; directory
+and could be named &lt;tt class="docutils literal"&gt;pdfstyle.css&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+h1 {
+    color: blue;
+}
+
+*, html {
+    font-family: &amp;quot;Calibri&amp;quot;;
+    font-size:11pt;
+    color: red;
+}
+&lt;/pre&gt;
+&lt;p&gt;Next, here&amp;#8217;s a template that lists all books (and contain some greek characters &amp;#8212; the title of the books also contain
+greek characters) &amp;#8212; I&amp;#8217;ve named it &lt;tt class="docutils literal"&gt;book_list_ex.html&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+{% load static %}
+&amp;lt;html&amp;gt;
+&amp;lt;head&amp;gt;
+    &amp;lt;meta http-equiv=&amp;quot;Content-Type&amp;quot; content=&amp;quot;text/html; charset=utf-8&amp;quot; /&amp;gt;
+    &amp;lt;style&amp;gt;
+        {% include &amp;quot;pdfstylefonts.css&amp;quot; %}
+    &amp;lt;/style&amp;gt;
+    &amp;lt;link rel='stylesheet' href='{% static &amp;quot;pdfstyle.css&amp;quot; %}'/&amp;gt;
+&amp;lt;/head&amp;gt;
+&amp;lt;body&amp;gt;
+    &amp;lt;h1&amp;gt;Λίστα βιβλίων&amp;lt;/h1&amp;gt;
+    &amp;lt;img src='{% static &amp;quot;pony.png&amp;quot; %}' /&amp;gt;
+    &amp;lt;table&amp;gt;
+        &amp;lt;tr&amp;gt;
+            &amp;lt;th&amp;gt;ID&amp;lt;/th&amp;gt;&amp;lt;th&amp;gt;Title&amp;lt;/th&amp;gt;&amp;lt;th&amp;gt;Cover&amp;lt;/th&amp;gt;
+        &amp;lt;/tr&amp;gt;
+        {% for book in books %}
+            &amp;lt;tr&amp;gt;
+                &amp;lt;td&amp;gt;{{ book.id }}&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;{{ book.title }}&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;&amp;lt;img src='{{ book.cover.url }}' /&amp;gt;&amp;lt;/td&amp;gt;
+            &amp;lt;/tr&amp;gt;
+        {% endfor %}
+    &amp;lt;/table&amp;gt;
+&amp;lt;/body&amp;gt;
+&amp;lt;/html&amp;gt;
+&lt;/pre&gt;
+&lt;p&gt;You&amp;#8217;ll see that the &lt;tt class="docutils literal"&gt;pdfstylefonts.css&lt;/tt&gt; is included as a Django template (so that &lt;tt class="docutils literal"&gt;{% static %}&lt;/tt&gt; will
+work in that file) while &lt;tt class="docutils literal"&gt;pdfstyle.css&lt;/tt&gt; is included using &lt;tt class="docutils literal"&gt;{% static %}&lt;/tt&gt;.
+Als, notice that I&amp;#8217;ve also added a static image (using the &lt;tt class="docutils literal"&gt;{% static %}&lt;/tt&gt; tag) and a dynamic (media)
+file to show off how great the url-to-local-path mechanism works. Please notice that for the
+media files to work fine in your development environment you need to configure the
+&lt;tt class="docutils literal"&gt;MEDIA_URL&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;MEDIA_ROOT&lt;/tt&gt; settigns (similar to &lt;tt class="docutils literal"&gt;STATIC_URL&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;STATIC_ROOT&lt;/tt&gt;) and follow the
+&lt;a class="reference external" href="https://docs.djangoproject.com/en/1.8/howto/static-files/#serving-files-uploaded-by-a-user-during-development"&gt;serve files uploaded by a user during development&lt;/a&gt; tutorial on Django&amp;nbsp;docs.&lt;/p&gt;
+&lt;p&gt;Finally, if you configure a PdfResponseMixin ListView like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class BookExPdfListView(PdfResponseMixin, ListView):
+    context_object_name = 'books'
+    model = Book
+    template_name = 'books/book_list_ex.html'
+&lt;/pre&gt;
+&lt;p&gt;you should see be able to see the correct (calibri) font (defined in &lt;tt class="docutils literal"&gt;pdfstylefonts.css&lt;/tt&gt;), with unicode characters without problems
+including both the static and user uploaded images and with the styles defined in the pdf stylesheet (&lt;tt class="docutils literal"&gt;pdfstyle.css&lt;/tt&gt;).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="configure-django-for-debugging-pdf-creation"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id15"&gt;Configure Django for debugging &lt;span class="caps"&gt;PDF&lt;/span&gt;&amp;nbsp;creation&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;If you experience any problems, you can configure xhtml2pdf to output &lt;span class="caps"&gt;DEBUG&lt;/span&gt; information. To do this,
+you may change your django logging configuration like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'xhtml2pdf': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        }
+    }
+}
+&lt;/pre&gt;
+&lt;p&gt;This configuration will keep existing loggers (&lt;tt class="docutils literal"&gt;'disable_existing_loggers': False,&lt;/tt&gt;) and will configure
+&lt;tt class="docutils literal"&gt;xhtml2pdf&lt;/tt&gt; to log its output to the console, helping us find out why some things won&amp;#8217;t be&amp;nbsp;working.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="concatenating-pdfs-in-django"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id16"&gt;Concatenating PDFs in&amp;nbsp;Django&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The final section of the &lt;span class="caps"&gt;PDF&lt;/span&gt;-Django-integration is to explain how we can concatenate PDFs in django using PyPDF2. There may be
+some other requirements like extracting pages from PDFs however the most common one as explained before is to just append
+the pages of one &lt;span class="caps"&gt;PDF&lt;/span&gt; after the other &amp;#8212; after all using PyPDF2 is really easy after you get the hang of&amp;nbsp;it.&lt;/p&gt;
+&lt;p&gt;To be more &lt;span class="caps"&gt;DRY&lt;/span&gt;, I will create a &lt;tt class="docutils literal"&gt;CoverPdfResponseMixin&lt;/tt&gt; that will output a &lt;span class="caps"&gt;PDF&lt;/span&gt; &lt;em&gt;with&lt;/em&gt; a cover. To be &lt;em&gt;even more&lt;/em&gt; &lt;span class="caps"&gt;DRY&lt;/span&gt;,
+I will refactor &lt;tt class="docutils literal"&gt;PdfResponseMixin&lt;/tt&gt; to put some common code in an extra method so that &lt;tt class="docutils literal"&gt;CoverPdfResponseMixin&lt;/tt&gt; could inherit from&amp;nbsp;it:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class PdfResponseMixin(object, ):
+    def write_pdf(self, file_object, ):
+        context = self.get_context_data()
+        template = self.get_template_names()[0]
+        generate_pdf(template, file_object=file_object, context=context)
+
+    def render_to_response(self, context, **response_kwargs):
+        resp = HttpResponse(content_type='application/pdf')
+        self.write_pdf(resp)
+        return resp
+
+
+class CoverPdfResponseMixin(PdfResponseMixin, ):
+    cover_pdf = None
+
+    def render_to_response(self, context, **response_kwargs):
+        merger = PdfFileMerger()
+        merger.append(open(self.cover_pdf, &amp;quot;rb&amp;quot;))
+
+        pdf_fo = StringIO.StringIO()
+        self.write_pdf(pdf_fo)
+        merger.append(pdf_fo)
+
+        resp = HttpResponse(content_type='application/pdf')
+        merger.write(resp)
+        return resp
+&lt;/pre&gt;
+&lt;p&gt;So, &lt;tt class="docutils literal"&gt;PdfResponseMixin&lt;/tt&gt; now has a &lt;tt class="docutils literal"&gt;write_pdf&lt;/tt&gt; method that gets a file-like object and outputs the &lt;span class="caps"&gt;PDF&lt;/span&gt; there.
+The new mixin, &lt;tt class="docutils literal"&gt;CoverPdfResponseMixin&lt;/tt&gt; has a &lt;tt class="docutils literal"&gt;cover_pdf&lt;/tt&gt; attribute that should be configured with the filesystem
+path of the cover file. The &lt;tt class="docutils literal"&gt;render_to_response&lt;/tt&gt; method now will create a &lt;tt class="docutils literal"&gt;PdfFileMerger&lt;/tt&gt; (which is empty
+initially) to which it appends the contents &lt;tt class="docutils literal"&gt;cover_pdf&lt;/tt&gt;. After that, it creates a file-stream (using StreamIO)
+and uses &lt;tt class="docutils literal"&gt;write_pdf&lt;/tt&gt; to create the &lt;span class="caps"&gt;PDF&lt;/span&gt; there and appends that file-stream to the merger. Finally, it writes
+the merger contents to the &lt;tt class="docutils literal"&gt;HttpResponse&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;One thing that I&amp;#8217;ve seen is that if you want to concatenate many PDFs with many pages sometimes you&amp;#8217;ll get
+a strange an error when using &lt;tt class="docutils literal"&gt;PdfFileMerger&lt;/tt&gt;. I was able to overcome this by reading and appending the pages of each
+&lt;span class="caps"&gt;PDF&lt;/span&gt; to-be-appended one by one using the &lt;tt class="docutils literal"&gt;PdfFileReader&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;PdfFileWriter&lt;/tt&gt; objects. Here&amp;#8217;s a small snippet of how
+this could be&amp;nbsp;done:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+pdfs = [] # List of pdfs to be concatenated
+writer = PdfFileWriter()
+
+for pdf in pdfs:
+    reader = PdfFileReader(open(pdf, &amp;quot;rb&amp;quot;))
+    for i in range(reader.getNumPages()):
+        writer.addPage(reader.getPage(i))
+
+resp = HttpResponse(content_type='application/pdf')
+writer.write(resp)
+return resp
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="more-advanced-xhtml2pdf-features"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id17"&gt;More advanced xhtml2pdf&amp;nbsp;features&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;In this section I will present some information on how to use various xhtml2pdf features
+to create the most common required printed document features, for example adding page
+numbers, adding headers and footers&amp;nbsp;etc.&lt;/p&gt;
+&lt;div class="section" id="laying-out"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id18"&gt;Laying&amp;nbsp;out&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;To find out how you can create your pages you should read the
+&lt;a class="reference external" href="https://github.com/xhtml2pdf/xhtml2pdf/blob/master/doc/usage.rst#defining-page-layouts"&gt;defining page layouts&lt;/a&gt; section of the xhtml2pdf manual. There
+you&amp;#8217;ll see that the basic components of laying out in xhtml2pdf is
+&amp;#64;page to create pages and &amp;#64;frames to create rectangular components
+inside these pages. So each page will have a number of frames
+inside it. These frames are seperated to static and dynamic. Staticsome
+should be used for things like headers
+and footers (so they&amp;#8217;ll be the same across all pages) and dynamic will
+contain the main content of the&amp;nbsp;report.&lt;/p&gt;
+&lt;p&gt;For pages you can use any page size you want, not just the specified ones. For example, in one of my
+projects I wanted to create a &lt;span class="caps"&gt;PDF&lt;/span&gt; print on a normal plastic card, so I&amp;#8217;d used the
+following &lt;tt class="docutils literal"&gt;size: 8.56cm 5.398cm;&lt;/tt&gt;. Also, page templates can be named
+and you can use different ones in the same &lt;span class="caps"&gt;PDF&lt;/span&gt; (so you could create
+a cover page with a different page template, use it first and then continue
+with the normal pages). To name a tempalte you just use &amp;#64;page template_name {}
+and to change the template use the combination of the following two xhtml2pdf&amp;nbsp;tags:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;lt;pdf:nexttemplate name=&amp;quot;back_page&amp;quot; /&amp;gt;
+&amp;lt;pdf:nextpage /&amp;gt;
+&lt;/pre&gt;
+&lt;p&gt;Now, one thing I&amp;#8217;ve noticed is that you are not able to use a named template for the first
+page of your &lt;span class="caps"&gt;PDF&lt;/span&gt;. So, what I&amp;#8217;ve done is that I create an anonymous (default) page for the
+first page of the report. If I want to &lt;em&gt;reuse&lt;/em&gt; it in another page, I copy it and name it
+accordingly. I will give an example&amp;nbsp;shortly.&lt;/p&gt;
+&lt;p&gt;Now, for frames, I recommend using the &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;-pdf-frame-border:&lt;/span&gt; 1;&lt;/tt&gt; command for debugging where
+they are actually printed. Also, I recommend using a normal ruler and measuring completely
+where you want them to be. For example, for the following&amp;nbsp;frame:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;#64;frame photo_frame {
+        -pdf-frame-border: 1;
+        top:  2.4cm;
+        left: 6.2cm;
+        width: 1.9cm;
+        height: 2.2cm;
+}
+&lt;/pre&gt;
+&lt;p&gt;I&amp;#8217;d used a ruler to find out that I want it to start 2.4 cm from the top of my page (actually a credit card)
+and 6.2 cm from the left and have a width and height of 1.9 and 2.2&amp;nbsp;cm.&lt;/p&gt;
+&lt;p&gt;I recommend naming all frames to be able to distinguish them however I don&amp;#8217;t think that their name plays
+any other role. However, for static frames you must define the id of the content they will contain using &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;-pdf-frame-content&lt;/span&gt;&lt;/tt&gt;
+in the css and a div with the corresponding id in the &lt;span class="caps"&gt;PDF&lt;/span&gt; template. For example, you could define a frame header like&amp;nbsp;this&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;#64;frame header {
+  -pdf-frame-content: headerContent;
+  width: 8in;
+  top: 0.5cm;
+  margin-left: 0.5cm;
+  margin-right: 0.5cm;
+  height: 2cm;
+}
+&lt;/pre&gt;
+&lt;p&gt;and its content like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;lt;div id='headerContent'&amp;gt;
+  &amp;lt;h1 &amp;gt;
+    Header !
+  &amp;lt;/h1&amp;gt;
+&amp;lt;/div&amp;gt;
+&lt;/pre&gt;
+&lt;p&gt;Please notice that if for some reason the stuff you want to put in your static frames does not fit there the frame will
+be totally empty. This means that if you have size for three lines but you want to output five lines in a static frame
+then you&amp;#8217;ll see no&amp;nbsp;lines!&lt;/p&gt;
+&lt;p&gt;Now, for dynamic content you can expect the opposite behavior:
+You &lt;em&gt;cannot&lt;/em&gt; select to which dynamic frame your content goes, instead the content just just flows to the first dynamic frame it
+fits! If it does not fit in any dynamic frames in the current page then a new page will be&amp;nbsp;created.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;d like to present a full example here on the already mentioned project of printing a plastic card for the books. I had two page layouts,
+one for the front page having a frame with the owner&amp;#8217;s data and another frame with his photo and one for the back page having
+a barcode. This is a Django template that is used to print not only but a &lt;span class="caps"&gt;PDF&lt;/span&gt; with a group of these&amp;nbsp;cards:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;lt;html&amp;gt;
+&amp;lt;head&amp;gt;
+&amp;lt;meta http-equiv=&amp;quot;Content-Type&amp;quot; content=&amp;quot;text/html; charset=utf-8&amp;quot; /&amp;gt;
+&amp;lt;style&amp;gt;
+    {% include &amp;quot;pdfstylefonts.css&amp;quot; %}
+&amp;lt;/style&amp;gt;
+&amp;lt;style type='text/css'&amp;gt;
+    &amp;#64;page {
+        size: 8.56cm 5.398cm;
+        margin: 0.0cm 0.0cm 0.0cm 0.0cm;
+        padding: 0;
+
+        &amp;#64;frame table_frame {
+            /* -pdf-frame-border: 1; */
+            top:  2.4cm;
+            left: 0.4cm;
+            width: 5.5cm;
+            height: 3cm;
+        }
+
+        &amp;#64;frame photo_frame {
+            /* -pdf-frame-border: 1; */
+            top:  2.4cm;
+            left: 6.2cm;
+            width: 1.9cm;
+            height: 2.2cm;
+        }
+    }
+
+    &amp;#64;page front_page {
+        size: 8.56cm 5.398cm;
+        margin: 0.0cm 0.0cm 0.0cm 0.0cm;
+        padding: 0;
+
+        &amp;#64;frame table_frame {
+            /* -pdf-frame-border: 1; */
+            top:  2.4cm;
+            left: 0.4cm;
+            width: 5.5cm;
+            height: 3cm;
+        }
+
+        &amp;#64;frame photo_frame {
+            /* -pdf-frame-border: 1; */
+            top:  2.4cm;
+            left: 6.2cm;
+            width: 1.9cm;
+            height: 2.2cm;
+        }
+    }
+
+    &amp;#64;page back_page {
+        size: 8.56cm 5.398cm;
+        margin: 0.0cm 0.0cm 0.0cm 0.0cm;
+        padding: 0;
+
+        &amp;#64;frame barcode_frame {
+            /* -pdf-frame-border: 1; */
+            top:  3.9cm;
+            left: 1.8cm;
+            width: 4.9cm;
+            height: 1.1cm;
+        }
+    }
+
+    *, html {
+        font-family: &amp;quot;Calibri&amp;quot;;
+        font-size: 8pt;
+        line-height: 80%;
+    }
+
+    .bigger {
+        font-size:9pt;
+        font-weight: bold;
+    }
+&amp;lt;/style&amp;gt;
+&amp;lt;/head&amp;gt;
+&amp;lt;body&amp;gt;
+    {% for book in books %}
+        &amp;lt;div&amp;gt;
+            &amp;lt;! -- Here I print the card data. It fits exactly in the table_frame so ... -&amp;gt;
+            {{ book.title }}&amp;lt;br /&amp;gt;
+            Data line 2&amp;lt;br /&amp;gt;
+            Data line 3&amp;lt;br /&amp;gt;
+            Data line 4&amp;lt;br /&amp;gt;
+            Data line 5&amp;lt;br /&amp;gt;
+            Data line 6&amp;lt;br /&amp;gt;
+            Data line 7&amp;lt;br /&amp;gt;
+            Data line 8&amp;lt;br /&amp;gt;
+            Data line 9&amp;lt;br /&amp;gt;
+            Data line 10&amp;lt;br /&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;div&amp;gt;
+            &amp;lt;! -- This photo here will be outputted to the photo_frame --&amp;gt;
+            &amp;lt;img src='{{ book.cover.url }}' style='width:1.9cm ; height: 2.2cm ; ' /&amp;gt;
+        &amp;lt;/div&amp;gt;
+
+        &amp;lt;! -- Now the template is chaned to print the back of the card --&amp;gt;
+        &amp;lt;pdf:nexttemplate name=&amp;quot;back_page&amp;quot; /&amp;gt;
+        &amp;lt;pdf:nextpage /&amp;gt;
+
+        &amp;lt;div &amp;gt;
+            &amp;lt;center&amp;gt;
+                &amp;lt;! -- Print the barcode to the barcode_frame --&amp;gt;
+                &amp;lt;pdf:barcode value=&amp;quot;{{ book.id }}&amp;quot; type=&amp;quot;code128&amp;quot; humanreadable=&amp;quot;1&amp;quot; barwidth=&amp;quot;0.43mm&amp;quot; barheight=&amp;quot;0.6cm&amp;quot; align=&amp;quot;middle&amp;quot; /&amp;gt;
+            &amp;lt;/center&amp;gt;
+        &amp;lt;/div&amp;gt;
+        &amp;lt;!-- Use the front_page template again for the next card --&amp;gt;
+        &amp;lt;pdf:nexttemplate name=&amp;quot;front_page&amp;quot; /&amp;gt;
+        &amp;lt;pdf:nextpage /&amp;gt;
+    {% endfor %}
+&amp;lt;/body&amp;gt;
+&amp;lt;/html&amp;gt;
+&lt;/pre&gt;
+&lt;p&gt;Notice that I want to print exactly 10 lines in the &lt;tt class="docutils literal"&gt;table_frame&lt;/tt&gt; (that&amp;#8217;s why I use &amp;lt;br /&amp;gt; to go to next line) &amp;#8212; if I had printed
+3-4 lines (for example) then the photo &lt;em&gt;would fit&lt;/em&gt; in the &lt;tt class="docutils literal"&gt;table_frame&lt;/tt&gt; and would be printed there and &lt;em&gt;not&lt;/em&gt; in the &lt;tt class="docutils literal"&gt;photo_frame&lt;/tt&gt;! Also,
+another interesting thing is that if I had
+outputed 8-9 lines then the photo wouldn&amp;#8217;t fit in that small space and would also be printed to the &lt;tt class="docutils literal"&gt;photo_frame&lt;/tt&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="extra-stuff"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id19"&gt;Extra&amp;nbsp;stuff&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Some extra things I want to mention concerning&amp;nbsp;xhtml2pdf:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;&amp;lt;pdf:pagenumber&amp;gt;&lt;/tt&gt; to output the current page number (please end the line after this&amp;nbsp;tag)&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;&amp;lt;pdf:pagecount&amp;gt;&lt;/tt&gt; to output the total page number (please end the line after this&amp;nbsp;tag)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;So if you want to print a footer with the pages, I recommend something like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;lt;div id='footerContent'&amp;gt;
+  Page &amp;lt;pdf:pagenumber&amp;gt;
+  from &amp;lt;pdf:pagecount&amp;gt;
+  total
+&amp;lt;/div&amp;gt;
+&lt;/pre&gt;
+&lt;p&gt;Notice how the lines end after the&amp;nbsp;tags.&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;&amp;lt;pdf:barcode&amp;gt;&lt;/tt&gt;: Output a barcode in your &lt;span class="caps"&gt;PDF&lt;/span&gt;. Here are the possible barcode types: I2of5, Standard39, Extended39, Standard93, Extended93, &lt;span class="caps"&gt;MSI&lt;/span&gt;, Codabar, Code11, &lt;span class="caps"&gt;FIM&lt;/span&gt;, &lt;span class="caps"&gt;POSTNET&lt;/span&gt;, USPS_4State, Code128, &lt;span class="caps"&gt;EAN13&lt;/span&gt;, &lt;span class="caps"&gt;EAN8&lt;/span&gt;, &lt;span class="caps"&gt;QR&lt;/span&gt;.&lt;/li&gt;
+&lt;li&gt;You may add a page background image using  the &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;background-image&lt;/span&gt;&lt;/tt&gt; property of &lt;tt class="docutils literal"&gt;&amp;#64;page&lt;/tt&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;For example, if you want the templates you create from your development/&lt;span class="caps"&gt;UAT&lt;/span&gt; systems to be different
+than the production ones you could do something like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;#64;page {
+    {% if DEBUG %}
+        background-image: url({% static &amp;quot;debug.png&amp;quot; %});
+    {% endif %}
+    &amp;lt;!-- Other page properties --&amp;gt;
+}
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="conclusion"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id20"&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;I hope that using the techniques described in this essential guide you&amp;#8217;ll
+be able to create great looking &lt;span class="caps"&gt;PDF&lt;/span&gt; documents from your Django application
+and overcome any difficulties that may arise. If you feel that there&amp;#8217;s something
+I&amp;#8217;ve not covered properly (and is not covered by the documentation) please comment
+out and I&amp;#8217;ll be happy to research it a bit and update the article with&amp;nbsp;info.&lt;/p&gt;
+&lt;p&gt;I am using all the above in various production applications for a long time and everything
+is smooth so don&amp;#8217;t afraid to create PDFs from&amp;nbsp;Django!&lt;/p&gt;
+&lt;/div&gt;
+</summary><category term="pdf"></category><category term="django"></category><category term="reportlab"></category><category term="python"></category><category term="xhtml2pdf"></category></entry><entry><title>Django dynamic tables and filters for similar models</title><link href="http://spapas.github.io/2015/10/05/django-dynamic-tables-similar-models/" rel="alternate"></link><updated>2015-10-05T14:20:00+03:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2015-10-05:2015/10/05/django-dynamic-tables-similar-models/</id><summary type="html">&lt;div class="contents topic" id="contents"&gt;
+&lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id1"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#the-problem-we-ll-solve" id="id2"&gt;The problem we&amp;#8217;ll&amp;nbsp;solve&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#adding-the-dynamic-table" id="id3"&gt;Adding the dynamic&amp;nbsp;table&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#creating-a-dynamic-form-for-filtering" id="id4"&gt;Creating a dynamic form for&amp;nbsp;filtering&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#creating-the-dynamic-cbv" id="id5"&gt;Creating the dynamic &lt;span class="caps"&gt;CBV&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#conclusion" id="id6"&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="introduction"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id1"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;One of my favorite django apps is &lt;a class="reference external" href="https://github.com/bradleyayers/django-tables2"&gt;django-tables2&lt;/a&gt;: It allows you to
+easily create pagination and sorting enabled &lt;span class="caps"&gt;HTML&lt;/span&gt; tables to represent
+your model data using the usual djangonic technique (similar to how
+you &lt;a class="reference external" href="https://docs.djangoproject.com/en/1.8/topics/forms/modelforms/#modelform"&gt;create ModelForms&lt;/a&gt;). I use it to almost all my projects to
+represent the data, along with &lt;a class="reference external" href="https://github.com/alex/django-filter"&gt;django-filter&lt;/a&gt; to create forms
+to filter my model data. I&amp;#8217;ve written &lt;a class="reference external" href="http://stackoverflow.com/questions/13611741/django-tables-column-filtering/15129259#15129259"&gt;a nice &lt;span class="caps"&gt;SO&lt;/span&gt; answer&lt;/a&gt; with
+instructions on how to use django-filter along with&amp;nbsp;django-tables2.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="the-problem-we-ll-solve"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id2"&gt;The problem we&amp;#8217;ll&amp;nbsp;solve&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The main tool django-tables2 offers is a template tag called &lt;tt class="docutils literal"&gt;render_table&lt;/tt&gt;
+that get an instance of a subclass of &lt;tt class="docutils literal"&gt;django_tables2.Table&lt;/tt&gt;
+which contains a description of the table (columns, style etc) along
+with a queryset with the table&amp;#8217;s data and output it to the page. A nice
+extra feature of render_table is that you could pass it just a simple
+django queryset and it will output it without the need to create the
+custom Table class. So you can do something like {% render_table User.objects.all() %}
+and get a quick output of your Users&amp;nbsp;table.&lt;/p&gt;
+&lt;p&gt;In one of my projects I had three models that
+were used for keeping a different type of business log in the database (for auditing reasons)
+and was using the above feature to display these logs to the administrators, just by
+creating a very simple &lt;tt class="docutils literal"&gt;ListView&lt;/tt&gt; (a different one for each Log type) and using the
+&lt;tt class="docutils literal"&gt;render_table&lt;/tt&gt; to display the data. So I&amp;#8217;d created three views like&amp;nbsp;this&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class AuditLogListView(ListView):
+  model = AuditLog
+  context_object_name = 'logs'
+&lt;/pre&gt;
+&lt;p&gt;which all used a single template that contained a line &lt;tt class="docutils literal"&gt;{% render_table logs %}&lt;/tt&gt; to display
+the table (the &lt;tt class="docutils literal"&gt;logs&lt;/tt&gt; context variable contains the list of &lt;tt class="docutils literal"&gt;AuditLog&lt;/tt&gt; s).&lt;/p&gt;
+&lt;p&gt;This was a nice &lt;span class="caps"&gt;DRY&lt;/span&gt; (but quick and dirty solution) that soon was not enough to fulfill the
+needs of the administrators since they neeeded to have default sorting, filtering, hide
+the primary key-id column etc. The obvious solution for that would be to just create three different
+&lt;tt class="docutils literal"&gt;Table&lt;/tt&gt; subclasses that
+would more or less have the same options with only their &lt;tt class="docutils literal"&gt;model&lt;/tt&gt; attributte different. I didn&amp;#8217;t
+like this solution that much since it seemed non-&lt;span class="caps"&gt;DRY&lt;/span&gt; to me and I would instead prefer to
+create a generic &lt;tt class="docutils literal"&gt;Table&lt;/tt&gt; (that wouldn&amp;#8217;t have a &lt;tt class="docutils literal"&gt;model&lt;/tt&gt; attributte) and would just output
+its data with the correct options &amp;#8212; so instead of three &lt;tt class="docutils literal"&gt;Table&lt;/tt&gt; classes I&amp;#8217;d like to create
+just a single one with common options that would display its data (what &lt;tt class="docutils literal"&gt;render_table&lt;/tt&gt; does).&lt;/p&gt;
+&lt;p&gt;Unfortunately, I couldn&amp;#8217;t find a solution to this, since when I ommited the &lt;tt class="docutils literal"&gt;model&lt;/tt&gt; attribute
+from the &lt;tt class="docutils literal"&gt;Table&lt;/tt&gt; subclass nothing was outputed (there was no way to define fields to
+display without also defining the model). An obvious (and &lt;span class="caps"&gt;DRY&lt;/span&gt;) resolution would be to create
+a base &lt;tt class="docutils literal"&gt;Table&lt;/tt&gt; subclass that would define the needed options and create three subclasses
+that would inherit from this class and override only the &lt;tt class="docutils literal"&gt;model&lt;/tt&gt; attribute. This unfortunately was not
+possible becase &lt;a class="reference external" href="http://stackoverflow.com/questions/16696066/django-tables2-dynamically-adding-columns-to-table-not-adding-attrs-to-table/16741665#16741665"&gt;inheritance does not work well with django-tables2&lt;/a&gt;!&lt;/p&gt;
+&lt;p&gt;Furthermore, there&amp;#8217;s the extra hurdle of adding filtering to the above tables so that
+the admin&amp;#8217;s would be able to quickly find a log message - if we wanted to use django-filter
+we&amp;#8217;d need again to create three different subclasses (one for each log model type)
+of &lt;tt class="docutils literal"&gt;django_filter.FilterSet&lt;/tt&gt; since
+django-filter requires you to define the model for which the filter will be&amp;nbsp;created.&lt;/p&gt;
+&lt;p&gt;The best way to resolve such problems is to create your classes dynamically when
+you need &amp;#8216;em. I&amp;#8217;ve already described a way to &lt;a class="reference external" href="http://spapas.github.io/2013/12/24/django-dynamic-forms/"&gt;dynamically create forms in django
+in a previous post&lt;/a&gt;. Below, I&amp;#8217;ll describe
+a similar technique which can be used to create both dynamic tables and filters. Using
+this methodology, you&amp;#8217;ll be able to add a new &lt;span class="caps"&gt;CBV&lt;/span&gt; that displays a table with
+pagination, order and filtering for your model by just inheriting from a base&amp;nbsp;class!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="adding-the-dynamic-table"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id3"&gt;Adding the dynamic&amp;nbsp;table&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;To create the &lt;span class="caps"&gt;DRY&lt;/span&gt; &lt;span class="caps"&gt;CBV&lt;/span&gt; we&amp;#8217;ll use the &lt;a class="reference external" href="http://django-tables2.readthedocs.org/en/latest/pages/generic-mixins.html?highlight=singletableview"&gt;SingleTableView&lt;/a&gt; (&lt;tt class="docutils literal"&gt;django_tables2.SingleTableView&lt;/tt&gt;)
+as a base and override its &lt;tt class="docutils literal"&gt;get_table_class&lt;/tt&gt; method to dynamically create our table class
+using &lt;tt class="docutils literal"&gt;type&lt;/tt&gt;.
+Here&amp;#8217;s how it could be done using a mixin (notice that this mixin should be used in a
+&lt;tt class="docutils literal"&gt;SingleTableView&lt;/tt&gt; to override its &lt;tt class="docutils literal"&gt;get_table_class&lt;/tt&gt; method):&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class AddTableMixin(object, ):
+  table_pagination = {&amp;quot;per_page&amp;quot;: 25}
+
+  def get_table_class(self):
+      def get_table_column(field):
+          if isinstance(field, django.db.models.DateTimeField):
+              return tables.DateColumn(&amp;quot;d/m/Y H:i&amp;quot;)
+          else:
+              return tables.Column()
+
+      attrs = dict(
+          (f.name, get_table_column(f)) for
+          f in self.model._meta.fields if not f.name == 'id'
+      )
+      attrs['Meta'] = type('Meta', (), {'attrs':{&amp;quot;class&amp;quot;:&amp;quot;table&amp;quot;}, &amp;quot;order_by&amp;quot;: (&amp;quot;-created_on&amp;quot;, ) } )
+      klass = type('DTable', (tables.Table, ), attrs)
+
+      return klass
+&lt;/pre&gt;
+&lt;p&gt;Let&amp;#8217;s try to explain the &lt;tt class="docutils literal"&gt;get_table_class&lt;/tt&gt; method: First of all, we&amp;#8217;ve defined a local &lt;tt class="docutils literal"&gt;get_table_column&lt;/tt&gt;
+function that will return a django-tables2 column depending on the field of the model. For example, in
+our case we want to use a &lt;tt class="docutils literal"&gt;django_tables2.DateColumn&lt;/tt&gt; with a specific format when a &lt;tt class="docutils literal"&gt;DateTimeField&lt;/tt&gt; is
+encountered and for all other model fields just use the stock &lt;tt class="docutils literal"&gt;Column&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;After that, we create a dictionary with all the attributes of the model. The &lt;tt class="docutils literal"&gt;self.model&lt;/tt&gt; field will contain
+the model Class, so using its &lt;tt class="docutils literal"&gt;_meta.fields&lt;/tt&gt; will return the defined fields. As we can see, we just use
+a generator expression to create a tuple with the name of the field and its type (using &lt;tt class="docutils literal"&gt;get_table_class&lt;/tt&gt;)
+excluding the &amp;#8216;id&amp;#8217; column. So, attrs will be a dictionary of field names and&amp;nbsp;types.&lt;/p&gt;
+&lt;p&gt;The &lt;tt class="docutils literal"&gt;Meta&lt;/tt&gt; class of this table is crated using &lt;tt class="docutils literal"&gt;type&lt;/tt&gt; which creates a parentless class by defining all its attributes in a dictionary
+and set it as the &lt;tt class="docutils literal"&gt;Meta&lt;/tt&gt; key in the previously defined &lt;tt class="docutils literal"&gt;attrs&lt;/tt&gt; dict. Finally, we create the actual &lt;tt class="docutils literal"&gt;django_tables2.Table&lt;/tt&gt; subclass by
+inheriting from it and passing the &lt;tt class="docutils literal"&gt;attrs&lt;/tt&gt; dict. We&amp;#8217;ll see an example of what &lt;tt class="docutils literal"&gt;get_table_class&lt;/tt&gt; returns&amp;nbsp;later.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="creating-a-dynamic-form-for-filtering"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id4"&gt;Creating a dynamic form for&amp;nbsp;filtering&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Let&amp;#8217;s create another mixin that could be used to create a dynamic &lt;tt class="docutils literal"&gt;django.Form&lt;/tt&gt; subclass to the &lt;span class="caps"&gt;CBV&lt;/span&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class AddFormMixin(object, ):
+  def define_form(self):
+      def get_form_field(f):
+          return forms.CharField(required=False)
+
+      attrs = dict(
+          (f, get_form_field(f)) for
+          f in self.get_form_fields() )
+
+      klass = type('DForm', (forms.Form, ), attrs)
+
+      return klass
+
+  def get_queryset(self):
+      form_class = self.define_form()
+      if self.request.GET:
+          self.form = form_class(self.request.GET)
+      else:
+          self.form = form_class()
+
+      qs = super(AddFormMixin, self).get_queryset()
+
+      if self.form.data and self.form.is_valid():
+          q_objects = Q()
+          for f in self.get_form_fields():
+              q_objects &amp;amp;= Q(**{f+'__icontains':self.form.cleaned_data.get(f, '')})
+
+          qs = qs.filter(q_objects)
+
+      return qs
+
+  def get_context_data(self, **kwargs):
+      ctx = super(AddFormMixin, self).get_context_data(**kwargs)
+      ctx['form'] = self.form
+      return ctx
+&lt;/pre&gt;
+&lt;p&gt;The first method that will be called is the &lt;tt class="docutils literal"&gt;get_queryset&lt;/tt&gt; method that will generate the dynamic form
+using &lt;tt class="docutils literal"&gt;define_form&lt;/tt&gt;. This method has a get_form_fields local function (similar to get_table_fields)
+that can be used to override the types of the fields (or just fallback to a normal CharField) and
+then create the &lt;tt class="docutils literal"&gt;attrs&lt;/tt&gt; dictionary and &lt;tt class="docutils literal"&gt;forms.Form&lt;/tt&gt; subclass in a similar way as the &lt;tt class="docutils literal"&gt;Table&lt;/tt&gt; subclass. Here,
+we don&amp;#8217;t want to create a filter form from all fields of the model as we did on table, so instead
+we&amp;#8217;ll use a &lt;tt class="docutils literal"&gt;get_form_fields&lt;/tt&gt; method that returns the name of the fields that we want to
+use in the filtering form and needs to be defined in each &lt;span class="caps"&gt;CBV&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;The &lt;tt class="docutils literal"&gt;get_queryset&lt;/tt&gt; method is more interesting: First of all, since we are just filtering the
+queryset we&amp;#8217;d need to submit the form with a &lt;tt class="docutils literal"&gt;&lt;span class="caps"&gt;GET&lt;/span&gt;&lt;/tt&gt; (and not a &lt;tt class="docutils literal"&gt;&lt;span class="caps"&gt;POST&lt;/span&gt;&lt;/tt&gt;). We see that if we have
+data to our &lt;tt class="docutils literal"&gt;request.&lt;span class="caps"&gt;GET&lt;/span&gt;&lt;/tt&gt; dictionary we&amp;#8217;ll instantiate the form using this data (or else we&amp;#8217;ll just
+create an empty form). To do the actual filtering, we check if the form is valid and create a &lt;tt class="docutils literal"&gt;django.models.db.Q&lt;/tt&gt; object
+that is used to combine (by &lt;span class="caps"&gt;AND&lt;/span&gt;) the conditions. Each of the individual Q objects that will be combined
+to create the complete one will be created using the line &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;Q(**{f+'__icontains':self.form.cleaned_data.get(f,&lt;/span&gt; &lt;span class="pre"&gt;'')})&lt;/span&gt;&lt;/tt&gt;
+(where f will be the name of the field) which will create a dictionary of the form &lt;tt class="docutils literal"&gt;{'action__icontains': 'test text'}&lt;/tt&gt; and then pass this as a keyword
+argument to the Q (using the &lt;tt class="docutils literal"&gt;**&lt;/tt&gt; mechanism) - this is the only way to pass dynamic kwargs to a&amp;nbsp;function!&lt;/p&gt;
+&lt;p&gt;Finally, the queryset will be filtered using the combined &lt;tt class="docutils literal"&gt;Q&lt;/tt&gt; object we just&amp;nbsp;described.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="creating-the-dynamic-cbv"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt;Creating the dynamic &lt;span class="caps"&gt;CBV&lt;/span&gt;&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Using the above mixins, we can easily create a dynamic &lt;span class="caps"&gt;CBV&lt;/span&gt; with a table and a filter form only by inheriting from the mixins
+and &lt;tt class="docutils literal"&gt;SingleTableView&lt;/tt&gt; and defining the &lt;tt class="docutils literal"&gt;get_form_fields&lt;/tt&gt; method:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class AuditLogListView(AddTableMixin, AddFormMixin, SingleTableView):
+  model = AuditLog
+  context_object_name = 'logs'
+
+  def get_form_fields(self):
+      return ('action','user__username', )
+&lt;/pre&gt;
+&lt;p&gt;Let&amp;#8217;s suppose that the &lt;tt class="docutils literal"&gt;AuditLog&lt;/tt&gt; is defined as&amp;nbsp;following:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class AuditLog(models.Model):
+  created_on = models.DateTimeField( auto_now_add=True, editable=False,)
+  user = models.ForeignKey(settings.AUTH_USER_MODEL, editable=False,)
+  action = models.CharField(max_length=256, editable=False,)
+&lt;/pre&gt;
+&lt;p&gt;Using the above &lt;tt class="docutils literal"&gt;AuditLogListView&lt;/tt&gt;, a dynamic table and a dynamic form will be automaticall created whenever the view is visited.
+The &lt;tt class="docutils literal"&gt;Table&lt;/tt&gt; class will be like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class DTable(tables.Table):
+  created_on = tables.DateColumn(&amp;quot;d/m/Y H:i&amp;quot;)
+  user = tables.Column()
+  action = tables.Column()
+
+  class Meta:
+      attrs = {&amp;quot;class&amp;quot;:&amp;quot;table&amp;quot;}
+      order_by = (&amp;quot;-created_on&amp;quot;, )
+&lt;/pre&gt;
+&lt;p&gt;and the &lt;tt class="docutils literal"&gt;Form&lt;/tt&gt; class like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class DForm(forms.Form):
+  user__username = forms.CharField()
+  action = forms.CharField()
+&lt;/pre&gt;
+&lt;p&gt;An interesting thing to notice is that we can drill down to foreign keys (f.e. &lt;tt class="docutils literal"&gt;user__username&lt;/tt&gt;) to create more interesting filters. Also we could add some more
+methods to be overriden by the implementing class beyond the &lt;tt class="docutils literal"&gt;get_form_fields&lt;/tt&gt;. For example, instead of using &lt;tt class="docutils literal"&gt;self.model._meta.fields&lt;/tt&gt;
+to generate the fields of the table, we could instead use a &lt;tt class="docutils literal"&gt;get_table_fields&lt;/tt&gt; method that would be overriden in the implementing
+classes (and even drill down on foreign keys to display more data on the table using &lt;a class="reference external" href="http://django-tables2.readthedocs.org/en/latest/pages/accessors.html"&gt;accessors&lt;/a&gt;).&lt;/p&gt;
+&lt;p&gt;Or, instead of just passing the the form field names we could also pass their type (instead of using &lt;tt class="docutils literal"&gt;get_form_fields&lt;/tt&gt;) and
+their lookup method (instead of  &lt;tt class="docutils literal"&gt;icontains&lt;/tt&gt;) &amp;#8212; similar to&amp;nbsp;django-filter.&lt;/p&gt;
+&lt;p&gt;Please notice that instead of creating a django form instance for filtering, we could instead create a django-filter instance with
+a similar methodology. However, I preferred to just use a normal django form because it makes the whole process more clear and removes
+a level of abstraction (we just create a &lt;tt class="docutils literal"&gt;django.Form&lt;/tt&gt; subclass while, if we used django-filter we&amp;#8217;d need to create a django-filter subclass
+which would create a &lt;tt class="docutils literal"&gt;django.Form&lt;/tt&gt; subclass)!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="conclusion"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id6"&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Using the above technique we can quickly create a table and filter for a number of Models that all share
+the same properties in the most &lt;span class="caps"&gt;DRY&lt;/span&gt;. This technique of course is useful only for quick CBVs that
+are more or less the same and require little customization. Another interesting thing is that instead of
+creating different &lt;tt class="docutils literal"&gt;SingleTableView&lt;/tt&gt; s we could instead create a single &lt;span class="caps"&gt;CBV&lt;/span&gt; that will get the content type
+of the Model to be viewed as a parameter and retrieve the model (and queryset) from the content&amp;nbsp;type!&lt;/p&gt;
+&lt;/div&gt;
+</summary><category term="django"></category><category term="python"></category><category term="forms"></category><category term="tables"></category></entry><entry><title>django-rq redux: advanced techniques and tools</title><link href="http://spapas.github.io/2015/09/01/django-rq-redux/" rel="alternate"></link><updated>2015-09-01T14:20:00+03:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2015-09-01:2015/09/01/django-rq-redux/</id><summary type="html">&lt;div class="contents topic" id="contents"&gt;
 &lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
 &lt;ul class="simple"&gt;
 &lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id1"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
@@ -223,7 +1267,8 @@ of instances in a single&amp;nbsp;server.&lt;/p&gt;
 application. The options in redis.conf that need to be changed per application
 is the port that this redis instance will bind (this port also needs to be passed to
 django settings.py) and the pid filename if you daemonize redis &amp;#8212; I recommend using
-a tool like &lt;a class="reference external" href="http://supervisord.org/"&gt;supervisord&lt;/a&gt; instead so that you won&amp;#8217;t need any daemonizing and pid files for&amp;nbsp;redis!&lt;/p&gt;
+a tool like &lt;a class="reference external" href="http://supervisord.org/"&gt;supervisord&lt;/a&gt; instead so that you won&amp;#8217;t need any daemonizing and pid files for
+each&amp;nbsp;per-app-redis-instance!&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="low-level-debugging"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id8"&gt;Low level&amp;nbsp;debugging&lt;/a&gt;&lt;/h2&gt;
@@ -794,9 +1839,10 @@ to help readers quickly test the concepts presented&amp;nbsp;here.&lt;/p&gt;
 &lt;li&gt;&lt;a class="reference internal" href="#id2" id="id18"&gt;Installation&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a class="reference internal" href="#id3" id="id19"&gt;Example&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a class="reference internal" href="#id4" id="id20"&gt;Usage&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#comparing-versions-with-django-reversion-compare" id="id21"&gt;Comparing versions with&amp;nbsp;django-reversion-compare&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#conclusion" id="id21"&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#conclusion" id="id22"&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
 &lt;div class="section" id="introduction"&gt;
@@ -806,6 +1852,8 @@ need to know &lt;em&gt;who&lt;/em&gt; did the change, &lt;em&gt;when&lt;/em&gt; 
 In this post we will see three
 different solution in order to add this functionality in Django: doing it ourselves,
 using django-simple-history and using&amp;nbsp;django-reversion.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Update 24/09/2015:&lt;/em&gt; Added a paragraph describing the django-reversion-compare which is
+a great addon for django-reversion that makes finding differences between versions a&amp;nbsp;breeze!&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="adding-simple-auditing-functionality-ourselves"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id6"&gt;Adding simple auditing functionality&amp;nbsp;ourselves&lt;/a&gt;&lt;/h2&gt;
@@ -1098,12 +2146,26 @@ def get_versions(self):
 &lt;li&gt;get the date of the change through the &lt;tt class="docutils literal"&gt;revision.date_created&lt;/tt&gt; attribute&lt;/li&gt;
 &lt;li&gt;get the values of the object fields as they were in this revision using the &lt;tt class="docutils literal"&gt;field_dict&lt;/tt&gt; attribute&lt;/li&gt;
 &lt;li&gt;get a model instance as it was on that revision using the &lt;tt class="docutils literal"&gt;object_version.object&lt;/tt&gt; attribute&lt;/li&gt;
-&lt;li&gt;revert to that previous version of that object using the &lt;tt class="docutils literal"&gt;rever()&lt;/tt&gt; method&lt;/li&gt;
+&lt;li&gt;revert to that previous version of that object using the &lt;tt class="docutils literal"&gt;revert()&lt;/tt&gt; method&lt;/li&gt;
 &lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="comparing-versions-with-django-reversion-compare"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id21"&gt;Comparing versions with&amp;nbsp;django-reversion-compare&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;A great addon for django-version is &lt;a class="reference external" href="github.com/jedie/django-reversion-compare"&gt;django-reversion-compare&lt;/a&gt; which helps you find out differences
+between versions of your objects. When you use django-reversion-compare, you&amp;#8217;ll be able to select
+two (different) versions of your object and you&amp;#8217;ll be presented with a list of all the differences
+found in the fields of that object between the two versions. The diff algorithm is smart, so you&amp;#8217;ll
+be able to easily recognise the&amp;nbsp;changes.&lt;/p&gt;
+&lt;p&gt;To use django-reversion-compare, after installing it you should just inherit your admin views from
+&lt;tt class="docutils literal"&gt;reversion_compare.admin.CompareVersionAdmin&lt;/tt&gt; (instead of &lt;tt class="docutils literal"&gt;reversion.VersionAdmin&lt;/tt&gt;) and you&amp;#8217;ll
+get the reversion-compare views instead of reversion views in the admin for the history of the&amp;nbsp;object.&lt;/p&gt;
+&lt;p&gt;Also, in case you need to give access to normal, non-admin users to the history of an object (this is
+useful for auditing reasons), you can use the &lt;tt class="docutils literal"&gt;reversion_compare.views.HistoryCompareDetailView&lt;/tt&gt;
+as a normal &lt;tt class="docutils literal"&gt;DetailView&lt;/tt&gt; to create a non-admin history and compare diff&amp;nbsp;view.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="section" id="conclusion"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id21"&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id22"&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;In the above we say that it is really easy to add basic (&lt;em&gt;who&lt;/em&gt; and &lt;em&gt;when&lt;/em&gt;) auditing capabilities to your models: You just need to
 inherit your models from the &lt;tt class="docutils literal"&gt;Auditable&lt;/tt&gt; abstract class and inherit your Create and Update CBVs from &lt;tt class="docutils literal"&gt;AuditableMixin&lt;/tt&gt;.
 If you want to know exactly &lt;em&gt;what&lt;/em&gt; was changed then you have two solutions: django-simple-history to create an extra table for

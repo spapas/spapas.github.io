@@ -78,27 +78,7 @@
 <time datetime="2014-12-16T16:20:00+02:00" pubdate>Τρι 16 Δεκέμβριος 2014</time>    </p>
 </header>
 
-  <div class="entry-content"><div class="section" id="warning-updated-on-05-february-2015">
-<h2>Warning - updated on 05 February&nbsp;2015</h2>
-<p>I recently noticed (to my surprise) that bootstrap-material-design has a not-very-open license
-(<a class="reference external" href="https://github.com/FezVrasta/bootstrap-material-design/blob/master/LICENSE.md">https://github.com/FezVrasta/bootstrap-material-design/blob/master/<span class="caps">LICENSE</span>.md</a>).
-Quoting from&nbsp;there:</p>
-<blockquote>
-You can use this software for free only for no-profit projects. If you&#8217;d like to use this software in a commercial project you may contact the author (Federico Zivolo) of the software and ask for his permission and fulfill his conditions.</blockquote>
-<p>This is a more general comment, but for me, if you want to develop an open source
-project and receive contributions from people not belonging to your company then you
-<em>need</em> to have a real Open Source License like Apache, <span class="caps">MIT</span>, <span class="caps">BSD</span> or <span class="caps">LGPL</span> (no, I don&#8217;t
-consider <span class="caps">GPL</span> to be really <em>open</em>).</p>
-<p>When people are contributing to an open source project they are doing it because most
-of the times they want to use this project and <em>their</em> contributions to their own
-projects which (most probably) are commercial, so people contributing to
-bootstrap-material-design won&#8217;t be able to use it in their own&nbsp;projects!</p>
-<p><strong>After this, I recommend people to avoid contributing to and stop using bootstrap-material-design
-for their own&nbsp;projects.</strong></p>
-<p>Instead, they should either use vanilla bootstrap, or a (<span class="caps">MIT</span> licensed) theme from <a class="reference external" href="https://bootswatch.com/">bootswatch</a>. Also,
-I&#8217;ve noticed (but not used yet) <a class="reference external" href="https://github.com/viewflow/django-material">django-material</a> which seems like a nice solution for django&nbsp;projects.</p>
-</div>
-<div class="section" id="introduction">
+  <div class="entry-content"><div class="section" id="introduction">
 <h2>Introduction</h2>
 <p><a class="reference external" href="https://github.com/FezVrasta/bootstrap-material-design">Bootstrap Material Design</a> is a great theme that sits on top of <a class="reference external" href="http://getbootstrap.com/">Bootstrap</a> and transforms it to
 <a class="reference external" href="http://www.google.com/design/spec/material-design/introduction.html">Material Design</a>! The great thing about Bootstrap Material Design is that you just need to include
@@ -139,6 +119,16 @@ in the same folder as with <tt class="docutils literal">bower.json</tt>, <tt cla
 </pre>
 <p>(I wanted to use the indigo color as my primary one - you may of course use whichever color from the ones defined in <tt class="docutils literal">less/_variables.less</tt> you&nbsp;like)</p>
 <p>This file may contain other default values for variables - if I find anything useful I will add it to this post (also please reply with any&nbsp;recommendations).</p>
+<p><strong>Update 13/10/2015</strong> After a request from commenter Jofferson Ramirez Tiquez, here&#8217;s a custom.less that overrides more colors from <tt class="docutils literal">_variables.css</tt>
+(beyond the primary color, it changes the success color to teal and info and warning to the corresponding hex color&nbsp;values):</p>
+<pre class="code literal-block">
+&#64;import &quot;less/material.less&quot;;
+
+&#64;primary: &#64;indigo;
+&#64;success: &#64;teal;
+&#64;info: #CFD8DC;
+&#64;warning:#455A64;
+</pre>
 </div>
 <div class="section" id="step-5-create-your-custom-material-css-file">
 <h2>Step 5: Create your custom material css&nbsp;file</h2>
@@ -180,19 +170,19 @@ custom version of Bootstrap Material Design! If you want your <tt class="docutil
     <h1>Recent Posts</h1>
     <ul id="recent_posts">
       <li class="post">
+          <a href="http://spapas.github.io/2015/12/22/ajax-with-react-fixed-data-table/">Ajax data with Fixed Data Table for React</a>
+      </li>
+      <li class="post">
+          <a href="http://spapas.github.io/2015/11/27/pdf-in-django/">PDFs in Django: The essential guide</a>
+      </li>
+      <li class="post">
+          <a href="http://spapas.github.io/2015/11/16/using-browserify-es6/">Improve your client-side-javascript workflow more by using ES6</a>
+      </li>
+      <li class="post">
+          <a href="http://spapas.github.io/2015/10/05/django-dynamic-tables-similar-models/">Django dynamic tables and filters for similar models</a>
+      </li>
+      <li class="post">
           <a href="http://spapas.github.io/2015/09/08/more-complex-react-flux-example/">A (little more) complex react and flux example</a>
-      </li>
-      <li class="post">
-          <a href="http://spapas.github.io/2015/09/01/django-rq-redux/">django-rq redux: advanced techniques and tools</a>
-      </li>
-      <li class="post">
-          <a href="http://spapas.github.io/2015/07/02/comprehensive-react-flux-tutorial-2/">A comprehensive React and Flux tutorial part 2: Flux</a>
-      </li>
-      <li class="post">
-          <a href="http://spapas.github.io/2015/06/05/comprehensive-react-flux-tutorial/">A comprehensive React and Flux tutorial part 1: React</a>
-      </li>
-      <li class="post">
-          <a href="http://spapas.github.io/2015/05/27/using-browserify-watchify/">Using browserify and watchify to improve your client-side-javascript workflow</a>
       </li>
     </ul>
   </section>
@@ -215,7 +205,7 @@ custom version of Bootstrap Material Design! If you want your <tt class="docutil
 
   <section>
   <h1>Tags</h1>
-    <a href="http://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="http://spapas.github.io/tag/tasks.html">tasks</a>,    <a href="http://spapas.github.io/tag/less.html">less</a>,    <a href="http://spapas.github.io/tag/spring.html">spring</a>,    <a href="http://spapas.github.io/tag/rest.html">rest</a>,    <a href="http://spapas.github.io/tag/google.html">google</a>,    <a href="http://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="http://spapas.github.io/tag/scheduling.html">scheduling</a>,    <a href="http://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="http://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="http://spapas.github.io/tag/git.html">git</a>,    <a href="http://spapas.github.io/tag/java.html">java</a>,    <a href="http://spapas.github.io/tag/rq.html">rq</a>,    <a href="http://spapas.github.io/tag/uglify.html">uglify</a>,    <a href="http://spapas.github.io/tag/django-rq.html">django-rq</a>,    <a href="http://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="http://spapas.github.io/tag/redis.html">redis</a>,    <a href="http://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="http://spapas.github.io/tag/forms.html">forms</a>,    <a href="http://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="http://spapas.github.io/tag/404.html">404</a>,    <a href="http://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="http://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="http://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="http://spapas.github.io/tag/css.html">css</a>,    <a href="http://spapas.github.io/tag/node.html">node</a>,    <a href="http://spapas.github.io/tag/jobs.html">jobs</a>,    <a href="http://spapas.github.io/tag/watchify.html">watchify</a>,    <a href="http://spapas.github.io/tag/python.html">python</a>,    <a href="http://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="http://spapas.github.io/tag/javascript.html">javascript</a>,    <a href="http://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="http://spapas.github.io/tag/react.html">react</a>,    <a href="http://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="http://spapas.github.io/tag/npm.html">npm</a>,    <a href="http://spapas.github.io/tag/rst.html">rst</a>,    <a href="http://spapas.github.io/tag/generic.html">generic</a>,    <a href="http://spapas.github.io/tag/browserify.html">browserify</a>,    <a href="http://spapas.github.io/tag/branching.html">branching</a>,    <a href="http://spapas.github.io/tag/design.html">design</a>,    <a href="http://spapas.github.io/tag/github.html">github</a>,    <a href="http://spapas.github.io/tag/pusher.html">pusher</a>,    <a href="http://spapas.github.io/tag/windows.html">windows</a>,    <a href="http://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="http://spapas.github.io/tag/django.html">django</a>,    <a href="http://spapas.github.io/tag/flux.html">flux</a>,    <a href="http://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="http://spapas.github.io/tag/error.html">error</a>,    <a href="http://spapas.github.io/tag/debug.html">debug</a>,    <a href="http://spapas.github.io/tag/asynchronous.html">asynchronous</a>,    <a href="http://spapas.github.io/tag/security.html">security</a>,    <a href="http://spapas.github.io/tag/flask.html">flask</a>,    <a href="http://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>  </section>
+    <a href="http://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="http://spapas.github.io/tag/tasks.html">tasks</a>,    <a href="http://spapas.github.io/tag/less.html">less</a>,    <a href="http://spapas.github.io/tag/spring.html">spring</a>,    <a href="http://spapas.github.io/tag/rest.html">rest</a>,    <a href="http://spapas.github.io/tag/google.html">google</a>,    <a href="http://spapas.github.io/tag/design.html">design</a>,    <a href="http://spapas.github.io/tag/scheduling.html">scheduling</a>,    <a href="http://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="http://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="http://spapas.github.io/tag/tables.html">tables</a>,    <a href="http://spapas.github.io/tag/reportlab.html">reportlab</a>,    <a href="http://spapas.github.io/tag/git.html">git</a>,    <a href="http://spapas.github.io/tag/java.html">java</a>,    <a href="http://spapas.github.io/tag/rq.html">rq</a>,    <a href="http://spapas.github.io/tag/uglify.html">uglify</a>,    <a href="http://spapas.github.io/tag/django-rq.html">django-rq</a>,    <a href="http://spapas.github.io/tag/babel.html">babel</a>,    <a href="http://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="http://spapas.github.io/tag/redis.html">redis</a>,    <a href="http://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="http://spapas.github.io/tag/fixed-data-tables.html">fixed-data-tables</a>,    <a href="http://spapas.github.io/tag/forms.html">forms</a>,    <a href="http://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="http://spapas.github.io/tag/404.html">404</a>,    <a href="http://spapas.github.io/tag/xhtml2pdf.html">xhtml2pdf</a>,    <a href="http://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="http://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="http://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="http://spapas.github.io/tag/css.html">css</a>,    <a href="http://spapas.github.io/tag/node.html">node</a>,    <a href="http://spapas.github.io/tag/jobs.html">jobs</a>,    <a href="http://spapas.github.io/tag/watchify.html">watchify</a>,    <a href="http://spapas.github.io/tag/python.html">python</a>,    <a href="http://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="http://spapas.github.io/tag/javascript.html">javascript</a>,    <a href="http://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="http://spapas.github.io/tag/react.html">react</a>,    <a href="http://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="http://spapas.github.io/tag/npm.html">npm</a>,    <a href="http://spapas.github.io/tag/pdf.html">pdf</a>,    <a href="http://spapas.github.io/tag/rst.html">rst</a>,    <a href="http://spapas.github.io/tag/generic.html">generic</a>,    <a href="http://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="http://spapas.github.io/tag/es6.html">es6</a>,    <a href="http://spapas.github.io/tag/browserify.html">browserify</a>,    <a href="http://spapas.github.io/tag/branching.html">branching</a>,    <a href="http://spapas.github.io/tag/github.html">github</a>,    <a href="http://spapas.github.io/tag/pusher.html">pusher</a>,    <a href="http://spapas.github.io/tag/windows.html">windows</a>,    <a href="http://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="http://spapas.github.io/tag/django.html">django</a>,    <a href="http://spapas.github.io/tag/flux.html">flux</a>,    <a href="http://spapas.github.io/tag/fixeddatatable.html">FixedDataTable</a>,    <a href="http://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="http://spapas.github.io/tag/error.html">error</a>,    <a href="http://spapas.github.io/tag/debug.html">debug</a>,    <a href="http://spapas.github.io/tag/asynchronous.html">asynchronous</a>,    <a href="http://spapas.github.io/tag/security.html">security</a>,    <a href="http://spapas.github.io/tag/flask.html">flask</a>,    <a href="http://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>  </section>
 
 
 

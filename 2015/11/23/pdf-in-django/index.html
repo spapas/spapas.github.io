@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="google-site-verification" content="5_8DTmIiEq4gFvNAfxAD6TsGOgrMAjp8lQFQvfA6zZc" />
+  <title>PDFs in Django: The essential guide &mdash; /var/</title>
+  <meta name="author" content="Serafeim Papastefanos">
+
+
+
+
+
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+    <link href="../../../../favicon.png" rel="icon">
+
+  <link href="../../../../theme/css/main.css" media="screen, projection"
+        rel="stylesheet" type="text/css">
+
+  <link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic"
+        rel="stylesheet" type="text/css">
+  <link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic"
+        rel="stylesheet" type="text/css">
+</head>
+
+<body>
+  <header role="banner"><hgroup>
+  <h1><a href="../../../../">/var/</a></h1>
+    <h2>Various programming stuff</h2>
+</hgroup></header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+</ul>
+
+
+<ul class="main-navigation">
+      <li >
+        <a href="../../../../category/css.html">Css</a>
+      </li>
+      <li class="active">
+        <a href="../../../../category/django.html">Django</a>
+      </li>
+      <li >
+        <a href="../../../../category/flask.html">Flask</a>
+      </li>
+      <li >
+        <a href="../../../../category/git.html">Git</a>
+      </li>
+      <li >
+        <a href="../../../../category/javascript.html">Javascript</a>
+      </li>
+      <li >
+        <a href="../../../../category/pelican.html">Pelican</a>
+      </li>
+      <li >
+        <a href="../../../../category/python.html">Python</a>
+      </li>
+      <li >
+        <a href="../../../../category/spring.html">Spring</a>
+      </li>
+      <li >
+        <a href="../../../../category/wagtail.html">Wagtail</a>
+      </li>
+</ul></nav>
+  <div id="main">
+    <div id="content">
+<div>
+  <article class="hentry" role="article">
+<header>
+      <h1 class="entry-title">PDFs in Django: The essential guide</h1>
+    <p class="meta">
+<time datetime="2015-11-23T14:20:00+02:00" pubdate>Δευ 23 Νοέμβριος 2015</time>    </p>
+</header>
+
+  <div class="entry-content"><div class="contents topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#introduction" id="id4">Introduction</a></li>
+<li><a class="reference internal" href="#the-players" id="id5">The players</a><ul>
+<li><a class="reference internal" href="#reportlab" id="id6">ReportLab</a></li>
+<li><a class="reference internal" href="#xhtml2pdf" id="id7">xhtml2pdf</a></li>
+<li><a class="reference internal" href="#pypdf2" id="id8">PyPDF2</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#django-integration" id="id9">Django integration</a><ul>
+<li><a class="reference internal" href="#using-a-plain-old-view" id="id10">Using a plain old&nbsp;view</a></li>
+<li><a class="reference internal" href="#using-a-cbv" id="id11">Using a <span class="caps">CBV</span></a></li>
+<li><a class="reference internal" href="#how-does-django-xhtml2pdf-loads-resources" id="id12">How does django-xhtml2pdf loads&nbsp;resources</a></li>
+<li><a class="reference internal" href="#using-a-common-style-for-your-pdfs" id="id13">Using a common style for your&nbsp;PDFs</a></li>
+<li><a class="reference internal" href="#changing-the-font-to-a-unicode-enabled-one" id="id14">Changing the font (to a Unicode enabled&nbsp;one)</a></li>
+<li><a class="reference internal" href="#configure-django-for-debugging-pdf-creation" id="id15">Configure Django for debugging <span class="caps">PDF</span>&nbsp;creation</a></li>
+<li><a class="reference internal" href="#concatenating-pdfs-in-django" id="id16">Concatenating PDFs in&nbsp;Django</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#more-advanced-xhtml2pdf-features" id="id17">More advanced xhtml2pdf features</a><ul>
+<li><a class="reference internal" href="#laying-out" id="id18">Laying&nbsp;out</a></li>
+<li><a class="reference internal" href="#extra-stuff" id="id19">Extra&nbsp;stuff</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#conclusion" id="id20">Conclusion</a></li>
+</ul>
+</div>
+<div class="section" id="introduction">
+<h2><a class="toc-backref" href="#id4">Introduction</a></h2>
+<p>I&#8217;ve noticed that although it is easy to create PDFs with
+Python, there&#8217;s no complete guide on how to
+integrate these tools with Django and resolve the problems
+that you&#8217;ll encounter when trying to actually create PDFs
+from your Django web&nbsp;application.</p>
+<p>In this article I will present the solution I use for
+creating PDFs with Django, along with various tips on how to
+solve most of your common requirements. Specifically, here
+are some things that we&#8217;ll&nbsp;cover:</p>
+<ul class="simple">
+<li>Learn how to create PDFs &quot;by&nbsp;hand&quot;</li>
+<li>Create PDFs with Django using a normal Djang Template (similar to an <span class="caps">HTML</span>&nbsp;page)</li>
+<li>Change the fonts of your&nbsp;PDFs</li>
+<li>Use styling in your&nbsp;output</li>
+<li>Create&nbsp;layouts</li>
+<li>Embed images to your&nbsp;PDFs</li>
+<li>Add page&nbsp;numbers</li>
+<li>Merge (concatenate)&nbsp;PDFs</li>
+</ul>
+</div>
+<div class="section" id="the-players">
+<h2><a class="toc-backref" href="#id5">The&nbsp;players</a></h2>
+<p>We are going to use the following main&nbsp;tools:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://bitbucket.org/rptlab/reportlab">ReportLab</a> is an open source python library for creating PDFs. It uses a low-level <span class="caps">API</span> that allows &quot;drawing&quot; strings on specific coordinates  on the <span class="caps">PDF</span> - for people familiar with creating PDFs in Java it is more or less <em>iText_ for python</em>.</li>
+<li><a class="reference external" href="https://github.com/chrisglass/xhtml2pdf">xhtml2pdf</a> (formerly named <em>pisa</em>) is an open source library that can convert <span class="caps">HTML</span>/<span class="caps">CSS</span> pages to <span class="caps">PDF</span> using&nbsp;ReportLab.</li>
+<li><a class="reference external" href="https://github.com/chrisglass/django-xhtml2pdf">django-xhtml2pdf</a> is a wrapper around xhtml2pdf that makes integration with Django&nbsp;easier.</li>
+<li><a class="reference external" href="https://github.com/mstamy2/PyPDF2">PyPDF2</a> is an open source tool of that can split, merge and transform pages of <span class="caps">PDF</span>&nbsp;files.</li>
+</ul>
+<p>I&#8217;ve created a <a class="reference external" href="https://github.com/spapas/django-pdf-guide">django project</a> <a class="reference external" href="https://github.com/spapas/django-pdf-guide">https://github.com/spapas/django-pdf-guide</a> with everything covered here. Please clone it,
+install its requirements and play with it to see how everything works&nbsp;!</p>
+<p>Before integrating the above tools to a Django project, I&#8217;d like to describe them individually a bit more. Any files
+I mention below will be included in this&nbsp;project.</p>
+<div class="section" id="reportlab">
+<h3><a class="toc-backref" href="#id6">ReportLab</a></h3>
+<p>ReportLab offers a really low <span class="caps">API</span> for creating PDFs. It is something like having a <tt class="docutils literal">canvas.drawString()</tt> method (for
+people familiar with drawing APIs) for your <span class="caps">PDF</span> page. Let&#8217;s take a look at an example, creating a <span class="caps">PDF</span> with a simple&nbsp;string:</p>
+<pre class="code literal-block">
+from reportlab.pdfgen import canvas
+import reportlab.rl_config
+
+
+if __name__ == '__main__':
+    reportlab.rl_config.warnOnMissingFontGlyphs = 0
+    c = canvas.Canvas(&quot;./hello1.pdf&quot;,)
+    c.drawString(100, 100, &quot;Hello World&quot;)
+    c.showPage()
+    c.save()
+</pre>
+<p>Save the above in a file named testreportlab1.py. If you run python testreportlab1.py (in an environment that has
+reportlab of cours) you should see no errors and a pdf named <tt class="docutils literal">hello1.pdf</tt> created. If you open it in your <span class="caps">PDF</span>
+reader you&#8217;ll see a blank page with &quot;Hello World&quot; written in its lower right&nbsp;corner.</p>
+<p>If you try to add a unicode text, for example &quot;Καλημέρα ελλάδα&quot;, you should see something like the&nbsp;following:</p>
+<img alt="Hello PDF" src="/images/hellopdf2.png" style="width: 280px;" />
+<p>It seems that the default font that ReportLab uses does not have a good support for accented greek characters
+since they are missing  (and probably for various other&nbsp;characters).</p>
+<p>To resolve this, we could try changing the font to one that contains the missing symbols. You can find free
+fonts on the internet (for example the <cite>DejaVu</cite> font), or even grab one from your system fonts (in windows,
+check out <tt class="docutils literal"><span class="pre">c:\windows\fonts\</span></tt>). In any case, just copy the ttf file of your font inside the folder of
+your project and crate a file named testreportlab2.py with the following (I am using the DejaVuSans&nbsp;font):</p>
+<pre class="code literal-block">
+# -*- coding: utf-8 -*-
+import reportlab.rl_config
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+
+
+if __name__ == '__main__':
+    c = canvas.Canvas(&quot;./hello2.pdf&quot;,)
+    reportlab.rl_config.warnOnMissingFontGlyphs = 0
+    pdfmetrics.registerFont(TTFont('DejaVuSans', 'DejaVuSans.ttf'))
+
+    c.setFont('DejaVuSans', 22)
+    c.drawString(100, 100, u&quot;Καλημέρα ελλάδα.&quot;)
+
+    c.showPage()
+    c.save()
+</pre>
+<p>The above was just a scratch on the surface of ReportLab, mainly to be confident that
+everything <em>will</em> work fine for non-english speaking people! To find out more, you should check the  <a class="reference external" href="http://www.reportlab.com/docs/reportlab-userguide.pdf">ReportLab open-source User Guide</a>.</p>
+<p>I also have to mention that
+<a class="reference external" href="http://reportlab.com/">the company behind ReportLab</a> offers some great commercial solutions based on ReportLab for creating PDFs (similar to <a class="reference external" href="http://community.jaspersoft.com/project/jasperreports-library">JasperReports</a>) - check it out
+if you need support or advanced&nbsp;capabilities.</p>
+</div>
+<div class="section" id="xhtml2pdf">
+<h3><a class="toc-backref" href="#id7">xhtml2pdf</a></h3>
+<p>The xhtml2pdf is a really great library that allows you to use html files as a template
+to a <span class="caps">PDF</span>. Of course, an html cannot always be converted to a <span class="caps">PDF</span> since,
+unfortunately, PDFs <em>do</em> have&nbsp;pages.</p>
+<p>xhtml2pdf has a nice executable script that can be used to test its capabilities. After
+you install it (either globally or to a virtual environment) you should be able to find
+out the executable <tt class="docutils literal">$<span class="caps">PYTHON</span>/scripts/xhtml2pdf</tt> (or <tt class="docutils literal">xhtml2pdf.exe</tt> if you are in
+Windows) and a corresponding python script &#64; <tt class="docutils literal"><span class="pre">$<span class="caps">PYTHON</span>/scripts/xhtml2pdf-script.py</span></tt>.</p>
+<p>Let&#8217;s try to use xhtml2pdf to explore some of its capabilities. Create a file named
+testxhtml2pdf.html with the following contents and run <tt class="docutils literal">xhtml2pdf testxhtml2pdf.html</tt>:</p>
+<pre class="code literal-block">
+&lt;html&gt;
+&lt;head&gt;
+    &lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot; /&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;Testing xhtml2pdf &lt;/h1&gt;
+    &lt;ul&gt;
+        &lt;li&gt;&lt;b&gt;Hello, world!&lt;/b&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;i&gt;Hello, italics&lt;/i&gt;&lt;/li&gt;
+        &lt;li&gt;Καλημέρα Ελλάδα!&lt;/li&gt;
+    &lt;/ul&gt;
+    &lt;hr /&gt;
+    &lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus nulla erat, porttitor ut venenatis eget,
+    tempor et purus. Nullam nec erat vel enim euismod auctor et at nisl. Integer posuere bibendum condimentum. Ut
+    euismod velit ut porttitor condimentum. In ullamcorper nulla at lectus fermentum aliquam. Nunc elementum commodo
+    dui, id pulvinar ex viverra id. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos
+    himenaeos.&lt;/p&gt;
+
+    &lt;p&gt;Interdum et malesuada fames ac ante ipsum primis in faucibus. Sed aliquam vitae lectus sit amet accumsan. Morbi
+    nibh urna, condimentum nec volutpat at, lobortis sit amet odio. Etiam quis neque interdum sapien cursus ornare. Cras
+    commodo lacinia sapien nec porta. Suspendisse potenti. Nulla hendrerit dolor et rutrum consectetur.&lt;/p&gt;
+    &lt;hr /&gt;
+    &lt;img  width=&quot;26&quot; height=&quot;20&quot; src=&quot;data:image/gif;base64,R0lGODlhEAAOALMAAOazToeHh0tLS/7LZv/0jvb29t/f3//Ub//ge8WSLf/
+    rhf/3kdbW1mxsbP//mf///yH5BAAAAAAALAAAAAAQAA4AAARe8L1Ekyky67QZ1hLnjM5UUde0ECwLJoExKcppV0aCcGCmTIHEIUEqjgaORCMxIC6e0C
+    cguWw6aFjsVMkkIr7g77ZKPJjPZqIyd7sJAgVGoEGv2xsBxqNgYPj/gAwXEQA7&quot;  &gt;
+    &lt;hr /&gt;
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;header0&lt;/th&gt;&lt;th&gt;header1&lt;/th&gt;&lt;th&gt;header2&lt;/th&gt;&lt;th&gt;header3&lt;/th&gt;&lt;th&gt;header4&lt;/th&gt;&lt;th&gt;header5&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Hello World!!!&lt;/td&gt;&lt;td&gt;Hello World!!!&lt;/td&gt;&lt;td&gt;Hello World!!!&lt;/td&gt;&lt;td&gt;Hello World!!!&lt;/td&gt;&lt;td&gt;Hello World!!!&lt;/td&gt;&lt;td&gt;Hello World!!!&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Hello World!!!&lt;/td&gt;&lt;td&gt;Hello World!!!&lt;/td&gt;&lt;td&gt;Hello World!!!&lt;/td&gt;&lt;td&gt;Hello World!!!&lt;/td&gt;&lt;td&gt;Hello World!!!&lt;/td&gt;&lt;td&gt;Hello World!!!&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Hello World!!!&lt;/td&gt;&lt;td&gt;Hello World!!!&lt;/td&gt;&lt;td&gt;Hello World!!!&lt;/td&gt;&lt;td&gt;Hello World!!!&lt;/td&gt;&lt;td&gt;Hello World!!!&lt;/td&gt;&lt;td&gt;Hello World!!!&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Hello World!!!&lt;/td&gt;&lt;td&gt;Hello World!!!&lt;/td&gt;&lt;td&gt;Hello World!!!&lt;/td&gt;&lt;td&gt;Hello World!!!&lt;/td&gt;&lt;td&gt;Hello World!!!&lt;/td&gt;&lt;td&gt;Hello World!!!&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+<p>Please notice the <tt class="docutils literal">&lt;meta <span class="pre">http-equiv=&quot;Content-Type&quot;</span> <span class="pre">content=&quot;text/html;</span> <span class="pre">charset=utf-8&quot;</span> /&gt;</tt> in the above <span class="caps">HTML</span> &#8212; also it is saved as
+Unicode (Encoding - Covert to <span class="caps">UTF</span>-8 in Notepad++). The result (<tt class="docutils literal">testxhtml2pdf.pdf</tt>) should&nbsp;have:</p>
+<ul class="simple">
+<li>A nice header&nbsp;(h1)</li>
+<li>Paragraphs</li>
+<li>Horizontal&nbsp;lines</li>
+<li>No support for greek characters (same problem as with&nbsp;reportlab)</li>
+<li>Images (I am inlining it as a base 64&nbsp;image)</li>
+<li>A&nbsp;list</li>
+<li>A&nbsp;table</li>
+</ul>
+<p>Before moving on, I&#8217;d like to fix the problem with the greek characters. You should
+set the font to one supporting greek characters, just like you did with ReportLab before.
+This can be done with the help of the <tt class="docutils literal"><span class="pre">&#64;font-face</span></tt> <a class="reference external" href="https://github.com/xhtml2pdf/xhtml2pdf/blob/master/doc/usage.rst#fonts">css directive</a>. So, let&#8217;s create
+a file named <tt class="docutils literal">testxhtml2pdf2.html</tt> with the following&nbsp;contents:</p>
+<pre class="code literal-block">
+&lt;html&gt;
+&lt;head&gt;
+    &lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot; /&gt;
+
+    &lt;style&gt;
+        &#64;font-face {
+            font-family: DejaVuSans;
+            src: url(&quot;c:/progr/py/django-pdf-guide/django_pdf_guide/DejaVuSans.ttf&quot;);
+        }
+
+        body {
+            font-family: DejaVuSans;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;Δοκιμή του xhtml2pdf &lt;/h1&gt;
+    &lt;ul&gt;
+        &lt;li&gt;Καλημέρα Ελλάδα!&lt;/li&gt;
+    &lt;/ul&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+<p>Before running <tt class="docutils literal">xhtml2pdf testxhtml2pdf2.html</tt>, please make
+sure to change the url of the font file above to the absolute path of that font in your
+local system . As a result, after running xhhtml2pdf
+you
+should see the unicode characters without&nbsp;problems.</p>
+<p>I have to mention here that I wasn&#8217;t able to use the font from a relative path, that&#8217;s
+why I used the absolute one. In case something is not right, try
+running it with the <tt class="docutils literal"><span class="pre">-d</span></tt> option to output debugging information (something like
+<tt class="docutils literal">xhtml2pdf <span class="pre">-d</span> testxhtml2pdf2.html</tt>). You must see a line like this&nbsp;one:</p>
+<pre class="code literal-block">
+DEBUG [xhtml2pdf] C:\progr\py\django-pdf-guide\venv\lib\site-packages\xhtml2pdf\context.py line 857: Load font 'c:\\progr\\py\\django-pdf-guide\\django_pdf_guide\\DejaVuSans.ttf'
+</pre>
+<p>to make sure that the font is actually&nbsp;loaded!</p>
+</div>
+<div class="section" id="pypdf2">
+<h3><a class="toc-backref" href="#id8">PyPDF2</a></h3>
+<p>The PyPDF2 library can be used to extract pages from a <span class="caps">PDF</span> to a new one
+or combine pages from different PDFs to a a new one. A common requirement is
+to have the first and page of a report as static PDFs, create the contents
+of this report through your app as a <span class="caps">PDF</span> and combine all three PDFs (front page,
+content and back page) to the resulting <span class="caps">PDF</span>.</p>
+<p>Let&#8217;s see a quick example of combining two&nbsp;PDFs:</p>
+<pre class="code literal-block">
+import sys
+from PyPDF2 import PdfFileMerger
+
+if __name__ == '__main__':
+    pdfs = sys.argv[1:]
+
+    if not pdfs or len(pdfs) &lt; 2:
+        exit(&quot;Please enter at least two pdfs for merging!&quot;)
+
+    merger = PdfFileMerger()
+
+    for pdf in pdfs:
+        merger.append(fileobj=open(pdf, &quot;rb&quot;))
+
+    output = open(&quot;output.pdf&quot;, &quot;wb&quot;)
+    merger.write(output)
+</pre>
+<p>The above will try to open all input parameters (as files) and append them to a the&nbsp;output.pdf.</p>
+</div>
+</div>
+<div class="section" id="django-integration">
+<h2><a class="toc-backref" href="#id9">Django&nbsp;integration</a></h2>
+<p>To integrate the <span class="caps">PDF</span> creation process with django we&#8217;ll use a simple app with only one model about books. We are
+going to use the django-xhtml2pdf library &#8212; I recommend installing the latest version (from github
+using something like <tt class="docutils literal">pip install <span class="pre">-e</span> <span class="pre">git+https://github.com/chrisglass/django-xhtml2pdf.git#egg=django-xhtml2pdf</span></tt>
+) since the pip package has not been updated in a long&nbsp;time!</p>
+<div class="section" id="using-a-plain-old-view">
+<h3><a class="toc-backref" href="#id10">Using a plain old&nbsp;view</a></h3>
+<p>The simplest case is to just create plain old view to display the <span class="caps">PDF</span>. We&#8217;ll use django-xhtml2pdf along with the
+followig django&nbsp;template:</p>
+<pre class="code literal-block">
+&lt;html&gt;
+&lt;head&gt;
+    &lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot; /&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;Books&lt;/h1&gt;
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;ID&lt;/th&gt;&lt;th&gt;Title&lt;/th&gt;
+        &lt;/tr&gt;
+        {% for book in books %}
+            &lt;tr&gt;
+                &lt;td&gt;{{ book.id }}&lt;/td&gt;&lt;td&gt;{{ book.title }}&lt;/td&gt;
+            &lt;/tr&gt;
+        {% endfor %}
+    &lt;/table&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+<p>Name it as <tt class="docutils literal">books_plain_old_view.html</tt> and put it on <tt class="docutils literal">books/templates</tt> directory. The view that
+returns the above template as <span class="caps">PDF</span> is the&nbsp;following:</p>
+<pre class="code literal-block">
+from django.http import HttpResponse
+from django_xhtml2pdf.utils import generate_pdf
+
+
+def books_plain_old_view(request):
+    resp = HttpResponse(content_type='application/pdf')
+    context = {
+        'books': Book.objects.all()
+    }
+    result = generate_pdf('books_plain_old_view.html', file_object=resp, context=context)
+    return result
+</pre>
+<p>We just use the <tt class="docutils literal">generate_pdf</tt> method of django-xhtml2pdf to help us generate the <span class="caps">PDF</span>, passing it
+our response object and a context dictionary (containing all&nbsp;books).</p>
+<p>Instead of the simple <span class="caps">HTTP</span> response above, we could add a &#8216;Content Disposition&#8217; <span class="caps">HTTP</span> header to
+our response
+(or use the django-xhtml2pdf method <tt class="docutils literal">render_to_pdf_response</tt> instead of <tt class="docutils literal">generate_pdf</tt>)
+to suggest a default filename for the file to be saved by adding the&nbsp;line</p>
+<pre class="code literal-block">
+resp['Content-Disposition'] = 'attachment; filename=&quot;output.pdf&quot;'
+</pre>
+<p>after the definition of <tt class="docutils literal">resp</tt>.</p>
+<p>This will have thw extra effect, at least in Chrome and Firefox to show the &quot;Save File&quot; dialog
+when clicking on the link instead of retrieving the <span class="caps">PDF</span> and displaying it inside* the browser&nbsp;window.</p>
+</div>
+<div class="section" id="using-a-cbv">
+<h3><a class="toc-backref" href="#id11">Using a <span class="caps">CBV</span></a></h3>
+<p>I don&#8217;t really recommend using plain old Django views - instead I propose to always use Class Based Views
+for their DRYness. The best approach is to create a mixin that would allow any kind of <span class="caps">CBV</span> (at least any
+kind of <span class="caps">CBV</span> that uses a template) to be rendered in <span class="caps">PDF</span>. Here&#8217;s how we could implement a <tt class="docutils literal">PdfResponseMixin</tt>:</p>
+<pre class="code literal-block">
+class PdfResponseMixin(object, ):
+    def render_to_response(self, context, **response_kwargs):
+        context=self.get_context_data()
+        template=self.get_template_names()[0]
+        resp = HttpResponse(content_type='application/pdf')
+        result = generate_pdf(template, file_object=resp, context=context)
+        return result
+</pre>
+<p>Now, we could use this mixin to create <span class="caps">PDF</span> outputting views from any other view! For example, here&#8217;s how
+we could create a book list in&nbsp;pdf:</p>
+<pre class="code literal-block">
+class BookPdfListView(PdfResponseMixin, ListView):
+    context_object_name = 'books'
+    model = Book
+</pre>
+<p>To display it, you could use the same template as <tt class="docutils literal">books_plain_old_view.html</tt> (so either add a <tt class="docutils literal"><span class="pre">template_name='books_plain_old_view.html'</span></tt>
+property to the class or copy <tt class="docutils literal">books_plain_old_view.html</tt> to <tt class="docutils literal">books/book_list.html</tt>).</p>
+<p>Also, as another example, here&#8217;s a <tt class="docutils literal">BookPdfDetailView</tt> that outputs <span class="caps">PDF</span>:</p>
+<pre class="code literal-block">
+class BookPdfDetailView(PdfResponseMixin, DetailView):
+    context_object_name = 'book'
+    model = Book
+</pre>
+<p>and a corresponding template (name it <tt class="docutils literal">books/book_detail.html</tt>):</p>
+<pre class="code literal-block">
+&lt;html&gt;
+&lt;head&gt;
+    &lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot; /&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;Book Detail&lt;/h1&gt;
+    &lt;b&gt;ID&lt;/b&gt;: {{ book.id }} &lt;br /&gt;
+    &lt;b&gt;Title&lt;/b&gt;: {{ book.title }} &lt;br /&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+</div>
+<div class="section" id="how-does-django-xhtml2pdf-loads-resources">
+<h3><a class="toc-backref" href="#id12">How does django-xhtml2pdf loads&nbsp;resources</a></h3>
+<p>Before doing more advanced things, we need to understand how <tt class="docutils literal"><span class="pre">django-xhtml2pdf</span></tt> works and specifically
+how we can refer to things like css, images, fonts etc from our <span class="caps">PDF</span> templates.
+If you check the <a class="reference external" href="https://github.com/chrisglass/django-xhtml2pdf/blob/master/django_xhtml2pdf/utils.py">utils.py of django-xhtml2pdf</a> you&#8217;ll see that it uses a function named <tt class="docutils literal">fetch_resources</tt>
+for loading these resources. This function checks to see if the resource starts with <tt class="docutils literal">/MEDIA_URL</tt> or
+<tt class="docutils literal">/STATIC_URL</tt> and converts it to a local (filesystem) path. For example, if you refer to a font like
+<tt class="docutils literal">/static/font1.ttf</tt> in your <span class="caps">PDF</span> template, <tt class="docutils literal">xhtml2pdf</tt> will try to load the file <tt class="docutils literal">STATIC_ROOT + /font1.ttf</tt>
+(and if it does not find the file you want to refer to there it will check all <tt class="docutils literal">STATICFILES_DIRS</tt> enries).</p>
+<p>Thus, you can just put your resources into your <tt class="docutils literal">STATIC_ROOT</tt> directory and use the <tt class="docutils literal">{% static %}</tt>
+template tag to create <span class="caps">URL</span> paths for them &#8212; django-xhtml2pdf will convert these to local paths and
+everything will work&nbsp;fine.</p>
+<p><strong>Please notice that you *need* to have configured &#8220;STATIC_ROOT&#8220; for this to work</strong> &#8212; if <tt class="docutils literal">STATIC_ROOT</tt> is
+empty (and, for example you use <tt class="docutils literal">static</tt> directories in your apps) then the described substitution
+mechanism will <em>not</em>&nbsp;work.</p>
+</div>
+<div class="section" id="using-a-common-style-for-your-pdfs">
+<h3><a class="toc-backref" href="#id13">Using a common style for your&nbsp;PDFs</a></h3>
+<p>If you need to create a lot of similar PDFs then you&#8217;ll probably want to
+use a bunch of common styles for them (same fonts, headers etc). This could be done using
+the <tt class="docutils literal">{% static %}</tt> trick we saw on the previous section. However, if we include the
+styling css as a static file then we won&#8217;t be able to use the static-file-uri-to-local-path
+mechanism described above (since the <tt class="docutils literal">{% static %}</tt> template tag won&#8217;t work in static&nbsp;files).</p>
+<p>Thankfully, not everything is lost &#8212; Django comes to the rescue!!! We can create a single <span class="caps">CSS</span> file
+that would be used by all our <span class="caps">PDF</span> templates and <em>include</em> it in the templates using the <tt class="docutils literal">{% include %}</tt> Django
+template tag! Django will think that this will be a normal template and paste its contents where we wanted and
+also execute the templates&nbsp;tags!</p>
+<p>We&#8217;ll see an example of all this in the next&nbsp;section.</p>
+</div>
+<div class="section" id="changing-the-font-to-a-unicode-enabled-one">
+<h3><a class="toc-backref" href="#id14">Changing the font (to a Unicode enabled&nbsp;one)</a></h3>
+<p>The time has finally arrived to change the font! It&#8217;s easy if you know exactly what to do. First of all
+configure your <tt class="docutils literal">STATIC_ROOT</tt> and <tt class="docutils literal">STATIC_URL</tt> setting, for example <tt class="docutils literal">STATIC_ROOT = <span class="pre">os.path.join(BASE_DIR,'static')</span></tt>
+and <tt class="docutils literal">STATIC_URL = '/static/'</tt>.</p>
+<p>Then, add a template-css file for your fonts in one of your templates directories. I am naming the
+file <tt class="docutils literal">pdfstylefonts.css</tt> and I&#8217;ve put it to <tt class="docutils literal">books/templates</tt>:</p>
+<pre class="code literal-block">
+{% load static %}
+&#64;font-face {
+    font-family: &quot;Calibri&quot;;
+    src: url({% static &quot;fonts/calibri.ttf&quot; %});
+}
+&#64;font-face {
+    font-family: &quot;Calibri&quot;;
+    src: url({% static &quot;fonts/calibrib.ttf&quot; %});
+    font-weight: bold;
+}
+&#64;font-face {
+    font-family: &quot;Calibri&quot;;
+    src: url({% static &quot;fonts/calibrii.ttf&quot; %});
+    font-style: italic, oblique;
+}
+&#64;font-face {
+    font-family: &quot;Calibri&quot;;
+    src: url({% static &quot;fonts/calibriz.ttf&quot; %});
+    font-weight: bold;
+    font-style: italic, oblique;
+}
+</pre>
+<p>I am using Calibri family of fonts (copied from c:windowsfonts) for this &#8212; I&#8217;ve also configured
+all styles (bold, italic, bold-italic) of this font family to use the correct ttf files. All the
+ttf files have been copied to the directory <tt class="docutils literal">static/fonts/</tt>.</p>
+<p>Now, add another css file that will be your global <span class="caps">PDF</span> styles. This should be put to the <tt class="docutils literal">static</tt> directory
+and could be named <tt class="docutils literal">pdfstyle.css</tt>:</p>
+<pre class="code literal-block">
+h1 {
+    color: blue;
+}
+
+*, html {
+    font-family: &quot;Calibri&quot;;
+    font-size:11pt;
+    color: red;
+}
+</pre>
+<p>Next, here&#8217;s a template that lists all books (and contain some greek characters &#8212; the title of the books also contain
+greek characters) &#8212; I&#8217;ve named it <tt class="docutils literal">book_list_ex.html</tt>:</p>
+<pre class="code literal-block">
+{% load static %}
+&lt;html&gt;
+&lt;head&gt;
+    &lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot; /&gt;
+    &lt;style&gt;
+        {% include &quot;pdfstylefonts.css&quot; %}
+    &lt;/style&gt;
+    &lt;link rel='stylesheet' href='{% static &quot;pdfstyle.css&quot; %}'/&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;Λίστα βιβλίων&lt;/h1&gt;
+    &lt;img src='{% static &quot;pony.png&quot; %}' /&gt;
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;ID&lt;/th&gt;&lt;th&gt;Title&lt;/th&gt;&lt;th&gt;Cover&lt;/th&gt;
+        &lt;/tr&gt;
+        {% for book in books %}
+            &lt;tr&gt;
+                &lt;td&gt;{{ book.id }}&lt;/td&gt;&lt;td&gt;{{ book.title }}&lt;/td&gt;&lt;td&gt;&lt;img src='{{ book.cover.url }}' /&gt;&lt;/td&gt;
+            &lt;/tr&gt;
+        {% endfor %}
+    &lt;/table&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+<p>You&#8217;ll see that the <tt class="docutils literal">pdfstylefonts.css</tt> is included as a Django template (so that <tt class="docutils literal">{% static %}</tt> will
+work in that file) while <tt class="docutils literal">pdfstyle.css</tt> is included using <tt class="docutils literal">{% static %}</tt>.
+Als, notice that I&#8217;ve also added a static image (using the <tt class="docutils literal">{% static %}</tt> tag) and a dynamic (media)
+file to show off how great the url-to-local-path mechanism works. Please notice that for the
+media files to work fine in your development environment you need to configure the
+<tt class="docutils literal">MEDIA_URL</tt> and <tt class="docutils literal">MEDIA_ROOT</tt> settigns (similar to <tt class="docutils literal">STATIC_URL</tt> and <tt class="docutils literal">STATIC_ROOT</tt>) and follow the
+<a class="reference external" href="https://docs.djangoproject.com/en/1.8/howto/static-files/#serving-files-uploaded-by-a-user-during-development">serve files uploaded by a user during development</a> tutorial on Django&nbsp;docs.</p>
+<p>Finally, if you configure a PdfResponseMixin ListView like&nbsp;this:</p>
+<pre class="code literal-block">
+class BookExPdfListView(PdfResponseMixin, ListView):
+    context_object_name = 'books'
+    model = Book
+    template_name = 'books/book_list_ex.html'
+</pre>
+<p>you should see be able to see the correct (calibri) font (defined in <tt class="docutils literal">pdfstylefonts.css</tt>), with unicode characters without problems
+including both the static and user uploaded images and with the styles defined in the pdf stylesheet (<tt class="docutils literal">pdfstyle.css</tt>).</p>
+</div>
+<div class="section" id="configure-django-for-debugging-pdf-creation">
+<h3><a class="toc-backref" href="#id15">Configure Django for debugging <span class="caps">PDF</span>&nbsp;creation</a></h3>
+<p>If you experience any problems, you can configure xhtml2pdf to output <span class="caps">DEBUG</span> information. To do this,
+you may change your django logging configuration like&nbsp;this:</p>
+<pre class="code literal-block">
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'xhtml2pdf': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        }
+    }
+}
+</pre>
+<p>This configuration will keep existing loggers (<tt class="docutils literal">'disable_existing_loggers': False,</tt>) and will configure
+<tt class="docutils literal">xhtml2pdf</tt> to log its output to the console, helping us find out why some things won&#8217;t be&nbsp;working.</p>
+</div>
+<div class="section" id="concatenating-pdfs-in-django">
+<h3><a class="toc-backref" href="#id16">Concatenating PDFs in&nbsp;Django</a></h3>
+<p>The final section of the <span class="caps">PDF</span>-Django-integration is to explain how we can concatenate PDFs in django using PyPDF2. There may be
+some other requirements like extracting pages from PDFs however the most common one as explained before is to just append
+the pages of one <span class="caps">PDF</span> after the other &#8212; after all using PyPDF2 is really easy after you get the hang of&nbsp;it.</p>
+<p>To be more <span class="caps">DRY</span>, I will create a <tt class="docutils literal">CoverPdfResponseMixin</tt> that will output a <span class="caps">PDF</span> <em>with</em> a cover. To be <em>even more</em> <span class="caps">DRY</span>,
+I will refactor <tt class="docutils literal">PdfResponseMixin</tt> to put some common code in an extra method so that <tt class="docutils literal">CoverPdfResponseMixin</tt> could inherit from&nbsp;it:</p>
+<pre class="code literal-block">
+class PdfResponseMixin(object, ):
+    def write_pdf(self, file_object, ):
+        context = self.get_context_data()
+        template = self.get_template_names()[0]
+        generate_pdf(template, file_object=file_object, context=context)
+
+    def render_to_response(self, context, **response_kwargs):
+        resp = HttpResponse(content_type='application/pdf')
+        self.write_pdf(resp)
+        return resp
+
+
+class CoverPdfResponseMixin(PdfResponseMixin, ):
+    cover_pdf = None
+
+    def render_to_response(self, context, **response_kwargs):
+        merger = PdfFileMerger()
+        merger.append(open(self.cover_pdf, &quot;rb&quot;))
+
+        pdf_fo = StringIO.StringIO()
+        self.write_pdf(pdf_fo)
+        merger.append(pdf_fo)
+
+        resp = HttpResponse(content_type='application/pdf')
+        merger.write(resp)
+        return resp
+</pre>
+<p>So, <tt class="docutils literal">PdfResponseMixin</tt> now has a <tt class="docutils literal">write_pdf</tt> method that gets a file-like object and outputs the <span class="caps">PDF</span> there.
+The new mixin, <tt class="docutils literal">CoverPdfResponseMixin</tt> has a <tt class="docutils literal">cover_pdf</tt> attribute that should be configured with the filesystem
+path of the cover file. The <tt class="docutils literal">render_to_response</tt> method now will create a <tt class="docutils literal">PdfFileMerger</tt> (which is empty
+initially) to which it appends the contents <tt class="docutils literal">cover_pdf</tt>. After that, it creates a file-stream (using StreamIO)
+and uses <tt class="docutils literal">write_pdf</tt> to create the <span class="caps">PDF</span> there and appends that file-stream to the merger. Finally, it writes
+the merger contents to the <tt class="docutils literal">HttpResponse</tt>.</p>
+<p>One thing that I&#8217;ve seen is that if you want to concatenate many PDFs with many pages sometimes you&#8217;ll get
+a strange an error when using <tt class="docutils literal">PdfFileMerger</tt>. I was able to overcome this by reading and appending the pages of each
+<span class="caps">PDF</span> to-be-appended one by one using the <tt class="docutils literal">PdfFileReader</tt> and <tt class="docutils literal">PdfFileWriter</tt> objects. Here&#8217;s a small snippet of how
+this could be&nbsp;done:</p>
+<pre class="code literal-block">
+pdfs = [] # List of pdfs to be concatenated
+writer = PdfFileWriter()
+
+for pdf in pdfs:
+    reader = PdfFileReader(open(pdf, &quot;rb&quot;))
+    for i in range(reader.getNumPages()):
+        writer.addPage(reader.getPage(i))
+
+resp = HttpResponse(content_type='application/pdf')
+writer.write(resp)
+return resp
+</pre>
+</div>
+</div>
+<div class="section" id="more-advanced-xhtml2pdf-features">
+<h2><a class="toc-backref" href="#id17">More advanced xhtml2pdf&nbsp;features</a></h2>
+<p>In this section I will present some information on how to use various xhtml2pdf features
+to create the most common required printed document features, for example adding page
+numbers, adding headers and footers&nbsp;etc.</p>
+<div class="section" id="laying-out">
+<h3><a class="toc-backref" href="#id18">Laying&nbsp;out</a></h3>
+<p>To find out how you can create your pages you should read the
+<a class="reference external" href="https://github.com/xhtml2pdf/xhtml2pdf/blob/master/doc/usage.rst#defining-page-layouts">defining page layouts</a> section of the xhtml2pdf manual. There
+you&#8217;ll see that the basic components of laying out in xhtml2pdf is
+&#64;page to create pages and &#64;frames to create rectangular components
+inside these pages. So each page will have a number of frames
+inside it. These frames are seperated to static and dynamic. Staticsome
+should be used for things like headers
+and footers (so they&#8217;ll be the same across all pages) and dynamic will
+contain the main content of the&nbsp;report.</p>
+<p>For pages you can use any page size you want, not just the specified ones. For example, in one of my
+projects I wanted to create a <span class="caps">PDF</span> print on a normal plastic card, so I&#8217;d used the
+following <tt class="docutils literal">size: 8.56cm 5.398cm;</tt>. Also, page templates can be named
+and you can use different ones in the same <span class="caps">PDF</span> (so you could create
+a cover page with a different page template, use it first and then continue
+with the normal pages). To name a tempalte you just use &#64;page template_name {}
+and to change the template use the combination of the following two xhtml2pdf&nbsp;tags:</p>
+<pre class="code literal-block">
+&lt;pdf:nexttemplate name=&quot;back_page&quot; /&gt;
+&lt;pdf:nextpage /&gt;
+</pre>
+<p>Now, one thing I&#8217;ve noticed is that you are not able to use a named template for the first
+page of your <span class="caps">PDF</span>. So, what I&#8217;ve done is that I create an anonymous (default) page for the
+first page of the report. If I want to <em>reuse</em> it in another page, I copy it and name it
+accordingly. I will give an example&nbsp;shortly.</p>
+<p>Now, for frames, I recommend using the <tt class="docutils literal"><span class="pre">-pdf-frame-border:</span> 1;</tt> command for debugging where
+they are actually printed. Also, I recommend using a normal ruler and measuring completely
+where you want them to be. For example, for the following&nbsp;frame:</p>
+<pre class="code literal-block">
+&#64;frame photo_frame {
+        -pdf-frame-border: 1;
+        top:  2.4cm;
+        left: 6.2cm;
+        width: 1.9cm;
+        height: 2.2cm;
+}
+</pre>
+<p>I&#8217;d used a ruler to find out that I want it to start 2.4 cm from the top of my page (actually a credit card)
+and 6.2 cm from the left and have a width and height of 1.9 and 2.2&nbsp;cm.</p>
+<p>I recommend naming all frames to be able to distinguish them however I don&#8217;t think that their name plays
+any other role. However, for static frames you must define the id of the content they will contain using <tt class="docutils literal"><span class="pre">-pdf-frame-content</span></tt>
+in the css and a div with the corresponding id in the <span class="caps">PDF</span> template. For example, you could define a frame header like&nbsp;this</p>
+<pre class="code literal-block">
+&#64;frame header {
+  -pdf-frame-content: headerContent;
+  width: 8in;
+  top: 0.5cm;
+  margin-left: 0.5cm;
+  margin-right: 0.5cm;
+  height: 2cm;
+}
+</pre>
+<p>and its content like&nbsp;this:</p>
+<pre class="code literal-block">
+&lt;div id='headerContent'&gt;
+  &lt;h1 &gt;
+    Header !
+  &lt;/h1&gt;
+&lt;/div&gt;
+</pre>
+<p>Please notice that if for some reason the stuff you want to put in your static frames does not fit there the frame will
+be totally empty. This means that if you have size for three lines but you want to output five lines in a static frame
+then you&#8217;ll see no&nbsp;lines!</p>
+<p>Now, for dynamic content you can expect the opposite behavior:
+You <em>cannot</em> select to which dynamic frame your content goes, instead the content just just flows to the first dynamic frame it
+fits! If it does not fit in any dynamic frames in the current page then a new page will be&nbsp;created.</p>
+<p>I&#8217;d like to present a full example here on the already mentioned project of printing a plastic card. I had two page layouts,
+one for the front page having a frame with the owner&#8217;s data and another frame with his photo and one for the back page having
+a barcode. This is a Django template that is used to print not only but a <span class="caps">PDF</span> with a group of these&nbsp;cards:</p>
+<pre class="code literal-block">
+{% load thumbnail %}
+&lt;html&gt;
+&lt;head&gt;
+&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot; /&gt;
+&lt;style type='text/css'&gt;
+    &#64;page {
+        size: 8.56cm 5.398cm;
+        margin: 0.0cm 0.0cm 0.0cm 0.0cm;
+        padding: 0;
+
+        &#64;frame table_frame {
+            /* -pdf-frame-border: 1; */
+            top:  2.4cm;
+            left: 0.4cm;
+            width: 5.5cm;
+            height: 3cm;
+        }
+
+        &#64;frame photo_frame {
+            /* -pdf-frame-border: 1; */
+            top:  2.4cm;
+            left: 6.2cm;
+            width: 1.9cm;
+            height: 2.2cm;
+        }
+    }
+
+    &#64;page front_page {
+        size: 8.56cm 5.398cm;
+        margin: 0.0cm 0.0cm 0.0cm 0.0cm;
+        padding: 0;
+
+        &#64;frame table_frame {
+            /* -pdf-frame-border: 1; */
+            top:  2.4cm;
+            left: 0.4cm;
+            width: 5.5cm;
+            height: 3cm;
+        }
+
+        &#64;frame photo_frame {
+            /* -pdf-frame-border: 1; */
+            top:  2.4cm;
+            left: 6.2cm;
+            width: 1.9cm;
+            height: 2.2cm;
+        }
+    }
+
+    &#64;page back_page {
+        size: 8.56cm 5.398cm;
+        margin: 0.0cm 0.0cm 0.0cm 0.0cm;
+        padding: 0;
+
+        &#64;frame barcode_frame {
+            /* -pdf-frame-border: 1; */
+            top:  3.9cm;
+            left: 1.8cm;
+            width: 4.9cm;
+            height: 1.1cm;
+        }
+    }
+
+    &#64;font-face {
+        font-family: &quot;Calibri&quot;;
+        src: url(&quot;fonts/calibri.ttf&quot;);
+    }
+
+    &#64;font-face {
+        font-family: &quot;Calibri&quot;;
+        src: url(&quot;fonts/calibrib.ttf&quot;);
+        font-weight: bold;
+    }
+    &#64;font-face {
+        font-family: &quot;Calibri&quot;;
+        src: url(&quot;fonts/calibrii.ttf&quot;);
+        font-style: italic;
+    }
+    &#64;font-face {
+        font-family: &quot;Calibri&quot;;
+        src: url(&quot;fonts/calibriz.ttf&quot;);
+        font-weight: bold;
+        font-style: italic;
+    }
+
+    *, html {
+        font-family: &quot;Calibri&quot;;
+        font-size: 8pt;
+        line-height: 80%;
+    }
+
+    .bigger {
+        font-size:9pt;
+        font-weight: bold;
+    }
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    {% for card in cards %}
+        &lt;div&gt;
+            &lt;! -- Here I print the card data. It fits exactly in the table_frame so ... -&gt;
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus nulla erat, porttitor ut venenatis eget,
+            tempor et purus. Nullam nec erat vel enim euismod auctor et at nisl. Integer posuere bibendum condimentum. Ut
+            euismod velit ut porttitor condimentum. In ullamcorper nulla at lectus fermentum aliquam. Nunc elementum commodo
+            dui, id pulvinar ex viverra id. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos
+            himenaeos.
+        &lt;/div&gt;
+        &lt;div&gt;
+            &lt;! -- This photo here will be outputted to the photo_frame --&gt;
+            {% thumbnail card.photo &quot;photo&quot; as thumb %}
+            &lt;img src=&quot;{{ thumb.file }}&quot; style='width:1.9cm ; height: 2.2cm ; ' /&gt;
+        &lt;/div&gt;
+
+        &lt;! -- Now the template is chaned to print the back of the card --&gt;
+        &lt;pdf:nexttemplate name=&quot;back_page&quot; /&gt;
+        &lt;pdf:nextpage /&gt;
+
+        &lt;div &gt;
+            &lt;center&gt;
+                &lt;! -- Print the barcode to the barcode_frame --&gt;
+                &lt;pdf:barcode value=&quot;{{ card.protocol }}&quot; type=&quot;code128&quot; humanreadable=&quot;1&quot; barwidth=&quot;0.43mm&quot; barheight=&quot;0.6cm&quot; align=&quot;middle&quot; /&gt;
+            &lt;/center&gt;
+        &lt;/div&gt;
+        &lt;!-- Use the front_page template again for the next card --&gt;
+        &lt;pdf:nexttemplate name=&quot;front_page&quot; /&gt;
+        &lt;pdf:nextpage /&gt;
+    {% endfor %}
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+</div>
+<div class="section" id="extra-stuff">
+<h3><a class="toc-backref" href="#id19">Extra&nbsp;stuff</a></h3>
+<p>Some extra things I want to mention concerning&nbsp;xhtml2pdf:</p>
+<ul class="simple">
+<li><tt class="docutils literal">&lt;pdf:pagenumber&gt;</tt> to output the current page number (please end the line after this&nbsp;tag)</li>
+<li><tt class="docutils literal">&lt;pdf:pagecount&gt;</tt> to output the total page number (please end the line after this&nbsp;tag)</li>
+</ul>
+<p>So if you want to print a footer with the pages, I recommend something like&nbsp;this:</p>
+<pre class="code literal-block">
+&lt;div id='footerContent'&gt;
+  Page &lt;pdf:pagenumber&gt;
+  from &lt;pdf:pagecount&gt;
+  total
+&lt;/div&gt;
+</pre>
+<p>Notice how the lines end after the&nbsp;tags.</p>
+<ul class="simple">
+<li><tt class="docutils literal">&lt;pdf:barcode&gt;</tt>: Output a barcode in your <span class="caps">PDF</span>. Here are the possible barcode types: I2of5, Standard39, Extended39, Standard93, Extended93, <span class="caps">MSI</span>, Codabar, Code11, <span class="caps">FIM</span>, <span class="caps">POSTNET</span>, USPS_4State, Code128, <span class="caps">EAN13</span>, <span class="caps">EAN8</span>, <span class="caps">QR</span>.</li>
+<li>You may add a page background image using  the <tt class="docutils literal"><span class="pre">background-image</span></tt> property of <tt class="docutils literal">&#64;page</tt>.</li>
+</ul>
+<p>For example, if you want the templates you create from your development/<span class="caps">UAT</span> systems to be different
+than the production ones you could do something like&nbsp;this:</p>
+<pre class="code literal-block">
+&#64;page {
+    {% if DEBUG %}
+        background-image: url({% static &quot;debug.png&quot; %});
+    {% endif %}
+    &lt;!-- Other page properties --&gt;
+}
+</pre>
+</div>
+</div>
+<div class="section" id="conclusion">
+<h2><a class="toc-backref" href="#id20">Conclusion</a></h2>
+<p>I hope that using the techniques described in this essential guide you&#8217;ll
+be able to create great looking <span class="caps">PDF</span> documents from your Django application
+and overcome any difficulties that may arise. If you feel that there&#8217;s something
+I&#8217;ve not covered properly (and is not covered by the documentation) please comment
+out and I&#8217;ll be happy to research it a bit and update the article with&nbsp;info.</p>
+<p>I am using all the above in various production applications for a long time and everything
+is smooth so don&#8217;t afraid to create PDFs from&nbsp;Django!</p>
+</div>
+</div>
+    <footer>
+<p class="meta">
+  <span class="byline author vcard">
+    Posted by <span class="fn">
+        Serafeim Papastefanos
+    </span>
+  </span>
+<time datetime="2015-11-23T14:20:00+02:00" pubdate>Δευ 23 Νοέμβριος 2015</time>  <span class="categories">
+    <a class='category' href='../../../../category/django.html'>django</a>
+  </span>
+  <span class="categories">
+    <a class="category" href="../../../../tag/pdf.html">pdf</a>,    <a class="category" href="../../../../tag/django.html">django</a>,    <a class="category" href="../../../../tag/reportlab.html">reportlab</a>,    <a class="category" href="../../../../tag/python.html">python</a>,    <a class="category" href="../../../../tag/.html"></a>  </span>
+</p><div class="sharing">
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="../../../../2015/11/23/pdf-in-django/" data-via="" data-counturl="../../../../2015/11/23/pdf-in-django/" >Tweet</a>
+</div>    </footer>
+  </article>
+
+</div>
+<aside class="sidebar">
+  <section>
+  <br />
+  <a href='/feeds/all.atom.xml'>Atom</a> 
+  |
+  <a href='/feeds/all.rss.xml'>RSS</a> 
+  </section>
+  <section>
+    <h1>Recent Posts</h1>
+    <ul id="recent_posts">
+      <li class="post">
+          <a href="../../../../2015/11/23/pdf-in-django/">PDFs in Django: The essential guide</a>
+      </li>
+      <li class="post">
+          <a href="../../../../2015/11/16/using-browserify-es6/">Improve your client-side-javascript workflow more by using ES6</a>
+      </li>
+      <li class="post">
+          <a href="../../../../2015/10/05/django-dynamic-tables-similar-models/">Django dynamic tables and filters for similar models</a>
+      </li>
+      <li class="post">
+          <a href="../../../../2015/09/08/more-complex-react-flux-example/">A (little more) complex react and flux example</a>
+      </li>
+      <li class="post">
+          <a href="../../../../2015/09/01/django-rq-redux/">django-rq redux: advanced techniques and tools</a>
+      </li>
+    </ul>
+  </section>
+  <section>
+      
+    <h1>Categories</h1>
+    <ul id="recent_posts">
+        <li><a href="../../../../category/css.html">css</a></li>
+        <li><a href="../../../../category/django.html">django</a></li>
+        <li><a href="../../../../category/flask.html">flask</a></li>
+        <li><a href="../../../../category/git.html">git</a></li>
+        <li><a href="../../../../category/javascript.html">javascript</a></li>
+        <li><a href="../../../../category/pelican.html">pelican</a></li>
+        <li><a href="../../../../category/python.html">python</a></li>
+        <li><a href="../../../../category/spring.html">spring</a></li>
+        <li><a href="../../../../category/wagtail.html">wagtail</a></li>
+    </ul>
+  </section>
+ 
+
+  <section>
+  <h1>Tags</h1>
+    <a href="../../../../tag/.html"></a>,    <a href="../../../../tag/pelican.html">pelican</a>,    <a href="../../../../tag/tasks.html">tasks</a>,    <a href="../../../../tag/less.html">less</a>,    <a href="../../../../tag/spring.html">spring</a>,    <a href="../../../../tag/rest.html">rest</a>,    <a href="../../../../tag/google.html">google</a>,    <a href="../../../../tag/cbv.html">cbv</a>,    <a href="../../../../tag/scheduling.html">scheduling</a>,    <a href="../../../../tag/auditing.html">auditing</a>,    <a href="../../../../tag/static-html.html">static-html</a>,    <a href="../../../../tag/tables.html">tables</a>,    <a href="../../../../tag/reportlab.html">reportlab</a>,    <a href="../../../../tag/git.html">git</a>,    <a href="../../../../tag/java.html">java</a>,    <a href="../../../../tag/rq.html">rq</a>,    <a href="../../../../tag/uglify.html">uglify</a>,    <a href="../../../../tag/django-rq.html">django-rq</a>,    <a href="../../../../tag/babel.html">babel</a>,    <a href="../../../../tag/nodejs.html">node.js</a>,    <a href="../../../../tag/redis.html">redis</a>,    <a href="../../../../tag/heroku.html">heroku</a>,    <a href="../../../../tag/forms.html">forms</a>,    <a href="../../../../tag/github-pages.html">github-pages</a>,    <a href="../../../../tag/404.html">404</a>,    <a href="../../../../tag/ldap.html">ldap</a>,    <a href="../../../../tag/gmail.html">gmail</a>,    <a href="../../../../tag/spring-security.html">spring-security</a>,    <a href="../../../../tag/css.html">css</a>,    <a href="../../../../tag/node.html">node</a>,    <a href="../../../../tag/jobs.html">jobs</a>,    <a href="../../../../tag/watchify.html">watchify</a>,    <a href="../../../../tag/python.html">python</a>,    <a href="../../../../tag/mongodb.html">mongodb</a>,    <a href="../../../../tag/javascript.html">javascript</a>,    <a href="../../../../tag/authentication.html">authentication</a>,    <a href="../../../../tag/react.html">react</a>,    <a href="../../../../tag/class-based-views.html">class-based-views</a>,    <a href="../../../../tag/npm.html">npm</a>,    <a href="../../../../tag/pdf.html">pdf</a>,    <a href="../../../../tag/rst.html">rst</a>,    <a href="../../../../tag/generic.html">generic</a>,    <a href="../../../../tag/es6.html">es6</a>,    <a href="../../../../tag/browserify.html">browserify</a>,    <a href="../../../../tag/branching.html">branching</a>,    <a href="../../../../tag/design.html">design</a>,    <a href="../../../../tag/github.html">github</a>,    <a href="../../../../tag/pusher.html">pusher</a>,    <a href="../../../../tag/windows.html">windows</a>,    <a href="../../../../tag/wagtail.html">wagtail</a>,    <a href="../../../../tag/django.html">django</a>,    <a href="../../../../tag/flux.html">flux</a>,    <a href="../../../../tag/githubio.html">github.io</a>,    <a href="../../../../tag/error.html">error</a>,    <a href="../../../../tag/debug.html">debug</a>,    <a href="../../../../tag/asynchronous.html">asynchronous</a>,    <a href="../../../../tag/security.html">security</a>,    <a href="../../../../tag/flask.html">flask</a>,    <a href="../../../../tag/boostrap-material-design.html">boostrap-material-design</a>  </section>
+
+
+
+</aside>    </div>
+  </div>
+  <footer role="contentinfo"><p>
+    Copyright &copy;  2013&ndash;2015  Serafeim Papastefanos &mdash;
+  <span class="credit">Powered by <a href="http://getpelican.com">Pelican</a></span>
+</p></footer>
+  <script src="../../../../theme/js/modernizr-2.0.js"></script>
+  <script src="../../../../theme/js/ender.js"></script>
+  <script src="../../../../theme/js/octopress.js" type="text/javascript"></script>
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-44750952-1', 'auto');
+
+    ga('send', 'pageview');
+    </script>
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+</body>
+</html>

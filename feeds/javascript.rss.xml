@@ -1,51 +1,539 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>/var/</title><link>http://spapas.github.io/</link><description>Various programming stuff</description><atom:link href="http://spapas.github.io/feeds/javascript.rss.xml" rel="self"></atom:link><lastBuildDate>Tue, 08 Sep 2015 12:55:00 +0300</lastBuildDate><item><title>A (little more) complex react and flux example</title><link>http://spapas.github.io/2015/09/08/more-complex-react-flux-example/</link><description>&lt;div class="contents topic" id="contents"&gt;
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>/var/</title><link>http://spapas.github.io/</link><description>Various programming stuff</description><atom:link href="http://spapas.github.io/feeds/javascript.rss.xml" rel="self"></atom:link><lastBuildDate>Tue, 22 Dec 2015 15:20:00 +0200</lastBuildDate><item><title>Ajax data with Fixed Data Table for React</title><link>http://spapas.github.io/2015/12/22/ajax-with-react-fixed-data-table/</link><description>&lt;div class="contents topic" id="contents"&gt;
 &lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
 &lt;ul class="simple"&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id3"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#more-about-flux-components" id="id4"&gt;More about Flux&amp;nbsp;components&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#explaining-the-application-components" id="id5"&gt;Explaining the application&amp;nbsp;components&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#reusable-application-components" id="id6"&gt;Reusable application components&lt;/a&gt;&lt;ul&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#dropdown-react-js" id="id7"&gt;DropDown.react.js&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#id1" id="id8"&gt;DropDown.react.js&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#pagingpanel-react-js" id="id9"&gt;PagingPanel.react.js&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#searchpanel-react-js" id="id10"&gt;SearchPanel.react.js&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#messagepanel" id="id11"&gt;MessagePanel&lt;/a&gt;&lt;ul&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#messagepanel-react-js" id="id12"&gt;MessagePanel.react.js&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#messagestore-js" id="id13"&gt;MessageStore.js&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#messageactions" id="id14"&gt;MessageActions&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#non-reusable-application-components" id="id15"&gt;Non-reusable application components&lt;/a&gt;&lt;ul&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#booktable-react-js" id="id16"&gt;BookTable.react.js&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#authordialog-react-js" id="id17"&gt;AuthorDialog.react.js&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#authorpanel-react-js" id="id18"&gt;AuthorPanel.react.js&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#statpanel-react-js" id="id19"&gt;StatPanel.react.js&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#bookform-react-js" id="id20"&gt;BookForm.react.js&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#bookpanel-react-js" id="id21"&gt;BookPanel.react.js&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#the-actions" id="id22"&gt;The&amp;nbsp;Actions&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#the-stores" id="id23"&gt;The Stores&lt;/a&gt;&lt;ul&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#id2" id="id24"&gt;MessageStore.js&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#authorstore-js" id="id25"&gt;AuthorStore.js&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#categorystore-js" id="id26"&gt;CategoryStore.js&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#bookstore-js" id="id27"&gt;BookStore.js&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#conclusion" id="id28"&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id1"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#our-project" id="id2"&gt;Our&amp;nbsp;project&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#how-fixeddatatable-gets-its-data" id="id3"&gt;How FixedDataTable gets its&amp;nbsp;data&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#ajaxcell-non-working-version-1" id="id4"&gt;AjaxCell: Non working version&amp;nbsp;1&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#ajaxcell-non-working-version-2" id="id5"&gt;AjaxCell: Non working version&amp;nbsp;2&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#ajaxcell-non-working-version-3" id="id6"&gt;AjaxCell: Non working version&amp;nbsp;3&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#ajaxcell-final-version" id="id7"&gt;AjaxCell: Final&amp;nbsp;version&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#the-table-container-component" id="id8"&gt;The Table container&amp;nbsp;component&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#some-enchancements" id="id9"&gt;Some&amp;nbsp;enchancements&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#conslusion" id="id10"&gt;Conslusion&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
 &lt;div class="section" id="introduction"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id3"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id1"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://facebook.github.io/fixed-data-table/"&gt;FixedDataTable&lt;/a&gt; is a nice React component from Facebook that is used to render tabular data.
+Its main characteristic is that it can handle many rows without sacrificing performance, however
+probably due to this fact I was not able to find any examples for loading data using Ajax - all
+examples I was able to find had the data already loaded (or created on the&amp;nbsp;fly).&lt;/p&gt;
+&lt;p&gt;So, although FixedDataTable is able to handle many rows, I am against transfering all of them to the user
+whenever our page loads since at most one page of data will be shown on screen (30 rows or so ?) -
+any other actions (filtering, sorting, aggregate calculations etc) should be done on the&amp;nbsp;server.&lt;/p&gt;
+&lt;p&gt;In the following I will present a simple, react-only example with a FixedDataTable that can be
+used with server-side, asynchronous, paginated&amp;nbsp;data.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="our-project"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id2"&gt;Our&amp;nbsp;project&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Let&amp;#8217;s see an example of what we&amp;#8217;ll&amp;nbsp;build:&lt;/p&gt;
+&lt;img alt="Our project" src="/images/ajax_fixed_data_tables.gif" style="width: 600px;" /&gt;
+&lt;p&gt;As a source of the data I&amp;#8217;ve used the &lt;a class="reference external" href="http://swapi.co/"&gt;Star Wars &lt;span class="caps"&gt;API&lt;/span&gt;&lt;/a&gt; and specifically its &lt;a class="reference external" href="http://swapi.co/documentation#people"&gt;People &lt;span class="caps"&gt;API&lt;/span&gt;&lt;/a&gt; by issuing
+requests to &lt;a class="reference external" href="http://swapi.co/api/people/?format=json"&gt;http://swapi.co/api/people/?format=json&lt;/a&gt;. This will return an array of people from the
+star wars universe in &lt;span class="caps"&gt;JSON&lt;/span&gt; format - the results are paginated with a page size of 10 (and we can switch
+to another page using the extra &lt;tt class="docutils literal"&gt;page=&lt;/tt&gt; request&amp;nbsp;parameter).&lt;/p&gt;
+&lt;p&gt;I will use es6 with the object spread operator (as described in &lt;a class="reference external" href="http://spapas.github.io/2015/11/16/using-browserify-es6/"&gt;a previous article&lt;/a&gt;)
+to write the code, using a single main.js as a source which will be transpiled to &lt;tt class="docutils literal"&gt;dist/bundle.js&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;The placeholder &lt;span class="caps"&gt;HTML&lt;/span&gt; for our application&amp;nbsp;is:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;lt;!DOCTYPE html&amp;gt;
+&amp;lt;html&amp;gt;
+  &amp;lt;head&amp;gt;
+    &amp;lt;meta charset=&amp;quot;UTF-8&amp;quot; /&amp;gt;
+    &amp;lt;title&amp;gt;Hello Ajax Fixed Data Table!&amp;lt;/title&amp;gt;
+    &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href='https://cdnjs.cloudflare.com/ajax/libs/fixed-data-table/0.6.0/fixed-data-table.min.css'&amp;gt;
+  &amp;lt;/head&amp;gt;
+  &amp;lt;body&amp;gt;
+    &amp;lt;div id=&amp;quot;main&amp;quot;&amp;gt;&amp;lt;/div&amp;gt;
+    &amp;lt;script type=&amp;quot;text/javascript&amp;quot; src='dist/bundle.js' &amp;gt;&amp;lt;/script&amp;gt;
+  &amp;lt;/body&amp;gt;
+&amp;lt;/html&amp;gt;
+&lt;/pre&gt;
+&lt;p&gt;The versions that are used are react 14.3 and fixed-data-table 0.6.0. You can find this project in github &amp;#64;
+&lt;a class="reference external" href="https://github.com/spapas/react-tables"&gt;https://github.com/spapas/react-tables&lt;/a&gt; &amp;#8212; tag name &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;fixed-data-table-ajax&lt;/span&gt;&lt;/tt&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="how-fixeddatatable-gets-its-data"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id3"&gt;How FixedDataTable gets its&amp;nbsp;data&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The data of a &lt;tt class="docutils literal"&gt;FixedDataTable&lt;/tt&gt; component is defined through a number of &lt;tt class="docutils literal"&gt;Column&lt;/tt&gt; components
+and specifically, the &lt;tt class="docutils literal"&gt;cell&lt;/tt&gt; attribute of that component which sould either return be a static string
+to be displayed in that column or a React component (usually a &lt;tt class="docutils literal"&gt;Cell&lt;/tt&gt;) that will be displayed in
+that column or even a function that returns a string or a react component. The function (or component)
+passed to &lt;tt class="docutils literal"&gt;cell&lt;/tt&gt; will have an object with a &lt;tt class="docutils literal"&gt;rowIndex&lt;/tt&gt; attribute (among others) as a parameter,
+for example the&amp;nbsp;following&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;lt;Column
+  header={&amp;lt;Cell&amp;gt;Url&amp;lt;/Cell&amp;gt;}
+  cell={props =&amp;gt; props.rowIndex}
+  width={200}
+/&amp;gt;
+&lt;/pre&gt;
+&lt;p&gt;will just display the rowIndex for each&amp;nbsp;cell.&lt;/p&gt;
+&lt;p&gt;So we can see that for each cell that FixedDataTable wants to display it will use its corresponding
+&lt;tt class="docutils literal"&gt;cell&lt;/tt&gt; attribute.
+So, a general though if we wanted to support asynchronous, paginated data
+is to check the rowIndex and retrieve the correct page asynchronously.
+This would lead to a difficulty: What should the &lt;tt class="docutils literal"&gt;cell&lt;/tt&gt; function return? We&amp;#8217;ll try to resolve this
+using an &lt;tt class="docutils literal"&gt;AjaxCell&lt;/tt&gt; function that should return a react componet to put in the&amp;nbsp;cell:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="ajaxcell-non-working-version-1"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id4"&gt;AjaxCell: Non working version&amp;nbsp;1&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;A first sketch of an &lt;tt class="docutils literal"&gt;`AjaxCell&lt;/tt&gt; component could be something like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+// Careful - not working
+const AjaxCell1 = ({rowIndex, col, ...props}) =&amp;gt; {
+    let page = 1;
+    let idx = rowIndex;
+    if(rowIndex&amp;gt;=pageSize) {
+        page = Math.floor(rowIndex / pageSize) + 1;
+        idx = rowIndex % pageSize;
+    }
+    fetch('http://swapi.co/api/people/?format=json&amp;amp;page='+page).then(function(response) {
+        return response.json();
+    }).then(function(j) {
+        // Here we have the result ! But where will it go ?
+    });
+    return /// what ?
+}
+&lt;/pre&gt;
+&lt;p&gt;The col attribute will later be used to select the attribute we want to display in this cell.
+The &lt;tt class="docutils literal"&gt;page&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;idx&lt;/tt&gt; will have the correct page number and idx inside that page (for example,
+if &lt;tt class="docutils literal"&gt;rowIndex&lt;/tt&gt; is 33, &lt;tt class="docutils literal"&gt;page&lt;/tt&gt; will be 4 and idx will be 3. The problem with the above is that
+the fetch function will be called &lt;em&gt;asynchronously&lt;/em&gt; so when the AjaxCell returns it will &lt;em&gt;not&lt;/em&gt; have
+the results (yet)! So we won&amp;#8217;t be able to render anything&amp;nbsp;:(&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="ajaxcell-non-working-version-2"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt;AjaxCell: Non working version&amp;nbsp;2&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;To be able to render &lt;em&gt;something&lt;/em&gt;, we could put the results of fetching a page to a &lt;tt class="docutils literal"&gt;cache&lt;/tt&gt; dictionary &amp;#8212; and only
+fetch that page if it is not inside the &lt;tt class="docutils literal"&gt;cache&lt;/tt&gt; - if it is inside the cache then we&amp;#8217;ll just return
+the correct&amp;nbsp;value:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+// Careful - not working correctly
+const cache = {}
+const AjaxCell2 = ({rowIndex, col, forceUpdate, ...props}) =&amp;gt; {
+    let page = 1;
+    let idx = rowIndex;
+    if(rowIndex&amp;gt;=pageSize) {
+        page = Math.floor(rowIndex / pageSize) + 1;
+        idx = rowIndex % pageSize;
+    }
+    if (cache[page]) {
+        return &amp;lt;Cell&amp;gt;{cache[page][idx][col]}&amp;lt;/Cell&amp;gt;
+    } else {
+        console.log(&amp;quot;Loading page &amp;quot; + page);
+        fetch('http://swapi.co/api/people/?format=json&amp;amp;page='+page).then(function(response) {
+            return response.json();
+        }).then(function(j) {
+            cache[page] = j['results'];
+        });
+    }
+    return &amp;lt;Cell&amp;gt;-&amp;lt;/Cell&amp;gt;;
+}
+&lt;/pre&gt;
+&lt;p&gt;The above will work, since it will return an empty (&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;&amp;lt;Cell&amp;gt;-&amp;lt;/Cell&amp;gt;&lt;/span&gt;&lt;/tt&gt;) initially but when the
+&lt;tt class="docutils literal"&gt;fetch&lt;/tt&gt; returns it will set the &lt;tt class="docutils literal"&gt;cache&lt;/tt&gt; for that page and return the correct value (&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;&amp;lt;Cell&amp;gt;{cache[page][idx][col]}&amp;lt;/Cell&amp;gt;&lt;/span&gt;&lt;/tt&gt;).&lt;/p&gt;
+&lt;p&gt;However, as can be understood, when the page first loads it will call &lt;tt class="docutils literal"&gt;AjaxCell2&lt;/tt&gt; for all visible cells &amp;#8212;
+because fetch is asynchronous and takes time until it returns (and sets the cache for that page), so the
+&lt;tt class="docutils literal"&gt;fetch&lt;/tt&gt; will be called for &lt;em&gt;all&lt;/em&gt;&amp;nbsp;cells!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="ajaxcell-non-working-version-3"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id6"&gt;AjaxCell: Non working version&amp;nbsp;3&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;fetch&lt;/tt&gt; ing each page multiple times is of course not acceptable, so we&amp;#8217;ll add a &lt;tt class="docutils literal"&gt;loading&lt;/tt&gt; flag
+and &lt;tt class="docutils literal"&gt;fetch&lt;/tt&gt; will be called only when this flag is &lt;tt class="docutils literal"&gt;false&lt;/tt&gt;, like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+// Not ready yet
+const cache = {};
+let loading = false;
+const AjaxCell2 = ({rowIndex, col, ...props}) =&amp;gt; {
+    let page = 1;
+    let idx = rowIndex;
+    if(rowIndex&amp;gt;=pageSize) {
+        page = Math.floor(rowIndex / pageSize) + 1;
+        idx = rowIndex % pageSize;
+    }
+    if (cache[page]) {
+        return &amp;lt;Cell&amp;gt;{cache[page][idx][col]}&amp;lt;/Cell&amp;gt;
+    } else if(!loading) {
+        console.log(&amp;quot;Loading page &amp;quot; + page);
+        loading = true;
+
+        fetch('http://swapi.co/api/people/?format=json&amp;amp;page='+page).then(function(response) {
+            return response.json();
+        }).then(function(j) {
+            cache[page] = j['results'];
+            loading = false;
+        });
+    }
+    return &amp;lt;Cell&amp;gt;-&amp;lt;/Cell&amp;gt;;
+}
+&lt;/pre&gt;
+&lt;p&gt;This works much better - the cells are rendered correctly and each page is loaded only once. However, if for example
+I tried to move to the end of the table quickly, I would see some cells that are always loading (they never get their correct value). This is because
+there is no way to know that the fetch function has actually completed in order to update with the latest (correct) value of that
+cell and will contain the stale placeholder (&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;&amp;lt;Cell&amp;gt;-&amp;lt;/Cell&amp;gt;&lt;/span&gt;&lt;/tt&gt;)&amp;nbsp;value.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="ajaxcell-final-version"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id7"&gt;AjaxCell: Final&amp;nbsp;version&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;To clear the stale data we need to do an update to the table data
+when each fetch is finished &amp;#8212; this should be done by a callback that will be passed to the &lt;tt class="docutils literal"&gt;AjaxCell&lt;/tt&gt;, like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+const cache = {};
+let loading = false;
+const AjaxCell = ({rowIndex, col, forceUpdate, ...props}) =&amp;gt; {
+    let page = 1;
+    let idx = rowIndex;
+    if(rowIndex&amp;gt;=pageSize) {
+        page = Math.floor(rowIndex / pageSize) + 1;
+        idx = rowIndex % pageSize;
+    }
+    if (cache[page]) {
+        return &amp;lt;Cell&amp;gt;{cache[page][idx][col]}&amp;lt;/Cell&amp;gt;
+    } else if(!loading) {
+        console.log(&amp;quot;Loading page &amp;quot; + page);
+        loading = true;
+
+        fetch('http://swapi.co/api/people/?format=json&amp;amp;page='+page).then(function(response) {
+            return response.json();
+        }).then(function(j) {
+            cache[page] = j['results'];
+            loading = false;
+            forceUpdate();
+        });
+    }
+    return loadingCell;
+}
+&lt;/pre&gt;
+&lt;p&gt;So we pass a forceUpdate callback as a property which is called when a fetch is finished. This may
+result to some not needed updates to the table (since we would do a fetch + forceUpdate for non-displayed
+data) but we can now be positive that when the data is loaded the table will be updated to dispaly&amp;nbsp;it.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="the-table-container-component"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id8"&gt;The Table container&amp;nbsp;component&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Finally, the component that contains the table is the&amp;nbsp;following:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+class TableContainer extends React.Component {
+    render() {
+        return &amp;lt;Table
+            rowHeight={30} rowsCount={87} width={600} height={200} headerHeight={30}&amp;gt;
+
+            &amp;lt;Column
+              header={&amp;lt;Cell&amp;gt;Name&amp;lt;/Cell&amp;gt;}
+              cell={ &amp;lt;AjaxCell col='name' forceUpdate={this.forceUpdate.bind(this)} /&amp;gt; }
+              width={200}
+            /&amp;gt;
+            &amp;lt;Column
+              header={&amp;lt;Cell&amp;gt;Birth Year&amp;lt;/Cell&amp;gt;}
+              cell={ &amp;lt;AjaxCell col='birth_year' forceUpdate={this.forceUpdate.bind(this)} /&amp;gt; }
+              width={200}
+            /&amp;gt;
+            &amp;lt;Column
+              header={&amp;lt;Cell&amp;gt;Url&amp;lt;/Cell&amp;gt;}
+              cell={ &amp;lt;AjaxCell col='url' forceUpdate={this.forceUpdate.bind(this)} /&amp;gt; }
+              width={200}
+            /&amp;gt;
+
+        &amp;lt;/Table&amp;gt;
+    }
+}
+&lt;/pre&gt;
+&lt;p&gt;I&amp;#8217;ve made it a component in order to be able to bind the &lt;tt class="docutils literal"&gt;forceUpdate&lt;/tt&gt; method of the component to and
+&lt;tt class="docutils literal"&gt;this&lt;/tt&gt; and pass it to the &lt;tt class="docutils literal"&gt;forceUpdate&lt;/tt&gt; parameter to the &lt;tt class="docutils literal"&gt;AjaxCell&lt;/tt&gt; component. I&amp;#8217;ve hard-coded
+the rowsCount value &amp;#8212; instead we should have done an initial fetch to the first page of the &lt;span class="caps"&gt;API&lt;/span&gt; to get
+the total number of rows and only after that fetch had returned display the &lt;tt class="docutils literal"&gt;&amp;lt;Table&amp;gt;&lt;/tt&gt; component (left
+as an exercise to the&amp;nbsp;reader).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="some-enchancements"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id9"&gt;Some&amp;nbsp;enchancements&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Instead of displaying &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;&amp;lt;Cell&amp;gt;-&amp;lt;/Cell&amp;gt;&lt;/span&gt;&lt;/tt&gt; (or &lt;tt class="docutils literal"&gt;&amp;lt;/Cell&amp;gt;&lt;/tt&gt;) when the page loads, I propose to define a
+cell with an embedded spinner,&amp;nbsp;like&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+const loadingCell = &amp;lt;Cell&amp;gt;
+    &amp;lt;img width=&amp;quot;16&amp;quot; height=&amp;quot;16&amp;quot; alt=&amp;quot;star&amp;quot; src=&amp;quot;data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==&amp;quot; /&amp;gt;
+&amp;lt;/Cell&amp;gt;
+&lt;/pre&gt;
+&lt;p&gt;and return this&amp;nbsp;instead.&lt;/p&gt;
+&lt;p&gt;Also, if your &lt;span class="caps"&gt;REST&lt;/span&gt; &lt;span class="caps"&gt;API&lt;/span&gt; returns too fast and you&amp;#8217;d like to see what would happen if the server request took too long to return, you could
+change fetch like&amp;nbsp;this&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+fetch('http://swapi.co/api/people/?format=json&amp;amp;page='+page).then(function(response) {
+    return response.json();
+}).then(function(j) {
+    setTimeout( () =&amp;gt; {
+        cache[page] = j['results'];
+        loading = false;
+        forceUpdate();
+    }, 1000);
+});
+&lt;/pre&gt;
+&lt;p&gt;to add a 1 second&amp;nbsp;delay.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="conslusion"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id10"&gt;Conslusion&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The above is a just a proof of concept of using FixedDataTable with asynchronously loaded server-side data.
+This of course could be used for small projects (I am already using it for an internal project) but I recommend
+using the &lt;a class="reference external" href="http://spapas.github.io/2015/07/02/comprehensive-react-flux-tutorial-2/"&gt;flux architecture&lt;/a&gt; for more complex projects. What this more or
+less means is that a store component
+should be developed that will actually keep the data for each row, and a &lt;tt class="docutils literal"&gt;fetchCompleted&lt;/tt&gt; action should be
+dispatched when the &lt;tt class="docutils literal"&gt;fetch&lt;/tt&gt; is finished instead of calling &lt;tt class="docutils literal"&gt;forceUpdate&lt;/tt&gt; directly.&lt;/p&gt;
+&lt;/div&gt;
+</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Serafeim Papastefanos</dc:creator><pubDate>Tue, 22 Dec 2015 15:20:00 +0200</pubDate><guid>tag:spapas.github.io,2015-12-22:2015/12/22/ajax-with-react-fixed-data-table/</guid><category>javascript</category><category>react</category><category>fixed-data-tables</category><category>FixedDataTable</category></item><item><title>Improve your client-side-javascript workflow more by using ES6</title><link>http://spapas.github.io/2015/11/16/using-browserify-es6/</link><description>&lt;div class="contents topic" id="contents"&gt;
+&lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id1"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#npm-save-save-dev-and-avoiding-global-deps" id="id2"&gt;&lt;span class="caps"&gt;NPM&lt;/span&gt;, &amp;#8212;save, &amp;#8212;save-dev and avoiding global&amp;nbsp;deps&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#using-babel" id="id3"&gt;Using&amp;nbsp;babel&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#integrate-babel-with-browserify" id="id4"&gt;Integrate babel with&amp;nbsp;browserify&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#the-object-spread-operator" id="id5"&gt;The object-spread&amp;nbsp;operator&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#conclusion" id="id6"&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;Update 22/12/2015:&lt;/strong&gt; Add section for the object-spread&amp;nbsp;operator.&lt;/p&gt;
+&lt;div class="section" id="introduction"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id1"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;In a &lt;a class="reference external" href="http://spapas.github.io/2015/05/27/using-browserify-watchify/"&gt;previous article&lt;/a&gt;
+we presented a simple workflow to improve your client-side (javascript) workflow
+by including a bunch of tools from the node-js world i.e &lt;a class="reference external" href="http://browserify.org/"&gt;browserify&lt;/a&gt; and
+its friends, &lt;a class="reference external" href="https://github.com/substack/watchify"&gt;watchify&lt;/a&gt; and &lt;a class="reference external" href="https://www.npmjs.com/package/uglify-js"&gt;uglify-js&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Using these tools we were able to properly manage our client side dependencies
+(no more script tags in our html templates) and modularize our code
+(so we could avoid monolithic javascript files that contained all our code).
+Another great improvement to our workflow would be to include &lt;span class="caps"&gt;ES6&lt;/span&gt; to the&amp;nbsp;mix!&lt;/p&gt;
+&lt;p&gt;&lt;span class="caps"&gt;ES6&lt;/span&gt; (or EcmaScript 2015) is more or less &amp;quot;Javascript: &lt;span class="caps"&gt;TNG&lt;/span&gt;&amp;quot;. It has many features
+that greatly improve the readability and writability of javascript code - for instance,
+thick arrows, better classes, better modules, iterators/generators, template strings,
+default function parameters and many others!
+More info on these features and how they could be used can be found on the &lt;a class="reference external" href="https://github.com/lukehoban/es6features"&gt;es6features&lt;/a&gt;&amp;nbsp;repository.&lt;/p&gt;
+&lt;p&gt;Unfortunately, these features are either not supported at all, or they are partially supported
+on current (November 2015) browsers. However all is &lt;em&gt;not&lt;/em&gt; lost yet: Since we already use browserify
+to our client side workflow, we can easily enable it to read source files with &lt;span class="caps"&gt;ES6&lt;/span&gt; syntax
+and transform them to normal javascript using a transformation through the &lt;a class="reference external" href="https://babeljs.io/"&gt;babel&lt;/a&gt;&amp;nbsp;tool.&lt;/p&gt;
+&lt;p&gt;In the following, we&amp;#8217;ll talk a bit more about the node-js package manager (npm) features,
+talk a little about babel and finally
+modify our workflow so that it will be able to use &lt;span class="caps"&gt;ES6&lt;/span&gt;! Please notice that to properly follow this article
+you need to first read the &lt;a class="reference external" href="http://spapas.github.io/2015/05/27/using-browserify-watchify/"&gt;previous one&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="npm-save-save-dev-and-avoiding-global-deps"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id2"&gt;&lt;span class="caps"&gt;NPM&lt;/span&gt;, &amp;#8212;save, &amp;#8212;save-dev and avoiding global&amp;nbsp;deps&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;In the previous article, I had recommended to install the needed tools
+(needed to create the output bundle browserify, watchify, uglify) globally
+using npm install -g package (of course the normal dependencies like moment.js
+would be installed locally).
+This has one advantage and two disadvantages: It
+puts these tools to the path so they can be called immediately (i.e browserify)
+but you will need root access to install a package globally and nothing is
+saved on &lt;tt class="docutils literal"&gt;package.json&lt;/tt&gt; so you don&amp;#8217;t know which packages must be installed
+in order to start developing the&amp;nbsp;project!&lt;/p&gt;
+&lt;p&gt;This could be ok for the introductionary article, however for this one I
+will propose another alternative: Install all the tools &lt;em&gt;locally&lt;/em&gt; using just
+&lt;tt class="docutils literal"&gt;npm install package &lt;span class="pre"&gt;--save&lt;/span&gt;&lt;/tt&gt;. These tools will be put to the &lt;tt class="docutils literal"&gt;node_modules&lt;/tt&gt; folder. They
+&lt;em&gt;will not&lt;/em&gt; be put to the path, but if you want to execute a binary by yourself
+to debug the output, you can find it in &lt;tt class="docutils literal"&gt;node_modules/bin&lt;/tt&gt;, for example,
+for browserify you can run &lt;tt class="docutils literal"&gt;node_modules/bin/browserify&lt;/tt&gt;. Another intersting
+thing is that if you create executable scripts in your &lt;tt class="docutils literal"&gt;package.json&lt;/tt&gt; you
+don&amp;#8217;t actually need to include the full path but the binaries will be&amp;nbsp;found.&lt;/p&gt;
+&lt;p&gt;Another thing I&amp;#8217;d like to discuss here is the difference between &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;--save&lt;/span&gt;&lt;/tt&gt;
+and &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;--save-dev&lt;/span&gt;&lt;/tt&gt; options that can be passed to npm install. If you take
+a look at other guides you&amp;#8217;ll see that people are using &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;--save-dev&lt;/span&gt;&lt;/tt&gt; for
+development dependencies (i.e testing) and &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;--save&lt;/span&gt;&lt;/tt&gt; for normal dependencies.
+The difference is that these dependencies are saved in different places in
+&lt;tt class="docutils literal"&gt;package.json&lt;/tt&gt; and if you run &lt;tt class="docutils literal"&gt;npm install &lt;span class="pre"&gt;--production&lt;/span&gt;&lt;/tt&gt; you&amp;#8217;ll get only
+the normal dependencies (while, if you run &lt;tt class="docutils literal"&gt;npm install&lt;/tt&gt; all dependencies
+will be installed). In these articles, I chose to just use &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;--save&lt;/span&gt;&lt;/tt&gt; everywhere,
+after all the only thing that would be needed for production would be the
+&lt;tt class="docutils literal"&gt;bundle.js&lt;/tt&gt; output&amp;nbsp;file.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="using-babel"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id3"&gt;Using&amp;nbsp;babel&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The &lt;a class="reference external" href="https://babeljs.io/"&gt;babel&lt;/a&gt; library &amp;quot;is a JavaScript compiler&amp;quot;. It gets input files in a variant
+of javascript (for example, &lt;span class="caps"&gt;ES6&lt;/span&gt;) and produces normal javascript files &amp;#8212; something
+like what browserify transforms do. However, what babel does (and I think its
+the only tool that does this) is that it allows you to use &lt;span class="caps"&gt;ES6&lt;/span&gt; features &lt;em&gt;now&lt;/em&gt; by
+transpiling them to normal (&lt;span class="caps"&gt;ES5&lt;/span&gt;) javascript. Also, babel has &lt;a class="reference external" href="https://babeljs.io/docs/plugins/"&gt;various other transforms&lt;/a&gt;,
+including a react transform
+(so you can use this instead of the reactify&amp;nbsp;browserify-transform)!&lt;/p&gt;
+&lt;p&gt;In any case, to be able to use &lt;span class="caps"&gt;ES6&lt;/span&gt;, we&amp;#8217;ll need to install babel and its es6 presets
+(don&amp;#8217;t forget that you need to have a &lt;tt class="docutils literal"&gt;package.json&lt;/tt&gt; for the dependencies to be
+saved so either do an &lt;tt class="docutils literal"&gt;npm init&lt;/tt&gt; or create a &lt;tt class="docutils literal"&gt;package.json&lt;/tt&gt; file containing only
+&lt;tt class="docutils literal"&gt;{}&lt;/tt&gt;):&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+npm install  babel babel-preset-es2015 --save
+&lt;/pre&gt;
+&lt;p&gt;If we wanted to also use babel for react we&amp;#8217;d need to install&amp;nbsp;babel-preset-react.&lt;/p&gt;
+&lt;p&gt;To configure babel we can either add a &lt;tt class="docutils literal"&gt;babel&lt;/tt&gt;
+section in our &lt;tt class="docutils literal"&gt;package.json&lt;/tt&gt; or create a new file named .babelrc and put the configuration&amp;nbsp;there.&lt;/p&gt;
+&lt;p&gt;I prefer the first one since we are already using the &lt;tt class="docutils literal"&gt;package.json&lt;/tt&gt;. So add the following attribute
+to your &lt;tt class="docutils literal"&gt;package.json&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;quot;babel&amp;quot;: {
+  &amp;quot;presets&amp;quot;: [
+    &amp;quot;es2015&amp;quot;
+  ]
+}
+&lt;/pre&gt;
+&lt;p&gt;If you wanted to configure it through &lt;tt class="docutils literal"&gt;.babelrc&lt;/tt&gt; then you&amp;#8217;d just copy to it the contents of &lt;tt class="docutils literal"&gt;&amp;quot;babel&amp;quot;&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;To do some tests with babel, you can install its cli (it&amp;#8217;s not included in the babel package) through
+&lt;tt class="docutils literal"&gt;npm install &lt;span class="pre"&gt;babel-cli&lt;/span&gt;&lt;/tt&gt;. Now, you can run &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;node_modules/.bin/babel&lt;/span&gt;&lt;/tt&gt;. For example, create a
+file named &lt;tt class="docutils literal"&gt;testbabel.js&lt;/tt&gt; with the following contents (thick&amp;nbsp;arrow):&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+[1,2,3].forEach(x =&amp;gt; console.log(x) );
+&lt;/pre&gt;
+&lt;p&gt;when you pass it to babel you&amp;#8217;ll see the following&amp;nbsp;output:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;gt;node_modules\.bin\babel testbabel.js
+&amp;quot;use strict&amp;quot;;
+
+[1, 2, 3].forEach(function (x) {
+  return console.log(x);
+});
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="integrate-babel-with-browserify"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id4"&gt;Integrate babel with&amp;nbsp;browserify&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;To call babel from browserify we&amp;#8217;re going to use the &lt;a class="reference external" href="https://github.com/babel/babelify"&gt;babelify&lt;/a&gt; browserify transform which
+actually uses babel to transpile the browserify input. After installing it&amp;nbsp;with&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+npm install babelify --save
+&lt;/pre&gt;
+&lt;p&gt;you need to tell browserify to use it. To do this, you&amp;#8217;ll just pass a -t babelify parameter to
+browserify. So if you run it with the &lt;tt class="docutils literal"&gt;testbabel.js&lt;/tt&gt; file as input you&amp;#8217;ll see the following&amp;nbsp;output:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;gt;node_modules\.bin\browserify -t babelify testbabel.js
+[...] browserify gibberish
+&amp;quot;use strict&amp;quot;;
+
+[1, 2, 3].forEach(function (x) {
+  return console.log(x);
+});
+
+[...] more browserify gibberish
+&lt;/pre&gt;
+&lt;p&gt;yey &amp;#8212; the code is transpiled to &lt;span class="caps"&gt;ES5&lt;/span&gt;!&lt;/p&gt;
+&lt;p&gt;To create a complete project, let&amp;#8217;s add a normal requirement&amp;nbsp;(moment.js):&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+npm install moment --save
+&lt;/pre&gt;
+&lt;p&gt;and a file named &lt;tt class="docutils literal"&gt;src\main.js&lt;/tt&gt; that uses it with &lt;span class="caps"&gt;ES6&lt;/span&gt;&amp;nbsp;syntax:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+import moment from 'moment';
+
+const arr = [1,2,3,4,5];
+arr.forEach(x =&amp;gt; setTimeout(() =&amp;gt; console.log(`Now: ${moment().format(&amp;quot;HH:mm:ss&amp;quot;)}, Later: ${moment().add(x, &amp;quot;days&amp;quot;).format(&amp;quot;L&amp;quot;)}...`), x*1000));
+&lt;/pre&gt;
+&lt;p&gt;To create the output javascript file, we&amp;#8217;ll use the browserify and watchify commands with the
+addition of the -t babelify switch. Here&amp;#8217;s the complete &lt;tt class="docutils literal"&gt;package.json&lt;/tt&gt; for this&amp;nbsp;project:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+{
+  &amp;quot;dependencies&amp;quot;: {
+    &amp;quot;babel&amp;quot;: &amp;quot;^6.1.18&amp;quot;,
+    &amp;quot;babel-preset-es2015&amp;quot;: &amp;quot;^6.1.18&amp;quot;,
+    &amp;quot;babelify&amp;quot;: &amp;quot;^7.2.0&amp;quot;,
+    &amp;quot;browserify&amp;quot;: &amp;quot;^12.0.1&amp;quot;,
+    &amp;quot;moment&amp;quot;: &amp;quot;^2.10.6&amp;quot;,
+    &amp;quot;uglify-js&amp;quot;: &amp;quot;^2.6.0&amp;quot;,
+    &amp;quot;watchify&amp;quot;: &amp;quot;^3.6.1&amp;quot;
+  },
+  &amp;quot;scripts&amp;quot;: {
+    &amp;quot;watch&amp;quot;: &amp;quot;watchify src/main.js -o dist/bundle.js -v -t babelify&amp;quot;,
+    &amp;quot;build&amp;quot;: &amp;quot;browserify src/main.js -t babelify | uglifyjs -mc warnings=false &amp;gt; dist/bundle.js&amp;quot;
+  },
+  &amp;quot;babel&amp;quot;: {
+    &amp;quot;presets&amp;quot;: [
+      &amp;quot;es2015&amp;quot;
+    ]
+  }
+}
+&lt;/pre&gt;
+&lt;p&gt;Running &lt;tt class="docutils literal"&gt;npm run build&lt;/tt&gt; should create a &lt;tt class="docutils literal"&gt;dist/bundle.js&lt;/tt&gt; file. If you include this in an html,
+you should see something like this in the&amp;nbsp;console:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+Now: 13:52:09, Later: 11/17/2015...
+Now: 13:52:10, Later: 11/18/2015...
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="the-object-spread-operator"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt;The object-spread&amp;nbsp;operator&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Many examples in the internet use the &lt;a class="reference external" href="https://facebook.github.io/react/docs/jsx-spread.html#spread-attributes"&gt;object spread operator&lt;/a&gt; which is &lt;a class="reference external" href="http://stackoverflow.com/questions/31115276/ecmascript-6-spread-operator-in-object-deconstruction-support-in-typescript-and"&gt;not part of es6&lt;/a&gt; so our
+proposed babel configuration does not support it!
+To be able to use this syntax, we&amp;#8217;ll need to install the corresponding babel plugin by using
+&lt;tt class="docutils literal"&gt;npm install &lt;span class="pre"&gt;babel-plugin-transform-object-rest-spread&lt;/span&gt; &lt;span class="pre"&gt;--save&lt;/span&gt;&lt;/tt&gt; and add it to our babel configuration
+in the plugins section, something like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;quot;presets&amp;quot;: [
+  &amp;quot;es2015&amp;quot;,
+  &amp;quot;react&amp;quot;
+],
+&amp;quot;plugins&amp;quot;: [
+  &amp;quot;transform-object-rest-spread&amp;quot;
+]
+&lt;/pre&gt;
+&lt;p&gt;If everything is ok this should be transpiled without errors using &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;node_modules\.bin\browserify&lt;/span&gt; testbabe.js &lt;span class="pre"&gt;-t&lt;/span&gt; babelify&lt;/tt&gt;&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+let x = {a:1 , b:2 };
+let y = {...x, c: 3};
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="conclusion"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id6"&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Using the combination of babel and javascript we can easily write &lt;span class="caps"&gt;ES6&lt;/span&gt; code in our modules! This,
+along with the modularization of our code and the management of client-side dependencies should
+make client side development a&amp;nbsp;breeze!&lt;/p&gt;
+&lt;p&gt;Please notice that to keep the presented workflow simple and easy to
+replicate and configure, we have not used any external
+task runners (like gulp or grunt) &amp;#8212; all configuration is kept in a single file (package.json) and
+the whole environment can be replicated just by doing a &lt;tt class="docutils literal"&gt;npm install&lt;/tt&gt;. Of course, the capabilities of
+browserify are not unlimited, so if you wanted to do something more complicated
+(for instance, lint your code before passing it to browserify) you&amp;#8217;d need to use the mentioned
+task runners (or webpack which is the current trend in javascript bundlers and actually replaces
+the task&amp;nbsp;runners).&lt;/p&gt;
+&lt;/div&gt;
+</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Serafeim Papastefanos</dc:creator><pubDate>Mon, 16 Nov 2015 14:20:00 +0200</pubDate><guid>tag:spapas.github.io,2015-11-16:2015/11/16/using-browserify-es6/</guid><category>javascript</category><category>browserify</category><category>node</category><category>npm</category><category>watchify</category><category>generic</category><category>uglify</category><category>babel</category><category>es6</category></item><item><title>A (little more) complex react and flux example</title><link>http://spapas.github.io/2015/09/08/more-complex-react-flux-example/</link><description>&lt;div class="contents topic" id="contents"&gt;
+&lt;p class="topic-title first"&gt;Contents&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#introduction" id="id2"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#more-about-flux-components" id="id3"&gt;More about Flux&amp;nbsp;components&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#explaining-the-application-components" id="id4"&gt;Explaining the application&amp;nbsp;components&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#reusable-application-components" id="id5"&gt;Reusable application components&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#dropdown-react-js" id="id6"&gt;DropDown.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#datepicker-react-js" id="id7"&gt;DatePicker.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#pagingpanel-react-js" id="id8"&gt;PagingPanel.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#searchpanel-react-js" id="id9"&gt;SearchPanel.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#messagepanel" id="id10"&gt;MessagePanel&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#messagepanel-react-js" id="id11"&gt;MessagePanel.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#messagestore-js" id="id12"&gt;MessageStore.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#messageactions" id="id13"&gt;MessageActions&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#non-reusable-application-components" id="id14"&gt;Non-reusable application components&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#booktable-react-js" id="id15"&gt;BookTable.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#authordialog-react-js" id="id16"&gt;AuthorDialog.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#authorpanel-react-js" id="id17"&gt;AuthorPanel.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#statpanel-react-js" id="id18"&gt;StatPanel.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#bookform-react-js" id="id19"&gt;BookForm.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#bookpanel-react-js" id="id20"&gt;BookPanel.react.js&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#the-actions" id="id21"&gt;The&amp;nbsp;Actions&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#the-stores" id="id22"&gt;The Stores&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#id1" id="id23"&gt;MessageStore.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#authorstore-js" id="id24"&gt;AuthorStore.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#categorystore-js" id="id25"&gt;CategoryStore.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#bookstore-js" id="id26"&gt;BookStore.js&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#conclusion" id="id27"&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="introduction"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id2"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;In &lt;a class="reference external" href="http://spapas.github.io/2015/06/05/comprehensive-react-flux-tutorial/"&gt;previous&lt;/a&gt;
-&lt;a class="reference external" href="http://spapas.github.io/2015/06/05/comprehensive-react-flux-tutorial/"&gt;two&lt;/a&gt; parts of this series, we have seen
+&lt;a class="reference external" href="http://spapas.github.io/2015/07/02/comprehensive-react-flux-tutorial-2/"&gt;two&lt;/a&gt; parts of this series, we have seen
 how we could implement a
 not-so-simple single page application with full &lt;span class="caps"&gt;CRUD&lt;/span&gt; capabilities
 using react only (in the &lt;a class="reference external" href="http://spapas.github.io/2015/06/05/comprehensive-react-flux-tutorial/"&gt;first part&lt;/a&gt; ) and then how to
-change it to use the flux architecture (in the &lt;a class="reference external" href="http://spapas.github.io/2015/06/05/comprehensive-react-flux-tutorial/"&gt;second part&lt;/a&gt;).&lt;/p&gt;
+change it to use the flux architecture (in the &lt;a class="reference external" href="http://spapas.github.io/2015/07/02/comprehensive-react-flux-tutorial-2/"&gt;second part&lt;/a&gt;).&lt;/p&gt;
 &lt;p&gt;In this, third, part, we will
 add some more capabilities to the previous app
 to prove how easy it is to create complex apps
@@ -81,7 +569,7 @@ a bunch of techniques such&amp;nbsp;as:&lt;/p&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
 &lt;div class="section" id="more-about-flux-components"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id4"&gt;More about Flux&amp;nbsp;components&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id3"&gt;More about Flux&amp;nbsp;components&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;Before delving into the source code of the above application, I&amp;#8217;d like to
 make crystal what is the proposed way to call methods in the flux chain
 and which types of components can include other types of components. Let&amp;#8217;s
@@ -204,7 +692,7 @@ we want to make the component reusable (more on this&amp;nbsp;later).&lt;/p&gt;
 child components (a BookTable depends on a BookTableRow&amp;nbsp;etc).&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="explaining-the-application-components"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt;Explaining the application&amp;nbsp;components&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id4"&gt;Explaining the application&amp;nbsp;components&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;There are a lot of components that are needed for
 the above application. A bird&amp;#8217;s eye view of the components
 and their hierarchies can be seen on the following&amp;nbsp;figure:&lt;/p&gt;
@@ -214,7 +702,7 @@ by other applications and after that the components that are specifically
 implemented for our book/author single page&amp;nbsp;application.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="reusable-application-components"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id6"&gt;Reusable application&amp;nbsp;components&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id5"&gt;Reusable application&amp;nbsp;components&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;We can see that beyond the specific components (&lt;tt class="docutils literal"&gt;BookPanel&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;BookTable&lt;/tt&gt; etc)
 there&amp;#8217;s a bunch of more general components (&lt;tt class="docutils literal"&gt;DropDown&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;DatePicker&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;PagingPanel&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;SearchPanel&lt;/tt&gt;,
 &lt;tt class="docutils literal"&gt;MessagePanel&lt;/tt&gt;) that have names like they could be used by other applications (for example every application
@@ -222,7 +710,7 @@ that wants to implement a DropDown could use our component) and not only by the
 Book-Author application. Let&amp;#8217;s take a quick look at these components and if they
 are actually&amp;nbsp;reusable:&lt;/p&gt;
 &lt;div class="section" id="dropdown-react-js"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id7"&gt;DropDown.react.js&lt;/a&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id6"&gt;DropDown.react.js&lt;/a&gt;&lt;/h3&gt;
 &lt;pre class="code literal-block"&gt;
 var React = require('react');
 
@@ -264,8 +752,8 @@ would be to pass an identifier as a property for each dropdown and the dropdown 
 dropdown action and passing this identifier &amp;#8212; however I think that actually passing the callback is
 easier and makes the code much more&amp;nbsp;readable.&lt;/p&gt;
 &lt;/div&gt;
-&lt;div class="section" id="id1"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id8"&gt;DropDown.react.js&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="section" id="datepicker-react-js"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id7"&gt;DatePicker.react.js&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;The datepicker component has more or less the same structure as with the dropdown: It needs one parameter
 for its current value (&lt;tt class="docutils literal"&gt;props.value&lt;/tt&gt;) and another as the callback to the function when the date is
 changed (once again this is required to have a reusable&amp;nbsp;component):&lt;/p&gt;
@@ -298,7 +786,7 @@ the component is mounted, we get its &lt;span class="caps"&gt;DOM&lt;/span&gt; c
 convert it to a datepicker. We also set its change function to be the passed&amp;nbsp;callback.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="pagingpanel-react-js"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id9"&gt;PagingPanel.react.js&lt;/a&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id8"&gt;PagingPanel.react.js&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;The paging panel is not actually a reusable component because it requires BookActions
 (to handle next and previous page clicks) - so
 it can&amp;#8217;t be used by Authors (if authors was a table that is). However, we can easily
@@ -343,7 +831,7 @@ module.exports.PagingPanel = PagingPanel;
 &lt;p&gt;and just displayd the current page along with buttons to go to the next or previous page (if these buttons should be visible of&amp;nbsp;course).&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="searchpanel-react-js"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id10"&gt;SearchPanel.react.js&lt;/a&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id9"&gt;SearchPanel.react.js&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;The SearchPanel is another panel that could be reusable if we&amp;#8217;d passed a callbeck instead of calling the &lt;tt class="docutils literal"&gt;BookActions.search&lt;/tt&gt;
 action directly. The promise behavior has been explained in the previous posts and is needed to buffer the queries to the
 server when a user types his search&amp;nbsp;query.&lt;/p&gt;
@@ -408,14 +896,14 @@ this consistent behavior (we&amp;#8217;d need to add two actions, one to handle 
 and another to handle the timeout firing &amp;#8212; making everythimg much more&amp;nbsp;complicated).&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="messagepanel"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id11"&gt;MessagePanel&lt;/a&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id10"&gt;MessagePanel&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;The MessagePanel is really interesting because it is a reusable component that actually has its own action and store module! This
 component can be reused in &lt;em&gt;different&lt;/em&gt; applications that need to display message but &lt;em&gt;not&lt;/em&gt; on the same application (because a single state
 is kept for all messages). If we wanted to use a different MessagePanel for Books or Authors then we&amp;#8217;d need to keep both in the
 state &lt;em&gt;and&lt;/em&gt; also it to the action to differentiate between messages for author and for book. Instead, by keeping a single Messages
 state for both Books and Authors we have a much more simple&amp;nbsp;version.&lt;/p&gt;
 &lt;div class="section" id="messagepanel-react-js"&gt;
-&lt;h4&gt;&lt;a class="toc-backref" href="#id12"&gt;MessagePanel.react.js&lt;/a&gt;&lt;/h4&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#id11"&gt;MessagePanel.react.js&lt;/a&gt;&lt;/h4&gt;
 &lt;p&gt;The MessagePanel component has a local state which responds to changes on MessageStore. When the
 state of MessageStore is changed the MessagePanel will be re-rendered with the new&amp;nbsp;message.&lt;/p&gt;
 &lt;pre class="code literal-block"&gt;
@@ -450,7 +938,7 @@ module.exports.MessagePanel = MessagePanel;
 &lt;/pre&gt;
 &lt;/div&gt;
 &lt;div class="section" id="messagestore-js"&gt;
-&lt;h4&gt;&lt;a class="toc-backref" href="#id13"&gt;MessageStore.js&lt;/a&gt;&lt;/h4&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#id12"&gt;MessageStore.js&lt;/a&gt;&lt;/h4&gt;
 &lt;p&gt;The MessageStore has a (private) state containing a &lt;tt class="docutils literal"&gt;message&lt;/tt&gt; that gets updated
 only when the ccorresponding action is dispached. The store has a single state
 for all messages - it doesn&amp;#8217;t care if the messages are for books or&amp;nbsp;authors.&lt;/p&gt;
@@ -493,7 +981,7 @@ module.exports.MessageStore = MessageStore;
 &lt;/pre&gt;
 &lt;/div&gt;
 &lt;div class="section" id="messageactions"&gt;
-&lt;h4&gt;&lt;a class="toc-backref" href="#id14"&gt;MessageActions&lt;/a&gt;&lt;/h4&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#id13"&gt;MessageActions&lt;/a&gt;&lt;/h4&gt;
 &lt;p&gt;Finally, there are two actions that are defined for the MessageStore: One for adding
 an ok message and one for adding an error message - both of which have the same
 message type (but pass a different color&amp;nbsp;parameter).&lt;/p&gt;
@@ -528,13 +1016,13 @@ module.exports.MessageActions = MessageActions;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="section" id="non-reusable-application-components"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id15"&gt;Non-reusable application&amp;nbsp;components&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id14"&gt;Non-reusable application&amp;nbsp;components&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;I don&amp;#8217;t want to discuss the source code for all the non-reusable components since some of them
 are more or less the same with the previous version and are easy to understand just by
 checking the source code (BookTableRow and ButtonPanel). However, I&amp;#8217;ll
 discuss the other, more complex components starting from the inside of the&amp;nbsp;react-onion:&lt;/p&gt;
 &lt;div class="section" id="booktable-react-js"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id16"&gt;BookTable.react.js&lt;/a&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id15"&gt;BookTable.react.js&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;I want to display this component to discuss how sorting is implemented: Each column has a key which,
 when passed to django-rest-framework will sort the results based on that key (the &lt;tt class="docutils literal"&gt;__&lt;/tt&gt; does a
 join so by &lt;tt class="docutils literal"&gt;author__last_name&lt;/tt&gt; we mean that we want to sort by the last_name field of the author
@@ -598,7 +1086,7 @@ of the function to the same object and only do the parameter&amp;nbsp;passing.&l
 either a + (for ascending) or - (for descending) in front of the column&amp;nbsp;title.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="authordialog-react-js"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id17"&gt;AuthorDialog.react.js&lt;/a&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id16"&gt;AuthorDialog.react.js&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;This is a handmade pop-up dialog that gets displayed when a new author is added (the + button is clicked)
 using only css to center it on the screen when it is displayed.
 We can see that it is either visible on invisible based on the &lt;tt class="docutils literal"&gt;showDialog&lt;/tt&gt; input property which actually
@@ -647,7 +1135,7 @@ module.exports.AuthorDialog = AuthorDialog ;
 &lt;/pre&gt;
 &lt;/div&gt;
 &lt;div class="section" id="authorpanel-react-js"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id18"&gt;AuthorPanel.react.js&lt;/a&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id17"&gt;AuthorPanel.react.js&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;The AuthorPanel displays the author select DropDown along with the + (add author) and
 - (delete author) buttons. It also contains the AuthorDialog which will be displayed
 or not depending on the value of the &lt;tt class="docutils literal"&gt;showDialog&lt;/tt&gt; property.&lt;/p&gt;
@@ -706,7 +1194,7 @@ module.exports.AuthorPanel = AuthorPanel;
 &lt;/ul&gt;
 &lt;/div&gt;
 &lt;div class="section" id="statpanel-react-js"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id19"&gt;StatPanel.react.js&lt;/a&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id18"&gt;StatPanel.react.js&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;The StatPanel is an interesting, read-only component that displays the number of
 authors and books. This component requests updates from both the &lt;tt class="docutils literal"&gt;BookStore&lt;/tt&gt; and
 &lt;tt class="docutils literal"&gt;AuthorStore&lt;/tt&gt; - when their state is updated the component will be re-rendered
@@ -770,7 +1258,7 @@ could be achieved with just a single change listener that would
 get both the books and&amp;nbsp;authors.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="bookform-react-js"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id20"&gt;BookForm.react.js&lt;/a&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id19"&gt;BookForm.react.js&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;The BookForm is one of the most complex panels of this application (along with BookPanel) because
 it actually contains a bunch of other panels and has some callbacks for them to&amp;nbsp;use.&lt;/p&gt;
 &lt;p&gt;We can see that, as explained before, when the current book form values are changed (through callbacks) the change_book action will be&amp;nbsp;called.&lt;/p&gt;
@@ -872,7 +1360,7 @@ the local state. The book that is edited is just passed as a property - actually
 property that this component needs to&amp;nbsp;work.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="bookpanel-react-js"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id21"&gt;BookPanel.react.js&lt;/a&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id20"&gt;BookPanel.react.js&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;Finally, BookPanel is the last component we&amp;#8217;ll talk about. This is the central component
 of the application - however we&amp;#8217;ll see that it is not very complex (since most user interaction
 is performed in other components). This component just listens on changes in the BookStore state
@@ -934,7 +1422,7 @@ module.exports.BookPanel = BookPanel ;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="section" id="the-actions"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id22"&gt;The&amp;nbsp;Actions&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id21"&gt;The&amp;nbsp;Actions&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;All actions are rather simple components without other dependencies as we&amp;#8217;ve already discussed. They
 just define &amp;quot;actions&amp;quot; (which are simple functions) that create the correct parameter object type and pass it
 to the dispatcher. The only attribute that is required for this object is the &lt;tt class="docutils literal"&gt;actionType&lt;/tt&gt; that
@@ -942,7 +1430,7 @@ should get a value from the constants. I won&amp;#8217;t go into any more detail
 the source code and all your questions will be&amp;nbsp;resolved.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="the-stores"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id23"&gt;The&amp;nbsp;Stores&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id22"&gt;The&amp;nbsp;Stores&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;First of all, all stores are defined through the following code that is already discussed in the previous&amp;nbsp;part:&lt;/p&gt;
 &lt;pre class="code literal-block"&gt;
 var MessageStore = $.extend({}, EventEmitter.prototype, {
@@ -970,8 +1458,8 @@ will be notified (their callback will be called) and will use
 to re-render and display the changes to the&amp;nbsp;store.&lt;/p&gt;
 &lt;p&gt;Let&amp;#8217;s now discuss the four stores defined &amp;#8212; I will include only the parts of each file that are
 actually interesting, for everything else &lt;em&gt;use the source Luke&lt;/em&gt;!&lt;/p&gt;
-&lt;div class="section" id="id2"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id24"&gt;MessageStore.js&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="section" id="id1"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id23"&gt;MessageStore.js&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;A very simple store that goes together with MessagePanel and MessageActions. It just keeps a state with
 the current message object and just changes this message when the MESSAGE_ADD message
 type is dispatched. After changing the message, the listeners (only one in this case) will be notified to
@@ -993,7 +1481,7 @@ MessageStore.dispatchToken = AppDispatcher.register(function(action) {
 &lt;/pre&gt;
 &lt;/div&gt;
 &lt;div class="section" id="authorstore-js"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id25"&gt;AuthorStore.js&lt;/a&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id24"&gt;AuthorStore.js&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;Here we see that the local state has an array of the authors and a &lt;tt class="docutils literal"&gt;showDialog&lt;/tt&gt; flag that
 controls the state of the add author popup. For the &lt;tt class="docutils literal"&gt;AUTHOR_ADD&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;HIDE_ADD_AUTHOR&lt;/tt&gt;
 cases of the dispatch we just change the state of this flag and emit the change; the &lt;tt class="docutils literal"&gt;BookForm&lt;/tt&gt;
@@ -1096,7 +1584,7 @@ AuthorStore.dispatchToken = AppDispatcher.register(function(action) {
 &lt;/pre&gt;
 &lt;/div&gt;
 &lt;div class="section" id="categorystore-js"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id26"&gt;CategoryStore.js&lt;/a&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id25"&gt;CategoryStore.js&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;The CategoryStore has an interesting functionality concerning the load_subcategory
 function. This function is called whenever a book is changed (so its category form field
 may be changed and the subcategories may be reloaded based on this category) or is edited
@@ -1175,7 +1663,7 @@ CategoryStore.dispatchToken = AppDispatcher.register(function(action) {
 &lt;/pre&gt;
 &lt;/div&gt;
 &lt;div class="section" id="bookstore-js"&gt;
-&lt;h3&gt;&lt;a class="toc-backref" href="#id27"&gt;BookStore.js&lt;/a&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#id26"&gt;BookStore.js&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;Here, beyond the book-related functionality we have also implemented the
 &lt;span class="caps"&gt;URL&lt;/span&gt; updating. The getUrlParameter that returns the value of a &lt;span class="caps"&gt;URL&lt;/span&gt; parameter has been taken from
 &lt;a class="reference external" href="http://stackoverflow.com/questions/19491336/get-url-parameter-jquery"&gt;http://stackoverflow.com/questions/19491336/get-url-parameter-jquery&lt;/a&gt;. Depending on the url parameters, we set some initial properties of
@@ -1319,7 +1807,7 @@ BookStore.dispatchToken = AppDispatcher.register(function(action) {
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="section" id="conclusion"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id28"&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id27"&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;The application presented here has a number of techniques that will help
 you when you actually try to create a more complex react flux application.
 I hope that in the whole three part series I&amp;#8217;ve thoroughly explained the
@@ -1365,7 +1853,7 @@ learn &lt;a class="reference external" href="http://spapas.github.io/2015/05/27/
 &lt;/div&gt;
 &lt;div class="section" id="flux-components"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id2"&gt;Flux&amp;nbsp;components&lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;To implement the Flux architecture, an application needs to have at least a store and about&amp;nbsp;dispatcher.&lt;/p&gt;
+&lt;p&gt;To implement the Flux architecture, an application needs to have at least a store and a&amp;nbsp;dispatcher.&lt;/p&gt;
 &lt;p&gt;The store is the central place of truth for the application and the dispacher is the central
 place of communications. The store should hold the
 state (and any models/DAOs) of the application and notify the react components when this state is changed. Also,
@@ -1401,6 +1889,14 @@ as requirements for&amp;nbsp;browserify:&lt;/p&gt;
   &amp;quot;react&amp;quot;: &amp;quot;^0.13.3&amp;quot;,
   &amp;quot;reactify&amp;quot;: &amp;quot;^1.1.1&amp;quot;
 }
+&lt;/pre&gt;
+&lt;p&gt;Also, in order to be able to use &lt;span class="caps"&gt;JSX&lt;/span&gt; with browserify, will use the &lt;a class="reference external" href="https://github.com/andreypopp/reactify"&gt;reactify&lt;/a&gt; transform. To apply it to
+your project, change the &lt;tt class="docutils literal"&gt;scripts&lt;/tt&gt; of your &lt;tt class="docutils literal"&gt;package.json&lt;/tt&gt; to:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;quot;scripts&amp;quot;: {
+  &amp;quot;watch&amp;quot;: &amp;quot;watchify -v -d static/main.js -t reactify -o static/bundle.js&amp;quot;,
+  &amp;quot;build&amp;quot;: &amp;quot;browserify static/main.js -t reactify  | uglifyjs -mc warnings=false &amp;gt; static/bundle.js&amp;quot;
+},
 &lt;/pre&gt;
 &lt;div class="section" id="main-js"&gt;
 &lt;h3&gt;&lt;a class="toc-backref" href="#id4"&gt;main.js&lt;/a&gt;&lt;/h3&gt;
@@ -1972,9 +2468,11 @@ create a simple app, moving to something more complex (and especially debugging 
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;li&gt;&lt;a class="reference internal" href="#local-state" id="id14"&gt;Local&amp;nbsp;state&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class="reference internal" href="#conclusion-to-the-first-part" id="id15"&gt;Conclusion to the first&amp;nbsp;part&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#adding-form-validation" id="id15"&gt;Adding form&amp;nbsp;validation&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#conclusion-to-the-first-part" id="id16"&gt;Conclusion to the first&amp;nbsp;part&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;Update 15/12/2015&lt;/strong&gt;: Added some insights for form&amp;nbsp;validation.&lt;/p&gt;
 &lt;div class="section" id="introduction"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#id1"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;&lt;a class="reference external" href="https://facebook.github.io/react/"&gt;React&lt;/a&gt; is a rather new library from Facebook for building dynamic components for web pages.
@@ -2477,8 +2975,61 @@ just save it as a property of the global state object in &lt;tt class="docutils 
 correct. What wouldn&amp;#8217;t be correct is if we had two copies of the same information in both the
 states of &lt;tt class="docutils literal"&gt;BookPanel&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;BookForm&lt;/tt&gt;, for example the book id that is&amp;nbsp;edited.&lt;/p&gt;
 &lt;/div&gt;
+&lt;div class="section" id="adding-form-validation"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id15"&gt;Adding form&amp;nbsp;validation&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Commenter Nitish Kumar made a nice comment about how we could do some validating to our form&amp;nbsp;fields.&lt;/p&gt;
+&lt;p&gt;First of all, this adds to the complexity of the application so maybe it would be better to do it in
+the &lt;a class="reference external" href="http://spapas.github.io/2015/07/02/comprehensive-react-flux-tutorial-2/"&gt;flux-architectured version&lt;/a&gt;. However, it&amp;#8217;s not really difficult
+to also have form validation using&amp;nbsp;react-only:&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s what we&amp;nbsp;need:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;A property (or properties) to pass the errors for each form field to the &lt;tt class="docutils literal"&gt;BookForm&lt;/tt&gt; component&lt;/li&gt;
+&lt;li&gt;A way to display the form errors if they exist in &lt;tt class="docutils literal"&gt;BookForm&lt;/tt&gt;&lt;/li&gt;
+&lt;li&gt;Execute an error handler when the form contents change and update the state if there&amp;#8217;s an&amp;nbsp;error&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;As an example, I&amp;#8217;d like to check that the book title is not written in uppercase, so I will add another
+attribute to the &lt;tt class="docutils literal"&gt;book&lt;/tt&gt; propery of &lt;tt class="docutils literal"&gt;BookForm&lt;/tt&gt; called &lt;tt class="docutils literal"&gt;titleError&lt;/tt&gt; and display it if it is defined,
+something like&amp;nbsp;this:&lt;/p&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;{this.props.book.titleError?&amp;lt;div&amp;gt;{this.props.book.titleError}&amp;lt;/div&amp;gt;:null}&lt;/span&gt;&lt;/tt&gt;&lt;/p&gt;
+&lt;p&gt;Now, the &lt;tt class="docutils literal"&gt;handleChange&lt;/tt&gt; method of &lt;tt class="docutils literal"&gt;BookPanel&lt;/tt&gt; should do the actual check and change the sate, so I&amp;#8217;m
+changing it like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+handleChange: function(title, category) {
+    var titleError = undefined;
+    if(title.length &amp;gt; 1 &amp;amp;&amp;amp; title === title.toUpperCase()) {
+        titleError='Please don\'t use only capital letters for book titles';
+    }
+    this.setState({
+        editingBook: {
+            title: title,
+            titleError: titleError,
+            category: category,
+            id: this.state.editingBook.id
+        }
+    });
+},
+&lt;/pre&gt;
+&lt;p&gt;So, the titleError attribute of editingBook will be defined only if there&amp;#8217;s an&amp;nbsp;error.&lt;/p&gt;
+&lt;p&gt;Finally, we must remember to &lt;em&gt;not&lt;/em&gt; create/update the book if there&amp;#8217;s an error so
+we add the following check to the &lt;tt class="docutils literal"&gt;handleSubmitClick&lt;/tt&gt; method:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+if(this.state.editingBook.titleError) {
+    this.setState({
+        message: &amp;quot;Please fix errors!&amp;quot;
+    });
+    return ;
+}
+&lt;/pre&gt;
+&lt;p&gt;The above could be easily generalized for checks on multiple fields. I am not really fond
+of doing the form validation in the &lt;tt class="docutils literal"&gt;BookPanel&lt;/tt&gt; component (I&amp;#8217;d prefer to do it on &lt;tt class="docutils literal"&gt;BookForm&lt;/tt&gt;
+or even better on the corresponding field - if it was a component) however this would mean that
+I&amp;#8217;d need to keep a local state with the error to the &lt;tt class="docutils literal"&gt;BookForm&lt;/tt&gt; (please see the discussion of
+the previous&amp;nbsp;paragraph).&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ve added a new tag named &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;react-only-validation&lt;/span&gt;&lt;/tt&gt; to the &lt;a class="reference external" href="https://github.com/spapas/react-tutorial/"&gt;https://github.com/spapas/react-tutorial/&lt;/a&gt;
+repository that contains the changes to have the&amp;nbsp;validation.&lt;/p&gt;
+&lt;/div&gt;
 &lt;div class="section" id="conclusion-to-the-first-part"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#id15"&gt;Conclusion to the first&amp;nbsp;part&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#id16"&gt;Conclusion to the first&amp;nbsp;part&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;We just created a not-so-simple React single page application offering &lt;span class="caps"&gt;CRUD&lt;/span&gt; for an object.
 This application of course could be improved by adding a pagination component to the table,
 but I&amp;#8217;m going to leave that as an excersie to the reader: To do that, I propose to create

@@ -1845,7 +1845,7 @@ when the ``componentDidMount`` method is called:
             const tsubmit = submit.bind(undefined,id);
             const dsubmit = del.bind(undefined,id, dispatch);
 
-            return <form   onSubmit={handleSubmit(tsubmit) }>
+            return <form onSubmit={handleSubmit(tsubmit)}>
                 <div className='row'>
                     <div className='six columns'>
                         <Input label='Title' field={title} />
@@ -1862,21 +1862,16 @@ when the ``componentDidMount`` method is called:
                         <Select label='Subcategory' field={subcategory} options={subcategories} />
                     </div>
                 </div>
-                
                 <div className='row'>
                     <div className='six columns'>
-                        <label forHtml='publish_date'>Publish Date</label>
-                        <DatePicker className="u-full-width" {...publish_date} />
+                        <DatePicker className="u-full-width" label='Publish Date' field={publish_date} />
                     </div>
                     <div className='six columns'>
-                        <label forHtml='author'>Author</label>
-                        <select type='text' className="u-full-width" {...author} >
-                            <option></option>
-                            {authors.map(a => <option value={a.id} key={a.id} >{a.last_name} {a.first_name}</option>)}
-                        </select>
+                        <Select label='Author' field={author} options={
+                            authors.map(a => ({'id': a.id, 'name': `${a.first_name} ${a.last_name}`}))
+                        } />
                     </div>
                 </div>
-                
                 <button disabled={isSubmitting} className='button button-primary' onClick={handleSubmit(tsubmit)}>
                     Save
                 </button> 
@@ -1887,7 +1882,59 @@ when the ``componentDidMount`` method is called:
         }
     };
 
-The ``render`` method of ``BookForm`` ...........
+The ``render`` method of ``BookForm`` defines (for convenience) a bunch of constants which are
+attributes of ``props``:
+    
+* The ``fields`` object contains the field attributes of the form which have been defined through the ``reduxForm`` function.
+* The ``handleSubmit`` is also provided by ``reduxForm`` and is used to submit the form - I'll explain it a bit later
+* The ``dispatch`` is provided by ``connect`` (``reduxForm`` is a special ``connect``). If you don't use ``mapDispatchToProps`` then ``connect`` will provide ``dispatch`` to ``props`` to use it as you like
+* The ``id`` is from the route - it will have value when updating and will be undefined when creating a new book
+* The ``isSubmitting``, ``categories``, ``subcategories`` and ``authors`` are provided from the state attributes through ``mapStateToProps``
+* The ``tsubmit`` and ``dsubmit`` are used when the form is submitted or the Delete button is clicked. As we'll see the ``tsubmit`` is passed as an argument to ``handleSubmit`` while the `dsubmit`` is used as it is.
+
+Beyond ``fields`` and ``handleSubmit`` a ``reduxForm`` component has various other
+`properties that you can use`_, like ``active``, ``dirty``, ``error``, ``pristine`` etc.
+Each ``field`` provided from ``reduxForm`` also has a bunch of properties, like 
+``active``, ``checked``, ``dirty``, ``error``, 
+``onBlur``, ``onChange``, ``onFocus``, 
+``pristine``, ``touched``, 
+``valid``, ``value``, ``visited``.
+
+After defining the constants, the ``render`` method returns the actual component.
+Here we are using a bunch of components we've defined to render the input
+components like ``Input``, ``DatePicker`` and ``Select`` which will be explained
+later. For each one of these components we pass the corresponding ``field`` 
+property along with the label we want to show. There are two interesting things
+in the parameters we pass to these input components:
+
+All fields except ``category`` use their own ``onChange``. For the ``category``
+field we pass a custom ``onChange`` function that will override the ``field`` 
+onChange in order to dispatch ``loadSubCategories`` when the ``category``
+is changed (notice that I actually call the ``category.onChange`` first and then
+use ``event.target.value`` to get the current value of the dropdown to pass it
+to ``loadSubCategories``).
+
+The ``Select`` fields get an ``options`` parameter which should be an array
+with ``id/name`` objects. For ``authors`` we create that array on the fly
+using ``map`` (since an author has a ``first_name`` and ``last_name``).
+
+The submit and delete buttons will be enabled or disabled depending on the ``isSubmitting`` flag,
+and will call ``handleClick(tsubmit)`` or ``dsubmit``. Also, the Delete button will
+be hidden if no ``id`` is provided.
+ 
+The ``handleSubmit`` method provided by ``reduxForm`` will run the ``validate`` function passing it
+the values from the form (notice that this is synchronous validation, we could also do asynchronous -
+on the server- validation for example to immediately check if a username is already used), and if 
+the validation passes it will submit the form. Submitting the form means that ``handleSubmit`` will
+either call ``this.props.onSubmit`` *or* will call the argument of ``handleSubmit`` (that's what
+we've done here), passing it the data of the form. 
+
+In our case, we want to pass the id of the book to be updated (or undefined when the form
+is used to create a book) to the submit function, that's why I am assigning 
+``submit.bind(undefined,id)`` to ``tsubmit`` (which is passed to ``handleSubmit``) - this
+will return a new function that as ``id`` as its first argument. The ``handleSubmit`` also
+passes the ``values`` of the form as an object along with the ``dispatch`` function, so
+``submit`` is a function with three arguments: 
     
 .. code::
 
@@ -1924,6 +1971,26 @@ The ``render`` method of ``BookForm`` ...........
             }
         });
     };
+    
+As we can see it just checks if the ``id`` has a value and creates the
+url and the method for the update (either a ``POST`` when creatign a new book or
+a ``PUT`` when updating an existing one). It will then ``dispatch`` the
+``submittingChanged`` action to change the UI and do the ajax call. When
+the call returns, if everything was ok it will ``dispatch`` the ``submittingChanged``
+(with false as a parameter), the ``showSuccessNotification`` (with success as parameter),
+either ``updateBookResult`` or ``addBookResult`` with the retrieved data as paramater
+(depending if there was an ``id``) and finally it will change the URL to ``/`` to display
+the books table. If there was an error will once again dispatch the 
+``submittingChanged`` action to turn off the submit flag of the state and 
+``showErrorNotification`` with information on the error. The url won't change
+so that the user will be able to fix the error.
+
+The ``del`` function is a little different. We bind not only with ``id`` but also
+with ``dispatch`` because we don't call it through ``handleSubmit`` 
+(since when deleting no validation is actually needed)
+but directly as the ``onclick`` handler of the delete button. 
+
+.. code::
 
     const del = (id, dispatch) => {
         const url = `//127.0.0.1:8000/api/books/${id}/`
@@ -1932,11 +1999,9 @@ The ``render`` method of ``BookForm`` ...........
             type,
             url,
             success: (d) => {
-                
                 dispatch(showSuccessNotification('Success!'))
                 dispatch(deleteBookResult(id))
                 dispatch(routeActions.push('/'));
-
             },
             error: (d) => {
                 dispatch(showErrorNotification(`Error (${d.status} - ${d.statusText}) while saving: ${d.responseText}` ))
@@ -1944,7 +2009,24 @@ The ``render`` method of ``BookForm`` ...........
         });
     };
 
+This function sends a ``DELETE`` method to the correct url and, if everything
+was ok ``dispatches`` the ``showSuccessNotification``, ``deleteBookResult`` and
+``routeActions.push``, similarly with ``submit``.
 
+One thing that I'd like to discuss here is the nature of the ``submit`` and ``del``
+functions: These function do dispatch other actions but they are not implemented
+as thunks so, in order
+to be able to actually dispatch something they need to retrieve ``dispatch``
+as a parameter
+(please remember the discussion on the redux-thunk section and the difference
+between ``dispatch(actionCreator)`` and ``actionCreator(dispatch)`` ). I could
+have implemented them as thunks (and put them to the ``actions`` module) however
+I feel that leaving them here 
+will make the API of the application more compact (since if these functions 
+had been put in the actions module they would need to be exported so they'd
+be a part of the public API of this application - however these two are only
+called from ``BookForm``) and also their purpose and integration with ``handleSubmit``
+is more clear if we leave them as plain functions.
 
 Conslusion
 ----------
@@ -1973,3 +2055,4 @@ dispatched when the ``fetch`` is finished instead of calling ``forceUpdate`` dir
 .. _`rather difficult to explain`: http://redux.js.org/docs/advanced/Middleware.html
 .. _`uses a location descriptor`: https://github.com/reactjs/history/blob/master/docs/Location.md#location-descriptors
 .. _`with template tag`: https://docs.djangoproject.com/es/1.9/ref/templates/builtins/#with
+.. _`properties that you can use`: http://erikras.github.io/redux-form/#/api/props?_k=y5rbd2

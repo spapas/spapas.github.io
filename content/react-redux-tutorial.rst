@@ -2028,6 +2028,151 @@ be a part of the public API of this application - however these two are only
 called from ``BookForm``) and also their purpose and integration with ``handleSubmit``
 is more clear if we leave them as plain functions.
 
+
+components/Input
+~~~~~~~~~~~~~~~~
+
+This is a simple functional component that gets a redux-form
+text field and a label as properties and renders a text
+input with a ``<label>`` and an optional error message.
+The error message will only be rendered if the field 
+has been touched (i.e the user has changed the field or
+the form has been submitted) and there's an actual error:
+
+.. code::
+
+    export default ({field, label}) => <div>
+        <label forHtml={field.name}>{label}</label>
+        <input type='text' className="u-full-width" {...field} />
+        {field.touched && field.error && <div style={{color: 'white', backgroundColor: danger}}>{field.error}</div>}
+    </div>
+
+One thing I'd like to explain is the ``{...field}`` snippet
+I pass to ``<input>``. This is the object spread operator and will
+convert each attribute of the ``field`` object to a corresponding ``attr=value``
+pair, i.e ``<input ... name=field.name onChange=field.onChange value=field.value onBlur=field.OnBlur etc />``.
+
+
+components/Select
+~~~~~~~~~~~~~~~~~
+
+The ``Select`` component renders a dropdown (select) input.
+It should receive a redux-form field, a label and an array
+of objects with ``id`` and ``name`` attributes that will be
+rendered as the options. The ``label`` and ``error` will be
+rendered similarly to ``Input``:
+
+.. code::
+
+    export default ({field, label, options, ...props}) => <div>
+        <label forHtml={field.name}>{label}</label>
+        <select type='text' className="u-full-width" {...field} {...props} >
+            <option></option>
+            {options.map(c => <option value={c.id} key={c.id} >{c.name}</option>)}
+        </select>
+        {field.touched && field.error && <div style={{color: 'white', backgroundColor: danger}}>{field.error}</div>}
+    </div>
+   
+For the options we include an empty option (as a default value) and the other
+options are created with the help of a ``map``. Finally, notice that I have
+used ``...props`` in the the function parameter list to capture all parameters not
+captured by ``field``, ``label`` and ``options`` and then pass
+both ``{...field}`` and ``{...props}`` to the ``select`` component. This is
+to capture the custom ``onChange`` (that I pass for the categories Select)
+and use that custom ``onChange`` when the select value changes. The custom
+``onChange`` will override the ``field.onChange`` because the {...props} if
+*after* {...field}, so the resulting select will be something like:
+
+.. code::
+
+    <select ... onChange=field.onChange ... onChange=props.onChange >
+    
+
+This is
+a common idiom for overriding properties of objects that are passed
+to components - for example I could pass a ``className`` property to
+``<Select>`` to override the default one (``className="u-full-width"``).
+
+
+components/DatePicker
+~~~~~~~~~~~~~~~~~~~~~
+
+This component is used to render a jquery-ui datepicker. Similarly 
+to the other input components it receives a redux-form ``field``
+and a ``label``. However, this is a
+class based component because it needs to have state for attaching
+the ``datepicker`` to an input. Beyond the normal rendering, we can
+see that we have added a ``ref='date'`` to the ``input`` to allow
+us to refer to it later. This ref is used by ``componentDidMount``
+and ``handleChange``: 
+
+
+.. code::
+
+    
+    class DatePicker extends React.Component {
+        render() {
+            const { field, label } = this.props
+            return(
+                <div>
+                    <label forHtml={field.name}>{label}</label>
+                    <input type='text' ref='date' className="u-full-width" {...field} />
+                    {field.touched && field.error && <div style={{color: 'white', backgroundColor: danger}}>{field.error}</div>}
+                </div>
+            );
+        }
+        
+        componentDidMount() {
+            $(ReactDOM.findDOMNode(this.refs.date)).datepicker({ dateFormat: 'yy-mm-dd' });
+            $(ReactDOM.findDOMNode(this.refs.date)).on('change', this.handleChange.bind(this));
+        }
+        
+        componentWillUnmount() {
+        
+        }
+        
+        handleChange(e) {
+            e.preventDefault()
+            let date = ReactDOM.findDOMNode(this.refs.date).value
+            this.props.field.onChange(date);
+        }
+    }
+    
+The ``componentDidMount`` retrieves the input DOM element through the ``ref``
+and makes it a datepicker. It also sets its ``onchange`` method to the 
+``handleChange`` method (notice the ``bind(this)`` part -- this is needed
+so that ``this`` will be defined correctly inside the ``handleChange``. The
+``handleChange`` retrieves the current date (once again from the ``ref``)
+and just calls the ``onChange`` of the provided ``field``, passing it the 
+date value. 
+
+Should I create my own input components?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+As you've seen, I've created my *own* custom input components. These components
+are created for the css framework I use here (``skeleton.css``) but
+of course with small changes could easily be modified to be used with other css frameworks
+(I am using ``bootstrap 3`` in most of my normal apps and these components work great).
+They also have been created for exactly my needs (get the ``redux-form`` field as input).
+
+Instead of creating your own components by hand, you could of course use some specific component
+libraries like material-ui_ or react-bootstrap_. These libraries contain components
+such as the ``Input`` or ``Select`` we implemented here with a consistent API and
+styling. Unfortunately, these components are a little more difficult to use than
+just creating your own:
+
+* You need to learn their API (the names of the properties they get, their behavior in various conditions etc)
+* You need to learn their styling API (most of them make it difficult to customize their appearence)
+* It is really difficult to integrate them to your existing css framework (if you have one), so you'll need to go all the way to using them
+
+So it all boils down to how big is your project and if you already have some styling for
+your pages. If you want to build a rather small project or your project already has a consistent
+styling then its better to create the required input components by hand. If on the other hand
+you want to build a big project from scratch then probably it would be better to bite the 
+bullet and use a component library. 
+
+I haven't yet needed to use such a library but that may change in the future.
+
 Conslusion
 ----------
 
@@ -2056,3 +2201,5 @@ dispatched when the ``fetch`` is finished instead of calling ``forceUpdate`` dir
 .. _`uses a location descriptor`: https://github.com/reactjs/history/blob/master/docs/Location.md#location-descriptors
 .. _`with template tag`: https://docs.djangoproject.com/es/1.9/ref/templates/builtins/#with
 .. _`properties that you can use`: http://erikras.github.io/redux-form/#/api/props?_k=y5rbd2
+.. _material-ui: http://www.material-ui.com/#/
+.. _react-bootstrap: https://react-bootstrap.github.io/

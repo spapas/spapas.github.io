@@ -2171,17 +2171,44 @@ styling then its better to create the required input components by hand. If on t
 you want to build a big project from scratch then probably it would be better to bite the 
 bullet and use a component library. 
 
-I haven't yet needed to use such a library but that may change in the future.
+components/AuthorPanel
+======================
 
-Conslusion
+The ``AuthorPanel`` uses ``Table`` to list the authors. Since I haven't used
+pagination or sorting here the component is very simple:
+
+.. code::
+        
+    const cols = [
+        {key: 'id', label: 'id', format: x=><Link to={`/author_update/${x.id}/`}>{x.id}</Link>},
+        {key: 'last_name', label: 'Last name',},
+        {key: 'first_name', label: 'First name',},
+    ]
+
+    const AuthorPanel = (props) => <div className="row">
+        <div className="twelve columns">
+            <h3>Author list <Link className='button button-primary' style={{fontSize:'1em'}} to="/author_create/">+</Link></h3>
+            <Table cols={cols} rows={props.authors.rows} />
+        </div>
+    </div>
+
+    const mapStateToProps = (state) => ({
+        authors:state.authors,
+    })
+    
+components/AuthorForm
+=====================
+
+The ``AuthorForm`` is similar to ``BookForm`` and is used to
+create a new author, update or delete an existing one. It uses
+the ``Input`` component to edit the first and last name
+of each author. I won't go into more detail about this
+component since everything must be clear by now.
+
+Conclusion
 ----------
 
-The above is a just a proof of concept of using FixedDataTable with asynchronously loaded server-side data. 
-This of course could be used for small projects (I am already using it for an internal project) but I recommend
-using the `flux architecture <{filename}react-flux-tutorial.rst>`_ for more complex projects. What this more or
-less means is that a store component
-should be developed that will actually keep the data for each row, and a ``fetchCompleted`` action should be 
-dispatched when the ``fetch`` is finished instead of calling ``forceUpdate`` directly.
+...
 
 .. _redux: https://github.com/rackt/redux
 .. _react-redux: https://github.com/rackt/react-redux

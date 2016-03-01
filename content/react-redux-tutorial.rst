@@ -1,8 +1,8 @@
 A comprehensive react-redux tutorial
 ####################################
 
-:date: 2016-02-19 15:20
-:tags: javascript, react, redux, react-redux, django, redux-thunk, redux-form, react-router, react-router-redux, react-notification, history es6, babel, babelify, browserify, watchify, uglify, boilerplate
+:date: 2016-03-01 15:20
+:tags: javascript, react, redux, react-redux, django, redux-thunk, redux-form, react-router, react-router-redux, react-notification, history, es6, babel, babelify, browserify, watchify, uglify, boilerplate
 :category: javascript
 :slug: react-redux-tutorial
 :author: Serafeim Papastefanos
@@ -14,50 +14,69 @@ Introduction
 ------------
 
 Continuing the series of React-related articles, we'll try to make a comprehensive
-introduction to the redux_ framework and its integrations with React, using the
+tutorial to the redux_ framework and its integrations with React, using the
 react-redux_ library. Redux can be used as an alternative to Flux 
-(which we discussed in `next part, <{filename}react-flux-tutorial.rst>`_)
+(which we discussed in `a previous article <{filename}react-flux-tutorial.rst>`_)
 to orchestrate the message passing between ui/components/data. 
 
-This introduction will also serve as an opinionated (my opinion) boilerplate
+This tutorial will also produce as a result an opinionated (my opinion) boilerplate
 project for creating react-redux Single Page Applications. I have used Django
 as the back end however you could use any server-side framework you like,
-the only thing Django does is offering a bunch of REST APIs from django-rest-framework.
+Django is only used for implementing a bunch of REST APIs through django-rest-framework.
+You may replace it with any other REST framework you like.
+
 I have also used ``browserify`` to pack the client-side code -- I prefer it
-from webpack as I find it much easier, clear and less-magical, and, since it fills all my
-needs I don't see any reason to take the webpack pill.
+from webpack as I find it much easier, clear and less-magical, and, since 
+it fills all my needs I don't see any reason to take the webpack pill.
 
 All client side code is written in ES6 javascript using the latest trends -- I will
 try to explain anything I feel that is not very clear.
 
-Before continuing, I have to mention that although I will provide an introduction to redux, 
+Before continuing, I have to mention that although I will provide an
+(as comprehensive as possible) introduction to redux, 
 I will concentrate on the correct integration between redux, react-redux and
-React in a complex, production level application. So, before reading the rest of
-this article please make sure that you've read the introduction and basics sections
-of `redux documentation`_ and watch the `getting started with redux`_ from the 
+React in a complex, production level application. I'll try to explain everything
+I talk about, however, before reading the rest of
+this article I recommend reading the introduction and basics sections
+of `redux documentation`_ and watching the `getting started with redux`_ from the 
 creator of redux -- I can't recommend the videos enough, they are really great!
+
+One final thing: This is a *really long* article (more than 100 kb). It will
+require a lot of time to read and understand it, especially if you are not
+familiar with the concepts described here. Please take your time when reading
+it and try verifying what I say here through the project that accompanies
+this article @ https://github.com/spapas/react-tutorial/, tag ``react-redux``.
 
 Introduction to redux
 ---------------------
 
-Redux is a really great framework. It is simpler than the original Flux and more opinionated.
-It has three basic concepts:
+I have to say that I got interested in redux because of all that buzz this
+framework generated. However, I got really interested in it when I 
+understood how close its philosophy was to functional programming -
+this, when combined with the usage of react functional components will
+enable you to write great code *and* (most important for me) really 
+enjoy coding with it (if you like functional programming of course :) )
+
+Redux is simpler, having fewer and less complex concepts than the original Flux 
+implementation and more opinionated - this is a good thing! 
+
+Here are the basic building blocks of redux:
 
 - One (and only one) **state**: It is an object that keeps the *global* state of your application. Everything has to be in that object, both data and ui.
-- A bunch of **actions**: These are objects that are created/dispatched when something happens (ui interaction, server response etc) with a mandatory property (their type) and a number of optional properties that define the data that accompanies each action.
-- A bunch of **action creators**: These are very simple functions that create action objects. Usually, there are as many action creators as actions (unless you use redux-thunk).
-- One (and only one) **reducer**: It is a function that retrieves the current state and an action and creates the resulting state. One very important thing to keep in mind is that the reducer *must not* mutate the state but return *a new object when something changes*.
+- A bunch of **actions**: These are simple objects that are created/dispatched when something happens (ui interaction, server response etc) with a mandatory property (their type) and a number of optional properties that define the data that accompanies each action.
+- A bunch of **action creators**: These are very simple functions that create action objects. Usually, there are as many action creators as actions (unless you use redux-thunk, we'll talk about it later).
+- One (and only one) **reducer**: It is a function that retrieves the current state and an action and creates the resulting state. This is the central component of a redux application - every action along with the current state will be passed to the reducer and the state of the application will be the resulting, new state.
 - One (and only one) **store**: It is an object that is created by redux and is used as a glue between the state, the reducer and the components
 
 The general idea/flow is:
 
 - Something (let's call it event) happens (i.e a user clicks a button, a timeout is fired, an ajax request responds)
 - An action describing that event is created by its the corresponding action creator and dispatched (i.e passed to the reducer along with the current state) through the store
-- The reducer is called with the current state object and the action as parameters
+- The dispach calls the reducer with the current state object and the action as parameters
 - The reducer checks the type of the action and, depending on the action type and any other properties this action has, creates a new state object
 - The store applies the new state to all components
 
-One thing we can see from the above is that redux is not react-only (although its general architecture fits perfectly with react) but
+One thing we can see from the above is that redux is not react-only (although its general architecture is a perfect fit to react) but
 could be also used with different view frameworks, or even with *no view framework*!
 
 A simple example
@@ -104,15 +123,16 @@ and two buttons that call the increase and decrease functions.
 
 Now, for the javascript, we create a reducer function that
 gets the previous state value (which initially is the number 0) and the
-action that is dispatched. It checks if the action type is 'INCREASE'
-or 'DECREASE' and correspondigly increases or decreases the state,
-which is just the number.
+action that is dispatched. When the reducer is called it will check if the action type is 'INCREASE'
+or 'DECREASE' and correspondigly increase or decreases the state,
+which is just that number. Normally, the state will be a (rather fat) object.
 
 We then create a store which gets the reducer as its only parameter
-and call its subscribe method passing a callback. This callback will be
-called whenever the state is changed - in our case, we'll just update
+then and call its subscribe method passing a callback. This callback will be
+called whenever the state is changed - in our case, the callback just updates
 the div with the current number from the state. Finally, the increase
-and decrease methods will just dispatch the corresponding action.
+and decrease methods that are called when the butts are clicked
+will just dispatch the corresponding action.
 
 Please notice that in the above example I didn't use action creators for
 simplicity. For completeness, the action creator for increase would be something like 
@@ -125,8 +145,8 @@ simplicity. For completeness, the action creator for increase would be something
   
 i.e it would just return an ``INCREASE`` action and ``window.increase``
 would be ``window.increase = e => store.dispatch(increaseCreator())``. Notice that
-the ``increaseCreator`` *is* called so that ``dispatch`` will receive the resulting
-action object as a parameter.
+the ``increaseCreator`` is called (has ``()``) so that ``dispatch`` will receive the 
+resulting action object as a parameter.
 
 The flow of the data when the increase button is clicked is the following:
 
@@ -135,6 +155,7 @@ The flow of the data when the increase button is clicked is the following:
 - ``increaseCreator()`` (if we used action creators - this a param to ``dispatch`` so it will be called first)
 - ``store.dispatch({type: 'INCREASE' })``
 - ``reducer(current_state, {type: 'INCREASE'})``
+- Reducer returns the new state (``state+1``)
 - ``callback()``
 - value is updated
 
@@ -144,16 +165,17 @@ Some people may argue that although a single reducer function is nice for
 the above simple demo, having a huge (spaghetti-like) switch statement in
 your reducer is not a very good practice - thankfully redux has a bunch
 of tools that will presented later and greatly help on this (seperating the
-reducing logic, using different modules etc).
+reducing logic, using different modules for each module etc).
 
 Interlude: So what's a reducer?
 ===============================
 
 I'd like to talk a bit about the "reducer", mainly for people not familiar with
 functional programming (although people writing Javascript *should* be familiar
-with functional programming since Javascript has functional features). 
+with functional programming since Javascript has functional features) to clarify
+my statement above that the redux philosophy is close to functional programming.
 
-In any case, one basic concept of functional programming is the concept of
+One basic concept of functional programming is the concept of
 "map-reduce". Mapping means calling a function (let's call it mapper)
 for all elements of a list and creating a new list with the output of each 
 individual call. So, a mapper gets only one parameter, the current value of
@@ -163,10 +185,11 @@ the list. For example the "double" mapper, defined like
 Reducing means calling a function (let's call it *reducer*) for all elements
 of a list and creating a single value that accumulates the result of each 
 individual call. This can be done because the reducer gets *two* parameters,
-the accumulated value of the list until now and the current value of the list.
+the accumulated value of the list until this point and the current value of the list.
 Also, when doing a reduce we need to define a starting value for the accumulator.
 For example, the "sum" reducer, defined like ``let sum = (s=0, x) => s+x``, 
-(which as an initial value of 0), would "reduce" the list ``[1,2,3]`` to ``6`` by calling:
+(which has an initial value of 0), would "reduce" the list ``[1,2,3]`` to ``6`` by calling
+the ``sum`` reducer three times:
 
 .. code::
 
@@ -178,11 +201,11 @@ So, a redux reducer is *actually* a (rather complex) functional reducer, getting
 state (as the accumulated value) and each individual action as the value and
 returning the new state which is the result of applying this action to the state!
 
-Three extra things to make sure about your redux reducers is that 
+Three extra things to make sure about your redux reducers are that:
 
-- they should have an initial value (with the initial state of the application) 
-- they must not not mutate (change) the state object but instead create and return a new one
-- always return a valid state as a result
+- they should have an initial value (with the initial state of the application) or know how to handle an undefined initial state
+- they must not not mutate (change) the state object but instead create and return a new one (not allowing object mutations is a general practice in functional programming but in redux also helps to quickly apply the changes to the components)
+- always return a valid state as a result (or else the application will have invalid state)
 
 What about react-redux?
 =======================
@@ -194,16 +217,18 @@ redux with React:
 - A ``Provider`` component. This is a parent component that can be used to (magically) pass the store properties to its children components.
 
 Please notice that nothing actually magical happens when the store properties are passed to the children 
-components through ``connect`` and ``Provider``, this is accomplished through the `react context`_ feature
+components through ``connect`` and ``Provider``! this is accomplished through the `react context`_ feature
 that allows you to "pass data through the component tree without having to pass the props down manually 
-at every level".
+at every level". So ``connect``ed components used context to retrieve the store properties that 
+have been passed to the context by the ``Provider``.
 
-This will be made more clear with another jsfiddle that will convert the previous example to React and
+How react-redux is used be made more clear with another jsfiddle that will convert the previous example to React and
 react-redux:
 
 .. jsfiddle:: 8aba3sp6/2
 
-The html is just ``<div id='container'></div>`` while the es6/jsx code is:
+The html is just ``<div id='container'></div>`` since the components will
+be rendered through react, while the es6/jsx code is:
 
 .. code::
 
@@ -249,30 +274,35 @@ The html is just ``<div id='container'></div>`` while the es6/jsx code is:
     )
 
 
-As we can see, the reducer and store are the same as the non-react version. What is new is 
-that I've added a React ``RootComponent`` that has two properties, one named ``number``
-and one named ``dispatch`` that can be used to dispatch an action through the store. But how this
-component retrieves these properties?
+As we can see, the reducer and store are the same as the non-react version. What is new 
+here is that I've added a React ``RootComponent`` that has two properties, one named ``number``
+and one named ``dispatch`` that can be used to dispatch an action through the store. 
 
 Using react-redux's ``connect`` function we create a new component, ``ConnnectedRootComponent`` 
-which is a new component with the redux-enabled functionality. The ``connect()`` function takes
-a bunch of optional arguments. I won't go into much detail since its a little complex (the `react-redux documentation`_
-is clear enough), however in our example we have defined two objects named ``mapStateToProps`` and ``mapDispatchToProps``
-which are passed to ``connect``. 
+which is a new component with the redux-enabled functionality (i.e it will have access to
+store). The ``connect()`` function takes
+a bunch of optional arguments. I won't go into much detail since its a little complex 
+(the `react-redux documentation`_ is clear enough), however in our example we have defined 
+two objects named ``mapStateToProps`` and ``mapDispatchToProps``
+which are passed to ``connect`` and define how the state and the dispatch are mapped to
+the properties the connected component will have. 
 
 The ``mapStateToProps`` is a function that will be called whenever the store's state 
-changes and should return an object whose attributes will be passed to the connected component. In our example,
-an object with a number attribute having the current state (which don't forget that is just a number) as its value - 
+changes and should return an object whose attributes will be passed to the connected component
+as properties. In our example,
+we return an object with a number attribute having the current state 
+(which don't forget that is just a number) as its value - 
 that's why we can extract the ``number`` attribute from ``this.props`` when rendering. 
 
-The ``mapDispatchToProps`` as we use it, once again returns an object whose attributes will be passed to the connected component.
-The difference between this object and the one returned from ``mapStateToProps`` is that the ``mapDispatchToProps`` attributes
-call actions (using the provided dispatch) while the ``mapStateToProps`` are state values. 
+The ``mapDispatchToProps`` as we use it, once again returns an object 
+whose attributes will be passed to the connected component and will dispatch
+actions when called.
 
-Now, in order for
-the ``ConnectedRootComponent`` to *actually* have these properties that we passed through connect, it must 
-be enclosed in a ``<Provider>`` parent component. Notice
-that this is recursive so if we had something
+Of course, in order for
+the ``ConnectedRootComponent`` to *actually* have these properties that we passed through ``connect``, 
+it must 
+be enclosed in a ``<Provider>`` parent component (so that the correct react context will be initialized). 
+Notice that this is recursive so if we had something
 
 .. code::
 
@@ -285,18 +315,19 @@ that this is recursive so if we had something
     </Component1>
   </Provider>
 
-the ``<ConnectedComponent>`` would still get the props (dispatch + state slice) we mentioned above.
+the ``<ConnectedComponent>`` would still get the props (dispatch + state slice) we mentioned above
+even if its parent components were not connected.
 
-Of course, in our example, we could avoid using react-redux altogether, by passing the store directly
+Although we could have avoided using react-redux  by passing the store directly
 to ``<RootComponent>`` and subscibing to the store changes from the ``RootComponent``'s ``componentWillMount`` method, 
-however the added-value of react-redux is that using ``connect`` and ``Provider`` we could pass dispatch and
+the added-value of react-redux is that using ``connect`` and ``Provider`` we could pass dispatch and
 state slices deep inside our component hierarchy without the need to explicitly pass the store
 to each individual component and also that react-redux will make optimizations so that the
 each connected component will be re-rendered only when needed (depending on the state slice it uses)
 and not for every state change. Please be warned that this does not mean that you should connect everything
 so that everything will have access to the global state and be able to dispatch actions. You should be very
 careful to connect only the components that really need to be connected (redux calls them container components) 
-and use ``mapStateToProps`` to  and pass dispatch and state as
+and pass dispatch and state as
 properties to their children (which are called presentational components). Also, each connected component should receive only 
 the part of the global state it
 needs and not everything (so that each particular component will update only when needed and not for
@@ -304,9 +335,12 @@ every state update). The above is absolutely necessary if you want to crate re-u
 easily testable components. I'll discuss this a little more when
 describing the sample project. 
 
-Finally, notice how easy it is to create reusable container components using ``mapStateToProps`` and ``mapDispatchToProps``:
-Both the way the component gets its state and calls its actions are defined through these two objects so you can create
-as many connected objects as you want by passing different ``mapStateToProps`` and ``mapDispatchToProps``. 
+Finally, notice how easy it is to create reusable container 
+components using ``mapStateToProps`` and ``mapDispatchToProps``:
+Both the way the component gets its state and calls its actions are 
+defined through these two objects so you can create
+as many connected objects as you want by passing different 
+``mapStateToProps`` and ``mapDispatchToProps`` - more on this later.
 
 
 Our project
@@ -315,23 +349,40 @@ Our project
 After this rather lengthy introduction to redux and react-redux we may move on to our
 project. First of all, let's see an example of what we'll actually build here:
 
-.. image:: /images/ajax_fixed_data_tables.gif
+.. image:: /images/demo3.gif
   :alt: Our project
   :width: 600 px
 
+This is a single-page application that supports client side routing and
+has four different routes: A books list, an authors list, a book editing/create
+form and an author editing/create form.
+The books list supports searching (with the filter field),
+pagination (with 5 books per page) and per-column sorting when
+clicking the column name (ascending/descending). The book form
+supports validation (on the book title), cascading drop downs
+(changing category limits the subcategory choices) and a 
+jquery ui datepicker to select the book publish date. Also,
+you can delete books or authors from their corresponding
+form. Notice that there's a statistics panel showing the current
+number of authors and books. A nice loading spinner
+will be displayed when asynchronous ajax actions are executed
+and a snackbar notification will be shown when such an action
+is executed. Finally, although you won't be able to see it,
+the url of the application is changed according to the choices
+the user makes.
 
 Other libraries used
 ====================
 
 React (and redux) have a big ecosystem of great libraries. Some of these have been used
-for this project and will also be discussed:
+for this project and will also be discussed in this article:
   
 - redux-thunk_: This is a nice add-on for redux that generalizes action creators.
 - redux-form_: A better way to use forms with react and redux. Always use it if you have non-trivial forms.
-- react-router_: A library to create routes for single page applications with React
-- react-router-redux_ (ex redux-simple-router): This library will help integrating react-router with redux
-- history_: This is used bt react-router to crete the page history (so that back forward etc work)
-- react-notification_: A simple react component to display notifications
+- react-router_: A library to create routes for single page applications with React.
+- react-router-redux_ (ex redux-simple-router): This library will help integrating react-router with redux.
+- history_: This is used bt react-router to crete the page history (so that back forward etc work).
+- react-notification_: A simple react component to display notifications.
 
 The triplet react-router, react-router-redux and history needs to be used for projects that 
 enable client side routing. The redux-form is really useful if you have non-trivial forms
@@ -342,12 +393,15 @@ you can easily exchange it with other similar components or create your own.
 redux-thunk?
 ============
 
-Now, about redux-thunk. I won't go into much detail here, you can read more in this `great SO answer`_,
+Now, about redux-thunk. I won't go into much detail here, you can read more about it in this `great SO answer`_,
 however I'd like to point out here that **everything that can be done with redux-thunk
-can also be done without it**.
+can also be done without it** so you may safely skip it if you feel that you don't really
+need it in your project.
 
-A thunk allows you to create action creators that don't only return 
-action objects but are more general, something like this: 
+But what does it do? Well, redux-thunk allows you to create action creators that don't only return 
+action objects but can do various other things, like calling other actions or 
+dispatching actions conditionally. When using redux-thunk, an action returns a function
+that can do any of the above mentioned things, something like this: 
 
 .. code::
 
@@ -365,7 +419,7 @@ action objects but are more general, something like this:
   
 Let's say that we wanted to implement an asynchronous, ajax call. 
 If we don't want to use redux thunk,
-then we need to create a normal function that gets dispatch as an argument, something
+then we need to create a normal function that gets ``dispatch`` as an argument, something
 like this:
 
 .. code::
@@ -381,9 +435,11 @@ like this:
   }
 
 The main problem with this approach is that the getData functions *is not*
-a real action creator (like ``showLoadingAction``, ``hideLoadingAction`` and ``showDataAction``)
-since it actually returns nothing so you'll need to remember to call it directly
-and pass it dispatch *instead of* passing its return value to dispatch!
+called like a normal 
+action creator (like ``showLoadingAction``, ``hideLoadingAction`` and ``showDataAction``)
+since it actually returns nothing (so nothing will be dispatched), 
+so you'll need to remember to call it directly
+and pass it the ``dispatch`` *instead of* passing its return value to ``dispatch``!
 
 If however we used thunk, then we'd have something like this:
 
@@ -399,9 +455,12 @@ If however we used thunk, then we'd have something like this:
     }
   }
   
-Now, this can be used like a normal action (i.e it can be called using ``dispatch(getDataThunk())``).
+Now, the above can be used like a normal action (i.e it can be called using ``dispatch(getDataThunk())``).
 That's more or less the main advantage of redux-thunk: You are able to create thunk action creators that 
-can be called like normal can do more complex things than just returning action objects. I have to repeat
+can be called like normal actions and can do more complex things than just returning action objects
+so you don't have to remember how to call each function. 
+
+I have to repeat
 again that everything that you be done with thunk action creators, can also be done with normal functions
 that get ``dispatch`` as a paremeter - the advantage of thunk action creators is that you don't need to
 remember if an action creator needs to be called through ``disaptch(actionCreator())`` 
@@ -417,17 +476,19 @@ Explaining the application
 In the following paragraphs we'll see together the structure and source code of
 this application. I'll try to go into as much detail as possible in order to solve
 any questions you may have (I know I had many when I tried setting up everything for
-the first time). I'll skip imports and non-interesting ccomponents - after all the
-complete source code can be found @ https://github.com/spapas/react-tutorial/. 
-We'll use a top down approach, starting from the main component where the routes
-are defined and the application is mounted to the DOM:
+the first time). I'll skip imports and non-interesting components - after all the
+complete source code can be found @ https://github.com/spapas/react-tutorial/,
+checkout the tag ``react-redux``. 
+We'll use a top down approach, starting from the main component where the 
+client side routing 
+is defined and the application is mounted to the DOM:
 
 main.js
 =======
 
 This module is used as an entry point for browserify (i.e we call browserify with
 ``browserify main.js -o bundle.js`` ) and uses components defined elsewhere to
-create he basic structure of our application. Let's take a look at the important
+create the basic structure of our application. Let's take a look at the important
 part of it:
  
 .. code::
@@ -463,16 +524,18 @@ We can see the well-known ``render`` function from ReactDOM that gets a componen
 and a DOM element to mount it to. The domponent we provide to render is the ``Provider``
 from react-redux we talked about before in order to enable all children components
 to use ``connect`` to have access to the store properties and dispatch. This is the usual
-approact with react-redux: The outer component should be the ``Provider``.
+approact with react-redux: *The outer component will always be the ``Provider``.*
 
 The ``Provider`` component gets one parameter which is the store that redux will use. We 
 have initialized our store in a different module which I will present below.
 
 Inside the ``Provider`` we are defining a ``Router`` from ``react-router``. This should
 be the parent component inside which all client-side routes of our appliccation are defined.
-The ``Router`` gets a ``history`` parameter which is initialized elsewhere.
+The ``Router`` gets a ``history`` parameter which is initialized elsewhere (stick with me
+for now, I will talk about it later).
 
-Now, inside ``Router`` we are defining the actual routes of this application. As we see,
+Now, inside ``Router`` we are defining the actual routes of this application. As we 
+can see,
 there's a parent ``Route`` that is connnected to the ``App`` component which actually
 contains everything else. The parent route contains an ``IndexRoute`` whose corresponding
 component (``BookPanel``) is called
@@ -491,7 +554,7 @@ store.js
 
 The ``store.js`` module contains the definition of the global store of our application
 (which is passed to the ``Provider``).
-Here, we also define the ``history`` object we pass to the parent ``Router``.
+Here, we also define the ``history`` object we passed to the parent ``Router``.
 
 .. code::
 
@@ -506,14 +569,14 @@ Here, we also define the ``history`` object we pass to the parent ``Router``.
     });
 
     
-First of all, we see that our ``history`` object is of type HashHistory
+First of all, we see that our ``history`` object is of type ``HashHistory``
 (`more info about history types`_) and I've also opted out of using
 ``queryKey``. If I hadn't used the ``queryKey: false`` configuration
 then there'd be a ``?_k=ckuvup`` query parameter in the URL. Now, this
 parameter is actually useful (it stores location state *not* present
 in the URL for example POST form data) but I don't need it for this
-example (and generally I prefer clean URLS) - but if you don't like
-the behavior of your history then go ahead and add it.
+example (and generally I prefer cleaner URLS) - but if you don't like
+the behavior of your history without it then go ahead and add it.
 
 Also, notice that I've used ``HashHistory`` which will append a ``#``
 to the URL and the client-side URL will come after that, so all
@@ -522,14 +585,25 @@ The react-router
 documentation recommends using ``BrowserHistory`` which uses normal (clean)
 urls -- so instead of ``/index.html#/authors`` we'd see ``/authors`` if we'd
 used ``BrowserHistory``. 
+
 The problem with ``BrowserHistory`` is that you'll need to configure correctly
 your HTTP server so that it will translate every URL (/foo) to the same
-URL under ``/index.html`` (``/index.html#/foo``). In my case, I don't think
-that configuring your HTTP server is worth the trouble and also I do really
+URL under ``/index.html`` (``/index.html#/foo``) - as can be understood,
+without that configuration the HTTP server doesn't know anything about the
+client side urls so when the webserver sees ``/authors`` it will pass 
+``/authors`` to your server side framework (which will return a 404 error) - that's
+why this translation is needed.
+
+However, in my case, I don't think
+that configuring your HTTP server to rewrite urls is worth the trouble and also I do really
 prefer using ``#`` for client-side urls! This is a common patter, recognised
 by everybody and even without the HTTP server-configuration part I'd still
-prefer ``HashHistory`` - of course this is just my opinion, feel free to use
+prefer ``HashHistory`` over ``BrowserHistory`` - of course this is just my opinion, feel free to use
 ``BrowserHistory`` if you don't like the hash ``#``!
+
+The next block of code from the ``store`` module creates the
+most important thing of a redux application, its reducer 
+along with the global store: 
 
 .. code::
 
@@ -555,28 +629,35 @@ prefer ``HashHistory`` - of course this is just my opinion, feel free to use
     export default store
 
 Please notice above that the ``Object.assign`` method is used - I'll talk about
-it later --  however, another common ES6 idiom that I've used is that when you define
-an object you can change  ``{ x: x }`` to ``{ x }``.
+it later --  however, another common ES6 idiom that I've used here
+is that when you define
+an object you can change  ``{ x: x }`` to ``{ x }`` (so ``{books}`` 
+means ``{'books': books}``).
     
-The next block of code from ``store.js`` generates the most important
-part of our store, the reducer! The ``combineReducers`` function is provided
+The ``combineReducers`` function is provided
 by redux and is a helper function that helps you in ... combining reducers!
 As you see, I've combined the reducers defined in this application 
 ``(books, notification, ui, categories, authors)`` with the reducers 
-of ``react-router-redux`` and ``redux-form``. I'll talk a bit in the next
+of ``react-router-redux`` and ``redux-form``
+to create *the reducer*. We'll talk a bit in the next
 interlude on what does combining reducers is.
 
+The ``routeReducer`` and ``formReducer`` reducers are provided by
+react-router-redux and refux-form to properly handle the routing 
+and form-related actions.
+
 The remaining of the code generates the ``store``: First of all, a middleware
-(please see next interlude for more)
+(please see next-next interlude for more)
 is created with ``syncHistory`` that allows actions to call history methods
 (so that when the URL is changed through actions they will be reflected to the
 history). Then, the ``createStoreWithMiddleware`` function is called to generate 
-the store that will be passed to the ``Provider``. This functions takes the 
+the store that will be passed to the ``Provider``. This function takes the 
 reducer as a parameter along with any store enchancers that we'd like to
 apply. A store enchancer is a function that modifies the store. The only
 store enchanccer that we use now is the output of the 
 ``applyMiddleware`` function that combines the two middlewares we've defined (one is for
-redux thunk, the other is for ``syncHistory``).
+redux thunk, the other is for ``syncHistory``). I know, your head hurts but
+I'll try to clear things out below.
             
 Interlude: Combining reducers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -586,11 +667,11 @@ the reducer is a simple function that gets the current state and an
 action as parameters and returns the next state (which is the result of applying
 the action to the state). The reducer will have a big switch statement that
 checks the type of the action and returns the correct new state. Unfortunately,
-this switch statement may get way too large and unmaintainable for large projects.
+this switch statement may get way too fat and unmaintainable for large projects.
 
 That's where combining reducers comes to the rescue: Instead of having one big,
-monolithic reducer for all the parts of our application, we can break it to individual
-reducers depending only on specific parts of the state object. What this means is
+monolithic reducer for all the parts of our application state tree, we can break it to individual
+reducers depending only on specific slices of the state object. What this means is
 that if we have for example a state tree like this:
 
 .. code::
@@ -599,22 +680,22 @@ that if we have for example a state tree like this:
     'data': {},
     'ui': {}
   }
-  
-  
+    
   
 with actions that manipulate either data or ui, we could create two indivdual reducers,
-one that would manipulate the data, and one for the ui. These reducers would get *only* 
-the slice of the state that they are interested to, so the ``dataReducer`` will get 
+one for the ``data`` slice, and one for the ``ui`` slice of the state tree. These reducers would get *only* 
+the slice of the state that they are interested in, so the ``dataReducer`` will get 
 only the ``data`` part of the state tree and the ``uiReducer`` will get only the ``ui``
 part of the state tree. 
 
-To *combine* these reducers the ``combineReducers`` function should be used. This function
-gets an object with the name of the state part for each sub-reducer as keys and that sub-reducer
-as values and returns returns a reducer function that passes the action along with 
+To *combine* these reducers the ``combineReducers`` function is used. This function
+gets an object with the name of the state part for each sub-reducer as attribute names
+and that sub-reducer
+as values and returns a reducer function that passes the action along with 
 the correct state slice to each of the sub-reducers and creates the global state object by
 combining the output of each sub-reducer. 
 
-For example, the combine reducers function could be something like this:
+This may be clarified more with our own version of a combine reducers function:
 
 .. code::
 
@@ -636,10 +717,10 @@ For example, the combine reducers function could be something like this:
   }
 
 The above function gets an object (``o``) with state slices and sub-reducers 
-as input and returns a function that:
+as input and returns a function (that function is the resulting reducer) that:
 
-* Creates an array (``mapped``) of objects with two attributes: ``key`` for each key of ``o`` and ``slice`` after applying the sub-reducer to the corresponding state slice
-* Reduces and returns the above array (``reduced``) to a single object that has keys for each state slice and the resulting state slice as values
+* Creates an array (named ``mapped``) of objects with two attributes: ``key`` for each attribute of ``o`` and ``slice`` after applying the sub-reducer to the corresponding state slice
+* Reduces and returns the above array (``reduced``) to a single object that has attributes for each state slice and the resulting state slice as values (this is actually the global state)
 
 To show-off the ES6 code (and my most sadistic tendencies), 
 the above code could be also writen like this:
@@ -652,7 +733,7 @@ the above code could be also writen like this:
         [x[0]]: x[1]
     }), {})
 
-
+I wouldn't like to explain this - its more or less a more functional version of ``combineReducers2``.
     
 Interlude: Middlewares
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -665,22 +746,24 @@ thunk action creators (for action creators that don't return the next state obje
 If you take a look at the ``createStore`` function, you'll see that
 its second parameter is called ``enhancer``. When ``enhancer`` 
 is a function (like in our case where it is the 
-result of ``applyMiddleware``) its return value
-is ``enhancer(createStore(...))`` so it calls the result of ``applyMiddleware``
+result of ``applyMiddleware``) the return value of ``createStore``
+is ``enhancer(createStore(...))`` so it will call the result of ``applyMiddleware``
 with the store as parameter. 
 
-Now, what does ``applyMiddleware``? It gets a variable (using the spread ``...`` operator)
-number of functions (let's call them middleware) as input and returns 
-*another* function  (this is the ``enhancer``) that gets a store as an input and 
-returns the same store with its ``dispatch`` method modified so that it
-calls each middleware and passes the result to the next. So, in our case the
+Now, what does ``applyMiddleware``? It gets a variable 
+number of functions (using the spread ``...`` operator) as input arguments (let's call
+them middlewares) and returns 
+*another* function (this is the ``enhancer`` we mentioned in the previous paragraph) 
+that gets a store as an input and 
+returns the same store with its ``dispatch`` method modified so that it will
+call each middleware and pass the result to the next. So, in our case the
 resulting store's dispatch function would be something like:
 
 .. code::
     
     (action) => reduxRouterMiddleware(thunk(dispatch(action)))
 
-Now, a middleware function looks should look like this:
+Now, a middleware function looks like this:
 
 .. code::
 
@@ -699,7 +782,7 @@ this: ``middleware2Dispatch(next=middleware1Dispatch(next=storeDispatch))``.
 Another
 explanation of the above is that a middleware: 
 
-* is a function (that gets a store as input) that returns 
+* is a function (that gets a store to enhance as input) that returns 
 * another function (that gets the next dispatcher to be called as input) that returns
 * another function (that gets an action as input) which is 
 * the dispatcher modified by this middleware
@@ -715,7 +798,8 @@ Let's take a look at the thunk middleware to actually see what it looks like:
           next(action);
     }
     
-So, it gets the store as an input and returns a function that gets ``next`` (i.e
+So, it gets the store (``dispatch`` and ``getState`` are store attributes)
+as an input and returns a function that gets ``next`` (i.e
 the next dispatcher to be called) as input. This function returns *another function*
 (the modified ``dispatch``). Since this function is a dispatcher, it will get 
 an ``action`` as an input and if that action 
@@ -731,11 +815,15 @@ state for every dispatch:
 .. code::
 
   const logStateMiddleware = ({dispatch, getState}) => next => action => {
+    // log the action type
     console.log(action.type, getState())
-    next(action)
+    // now we must call next(action) to propagate and finally dispatch the action object
+    next(action) 
   }
   
 just put it in the applyMiddleware parameter list and observe all state changes!
+
+
 
 reducers.js
 ===========
@@ -749,16 +837,58 @@ as a different module. Let's start reviewing the code of the ``reducers.js`` mod
 .. code::
 
     export const notification = (state={}, action) => {
-        // ...
+        switch (action.type) {
+            case 'SHOW_NOTIFICATION':
+                let { notification_type, message } = action
+                return Object.assign({}, state, {
+                    message,
+                    notification_type,
+                })
+            case 'CLEAR_NOTIFICATION':
+                return {}
+        }
+        return state;
     }
 
+
     export const ui = (state={}, action) => {
-        // ...
+        switch (action.type) {
+            case 'IS_LOADING':
+                return Object.assign({}, state, {
+                    isLoading: action.isLoading
+                });
+                break;
+            case 'IS_SUBMITTING':
+                return Object.assign({}, state, {
+                    isSubmitting: action.isSubmitting
+                });
+                break;
+        }
+        return state;
     }
     
 The ``notification`` and `ui` are two sub-reducers that control the state of the notification popup and if 
 the application is loading / is submitting. I won't go into much detal about
-them, they are really simple.
+them, they are really simple. However, notice that they both create a new state object
+for each of their actions. To achieve this, the ``Object.assign()`` method is used. 
+This method is defined like this: 
+``Object.assign(target, ...sources)``. Its first parameter is an object (a new, empty object) while the rest
+parameters (``sources``) are other objects whose properties will be assigned ``target``. The rightmost members of 
+``sources`` overwrite the previous ones if they have the same names. So, for example the code
+
+.. code::
+
+    Object.assign({}, state, {
+        rows: action.books.results,
+        count: action.books.count,
+    });
+
+creates a new object which will have all the properties of the current ``state`` with the exception of the
+``rows`` and ``count`` attributes which will get their values from the ``action``. This is a common idiom in 
+redux and you are going to see it all the time so please make sure that you grok it before continuing. Also,
+notice that the new state is a new, empty object in which 
+all the attributes of the new state are copied - this is because
+the old state cannot be mutated.
 
 Now we'll see the reducer that handles books. Before understanding the actual reducer, I will present
 the initial value of the books state slice:
@@ -871,36 +1001,19 @@ function. Now, the actual reducer is:
                     });
                 }
                 break;
-
         }
         return state;
     }
     
 
-
 The books subreducer handles the ``SHOW_BOOKS, SHOW_BOOK, CHANGE_PAGE, TOGGLE_SORTING`` and ``CHANGE_SEARCH``
-actions by retrieving the paramaters of these actions and returning a new books-state-slice object with the correctl
-parameters. To achieve this, the ``Object.assign()`` method is used. This method is defined like this
-``Object.assign(target, ...sources)``. Its first parameter is an object (a new, empty object) while the rest
-parameters (``sources``) are other objects whose properties will be assigned ``target``. The rightmost members of 
-``sources`` overwrite the previous ones if they have the same names. So, for example the code
-
-.. code::
-
-    Object.assign({}, state, {
-        rows: action.books.results,
-        count: action.books.count,
-    });
-
-creates a new object which will have all the properties of the current ``state`` with the exception of the
-``rows`` and ``count`` attributes which will get their values from the ``action``. This is a common idiom in 
-redux and you are going to see it all the time so please make sure that you grok it before continuing. Also,
-notice that the new state is a new, empty object in which all the attributes of the new state are copied - this is because
-the old state cannot be mutated.
+actions by retrieving the paramaters of these actions and returning a new books-state-slice object 
+with the correct parameters using ``Object.assign``. 
 
 The ``ADD_BOOK`` action is a little more complicated: This action will be dispached when a new book is added with
 the data of that new book as a parameter (``action.book``). In order to make everything easier, I just append the new
-book to the end of the current page and increase the count number (I also set the new book to be the ``book`` attribute
+book to the end of the books that are displayed on the 
+current page and increase the count number (I also set the new book to be the ``book`` attribute
 of the state). This means that the newly created book will not go to its correct place (based on the ordering) and
 that the visible items will be more than the ajax page coun (also notice that if you add another book then the visible
 items will also be increased by one more). This is not a problem (for me) since if the user changes page or does a search
@@ -908,16 +1021,17 @@ everything will fall back to its place. However, if you don't like it there are 
 difficult:
 
 * Easier solution: When adding a book just *invalidate* (make undefined) the ``books`` state attribute. This will result in an ajax call to reload the books and everything will be in place. However the user may not see the newly added book if it does not fall to the currently selected page (and there'd be an extra, unnecessary ajax call)
-* Harder solution: Well, depending on the sorting you may check if the current books should be displayed or not on the current page and push it to its correct place (and remove the last item of ``rows`` so that count is not increased). Once again, the newly book may no be displayed at all if it does not belong to the correct page
+* Harder solution: Depending on the sorting you may check if the current books should be displayed or not on the current page and push it to its correct place (and remove the last item of ``rows`` so that count is not increased). Once again, the newly book may no be displayed at all if it does not belong to the visible page
 
-The ``UPDATE_BOOK`` and ``DELETE_BOOK`` actions are even more complex. I'll explain update, delete is more or less
+The ``UPDATE_BOOK`` and ``DELETE_BOOK`` actions are even more complex. I'll only explain update, delete is more or less
 the same (with the difference that update has the updated book as an action parameter while delete has only its id
 as an acton parameter): First of all we check if the updated book is currently displayed (if one of the books of
 ``rows`` has the same ``id`` as the updated book). If the book is not displayed then only the current edited book
 is set to the new state. However, if it is displayed then it would need to be updated because the ``rows`` array
 does not know anything about the updated values of the book! 
 
-So, inside the ``else`` branch, the ``idx`` variable will hold its current index and the ``rows`` attribute of the new state will get the following value:
+So, inside the ``else`` branch, the ``idx`` variable will hold its current index and the 
+``rows`` attribute of the new state will get the following value:
 
 .. code::
 
@@ -930,7 +1044,8 @@ So, inside the ``else`` branch, the ``idx`` variable will hold its current index
 The ``...`` spread operator expands an array so, for example ``[ ...[1,2,3] ]`` would be like ``[1,2,3]``
 and the ``slice`` method gets two parameters and returns a copy of the array elements between them. Using
 this knowledge, we can understand that the above code returns an array (``[]``) that contains the books of
-``rows`` from the first to the updated one (not including the updated one), the updated book (which we get
+``rows`` from the first to the updated one (not including the updated one), the updated book 
+object (which we get
 from ``action``) and the rest of the books of ``rows`` (after the updated one). 
 
 The code for the ``authors`` and ``categories`` sub-reducers does not have any surprises so I won't go
@@ -952,15 +1067,15 @@ into detail about it.
     export const categories = (state=CATEGORIES_INITIAL, action) => {
         // ... 
     }
-    
 
 The global state tree
 ~~~~~~~~~~~~~~~~~~~~~
 
-As we've already seen, the global reducer is created through ``combineReducers``
-which retrieves an object with our defined reducers and two reducers from
-the react-router-redux and redux-form libraries. This means, that the global 
-state object will be something like this:
+Remember that all the above are sub-reducers, each one taking only a slice
+of the global state tree. They are all combined, along with the routing and
+form reducers to create the global reducer function.    
+
+This also means, that the global state object will be something like this:
 
 .. code::
 
@@ -981,14 +1096,15 @@ slice of that object.
 actions.js
 ==========
 
-The ``actions.js`` module should probably have been named ``action_creators.s`` since
+The ``actions.js`` module should probably have been named ``action_creators.js`` since
 it actually contains redux action creators. Also, a common practice is create a folder
 named ``actions`` and put there individual modules that contain action creators for
 the sub-reducers (in our case, for example there would be ``books.js``, ``authors.s`` etc).
 
 In any case, for simplicity I chose to just use a module named ``actions.js`` and put
 everything there. One important thing to keep in mind is that ``actions.js`` contains both
-normal action creators (i.e functions that return actions and should be "dispatched") *and* thunk action creators (i.e
+normal action creators (i.e functions that return actions and should be "dispatched") 
+*and* thunk action creators (i.e
 functions that not necessarily return actions but can be "dispatcher") - please see the
 discussion about redux-thunk on a previous paragraph.
 
@@ -1054,15 +1170,14 @@ user sorting or the search/filtering parameters of the displayed books are chang
 
 Notice that these are thunk action creators (they return a function) and
 the important thing that they do is that they call two other action creators
-(``toggleSorting`` or ``changeSearch`` and ``loadBooks``) and they update the
-URL using ``history.push``. The ``history`` object is the one we created in
+(``toggleSorting`` or ``changeSearch`` and ``loadBooks``) and update the
+URL using ``history.push``. The ``history`` object is the one we had created in
 the ``store.js`` and its ``push`` method changes the displayed URL. This
-method uses a location `uses a location descriptor`_ that contains
+method `uses a location descriptor`_ that contains
 an attribute for the path name and an attribute for the query parameters
 - in or case we just want to update the query parameters (i.e ``#/url/?search=query1&sorting=query2``),
 so we pass an obect with only the ``search`` attribute. The ``formatUrl`` function, to
-which the books state slice is passsed,
-is a rather simple function
+which the books state slice is passsed, is a rather simple function
 that checks if either the sorting or the search should exist in th URL and
 returns the full URL. This function is contained in the ``util/formatters.s`` module.
 
@@ -1135,15 +1250,17 @@ The following thunk action creators are used for asynchronous, ajax queries:
 The ``loadBooks`` thunk action creator creates the URL parameters that should
 be passed to the REST API using the ``getState()`` method that returns the current state.
 It then dispatches the ``loadingChanged`` action so that the ``ui.isLoading`` will be
-changed to true. After that it asynchronously calls the load books REST API and returns.
+changed to true. After that it asynchronously calls the load books REST API passing
+it the created url and returns.
 Since this is a thunk action there's no problem that nothing is returned. When the 
 ajax call returns it will dispatch the ``showBooksResult``, passing the book data to
 change the state with the loaded book data and the ``loadingChanged`` to hide the loading
-graph. Also, please notice that I've put the return of the ajax call inside a ``setTimeout``
-to emulate a 1 second delay and be able to see the loading spinner. Also, I may have used
-setTImeout in some other places to make sure to be able to emulate server-side delays. 
+spinner. Also, please notice that I've put the return of the ajax call inside a ``setTimeout``
+to emulate a 1 second delay and be able to see the loading spinner. 
 
-*Please don't forget to remove these ``setTimeout``s from your code!*
+I may have used
+setTimeout in some other places to make sure to be able to emulate server-side delays so 
+*please don't forget to remove these ``setTimeout``s from your code!*
 
 The ``loadBook`` is more or less the same - however here only a single book's data will
 be loaded. When this book is loaded the ``loadSubCategories`` action will also be dispatched,
@@ -1160,7 +1277,7 @@ components/app.js
 =================
 
 We'll now start explaining the actual react components (modified to be used through redux of course).
-The parent of all other components is the ``App`` which, as we've already seen in ``main.js`` it
+The parent of all other components is the ``App`` which, as we've already seen in ``main.js``
 is connected with the parent route:
 
 .. code::
@@ -1207,12 +1324,11 @@ is connected with the parent route:
         loadBooks, loadAuthors 
     }, dispatch)
 
-
     export default connect(mapStateToProps, mapDispatchToProps)(App);
 
 As we can see, there's an internal component (named ``App``) but we export the ``connect``ed component. 
 One interesting thing to notice is that ``App`` is an ES6 class based react component (i.e it extends
-from ``React.Component`` -- I'll talk a bit about these components while taking a look at 
+``React.Component`` -- I'll talk a bit about these components while taking a look at 
 the ``BookSearchPanel`` which has some more interesting features).
 
 Concerning the exported, 
@@ -1231,7 +1347,7 @@ the returned object would be something like:
         loadAuthors: () => dispatch(loadAuthors()),
     }
 
-This object of course could be created by hand, however bindActionCreators would be really useful if we wanted
+This object of course could be created by hand, however ``bindActionCreators`` would be really useful if we wanted
 to dispatch lots of actions in a component (or if we had seperated our action creators to different modules) --
 we could for example do something like this:
 
@@ -1252,7 +1368,7 @@ authors. It also renders two Links one for the books table and one for the autho
 
 Beyond these, when the component is mounted it checks if the authors and books have been loaded and if not, it
 dispatches the ``loadBooks`` and ``loadAuthors`` actions (remember, because we used ``mapDispatchToProps`` by
-calling these methods from ``props`` they'll be automatically dspatched).
+calling these methods from ``props`` they'll be automatically dspatched when called).
 
 Let's take a quick look at the three small components that are contained in ``App``
 
@@ -1387,7 +1503,7 @@ to do stuff on ``componentWillMount``).
 components/StatPanel.js
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Another very simple component - just display the number of books and authors from the passed parameter.
+Another very simple functional component - just display the number of books and authors from the passed parameter.
 
 components/BookPanel.js
 =======================
@@ -1437,9 +1553,9 @@ As we can see, after retrieving the needed properties from the ``books`` state s
 and the actions to dispatch, we define an ``onSearchChanged`` function that will be 
 passed to the ``BookSearchPanel`` to be called when the search query is changed.
 
-After that, the ``sort_method`` is defined: Please notice the ``sort_method`` is
+After that, the ``sort_method`` is defined. This is
 a function that gets a ``key`` parameter and returns another function that 
-dispatches ``toggleSortingAndLoadBooks`` with that ``key``. This is the 
+dispatches ``toggleSortingAndLoadBooks`` passing it that ``key``. This is the 
 parameter that is passed to ``getCols``. So, for example for the ``id``,
 the result of the ``sort_method`` would be the following function:
 ``() => toggleSortingAndLoadBooks('id')``.
@@ -1514,8 +1630,7 @@ state and calls the provided
 (through ``props``) ``onSearchChanged`` method that will dispatch the
 ``changeSearchAndLoadBooks`` action with the current value as a parameter. 
 The whole thing with the ``ths.promise`` and ``clearInterval`` is to make
-sure that the provided ``onSearchChanged`` will not be called too often.
-
+sure that the provided ``onSearchChanged`` will not be called too often:
 
 .. code::
 
@@ -1654,7 +1769,7 @@ and have a cool, totally *functional function*!
 components/PagingPanel.js
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Another functional component - this retrieves ``params`` with the 
+Another functional component - this one has  params with the 
 attributes ``page``, ``page_size``, ``count``, ``onNextPage``,
 ``onPreviousPage`` and, after finding out the total number of pages
 it renders the current page number and the total pages number along
@@ -1702,8 +1817,8 @@ instead of the complex value. Something like this
     {% endwith %}
 
 Having such a concept in ES6 would be ideal for our case! I am not sure if something
-like ``with`` actually exists, however we can really easy emulate it with a function,
-something like this:
+like ``with`` actually exists, however we can really easy emulate it with a function
+closure, something like this:
 
 .. code::
 
@@ -1772,7 +1887,7 @@ The ``mapStateToProps`` contains a bunch of required things from the state (we n
 the current ``book`` that is edited, the ``categories`` to select from, the ``authors`` to also
 select from and the ``ui`` to find out if submitting has finished). Beyond these, we see
 that there's an ``initialValues`` attribute to the object returned from ``mapStateToProps``. This
-attribute should be an object with valus to initialize the form fields. So if our form has 
+attribute should be an object with values to initialize the form fields. So if our form has 
 fields named ``title`` and ``category`` the ``initial`` object should also have ``title`` and
 ``category`` attributes so that the form fields would be initialized. In our case, we just
 check if the ``props.params.id`` method is defined and the to-be-updated book has been loaded
@@ -1780,16 +1895,16 @@ to the state and assign the to-be-updated ``book`` to ``initialValues``.
 
 The ``reduxForm`` method is used to ``connect`` the form component: Beyond the usual 
 ``mapStateToProps`` and ``mapDispatchToProps`` (we don't use ``mapDispatchToProps`` here),
-it retrieves a required parameter which is the object used to initialize the form: This
+it needs a required parameter which is the object used to initialize the form: This
 object should have 
 
 * A ``form`` attribute with the name of the form. This must be unique among all forms in your application
 * A ``fields`` string array with the names of the form fields
 * A optional ``validate`` attribute that is a function that will be called when the form fields are changed 
 
-The validate functon gets an object with the field names with their corresponding values as attributes and 
+The validate function gets an object with the field names with their corresponding values as attributes and 
 should return another object with the field names that have an error and the error message. In our case,
-we want the ``title`` to be required, so the ``validate`` is:
+we want the ``title`` to be required and the date to be valid (if exists), so the ``validate`` is:
 
 .. code::
 
@@ -1798,14 +1913,20 @@ we want the ``title`` to be required, so the ``validate`` is:
         if (!values.title) {
             errors.title = 'Required';
         }
+        if(values.publish_date) {
+            const re = /^\d{4}-\d{2}-\d{2}$/;  
+            if(!re.exec(values.publish_date)) {
+                errors.publish_date = 'Invalid';
+            }
+        }
         return errors;
     }
 
 This validate function is called *whenever a form field is changed* so, depending on the implementation
-of course, the error messages will be displayed and hidden as the user types in the fields. Please notice
+of course, the error messages will be shown and hidden as the user types in the fields. Please notice
 that when the user starts typing in a field in an empty form, this field may be valid but all other
 fields will be empty - to avoid displaying an error message for fields that the user has not been yet
-been able to modify, then we have to use a the ``touched`` property of each field -- only display the
+been able to modify, we can use the ``touched`` property of each field -- only display the
 field's error message if this field has been ``touched``. When the form is submitted all fields are
 changed to ``touched`` so all error messages will be displayed.
 

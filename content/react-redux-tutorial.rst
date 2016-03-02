@@ -1,8 +1,8 @@
 A comprehensive react-redux tutorial
 ####################################
 
-:date: 2016-03-01 15:20
-:tags: javascript, react, redux, react-redux, django, redux-thunk, redux-form, react-router, react-router-redux, react-notification, history, es6, babel, babelify, browserify, watchify, uglify, boilerplate
+:date: 2016-03-02 11:20
+:tags: javascript, react, redux, react-redux, django, django-rest-framework, redux-thunk, redux-form, react-router, react-router-redux, react-notification, history, es6, babel, babelify, browserify, watchify, uglify, boilerplate, ajax, tutorial, introduction
 :category: javascript
 :slug: react-redux-tutorial
 :author: Serafeim Papastefanos
@@ -1442,6 +1442,10 @@ to the real ``Notification``  component from ``react-notification``.
 
     export default connect(mapStateToProps, mapDispatchToProps)(NotificationContainer);
     
+Notice the ``style={{ .. }}`` snippet above: The external ``{}`` are the Javascript code
+inclusion tags of JSX while the internal ``{}`` are for creating a normal javascript object
+that defines the styling of the notification.
+    
 Creating a re-usable notification
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
@@ -1449,7 +1453,8 @@ Please notice that although I've implemented this as a connected component this 
 way to do it! Actually, probably my implementation is less-reusable from the others I will propose... 
 
 In any case, instead of implementing ``NotificationContainer`` as a connected component we could
-have implemented it as a normal, non connected component that would receive two properties: 
+have implemented it as a normal, non connected component that would receive two properties
+from its parent: 
 the ``notification`` slice of state and an ``onHide`` function that would dispatch 
 ``hideNotification``. Doing this would be very easy, just change 
 ``App`` so that its ``mapDispatchToProps`` would also return the ``notification`` slice of 
@@ -1470,12 +1475,13 @@ approach, i.e create a reusable non-connected component and use it to create con
 components by defining their ``mapStateToProps`` and ``mapDispatchToProps`` is the 
 approach proposed by react-redux to create components.
 
-Finally, one last comment on this approach that will clarify 
+Finally, one last comment on this approach that may clarify more
 the purpose of  ``mapStateToProps`` and
-``mapDispatchToProps`` is that these two functions are dual (mirror): 
+``mapDispatchToProps`` of connected components
+is that these two functions are *dual* (mirror): 
 
-* Using ``mapStateToProps`` we define which parts of the state will actually be passed to the component (= read the state).
-* Using ``mapDispatchToProps`` we define the actions which will be dispatched by the component (= change/write the state)
+* Using ``mapStateToProps`` we define which parts of the state will actually be passed to the component (= reading the state).
+* Using ``mapDispatchToProps`` we define the actions which will be dispatched by the component (= changing/writing the state)
 
  
 components/loading.js
@@ -1495,8 +1501,12 @@ it at ``static/cssloader.css`` (this is not my css code - I've copied it from ht
 Also, please notice that in this module we just export a function, taking an object which
 has an ``isLoading`` attribute as a parameter. That's a functional react component: A
 function that gets a ``params`` object as an input and implements the render method,
-returning a component. Using functional components is recommended for reasons that
-are far too obvious - you should use class based components only when absolutely
+returning a component. 
+
+Using functional components is recommended for reasons that
+are far too obvious (easy to test - just call the function, idemponent - no state
+to keep track of, less code to write, easier to the eye, *functional* ) 
+- you should use class based components only when absolutely
 necessary (i.e when the component needs to keep some local state or when it needs
 to do stuff on ``componentWillMount``).
 
@@ -1510,20 +1520,28 @@ components/BookPanel.js
 
 Continuing our top-down approach on exploring the project, we'll now talk 
 about the ``BookPanel`` component which is displayed by the ``IndexRoute``.
-Before talking about the actual component, I'd like to present a 
+Before talking about the actual component, I'd like to present
 the ``getCols`` function that is used to create an array of the columns
-that will be displayed by the ``Table`` we render in this panel. 
+that will be displayed by the ``Table`` we render in this panel.
 
 As we can see, the ``getCols`` gets one parameter which is the sort method -- 
 this method gets a string and uses it to toggle sorting by this string.
+We use a function to create the columns instead of a constant because
+that ``sort_function`` needs to ``dispatch`` an action -- ``dispatch`` is available from
+the ``props`` that the functional ``BookPanel`` component receives so the function
+will be called from inside that functional component.
+
 Each column, has up to four parameters: 
 
 * A ``key`` which is the attribute  of the ``row`` object to display
 * A ``title`` which is the column title
-* A ``format`` which may be used to display the value of that column and
-* A ``sorting`` which is a function that will be called when the column title is clicked (so that the sorting is changed ) - this attribute is created using the ``sort_method``
+* A ``format`` (optional) which may be used to display the value of that column and
+* A ``sorting`` (optional) which is a function that will be called when the column title is clicked (so that the sorting is changed ) - this attribute is created using the ``sort_method``
 
-We'll see how these attributes are used by the ``Table`` in the corresponding section.
+We'll see how these attributes are used by the ``Table`` in the corresponding section. Five
+columns have been defined: ``id`` (which, when clicked will update the book
+that's where ``format`` is used), ``title``, ``category_name``, ``publish_date``
+and ``author_name``: 
 
 .. code::
 
@@ -1541,10 +1559,11 @@ We'll see how these attributes are used by the ``Table`` in the corresponding se
     ]
     
 
-The actual ``BookPanel`` is a connected component - we need to use connect because we can't
+The actual (exported) ``BookPanel`` is a connected component - we need to use connect because we can't
 actually pass properties or ``dispatch`` to this component since it is
 rendered through a route (and not as a child of another component), so it
-must be connected to the store through ``connect``. We pass the ``books`` state
+must be connected to the store through ``connect`` to be able to receive 
+state attributes and ``dispatch``. We pass the ``books`` state
 slice as a property using ``mapStateToProps`` and use the same techique as 
 before in ``App``  with
 ``bindActionCreators`` to create auto-dispatchable actions.
@@ -1553,24 +1572,25 @@ As we can see, after retrieving the needed properties from the ``books`` state s
 and the actions to dispatch, we define an ``onSearchChanged`` function that will be 
 passed to the ``BookSearchPanel`` to be called when the search query is changed.
 
-After that, the ``sort_method`` is defined. This is
+Next, the ``sort_method`` is defined. This is
 a function that gets a ``key`` parameter and returns another function that 
 dispatches ``toggleSortingAndLoadBooks`` passing it that ``key``. This is the 
 parameter that is passed to ``getCols``. So, for example for the ``id``,
 the result of the ``sort_method`` would be the following function:
 ``() => toggleSortingAndLoadBooks('id')``.
 
-Finally, we see that the ``BookPanel`` renders the following:
+Finally, the ``BookPanel`` renders the following:
 
 * A ``BookSearchPanel`` passing it the ``search`` property and the ``onSearchChanged`` action
 * A ``Link`` to create a new book
 * A ``Table`` passing it the ``sorting`` and ``rows`` parameters and the ``cols`` constant we just defined
 * A ``PagingPanel`` passing it the total number of books (``count``), the current page (``page``) and two methods ``onNextPage`` and ``onPreviousPage`` that will be called when switch to the next or previous page.
 
-As we can see, the ``onNextPage`` and ``onPreviousPage`` dispach the ``changePage`` action passing it
+As we can see, the ``onNextPage`` and ``onPreviousPage`` functions dispach the ``changePage`` action passing it
 the page to change to and reload the books by dispatch ``loadBooks``. Instead of this we could create
 a ``changePageAndLoadBooks`` thunk action creator that would call these two methods when dispatched
-(similarly to how ``changeSearchAndLoadBooks`` and ``toggleSortingAndLoadBooks`` have been implemented).
+(similarly to how ``changeSearchAndLoadBooks`` and ``toggleSortingAndLoadBooks`` have been implemented)
+- I'm leaving it like this to show all possibilities:
     
 .. code::
 
@@ -1615,22 +1635,26 @@ components/BookSearchPanel.js
 
 The ``BookSearchPanel`` is a component used for searching books. What
 is interesting about this component is that it has internal state (i.e 
-state that is not reflected to the global search tree). Notice that this
-is an ES6 class component:
+state that is not reflected to the global search tree). Notice that 
+``BookSearchPanel`` is an ES6 class component. Here are some of its
+characteristics as opposed to non-ES6 react components:
 
 * It extends ``React.Component`` instead of using ``React.CreateClass``
 * It has a constructor that initializes the local state instead of implementing ``getInitialState``
-* It does not automatically bind the methods to ``this`` so we do it in the constructor (or else ``this`` would be undefined in ``onSearchChange`` and ``onClearSearch``)
+* It does not automatically bind the methods to ``this`` so we do it in the constructor (or else ``this`` would be undefined in ``onSearchChange`` and ``onClearSearch``) - *be very careful with that, its a common problem*
 
 So, what happens
 here? We render an HTML ``input`` element and call ``this.onSearchChange``
-method. This method retrieves the current value of te input (using ``this.refs``)
-and, if the previous change was more than 400 ms ago, it sets the local
-state and calls the provided
+method. This method retrieves the current value of the input (using ``this.refs``)
+and, if the previous change was more than 400 ms ago calls the provided
 (through ``props``) ``onSearchChanged`` method that will dispatch the
-``changeSearchAndLoadBooks`` action with the current value as a parameter. 
+``changeSearchAndLoadBooks`` action with the current value as a parameter
+(notice however that ``this.setState`` is *always* called immediately or else the
+user keypresses wouldn't be reflected to the input). 
+
 The whole thing with the ``ths.promise`` and ``clearInterval`` is to make
-sure that the provided ``onSearchChanged`` will not be called too often:
+sure that the provided ``onSearchChanged`` will not be called too often
+(i.e it will be called 400 ms after the last keypress):
 
 .. code::
 
@@ -1686,13 +1710,16 @@ the value of the element could be retrieved using ``event.target.value``.
 
 The difference between the ``defaultValue`` and ``value`` parameters is really important: The
 ``defaultValue`` is just the initial value of this specific input and it will be equal to
-``props.search``. On the other hand, the ``value`` parameter is the current value of 
+``props.search`` (so that if the user enters a URL which has a search query parameter this will
+be pre-filled here). On the other hand, the ``value`` parameter is the current value of 
 the element and will be equal to the ``state.search``. When the user types in the input,
-the ``onSearchChange`` will be called which will *always* change the ``state.search`` - or 
-else the change wouldn't be reflected to the user! 
+the ``onSearchChange`` will be called which will *always* change the ``state.search`` 
+and the ``value`` will get the correct, new value (or 
+else the change wouldn't be reflected to the user)! 
 
 Finally concerning the clear search query button, 
-when there's a search query a  ``x`` button will be displayed which, when 
+when there's a search query a  ``x`` button will be displayed 
+if there's something to the input field which, when 
 clicked the search local state will be cleared 
 and the provided ``onSearchChanged`` will be called with an empty query.
 
@@ -1715,10 +1742,11 @@ label if this column is not used for sorting:
     )
 
 The ``Table``
-is a functional component that uses the props we mentioned before when talking about 
+uses the props we mentioned before when talking about 
 ``BookPanel``. When it is rendered, the headers of the table are constructed by
 applying a map method on the items of the ``cols`` attribute. Remember that map
 will apply a function to all items of a list and return a new list with the results.
+So this will create a list of correctly formatted ``<th>`` elements.
 
 In our case, the mapper 
 checks if each column has a ``sorting`` attribute and if yes it 
@@ -1729,6 +1757,8 @@ displays the column header.
 
 The rows of the table are created using two maps, one that maps the ``rows``
 which, for each row maps ``cols`` to get the individual values for this row and column.
+So, for the rows a list of ``<tr>`` elements each one including the correct
+``<td>`` elements will be created:
     
 .. code::    
 
@@ -1761,15 +1791,22 @@ which, for each row maps ``cols`` to get the individual values for this row and 
             </tbody>
         </table>
     }
+    
 
-Please notice that the ``const headers`` and ``rows`` we've defined are there just
-for clarity - we could instead put them directly inside the ``return``ed ``<table>``
+
+The ``key`` property I am passing to all elements that belong to a list is to
+help React identify these child elements - we'd get a ``Warning: Each 
+child in an array or iterator should have a unique "key" prop.``
+error without this property.
+    
+Also, please notice that the ``const headers`` and ``rows`` we've defined are there just
+for clarity - we could instead put them directly inside the returned ``<table>``
 and have a cool, totally *functional function*! 
 
 components/PagingPanel.js
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Another functional component - this one has  params with the 
+Another functional and reusable component - this one has  params with the 
 attributes ``page``, ``page_size``, ``count``, ``onNextPage``,
 ``onPreviousPage`` and, after finding out the total number of pages
 it renders the current page number and the total pages number along
@@ -1797,6 +1834,10 @@ see any buttons).
             }}>&gt;</button>}
         </div>
     }
+    
+The same paging panel could be used for any table we wanted to have paging: Just pass it
+the page number, page size, total number of items and what to do when next or previous page
+buttons are clicked.
 
 Interlude: A more functional component
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1831,9 +1872,9 @@ closure, something like this:
     )(Math.ceil(count / page_size))
     
 We define a function that gets ``total_pages`` as a parameter and returns *another function* (
-which is the actual render method of the ``PagingPanel``) and *call the outer function* 
+this one is the actual render method of the ``PagingPanel``) and *call the outer function* 
 passing it the value we want to give to ``total_pages``. This way, the ``total_pages`` will
-have a value in the inner function! 
+have a value in the inner function! Thank you, function closure!!!
 
 Now ``PagingPanel`` is also a completely functional function component!
 
@@ -1850,12 +1891,15 @@ been defined in ``main.js``:
     <Route path="/book_create/" component={BookForm} />
     <Route path="/book_update/:id" component={BookForm} />
 
-So the difference between create and update is that update will contain the ``id`` of the book to be
+So, although create and update render the same component, their difference 
+is that update will contain the ``id`` of the book to be
 updated in the url. This (along with any other url parameters) is passed by react-router as a property
-through an object named ``params`` to the ``BookForm`` component, so, when updating the ``props.params.id``
+through an object named ``params`` to the ``BookForm`` component, so, when updating a book 
+the ``props.params.id`` of ``BookForm`` 
 should have a value.
 
-The ``BookForm`` is a connected component, however because it is also a redux-form, a special
+The ``BookForm`` is a connected component (because it needs access to the state slice and dispatch and
+is rendered through a route), however because it is also a redux-form, a special
 method (``reduxForm``) is used to connect the component and pass the form-related props to the component:
 
 .. code:: 
@@ -1885,21 +1929,23 @@ method (``reduxForm``) is used to connect the component and pass the form-relate
     
 The ``mapStateToProps`` contains a bunch of required things from the state (we need
 the current ``book`` that is edited, the ``categories`` to select from, the ``authors`` to also
-select from and the ``ui`` to find out if submitting has finished). Beyond these, we see
+select from and the ``ui`` to find out if submitting has finished and render the buttons
+as enabled/disabled). Beyond these, we see
 that there's an ``initialValues`` attribute to the object returned from ``mapStateToProps``. This
-attribute should be an object with values to initialize the form fields. So if our form has 
-fields named ``title`` and ``category`` the ``initial`` object should also have ``title`` and
-``category`` attributes so that the form fields would be initialized. In our case, we just
+attribute is used to initialize the form fields. So if our form has 
+fields named ``title`` and ``category``, if the ``initial`` object had ``title`` and
+``category`` attributes the form fields would be initialized by them. In our case, we just
 check if the ``props.params.id`` method is defined and the to-be-updated book has been loaded
-to the state and assign the to-be-updated ``book`` to ``initialValues``.
+to the state and just assign the to-be-updated ``book`` to ``initialValues``.
 
 The ``reduxForm`` method is used to ``connect`` the form component: Beyond the usual 
-``mapStateToProps`` and ``mapDispatchToProps`` (we don't use ``mapDispatchToProps`` here),
-it needs a required parameter which is the object used to initialize the form: This
+``mapStateToProps`` and ``mapDispatchToProps`` (we don't actually use ``mapDispatchToProps`` here
+because I feel that just getting ``dispatch`` is more clear),
+it needs a required parameter which is the object used to initialize the redux-form form: This
 object should have 
 
-* A ``form`` attribute with the name of the form. This must be unique among all forms in your application
-* A ``fields`` string array with the names of the form fields
+* A ``form`` attribute with the name of the form. This must be unique among all forms in your application and will be used as a parameter to the actions that redux-form will dispatch
+* A ``fields`` string array with the names of the form fields. For each one of them a ``field`` will be passed to the ``props.fields`` array in the form component
 * A optional ``validate`` attribute that is a function that will be called when the form fields are changed 
 
 The validate function gets an object with the field names with their corresponding values as attributes and 
@@ -1922,6 +1968,10 @@ we want the ``title`` to be required and the date to be valid (if exists), so th
         return errors;
     }
 
+I just used a very simple regular expression to check the validity of
+the date (it must be in the format YYYY-MM-DD) - this is just to make
+a point, for normal date rendered you should use moment.js_.
+    
 This validate function is called *whenever a form field is changed* so, depending on the implementation
 of course, the error messages will be shown and hidden as the user types in the fields. Please notice
 that when the user starts typing in a field in an empty form, this field may be valid but all other
@@ -2008,52 +2058,55 @@ attributes of ``props``:
     
 * The ``fields`` object contains the field attributes of the form which have been defined through the ``reduxForm`` function.
 * The ``handleSubmit`` is also provided by ``reduxForm`` and is used to submit the form - I'll explain it a bit later
-* The ``dispatch`` is provided by ``connect`` (``reduxForm`` is a special ``connect``). If you don't use ``mapDispatchToProps`` then ``connect`` will provide ``dispatch`` to ``props`` to use it as you like
+* The ``dispatch`` is provided by ``connect`` (remember, ``reduxForm`` is a special ``connect``). If you don't use ``mapDispatchToProps`` then ``connect`` will provide ``dispatch`` to ``props`` to use it as you like
 * The ``id`` is from the route - it will have value when updating and will be undefined when creating a new book
 * The ``isSubmitting``, ``categories``, ``subcategories`` and ``authors`` are provided from the state attributes through ``mapStateToProps``
 * The ``tsubmit`` and ``dsubmit`` are used when the form is submitted or the Delete button is clicked. As we'll see the ``tsubmit`` is passed as an argument to ``handleSubmit`` while the `dsubmit`` is used as it is.
 
-Beyond ``fields`` and ``handleSubmit`` a ``reduxForm`` component has various other
-`properties that you can use`_, like ``active``, ``dirty``, ``error``, ``pristine`` etc.
+Beyond ``fields`` and ``handleSubmit`` a ``reduxForm`` enabled form component has various other
+`properties that you can use`_, like ``active``, ``dirty``, ``error``, ``pristine`` etc. 
 Each ``field`` provided from ``reduxForm`` also has a bunch of properties, like 
 ``active``, ``checked``, ``dirty``, ``error``, 
 ``onBlur``, ``onChange``, ``onFocus``, 
 ``pristine``, ``touched``, 
-``valid``, ``value``, ``visited``.
+``valid``, ``value``, ``visited``. I won't use most of these here however please make sure
+that you are familiar with these when using redux-form.
 
 After defining the constants, the ``render`` method returns the actual component.
-Here we are using a bunch of components we've defined to render the input
-components like ``Input``, ``DatePicker`` and ``Select`` which will be explained
+Here we are using a bunch of child components we've defined to render the input
+fields, like ``Input``, ``DatePicker`` and ``Select`` which will be explained
 later. For each one of these components we pass the corresponding ``field`` 
-property along with the label we want to show. There are two interesting things
+property along with the label we want to show. There are some interesting things
 in the parameters we pass to these input components:
 
 All fields except ``category`` use their own ``onChange``. For the ``category``
 field we pass a custom ``onChange`` function that will override the ``field`` 
 onChange in order to dispatch ``loadSubCategories`` when the ``category``
-is changed (notice that I actually call the ``category.onChange`` first and then
+is changed (notice that in the custom ``onChange`` 
+I actually call the ``category.onChange`` first and then
 use ``event.target.value`` to get the current value of the dropdown to pass it
-to ``loadSubCategories``).
+to the dispatched ``loadSubCategories``).
 
 The ``Select`` fields get an ``options`` parameter which should be an array
 with ``id/name`` objects. For ``authors`` we create that array on the fly
-using ``map`` (since an author has a ``first_name`` and ``last_name``).
+using ``map`` (since an author object has a ``first_name`` and ``last_name``).
 
 The submit and delete buttons will be enabled or disabled depending on the ``isSubmitting`` flag,
-and will call ``handleClick(tsubmit)`` or ``dsubmit``. Also, the Delete button will
+and will call ``handleClick(tsubmit)`` or ``dsubmit`` correspondingly. Also, the Delete button will
 be hidden if no ``id`` is provided.
  
 The ``handleSubmit`` method provided by ``reduxForm`` will run the ``validate`` function passing it
 the values from the form (notice that this is synchronous validation, we could also do asynchronous -
 on the server- validation for example to immediately check if a username is already used), and if 
-the validation passes it will submit the form. Submitting the form means that ``handleSubmit`` will
+the validation does not return any errors, it will submit the form. 
+Submitting the form means that ``handleSubmit`` will
 either call ``this.props.onSubmit`` *or* will call the argument of ``handleSubmit`` (that's what
 we've done here), passing it the data of the form. 
 
 In our case, we want to pass the id of the book to be updated (or undefined when the form
 is used to create a book) to the submit function, that's why I am assigning 
-``submit.bind(undefined,id)`` to ``tsubmit`` (which is passed to ``handleSubmit``) - this
-will return a new function that as ``id`` as its first argument. The ``handleSubmit`` also
+``submit.bind(undefined,id)`` to ``tsubmit`` (which is what is passed to ``handleSubmit``) - this
+will return a new function with the ``id`` as its first argument. The ``handleSubmit`` also
 passes the ``values`` of the form as an object along with the ``dispatch`` function, so
 ``submit`` is a function with three arguments: 
     
@@ -2094,22 +2147,23 @@ passes the ``values`` of the form as an object along with the ``dispatch`` funct
     };
     
 As we can see it just checks if the ``id`` has a value and creates the
-url and the method for the update (either a ``POST`` when creatign a new book or
+url and the HTTP method for the update (either a ``POST`` when creatign a new book or
 a ``PUT`` when updating an existing one). It will then ``dispatch`` the
-``submittingChanged`` action to change the UI and do the ajax call. When
+``submittingChanged`` action to change the UI (disable the buttons) and do the ajax call. When
 the call returns, if everything was ok it will ``dispatch`` the ``submittingChanged``
 (with false as a parameter), the ``showSuccessNotification`` (with success as parameter),
 either ``updateBookResult`` or ``addBookResult`` with the retrieved data as paramater
 (depending if there was an ``id``) and finally it will change the URL to ``/`` to display
-the books table. If there was an error will once again dispatch the 
+the books table. If there was an error it will once again dispatch the 
 ``submittingChanged`` action to turn off the submit flag of the state and 
 ``showErrorNotification`` with information on the error. The url won't change
-so that the user will be able to fix the error.
+so that the user will be able to fix the error and retry submitting.
 
 The ``del`` function is a little different. We bind not only with ``id`` but also
 with ``dispatch`` because we don't call it through ``handleSubmit`` 
 (since when deleting no validation is actually needed)
-but directly as the ``onclick`` handler of the delete button. 
+but directly as the ``onclick`` handler of the delete button
+(so we must pass dispatch manually): 
 
 .. code::
 
@@ -2140,14 +2194,22 @@ as thunks so, in order
 to be able to actually dispatch something they need to retrieve ``dispatch``
 as a parameter
 (please remember the discussion on the redux-thunk section and the difference
-between ``dispatch(actionCreator)`` and ``actionCreator(dispatch)`` ). I could
+between ``dispatch(actionCreator)`` and ``actionCreator(dispatch)`` ). The
+``submit`` function  receives ``dispatch`` from ``handleSubmit`` while we pass
+dispatch directly (using ``bind``) to the ``del`` function.
+
+I could
 have implemented them as thunks (and put them to the ``actions`` module) however
 I feel that leaving them here 
 will make the API of the application more compact (since if these functions 
 had been put in the actions module they would need to be exported so they'd
 be a part of the public API of this application - however these two are only
 called from ``BookForm``) and also their purpose and integration with ``handleSubmit``
-is more clear if we leave them as plain functions.
+is more clear if we leave them as plain functions. This is just my personal
+opinion - if for example you wanted to allow deleting a book not only from the ``BookForm``
+but also from the ``BookPanel`` (by adding a delete button to each book row) then
+you'd definitely need to export ``del`` as an action creator (preferably as a thunk action
+creator to be consistent with the others).
 
 
 components/Input
@@ -2196,19 +2258,18 @@ rendered similarly to ``Input``:
    
 For the options we include an empty option (as a default value) and the other
 options are created with the help of a ``map``. Finally, notice that I have
-used ``...props`` in the the function parameter list to capture all parameters not
+also used ``...props`` here in the the function parameter list to capture all parameters not
 captured by ``field``, ``label`` and ``options`` and then pass
 both ``{...field}`` and ``{...props}`` to the ``select`` component. This is
-to capture the custom ``onChange`` (that I pass for the categories Select)
+to capture the custom ``onChange`` (that I pass for the categories ``Select``)
 and use that custom ``onChange`` when the select value changes. The custom
-``onChange`` will override the ``field.onChange`` because the {...props} if
+``onChange`` will override the ``field.onChange`` because the {...props} is
 *after* {...field}, so the resulting select will be something like:
 
 .. code::
 
     <select ... onChange=field.onChange ... onChange=props.onChange >
     
-
 This is
 a common idiom for overriding properties of objects that are passed
 to components - for example I could pass a ``className`` property to
@@ -2221,15 +2282,13 @@ components/DatePicker
 This component is used to render a jquery-ui datepicker. Similarly 
 to the other input components it receives a redux-form ``field``
 and a ``label``. However, this is a
-class based component because it needs to have state for attaching
+class based component because it needs to have ``this`` for attaching
 the ``datepicker`` to an input. Beyond the normal rendering, we can
 see that we have added a ``ref='date'`` to the ``input`` to allow
 us to refer to it later. This ref is used by ``componentDidMount``
 and ``handleChange``: 
 
-
 .. code::
-
     
     class DatePicker extends React.Component {
         render() {
@@ -2262,7 +2321,7 @@ and ``handleChange``:
 The ``componentDidMount`` retrieves the input DOM element through the ``ref``
 and makes it a datepicker. It also sets its ``onchange`` method to the 
 ``handleChange`` method (notice the ``bind(this)`` part -- this is needed
-so that ``this`` will be defined correctly inside the ``handleChange``. The
+so that ``this`` will be defined correctly inside the ``handleChange``). The
 ``handleChange`` retrieves the current date (once again from the ``ref``)
 and just calls the ``onChange`` of the provided ``field``, passing it the 
 date value. 
@@ -2271,10 +2330,11 @@ Should I create my own input components?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 As you've seen, I've created my *own* custom input components. These components
-are created for the css framework I use here (``skeleton.css``) but
+are created with the correct styling for the css framework I use here (``skeleton.css``) but
 of course with small changes could easily be modified to be used with other css frameworks
-(I am using ``bootstrap 3`` in most of my normal apps and these components work great).
-They also have been created for exactly my needs (get the ``redux-form`` field as input).
+(I am using ``bootstrap 3`` in most of my normal apps and such components work great).
+They also have been created for exactly my needs (i.e get the ``redux-form`` field as input,
+allow overriding onChange etc).
 
 Instead of creating your own components by hand, you could of course use some specific component
 libraries like material-ui_ or react-bootstrap_. These libraries contain components
@@ -2284,13 +2344,15 @@ just creating your own:
 
 * You need to learn their API (the names of the properties they get, their behavior in various conditions etc)
 * You need to learn their styling API (most of them make it difficult to customize their appearence)
-* It is really difficult to integrate them to your existing css framework (if you have one), so you'll need to go all the way to using them
+* It is not very easy to integrate them to your existing css framework (if you have one), so you'll need to go all the way to use their styles
+* You may need to use custom components anyway because you want to use a different javascript component that is not provided by these libraries
 
-So it all boils down to how big is your project and if you already have some styling for
+It all boils down to how big is your project and if you already have some styling for
 your pages. If you want to build a rather small project or your project already has a consistent
 styling then its better to create the required input components by hand. If on the other hand
 you want to build a big project from scratch then probably it would be better to bite the 
-bullet and use a component library. 
+bullet and use a component library, but keep in mind that you may actually need to create
+your own components. 
 
 components/AuthorPanel
 ======================
@@ -2329,7 +2391,43 @@ component since everything must be clear by now.
 Conclusion
 ----------
 
-...
+In the above sections we presented and explained 
+a more or less complete single page react / redux
+application, *almost* ready to be deployed to production. 
+I tried to explain every concept I came across that's why
+this article became more fat that I was expecting when I
+started writing it! The presented application supports nearly
+everything you'll want to use when creating your own apps:
+
+* Complex forms
+* Custom components
+* Asynchronous actions / Ajax
+* Creating / updating / deleting objects
+* Client side routing
+* Result lists with pagination, sorting and filtering
+
+The above have been implemented using the following technologies / libraries:
+
+* Django / django-rest-framework
+* ES6 with babel
+* browserify / watchify / babelify
+* React / redux / react-redux
+* redux-thunk / redux-form / react-router-redux / react-notification
+
+What could be missing from the application we presented here:
+
+* Tests! 
+* Integrating redux-devtools_
+* Using envify to seperate development/production client side code (this is needeed if you actually integrate redux-devtools)
+* Intagration with a component library
+
+I advice you to research these subjects a bit - I'll also try to 
+write another (hopefully thinner) post with more info
+about these.
+
+Finally, two thing I'd like to point out and keep in mind are that using
+redux/react-redux the flow of the data is *crystal* and that writing functional
+components and reducers is *pure fun*! 
 
 .. _redux: https://github.com/rackt/redux
 .. _react-redux: https://github.com/rackt/react-redux
@@ -2351,3 +2449,5 @@ Conclusion
 .. _`properties that you can use`: http://erikras.github.io/redux-form/#/api/props?_k=y5rbd2
 .. _material-ui: http://www.material-ui.com/#/
 .. _react-bootstrap: https://react-bootstrap.github.io/
+.. _moment.js: http://momentjs.com/
+.. _redux-devtools: https://github.com/gaearon/redux-devtools

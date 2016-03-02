@@ -2426,8 +2426,8 @@ write another (hopefully thinner) post with more info
 about these.
 
 Finally, two thing I'd like to point out and keep in mind are that using
-redux/react-redux the flow of the data is *crystal* and that writing functional
-components and reducers is *pure fun*! 
+redux/react-redux the flow of the data is *crystal* and that as you've already
+seen by now, writing functional components and reducers is *pure fun*! 
 
 .. _redux: https://github.com/rackt/redux
 .. _react-redux: https://github.com/rackt/react-redux

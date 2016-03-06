@@ -103,8 +103,12 @@ of the downloaded MIME text file (original message) to eml and open it with Outl
 Outlook in my system, however I tried opening it with Thunderbird_ and it worked!!! So please
 try this solution before trying the pythonic way (especially if you're not familiar with python).
 
+**Update, 6 March 2016**: Commenter Alex (Alexandre Barfuhok) proposed another clever trick (involving making visible
+the initially invisible "Download to drive" button) for retrieving gmail blocked attachments!
+Read more about it `at his article`_!
+
 
 
 .. _`created an improved version`: https://gist.github.com/stefansundin/a99bbfb6cda873d14fd2
 .. _Thunderbird: https://www.mozilla.org/el/thunderbird/
- 
+.. _`at his article`: http://www.barfuhok.com/how-to-download-a-file-with-anti-virus-warning-on-gmail/ 

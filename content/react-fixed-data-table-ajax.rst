@@ -44,7 +44,7 @@ to write the code, using a single main.js as a source which will be transpiled t
 
 The placeholder HTML for our application is:
 
-.. code::
+.. code-block:: html
 
     <!DOCTYPE html>
     <html>
@@ -72,7 +72,7 @@ that column or even a function that returns a string or a react component. The f
 passed to ``cell`` will have an object with a ``rowIndex`` attribute (among others) as a parameter,
 for example the following
 
-.. code::
+.. code-block:: html
 
     <Column
       header={<Cell>Url</Cell>}
@@ -94,7 +94,7 @@ AjaxCell: Non working version 1
 
 A first sketch of an ```AjaxCell`` component could be something like this: 
 
-.. code::
+.. code-block:: javascript
 
     // Careful - not working
     const AjaxCell1 = ({rowIndex, col, ...props}) => {
@@ -125,7 +125,7 @@ To be able to render *something*, we could put the results of fetching a page to
 fetch that page if it is not inside the ``cache`` - if it is inside the cache then we'll just return
 the correct value: 
 
-.. code::
+.. code-block:: javascript
 
     // Careful - not working correctly
     const cache = {}
@@ -162,7 +162,7 @@ AjaxCell: Non working version 3
 ``fetch`` ing each page multiple times is of course not acceptable, so we'll add a ``loading`` flag
 and ``fetch`` will be called only when this flag is ``false``, like this:
 
-.. code::
+.. code-block:: javascript
 
     // Not ready yet
     const cache = {};
@@ -201,7 +201,7 @@ AjaxCell: Final version
 To clear the stale data we need to do an update to the table data
 when each fetch is finished -- this should be done by a callback that will be passed to the ``AjaxCell``, like this:
 
-.. code:: 
+.. code-block:: javascript
 
     const cache = {};
     let loading = false;
@@ -238,7 +238,7 @@ The Table container component
 
 Finally, the component that contains the table is the following: 
 
-.. code::
+.. code-block:: javascript
 
     class TableContainer extends React.Component {
         render() { 
@@ -277,7 +277,7 @@ Some enchancements
 Instead of displaying ``<Cell>-</Cell>`` (or ``</Cell>``) when the page loads, I propose to define a 
 cell with an embedded spinner, like
 
-.. code::
+.. code-block:: javascript
 
     const loadingCell = <Cell>
         <img width="16" height="16" alt="star" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
@@ -288,8 +288,7 @@ and return this instead.
 Also, if your REST API returns too fast and you'd like to see what would happen if the server request took too long to return, you could 
 change fetch like this
 
-.. code::
-
+.. code-block:: javascript
 
     fetch('http://swapi.co/api/people/?format=json&page='+page).then(function(response) { 
         return response.json();

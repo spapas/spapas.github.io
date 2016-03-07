@@ -61,7 +61,7 @@ ReportLab offers a really low API for creating PDFs. It is something like having
 people familiar with drawing APIs) for your PDF page. Let's take a look at an example, creating a PDF with a simple
 string:
 
-.. code::
+.. code-block:: python
 
   from reportlab.pdfgen import canvas
   import reportlab.rl_config
@@ -92,7 +92,7 @@ fonts on the internet (for example the `DejaVu` font), or even grab one from you
 check out ``c:\windows\fonts\``). In any case, just copy the ttf file of your font inside the folder of
 your project and crate a file named testreportlab2.py with the following (I am using the DejaVuSans font):
 
-.. code::
+.. code-block:: python
 
   # -*- coding: utf-8 -*-
   import reportlab.rl_config
@@ -134,7 +134,7 @@ Windows) and a corresponding python script @ ``$PYTHON/scripts/xhtml2pdf-script.
 Let's try to use xhtml2pdf to explore some of its capabilities. Create a file named
 testxhtml2pdf.html with the following contents and run ``xhtml2pdf testxhtml2pdf.html``:
 
-.. code::
+.. code-block:: html
 
     <html>
     <head>
@@ -198,7 +198,7 @@ set the font to one supporting greek characters, just like you did with ReportLa
 This can be done with the help of the ``@font-face`` `css directive`_. So, let's create
 a file named ``testxhtml2pdf2.html`` with the following contents:
 
-.. code::
+.. code-block:: html
 
     <html>
     <head>
@@ -253,7 +253,7 @@ content and back page) to the resulting PDF.
 
 Let's see a quick example of combining two PDFs:
 
-.. code::
+.. code-block:: python
 
     import sys
     from PyPDF2 import PdfFileMerger
@@ -289,7 +289,7 @@ Using a plain old view
 The simplest case is to just create plain old view to display the PDF. We'll use django-xhtml2pdf along with the
 followig django template:
 
-.. code::
+.. code-block:: html
 
     <html>
     <head>
@@ -314,7 +314,7 @@ followig django template:
 Name it as ``books_plain_old_view.html`` and put it on ``books/templates`` directory. The view that
 returns the above template as PDF is the following:
 
-.. code::
+.. code-block:: python
 
     from django.http import HttpResponse
     from django_xhtml2pdf.utils import generate_pdf
@@ -352,7 +352,7 @@ I don't really recommend using plain old Django views - instead I propose to alw
 for their DRYness. The best approach is to create a mixin that would allow any kind of CBV (at least any
 kind of CBV that uses a template) to be rendered in PDF. Here's how we could implement a ``PdfResponseMixin``:
 
-.. code::
+.. code-block:: python
 
     class PdfResponseMixin(object, ):
         def render_to_response(self, context, **response_kwargs):
@@ -365,7 +365,7 @@ kind of CBV that uses a template) to be rendered in PDF. Here's how we could imp
 Now, we could use this mixin to create PDF outputting views from any other view! For example, here's how
 we could create a book list in pdf:
 
-.. code::
+.. code-block:: python
 
     class BookPdfListView(PdfResponseMixin, ListView):
         context_object_name = 'books'
@@ -376,7 +376,7 @@ property to the class or copy ``books_plain_old_view.html`` to ``books/book_list
 
 Also, as another example, here's a ``BookPdfDetailView`` that outputs PDF:
 
-.. code::
+.. code-block:: python
 
     class BookPdfDetailView(PdfResponseMixin, DetailView):
         context_object_name = 'book'
@@ -384,7 +384,7 @@ Also, as another example, here's a ``BookPdfDetailView`` that outputs PDF:
 
 and a corresponding template (name it ``books/book_detail.html``):
         
-.. code::
+.. code-block:: htmldjango
 
     <html>
     <head>
@@ -400,7 +400,7 @@ and a corresponding template (name it ``books/book_detail.html``):
 
 To add the content-disposition header and a name for your PDF, you can use the following mixin: 
 
-.. code::
+.. code-block:: python
 
     class PdfResponseMixin(object, ):
         pdf_name = "output"
@@ -472,7 +472,7 @@ and ``STATIC_URL = '/static/'``.
 Then, add a template-css file for your fonts in one of your templates directories. I am naming the
 file ``pdfstylefonts.css`` and I've put it to ``books/templates``:
 
-.. code::
+.. code-block:: css
 
     {% load static %}
     @font-face {
@@ -503,7 +503,7 @@ ttf files have been copied to the directory ``static/fonts/``.
 Now, add another css file that will be your global PDF styles. This should be put to the ``static`` directory
 and could be named ``pdfstyle.css``:
 
-.. code::
+.. code-block:: css
     
     h1 {
         color: blue;
@@ -518,7 +518,7 @@ and could be named ``pdfstyle.css``:
 Next, here's a template that lists all books (and contain some greek characters -- the title of the books also contain
 greek characters) -- I've named it ``book_list_ex.html``:
     
-.. code::
+.. code-block:: htmldjango
 
     {% load static %}
     <html>
@@ -555,7 +555,7 @@ media files to work fine in your development environment you need to configure t
 
 Finally, if you configure a PdfResponseMixin ListView like this:
 
-.. code::
+.. code-block:: python
     
     class BookExPdfListView(PdfResponseMixin, ListView):
         context_object_name = 'books'
@@ -572,7 +572,7 @@ Configure Django for debugging PDF creation
 If you experience any problems, you can configure xhtml2pdf to output DEBUG information. To do this,
 you may change your django logging configuration like this:
 
-.. code::
+.. code-block:: python
 
     LOGGING = {
         'version': 1,
@@ -605,7 +605,7 @@ the pages of one PDF after the other -- after all using PyPDF2 is really easy af
 To be more DRY, I will create a ``CoverPdfResponseMixin`` that will output a PDF *with* a cover. To be *even more* DRY,
 I will refactor ``PdfResponseMixin`` to put some common code in an extra method so that ``CoverPdfResponseMixin`` could inherit from it:
 
-.. code::
+.. code-block:: python
 
     class PdfResponseMixin(object, ):
         def write_pdf(self, file_object, ):
@@ -646,7 +646,7 @@ a strange an error when using ``PdfFileMerger``. I was able to overcome this by 
 PDF to-be-appended one by one using the ``PdfFileReader`` and ``PdfFileWriter`` objects. Here's a small snippet of how
 this could be done: 
 
-.. code::
+.. code-block:: python
 
     pdfs = [] # List of pdfs to be concatenated
     writer = PdfFileWriter()
@@ -691,7 +691,7 @@ a cover page with a different page template, use it first and then continue
 with the normal pages). To name a tempalte you just use @page template_name {}
 and to change the template use the combination of the following two xhtml2pdf tags:
 
-.. code::
+.. code-block:: html
 
   <pdf:nexttemplate name="back_page" />
   <pdf:nextpage />
@@ -705,7 +705,7 @@ Now, for frames, I recommend using the ``-pdf-frame-border: 1;`` command for deb
 they are actually printed. Also, I recommend using a normal ruler and measuring completely
 where you want them to be. For example, for the following frame:
 
-.. code::
+.. code-block:: css
 
     @frame photo_frame {
             -pdf-frame-border: 1;
@@ -722,7 +722,7 @@ I recommend naming all frames to be able to distinguish them however I don't thi
 any other role. However, for static frames you must define the id of the content they will contain using ``-pdf-frame-content``
 in the css and a div with the corresponding id in the PDF template. For example, you could define a frame header like this
 
-.. code::
+.. code-block:: css
 
   @frame header {
     -pdf-frame-content: headerContent;
@@ -735,7 +735,7 @@ in the css and a div with the corresponding id in the PDF template. For example,
 
 and its content like this:
 
-.. code::
+.. code-block:: html
 
   <div id='headerContent'>
     <h1 >
@@ -755,7 +755,7 @@ I'd like to present a full example here on the already mentioned project of prin
 one for the front page having a frame with the owner's data and another frame with his photo and one for the back page having
 a barcode. This is a Django template that is used to print not only but a PDF with a group of these cards: 
 
-.. code::
+.. code-block:: htmldjango
 
     <html>
     <head>
@@ -886,7 +886,7 @@ Some extra things I want to mention concerning xhtml2pdf:
 
 So if you want to print a footer with the pages, I recommend something like this:
 
-.. code::
+.. code-block:: html
 
   <div id='footerContent'>
     Page <pdf:pagenumber>

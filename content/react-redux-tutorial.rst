@@ -89,7 +89,7 @@ a number using two buttons to support the above:
 
 Its html is: 
 
-.. code::
+.. code-block:: html
 
   <div id='state_container'>0</div>
   <button onclick='increase()'>+</button>
@@ -97,7 +97,7 @@ Its html is:
 
 while its javascript (es6) code is:
 
-.. code:: 
+.. code-block:: js
 
   let reducer = (state=0, action) => {
     switch (action.type) {
@@ -137,7 +137,7 @@ will just dispatch the corresponding action.
 Please notice that in the above example I didn't use action creators for
 simplicity. For completeness, the action creator for increase would be something like 
 
-.. code::
+.. code-block:: js
   
   const increaseCreator = () => {
     type: 'INCREASE'
@@ -191,7 +191,7 @@ For example, the "sum" reducer, defined like ``let sum = (s=0, x) => s+x``,
 (which has an initial value of 0), would "reduce" the list ``[1,2,3]`` to ``6`` by calling
 the ``sum`` reducer three times:
 
-.. code::
+.. code-block:: js
 
   tmp1 = sum(0, 1); // tmp1 = 1
   tmp2 = sum(tmp1, 2); // tmp2 = 3
@@ -230,7 +230,7 @@ react-redux:
 The html is just ``<div id='container'></div>`` since the components will
 be rendered through react, while the es6/jsx code is:
 
-.. code::
+.. code-block:: javascript
 
     let reducer = (state=0, action) => {
       switch (action.type) {
@@ -304,7 +304,7 @@ it must
 be enclosed in a ``<Provider>`` parent component (so that the correct react context will be initialized). 
 Notice that this is recursive so if we had something
 
-.. code::
+.. code-block:: html
 
   <Provider store={store}>
     <Component1>
@@ -403,7 +403,7 @@ action objects but can do various other things, like calling other actions or
 dispatching actions conditionally. When using redux-thunk, an action returns a function
 that can do any of the above mentioned things, something like this: 
 
-.. code::
+.. code-block:: javascript
 
   const thunkAction = () => {
     return (dispatch, getState) => {
@@ -422,7 +422,7 @@ If we don't want to use redux thunk,
 then we need to create a normal function that gets ``dispatch`` as an argument, something
 like this:
 
-.. code::
+.. code-block:: javascript
 
   import {showLoadingAction, hideLoadingAction, showDataAction } from './actions'
 
@@ -443,7 +443,7 @@ and pass it the ``dispatch`` *instead of* passing its return value to ``dispatch
 
 If however we used thunk, then we'd have something like this:
 
-.. code::
+.. code-block:: javascript
 
   const getDataThunk = () => {
     return (dispatch, getState) => {
@@ -491,7 +491,7 @@ This module is used as an entry point for browserify (i.e we call browserify wit
 create the basic structure of our application. Let's take a look at the important
 part of it:
  
-.. code::
+.. code-block:: javascript
 
     const About = () => {
         return <div>
@@ -556,7 +556,7 @@ The ``store.js`` module contains the definition of the global store of our appli
 (which is passed to the ``Provider``).
 Here, we also define the ``history`` object we passed to the parent ``Router``.
 
-.. code::
+.. code-block:: javascript
 
     import { reducer as formReducer } from 'redux-form';
 
@@ -605,7 +605,7 @@ The next block of code from the ``store`` module creates the
 most important thing of a redux application, its reducer 
 along with the global store: 
 
-.. code::
+.. code-block:: javascript
 
     const reducer = combineReducers(Object.assign({}, { 
             books, 
@@ -674,7 +674,7 @@ monolithic reducer for all the parts of our application state tree, we can break
 reducers depending only on specific slices of the state object. What this means is
 that if we have for example a state tree like this:
 
-.. code::
+.. code-block:: javascript
 
   {
     'data': {},
@@ -697,7 +697,7 @@ combining the output of each sub-reducer.
 
 This may be clarified more with our own version of a combine reducers function:
 
-.. code::
+.. code-block:: javascript
 
   const combineReducers2 = o => {
     return (state={}, action) => {
@@ -725,7 +725,7 @@ as input and returns a function (that function is the resulting reducer) that:
 To show-off the ES6 code (and my most sadistic tendencies), 
 the above code could be also writen like this:
 
-.. code::
+.. code-block:: javascript
 
     const combineReducers3 = o => (state={}, action) => Object.keys(o).map(k => [
         k, o[k](state[k], action)
@@ -759,13 +759,13 @@ returns the same store with its ``dispatch`` method modified so that it will
 call each middleware and pass the result to the next. So, in our case the
 resulting store's dispatch function would be something like:
 
-.. code::
+.. code-block:: javascript
     
     (action) => reduxRouterMiddleware(thunk(dispatch(action)))
 
 Now, a middleware function looks like this:
 
-.. code::
+.. code-block:: javascript
 
   const middleware = store => next => action => {
     // 
@@ -789,7 +789,7 @@ explanation of the above is that a middleware:
 
 Let's take a look at the thunk middleware to actually see what it looks like: 
 
-.. code::
+.. code-block:: javascript
 
     function thunkMiddleware({ dispatch, getState }) {
       return next => action =>
@@ -812,7 +812,7 @@ If this action is not a function
 Finally, we'll create a simple middleware that will output the action type and the 
 state for every dispatch:
 
-.. code::
+.. code-block:: javascript  
 
   const logStateMiddleware = ({dispatch, getState}) => next => action => {
     // log the action type
@@ -834,7 +834,7 @@ the global reducer of the application. I've put everything in a single file, how
 it is more common to create a ``reducers`` directory and put every sub-reducer inside it
 as a different module. Let's start reviewing the code of the ``reducers.js`` module:
 
-.. code::
+.. code-block:: javascript
 
     export const notification = (state={}, action) => {
         switch (action.type) {
@@ -876,7 +876,7 @@ This method is defined like this:
 parameters (``sources``) are other objects whose properties will be assigned ``target``. The rightmost members of 
 ``sources`` overwrite the previous ones if they have the same names. So, for example the code
 
-.. code::
+.. code-block:: javascript
 
     Object.assign({}, state, {
         rows: action.books.results,
@@ -893,7 +893,7 @@ the old state cannot be mutated.
 Now we'll see the reducer that handles books. Before understanding the actual reducer, I will present
 the initial value of the books state slice:
 
-.. code::
+.. code-block:: javascript
 
     //http://stackoverflow.com/a/5158301/119071
     function getParameterByName(name) {
@@ -927,7 +927,7 @@ to be initialized from the URL (so that using a url like ``#?search=foo`` will s
 containing ``foo``). To get the parameters from the URL I'm using the ``getParameterByName``
 function. Now, the actual reducer is:
 
-.. code::
+.. code-block:: javascript
     
     export const books = (state=BOOKS_INITIAL, action) => {
         let idx = 0;
@@ -1033,7 +1033,7 @@ does not know anything about the updated values of the book!
 So, inside the ``else`` branch, the ``idx`` variable will hold its current index and the 
 ``rows`` attribute of the new state will get the following value:
 
-.. code::
+.. code-block:: javascript
 
     [
         ...state.rows.slice(0, idx),
@@ -1051,7 +1051,7 @@ from ``action``) and the rest of the books of ``rows`` (after the updated one).
 The code for the ``authors`` and ``categories`` sub-reducers does not have any surprises so I won't go
 into detail about it.
 
-.. code::
+.. code-block:: javascript
 
     const AUTHORS_INITIAL = {
         // ... 
@@ -1077,7 +1077,7 @@ form reducers to create the global reducer function.
 
 This also means, that the global state object will be something like this:
 
-.. code::
+.. code-block:: javascript
 
   {
     books: {},
@@ -1146,7 +1146,7 @@ to the action parameter.
 The following two are thunk action creators that are called when either the
 user sorting or the search/filtering parameters of the displayed books are changed:
 
-.. code::
+.. code-block:: javascript
 
     export function changeSearchAndLoadBooks(search) {
         return (dispatch, getState) => {
@@ -1183,7 +1183,7 @@ returns the full URL. This function is contained in the ``util/formatters.s`` mo
 
 The following thunk action creators are used for asynchronous, ajax queries:
 
-.. code::
+.. code-block:: javascript
     
     export function loadBooks(page=1) {
         return (dispatch, getState) => {
@@ -1280,7 +1280,7 @@ We'll now start explaining the actual react components (modified to be used thro
 The parent of all other components is the ``App`` which, as we've already seen in ``main.js``
 is connected with the parent route:
 
-.. code::
+.. code-block:: javascript
 
     class App extends React.Component {
 
@@ -1340,7 +1340,7 @@ This method gets an object whose values are action creators and the ``dispatch``
 whose values are the dispatch-enabled corresponding action creators. So, in our case
 the returned object would be something like:
 
-.. code::
+.. code-block:: javascript
     
     {
         loadBooks: () => dispatch(loadBooks()),
@@ -1351,7 +1351,7 @@ This object of course could be created by hand, however ``bindActionCreators`` w
 to dispatch lots of actions in a component (or if we had seperated our action creators to different modules) --
 we could for example do something like this:
 
-.. code::
+.. code-block:: javascript
 
     import * as actions from '../actions'
     
@@ -1385,7 +1385,7 @@ displayed (``isActive`` will be true if there's an actual message) and select th
 of the background. Finally, it passes this information along with some styling 
 to the real ``Notification``  component from ``react-notification``.
 
-.. code::
+.. code-block:: javascript
 
     const NotificationContainer = (props) => {
         let { message, notification_type } = props.notification;
@@ -1489,7 +1489,7 @@ components/loading.js
 
 This is a really simple component: If the ``isLoading`` parameter is true, display a ``div`` with the ``loading`` class:
 
-.. code::
+.. code-block:: javascript
 
     export default ({isLoading}) => <div>
         {isLoading?<div className="loading">Loading&#8230;</div>:null}
@@ -1543,7 +1543,7 @@ columns have been defined: ``id`` (which, when clicked will update the book
 that's where ``format`` is used), ``title``, ``category_name``, ``publish_date``
 and ``author_name``: 
 
-.. code::
+.. code-block:: javascript
 
     const getCols = sort_method => [
         {
@@ -1592,7 +1592,7 @@ a ``changePageAndLoadBooks`` thunk action creator that would call these two meth
 (similarly to how ``changeSearchAndLoadBooks`` and ``toggleSortingAndLoadBooks`` have been implemented)
 - I'm leaving it like this to show all possibilities:
     
-.. code::
+.. code-block:: javascript
 
     const BookPanel = (props) => {
         const { rows, count, page, sorting, search } = props.books;
@@ -1656,7 +1656,7 @@ The whole thing with the ``ths.promise`` and ``clearInterval`` is to make
 sure that the provided ``onSearchChanged`` will not be called too often
 (i.e it will be called 400 ms after the last keypress):
 
-.. code::
+.. code-block:: javascript
 
     export default class SearchPanel extends React.Component {
         constructor() {
@@ -1699,7 +1699,7 @@ sure that the provided ``onSearchChanged`` will not be called too often
 
 Let's take a closer look at the ``<input>`` element:
 
-.. code::
+.. code-block:: javascript
 
     <input ref='search' name='search' type='text' defaultValue={this.props.search} value={this.state.search} onChange={this.onSearchChange } />
     
@@ -1735,7 +1735,7 @@ sorting) and returns the label with a ``'+'`` in front of it if the sorting is a
 by this column or a ``'-'`` if the sorting is descending by this column or just the
 label if this column is not used for sorting:
 
-.. code::
+.. code-block:: javascript
         
     const formatHeader = ({key, label}, sorting) => (sorting==key)?('+'+label):(
         (sorting=='-'+key)?('-'+label):label
@@ -1760,7 +1760,7 @@ which, for each row maps ``cols`` to get the individual values for this row and 
 So, for the rows a list of ``<tr>`` elements each one including the correct
 ``<td>`` elements will be created:
     
-.. code::    
+.. code-block:: javascript
 
     export default (props) => {
         const headers = props.cols.map(col => <th key={col.key}>
@@ -1817,7 +1817,7 @@ here is that the next and previous page buttons will only be rendered if
 we are not in the first or last page (so if there's only one page you won't
 see any buttons).
 
-.. code::
+.. code-block:: javascript
 
     export default ({page=1, page_size=5, count, onNextPage, onPreviousPage, ...props}) => {
         const total_pages = Math.ceil(count / page_size);
@@ -1861,7 +1861,7 @@ Having such a concept in ES6 would be ideal for our case! I am not sure if somet
 like ``with`` actually exists, however we can really easy emulate it with a function
 closure, something like this:
 
-.. code::
+.. code-block:: javascript
 
     export default ({page=1, page_size=5, count, onNextPage, onPreviousPage, ...props}) => ( 
         total_pages => <div className="row">
@@ -1886,7 +1886,7 @@ a book. It also has a delete button for removing books. To decide if this is a c
 update form, it relies on the parameter passed from the route - remember how the two routes have
 been defined in ``main.js``:
 
-.. code::
+.. code-block:: html
 
     <Route path="/book_create/" component={BookForm} />
     <Route path="/book_update/:id" component={BookForm} />
@@ -1902,7 +1902,7 @@ The ``BookForm`` is a connected component (because it needs access to the state 
 is rendered through a route), however because it is also a redux-form, a special
 method (``reduxForm``) is used to connect the component and pass the form-related props to the component:
 
-.. code:: 
+.. code-block:: javascript
 
     const mapStateToProps = (state, props) => {
         let initial = {}
@@ -1952,7 +1952,7 @@ The validate function gets an object with the field names with their correspondi
 should return another object with the field names that have an error and the error message. In our case,
 we want the ``title`` to be required and the date to be valid (if exists), so the ``validate`` is:
 
-.. code::
+.. code-block:: javascript
 
     const validate = values => {
         const errors = {};
@@ -1986,7 +1986,7 @@ when the ``componentDidMount`` method is called:
 * Check if the categories have been loaded - if not dispatch the ``loadCategories`` action
 * Check if the this is an update and if yes, check to see if the to-be-updated book needs to be loaded and, if it needs dispatch ``loadBook`` with the book's id
 
-.. code::
+.. code-block:: javascript
 
     class BookForm extends React.Component {
     
@@ -2110,7 +2110,7 @@ will return a new function with the ``id`` as its first argument. The ``handleSu
 passes the ``values`` of the form as an object along with the ``dispatch`` function, so
 ``submit`` is a function with three arguments: 
     
-.. code::
+.. code-block:: javascript
 
     const submit = (id, values, dispatch) => {
         let url = '//127.0.0.1:8000/api/books/'
@@ -2165,7 +2165,7 @@ with ``dispatch`` because we don't call it through ``handleSubmit``
 but directly as the ``onclick`` handler of the delete button
 (so we must pass dispatch manually): 
 
-.. code::
+.. code-block:: javascript
 
     const del = (id, dispatch) => {
         const url = `//127.0.0.1:8000/api/books/${id}/`
@@ -2222,7 +2222,7 @@ The error message will only be rendered if the field
 has been touched (i.e the user has changed the field or
 the form has been submitted) and there's an actual error:
 
-.. code::
+.. code-block:: javascript
 
     export default ({field, label}) => <div>
         <label forHtml={field.name}>{label}</label>
@@ -2233,7 +2233,11 @@ the form has been submitted) and there's an actual error:
 One thing I'd like to explain is the ``{...field}`` snippet
 I pass to ``<input>``. This is the object spread operator and will
 convert each attribute of the ``field`` object to a corresponding ``attr=value``
-pair, i.e ``<input ... name=field.name onChange=field.onChange value=field.value onBlur=field.OnBlur etc />``.
+pair, i.e 
+
+.. code-block:: javascript
+
+    <input ... name=field.name onChange=field.onChange value=field.value onBlur=field.OnBlur etc />
 
 
 components/Select
@@ -2245,7 +2249,7 @@ of objects with ``id`` and ``name`` attributes that will be
 rendered as the options. The ``label`` and ``error` will be
 rendered similarly to ``Input``:
 
-.. code::
+.. code-block:: javascript
 
     export default ({field, label, options, ...props}) => <div>
         <label forHtml={field.name}>{label}</label>
@@ -2266,7 +2270,7 @@ and use that custom ``onChange`` when the select value changes. The custom
 ``onChange`` will override the ``field.onChange`` because the {...props} is
 *after* {...field}, so the resulting select will be something like:
 
-.. code::
+.. code-block:: javascript
 
     <select ... onChange=field.onChange ... onChange=props.onChange >
     
@@ -2288,7 +2292,7 @@ see that we have added a ``ref='date'`` to the ``input`` to allow
 us to refer to it later. This ref is used by ``componentDidMount``
 and ``handleChange``: 
 
-.. code::
+.. code-block:: javascript
     
     class DatePicker extends React.Component {
         render() {
@@ -2360,7 +2364,7 @@ components/AuthorPanel
 The ``AuthorPanel`` uses ``Table`` to list the authors. Since I haven't used
 pagination or sorting here the component is very simple:
 
-.. code::
+.. code-block:: javascript
         
     const cols = [
         {key: 'id', label: 'id', format: x=><Link to={`/author_update/${x.id}/`}>{x.id}</Link>},

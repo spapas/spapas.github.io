@@ -1,7 +1,7 @@
 Configuring Spring Boot
 #######################
 
-:date: 2016-03-31 15:20
+:date: 2016-03-31 19:20
 :tags: spring, spring-boot, java, ldap, profiles, settings, properties, yaml, configuration
 :category: spring
 :slug: spring-boot-settings
@@ -276,7 +276,9 @@ Conclusion
 ----------
 
 Using the descibed file structure you should be able to fully configure Spring Boot and have all the
-
+goodies you'd like: global settings, profiles, non-version control settings! Also, using the
+advanced profiles techniques you'll be able to do any number of exotic things you want with your
+configuration!
 
 
 .. _`Spring boot`: http://projects.spring.io/spring-boot/

@@ -275,10 +275,11 @@ Use command line arguments only for quick tests (run something with a specific s
 Conclusion
 ----------
 
-Using the descibed file structure you should be able to fully configure Spring Boot and have all the
-goodies you'd like: global settings, profiles, non-version control settings! Also, using the
-advanced profiles techniques you'll be able to do any number of exotic things you want with your
-configuration!
+Using the described file structure you should be able to fully configure Spring Boot and have all the
+goodies you'd expect from a modern framework: global settings, profiles, non-version control settings! Also, using the
+advanced profiles techniques (multiple profiles, profile enabled 
+@Components and @Configurations) you'll be able to implement 
+some really complex configurations!
 
 
 .. _`Spring boot`: http://projects.spring.io/spring-boot/

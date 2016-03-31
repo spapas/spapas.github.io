@@ -1,35 +1,35 @@
 Configuring Spring Boot
 #######################
 
-:date: 2016-03-28 08:55
-:tags: spring, spring-boot, java, ldap, profiles, settings, properties
+:date: 2016-03-31 15:20
+:tags: spring, spring-boot, java, ldap, profiles, settings, properties, yaml, configuration
 :category: spring
 :slug: spring-boot-settings
 :author: Serafeim Papastefanos
-:summary: An opinionated methodology for configuring your Spring Boot applications using application properties, profiles, locan  settings and command line arguments!
+:summary: Configuring your Spring Boot applications using application properties, profiles, locan  settings and command line arguments!
 
 .. contents::
 
 Introduction
 ------------
 
-The spring-boot_ project is great way of building Java applications using
-Spring. Instead of trying to integrate everything by hand (configuration
-hell) you use spring-boot to help you to bootstrap your: Just include your 
-dependencies in your pom.xml and spring-boot will try its 
-best to auto-configure all the components. 
+The `Spring Boot`_ project is great way of building Java applications using
+Spring. Instead of trying to integrate everything by hand (and usually
+end up with a configuration hell) you use spring-boot to help you to 
+bootstrap your application: Just include its
+dependencies in your pom.xml and Spring Boot will try its 
+best to auto-configure all these components!
 
-Of course, no matter how hard spring-boot try, you'll still need to pass
-some configuration to configure your databases, caches, ldap connections,
-email sending, authentication, authorization etc. Thankfully, spring boot
+Of course, no matter how hard Spring Boot tries to auto-configure everything, 
+you'll still need to pass some configuration to configure your databases, 
+caches, email sending, security etc. Thankfully, Spring Boot
 can be configured without *any* xml (actually, its a bad practice to
-use xml-based configuration with spring-boot), using plain Java .properties
-or (if you prefer the more compact syntax) .yml files! 
+use xml-based configuration with it), using plain Java .properties
+files or (if you prefer the more compact syntax) YAML_ .yml files! 
 
-In this guide, along with a simple introduction to the way spring-boot configuration
-works, I'll propose an opinionated methodology for configuring your spring-boot
-applications and stucturing your configuration files. In the end, you'll have
-the following:
+In this guide, along with a simple introduction to the way Spring Boot configuration
+works, we'll talk about a specific way of stucturing your settings configuration files in 
+order to have: 
 
 * A global configuration file that will contain all your settings
 * Different settings for each of your environments (development, UAT, staging, production and test)
@@ -38,70 +38,142 @@ the following:
 
 To quickly test the proposed settings configuration I've created a simple
 Spring Boot project @ https://github.com/spapas/spring-boot-config. Just clone
-it, optionally change the packaged settings (more on this later), package it (``mvn package``), change 
+it, optionally change the packaged settings (more on this later), package it (``mvn package``), optionally change 
 the ``config`` settings (more on this also later) and run it 
-(``java -jar target\spring-boot-config-0.0.1-SNAPSHOT.jar``) passing it command line settings (more on this
+(using something like ``java -jar spring-boot-config-0.0.1-SNAPSHOT.jar``) optionally passing it command line settings (more on this
 also later). You'll then be able to visit ``http://127.0.0.1:8080`` and check the current settings!
 
 properties vs yml files
 -----------------------
 
+You can use two kinds of files to configure your settings: Normal Java .properties files
+or YAML_ .yml files. The .properties files have the form:
 
+.. code::
 
-Different settings keeping options
-----------------------------------
+    config.value.a=1
+    config.value.b=2
+    config.value.c=3
+    
+while the .yml files are like:
 
-We'll use four different options for keeping our settings. Starting from the most global to the most
-specific ones (i.e the latter ones will override the previous ones):
+.. code::
+
+    config:
+        value:
+            a: 1
+            b: 2
+            c: 3
+
+You may use whatever you wish - in the examples I'll use normal Java .properties
+files because they are more compact (you don't need to use multiple lines to represent
+a single setting like in YAML).
+
+Structuring your configuration files
+------------------------------------
+
+Spring Boot reads its configuration from `various places`_, however in this article we'll talk
+about four of them which should be enough for most cases. Starting from the most global to the most
+specific ones (i.e the latter ones will override the previous ones) these are:
+
+- Main (global) application settings
+- Profile settings
+- Local (/config) settings
+- Command line arguments
+
+The first two are setting files that will be contained inside the artifact (jar or war) that will be
+created and should be commited to your version control system. I'll call them jar-packaged
+settings. The other two won't be commited to the version control but will be created directly
+on the server to-deploy. Let's see a little more about them: 
 
 Main application settings
 =========================
 
-These are kept in ``application.properties`` (or ``yml``): This file should be inside the ``resources`` folder
-of your project an ideally contain *all* the settings your spring-boot application users. Some
+These are kept in a file named ``application.properties`` (or ``yml`` -- from now on I'll just use
+`.properties`` but keep in mind that you may use ``.yml``): This file should reside 
+inside the ``src\main\resources`` folder
+of your project and ideally contain all the settings your spring-boot application users. Some
 of these settings will be overriden by settings kept in the next source so they may have a
-default valur or even be empty if they will be alwas overriden, however I still prefer to list
-them all in this file even as placeholders to have a central source of all the application settings.
+default value or even be empty if they will be always overriden (or contain sensitive data
+like passwords), however I still prefer to list
+them all in this file even as placeholders to have a central source of all the settings that
+your Spring Boot application uses.
 
 Profiles
 ========
 
 A profile is a set of settings that can be configured to override settings from ``application.properties``.
 Each profile is contained in a file named ``application-profilename.properties`` where ``profilename`` is
-the name of the profile. Now, a profile could configure anything you want, however I propose to 
-have the following profile names (depending of course on what are your requirements): 
+the name of the profile. Now, a profile could configure anything you want, however 
+for most projects I propose to 
+have the following profiles: 
+
 * ``dev`` for your local development settings
 * ``uat`` for your UAT server settings
 * ``staging`` for your staging server settings
 * ``prod`` for your production settings
 * ``test`` for running your tests
 
-These need to be different because, for example when developing you may want
-to use a local database, when running tests an ephemeral, in memory database
-etc. These profile files will be stored inside your ``resources`` folder,
-right next to the ``application.properties`` (or ``yml``), i.e you'll have
+(depending of course on what are your requirements, some projects may not
+need ``uat`` or ``staging`` but all projects should have a ``dev``, a ``prod`` and a ``test`` profile).
+The configuration for these environemnts needs to be different for obvious reasons. 
+For example when developing you may want
+to use a local database, when running tests an ephemeral in memory database
+and your production database when deploying to production.
+These profile configuration files will be stored inside your ``src\main\resources`` folder,
+right next to the ``application.properties``, i.e you'll have
 ``application-dev.properties``, ``application-prod.properties``, 
 ``application-test.properties`` etc - and all these files will be kept
-in your VCS.
+in your VCS (and will also be jar-packaged since they will be
+contained in the resulting artifact).
 
-How do you select which profile is active each time (i.e correlate its
-with the corresponding environment)? For tests, since they use a 
-different executable you can use the ``@ActiveProfiles`` annotation
+How do you select which profile is active each time (i.e pick it
+when running the Spring Boot application under 
+its corresponding environment)? 
+
+For tests, since they can be run by a different ``Main`` than
+the normal application, you should use the ``@ActiveProfiles`` annotation
 (for example ``@ActiveProfiles("test")``) to make sure that the tests
-will run with the correct settings.
+will run with the correct settings. So if the contents of your ``application-test.properties``
+are ``config.value=Hello test!`` running this test should produce no errors:
 
-To activate a different profile when running your spring boot applications
-you should use the ``spring.profiles.active`` setting, so if you set
+.. code-block:: java
+
+    @RunWith(SpringJUnit4ClassRunner.class)
+    @SpringApplicationConfiguration(classes = SpringBootConfigApplication.class)
+    @ActiveProfiles("test")
+    public class SpringBootConfigApplicationTests {
+
+        @Value("${config.value}")
+        private String value;
+        
+        @Value("${spring.profiles.active}")
+        private String profile;
+
+        @Test
+        public void contextLoads() {
+            assertThat(value, is("Hello test!"));
+            assertThat(profile, is("test"));
+        }
+    }
+    
+
+
+To activate a different profile when running your Spring Boot applications
+you'll need to use the ``spring.profiles.active`` setting, so if you set
 ``spring.profiles.active=prod`` in your ``application.properties`` and
 create the packaged jar (or war) then you'll have the production settings  
-when you run your application. To deploy it to UAT, you'll need to change
+when you run your application (i.e the contents of ``application-prod.properties``
+will be used to override your ``application.properties``). Of course, to deploy it 
+to UAT, you'll need to change
 ``spring.profiles.active`` to ``uat`` and re-create the packaged artifact --
-see something nasty here? Definitely you don't want to do re-create 4
-different artifacts for each of the environments you may want to deploy! 
-We'll see in the next sections how to improve this flow!
+see some repetition and penal labour here? Definitely you don't want to do re-create
+your artifacts for each of the environments you may want to deploy -- 
+we'll see in the next sections how to improve this flow by overriding 
+jar-packaged settings!
 
-Some more advanced profiles
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Some more advanced profile usage
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You may have noticed in the previous section that the name of the 
 annotation is ``@ActiveProfiles`` and the name of the setting 
@@ -125,38 +197,63 @@ All the above settings we've defined should be safely kept inside
 your VCS - however we wouldn't like storing passwords or other
 sensitive data to a VCS! Sensitive settings should be empty 
 (or have a default value) when
-saved to VCS and overriden by "local" settings. Overriding settings
-is also useful in selecting the correct profile for running
-your application, since you can just override the ``spring.profiles.active``
-setting and change your active profile, without the need to
-re-package your application. There are two ways to override
-settings:
+saved to VCS and overriden by "local" settings. 
+
+Also, all the previous are jar-packaged
+and we definitely need a way to override them without messing
+with the artifacts (for example, we need to select the
+correct profile for running the application by overriding
+``spring.profiles.active``). 
+
+There two methods of overriding settings, and these are the last
+two methods of the four we discussed above:
 
 Using a config/application.properties
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can put files in a directory named ``config`` that is at the same level
-as the location from which you try to run your jar to override your jar-packaged
-settings. What happens is that Spring will try to load a file named config/application.properties that will
-override your jar-packaged application.properties. It will also try to load
+as the location from which you try to run your jar. These file should be
+named either ``application.properties`` or ``application-profilename.properties``
+and will be used to override your jar-packaged
+settings. 
+
+What happens is that Spring will at first try to load a file named ``config/application.properties`` that will
+override your jar-packaged ``application.properties`` (so here you can set your current profile). Then, it will also try to load
 a file named ``config/application-profilename.properties`` that will override
-your jar-packaged ``application-profilename.properties``. So, repeating for
-emphasis: The settings in your jar-packed application-profilename.properties will *only*
-be overriden by ``config/application-profilename.properties``.
+your jar-packaged ``application-profilename.properties`` (so here you may
+override any profile related properties). 
 
-To make everything clear about where ``config`` should reside: If the current directory is ``/home/serafeim`` and
-you want to execute ``/opt/spring/my-spring-app.jar`` the ``config`` directory should
-be at ``/home/serafeim/config`` -- however probably the best approach wouldn
-be to put it at ``/opt/spring/config`` and ``cd /opt/spring`` before running
-your jar.
+The priority of the files from lowest to highest:
 
-Now, my recommendation is to keep these ``config/*properties`` files off version control
-and to put only the profile selection setting and sensitive information there. That means that 
-the ``config/application.properties`` file should only contain a ``spring.profiles.active=profilename`` 
+- jar-packaged ``application.properties``
+- local ``config/application.properties``
+- jar-packaged ``application-profilename.properties``
+- local ``config/application-profilename.properties``
+
+So (repeating for emphasis) the settings in your jar-packaged ``application-profilename.properties`` will *only*
+be overriden by ``config/application-profilename.properties`` (and not by the ``config/application.properties``
+which will only override settings on the jar-packaged ``application.properties``).
+
+Also, to make everything clear about where the ``config`` directory should be kept:
+ 
+If the current directory from which you'll run your jar is ``/home/serafeim`` and
+you want to execute ``/opt/spring/my-spring-app.jar`` (so you'll run something like
+``/home/serafeim$ java -jar /opt/spring/my-spring-app.jar``) then 
+the ``config`` directory should
+be at ``/home/serafeim/config`` (i.e at the same directory from where you execute
+jar). Normally however and to avoid confusion, the best approach would
+be to just put it at ``/opt/spring/config`` and ``cd /opt/spring`` before running
+your jar (so ``config`` will be right next to your jar and run the jar from the directory).
+
+Finally, my recommendation is to keep these ``config/*properties`` files off version control
+(after all they should be different for each of your environments - common settings should
+go to the jar-packaged files)
+and to put only the profile selection setting and sensitive settings there. That means that 
+the ``config/application.properties`` file should *only* contain a ``spring.profiles.active=profilename`` 
 setting to set the correct profile for this instance of your app and the ``config/application-profilename.properties``
-will contain all sensitive information that you'll need.
+will contain all sensitive information that you'll need to run that profile.
 
-So for example in your UAT server you'll have ``spring.profiles.active=uat`` in your ``application.properties``
+For example in your UAT server you'll have ``spring.profiles.active=uat`` in your ``application.properties``
 and your uat server passwords in your ``application-uat.properties``
 
 Passing command line arguments
@@ -167,16 +264,22 @@ directly passing these parameters as arguments when running your jar. For exampl
 if you run ``java -Dconfig.value=foo -jar my-spring-app.jar`` then the ``config.value``
 will always have a value of ``foo`` no matter what you have in your other config files.
 
-That's a different way to set your active profile or to set sensitive settings however
-I prefer to keep the settings in properties files (and not to put them in scripts etc)
+That's a different way to set your active profile (by passing ``-Dspring.profiles.active=profilename``) 
+or to quickly set sensitive settings however
+I prefer to keep the settings in properties files (and not to put them in scripts where they will definitely
+be missed and will be more difficult to be managed)
 so I'll recommend the previous way of using a non-commited to version control local config/application.properties.
+Use command line arguments only for quick tests (run something with a specific setting to test how it works).
 
 
 Conclusion
 ----------
 
-Using the previous 
+Using the descibed file structure you should be able to fully configure Spring Boot and have all the
 
 
-.. _spring-boot: http://projects.spring.io/spring-boot/
-.. _spring-security: http://projects.spring.io/spring-security/
+
+.. _`Spring boot`: http://projects.spring.io/spring-boot/
+.. _YAML: https://en.wikipedia.org/wiki/YAML
+.. _`various places`: https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-external-config.html
+

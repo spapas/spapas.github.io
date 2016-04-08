@@ -2,11 +2,11 @@ Configuring Spring Boot
 #######################
 
 :date: 2016-03-31 19:20
-:tags: spring, spring-boot, java, ldap, profiles, settings, properties, yaml, configuration
+:tags: spring, spring-boot, java, ldap, profiles, settings, properties, yaml, configuration, deploy, init.d
 :category: spring
 :slug: spring-boot-settings
 :author: Serafeim Papastefanos
-:summary: Configuring your Spring Boot applications using application properties, profiles, locan  settings and command line arguments!
+:summary: Configuring your Spring Boot applications using application properties, profiles, locan  settings and command line arguments and deploying them using init.d!
 
 .. contents::
 
@@ -35,6 +35,7 @@ order to have:
 * Different settings for each of your environments (development, UAT, staging, production and test)
 * A way to configure your passwords and other sensitive data (that you don't want to put to your VCS)
 * Being able to override any setting in any environment
+* Deploying your Spring Boot app in Linux using ``init.d``
 
 To quickly test the proposed settings configuration I've created a simple
 Spring Boot project @ https://github.com/spapas/spring-boot-config. Just clone
@@ -272,6 +273,87 @@ so I'll recommend the previous way of using a non-commited to version control lo
 Use command line arguments only for quick tests (run something with a specific setting to test how it works).
 
 
+Deploying Spring Boot applications
+----------------------------------
+
+If you check
+the deployment documentation of Spring Boot you'll see that it has various hints on 
+`on deploying Spring Boot applications`_. I won't go into much detail about these however I'll
+represent my recommendation on deploying Spring Boot apps on Linux as an init.d script:
+
+What is really interesting about Spring boot is that it allows you to make your jar-packaged jars `executable as an init.d script`_ so that you will
+be able to manage it using something like ``service springbootapp start/stop/restart`` etc. To do that,
+you'll just need to add the ``<executable>true</executable>`` ``configuration`` for your pom's
+``spring-boot-maven-plugin``. This will add some things in the start of your resulting jar file
+that will make it behave as a unix init.d script. If you take a look at your package artifact
+you'll see something like this:
+
+.. code-block:: bash
+
+    #!/bin/bash
+    #
+    #    .   ____          _            __ _ _
+    #   /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+    #  ( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+    #   \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+    #    '  |____| .__|_| |_|_| |_\__, | / / / /
+    #   =========|_|==============|___/=/_/_/_/
+    #   :: Spring Boot Startup Script ::
+    #
+
+    ### BEGIN INIT INFO
+    # Provides:          spring-boot-config
+    # Required-Start:    $remote_fs $syslog $network
+    # Required-Stop:     $remote_fs $syslog $network
+    # Default-Start:     2 3 4 5
+    # Default-Stop:      0 1 6
+    # Short-Description: spring-boot-config
+    # Description:       Demo project for Spring Boot configuration
+    # chkconfig:         2345 99 01
+    ### END INIT INFO
+
+    [[ -n "$DEBUG" ]] && set -x
+
+    # Initialize variables that cannot be provided by a .conf file
+    WORKING_DIR="$(pwd)"
+    # shellcheck disable=SC2153
+    [[ -n "$JARFILE" ]] && jarfile="$JARFILE"
+    [[ -n "$APP_NAME" ]] && identity="$APP_NAME"
+
+    ...
+    
+One thing that may seem puzzling at first is that if make this jar executable
+and try to run it you'll see that, instead of offering you the well known 
+options of the init scripts (Usage ... start/stop/restart etc)  it will immediatelly 
+run the application! This is because the embedded script is smart enough to
+check that it will be executed as an init script only when it is executed
+as a link from ``/etc/init.d`` - else it will immediately run the application. 
+
+If
+you want to quickly test that behavior, you may override the ``MODE`` parameter
+which forces the mode of operation of the jar. If you want to run it as a
+script (without using a links from /etc/ini.d) then just set ``MODE=service``.
+So, try runnin:
+
+.. code::
+
+    > MODE=service ./springapplication.jar
+    Usage: ./hsk9eea.jar {start|stop|restart|force-reload|status|run}
+
+Success! Of course, this is just for testing purposes, to actually deploy
+your application then please create a link to it from ``/etc/init.d`` as
+proposed by the Spring Boot docs.
+
+If you want to `customize the init.d script`_  you can use a file named
+``sprinbootapp.conf`` in the same directory as your ``springbootapp.jar``
+(i.e it should have the same name as your jar with an extension of .conf). The
+options from it will be sourced before running your application -- for example
+you could set the active profile using ``RUN_ARGS``, however as I already
+recommended, explicitly setting it to a file named ``config/applications.properties``
+is preferrable.
+
+
+
 Conclusion
 ----------
 
@@ -279,10 +361,13 @@ Using the described file structure you should be able to fully configure Spring 
 goodies you'd expect from a modern framework: global settings, profiles, non-version control settings! Also, using the
 advanced profiles techniques (multiple profiles, profile enabled 
 @Components and @Configurations) you'll be able to implement 
-some really complex configurations!
+some really complex configurations! Finally, you'll be able to really
+quickly deploy the resulting jar as an init.d system service!
 
 
 .. _`Spring boot`: http://projects.spring.io/spring-boot/
 .. _YAML: https://en.wikipedia.org/wiki/YAML
 .. _`various places`: https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-external-config.html
-
+.. _`on deploying Spring Boot applications`: http://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/htmlsingle/#deployment
+.. _`executable as an init.d script`: https://docs.spring.io/spring-boot/docs/current/reference/html/deployment-install.html
+.. _`customize the init.d script`: http://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/htmlsingle/#deployment-script-customization

@@ -857,7 +857,7 @@ as a different module. Let&#8217;s start reviewing the code of the <tt class="do
 <span class="p">}</span>
 </pre></div>
 <p>The <tt class="docutils literal">notification</tt> and <cite>ui</cite> are two sub-reducers that control the state of the notification popup and if
-the application is loading / is submitting. I won&#8217;t go into much detal about
+the application is loading / is submitting. I won&#8217;t go into much detail about
 them, they are really simple. However, notice that they both create a new state object
 for each of their actions. To achieve this, the <tt class="docutils literal">Object.assign()</tt> method is used.
 This method is defined like this:

@@ -868,7 +868,7 @@ as a different module. Let's start reviewing the code of the ``reducers.js`` mod
     }
     
 The ``notification`` and `ui` are two sub-reducers that control the state of the notification popup and if 
-the application is loading / is submitting. I won't go into much detal about
+the application is loading / is submitting. I won't go into much detail about
 them, they are really simple. However, notice that they both create a new state object
 for each of their actions. To achieve this, the ``Object.assign()`` method is used. 
 This method is defined like this: 

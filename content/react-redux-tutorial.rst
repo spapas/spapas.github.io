@@ -10,6 +10,8 @@ A comprehensive react-redux tutorial
 
 .. contents::
 
+**Update 10/05/2016**: Add a section on how to update the UI when the data in the database is changed without using the UI.
+
 Introduction
 ------------
 
@@ -2392,6 +2394,61 @@ the ``Input`` component to edit the first and last name
 of each author. I won't go into more detail about this
 component since everything must be clear by now.
 
+
+Changing the UI when the data is changed
+----------------------------------------
+
+Commenter Tomas Jacobsen asked for a tutorial on `how the UI will be updated when the data is changed in a different window`_. Well,
+requirements like this is actually the reason for using react and redux I decided to add that capability to this application. If you want
+to check it out, please ``git checkout`` the tag ``react-redux-poll-update`` of the same repository (https://github.com/spapas/react-tutorial/).
+
+This extra functionality simply checks (using polling) every few seconds if the number of authors has changed and if it has, it will reload the authors
+and dispaly a notification. Beyond the ES6 code, I've added a small REST API view that returns the number of authors in the database (it just
+returns a number) and a django management command that adds an author. So, to test the new functionality, run
+the django application and thhen run ``python manage.py add_author`` in a different window - after a few seconds you should see that the
+authors have been updated along with a notification.
+
+To implement the UI update in ES6, I've added a file named ``scheduler.js`` with the following contents:
+
+.. code-block:: javascript
+
+    import store from './store'
+    import {loadAuthors, showSuccessNotification} from './actions';
+
+    export default () => {
+        console.log("Starting scheduler")
+        window.setInterval( () => {
+            
+            let url = 'http://127.0.0.1:8000/api/authors/get_author_number/';
+            $.get(url, realAuthorNumber => {
+                let authorNumber = store.getState().authors.rows.length;
+                if(authorNumber!=realAuthorNumber) {
+                    store.dispatch(showSuccessNotification("Authors have changed - reloading ..."));
+                    store.dispatch(loadAuthors());
+                }
+            });
+            
+        }, 2000);
+    };
+
+and then just import the default function from ``main.js`` and call it:
+
+.. code-block:: javascript
+
+    import schedule from './scheduler';
+
+    schedule();
+
+So, we can see that every 2 seconds we retrieve (using Ajax) the number of authors and,
+if their number is different than the current number of authors in the UI (which we retrieve from
+the store using its ``getState`` method) display the notification and reload the authors (by
+dispatching two actions (which are created through the corresponding actions creators)! That's
+all that is needed to update the UI!
+
+Notice that, although I've used ajax and polling to find out when the UI needs to be updated
+you could instead use whatever different method you like, for example WebSockets.
+    
+
 Conclusion
 ----------
 
@@ -2455,3 +2512,4 @@ seen by now, writing functional components and reducers is *pure fun*!
 .. _react-bootstrap: https://react-bootstrap.github.io/
 .. _moment.js: http://momentjs.com/
 .. _redux-devtools: https://github.com/gaearon/redux-devtools
+.. _`how the UI will be updated when the data is changed in a different window`: http://spapas.github.io/2015/09/08/more-complex-react-flux-example/#comment-2667922265

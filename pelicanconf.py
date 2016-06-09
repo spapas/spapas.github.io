@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 AUTHOR = u'Serafeim Papastefanos'
 SITENAME = u'/var/'
 SITESUBTITLE =u'Various programming stuff'
-SITEURL = 'http://spapas.github.io'
+SITEURL = 'https://spapas.github.io'
 TIMEZONE = 'Europe/Athens'
 DEFAULT_LANG = u'en'
 

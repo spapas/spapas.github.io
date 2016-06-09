@@ -86,6 +86,15 @@ custom version of Bootstrap Material Design! If you want your ``material-custom.
 You may now include ``material-custom.css`` instead of ``material.css`` (or the minified version of it) to your projects and you'll have your own primary color! 
 
 
+**Update 09/06/2016**: After some comments I returned to this blog post and tried to re-create the custom
+css file. Unfortunately, for the latest versions of the bootstrap-material-design, the above step by step instructions need to be changed in two places:
+
+* Step 1: Instead of only the bootstrap-material-design code, you also need to retrieve the code of the original bootstrap. To do that you can do a ``git clone https://github.com/twbs/bootstrap.git`` so that you'll have the bootstrap directory next to the bootstrap-material-design directory. Be careful on that, you should have two directories side by side, one containing the bootstrap code and another containing the bootstrap-material-design code. This is required because bootstrap-material-design references some bootstrap variables (from ``less/_import-bs-less.less``).
+* Step 4: For the customizations file (``custom.less``), you should change the line ``@import "less/material.less";`` to ``@import "less/bootstrap-material-design.less";`` because the name of that file has been changed.
+
+After these two changes you should once again be able to create your custom css file!
+
+
 .. _`Bootstrap Material Design`: https://github.com/FezVrasta/bootstrap-material-design
 .. _`Bootstrap`: http://getbootstrap.com/
 .. _`Material Design`: http://www.google.com/design/spec/material-design/introduction.html

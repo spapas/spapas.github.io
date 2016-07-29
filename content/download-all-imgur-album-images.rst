@@ -67,7 +67,7 @@ the selected react component is available as $r in the normal javascript console
 
 .. code::
 
-    copy($r.props.album_image_store._.posts.aoi3T)
+    copy($r.props.album_image_store._.posts.aoi3T.images)
 
 I was able to copy the images of the album to my clipboard (please notice that ``$r`` will have the
 value of the selected react component so, before trying it you must select the ``GalleryPost`` 
@@ -138,9 +138,9 @@ Also, I haven't been able to find a way to quickly access the ``GalleryPost`` re
 component from the javascript console - you need to install the react dev tools and 
 select that component from there so that you'll have the ``$r`` reference to it in
 the javascript console. Finally, don't forget to change the 
-``copy($r.props.album_image_store._.posts.aoi3T)``
+``copy($r.props.album_image_store._.posts.aoi3T.images)``
 depending on your album id (also if the id is not a valid identifier, for example it
-starts with number, use ``copy($r.props.album_image_store._.posts['aoi3T']``).
+starts with number, use ``copy($r.props.album_image_store._.posts['aoi3T'].images``).
 
 .. _imgur: http://imgur.com/
 .. _`379 movie stills that could be used for desktop background`: http://imgur.com/a/aoi3T

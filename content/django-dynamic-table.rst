@@ -166,8 +166,9 @@ Let's create another mixin that could be used to create a dynamic ``django.Form`
         if self.form.data and self.form.is_valid():
             q_objects = Q()
             for f in self.get_form_fields():
-                q_objects &= Q(**{f+'__icontains':self.form.cleaned_data.get(f, '')})
-
+                if self.form.cleaned_data.get(f):
+                    q_objects &= Q(**{f+'__icontains':self.form.cleaned_data[f]})
+                
             qs = qs.filter(q_objects)
 
         return qs

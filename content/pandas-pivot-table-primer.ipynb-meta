@@ -1,0 +1,8 @@
+Title: A pandas pivot_table primer
+slug: pandas-pivot-table-primer
+Date: 2016-08-31
+Category: python
+Tags: python, pandas, scipy, numpy, pivot, pivot_table, ipython, jupyter, notebook
+Author: Serafeim Papastefanos
+Summary: A primer on how to use the very useful pivot_table command of a pandas dataframe.
+

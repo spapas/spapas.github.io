@@ -2,6 +2,11 @@
 # -*- coding: utf-8 -*- #
 from __future__ import unicode_literals
 
+# Fix for ipynb plugin https://github.com/danielfrg/pelican-ipynb/issues/49
+import sys
+reload(sys)
+sys.setdefaultencoding("utf-8")
+
 AUTHOR = u'Serafeim Papastefanos'
 SITENAME = u'/var/'
 SITESUBTITLE =u'Various programming stuff'
@@ -48,6 +53,7 @@ PLUGIN_PATHS = ['../pelican-plugins']
 PLUGINS = [
     'sitemap',
     'pelican_jsfiddle',
+    'ipynb.markup',
 ]
 
 SITEMAP = {
@@ -64,3 +70,5 @@ SITEMAP = {
     }
 }
 
+MARKUP = ('rst', 'md', 'ipynb', )
+IGNORE_FILES = ['.ipynb_checkpoints']

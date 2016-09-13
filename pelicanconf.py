@@ -53,7 +53,7 @@ PLUGIN_PATHS = ['../pelican-plugins']
 PLUGINS = [
     'sitemap',
     'pelican_jsfiddle',
-    #'ipynb.markup',
+    'ipynb.markup',
 ]
 
 SITEMAP = {
@@ -70,6 +70,6 @@ SITEMAP = {
     }
 }
 
-#MARKUP = ('rst', 'md', 'ipynb', )
-MARKUP = ('rst', 'md', )
+MARKUP = ('rst', 'md', 'ipynb', )
+#MARKUP = ('rst', 'md', )
 IGNORE_FILES = ['.ipynb_checkpoints']

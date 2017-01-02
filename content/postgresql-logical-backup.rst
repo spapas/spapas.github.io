@@ -84,6 +84,48 @@ the above won't work because sudo requires a tty to work and cron doesn't have o
 
 of your /etc/sudoers file.
 
+**Update 02/12/2016:** Here's a little better version of the above script that
+
+1. Create two files for each database, one with SQL script backup, one with binary backup. Although with SQL backup you can check out the backup and maybe do changes before applying it, the binary backup is a more foolproof method of restoring everything to your database! Also, instead of restoring the database through ``psql`` (as required by the SQL script backup), using the binary backup you can restore through the ``pg_restore`` tool.
+2. Adds a function to output the file size (so the script is more DRY)
+
+.. code-block:: bash
+
+    #!/bin/sh
+     
+    function output_file_size {
+      size=`stat $1 --printf="%s"`
+      kb_size=`echo "scale=2; $size / 1024.0" | bc`
+      echo "Finished backup for $2 - size is $kb_size KB" >> /tmp/db_backup_info.log
+    }
+     
+    echo "" > /tmp/db_backup.log
+    echo "" > /tmp/db_backup_info.log
+    date_str=$(date +"%Y%m%d_%H%M%S")
+    backup_dir=/mnt/backupdb/dbpg/pg_backup.$date_str
+     
+    mkdir $backup_dir
+    pushd $backup_dir > /dev/null
+    dbs=`sudo -u postgres psql -Upostgres -lt | cut -d \| -f 1 | grep -v template | grep -v -e '^\s*$' | sed -e 's/  *$//'|  tr '\n' ' '`
+    #dbs='dgul  hrms  mailer_server  missions  postgres'
+    echo "Will backup: $dbs to $backup_dir" >> /tmp/db_backup_info.log
+    for db in $dbs; do
+      echo "Starting backup for $db" >> /tmp/db_backup_info.log
+      filename=$db.$date_str.sql.gz
+      filename_binary=$db.$date_str.bak.gz
+      sudo -u postgres vacuumdb --analyze -Upostgres $db >> /tmp/db_backup.log
+      sudo -u postgres pg_dump -Upostgres -v $db -F p 2>> /tmp/db_backup.log | gzip > $filename
+      sudo -u postgres pg_dump -Upostgres -v $db -F c 2>> /tmp/db_backup.log | gzip > $filename_binary
+      output_file_size $filename "$db sql"
+      output_file_size $filename_binary "$db bin"
+    done
+    echo "Backing up global objects" >> /tmp/db_backup_info.log
+    filename=global.$date_str.sql.gz
+    sudo -u postgres pg_dumpall -Upostgres -v -g 2>> /tmp/db_backup.log | gzip > $filename
+    output_file_size $filename global
+    echo "Ok!" >> /tmp/db_backup_info.log
+    mail -s "Backup results" spapas@hcg.gr  < /tmp/db_backup_info.log
+    popd > /dev/null
 
 .. _Werkzeug: http://werkzeug.pocoo.org/
 .. _django-extensions: https://github.com/django-extensions/django-extensions

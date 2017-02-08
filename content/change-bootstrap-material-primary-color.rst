@@ -76,6 +76,9 @@ This file may contain other default values for variables - if I find anything us
     @info: #CFD8DC;
     @warning:#455A64;
     
+**Update 08/02/2017** Commenter Enrique SIlva informed me that the names of these color variables have been changed to
+``@brand-primary``, ``@brand-success`` etc (as can be seen on ``less/_variables.less``) so you must change them accordingly when overriding them!
+    
 
 Step 5: Create your custom material css file
 --------------------------------------------

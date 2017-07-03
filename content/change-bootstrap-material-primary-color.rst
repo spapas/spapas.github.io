@@ -78,7 +78,8 @@ This file may contain other default values for variables - if I find anything us
     
 **Update 08/02/2017** Commenter Enrique SIlva informed me that the names of these color variables have been changed to
 ``@brand-primary``, ``@brand-success`` etc (as can be seen on ``less/_variables.less``) so you must change them accordingly when overriding them!
-    
+
+   
 
 Step 5: Create your custom material css file
 --------------------------------------------
@@ -96,6 +97,20 @@ css file. Unfortunately, for the latest versions of the bootstrap-material-desig
 * Step 4: For the customizations file (``custom.less``), you should change the line ``@import "less/material.less";`` to ``@import "less/bootstrap-material-design.less";`` because the name of that file has been changed.
 
 After these two changes you should once again be able to create your custom css file!
+
+**Update 03/07/2017** Commenter Nuraan Bader informed of an `NameError: variable @line-height-base is undefined` error when 
+creating the custom css file. This is because bootstrap has changed the default branch from `master` to `v4-dev`
+so when you clone you'll get the `v4-dev` branch instead of the `master` one! To fix this, after you clone (check out 
+my 09/06/2016 update) do the following:
+
+.. code:: 
+
+    cd bootstrap
+    git checkout master
+
+
+This should change the current branch to master and you should see the `less` folder inside the `bootstrap` folder. After that everything should work as expected.
+
 
 
 .. _`Bootstrap Material Design`: https://github.com/FezVrasta/bootstrap-material-design

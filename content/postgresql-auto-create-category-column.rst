@@ -1,7 +1,7 @@
 Automatically create a category table in Postgresql by extracting unique table values
 #####################################################################################
 
-:date: 2017-07-03 15:10
+:date: 2017-07-04 09:05
 :tags: postgresql, plpgsql, 
 :category: postgresql
 :slug: postgresql-auto-create-category-column

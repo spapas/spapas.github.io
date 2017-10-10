@@ -115,6 +115,23 @@ So let's start with the list:
   offline mode, you need to run a management command that will create the static files *while deploying* the applications - this mode is
   recommended because any missing files problems etc will be resolved while deploying the app.
   
+- django-debug-toolbar_: This is a well known package for debugging django apps that is always included in the development configuration of my projects. 
+  It has various panels that help you debug your application but, at least for me, the most helpful is the one that displays you all SQL queries that
+  are executed for a page load. Because of how the django orm is working it will go on and follow all relations something that will lead to
+  hundreds of queries. For example, let's say that you have simple Book model with a foreign key to an Author model that has N instances in your
+  database. If you do a ``Book.objects.all()``
+  and want display the author name for each book in a template then you'll always do ``N+1`` queries to the database! This is really easy to miss because
+  in the django you'll just do ``{% for book in books %}{{ book.name}}, {{ book.author.name }}{% endif %}`` -- however the ``{{ book.author.name }}`` will go
+  on and do an extra SQL query!!! Such cases are easily resolved by using select_related_ (and prefetch_related_) but you must be sure to use select_related 
+  for all your queries (and if you add some extra things to your template you must remember to also add them to your select_related clause for the query). 
+  
+  So, what I recommend before going to production is to visit all your pages using django-debug-toolbar and take a quick look at the number of SQL
+  queries. If you see something that does not make sense (for example you see more than 10 queries) then you'll need to think about the problem I just
+  mentioned. Please notice that this, at least for me, is not premature optimization - this is not actually optimization! This is about writing correct
+  code. Let's suppose that you could not use the django orm anymore and you had to use plain old SQL queries. Would you write ``SELECT * FROM books`` and
+  then for each row do another ``SELECT * FROM authors WHERE id=?`` passing the author of each book *or* do only ``select * from books b LEFT JOIN
+  authors a on b.author_id = a.id``?
+  
 - django-constance_: A simple package that enables you to add quick-configurable settings in your application. To change the settings.py file
   you need to edit a source text file and restart the application - for most installations this is a full re-deployment of the application. Fully
   re-deploying the app just to change a setting is not very good practice. That's where django-constance comes to help you. You can define some
@@ -141,20 +158,54 @@ So let's start with the list:
   delete). Using django-generic-scaffold you can just create a scaffold which is related with a Model and all the views will be automagically created - 
   you only need to link them to your urls.py. The created CBVs are fully configurable by adding extra mixins or even changing the parent class of each CBV.
 
+- django-taggit_: This is the library you'll want to use if you have to use tags with your models. You just add `tags = TaggableManager()` to your
+  model and you are ready to go! Of course it will need some more configuration to be included in django admin and django forms but thankfully,
+  autocomplete-lights can be `integrated with django-taggit`_!
+  
+- django-sendfile_: This is very important - at least to - me library. Sometimes, user uploaded files (media in django) should not be visible to all users
+  so you'll need to implement some access control through your django app. However, it is important to *not* serve these media files through your application
+  server (uwsi, gunicorn etc) but use a web server to properly serve them (nginx, apache ect). This package (along with the support of X-Sendfile from the web servers)
+  helps you check permissions to your media through your django application *but* serve your uploaded through your web server. More info about 
+  `django-sendfile can be found on this SO answer`_ but with a few words, with django-sendfile you create a view that checks if a file is allowed to be served
+  and, if yes, instruct the web server to actually serve that file!
+  
+- easy-thumbnails_: This is a great library if you want to support thumbnails. Actually, thumbnails is not 100% correct - this package can be used to
+  generate and manage various versions of your original images, for example you may have a small version of the image that will be used as a thumbnail,
+  a larger version that will be used in a gallery-carousel view and an even larger version (but not the original one which could be huge) that will be used when
+  the user clicks on the gallery to view the image. To do that you define the image configurations you support in your settings.py and then you have access
+  to your thumbnails both in your templates and in your views. Notice that a specific thumbnail congfiguration for an image will be created only once since
+  the generated images are saved so each thumbnail will be generated on the first request it contains it and will be reused in the following such requests.
+  
+- django-allauth_: This package is used in two cases: When you want a *better* user registration workflow than the default (non-existant) one or you want
+  to integrate your application with an external OAuth provider (i.e allow your users to login through their facebook, google, twitter, github etc accounts). I
+  have mainly used this package for the first case and I can confirm that it works great and you can create as complex flows as you want (for example, in
+  one of my projects I have the following user registration-activation flow: A user registers using a custom form and using his email as username, he receives 
+  an email with a confirmation link,
+  after he has confirmed his email he receivs a custom message to wait for his account activation and the administrators of the application are notified,
+  the administrators enable the new user's account after checking some things and only then he'll be able to log-in). One thing that must be noticed about
+  django-allauth is that it does not have very good documentation but there are lots of answers about `django-allauth in stackoverflow`_ and the source code
+  is very clear so you can always use the source as documentation for this package.
+  
+- django-modeltranslation_: The django-modeltranslation library is the library I recommend for when you want to have translations to your models. To use it
+  you add a translation.py file where you declare the models and their fields that should be translated. The, depending on which languages you have configured
+  in your settings.py after you run makemigrations and migrate you'll see that django-modeltranslation will have included extra fields to the database, each one
+  with the corresponding language name (for example if you have added a field ``name`` to the translations and have english and greek as language, 
+  django-modeltranslation will add the fields ``name_en`` and ``name_el`` to your table). You can the edit the i18n fields (using forms or the django admin) and
+  depending on the current language of your site when you use ``name`` you'll get either ``name_el`` or ``name_en``.
+
+- django-rest-framework_: This is the best package for creating web APIs with django. I don't recommend using it if you want to create a quick JSON search
+  API (take a look at `django non-HTML responses`_) but if you want to go the SPA way or if you want to create multiple APIs for various models then 
+  this is the way to go. Integrating it to your project will need some effort (that's why I don't recommend it for quick and dirty APIs) because you'll
+  need to create a serializers.py which will define the serializers (more or less the fields) for the models you'll want to expose through your API and
+  then create the views (or the viewsets which are families of views for example list, detail, delete, update, create) and add them to your urls.py. You'll
+  also need to configure authentication, authorization and probably filtering and pagination. This may seem like a lot of work but the result are 
+  excellent - you can take a look at a sample application in my `React tutorial`_ repository (yes this is a repository that has a tutorial for React and
+  friends but the back-end is in django and django-rest-framework).
+  
+
+  The above packages are 
 
 
-
-- easy-thumbnails
-- django-allauth
-- django-modeltranslation
-- djangorestframework
-- xlrd / xlwt
-
-- django-sendfile
-- django-taggit
-- django-debug-toolbar
-- raven
-- python-memcached
 
 .. _django-compressor: https://github.com/django-compressor/django-compressor/
 .. _django-tables2: https://github.com/bradleyayers/django-tables2
@@ -171,6 +222,12 @@ So let's start with the list:
 .. _django-constance: https://github.com/jazzband/django-constance
 .. _django-rq: https://github.com/ui/django-rq
 .. _django-generic-scaffold: https://github.com/spapas/django-generic-scaffold
+.. _django-taggit: https://github.com/alex/django-taggit
+.. _django-sendfile: https://github.com/johnsensile/django-sendfile
+.. _django-debug-toolbar: https://github.com/jazzband/django-debug-toolbar
+.. _django-allauth: https://github.com/pennersr/django-allauth
+.. _django-rest-framework: https://github.com/encode/django-rest-framework
+.. _django-modeltranslation: https://github.com/deschler/django-modeltranslation
 
 .. _`a django cookiecutter`: https://github.com/spapas/cookiecutter-django-starter
 .. _`Mailer Server`: https://github.com/spapas/mailer_server
@@ -182,6 +239,14 @@ So let's start with the list:
 .. _`reportlab`: http://www.reportlab.com
 .. _rq: https://github.com/nvie/rq
 .. _django-rules-light: https://github.com/yourlabs/django-rules-light
+.. _`integrated with django-taggit`: https://django-autocomplete-light.readthedocs.io/en/master/taggit.html
+.. _select_related: https://docs.djangoproject.com/en/1.11/ref/models/querysets/#select-related
+.. _prefetch_related: https://docs.djangoproject.com/en/1.11/ref/models/querysets/#prefetch-related
 
+.. _`django-sendfile can be found on this SO answer`: https://stackoverflow.com/q/7296642/119071
+.. _`easy-thumbnails`: https://github.com/SmileyChris/easy-thumbnails
 .. _`asynchronous tasks in django`: https://spapas.github.io/2015/01/27/async-tasks-with-django-rq/
 .. _`django-rq redux`: https://spapas.github.io/2015/09/01/django-rq-redux/
+.. _`django-allauth in stackoverflow`: https://stackoverflow.com/questions/tagged/django-allauth
+.. _`django non-HTML responses`https://spapas.github.io/2014/09/15/django-non-html-responses/
+.. _`Rect tutorial`: https://github.com/spapas/react-tutorial

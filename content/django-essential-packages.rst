@@ -480,6 +480,11 @@ Use django-simple-captcha_ to add (configurable) captchas to your django forms. 
 beyond the Pillow library for the captcha image generator. The generated captchas are simple images with some added noise so it won't integrate
 reCAPTCHA_ with which you may be more familiar. I deliberatly propose this package for captchas so you won't need to integrate with Google services. 
 
+wagtail
+-------
+
+wagtail_ is a great django CMS. I use it when I need to create a CMS or I need to add CMS like capabilities to a project. It has many
+capabilities, too many to be listed here. I urge you to try it if you need a CMS!
 
 
 Conclusion
@@ -535,6 +540,7 @@ any smart tricks or reinventing the wheel.
 .. _django-reversion-compare: https://github.com/jedie/django-reversion-compare
 .. _django-widget-tweaks: https://github.com/jazzband/django-widget-tweaks
 .. _django-simple-captcha: https://github.com/mbi/django-simple-captcha
+.. _wagtail: https://github.com/wagtail/wagtail
 
 .. _`a django cookiecutter`: https://github.com/spapas/cookiecutter-django-starter
 .. _`Mailer Server`: https://github.com/spapas/mailer_server

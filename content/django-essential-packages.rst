@@ -26,7 +26,7 @@ generic python packages (with the exception of xhtml2pdf which I discuss later).
 are a bunch of python-generic packages that I usually use (xlrd, xlwt, requests, raven, unidecode,
 database connectors etc) but these won't be discussed here.
 
-.. contents::
+.. contents:: :backlinks: none
 
 
 Packages I use in all my projects

@@ -3,7 +3,7 @@ Show 404 page on django when DEBUG=True
 
 :date: 2015-04-29 10:20
 :tags: django, debug, 404, error, python
-:category: python
+:category: django
 :slug: django-show-404-page
 :author: Serafeim Papastefanos
 :summary: How to display the 404 error page on django when DEBUG=True

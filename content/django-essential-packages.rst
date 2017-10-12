@@ -3,7 +3,7 @@ My essential django package list
 
 :date: 2017-10-11 14:20
 :tags: django, python
-:category: python
+:category: django
 :slug: essential-django-packages
 :author: Serafeim Papastefanos
 :summary: A list of packages (add-ons) that I use in most of my projects

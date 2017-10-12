@@ -529,7 +529,7 @@ any smart tricks or reinventing the wheel.
 .. _django-rq: https://github.com/ui/django-rq
 .. _django-generic-scaffold: https://github.com/spapas/django-generic-scaffold
 .. _django-taggit: https://github.com/alex/django-taggit
-.. _django-sendfile: https://github.com/johnsensile/django-sendfile
+.. _django-sendfile: https://github.com/johnsensible/django-sendfile
 .. _django-debug-toolbar: https://github.com/jazzband/django-debug-toolbar
 .. _django-allauth: https://github.com/pennersr/django-allauth
 .. _django-rest-framework: https://github.com/encode/django-rest-framework

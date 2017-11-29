@@ -3,7 +3,7 @@ Using Werkzeug debugger with Django
 
 :date: 2016-06-07 10:40
 :tags: django, debug, python, werkzeug, django-extensions
-:category: python
+:category: django
 :slug: django-werkzeug-debugger
 :author: Serafeim Papastefanos
 :summary: How to use the Werkzeug interactive debugger with Django to improve your development workflow

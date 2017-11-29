@@ -3,7 +3,7 @@ Splitting a query into individual fields in Django
 
 :date: 2016-09-12 16:20
 :tags: django, python, query, q, filter
-:category: python
+:category: django
 :slug: django-split-query
 :author: Serafeim Papastefanos
 :summary: How to split a query containing spaces into individual model fields

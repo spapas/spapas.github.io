@@ -444,10 +444,122 @@ and all the proposed use cases using the base class view and the mixins:
         pass
 
 I believe that the above definitions are self-documented and it is very easy to know which
-method of the resulting class will be called each time.
+method of the resulting class will be called each time: Start from the main class and if 
+the method is not found there continue from left to right to the ancestor list.
+
+The final thing and extension I'd like to discuss for our custom class based views is the case
+where you want to use the functionality of more than one mixins. For example, let's suppose
+that we had a mixin that added some data to the context and a different mixing that added
+some different data to the context. Both would use the ``get_context`` method. 
+How could we add implement these mixins and stay DRY? This is the same problem as 
+if we wanted to inherit from a mixin (or a class view) and override one of its methods
+but *also* call its parent (overriden) method for example to get its output and use it as the base
+of the output for the overriden method.
+
+Both of the above are more or less the same requirement because what stays in the end is
+the MRO list. So, say we we had the following base clase
+
+.. code::
+
+    class V:pass
+
+and we wanted to override it either using mixins or by using normal inheritance. 
+
+Using mixins we'll have the following MRO:
+
+.. code::
+
+    class M1:pass
+    class M2:pass
+    class MIXIN(M2, M1, V):pass
+    
+    # MIXIN.mro()
+    # [MIXIN, M2, M1, V, ]
+
+and using inheritance we'll have the following MRO:
+
+.. code::
+
+    class M1V(V):pass
+    class M2M1V(M1V):pass
+    class INHERITANCE(M2M1V):pass
+    
+    # INHERITANCE.mro()
+    # [INHERITANCE, M2M1V, M1V, V, ]
+
+As we can see in both cases the base class V is the last one and between there are
+the classes that define the extra (mixin) functionality: ``M2`` and ``M1`` (start from
+left to right) in the first case and ``M2M1V`` and ``M1V`` (follow the inheritance hierarchy)
+in the second case. So in both cases when calling a method they will be searched using
+the MRO list and when the method is found it will be exetuted and the search will stop.
+
+But what if we needed to re-use the functionality from ``V``? The answer to both cases is ``super``.
+
+The ``super`` method can be used by a class to call a method of *its ancestors* respecting
+the MRO. Thus, running ``super().x()`` from a method instance will try to find method ``x()``
+on the MRO ancestors of this instance *even if the instance defines the ``x()`` method*. Notice
+that if the ``x()`` method does not exist in the MRO chain you'll get an attribute error.
+
+Let's take a look at how ``super()`` works by defining a method calld ``x()`` on all classes
+of the previous example:
+
+.. code-python::
+
+    class V:
+        def x(self):
+            print ("From V")
+
+    class M1:
+        def x(self):
+            super().x()
+            print ("From M1")
+
+    class M2:
+        def x(self):
+            super().x()
+            print ("From M2")
+
+    class MIXIN(M2, M1, V):
+        def x(self):
+            super().x()
+            print ("From MIXIN")
 
 
+    class M1V(V):
+        def x(self):
+            super().x()
+            print ("From M1V")
 
+    class M2M1V(M1V):
+        def x(self):
+            super().x()
+            print ("From M2M1V")
+
+    class INHERITANCE(M2M1V):
+        def x(self):
+            super().x()
+            print ("From INHERITANCE")
+
+    print ("MIXIN OUTPUT")
+    MIXIN().x()
+
+    print ("INHERITANCE OUTPUT")
+    INHERITANCE().x()
+
+Here's the output:
+
+.. code:: 
+
+    MIXIN OUTPUT
+    From V
+    From M1
+    From M2
+    From MIXIN
+    INHERITANCE OUTPUT
+    From V
+    From M1V
+    From M2M1V
+    From INHERITANCE
 
 A high level overview of CBVs
 =============================

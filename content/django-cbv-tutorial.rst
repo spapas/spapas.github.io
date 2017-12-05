@@ -503,7 +503,7 @@ that if the ``x()`` method does not exist in the MRO chain you'll get an attribu
 Let's take a look at how ``super()`` works by defining a method calld ``x()`` on all classes
 of the previous example:
 
-.. code-python::
+.. code-block:: python
 
     class V:
         def x(self):
@@ -561,8 +561,134 @@ Here's the output:
     From M2M1V
     From INHERITANCE
 
+Notice when each message is printed: Because x() first calls its ``super()`` method
+and then it prints the message in both cases first the ``From V`` message is printed
+from the base class and then from the following classes in the hierarch (as per the MRO)
+ending with the class of the isntance (either ``MIXIN`` or ``INHERITANCE``).
+
+Using super and mixins it is easy to mix and match functionality to create new
+classes. For example, let's suppose that sometimes we need to add a prefix to
+the header. Here's how it should be imlemented:
+
+.. code-block:: python
+
+    class HeaderPrefixMixin:
+        def get_header(self, ):
+            return "PREFIX: " + super().get_header()
+
+and here's how it could be used:
+
+.. code-block:: python
+
+    class HeaderPrefixBetterCustomClassView(mixins.HeaderPrefixMixin, BetterCustomClassView):
+        header='Hello!'
+
+What if we wanted to re-use the default header mixin? First let's change ``DefaultHeaderMixin``
+to properly use ``super()``:
+
+.. code-block:: python
+
+    class DefaultHeaderSuperMixin:
+        def get_header(self, ):
+            return super().get_header() if super().get_header() else "DEFAULT HEADER"
+
+.. code-block:: python
+
+    class HeaderPrefixDefaultBetterCustomClassView(mixins.HeaderPrefixMixin, mixins.DefaultHeaderSuperMixin, BetterCustomClassView):
+        pass
+
+Notice the order of the ancestor classes. The ``get_header()`` of  ``HeaderPrefixMixin`` will be called which
+will call the ``get_header()`` of 
+``DefaultHeaderSuperMixin`` (which will call the ``get_header()`` of ``BetterCustomClassView`` which will return ``None``). 
+So the result will be ``"PREFIX: DEFAULT HEADER"``. Now, if instead we had defined this clas like this:
+
+.. code-block:: python
+
+    class HeaderPrefixDefaultBetterCustomClassView(mixins.DefaultHeaderSuperMixin, mixins.HeaderPrefixMixin, BetterCustomClassView):
+        pass
+
+Now the result would be ``"PREFIX: "``. Can you understand why?
+
+Let's define a couple of mixins that add things to the context:
+
+.. code-block:: python
+
+    class ExtraContext1Mixin:
+        def get_context(self, ):
+            ctx = super().get_context()
+            ctx.append('data1')
+            return ctx
+
+
+    class ExtraContext2Mixin:
+        def get_context(self, ):
+            ctx = super().get_context()
+            ctx.insert(0, 'data2')
+            return ctx
+
+The first one retrieves the ancestor context list and appends ``'data1'`` to the 
+it while the second one will insert ``'data2'`` to the start of the list. To use
+these mixins just add them to the ancestor list of your class hierarchy as usually.
+One interesting thing to notice here is that because of how ``get_context`` is
+defined we'll get the same output no matter the order of the mixins in the hierarchy
+since ``ExtraContext1Mixin`` will append ``data1`` to the end of the context list and
+the ``ExtraContext2Mixin`` will insert ``data2`` to the start of the context list.
+
+.. code-block:: python
+
+    class ExtraContext12BetterCustomClassView(mixins.ExtraContext1Mixin, mixins.ExtraContext2Mixin, BetterCustomClassView):
+        pass
+
+    class ExtraContext21BetterCustomClassView(mixins.ExtraContext2Mixin, mixins.ExtraContext1Mixin, BetterCustomClassView):
+        pass
+
+Of course, since we've already defined ``HeaderPrefixMixin`` and ``DefaultHeaderSuperMixin`` nothing stops us
+from using all those mixins together!
+
+.. code-block:: python
+
+    class AllTogetherNowBetterCustomClassView(
+            mixins.HeaderPrefixMixin,
+            mixins.DefaultHeaderSuperMixin,
+            mixins.ExtraContext1Mixin,
+            mixins.ExtraContext2Mixin,
+            BetterCustomClassView
+        ):
+        pass
+
+
+
 A high level overview of CBVs
 =============================
+
+After the previous rather long (but I hope gentle enough) introduction to implementing
+our own class based view hierarchy using inheritance, mixins, MRO, method overriding
+and super we can now start talking about the Django Class Based Views (CBVs). Our
+guide will be the `CBV inspector` application which displays all classes and mixins
+that Django CBVs are using along with their methods and attributes. Using this application
+and after reading this article you should be able to quickly and definitely know
+which method or attribute you need to define to each one of your mixins or views.
+
+To use CBV inspector, just click on a class name (for example ``CreateView``) - you will
+immediately see its MRO ancestors, its list of attributes (and the class that defines
+each one) and finally a list of methods that this class and all its ancestors define.
+Of course when a method is defined by multiple classes the MRO ordering will be used - 
+super is used when the functionality of the ancestor classes is also used. The CBV
+inspector uses Python 2 syntax which uses the following syntax to call super for method ``x()``:
+
+.. code-block:: python
+
+    super(ClassName, self).x()
+
+this is the same as calling
+
+.. code-block:: python
+
+    super().x() 
+
+in Python 3.
+
+In any case, our travel starts from the central CBV class which is (intuitively) called ... View_!
 
 Real world use cases
 ====================
@@ -573,3 +699,4 @@ Real world use cases
 .. _`CBV inspector`: http://ccbv.co.uk`
 .. _`request`: https://docs.djangoproject.com/en/1.11/ref/request-response/#django.http.HttpRequest
 .. _`response`: https://docs.djangoproject.com/en/1.11/ref/request-response/#django.http.HttpResponse
+.. _View: https://ccbv.co.uk/View

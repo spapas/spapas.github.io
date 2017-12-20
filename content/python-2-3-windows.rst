@@ -52,7 +52,7 @@ If you run it without parameters the Python 3.6 interpreter will by started. You
 the -2 parameter to start the python 2.x interpreter or -3 to explicitly declare the
 python 3.x interpreter:
 
-.. code-block:: 
+.. code:: 
 
     C:\Users\Serafeim>py -2
     Python 2.7.14 (v2.7.14:84471935ed, Sep 16 2017, 20:19:30) [MSC v.1500 32 bit (Intel)] on win32
@@ -68,10 +68,10 @@ python 3.x interpreter:
 With py we can easily start the Python interpreter we want. This is not enough though - we
 need to use virtualenv and create proper virtual environments for our projects. To do this
 you can add the -m option to py to run a module with the proper python version. For example,
-to start an http server with Python 2 you would use the module `SimpleHTTPServer` while
-for python 3 you would use `http.server` (`as per this`_):
+to start an http server with Python 2 you would use the module ``SimpleHTTPServer`` while
+for python 3 you would use ``http.server`` (`as per this`_):
 
-.. code-block:: 
+.. code:: 
 
     C:\progr\py\pelican\spapas.github.io>py -2 -m SimpleHTTPServer
     Serving HTTP on 0.0.0.0 port 8000 ...
@@ -80,12 +80,12 @@ for python 3 you would use `http.server` (`as per this`_):
     Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
 
 Now, to create the virtual environments we'll use the virtualenv module which is installed
-by default in Python 2.x (try running `py -2 -m pip freeze` to see the list of installed
+by default in Python 2.x (try running ``py -2 -m pip freeze`` to see the list of installed
 packages for Python 2.x) and the venv module which is included in the Python 3.x core. So
-to create a virtualenv for Python 2 we'll run `py -2 -m virtualenv name-of-virtualenv`
-and for Python 3 `py -3 -m venv name-of-virtualenv`.
+to create a virtualenv for Python 2 we'll run ``py -2 -m virtualenv name-of-virtualenv``
+and for Python 3 ``py -3 -m venv name-of-virtualenv``.
 
-.. code-block::
+.. code::
 
     C:\progr\py>py -2 -m virtualenv venv-2
     New python executable in C:\progr\py\venv-2\Scripts\python.exe
@@ -105,7 +105,7 @@ and for Python 3 `py -3 -m venv name-of-virtualenv`.
     (venv-3) C:\progr\py>python -V
     Python 3.6.4
 
-
+That's how easy it is to have both Python 2.7 and Python 3.6 in your Windows!
 
 .. _`Python download page`: https://www.python.org/downloads/
 .. _`as per this`: https://stackoverflow.com/questions/7943751/what-is-the-python-3-equivalent-of-python-m-simplehttpserver

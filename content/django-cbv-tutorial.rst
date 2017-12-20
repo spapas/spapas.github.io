@@ -1,6 +1,7 @@
 A comprehensive Django CBV guide
 ################################
 
+:status: draft
 :date: 2017-11-29 11:20
 :tags: python, cbv, class-based-views, django
 :category: django

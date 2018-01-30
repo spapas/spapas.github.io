@@ -986,7 +986,44 @@ to override for your needs.
 Real world use cases
 ====================
 
+In this section I am going to present a number of use cases demonstrating the usefulness of Django CBVs. In most of
+these examples I am goint to override one of the methods of the mixins I discussed in the previous section. There
+are *two* methods you can use for integrating the following use cases to your application.
 
+Create your own class inheriting from one of the Django CBVs and add to it directly the method to override. For example, 
+if you wanted to override the ``get_queryset()`` method a ``ListView`` you would do a:
+
+.. code-block:: python
+
+    class GetQuerysetOverrideListView(ListView):
+        def get_queryset(self):
+            qs = super().get_queryset()
+            return qs.filter(status='PUBLISHED')
+
+This is useful if you know that you aren't going to need the overriden ``get_queryset`` functionality to a different
+method and following the YAGNI principle. However, if you know that there may be more CBVs that would need their
+queryset filtered by ``status='PUBLISHED'`` then you should add a mixin that would be used by your CBVs:
+
+.. code-block:: python
+
+    class GetQuerysetOverrideMixin:
+        def get_queryset(self):
+            qs = super().get_queryset()
+            return qs.filter(status='PUBLISHED')
+
+    class GetQuerysetOverrideListView(GetQuerysetOverrideMixin, ListView):
+        pass
+
+Now, one thing that needs some discussion here is that the method ``get_queryset`` is provided by a mixin (in fact
+it is provided by two mixins: ``MultipleObjectMixin`` for ``ListView`` and ``SingleObjectMixin`` for ``DetailView``,
+``UpdateView`` and ``DeleteView``). Because of how MRO works, I won't need to inhert ``GetQuerysetOverrideMixin`` from
+``MultipleObjectMixin`` (or ``SingleObjectMixin`` but let's ignore that for now) but I can just inherit from object
+and make sure that, as already discussed, put the mixin *before* (to the left) of the CBV. Notice that even if I had
+defined ``GetQuerysetOverrideMixin`` as ``GetQuerysetOverrideMixin(MultipleObjectMixin)`` the ``MultipleObjectMixin`` class would
+be found *twice* in the MRO list so only the rightmost instance would remain. So the MRO for both ``GetQuerysetOverrideMixin(object, )``
+and ``GetQuerysetOverrideMixin(MultipleObjectMixin)`` *would be the same*! Also, inheriting directly from object makes
+our ``GetQuerysetOverrideMixin`` more DRY since if it inherited from ``MultipleObjectMixin`` we'd need to create *another*
+version of it that would inherit from ``SingleObjectMixin``; this is because ``get_queryset`` exists in both these mixins.
 
 
 .. _`CBV inspector`: http://ccbv.co.uk`

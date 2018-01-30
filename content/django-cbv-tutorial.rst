@@ -913,7 +913,7 @@ some magic with the queryset or model so that it will automagically create a
 template name (so you won't need to define it yourself) - that's from where the
 ``app_label/app_model_list.html`` default template name is created.
 
-Similar to the ``ListView`` is the DetailView which has the same class hierarcy as the ListView with two differnces:
+Similar to the ``ListView`` is the DetailView_ which has the same class hierarcy as the ``ListView`` with two differnces:
 It uses ``SingleObjectMixin`` instead of ``MultipleOjbectMixin``,  
 ``SingleObjectTemplateResponseMixin`` instead of ``MultipleObjectTemplateResponseMixin``
 and ``BaseDetailView`` instead of ``BaseListView``. The
@@ -924,7 +924,62 @@ will pick and return a single object from that queryset (using a pk or slug para
 will be put to the context of this view by the ``get_context_data``. The ``BaseDetailView`` just
 defines a proper ``get`` to call the ``get_context_data`` (of ``SingleObjectMixin``) and finally
 the ``SingleObjectTemplateResponseMixin`` will automatically generate the template name (i.e generate
-``app_label/app_model_detail.list``).
+``app_label/app_model_detail.html``).
+
+The next Django CBV we'll talk about is CreateView_. This class is used to create a new instance
+of a model. It has a rather complex hierarchy diagram but we've already discussed most of these classes:
+
+.. raw:: html 
+
+      <img src="https://yuml.me/diagram/plain;/class/[SingleObjectTemplateResponseMixin%7Bbg:white%7D]%5E-[CreateView%7Bbg:green%7D],%20[TemplateResponseMixin%7Bbg:white%7D]%5E-[SingleObjectTemplateResponseMixin%7Bbg:white%7D],%20[BaseCreateView%7Bbg:white%7D]%5E-[CreateView%7Bbg:green%7D],%20[ModelFormMixin%7Bbg:white%7D]%5E-[BaseCreateView%7Bbg:white%7D],%20[FormMixin%7Bbg:white%7D]%5E-[ModelFormMixin%7Bbg:white%7D],%20[ContextMixin%7Bbg:white%7D]%5E-[FormMixin%7Bbg:white%7D],%20[SingleObjectMixin%7Bbg:white%7D]%5E-[ModelFormMixin%7Bbg:white%7D],%20[ContextMixin%7Bbg:white%7D]%5E-[SingleObjectMixin%7Bbg:white%7D],%20[ProcessFormView%7Bbg:white%7D]%5E-[BaseCreateView%7Bbg:white%7D],%20[View%7Bbg:lightblue%7D]%5E-[ProcessFormView%7Bbg:white%7D].svg" />
+
+As we can see the ``CreateView`` inherits from ``BaseCreateView`` and ``SingleObjectTemplateResponseMixin``. The
+``SingleObjectTemplateResponseMixin`` is mainly used to automagically create the template names that will be seached for
+(i.e ``app_label/app_model_form.html``), while the ``BaseCreateView`` 
+is used to combine the functionality of ``ProcessFormView`` (that handles the basic form workflow as we have
+already discussed) and ``ModelFormMixin``. The ``ModelFormMixin`` is a rather complex mixin that inherits from
+both ``SingleObjectMixin`` and ``FormMixin``. The ``SingleObjectMixin`` functionality is not really used by ``CreateView`` 
+(since no object will need to be retrieved for the ``CreateView``) however the ``ModelFormMixin`` is also used
+by ``UpdateView`` that's why ``ModelFormMixin`` also inherits from it. This mixin adds functionality
+for handling forms related to models and object instances. More specifically it adds functionality for
+* creating a form class (if one is not provided) by the configured model / queryset 
+* overrides the ``form_valid`` in order to save the object instance of the form
+* fixes ``get_success_url`` to redirect to the saved object's absolute_url when the object is saved
+* pass the object instance to the form
+
+The UpdateView_ class is almost identical to the ``CreateView`` - the only difference is that 
+``UpdateView`` inherits from ``BaseUpdateView`` (and ``SingleObjectTemplateResponseMixin``) instead
+of ``BaseCreateView``.  The ``BaseUpdateView`` overrides the ``get`` and ``post`` methods of
+``ProcessFormView`` to retrieve the object (using ``SingleObjectMixin``'s ``get_object()``) 
+and assign it to an instance variable - this will then be picked up by the ``ModelFormMixin`` and used
+properly in the form as explained before. One thing I notice here is that probably the hierarchy would
+be better if the ``ModelFormMixin`` inherited *only* from ``FormMixin`` (instead of both from
+``FormMixin`` and ``SingleObjectMixin``) and ``BaseUpdateView`` inheriting from ``ProcessFormView``,
+``ModelForMixin`` *and* ``SingleObjectMixin``. This way the ``BaseCreateView`` wouldn't get the
+non-needed ``SingleObjectMixin`` functionality. I am not sure why Django is implemented this way
+(i.e the ``ModelFormMixin`` also inheriting from ``SingleObjectMixin`` thus passing this non-needed
+functionality to ``BaseCreateView``) -- if a reader has a clue I'd like to know it. 
+
+In any way, I'd like to also present the DeleteView_ which is more or less the same as the DetailView_
+with the addition of the ``DeleteMixin`` in the mix. The ``DeleteMixin`` adds a ``post()`` method
+that will delete the object when called and makes success_url required (since there would be no
+object to redirect to after this view is posted).
+
+Another small hierarchy of class based views (actually these are all mixins) are the authentication ones which
+can be used to control acccess to a view.
+These are ``AcessMixin``, ``LoginRequiredMixin``, ``PermissionRequiredMixin`` and ``UserPassesTestMixin``.
+The ``AccessMixin`` provides some basic functionality (i.e what to do when the user does not have access
+to the view, find out the login url to redirect him etc) and is used as a base for the other three. These
+three override the ``dispatch()`` method of ``View`` to check if the user has the specific rights (i.e
+if he has logged in for ``LoginRequiredMixin``, if he has the defined permissions for ``PermissionRequiredMixin``
+or if he passes the provided test in ``UserPassesTextMixin``). If the user has the rights the view will procceed
+as normally (call super's dispatch) else the access denied functionality from ``AccessMixin`` will be implemented.
+
+Beyond the class based views I discussed in this section, Django also has a bunch of CBVs related
+to account views (``LoginView``, ``LogoutView``, ``PasswordChangeView`` etc) and Dates (``DateDetailView``, ``YearArchiveView`` etc).
+I won't go into detail about these since they follow the same concepts and use most of the mixins
+we've discussed before. Using the CBV Inspector you should be able to follow along and decide the methods you need
+to override for your needs.
 
 
 
@@ -946,3 +1001,6 @@ Real world use cases
 .. _FormView: https://docs.djangoproject.com/en/2.0/ref/class-based-views/generic-editing/#formview
 .. _ListView: https://docs.djangoproject.com/en/2.0/ref/class-based-views/generic-display/#listview
 .. _DetailView: https://docs.djangoproject.com/en/2.0/ref/class-based-views/generic-display/#detailview
+.. _CreateView: https://docs.djangoproject.com/en/2.0/ref/class-based-views/generic-display/#createview
+.. _UpdateView: https://docs.djangoproject.com/en/2.0/ref/class-based-views/generic-display/#updateview
+.. _DeleteView: https://docs.djangoproject.com/en/2.0/ref/class-based-views/generic-display/#deleteview

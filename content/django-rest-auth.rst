@@ -82,8 +82,8 @@ I have included the the following urls to ``urls.py``:
     urlpatterns = [
         path('admin/', admin.site.urls),
         path('test_auth/', TestAuthView.as_view(), name='test_auth', ),
-        url(r'^rest-auth/', include('rest_auth.urls')),
-        path(r'', HomeTemplateView.as_view(), name='home', ),
+        path('rest-auth/', include('rest_auth.urls')),
+        path('', HomeTemplateView.as_view(), name='home', ),
     ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 These are: The django-admin, a test_auth view (that works only for authenticated users and returns their username),

@@ -73,3 +73,7 @@ SITEMAP = {
 MARKUP = ('rst', 'md', 'ipynb', )
 #MARKUP = ('rst', 'md', )
 IGNORE_FILES = ['.ipynb_checkpoints']
+
+GITHUB_USER = 'spapas'
+GITHUB_SHOW_USER_LINK = True
+GITHUB_SKIP_FORK = True

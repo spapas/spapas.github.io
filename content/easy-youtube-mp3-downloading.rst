@@ -1,5 +1,5 @@
-Easy downloading youtube videos and mp3s using python
-#####################################################
+Easy downloading youtube videos and mp3s using youtube-dl and python
+####################################################################
 
 :date: 2018-03-06 12:20
 :tags: youtube, youtube-dl, ffmpeg, python
@@ -25,7 +25,7 @@ Installation
 ------------
 
 To install youtube-dl I recommend installing it in your global python (2 or 3) package list using pip. Please read my
-`previous1 <{filename}python-2-3-windows.rst>`_ article
+`previous <{filename}python-2-3-windows.rst>`_ article
 
 to see how you should install and use Python 2 or 3
 on Windows. Following the instructions from there, you can do the following to install youtube-dl in your global 

@@ -945,7 +945,7 @@ for handling forms related to models and object instances. More specifically it 
 * creating a form class (if one is not provided) by the configured model / queryset 
 * overrides the ``form_valid`` in order to save the object instance of the form
 * fixes ``get_success_url`` to redirect to the saved object's absolute_url when the object is saved
-* pass the object instance to the form
+* pass the current object (if it has one - CreateView does not for example) to the form as the ``instance`` attribute
 
 The UpdateView_ class is almost identical to the ``CreateView`` - the only difference is that 
 ``UpdateView`` inherits from ``BaseUpdateView`` (and ``SingleObjectTemplateResponseMixin``) instead
@@ -1025,6 +1025,289 @@ and ``GetQuerysetOverrideMixin(MultipleObjectMixin)`` *would be the same*! Also,
 our ``GetQuerysetOverrideMixin`` more DRY since if it inherited from ``MultipleObjectMixin`` we'd need to create *another*
 version of it that would inherit from ``SingleObjectMixin``; this is because ``get_queryset`` exists in both these mixins.
 
+For some of the following use cases I am also going to use the following models for user generated content (articles and uploaded files):
+
+.. code-block:: python
+
+    STATUS_CHOICES = (
+        ('DRAFT', 'Draft', ),
+        ('PUBLISHED', 'Published', ),
+        ('REMOVED', 'Removed', ),
+    )
+
+
+    class Category(models.Model):
+        name = models.CharField(max_length=128, )
+
+
+    class AbstractGeneralInfo(models.Model):
+        category = models.ForeignKey('category', on_delete=models.PROTECT, )
+        created_on = models.DateTimeField(auto_now_add=True, )
+        created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='%(class)s_created_by', )
+        modified_on = models.DateTimeField(auto_now=True, )
+        modified_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='%(class)s_modified_by', )
+        published_on = models.DateTimeField(blank=True, null=True)
+
+        class Meta:
+            abstract = True
+
+
+    class Article(AbstractGeneralInfo):
+        title = models.CharField(max_length=128, )
+        content = models.TextField()
+
+
+    class Document(AbstractGeneralInfo):
+        description = models.CharField(max_length=128, )
+        file = models.FileField()
+
+Auto-fill created_by and modified_by
+====================================
+
+The ``Article`` and ``Document`` models which both inherit (abstract) from ``AbstractGeneralInfo`` have a ``created_by`` and
+a ``modified_by`` field. These fields have to be filled automatically from the current logged in user. Now, there are various
+options to do that but what I vote for is using an ``AuditableMixin`` as I have already described in `my Django model auditing article`_.
+
+To replicate the functionality we'll create the ``AuditableMixin`` like this:
+
+.. code-block:: python
+
+    class AuditableMixin(object,):
+        def form_valid(self, form, ):
+            if not form.instance.created_by:
+                form.instance.created_by = self.request.user
+            form.instance.modified_by = self.request.user
+            return super().form_valid(form)
+
+This mixin can be used by both the create and update view of both ``Article`` and ``Document``. So all four of these
+classes will share the same functionality. Notice that the ``form_valid`` method is overriden - the ``created_by`` 
+of the form's instance (which is the object that was edited, remember how ``ModelFormMixin`` works) will by set
+to the current user if it is null (so it will be only set once) while the ``modified_by`` will be set always to the
+current user. Finally we call ``super().form_valid`` and return its response so
+that the form will be actually saved and the redirect will go to the proper success url. To use it for example for the
+``Article``, ``CreateView`` should be defined like this:
+
+.. code-block:: python
+
+    class ArticleCreateView(AuditableMixin, CreateView):
+        class Meta:
+            model = Article
+
+
+Allow each user to list/view/edit/delete only his own items
+===========================================================
+
+Let's suppose that we want to create a managerial backend where each user would be able to list the items (articles and
+documents) he has created and view/edit/delete them. We also want to allow superusers to view/edit everything.
+
+Since the ``Article`` and ``Document`` models both have a ``created_by`` element we can use use this to filter
+the results returned by ``get_queryset()``. Here's how this mixin could be implemented:
+
+
+.. code-block:: python
+
+    class LimitAccessMixin:
+        def get_queryset(self):
+            qs = super().get_queryset()
+            if self.request.user.is_superuser:
+                return qs
+            return qs.filter(created_by=self.request.user)
+
+
+Configure the form's initial values from GET parameters
+=======================================================
+
+Sometimes we want to have a ``CreateView`` with some fields already filled. I usually
+implement this by passing the proper parameters to the queryset and then using the following
+mixin to generate the form's initial data from it:
+
+.. code-block:: python
+
+    class SetInitialMixin(object,):
+        def get_initial(self):
+            initial = super(SetInitialMixin, self).get_initial()
+            initial.update(self.request.GET.dict())
+            return initial
+
+So if the /article_create url can be used to initialte the ``CreateView`` for the article,
+using ``/article_create?category_id=3`` will show the CreateView with the Category with id=3
+pre-selected in the category field.
+
+Pass extra kwargs to the FormView form
+======================================
+
+This is a very common requirement. The form may need to be modified by an external condition,
+for example the current user or something that can be calculated from the view. Here's a
+sample mixin that passes the current request (which also includes the user) to the form:
+
+.. code-block:: python
+
+    class RequestArgMixin:
+        def get_form_kwargs(self):
+            kwargs = super(RequestArgMixin, self).get_form_kwargs()
+            kwargs.update({'request': self.request})
+            return kwargs
+
+Please notice that the form has to properly handle the extra kwarg in its constructor,
+before calling the super's constructor. For
+example, here's how a form that can accept the request could be implemented:
+
+.. code-block:: python
+
+    class RequestForm(forms.Form):
+        def __init__(self, *args, **kwargs):
+            self.request = kwargs.pop('request', None)
+            super()__init__(*args, **kwargs)
+
+We use ``pop`` to remove the request from the received ``kwargs`` and only then we call the 
+parent constructor.
+
+Add values to the context
+=========================
+
+To add values to the context of a CBV we override the ``get_context_data()`` method. Here's
+a mixin that adds a list of categories to all CBVs using it:
+
+.. code-block:: python
+
+    class CategoriesContextMixin:
+        def get_context_data(self, **kwargs):
+            ctx = super().get_context_data(**kwargs)
+            ctx['categories'] = Category.objects.all()
+            return ctx
+
+Notice that the mixin calls super to get the context data of its ancestors and appends to it. This
+mean that if we also had a mixin that f.e added the current logged in user to the context (this isn't really
+needed since there's a context processor for this but anyway) then when a CBV inherited from both of
+them then the data of both of them would be added to the context.
+
+As a general comment there are three other methods the same functionality could be achieved:
+
+* Just override the ``get_context_data`` of the CBV you want to add extra data to its context
+* Add a template tag that will bring the needed data to the template
+* Use a context processor to bring the data to all templates
+
+As can be understood, each of the above methods has certain advantages and disadvantages. For
+example, if the extra data will query the database then the context processor method will add
+one extra query for all page loads (even if the data is not needed). On the other hand,
+the template tag will query the database only on specific views but it makes debugging and
+more difficult since if you have a lot of template tags you'll have various context variables
+appearing from thing air!
+
+Support for success messages
+============================
+
+Django has a very useful `messages framework`_ which can be used to add flash messages
+to a view. A flash message is a message that persists in the sesion until it is viewed
+by the user. So, for example when a user edits an object and saves it, he'll be redirected
+to the success page - if you have configured a flash message to inform the user that the 
+save was ok then he'll see this message once and then if he reloads the page it will
+be removed.
+
+Here's a mixin that can be used to support flash messages using Django's message framework:
+
+.. code-block:: python
+
+    class SuccessMessageMixin:
+        success_message = ''
+
+        def get_success_message(self):
+            return self.success_message
+
+        def form_valid(self, form):
+            messages.success(self.request, self.get_success_message())
+            return super().form_valid(form)
+
+This mixin overrides the ``form_valid`` and adds the message using ``get_success_message`` - this
+can be overriden if you want to have a dynamic message or just set the ``success_message`` attribute
+for a static message, for example something like this:
+
+.. code-block:: python
+
+    class SuccesMessageArticleCreateView(SuccessMessageMixin, CreateView):
+        success_message = 'Object was created!'
+
+        class Meta:
+            model = Article
+
+I'd like to once again point out here tghat since the ``super().form_valid(form)`` method is properly used
+then if a CBV uses multiple mixins that override form_valid (for example if your CBV overrides both
+``SuccessMessageMixin`` and ``AuditableMixin`` then the form_valid of *both* will be called so you'll
+get both the created_by/modified_by values set to the current user and the success message!
+
+Notice that Django actually provides an implementation of `a message mixin`_ which can be used instead
+of the proposed implementation here (I didn't know it until recently that's why I am using this to some
+projects and I also present it here).
+
+Allow access to a view if a user has one out of a group of permissions
+======================================================================
+
+For this we'll need to use the authentication mixins functionality. We could implement 
+this by overriding ``PermissionRequiredMixin`` or by overriding ``UserPassesTestMixin``.
+
+Using ``PermissionRequiredMixin`` is not very easy because the way it works
+it will allow access if the user has *all* permissions from the group (not only one as is the requirement). 
+Of course you could override its ``has_permission`` method to change the way it checks if
+the user has the permissions (i.e make sure it has one permission instead of all):
+
+.. code-block:: python
+
+    class AnyPermissionRequiredMixin(PermissionRequiredMixin, ):
+        def has_permission(self):
+            perms = self.get_permission_required()
+            return any(self.request.user.has_perm(perm) for perm in perms)
+
+So we can implement our mixin using ``UserPassesTestMixin`` as its base:
+
+.. code-block:: python
+
+    class AnyPermissionRequiredAlternativeMixin(UserPassesTestMixin):
+        permissions = []
+
+        def test_func(self):
+            return any(self.request.user.has_perm(perm) for perm in self.permissions)
+
+
+Notice that for the above implementations we inherited from ``PermissionRequiredMixin`` or ``UserPassesTextMixin`` to keep their functionality - if we had inherited
+these mixins from object then we'd need to inherit our CBVs from both ``AnyPermissionRequiredMixin`` and ``PermissionRequiredMixin`` or ``AnyPermissionRequiredAlternativeMixin`` and ``UserPassesTestMixin``.
+and of course
+the inheriting mixin would need to be *before* (to the left) the base mixin in the mro list).
+
+The functionality is very simple: If the user has one of the list of the configured permissions then the test will pass (so he'll have access to the view).
+If instead the user has none of the permissions then he won't be able to access the view.
+
+Now, the whole permission cheking functionality can be even more DRY. Let's suppose that we know that there are a couple of views which should only
+be visible to users having either the ``app.admin`` or ``app.curator`` permission. Instead of inheriting all these views from ``AtLeastOnePermissionRequiredMixin``
+and configuring the permissions list to each one, the DRY way to implement this is to add yet another mixin from which the CBVs will actually inhert:
+
+.. code-block:: python
+
+    class AdminorUserPermissionRequiredMixin(AtLeastOnePermissionRequiredMixin):
+        permissions = ['app.admin', 'app.curator']
+
+
+Disable a view based on some condition
+======================================
+
+There are times you want to disable a view based on an arbitrary condition - for example example make the view
+disabled before a specific date. Here's a simple mixin that overrides ``dispatch`` to do this:
+
+.. code-block:: python
+
+    class DisabledMixin(object, ):
+        def dispatch(self, request, *args, **kwargs):
+            if datetime.date.today() < datetime.date(2018,1,1):
+                raise PermissionDenied
+            return super().dispatch(request, *args, **kwargs)
+
+Output a view as a PDF
+======================
+
+It is very easy to create a mixin that will output a view to PDF - I have already written
+an `essential guide for outputting PDFs in Django` so I am just going to refer you to this article for
+(much more) information!
+
+
 
 .. _`CBV inspector`: http://ccbv.co.uk`
 .. _`request`: https://docs.djangoproject.com/en/1.11/ref/request-response/#django.http.HttpRequest
@@ -1041,3 +1324,8 @@ version of it that would inherit from ``SingleObjectMixin``; this is because ``g
 .. _CreateView: https://docs.djangoproject.com/en/2.0/ref/class-based-views/generic-display/#createview
 .. _UpdateView: https://docs.djangoproject.com/en/2.0/ref/class-based-views/generic-display/#updateview
 .. _DeleteView: https://docs.djangoproject.com/en/2.0/ref/class-based-views/generic-display/#deleteview
+.. _`my Django model auditing article`: https://spapas.github.io/2015/01/21/django-model-auditing/#adding-simple-auditing-functionality-ourselves
+.. _`messages framework`: https://docs.djangoproject.com/en/2.0/ref/contrib/messages/
+.. _`a message mixin`: https://docs.djangoproject.com/en/2.0/ref/contrib/messages/#adding-messages-in-class-based-views
+.. _`essential guide for outputting PDFs in Django`: https://spapas.github.io/2015/11/27/pdf-in-django/#using-a-cbv 
+ 

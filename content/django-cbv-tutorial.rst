@@ -9,27 +9,31 @@ A comprehensive Django CBV guide
 :author: Serafeim Papastefanos
 :summary: A comprehensive guide to django CBVs - from neophyte to more advanced
 
+.. contents:: :backlinks: none
+
+
 Class Based Views (CBV) is one of my favourite things about Django. During my
 first Django projects (using Django 1.4 around 6 years ago) I was mainly using
 functional views -- that's what the tutorial recommended then anyway. However,
 slowly in my next projects I started reducing the amount of functional views
 and embracing CBVs, slowly understanding their usage and usefulness. Right now,
-I more or less only use CBVs for my views - even if sometimes it seems more work
+I more or less use only use CBVs for my views; even if sometimes it seems more work
 to use a CBV instead of a functional one I know that sometime in the future I'd
-be glad that I did it.
+be glad that I did it since I'll want to re-use some view functionality and 
+CBVs are more or less the only way to have DRY views in Django.
 
-I've heard
-various rants about them, mainly that they are too complex and difficult to 
+I've heard various rants about them, mainly that they are too complex and difficult to 
 understand and use, however I believe that they are easy to be understood when
 you start from the basics and 
-when they are used properly they will greatly improve your Django experience. 
-CBVs are the only way to have DRY views in Django (if of course your views been
-properly implemented to be dry - more on this later). 
+when they are used properly they will greatly improve your Django experience. Notice
+that to properly understand CBVs you must have a good comprehension of how 
+python's (multiple) inheritance and MRO work. Yes, this is a rather complex and
+confusing thing but I'll try to also explain this as good as I can to the first chapter of this article.
 
 This guide has three parts:
 
 - A gentle introduction to how CBVs are working and to the the problems that do solve. For this we'll implement
-  our own simple Custom Class Based View variant.
+  our own simple Custom Class Based View variant and take a look at python's inheritance model.
 - A high level overview of the real Django CBVs using `CBV inspector`_ as our guide.
 - A number of use cases where CBVs can be used to elegantly solve real world problems
 
@@ -750,6 +754,9 @@ this is the same as calling
 
 in Python 3.x.
 
+Taking a look at the ... View
+-----------------------------
+
 In any case, our travel starts from the central CBV class which is (intuitively) called ... View_!
 
 This class is used as the base view in Django's CBV hierarchy (similar to how  ``CustomClassView``
@@ -820,12 +827,17 @@ to use the proper ones defined by Django - that's what we're going to do from
 now on I just wanted to make clear that there's nothing special in Django's CBV
 hiearchy and can be overriden as we'd like.
 
+RedirectView and TemplateView
+-----------------------------
+
 Continuing our tour of Django CBVs I'd like to talk a little about the classes
 that the CBV Inspector puts in the same level as ``View`` (GENERIC BASE):
 RedirectView_ and TemplateView_. Both inherit directly from ``View`` and, the
-first one uses defines a ``get`` method that returns a redirect to another page
+first one defines a ``get`` method that returns a redirect to another page
 while the latter one renders and returns a django template in the ``get``
-method. The ``TemplateView`` however inherits from two more classes (actually
+method. 
+
+The ``TemplateView`` however inherits from two more classes (actually
 these are mixins) beyond ``View``: ``TemplateResponseMixin`` and
 ``ContextMixin``. If you take a look at them you'll see that the
 ``TemplateResponseMixin`` defines some template-related attributes and two
@@ -835,20 +847,24 @@ and one that actually renders the template (``render_to_response``) using a
 TemplateResponse_ instance. The
 ``ContextMixin`` on the other hand provides the ``get_context_data`` that is
 passed to the template to be rendered and should be overriden if you want to
-pass more context variables. We can already see many opportunities of reusing
-and overriding
+pass more context variables. 
+
+We can already see many opportunities of reusing and overriding
 functionality and improving our DRY score, for example: Create a catch all RedirectView
 that depending on the remainder of the url it will redirect to a different page,
-create a mixin that
-appends some things to the context of all CBVs using it, use dynamic template
-names based on some other condition (that's actually what Detail/List/UpdateView
+create a mixin that appends some things to the context of all CBVs using it, use dynamic templates
+based on some other condition (that's actually what Detail/List/UpdateView
 are doing), render a template to a different output than Html (for example a
 text file). I'll try to present examples for these in the next section.
 
+The FormView
+------------
+
 The next view we're going to talk about is FormView_. This is a view that can be
 used whenever we want to display a form (*not* a form related to a Model i.e for
-Create/Update/Delete). It is interesting to take a look at the list of its
-ancestors: TemplateResponseMixin, BaseFormView, FormMixin, ContextMixin, ProcessFormView and View.
+Create/Update/Delete, for these cases there are specific CBVs we'll see later). 
+It is interesting to take a look at the list of its
+ancestors: ``TemplateResponseMixin``, ``BaseFormView``, ``FormMixin``, ``ContextMixin``, ``ProcessFormView`` and ``View``.
 We are familiar with TemplateResponseMixin, ContextMixin and View but not with
 the others. Before discussing these classes let's take a look at the FormView
 hierarchy, courtesy of http://ccbv.cco.uk and http://yuml.me:
@@ -885,6 +901,9 @@ Finally, the ``BaseFormView`` class is used to
 inherit from ``ProcessFormView`` and ``FormMixin``. It does not do anything
 more than providing a base class that other classes that want to use the form
 functionality (i.e both the ``ProcessFormView`` and ``FormMixin``) will inherit from.
+
+The ListView and DetailView
+---------------------------
 
 Next in our Django CBV tour is the ListView_. The ``ListView`` is used to render multiple
 objects in a template, for example in a list or table. Here's a diagram of the class
@@ -926,6 +945,9 @@ defines a proper ``get`` to call the ``get_context_data`` (of ``SingleObjectMixi
 the ``SingleObjectTemplateResponseMixin`` will automatically generate the template name (i.e generate
 ``app_label/app_model_detail.html``).
 
+The CreateView
+--------------
+
 The next Django CBV we'll talk about is CreateView_. This class is used to create a new instance
 of a model. It has a rather complex hierarchy diagram but we've already discussed most of these classes:
 
@@ -947,6 +969,9 @@ for handling forms related to models and object instances. More specifically it 
 * fixes ``get_success_url`` to redirect to the saved object's absolute_url when the object is saved
 * pass the current object (if it has one - CreateView does not for example) to the form as the ``instance`` attribute
 
+The UpdateView and DeleteView
+-----------------------------
+
 The UpdateView_ class is almost identical to the ``CreateView`` - the only difference is that 
 ``UpdateView`` inherits from ``BaseUpdateView`` (and ``SingleObjectTemplateResponseMixin``) instead
 of ``BaseCreateView``.  The ``BaseUpdateView`` overrides the ``get`` and ``post`` methods of
@@ -965,6 +990,9 @@ with the addition of the ``DeleteMixin`` in the mix. The ``DeleteMixin`` adds a 
 that will delete the object when called and makes success_url required (since there would be no
 object to redirect to after this view is posted).
 
+Access control mixins
+---------------------
+
 Another small hierarchy of class based views (actually these are all mixins) are the authentication ones which
 can be used to control acccess to a view.
 These are ``AcessMixin``, ``LoginRequiredMixin``, ``PermissionRequiredMixin`` and ``UserPassesTestMixin``.
@@ -974,6 +1002,9 @@ three override the ``dispatch()`` method of ``View`` to check if the user has th
 if he has logged in for ``LoginRequiredMixin``, if he has the defined permissions for ``PermissionRequiredMixin``
 or if he passes the provided test in ``UserPassesTextMixin``). If the user has the rights the view will procceed
 as normally (call super's dispatch) else the access denied functionality from ``AccessMixin`` will be implemented.
+
+Some other CBVs
+---------------
 
 Beyond the class based views I discussed in this section, Django also has a bunch of CBVs related
 to account views (``LoginView``, ``LogoutView``, ``PasswordChangeView`` etc) and Dates (``DateDetailView``, ``YearArchiveView`` etc).
@@ -1062,7 +1093,7 @@ For some of the following use cases I am also going to use the following models 
         file = models.FileField()
 
 Auto-fill created_by and modified_by
-====================================
+------------------------------------
 
 The ``Article`` and ``Document`` models which both inherit (abstract) from ``AbstractGeneralInfo`` have a ``created_by`` and
 a ``modified_by`` field. These fields have to be filled automatically from the current logged in user. Now, there are various
@@ -1095,7 +1126,7 @@ that the form will be actually saved and the redirect will go to the proper succ
 
 
 Allow each user to list/view/edit/delete only his own items
-===========================================================
+-----------------------------------------------------------
 
 Let's suppose that we want to create a managerial backend where each user would be able to list the items (articles and
 documents) he has created and view/edit/delete them. We also want to allow superusers to view/edit everything.
@@ -1115,7 +1146,7 @@ the results returned by ``get_queryset()``. Here's how this mixin could be imple
 
 
 Configure the form's initial values from GET parameters
-=======================================================
+-------------------------------------------------------
 
 Sometimes we want to have a ``CreateView`` with some fields already filled. I usually
 implement this by passing the proper parameters to the queryset and then using the following
@@ -1134,7 +1165,7 @@ using ``/article_create?category_id=3`` will show the CreateView with the Catego
 pre-selected in the category field.
 
 Pass extra kwargs to the FormView form
-======================================
+--------------------------------------
 
 This is a very common requirement. The form may need to be modified by an external condition,
 for example the current user or something that can be calculated from the view. Here's a
@@ -1157,13 +1188,13 @@ example, here's how a form that can accept the request could be implemented:
     class RequestForm(forms.Form):
         def __init__(self, *args, **kwargs):
             self.request = kwargs.pop('request', None)
-            super()__init__(*args, **kwargs)
+            super().__init__(*args, **kwargs)
 
 We use ``pop`` to remove the request from the received ``kwargs`` and only then we call the 
 parent constructor.
 
 Add values to the context
-=========================
+-------------------------
 
 To add values to the context of a CBV we override the ``get_context_data()`` method. Here's
 a mixin that adds a list of categories to all CBVs using it:
@@ -1190,12 +1221,12 @@ As a general comment there are three other methods the same functionality could 
 As can be understood, each of the above methods has certain advantages and disadvantages. For
 example, if the extra data will query the database then the context processor method will add
 one extra query for all page loads (even if the data is not needed). On the other hand,
-the template tag will query the database only on specific views but it makes debugging and
-more difficult since if you have a lot of template tags you'll have various context variables
-appearing from thing air!
+the template tag will query the database only on specific views but it makes debugging and 
+reasoning about your template more difficult since if you have a lot of template tags you'll have 
+various context variables appearing from thing air!
 
 Support for success messages
-============================
+----------------------------
 
 Django has a very useful `messages framework`_ which can be used to add flash messages
 to a view. A flash message is a message that persists in the sesion until it is viewed
@@ -1230,7 +1261,7 @@ for a static message, for example something like this:
         class Meta:
             model = Article
 
-I'd like to once again point out here tghat since the ``super().form_valid(form)`` method is properly used
+I'd like to once again point out here that since the ``super().form_valid(form)`` method is properly used
 then if a CBV uses multiple mixins that override form_valid (for example if your CBV overrides both
 ``SuccessMessageMixin`` and ``AuditableMixin`` then the form_valid of *both* will be called so you'll
 get both the created_by/modified_by values set to the current user and the success message!
@@ -1239,8 +1270,42 @@ Notice that Django actually provides an implementation of `a message mixin`_ whi
 of the proposed implementation here (I didn't know it until recently that's why I am using this to some
 projects and I also present it here).
 
+Implement moderation
+--------------------
+
+It is easy to implement some moderation to our model publishing. For example, let's suppose that we only
+allow publishers to publish a model. Here's how it can be done:
+
+.. code-block:: python
+
+    class ModerationMixin:
+        def form_valid(self, form):
+            redirect_to = super().form_valid(form)
+            if self.object.status != 'REMOVED':
+                if self.request.user.has_perm('spots.publisher_access'):
+                    self.object.status = 'PUBLISHED'
+                else:
+                    self.object.status = 'DRAFT'
+                self.object.save()
+                
+            return redirect_to
+            
+So, first of all we call the parent ``form_valid`` to properly save the form and save
+the redirect to value. We then make sure that the object is not ``REMOVED`` (if it is
+remove it we don't do anything else). Next we check if the current user has 
+``publisher_access`` if yes we change the object's status to ``PUBLISHED`` - on any
+other case we change its status to ``DRAFT``. Notice that this means that whenever a
+publisher saves the object it will be published and whenever a non-publisher saves it
+it will be made a draft. 
+
+I'd like to repeat here that this mixin, since it calls super, can work concurrently
+with any other mixins that override ``form_valid`` (and also call their super method
+of course), for example it can be used together with the audit (auto-fill created_by
+and moderated_by) and the success mixins we defined previously!
+
+
 Allow access to a view if a user has one out of a group of permissions
-======================================================================
+----------------------------------------------------------------------
 
 For this we'll need to use the authentication mixins functionality. We could implement 
 this by overriding ``PermissionRequiredMixin`` or by overriding ``UserPassesTestMixin``.
@@ -1257,7 +1322,7 @@ the user has the permissions (i.e make sure it has one permission instead of all
             perms = self.get_permission_required()
             return any(self.request.user.has_perm(perm) for perm in perms)
 
-So we can implement our mixin using ``UserPassesTestMixin`` as its base:
+Also we could implement our mixin using ``UserPassesTestMixin`` as its base:
 
 .. code-block:: python
 
@@ -1268,45 +1333,63 @@ So we can implement our mixin using ``UserPassesTestMixin`` as its base:
             return any(self.request.user.has_perm(perm) for perm in self.permissions)
 
 
-Notice that for the above implementations we inherited from ``PermissionRequiredMixin`` or ``UserPassesTextMixin`` to keep their functionality - if we had inherited
-these mixins from object then we'd need to inherit our CBVs from both ``AnyPermissionRequiredMixin`` and ``PermissionRequiredMixin`` or ``AnyPermissionRequiredAlternativeMixin`` and ``UserPassesTestMixin``.
-and of course
-the inheriting mixin would need to be *before* (to the left) the base mixin in the mro list).
-
 The functionality is very simple: If the user has one of the list of the configured permissions then the test will pass (so he'll have access to the view).
-If instead the user has none of the permissions then he won't be able to access the view.
+If instead the user has none of the permissions then he won't be able to access the view.            
+            
+Notice that for the above implementations we inherited from ``PermissionRequiredMixin`` or ``UserPassesTextMixin`` to keep their functionality - if we had inherited
+these mixins from object then we'd need to inherit our CBVs from both ``AnyPermissionRequiredMixin`` and ``PermissionRequiredMixin`` or 
+``AnyPermissionRequiredAlternativeMixin`` and ``UserPassesTestMixin`` (with the correct MRO order of course).
+
 
 Now, the whole permission cheking functionality can be even more DRY. Let's suppose that we know that there are a couple of views which should only
-be visible to users having either the ``app.admin`` or ``app.curator`` permission. Instead of inheriting all these views from ``AtLeastOnePermissionRequiredMixin``
+be visible to users having either the ``app.admin`` or ``app.curator`` permission. Instead of inheriting all these views from ``AnyPermissionRequiredMixin``
 and configuring the permissions list to each one, the DRY way to implement this is to add yet another mixin from which the CBVs will actually inhert:
 
 .. code-block:: python
 
-    class AdminorUserPermissionRequiredMixin(AtLeastOnePermissionRequiredMixin):
+    class AdminorUserPermissionRequiredMixin(AnyPermissionRequiredMixin):
         permissions = ['app.admin', 'app.curator']
 
 
 Disable a view based on some condition
-======================================
+--------------------------------------
 
 There are times you want to disable a view based on an arbitrary condition - for example example make the view
 disabled before a specific date. Here's a simple mixin that overrides ``dispatch`` to do this:
 
 .. code-block:: python
 
-    class DisabledMixin(object, ):
+    class DisabledDateMixin(object, ):
+        the_date = datetime.date(2018,1,1)
+        
         def dispatch(self, request, *args, **kwargs):
-            if datetime.date.today() < datetime.date(2018,1,1):
+            if datetime.date.today() < the_date:
                 raise PermissionDenied
             return super().dispatch(request, *args, **kwargs)
+            
+You can even disable a view completely  in case you want to keep it in your urls.py using this mixin:
+
+.. code-block:: python
+
+    class DisabledDateMixin(object, ):
+        def dispatch(self, request, *args, **kwargs):
+            raise PermissionDenied
 
 Output a view as a PDF
-======================
+----------------------
 
 It is very easy to create a mixin that will output a view to PDF - I have already written
-an `essential guide for outputting PDFs in Django` so I am just going to refer you to this article for
+an `essential guide for outputting PDFs in Django`_ so I am just going to refer you to this article for
 (much more) information!
 
+Create a catch all RedirectView
+-------------------------------
+
+Using dynamic templates
+-----------------------
+
+Add a dynamic filter to the context
+-----------------------------------
 
 
 .. _`CBV inspector`: http://ccbv.co.uk`

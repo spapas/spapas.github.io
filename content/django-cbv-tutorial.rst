@@ -2,7 +2,7 @@ A comprehensive Django CBV guide
 ################################
 
 :status: draft
-:date: 2017-11-29 11:20
+:date: 2018-03-14 12:20
 :tags: python, cbv, class-based-views, django
 :category: django
 :slug: comprehensive-django-cbv-guide
@@ -100,6 +100,9 @@ original class. Each one of your class based views can inherit its functionality
 multiple mixins thus allowing you to define a single class for each thing you need
 and re-using it everywhere. Notice of course that this is possible only if the
 CBVs are properly implemented to allow overriding their functionality.
+
+Hand-made CBVs
+--------------
 
 To make things more clear we'll try to implement our own class based views hierarchy. Here's
 a first try:
@@ -222,6 +225,9 @@ see how this is done in a second). In any case, I won't discuss passing paramete
 so from now on any class based views I define will be added to urls py using ``ClassName.as_view()`` without any
 parameters to the ``as_view()`` class method.
 
+A ... drier (more DRY) approach
+-------------------------------
+
 Let's now suppose that we wanted to allow our class based view to print something on the header even if no header is provided
 when you configure it. The naive way to do it would be to re-define the ``render`` method and do something like
 
@@ -320,6 +326,9 @@ just set the header attribute of your class to ``"DEFAULT HEADER"`` - this is no
 user generated input, this is your source code!). All this will show how useful
 it is when you consider more complex use-cases.
 
+Re-using view functionality
+---------------------------
+
 We have come now to a crucial point in this introduction, so please stick with me. Let's say that you have
 *more than one* class based views that contain a header attribute. You want to include
 the default header functionality on all of them so that if any view instantiated from these
@@ -385,27 +394,30 @@ correct one since the methods ``get_header`` and ``as_view`` exist in *both* anc
 in the first option (``JsonDefaultHeaderCustomClassView``) the ``get_header`` and ``as_view`` from ``JsonCustomClassView`` will be used while
 in the second option (``DefaultHeaderJsonCustomClassView``) the ``get_header`` and ``as_view`` from ``DefaultHeaderBetterCustomClassView`` will
 be used. Notice that if these classes had a common ancestor (for example they both used
-``CustomClassView``) you may actually get the correct behavior depending on the rather complex rules
-of python MRO (method resolution order). The MRO is also what I used to know which ``get_header``
+``CustomClassView``) you may actually get the correct behaviour depending on the rather complex rules
+of python MRO (Method Resolution Order). The MRO is also what I used to know which ``get_header``
 and ``as_view`` will be used in each case in the previous example.
+
+Interlude: An MRO primer
+------------------------
 
 What is MRO? For every class that python sees, it tries to create a *list* (MRO list) of ancestor classes containing that class as 
 the first element and its ancestors in a specific order I'll discuss right next after that. When a method
 of an object of a specific class needs to be
-called, then the method will be seached in the list (from the first element of the MRO list i.e. starting that class) - when a class is found
-in the list that defines the method then that specific method (ie the method defined in this class) will be called and the search will stop (careful readers: I haven't
+called, then the method will be searched in the list (from the first element of the MRO list i.e. starting that class) - when a class is found
+in the list that defines the method then that specific method (i.e. the method defined in this class) will be called and the search will stop (careful readers: I haven't
 yet talked about *super* so please be patient). 
 
 Now, how is the MRO list created? As I explained, the first element
 is the class of the object. The second element is the MRO of the *leftmost* ancestor of that object (so MRO will 
-run recursively on each ancenstor), the third element will be the MRO of the ancestor right next to the leftomost
+run recursively on each ancestor), the third element will be the MRO of the ancestor right next to the leftmost
 ancestor etc. There is one extra and important rule: When a class is found multiple times in the MRO list (for example
-if some elements have a common ancestor) then *only the last occurence in the list will be kept* - so each class
+if some elements have a common ancestor) then *only the last occurrence in the list will be kept* - so each class
 will exist only once in the MRO list. The above rule implies that the
 rightmost element in every MRO list will always be object - please make sure you
 understand why before continuing.
 
-Thus, thwe MRO list for ``DefaultHeaderJsonCustomClassView`` is (remember, start
+Thus, the MRO list for ``DefaultHeaderJsonCustomClassView`` is (remember, start
 with the class to the left and add the MRO of each of its ancestors starting
 from the leftmost one):
 ``[DefaultHeaderJsonCustomClassView, DefaultHeaderBetterCustomClassView, BetterCustomClassView, CustomClassView, JsonCustomClassView, object]``, while
@@ -446,7 +458,7 @@ Notice that classes ``BetterCustomClassView``, ``CustomClassView`` and ``object`
 (on place 3,4,5 and 7,8,9) thus *only* their last occurence will be kept in the list. So the
 resulting MRO is the following:
 
-``[DefaultHeaderContextCustomClassView, DefaultHeaderBetterCustomClassView, DefaultContextBetterCustomClassView, BetterCustomClassView, CustomClassView, object]``.
+``[DefaultHeaderContextCustomClassView, DefaultHeaderBetterCustomClassView, DefaultContextBetterCustomClassView, BetterCustomClassView, CustomClassView, object]``
 
 One funny thing here is that the ``DefaultHeaderContextCustomClassView`` *will actually work* properly because the 
 ``get_header`` will be found in ``DefaultHeaderBetterCustomClassView`` and the
@@ -459,7 +471,14 @@ of finding out the MRO for each class you define to see which method will be act
 (hint: that ``get_context`` would be used and the ``get_context`` of ``DefaultContextBetterCustomClassView``
 would be ignored).
 
-That's why I
+Using mixins for code-reuse
+---------------------------
+
+The above explanation of MRO should convince you that the best approach to avoid
+mixing hierarchies of classes - if you are not convinced then wait until I introduce ``super()``
+in the next section and I guarantee that you'll be!
+
+So, that's why I
 propose implementing common functionality that needs to be re-used between
 classes only with mixins (hint: that's also what Django does). Each re-usable functionality
 will be implemented in its own mixin;  class views that need to implement that
@@ -503,6 +522,9 @@ I believe that the above definitions are self-documented and it is very easy to 
 method of the resulting class will be called each time: Start from the main class and if 
 the method is not found there continue from left to right to the ancestor list.
 
+The ``super`` situation
+-----------------------
+
 The final thing and extension I'd like to discuss for our custom class based views is the case
 where you want to use the functionality of more than one mixins for the same thing. For example, let's suppose
 that we had a mixin that added some data to the context and a different mixing that added
@@ -512,7 +534,7 @@ this is not possible using the implementations above because when a
 ``get_context`` is found in the MRO list it will be called and the MRO search
 will finish there.
 
-. 
+ 
 So how could we add the functionality of both these mixins to a class based view? This is the same problem as 
 if we wanted to inherit from a mixin (or a class view) and override one of its methods
 but *also* call its parent (overriden) method for example to get its output and use it as the base
@@ -554,8 +576,9 @@ in the second case. So in both cases when calling a method they will be searched
 the MRO list and when the method is found it will be exetuted and the search will stop.
 
 But what if we needed to re-use some method from ``V`` (or from some other ancestor) and
-a leftmost MRO class has the same method? 
-The answer is ``super``.
+a class on the left of the MRO list has the same method? 
+The answer, as you should have guessed by now if you have some Python knowledge is ``super``.
+
 
 The ``super`` method can be used by a class method to call a method of *its ancestors* respecting
 the MRO. Thus, running ``super().x()`` from a method instance will try to find method ``x()``
@@ -921,7 +944,14 @@ method checks to see if the ``queryset`` or ``model`` attribute are defined
 (``queryset`` will be checked first so it has priority of both are defined) and
 returns a queryset result (taking into account the ordering). This queryset
 result will be used by the ``get_context_data()`` method of this mixin to
-actually put it to the context. The ``MultipleObjectMixin`` can be used and
+actually put it to the context by saving to a context variable named ``object_list``.
+Notice that you can set the ``context_object_name`` attribute to add and extra 
+another variable to the context with the queryset beyond ``object_list`` (for
+example if you have an ``ArticleLsitView`` you can set ``context_object_name = articles`` to
+be able to do ``{% for article in articles %}`` in your context instead of 
+``{% for article in object_list %}``).
+
+The ``MultipleObjectMixin`` can be used and
 overriden when we need to put multiple objects in a View. This mixin is
 inherited (along with ``View``) from ``BaseListView`` that adds a proper ``get``
 method to call ``get_context_data`` and pass the result to the template.
@@ -1375,21 +1405,83 @@ You can even disable a view completely  in case you want to keep it in your urls
         def dispatch(self, request, *args, **kwargs):
             raise PermissionDenied
 
-Output a view as a PDF
-----------------------
+Output non-html views
+---------------------
 
-It is very easy to create a mixin that will output a view to PDF - I have already written
+I've written a whole article about this, please take a look at my `Django non-HTML responses`_ article.
+
+Also, notice that is very easy to create a mixin that will output a view to PDF - I have already written
 an `essential guide for outputting PDFs in Django`_ so I am just going to refer you to this article for
 (much more) information!
 
-Create a catch all RedirectView
--------------------------------
+Finally, let's take a look at a generic Mixin that you can use to add CSV exporting capabilities to a
+``ListView``:
+
+.. code-block:: python
+
+
+    class ExportCsvMixin:
+        def render_to_response(self, context, **response_kwargs):
+            if self.request.GET.get('csv'):
+                response = HttpResponse(content_type='text/csv')
+                response['Content-Disposition'] = 'attachment; filename="export.csv"'
+
+                writer = csv.writer(response)
+                for idx, o in enumerate(context['object_list']):
+                    if idx == 0: # Write headers
+                        writer.writerow(k for (k,v) in o.__dict__.items() if not k.startswith('_'))
+                    writer.writerow(v for (k,v) in o.__dict__.items() if not k.startswith('_'))
+
+                return response
+            return super().render_to_response(context, **response_kwargs)
+            
+As you can see this mixin overrides the ``render_to_response`` method. It will check if there's a 
+``csv`` key to the ``GET`` queryset dictionary, thus the url must be called with ``?csv=true`` or something similar. You 
+can just add this link to your template:
+
+.. code-block:: html
+
+    <a class='button' href='?csv=true'>Export csv</a>
+
+So if the view needs to be exported to CSV, it will create a new ``HttpResponse`` object with the correct content type.
+The next line will add a header that (``Content-Disposition``) will mark the response as an attachment and give it a default filename.
+We then crate a new ``csv.writer`` passing the just-created response as the place to write the csv. The ``for`` loop that follows
+enumerates the ``object_list`` value of the context (remember that this is added by the ``MultipleObjectMixin`` and contains the
+result of the ``ListView``). It will then use the object's ``__dict__`` attribute to write the headers (for the first time) and then
+write the values of all objects.
+    
 
 Using dynamic templates
 -----------------------
 
-Add a dynamic filter to the context
------------------------------------
+Some people think that they may never need to override the ``get_template_names`` method of
+``TemplateResponseMixin``. However overriding this method can be used to create a DRY Ajax view
+of your data! For example, let's say that you have a ``DetailView`` for one of your models that 
+has overriden the ``get_template_names`` like this:
+
+.. code-block:: python
+
+    def get_template_names(self):
+        if self.request.is_ajax():
+            return 'core/partial/data_ajax.html'
+        return super().get_template_names()
+        
+and you have also defined a normal template for classic request response viewing and an ajax template
+that contains only the specific data for this instances (i.e it does not containg html body, headers, footers etc,
+only a <div> with the instance's data). 
+
+Using this technique you can create an Ajax view of your data just by requesting the DetailView through an
+Ajax call and dumping the response you get to a modal dialog (for example)  - no need for fancy REST APIs. Also as 
+a bonus, the classic DetailView will work normally, so you can have the Ajax view to give a summary of the instance's
+data (i.e have a subset of the info on the Ajax template) and the normal view to display everything.
+
+Add a dynamic filter and/or table to the context
+------------------------------------------------
+
+If you have a lot of similar models you can add a mixin that dynamically creates tables and a filters
+for these models  - take a look at my `dynamic tables and filters for similar models`_ article!
+
+
 
 
 .. _`CBV inspector`: http://ccbv.co.uk`
@@ -1411,4 +1503,5 @@ Add a dynamic filter to the context
 .. _`messages framework`: https://docs.djangoproject.com/en/2.0/ref/contrib/messages/
 .. _`a message mixin`: https://docs.djangoproject.com/en/2.0/ref/contrib/messages/#adding-messages-in-class-based-views
 .. _`essential guide for outputting PDFs in Django`: https://spapas.github.io/2015/11/27/pdf-in-django/#using-a-cbv 
- 
+.. _`dynamic tables and filters for similar models`: https://spapas.github.io/2015/10/05/django-dynamic-tables-similar-models/ 
+.. _`Django non-HTML responses`: https://spapas.github.io/2014/09/15/django-non-html-responses/

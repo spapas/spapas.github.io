@@ -19,14 +19,14 @@ slowly in my next projects I started reducing the amount of functional views
 and embracing CBVs, slowly understanding their usage and usefulness. Right now,
 I more or less use only use CBVs for my views; even if sometimes it seems more work
 to use a CBV instead of a functional one I know that sometime in the future I'd
-be glad that I did it since I'll want to re-use some view functionality and 
+be glad that I did it since I'll want to re-use some view functionality and
 CBVs are more or less the only way to have DRY views in Django.
 
-I've heard various rants about them, mainly that they are too complex and difficult to 
+I've heard various rants about them, mainly that they are too complex and difficult to
 understand and use, however I believe that they are easy to be understood when
-you start from the basics and 
+you start from the basics and
 when they are used properly they will greatly improve your Django experience. Notice
-that to properly understand CBVs you must have a good comprehension of how 
+that to properly understand CBVs you must have a good comprehension of how
 python's (multiple) inheritance and MRO work. Yes, this is a rather complex and
 confusing thing but I'll try to also explain this as good as I can to the first chapter of this article.
 
@@ -52,19 +52,19 @@ view function is to properly parse the request parameters and construct the
 response object - as can be understood there is a lot of work that need to be
 done for each view (for example check if the method is GET or POST, if the user
 has access to that page, retrieve objects from the database, crate a context dict
-and pass it to the template to be rendered etc). 
+and pass it to the template to be rendered etc).
 
 Now, since functional views are simple python functions it is *not* easy to override,
 reuse or extend their behavior. There are more or less two methods for this: Use function
 decorators or pass extra parameters when adding the view to your urls. I'd like
-to point out here that there's a third method for code-reuse: Extracting 
+to point out here that there's a third method for code-reuse: Extracting
 functionality to common and re-usable functions or classes that will be called from the
 functional views but this is not something specific to Django views but a general
 concept of good programming style which you should follow anyway.
 
 The first one uses `python decorators`_ to create a functional view that wraps the
 initial one. The new view is called before the initial one, adds some functionality
-(for example check if the current user has access, modify request parameters etc), 
+(for example check if the current user has access, modify request parameters etc),
 calls the initial one which will return a response object, modify the response if needed
 and then return that. This is how login_required_ works. Notice that by using
 decorators you can change things before and after the original view runs but
@@ -159,7 +159,7 @@ Notice that the instance of the ``CustomClassView`` inside the ``_as_view`` is n
 ``CustomClassView(**kwargs)`` but using ``cls(**kwargs)`` - cls is the name of the
 class that ``as_view`` was called on and actually passed as a parameter for
 class methods (in a similar manner to how self is passed to instance methods).
-This is important to instantiate an object instace of the proper class. 
+This is important to instantiate an object instace of the proper class.
 For example, if you created a class that inherits from ``CustomClassView``
 and called its ``as_view`` method then when you use the ``cls`` parameter to instantiate
 the object it will correctly
@@ -247,7 +247,7 @@ whole ``render`` method.
 
 This is definitely not DRY. If that was our only option then we could just stick to functional views. However, we can do
 much better if we define the class based view in such a way that allows inherited classes to override methods that
-define specific parts of the functionality. To do this the class-based-view must be properly implemented so each 
+define specific parts of the functionality. To do this the class-based-view must be properly implemented so each
 part of its functionality is implemented by a differnet method. Here's how we could improve the ``CustomClassView``:
 
 .. code-block:: python
@@ -339,7 +339,7 @@ you want to override may be adding stuff to the context or filtering the objects
 from the database).
 
 To re-use this default header funtionality from multiple classes you have *two* options:
-Either inherit all classes that need this functionality from ``DefaultHeaderBetterCustomClassView`` or 
+Either inherit all classes that need this functionality from ``DefaultHeaderBetterCustomClassView`` or
 extract the custom ``get_header`` method to a *mixin* and inherit from the mixin. A mixin is a class not
 related to the class based view hierarchy we are using - the mixin inherits from object (or from another
 mixin) and just defines the methods and attributes that need to be overriden. So
@@ -376,7 +376,7 @@ inherit from BetterCustomClassView) but from object since it provides
 its own ``as_view`` method. How could we re-use default header functionality
 in this class (without having to re-implement it)? One solution would be to create a class that
 inherits from both ``JsonCustomClassView`` and ``DefaultHeaderBetterCustomClassView`` using something
-like 
+like
 
 .. code-block:: python
 
@@ -384,7 +384,7 @@ like
     class JsonDefaultHeaderCustomClassView(JsonCustomClassView, DefaultHeaderBetterCustomClassView):
         pass
 
-    # OR 
+    # OR
     # OPTION 2
     class DefaultHeaderJsonCustomClassView(DefaultHeaderBetterCustomClassView, JsonCustomClassView):
         pass
@@ -401,15 +401,15 @@ and ``as_view`` will be used in each case in the previous example.
 Interlude: An MRO primer
 ------------------------
 
-What is MRO? For every class that python sees, it tries to create a *list* (MRO list) of ancestor classes containing that class as 
+What is MRO? For every class that python sees, it tries to create a *list* (MRO list) of ancestor classes containing that class as
 the first element and its ancestors in a specific order I'll discuss right next after that. When a method
 of an object of a specific class needs to be
 called, then the method will be searched in the list (from the first element of the MRO list i.e. starting that class) - when a class is found
 in the list that defines the method then that specific method (i.e. the method defined in this class) will be called and the search will stop (careful readers: I haven't
-yet talked about *super* so please be patient). 
+yet talked about *super* so please be patient).
 
 Now, how is the MRO list created? As I explained, the first element
-is the class of the object. The second element is the MRO of the *leftmost* ancestor of that object (so MRO will 
+is the class of the object. The second element is the MRO of the *leftmost* ancestor of that object (so MRO will
 run recursively on each ancestor), the third element will be the MRO of the ancestor right next to the leftmost
 ancestor etc. There is one extra and important rule: When a class is found multiple times in the MRO list (for example
 if some elements have a common ancestor) then *only the last occurrence in the list will be kept* - so each class
@@ -421,12 +421,12 @@ Thus, the MRO list for ``DefaultHeaderJsonCustomClassView`` is (remember, start
 with the class to the left and add the MRO of each of its ancestors starting
 from the leftmost one):
 ``[DefaultHeaderJsonCustomClassView, DefaultHeaderBetterCustomClassView, BetterCustomClassView, CustomClassView, JsonCustomClassView, object]``, while
-for ``JsonDefaultHeaderCustomClassView`` is 
+for ``JsonDefaultHeaderCustomClassView`` is
 ``[JsonDefaultHeaderCustomClassView, JsonCustomClassView, DefaultHeaderBetterCustomClassView, BetterCustomClassView, CustomClassView, object``
 
-Let's try an example that has the same base class twice in the hierarchy. For this, we'll create a 
-``DefaultContextBetterCustomClassView`` that returns a default context if the context is empty 
-(similar to the default header functionality). 
+Let's try an example that has the same base class twice in the hierarchy. For this, we'll create a
+``DefaultContextBetterCustomClassView`` that returns a default context if the context is empty
+(similar to the default header functionality).
 
 .. code-block:: python
 
@@ -434,7 +434,7 @@ Let's try an example that has the same base class twice in the hierarchy. For th
         def get_context(self, ):
             return self.context if self.context else ["DEFAULT CONTEXT"]
 
-Now we'll create a class that inherits from both of them: 
+Now we'll create a class that inherits from both of them:
 
 .. code-block:: python
 
@@ -447,7 +447,7 @@ Initially, the MRO will be the following:
 
 .. code::
 
-    Starting with the initial class 
+    Starting with the initial class
     1. DefaultHeaderContextCustomClassView
     Follows the leftmost class (DefaultHeaderBetterCustomClassView) MRO
     2. DefaultHeaderContextCustomClassView, 3. BetterCustomClassView, 4. CustomClassView, 5. object
@@ -460,13 +460,13 @@ resulting MRO is the following:
 
 ``[DefaultHeaderContextCustomClassView, DefaultHeaderBetterCustomClassView, DefaultContextBetterCustomClassView, BetterCustomClassView, CustomClassView, object]``
 
-One funny thing here is that the ``DefaultHeaderContextCustomClassView`` *will actually work* properly because the 
+One funny thing here is that the ``DefaultHeaderContextCustomClassView`` *will actually work* properly because the
 ``get_header`` will be found in ``DefaultHeaderBetterCustomClassView`` and the
 ``get_context`` will be found in ``DefaultContextBetterCustomClassView`` so this
 result to the correct functionality.
 
 Yes it does work but at what cost? Do you really want to do the mental exercise
-of finding out the MRO for each class you define to see which method will be actually used? Also, what would happen if the 
+of finding out the MRO for each class you define to see which method will be actually used? Also, what would happen if the
 ``DefaultHeaderContextCustomClassView`` class also had a ``get_context`` method defined
 (hint: that ``get_context`` would be used and the ``get_context`` of ``DefaultContextBetterCustomClassView``
 would be ignored).
@@ -519,7 +519,7 @@ and all the proposed use cases using the base class view and the mixins:
         pass
 
 I believe that the above definitions are self-documented and it is very easy to know which
-method of the resulting class will be called each time: Start from the main class and if 
+method of the resulting class will be called each time: Start from the main class and if
 the method is not found there continue from left to right to the ancestor list.
 
 The ``super`` situation
@@ -534,18 +534,18 @@ this is not possible using the implementations above because when a
 ``get_context`` is found in the MRO list it will be called and the MRO search
 will finish there.
 
- 
-So how could we add the functionality of both these mixins to a class based view? This is the same problem as 
+
+So how could we add the functionality of both these mixins to a class based view? This is the same problem as
 if we wanted to inherit from a mixin (or a class view) and override one of its methods
 but *also* call its parent (overriden) method for example to get its output and use it as the base
 of the output for the overriden method. Both are the same because what stays in the end is
-the MRO list. For example say we we had the following base class 
+the MRO list. For example say we we had the following base class
 
 .. code::
 
     class V:pass
 
-and we wanted to override it either using mixins or by using normal inheritance. 
+and we wanted to override it either using mixins or by using normal inheritance.
 
 Using mixins we'll have the following MRO:
 
@@ -554,7 +554,7 @@ Using mixins we'll have the following MRO:
     class M1:pass
     class M2:pass
     class MIXIN(M2, M1, V):pass
-    
+
     # MIXIN.mro()
     # [MIXIN, M2, M1, V, object, ]
 
@@ -565,7 +565,7 @@ and using inheritance we'll have the following MRO:
     class M1V(V):pass
     class M2M1V(M1V):pass
     class INHERITANCE(M2M1V):pass
-    
+
     # INHERITANCE.mro()
     # [INHERITANCE, M2M1V, M1V, V, object ]
 
@@ -576,7 +576,7 @@ in the second case. So in both cases when calling a method they will be searched
 the MRO list and when the method is found it will be exetuted and the search will stop.
 
 But what if we needed to re-use some method from ``V`` (or from some other ancestor) and
-a class on the left of the MRO list has the same method? 
+a class on the left of the MRO list has the same method?
 The answer, as you should have guessed by now if you have some Python knowledge is ``super``.
 
 
@@ -634,7 +634,7 @@ of the previous example:
 
 Here's the output:
 
-.. code:: 
+.. code::
 
     MIXIN OUTPUT
     From V
@@ -685,8 +685,8 @@ to properly use ``super()``:
         pass
 
 Notice the order of the ancestor classes. The ``get_header()`` of  ``HeaderPrefixMixin`` will be called which
-will call the ``get_header()`` of 
-``DefaultHeaderSuperMixin`` (which will call the ``get_header()`` of ``BetterCustomClassView`` returning ``None``). 
+will call the ``get_header()`` of
+``DefaultHeaderSuperMixin`` (which will call the ``get_header()`` of ``BetterCustomClassView`` returning ``None``).
 So the result will be ``"PREFIX: DEFAULT HEADER"``. However if instead we had defined this class like
 
 .. code-block:: python
@@ -713,7 +713,7 @@ For another example of super, let's define a couple of mixins that add things to
             ctx.insert(0, 'data2')
             return ctx
 
-The first one retrieves the ancestor context list and appends ``'data1'`` to the 
+The first one retrieves the ancestor context list and appends ``'data1'`` to the
 it while the second one will insert ``'data2'`` to the start of the list. To use
 these mixins just add them to the ancestor list of your class hierarchy as usually.
 One interesting thing to notice here is that because of how ``get_context`` is
@@ -761,7 +761,7 @@ which method or attribute you need to define to each one of your mixins or views
 To use CBV inspector, just click on a class name (for example ``CreateView``) - you will
 immediately see its MRO ancestors, its list of attributes (and the ancestor class that defines
 each one) and finally a list of methods that this class and all its ancestors define.
-Of course when a method is defined by multiple classes the MRO ordering will be used - 
+Of course when a method is defined by multiple classes the MRO ordering will be used -
 super is used when the functionality of the ancestor classes is also used. Unfortunately the CBV
 inspector has Python 2 (and Django 1.11) syntax which has the following syntax to call super for method ``x()``:
 
@@ -773,7 +773,7 @@ this is the same as calling
 
 .. code-block:: python
 
-    super().x() 
+    super().x()
 
 in Python 3.x.
 
@@ -796,11 +796,11 @@ only HTTP GET and HTTP POST are supported then the inherited class must define a
 ``get`` and a ``post`` method; these methods are called from the functional view
 through a method called ``dispatch`` and need to return a proper response object. So,
 we have two central methods here: The ``as_view`` class method that creates the
-object instance and returns its view function and ``dispatch`` that will call 
+object instance and returns its view function and ``dispatch`` that will call
 the proper named class method depending on the HTTP method (i.e post, get, put
 etc). One thing to keep from this discussion is that you shouldn't ever need to
 mess with ``as_view`` but, because ``dispatch`` is the only instance method that is
-guaranteed to run everytime the class based view will run, you will frequently 
+guaranteed to run everytime the class based view will run, you will frequently
 need to override it especially to control authentication.
 
 As an example, we can implemented the ``BetterCustomClassView`` from the first
@@ -811,7 +811,7 @@ section using ``View`` as its ancestor:
     class DjangoBetterCustomClassView(View, ):
         header = ''
         context =''
-        
+
         def get_header(self, ):
             return self.header if self.header else ""
 
@@ -858,19 +858,19 @@ that the CBV Inspector puts in the same level as ``View`` (GENERIC BASE):
 RedirectView_ and TemplateView_. Both inherit directly from ``View`` and, the
 first one defines a ``get`` method that returns a redirect to another page
 while the latter one renders and returns a django template in the ``get``
-method. 
+method.
 
 The ``TemplateView`` however inherits from two more classes (actually
 these are mixins) beyond ``View``: ``TemplateResponseMixin`` and
 ``ContextMixin``. If you take a look at them you'll see that the
 ``TemplateResponseMixin`` defines some template-related attributes and two
 methods: One that retrieves the template that will be used to render this View
-(``get_template_names``) 
+(``get_template_names``)
 and one that actually renders the template (``render_to_response``) using a
 TemplateResponse_ instance. The
 ``ContextMixin`` on the other hand provides the ``get_context_data`` that is
 passed to the template to be rendered and should be overriden if you want to
-pass more context variables. 
+pass more context variables.
 
 We can already see many opportunities of reusing and overriding
 functionality and improving our DRY score, for example: Create a catch all RedirectView
@@ -885,40 +885,39 @@ The FormView
 
 The next view we're going to talk about is FormView_. This is a view that can be
 used whenever we want to display a form (*not* a form related to a Model i.e for
-Create/Update/Delete, for these cases there are specific CBVs we'll see later). 
+Create/Update/Delete, for these cases there are specific CBVs we'll see later).
 It is interesting to take a look at the list of its
 ancestors: ``TemplateResponseMixin``, ``BaseFormView``, ``FormMixin``, ``ContextMixin``, ``ProcessFormView`` and ``View``.
 We are familiar with TemplateResponseMixin, ContextMixin and View but not with
 the others. Before discussing these classes let's take a look at the FormView
 hierarchy, courtesy of http://ccbv.cco.uk and http://yuml.me:
 
-.. raw:: html 
+.. raw:: html
 
       <img src="https://yuml.me/diagram/plain;/class/[TemplateResponseMixin%7Bbg:white%7D]%5E-[FormView%7Bbg:green%7D],%20[BaseFormView%7Bbg:white%7D]%5E-[FormView%7Bbg:green%7D],%20[FormMixin%7Bbg:white%7D]%5E-[BaseFormView%7Bbg:white%7D],%20[ContextMixin%7Bbg:white%7D]%5E-[FormMixin%7Bbg:white%7D],%20[ProcessFormView%7Bbg:white%7D]%5E-[BaseFormView%7Bbg:white%7D],%20[View%7Bbg:lightblue%7D]%5E-[ProcessFormView%7Bbg:white%7D].svg" alt="FormView">
 
 The above diagram should make everything easier: The ``FormMixin`` inherits
 from ``ContextMixin`` and overrides its ``get_context_data`` method to add the
-form. Beyond this, it adds some attributes and methods for proper form handling for
-example ``form_class`` (attribute when the form class will be the same always) and 
-``get_form_class()`` (method when the form class will be dynamic for example on
+form to the view. Beyond this, it adds some attributes and methods for proper form handling for
+example ``form_class`` (attribute when the form class will be the same always) and
+``get_form_class()`` (method when the form class will be dynamic for example
+depending on
 the logged in user), ``initial`` and ``get_initial()`` (same logic as before for
 the form's initial values), ``form_valid()`` and ``form_invalid()`` to define
 what should happen when the form is valid or invalid etc. Notice that FormMixin
 does not define any form handling logic (i.e check if the form is valid and call
 its ``form_valid()`` method) -- this logic is defined in the ``ProcessFormView``
 which inherits from ``View`` and defines proper ``get()`` (just render the form)
-and ``post()`` (check if the form is valid and call ``form_valid`` else call
-``form_invalid``) methods. 
+and ``post()`` (check if the form is valid and call ``form_valid`` else call ``form_invalid``) methods.
 
 One interesting here is to notice here is that Django defines both the ``FormMixin`` and ``ProcessFormView``.
 The ``FormMixin`` offers the basic Form elements (the form class, initial data
 etc) and could be re-used in a different flow beyond the one offered by
 ``ProcessFormView`` (for example display the form as a JSON object instead of a
-django template). On the other hand, ``ProcessFormView`` is required in order to
+Django template). On the other hand, ``ProcessFormView`` is required in order to
 define the ``get`` and ``post`` methods that are needed from the ``View``. These
-methods can't be overriden in the FormMixin since that would mean that the mixin
-would behave as a view! 
-
+methods can't be overridden in the FormMixin since that would mean that the mixin
+would behave as a view!
 
 Finally, the ``BaseFormView`` class is used to
 inherit from ``ProcessFormView`` and ``FormMixin``. It does not do anything
@@ -932,7 +931,7 @@ Next in our Django CBV tour is the ListView_. The ``ListView`` is used to render
 objects in a template, for example in a list or table. Here's a diagram of the class
 hierarchy (courtesy of http://ccbv.cco.uk and http://yuml.me):
 
-.. raw:: html 
+.. raw:: html
 
     <img src="https://yuml.me/diagram/plain;/class/[MultipleObjectTemplateResponseMixin%7Bbg:white%7D]%5E-[ListView%7Bbg:green%7D],%20[TemplateResponseMixin%7Bbg:white%7D]%5E-[MultipleObjectTemplateResponseMixin%7Bbg:white%7D],%20[BaseListView%7Bbg:white%7D]%5E-[ListView%7Bbg:green%7D],%20[MultipleObjectMixin%7Bbg:white%7D]%5E-[BaseListView%7Bbg:white%7D],%20[ContextMixin%7Bbg:white%7D]%5E-[MultipleObjectMixin%7Bbg:white%7D],%20[View%7Bbg:lightblue%7D]%5E-[BaseListView%7Bbg:white%7D].svg" alt="ListView">
 
@@ -945,10 +944,10 @@ method checks to see if the ``queryset`` or ``model`` attribute are defined
 returns a queryset result (taking into account the ordering). This queryset
 result will be used by the ``get_context_data()`` method of this mixin to
 actually put it to the context by saving to a context variable named ``object_list``.
-Notice that you can set the ``context_object_name`` attribute to add and extra 
+Notice that you can set the ``context_object_name`` attribute to add and extra
 another variable to the context with the queryset beyond ``object_list`` (for
 example if you have an ``ArticleLsitView`` you can set ``context_object_name = articles`` to
-be able to do ``{% for article in articles %}`` in your context instead of 
+be able to do ``{% for article in articles %}`` in your context instead of
 ``{% for article in object_list %}``).
 
 The ``MultipleObjectMixin`` can be used and
@@ -963,7 +962,7 @@ template name (so you won't need to define it yourself) - that's from where the
 ``app_label/app_model_list.html`` default template name is created.
 
 Similar to the ``ListView`` is the DetailView_ which has the same class hierarcy as the ``ListView`` with two differnces:
-It uses ``SingleObjectMixin`` instead of ``MultipleOjbectMixin``,  
+It uses ``SingleObjectMixin`` instead of ``MultipleOjbectMixin``,
 ``SingleObjectTemplateResponseMixin`` instead of ``MultipleObjectTemplateResponseMixin``
 and ``BaseDetailView`` instead of ``BaseListView``. The
 ``SingleObjectMixin`` will use the ``get_queryset()`` (in a similar manner to the ``get_queryset()`` of
@@ -981,31 +980,32 @@ The CreateView
 The next Django CBV we'll talk about is CreateView_. This class is used to create a new instance
 of a model. It has a rather complex hierarchy diagram but we've already discussed most of these classes:
 
-.. raw:: html 
+.. raw:: html
 
       <img src="https://yuml.me/diagram/plain;/class/[SingleObjectTemplateResponseMixin%7Bbg:white%7D]%5E-[CreateView%7Bbg:green%7D],%20[TemplateResponseMixin%7Bbg:white%7D]%5E-[SingleObjectTemplateResponseMixin%7Bbg:white%7D],%20[BaseCreateView%7Bbg:white%7D]%5E-[CreateView%7Bbg:green%7D],%20[ModelFormMixin%7Bbg:white%7D]%5E-[BaseCreateView%7Bbg:white%7D],%20[FormMixin%7Bbg:white%7D]%5E-[ModelFormMixin%7Bbg:white%7D],%20[ContextMixin%7Bbg:white%7D]%5E-[FormMixin%7Bbg:white%7D],%20[SingleObjectMixin%7Bbg:white%7D]%5E-[ModelFormMixin%7Bbg:white%7D],%20[ContextMixin%7Bbg:white%7D]%5E-[SingleObjectMixin%7Bbg:white%7D],%20[ProcessFormView%7Bbg:white%7D]%5E-[BaseCreateView%7Bbg:white%7D],%20[View%7Bbg:lightblue%7D]%5E-[ProcessFormView%7Bbg:white%7D].svg" />
 
 As we can see the ``CreateView`` inherits from ``BaseCreateView`` and ``SingleObjectTemplateResponseMixin``. The
-``SingleObjectTemplateResponseMixin`` is mainly used to automagically create the template names that will be seached for
-(i.e ``app_label/app_model_form.html``), while the ``BaseCreateView`` 
+``SingleObjectTemplateResponseMixin`` is mainly used to automagically create the template names that will be searched for
+(i.e ``app_label/app_model_form.html``), while the ``BaseCreateView``
 is used to combine the functionality of ``ProcessFormView`` (that handles the basic form workflow as we have
 already discussed) and ``ModelFormMixin``. The ``ModelFormMixin`` is a rather complex mixin that inherits from
-both ``SingleObjectMixin`` and ``FormMixin``. The ``SingleObjectMixin`` functionality is not really used by ``CreateView`` 
+both ``SingleObjectMixin`` and ``FormMixin``. The ``SingleObjectMixin`` functionality is not really used by ``CreateView``
 (since no object will need to be retrieved for the ``CreateView``) however the ``ModelFormMixin`` is also used
-by ``UpdateView`` that's why ``ModelFormMixin`` also inherits from it. This mixin adds functionality
+by ``UpdateView`` that's why ``ModelFormMixin`` also inherits from it (to retrieve the object that will be updated).
+This mixin adds functionality
 for handling forms related to models and object instances. More specifically it adds functionality for
-* creating a form class (if one is not provided) by the configured model / queryset 
+* creating a form class (if one is not provided) by the configured model / queryset. If you don't provide the form class (by using the ``form_class`` attribute) then you need to configure the fields that the generated form will display by passing an array of field names through the ``fields`` attribute
 * overrides the ``form_valid`` in order to save the object instance of the form
 * fixes ``get_success_url`` to redirect to the saved object's absolute_url when the object is saved
-* pass the current object (if it has one - CreateView does not for example) to the form as the ``instance`` attribute
+* pass the current object to be updated (that was retrieving through the ``SingleObjectMixin``) -if there is a current object- to the form as the ``instance`` attribute
 
 The UpdateView and DeleteView
 -----------------------------
 
-The UpdateView_ class is almost identical to the ``CreateView`` - the only difference is that 
+The UpdateView_ class is almost identical to the ``CreateView`` - the only difference is that
 ``UpdateView`` inherits from ``BaseUpdateView`` (and ``SingleObjectTemplateResponseMixin``) instead
 of ``BaseCreateView``.  The ``BaseUpdateView`` overrides the ``get`` and ``post`` methods of
-``ProcessFormView`` to retrieve the object (using ``SingleObjectMixin``'s ``get_object()``) 
+``ProcessFormView`` to retrieve the object (using ``SingleObjectMixin``'s ``get_object()``)
 and assign it to an instance variable - this will then be picked up by the ``ModelFormMixin`` and used
 properly in the form as explained before. One thing I notice here is that probably the hierarchy would
 be better if the ``ModelFormMixin`` inherited *only* from ``FormMixin`` (instead of both from
@@ -1013,7 +1013,7 @@ be better if the ``ModelFormMixin`` inherited *only* from ``FormMixin`` (instead
 ``ModelForMixin`` *and* ``SingleObjectMixin``. This way the ``BaseCreateView`` wouldn't get the
 non-needed ``SingleObjectMixin`` functionality. I am not sure why Django is implemented this way
 (i.e the ``ModelFormMixin`` also inheriting from ``SingleObjectMixin`` thus passing this non-needed
-functionality to ``BaseCreateView``) -- if a reader has a clue I'd like to know it. 
+functionality to ``BaseCreateView``) -- if a reader has a clue I'd like to know it.
 
 In any way, I'd like to also present the DeleteView_ which is more or less the same as the DetailView_
 with the addition of the ``DeleteMixin`` in the mix. The ``DeleteMixin`` adds a ``post()`` method
@@ -1051,7 +1051,7 @@ In this section I am going to present a number of use cases demonstrating the us
 these examples I am goint to override one of the methods of the mixins I discussed in the previous section. There
 are *two* methods you can use for integrating the following use cases to your application.
 
-Create your own class inheriting from one of the Django CBVs and add to it directly the method to override. For example, 
+Create your own class inheriting from one of the Django CBVs and add to it directly the method to override. For example,
 if you wanted to override the ``get_queryset()`` method a ``ListView`` you would do a:
 
 .. code-block:: python
@@ -1122,6 +1122,7 @@ For some of the following use cases I am also going to use the following models 
         description = models.CharField(max_length=128, )
         file = models.FileField()
 
+
 Auto-fill created_by and modified_by
 ------------------------------------
 
@@ -1141,7 +1142,7 @@ To replicate the functionality we'll create the ``AuditableMixin`` like this:
             return super().form_valid(form)
 
 This mixin can be used by both the create and update view of both ``Article`` and ``Document``. So all four of these
-classes will share the same functionality. Notice that the ``form_valid`` method is overriden - the ``created_by`` 
+classes will share the same functionality. Notice that the ``form_valid`` method is overriden - the ``created_by``
 of the form's instance (which is the object that was edited, remember how ``ModelFormMixin`` works) will by set
 to the current user if it is null (so it will be only set once) while the ``modified_by`` will be set always to the
 current user. Finally we call ``super().form_valid`` and return its response so
@@ -1220,8 +1221,10 @@ example, here's how a form that can accept the request could be implemented:
             self.request = kwargs.pop('request', None)
             super().__init__(*args, **kwargs)
 
-We use ``pop`` to remove the request from the received ``kwargs`` and only then we call the 
+We use ``pop`` to remove the request from the received ``kwargs`` and only then we call the
 parent constructor.
+
+
 
 Add values to the context
 -------------------------
@@ -1251,8 +1254,8 @@ As a general comment there are three other methods the same functionality could 
 As can be understood, each of the above methods has certain advantages and disadvantages. For
 example, if the extra data will query the database then the context processor method will add
 one extra query for all page loads (even if the data is not needed). On the other hand,
-the template tag will query the database only on specific views but it makes debugging and 
-reasoning about your template more difficult since if you have a lot of template tags you'll have 
+the template tag will query the database only on specific views but it makes debugging and
+reasoning about your template more difficult since if you have a lot of template tags you'll have
 various context variables appearing from thing air!
 
 Support for success messages
@@ -1261,7 +1264,7 @@ Support for success messages
 Django has a very useful `messages framework`_ which can be used to add flash messages
 to a view. A flash message is a message that persists in the sesion until it is viewed
 by the user. So, for example when a user edits an object and saves it, he'll be redirected
-to the success page - if you have configured a flash message to inform the user that the 
+to the success page - if you have configured a flash message to inform the user that the
 save was ok then he'll see this message once and then if he reloads the page it will
 be removed.
 
@@ -1317,16 +1320,16 @@ allow publishers to publish a model. Here's how it can be done:
                 else:
                     self.object.status = 'DRAFT'
                 self.object.save()
-                
+
             return redirect_to
-            
+
 So, first of all we call the parent ``form_valid`` to properly save the form and save
 the redirect to value. We then make sure that the object is not ``REMOVED`` (if it is
-remove it we don't do anything else). Next we check if the current user has 
+remove it we don't do anything else). Next we check if the current user has
 ``publisher_access`` if yes we change the object's status to ``PUBLISHED`` - on any
 other case we change its status to ``DRAFT``. Notice that this means that whenever a
 publisher saves the object it will be published and whenever a non-publisher saves it
-it will be made a draft. 
+it will be made a draft.
 
 I'd like to repeat here that this mixin, since it calls super, can work concurrently
 with any other mixins that override ``form_valid`` (and also call their super method
@@ -1337,11 +1340,11 @@ and moderated_by) and the success mixins we defined previously!
 Allow access to a view if a user has one out of a group of permissions
 ----------------------------------------------------------------------
 
-For this we'll need to use the authentication mixins functionality. We could implement 
+For this we'll need to use the authentication mixins functionality. We could implement
 this by overriding ``PermissionRequiredMixin`` or by overriding ``UserPassesTestMixin``.
 
 Using ``PermissionRequiredMixin`` is not very easy because the way it works
-it will allow access if the user has *all* permissions from the group (not only one as is the requirement). 
+it will allow access if the user has *all* permissions from the group (not only one as is the requirement).
 Of course you could override its ``has_permission`` method to change the way it checks if
 the user has the permissions (i.e make sure it has one permission instead of all):
 
@@ -1364,10 +1367,10 @@ Also we could implement our mixin using ``UserPassesTestMixin`` as its base:
 
 
 The functionality is very simple: If the user has one of the list of the configured permissions then the test will pass (so he'll have access to the view).
-If instead the user has none of the permissions then he won't be able to access the view.            
-            
+If instead the user has none of the permissions then he won't be able to access the view.
+
 Notice that for the above implementations we inherited from ``PermissionRequiredMixin`` or ``UserPassesTextMixin`` to keep their functionality - if we had inherited
-these mixins from object then we'd need to inherit our CBVs from both ``AnyPermissionRequiredMixin`` and ``PermissionRequiredMixin`` or 
+these mixins from object then we'd need to inherit our CBVs from both ``AnyPermissionRequiredMixin`` and ``PermissionRequiredMixin`` or
 ``AnyPermissionRequiredAlternativeMixin`` and ``UserPassesTestMixin`` (with the correct MRO order of course).
 
 
@@ -1391,12 +1394,12 @@ disabled before a specific date. Here's a simple mixin that overrides ``dispatch
 
     class DisabledDateMixin(object, ):
         the_date = datetime.date(2018,1,1)
-        
+
         def dispatch(self, request, *args, **kwargs):
             if datetime.date.today() < the_date:
                 raise PermissionDenied
             return super().dispatch(request, *args, **kwargs)
-            
+
 You can even disable a view completely  in case you want to keep it in your urls.py using this mixin:
 
 .. code-block:: python
@@ -1434,9 +1437,9 @@ Finally, let's take a look at a generic Mixin that you can use to add CSV export
 
                 return response
             return super().render_to_response(context, **response_kwargs)
-            
-As you can see this mixin overrides the ``render_to_response`` method. It will check if there's a 
-``csv`` key to the ``GET`` queryset dictionary, thus the url must be called with ``?csv=true`` or something similar. You 
+
+As you can see this mixin overrides the ``render_to_response`` method. It will check if there's a
+``csv`` key to the ``GET`` queryset dictionary, thus the url must be called with ``?csv=true`` or something similar. You
 can just add this link to your template:
 
 .. code-block:: html
@@ -1449,29 +1452,32 @@ We then crate a new ``csv.writer`` passing the just-created response as the plac
 enumerates the ``object_list`` value of the context (remember that this is added by the ``MultipleObjectMixin`` and contains the
 result of the ``ListView``). It will then use the object's ``__dict__`` attribute to write the headers (for the first time) and then
 write the values of all objects.
-    
+
 
 Using dynamic templates
 -----------------------
 
 Some people think that they may never need to override the ``get_template_names`` method of
 ``TemplateResponseMixin``. However overriding this method can be used to create a DRY Ajax view
-of your data! For example, let's say that you have a ``DetailView`` for one of your models that 
+of your data! For example, let's say that you have a ``DetailView`` for one of your models that
 has overriden the ``get_template_names`` like this:
 
 .. code-block:: python
 
     def get_template_names(self):
-        if self.request.is_ajax():
+        if self.request.is_ajax() or self.request.GET.get('ajax_partial'):
             return 'core/partial/data_ajax.html'
         return super().get_template_names()
-        
+
 and you have also defined a normal template for classic request response viewing and an ajax template
 that contains only the specific data for this instances (i.e it does not containg html body, headers, footers etc,
-only a <div> with the instance's data). 
+only a <div> with the instance's data). Notice I'm using either the ``is_ajax`` method or I directly passed GET
+value (``ajax_partial``) - this is needed because sometimes ``is_ajax`` is not working as expected (depending on
+how you're going to do the request), also this way you can easily test the partial ajax view through your browser
+by passing it ``?ajax_partia=true``.
 
 Using this technique you can create an Ajax view of your data just by requesting the DetailView through an
-Ajax call and dumping the response you get to a modal dialog (for example)  - no need for fancy REST APIs. Also as 
+Ajax call and dumping the response you get to a modal dialog (for example)  - no need for fancy REST APIs. Also as
 a bonus, the classic DetailView will work normally, so you can have the Ajax view to give a summary of the instance's
 data (i.e have a subset of the info on the Ajax template) and the normal view to display everything.
 
@@ -1482,6 +1488,116 @@ If you have a lot of similar models you can add a mixin that dynamically creates
 for these models  - take a look at my `dynamic tables and filters for similar models`_ article!
 
 
+Configure forms for your views
+------------------------------
+
+As I've already explained if you are using a ``FormView`` you'll need to set a ``form_class`` for
+your view (needed by ``FormMixin``) while, for an Update or ``CreateView`` which use the ``ModelFormMixin``
+you can either set the ``form-class`` or directly configure the instance's fields that will be displayed
+to the form using the ``fields`` attribute.
+
+For example, let's say that you have a rather generic ``FormView`` that will display a different form
+depending on the user permissions. Here's how you could do this to return a ``SuperForm`` if the
+current user is a superuser and a ``SimpleForm`` in other cases:
+
+
+.. code-block:: python
+
+    def get_form_class(self):
+        if self.request.user.is_superuser:
+            return SuperForm
+        return SimpleForm
+
+Display a different form for Create and Update
+----------------------------------------------
+
+There are various ways you can do this (for example you can just declare a different ``form_class`` for your
+``Create`` and ``UpdateView``) but I think that the most DRY one, especially if the create and update form are
+similar is to pass an ``is_create`` argument to the form which it will then be used to properly configure the form.
+
+Thus, on your ``CreateView`` you'll add this ``get_form_kwargs``:
+
+.. code-block:: python
+
+    def get_form_kwargs(self):
+        kwargs = super(MyCreateView, self).get_form_kwargs()
+        kwargs.update({'is_create': True})
+        return kwargs
+
+while on your ``UpdateView`` you'll add this:
+
+.. code-block:: python
+
+    def get_form_kwargs(self):
+        kwargs = super(MyUpdateView, self).get_form_kwargs()
+        kwargs.update({'is_create': False})
+        return kwargs
+
+Please notice that the form has to properly handle the extra kwarg in its constructor as I've already explained previously.
+
+Only allow specific HTTP methods for a view
+-------------------------------------------
+
+Let's say that you want to create an ``UnpublishView`` i.e a view that will change the status of your content
+to ``DRAFT``. Since this view will change your model instance it must be called through ``POST``, however
+you may not want to display an individual form for this view, just a button that when called will display
+a client-side (Javascript) prompt and if the user clicks it it will immediately do a ``POST`` request
+by submitting the form. The best way to create this is to just implement an ``UpdateView`` for your model
+and change its form valid to change the status to ``DRAFT``, something like this:
+
+.. code-block:: python
+
+    def form_valid(self, form, ):
+        form.instance.status = 'DRAFT'
+        return super().form_valid(form)
+
+Beyond this, you'll need to add a ``fields = []`` attribute to your ``UpdateView`` to denote that you won't
+need to update any fields from the model (since you'll update the status directly) and finally, to only allow
+this view to be called through an http ``POST`` method add the following attribute:
+
+.. code-block:: python
+
+        http_method_names = ['post',]
+
+
+Create an umbrella View for multiple models
+-------------------------------------------
+
+Let's say that you have a couple of models (called ``Type1`` and ``Type2`` that are more or less the same and
+you want to quickly create a ``ListView`` for both of them but you'd like to create just one ``ListView`` and 
+separate them by their url. Here's how it could be done:
+
+.. code-block:: python
+
+
+    class UmbrellaListView(ListView):
+        template_name='umbrella_list.html'
+
+        def dispatch(self, request, *args, **kwargs):
+            self.kind = kwargs['kind']
+            if self.kind == 'type1':
+                self.queryset = models.Type1.objects.all()
+            elif self.kind == 'type2':
+                self.queryset = models.Type2.objects.all()
+            return super(UmbrellaListView, self).dispatch(request, *args, **kwargs)
+
+Notice that for this to work properly you must setup your urls like this:
+
+.. code-block:: python
+    
+    ...
+    url(r'^list/(?P<kind>type1|type2)/$', UmbrellaListView.as_view() ) , name='umbrella_list' ),
+    ...
+    
+A heavy CBV user project
+========================
+
+DSd asd asd
+    
+Conclusion
+==========
+
+asdasd
 
 
 .. _`CBV inspector`: http://ccbv.co.uk`
@@ -1502,6 +1618,6 @@ for these models  - take a look at my `dynamic tables and filters for similar mo
 .. _`my Django model auditing article`: https://spapas.github.io/2015/01/21/django-model-auditing/#adding-simple-auditing-functionality-ourselves
 .. _`messages framework`: https://docs.djangoproject.com/en/2.0/ref/contrib/messages/
 .. _`a message mixin`: https://docs.djangoproject.com/en/2.0/ref/contrib/messages/#adding-messages-in-class-based-views
-.. _`essential guide for outputting PDFs in Django`: https://spapas.github.io/2015/11/27/pdf-in-django/#using-a-cbv 
-.. _`dynamic tables and filters for similar models`: https://spapas.github.io/2015/10/05/django-dynamic-tables-similar-models/ 
+.. _`essential guide for outputting PDFs in Django`: https://spapas.github.io/2015/11/27/pdf-in-django/#using-a-cbv
+.. _`dynamic tables and filters for similar models`: https://spapas.github.io/2015/10/05/django-dynamic-tables-similar-models/
 .. _`Django non-HTML responses`: https://spapas.github.io/2014/09/15/django-non-html-responses/

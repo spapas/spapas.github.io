@@ -2,12 +2,12 @@ A comprehensive Django CBV guide
 ################################
 
 :status: draft
-:date: 2018-03-14 12:20
+:date: 2018-03-15 12:20
 :tags: python, cbv, class-based-views, django
 :category: django
 :slug: comprehensive-django-cbv-guide
 :author: Serafeim Papastefanos
-:summary: A comprehensive guide to django CBVs - from neophyte to more advanced
+:summary: A comprehensive guide to Django CBVs - from neophyte to more advanced
 
 .. contents:: :backlinks: none
 
@@ -17,36 +17,52 @@ first Django projects (using Django 1.4 around 6 years ago) I was mainly using
 functional views -- that's what the tutorial recommended then anyway. However,
 slowly in my next projects I started reducing the amount of functional views
 and embracing CBVs, slowly understanding their usage and usefulness. Right now,
-I more or less use only use CBVs for my views; even if sometimes it seems more work
+I more or less only use CBVs for my views; even if sometimes it seems more work
 to use a CBV instead of a functional one I know that sometime in the future I'd
 be glad that I did it since I'll want to re-use some view functionality and
 CBVs are more or less the only way to have DRY views in Django.
 
 I've heard various rants about them, mainly that they are too complex and difficult to
-understand and use, however I believe that they are easy to be understood when
-you start from the basics and
-when they are used properly they will greatly improve your Django experience. Notice
-that to properly understand CBVs you must have a good comprehension of how
-python's (multiple) inheritance and MRO work. Yes, this is a rather complex and
-confusing thing but I'll try to also explain this as good as I can to the first chapter of this article.
+understand and use, however I believe that they are not really difficult when
+you start from the basics. Even if it is a little work to become comfortable with
+the CBV logic, when they are used properly they will greatly improve your Django experience
+so it is definitely worth it.
 
-This guide has three parts:
+Notice
+that to properly understand CBVs you must have a good understanding of how
+Python's (multiple) inheritance and MRO work. Yes, this is a rather complex and
+confusing thing but I'll try to also explain this as good as I can to the first chapter 
+of this article so if you follow along you shouldn't have any problems.
+
+This guide has four parts:
 
 - A gentle introduction to how CBVs are working and to the the problems that do solve. For this we'll implement
   our own simple Custom Class Based View variant and take a look at python's inheritance model.
 - A high level overview of the real Django CBVs using `CBV inspector`_ as our guide.
 - A number of use cases where CBVs can be used to elegantly solve real world problems
+- Describing the usage of some of the previous use cases to a real Django application
+
+I've implemented an accompanying project to this article which you can find at https://github.com/spapas/cbv-tutorial.
+This project has two separate parts. One that is the implementation of the Custom Class Based View variant
+to see how it is working and the other is the application that contains the usage of the various CBV use cases.
 
 A gentle introduction to CBVs
 =============================
 
-In this part of the guide we'll do a gentle introduction to (our own) class based views -
-along with it we'll introduce some basic concepts of python (multiple) inheritance and how it applies to CBVs.
+In this part of the guide we'll do a gentle introduction to how CBVs work by implementing 
+our own class based views variant - along with it we'll introduce and try to understand 
+some concepts of  python (multiple) inheritance and how it applies to CBVs.
 
 Before continuing, let's talk about the concept of the "view" in Django:
-Traditionally, a view in Django is a normal python function that takes a single parameter,
+Django is considered an MVT (Model View Template) framework - the View as 
+conceived by Django is not the same as the MVC-View. A Django View is more or 
+less a way to define the data that the Template (which is cloased to the MVC-View)
+will display, so the Django View (with the help of the Django Framework) is similar 
+to the MVC-Controller.
+
+In any case, traditionally a view in Django is a normal python function that takes a single parameter,
 the request_ object and must return a response_ object (notice that if the
-view takes request parameters for example the id of an object to be edited
+view uses request parameters for example the id of an object to be edited
 they will also be passed to the function). The responsibility of the
 view function is to properly parse the request parameters and construct the
 response object - as can be understood there is a lot of work that need to be
@@ -55,7 +71,7 @@ has access to that page, retrieve objects from the database, crate a context dic
 and pass it to the template to be rendered etc).
 
 Now, since functional views are simple python functions it is *not* easy to override,
-reuse or extend their behavior. There are more or less two methods for this: Use function
+reuse or extend their behaviour. There are more or less two methods for this: Use function
 decorators or pass extra parameters when adding the view to your urls. I'd like
 to point out here that there's a third method for code-reuse: Extracting
 functionality to common and re-usable functions or classes that will be called from the
@@ -68,20 +84,23 @@ initial one. The new view is called before the initial one, adds some functional
 calls the initial one which will return a response object, modify the response if needed
 and then return that. This is how login_required_ works. Notice that by using
 decorators you can change things before and after the original view runs but
-you can't do anything about the way the view works.
+you can't do anything about the way the original view works.
 
-For the second one you must
+For the second one (adding extra view parameters) you must
 write your function view in a way which allows it to be reused, for example instead
-of hard-coding the template name allow it to be passed by a parameter or instead
+of hard-coding the template name allow it to be passed as a parameter or instead
 of using a specific form class for a form make it configurable through a parameter. Then,
 when you add this function to your urls you will pass different parameters
 depending on how you want to configure your view. Using this method you can
-override the original function behavior however there's a limit to the number of
-parameters you can allow your function views to hava and notice that these
-function views cannot be further overrided.
+override the original function behaviour however there's a limit to the number of
+parameters you can allow your function views to have and notice that these
+function views cannot be further overridden. The login_ authentication view (which
+is now deprecated in favour of a CBV one)
+is using this technique, for example you can pass it 
+the template name that will be used, a custom authentication form etc.
 
 It should be obvious that both these methods have severe limitations and do not allow you to be as DRY as
-you should be. Using the wrapped views you can't actually
+you should be. When using the wrapped views you can't actually
 change the functionality of the original view (since that original function needs
 to be called) but only do things before and after calling it. Also, using the
 parameters will lead to spaghetti code with multiple if / else conditions in order
@@ -90,22 +109,23 @@ very reduced re-usability and DRYness of functional views - usually the best thi
 you can do is to gather the common things in external normal python functions (not view functions) that could be
 re-used from other functional views as already discussed.
 
-Class based views solve the above problem of non-DRY-ness by using the well know
+Class based views solve the above problem of non-DRY-ness by using the well known
 concept of OO inheritance: The view is defined from a class which has methods
 for implementing the view functionality - you inherit from that class and override
-the parts you want so the inherited class based view will use the overriden methods instead
+the parts you want so the inherited class based view will use the overridden methods instead
 of the original ones. You can also create re-usable classes (mixins) that offer a specific
 functionality to your class based view by implementing some of the methods of the
 original class. Each one of your class based views can inherit its functionality from
 multiple mixins thus allowing you to define a single class for each thing you need
 and re-using it everywhere. Notice of course that this is possible only if the
-CBVs are properly implemented to allow overriding their functionality.
+CBVs are *properly implemented* to allow overriding their functionality. We'll see 
+how this is possible in the next section.
 
 Hand-made CBVs
 --------------
 
-To make things more clear we'll try to implement our own class based views hierarchy. Here's
-a first try:
+To make things more clear we'll start implementing our own class based views hierarchy. Here's
+a rather naive first try:
 
 .. code-block:: python
 
@@ -144,26 +164,33 @@ then you'd need to use new-style classes i.e the previous class would need
 to be defined like CustomClassView(object ,).**
 
 This class can be used to render a simple HTML template with a custom header and
-a list in the body (named ``context``). There are two things to notice here: The ``__init__`` method (which
-will be called as the object's constructor) will assign all the kwargs it receives
+a list of items in the body (named ``context``). There are two things to notice here: The ``__init__`` method (which
+will be called as the object's constructor) will assign all the keyword arguments (``kwargs``) it receives
 as instance attributes (for example ``CustomClassView(header='hello')`` will create
-an instance with ``'hello'`` as its header attribute). The ``as_view`` is a classmethod
-(i.e it can be called on the *class* without the need to instantiate an object) that
-defines and returns a functional view that will be used to serve the view. The returned
-functional view is very simple - it just instantiates a new instance of CustomClassView passing
-the kwargs it got in the constructor and then returns a normal ``HttpResponse`` with
-the instance's ``render()`` result. The ``render`` method will just output some html
+an instance with ``'hello'`` as its ``header`` attribute). The ``as_view`` is a class method
+(i.e it can be called directly on the *class* without the need to instantiate an object
+for example you can call ``CustomClassView.as_view()`` ) that
+defines and returns a traditional functional view (named ``view``) that will be used to 
+actually serve the view. The returned
+functional view is very simple - it just instantiates a new instance (object) 
+of ``CustomClassView`` passing
+the ``kwargs`` it got in the constructor and then returns a normal ``HttpResponse`` with
+the instance's ``render()`` result. This ``render()`` method will just output some html
 using the instance's header and context to fill it.
 
-Notice that the instance of the ``CustomClassView`` inside the ``_as_view`` is not created using
-``CustomClassView(**kwargs)`` but using ``cls(**kwargs)`` - cls is the name of the
-class that ``as_view`` was called on and actually passed as a parameter for
-class methods (in a similar manner to how self is passed to instance methods).
-This is important to instantiate an object instace of the proper class.
-For example, if you created a class that inherits from ``CustomClassView``
+Notice that the instance of the ``CustomClassView`` inside the ``as_view`` class method 
+is not created using
+``CustomClassView(**kwargs)`` but using ``cls(**kwargs)`` - ``cls`` is the name of the
+class that ``as_view`` was called on and is actually passed as a parameter for
+class methods (in a similar manner to how ``self`` is passed to instance methods).
+This is important to instantiate an object instance of the proper class.
+
+For example, if you created a class that inherited from ``CustomClassView``
 and called its ``as_view`` method then when you use the ``cls`` parameter to instantiate
-the object it will correctly
-create an object of the *inherited* class and not the *base* one.
+the object it will correctly create an object of the *inherited* class and not the *base* one
+(if on the other hand you had used ``CustomClassView(**kwargs)`` to instantiate the instance
+then the ``as_view`` method of the inheriting classes would instantiate instances of 
+``CustomClassView`` so inheritance wouldn't really work!).
 
 To add the above class method in your urls, just use its ``as_view()`` as you'd
 normally use a functional view:
@@ -181,7 +208,7 @@ normally use a functional view:
 This doesn't actually render anything since both header and context are empty on
 the created instance -- remember that ``as_view`` returns a functional view that
 instantiates a ``CustomClassView`` objet and returns an ``HttpResponse`` filling it
-with the object's ``render()`` reuslts. To add some functionality we can either
+with the object's ``render()`` reuslts. To add some output we can either
 create another class that inherits from ``CustomClassView`` or
 initialize the attributes from the constructor of the class (using the kwargs functionality described above).
 
@@ -211,44 +238,57 @@ constructor which will set the attributes in the instance). Here's an example:
 
     url(r'^ccv-with-values/$', views.CustomClassView.as_view(header='Hello', context=['hello', 'world', ], footer='Bye', ), name='ccv-with-values'),
 
-The above will create a ``CustomClassView`` instance with the provided values as its attributes. This is more or less
-similar to how functional views are configured and is limited for the same reasons explained above.
+The above will create a ``CustomClassView`` instance with the provided values as its attributes. 
 
-I don't use this method of configuring class based views anymore but I want to discuss it a bit because
-it is supported (and used) in normal django CBVs (for example
-set the ``template_name`` in a ``TemplateView``). I recommend you also avoid using it  because passing parameters
+Although this method of configuration is used in normal django CBVs (for example
+setting the ``template_name`` in a ``TemplateView``) I recommend you avoid using it because passing parameters
 to the ``as_view`` method pollutes the urls.py with configuration
-that (at least in my opinion) should *not* be there and also, even for very simple views I know that after some time I'll need
+that (at least in my opinion) should *not* be there (and there's no reason to have to take a look at both
+your urls.py and your views.py to understand the behavior of your views) and also, even for very simple views I know that after some time I'll need
 to add some functionality that cannot be implemented by passing the parameters so I prefer to bite the
 bullet and define all my views as inherited classes so it will be easy for me to further customize them later (we'll
-see how this is done in a second). In any case, I won't discuss passing parameters to the ``as_view`` method any more
-so from now on any class based views I define will be added to urls py using ``ClassName.as_view()`` without any
-parameters to the ``as_view()`` class method.
+see how this is done in a second). Thus, even if you have 
 
-A ... drier (more DRY) approach
--------------------------------
+In any case, I won't discuss passing parameters to the ``as_view`` method any more, 
+so from now on any class based views I define will be added to urls py using ``ClassName.as_view()`` without any
+parameters to the ``as_view()`` class method. 
+
+Is this really DRY ?
+--------------------
 
 Let's now suppose that we wanted to allow our class based view to print something on the header even if no header is provided
-when you configure it. The naive way to do it would be to re-define the ``render`` method and do something like
+when you configure it. The only way to do it would be to re-define the ``render`` method like this:
 
 .. code-block:: python
 
-    header=self.header if self.header else "DEFAULT HEADER"
+    def render(self):
+        header=self.header if self.header else "DEFAULT HEADER"
+        return """
+            <html>
+                <body>
+                    <h1>{header}</h1>
+                    {body}
+                </body>
+            </html>
+        """.format(
+                header=header, body='<br />'.join(self.context),
+            )
 
-in the ``render()`` method's format.
 This is definitely not the DRY way to do it because you would need to re-define the whole ``render`` method. Think
 what would happen if
 you wanted to print ``"ANOTHER DEFAULT HEADER"`` as a default header for some other view - once again re-defining
-``render``... In fact, the above
+``render``! In fact, the above
 ``CustomClassView`` is naively implemented because it does not allow proper customization through inheritance. The
 same problems for the header arise also when you need modify the body; for
 example, if you wanted to add an index number before displaying the items of the list then you'd need to again re-implement the
 whole ``render`` method.
 
-This is definitely not DRY. If that was our only option then we could just stick to functional views. However, we can do
+If that was our only option then we could just stick to functional views. However, we can do
 much better if we define the class based view in such a way that allows inherited classes to override methods that
 define specific parts of the functionality. To do this the class-based-view must be properly implemented so each
-part of its functionality is implemented by a differnet method. Here's how we could improve the ``CustomClassView``:
+part of its functionality is implemented by a different method.
+
+Here's how we could improve the ``CustomClassView`` to make it more DRY:
 
 .. code-block:: python
 
@@ -279,19 +319,19 @@ part of its functionality is implemented by a differnet method. Here's how we co
                 )
 
 So what happens here? First of all we inherit from ``ClassClassView`` to keep the
-``as_view`` method which doesn't need changing (for now). Beyond this, the render
+``as_view`` method which doesn't need changing. Beyond this, the render
 uses methods (``get_header`` and ``render_context``) to retrieve the values from the header and the body - this means
 that we could re-define these methods to an inherited class in order to override
 what these methods will return. Beyond ``get_header`` and ``render_contex`` I've added
 a ``get_context`` method that is used by ``render_context`` to make this CBV even
 more re-usable. For example I may
 need to configure the context (add/remove items from the context i.e have a CBV
-that adds a last item with the numer of list itens to the list to be displayed). Of course this could
+that adds a last item with the number of list items to the list to be displayed). Of course this could
 be done from ``render_context`` *but* this means that I would need to define my new functionality
 (modifying the context items) *and* re-defining the context list formatting. It is much
-better (in my opinion always) to keep properly seperated these things.
+better (in my opinion always) to keep properly separated these things.
 
-Now, the above is a first try that I created to mainly fulfill my requirement of
+Now, the above is a first try that I created to mainly fulfil my requirement of
 having a default header and some more examples I will discuss later (and keep
 everything simple enough). You could
 extract more functionality as methods-for-overriding, for example the render
@@ -306,8 +346,8 @@ method could be written like this:
 
 and add a ``get_template`` method that will return the actual html template. There's no
 hard rules here on what functionality should be extracted to a method (so it could
-be overriden) however I recommend to follow the YAGNI rule (i.e implement everything
-as normnal and when you see that some functionality needs to be overriden then refactor
+be overridden) however I recommend to follow the YAGNI rule (i.e implement everything
+as normal and when you see that some functionality needs to be overridden then refactor
 your code to extract it to a separate method).
 
 Let's see an example of adding the default header functionality by overriding ``get_header``:
@@ -329,7 +369,7 @@ it is when you consider more complex use-cases.
 Re-using view functionality
 ---------------------------
 
-We have come now to a crucial point in this introduction, so please stick with me. Let's say that you have
+We have come now to a crucial point in this chapter, so please stick with me. Let's say that you have
 *more than one* class based views that contain a header attribute. You want to include
 the default header functionality on all of them so that if any view instantiated from these
 class based views doesn't define a header
@@ -338,15 +378,16 @@ to keep everything simple to make following easy - instead of the default header
 you want to override may be adding stuff to the context or filtering the objects you'll retrieve
 from the database).
 
-To re-use this default header funtionality from multiple classes you have *two* options:
+To re-use this default header functionality from multiple classes you have *two* options:
 Either inherit all classes that need this functionality from ``DefaultHeaderBetterCustomClassView`` or
 extract the custom ``get_header`` method to a *mixin* and inherit from the mixin. A mixin is a class not
 related to the class based view hierarchy we are using - the mixin inherits from object (or from another
-mixin) and just defines the methods and attributes that need to be overriden. So
+mixin) and just defines the methods and attributes that need to be overridden. When the mixin is *mixed*
+with the ancestors of a class its functionality will be used by that class (we'll see how shortly). So
 the mixin will only define ``get_header`` and not all other methods like
 ``render``, ``get_context`` etc. Using the
-``DefaultHeaderBetterCustomClassView`` may be enough for some cases but for the general case
-you'll need to create the mixin. Let's see why:
+``DefaultHeaderBetterCustomClassView`` is enough for some cases but for the general case
+of re-using the functionality you'll need to create the mixin. Let's see why:
 
 Suppose that you have a base class that renders the header and context as JSON instead of the HTML
 template, something like this:
@@ -381,35 +422,33 @@ like
 .. code-block:: python
 
     # OPTION 1
-    class JsonDefaultHeaderCustomClassView(JsonCustomClassView, DefaultHeaderBetterCustomClassView):
-        pass
-
-    # OR
-    # OPTION 2
     class DefaultHeaderJsonCustomClassView(DefaultHeaderBetterCustomClassView, JsonCustomClassView):
         pass
+   
+    # OR
+    # OPTION 2
+    class JsonDefaultHeaderCustomClassView(JsonCustomClassView, DefaultHeaderBetterCustomClassView):
+        pass
+    
 
-is not the
-correct one since the methods ``get_header`` and ``as_view`` exist in *both* ancestor classes so
-in the first option (``JsonDefaultHeaderCustomClassView``) the ``get_header`` and ``as_view`` from ``JsonCustomClassView`` will be used while
-in the second option (``DefaultHeaderJsonCustomClassView``) the ``get_header`` and ``as_view`` from ``DefaultHeaderBetterCustomClassView`` will
-be used. Notice that if these classes had a common ancestor (for example they both used
-``CustomClassView``) you may actually get the correct behaviour depending on the rather complex rules
-of python MRO (Method Resolution Order). The MRO is also what I used to know which ``get_header``
+What will happen here? Notice that the methods ``get_header`` and ``as_view`` exist in *both* ancestor classes! So
+which one will be used in each case? Actually, there's a (rather complex) rule for that called 
+MRO (Method Resolution Order). The MRO is also what can used to know which ``get_header``
 and ``as_view`` will be used in each case in the previous example.
+
 
 Interlude: An MRO primer
 ------------------------
 
-What is MRO? For every class that python sees, it tries to create a *list* (MRO list) of ancestor classes containing that class as
-the first element and its ancestors in a specific order I'll discuss right next after that. When a method
-of an object of a specific class needs to be
-called, then the method will be searched in the list (from the first element of the MRO list i.e. starting that class) - when a class is found
-in the list that defines the method then that specific method (i.e. the method defined in this class) will be called and the search will stop (careful readers: I haven't
+What is MRO? For every class that Python sees, it tries to create a *list* (MRO list) of ancestor classes containing that class as
+the first element and its ancestors in a specific order I'll discuss in the next paragraph. When a method
+of an object of that specific class needs to be
+called, then the method will be searched in the MRO list (from the first element of the MRO list i.e. starting with the class it self) - when a class is found
+in the list that defines the method then that method instance (i.e. the method defined in this class) will be called and the search will stop (careful readers: I haven't
 yet talked about *super* so please be patient).
 
 Now, how is the MRO list created? As I explained, the first element
-is the class of the object. The second element is the MRO of the *leftmost* ancestor of that object (so MRO will
+is the class itself. The second element is the MRO of the *leftmost* ancestor of that object (so MRO will
 run recursively on each ancestor), the third element will be the MRO of the ancestor right next to the leftmost
 ancestor etc. There is one extra and important rule: When a class is found multiple times in the MRO list (for example
 if some elements have a common ancestor) then *only the last occurrence in the list will be kept* - so each class
@@ -417,14 +456,19 @@ will exist only once in the MRO list. The above rule implies that the
 rightmost element in every MRO list will always be object - please make sure you
 understand why before continuing.
 
-Thus, the MRO list for ``DefaultHeaderJsonCustomClassView`` is (remember, start
+Thus, the MRO list for ``DefaultHeaderJsonCustomClassView`` defined in the previous section 
+is (remember, start
 with the class to the left and add the MRO of each of its ancestors starting
 from the leftmost one):
 ``[DefaultHeaderJsonCustomClassView, DefaultHeaderBetterCustomClassView, BetterCustomClassView, CustomClassView, JsonCustomClassView, object]``, while
 for ``JsonDefaultHeaderCustomClassView`` is
-``[JsonDefaultHeaderCustomClassView, JsonCustomClassView, DefaultHeaderBetterCustomClassView, BetterCustomClassView, CustomClassView, object``
+``[JsonDefaultHeaderCustomClassView, JsonCustomClassView, DefaultHeaderBetterCustomClassView, BetterCustomClassView, CustomClassView, object]``. What this
+means is that for ``DefaultHeaderJsonCustomClassView`` the ``CustomClassView.as_view()`` and ``DefaultHeaderBetterCustomClassView.get_header()``  (thus 
+we will not get the JSON output) and for ``JsonDefaultHeaderCustomClassView`` the ``JsonCustomClassView.as_view()`` and ``JsonCustomClassView.get_header()``
+will be used (so we won't get the default header functionality) - i.e none of those two options will result to the desired behaviour.
 
-Let's try an example that has the same base class twice in the hierarchy. For this, we'll create a
+Let's try an example that has the same base class twice in the hierarchy (actually the previous examples also had a class twice in
+the hierarchy - ``object`` but let's be more explicit). For this, we'll create a
 ``DefaultContextBetterCustomClassView`` that returns a default context if the context is empty
 (similar to the default header functionality).
 
@@ -434,7 +478,7 @@ Let's try an example that has the same base class twice in the hierarchy. For th
         def get_context(self, ):
             return self.context if self.context else ["DEFAULT CONTEXT"]
 
-Now we'll create a class that inherits from both of them:
+Now we'll create a class that inherits from both ``DefaultHeaderBetterCustomClassView`` and ``DefaultContextBetterCustomClassView``:
 
 .. code-block:: python
 
@@ -455,8 +499,8 @@ Initially, the MRO will be the following:
     6. DefaultContextBetterCustomClassView, 7. BetterCustomClassView, 8. CustomClassView, 9. object
 
 Notice that classes ``BetterCustomClassView``, ``CustomClassView`` and ``object`` are repeated two times
-(on place 3,4,5 and 7,8,9) thus *only* their last occurence will be kept in the list. So the
-resulting MRO is the following:
+(on place 3,4,5 and 7,8,9) thus *only* their last (rightmost) occurrences will be kept in the list. So the
+resulting MRO is the following (3,4,5 are removed):
 
 ``[DefaultHeaderContextCustomClassView, DefaultHeaderBetterCustomClassView, DefaultContextBetterCustomClassView, BetterCustomClassView, CustomClassView, object]``
 
@@ -474,7 +518,7 @@ would be ignored).
 Using mixins for code-reuse
 ---------------------------
 
-The above explanation of MRO should convince you that the best approach to avoid
+The above explanation of MRO should convince you that you should avoid
 mixing hierarchies of classes - if you are not convinced then wait until I introduce ``super()``
 in the next section and I guarantee that you'll be!
 
@@ -484,9 +528,9 @@ classes only with mixins (hint: that's also what Django does). Each re-usable fu
 will be implemented in its own mixin;  class views that need to implement that
 functionality will just inherit from the mixin along with the base class view. Each
 one of the view classes you define should inherit from *one and only one* other class
-view and any number of mixins you want. Make sure that the view class is righmost in
-the ancestors list and the mixins are to the left (so that they will properly override
-its behavior; remember that the methods of the ancestors to the left are searched first
+view and any number of mixins you want. Make sure that the view class is rightmost in
+the ancestors list and the mixins are to the left of it (so that they will properly override
+its behaviour; remember that the methods of the ancestors to the left are searched first
 in the MRO list -- and the methods of the defined class have of course the highest priority
 since it goes first in the MRO list).
 
@@ -520,25 +564,25 @@ and all the proposed use cases using the base class view and the mixins:
 
 I believe that the above definitions are self-documented and it is very easy to know which
 method of the resulting class will be called each time: Start from the main class and if
-the method is not found there continue from left to right to the ancestor list.
+the method is not found there continue from left to right to the ancestor list; since the mixins
+do only one thing and do it well you'll know what each class does simply by looking at its definition.
 
-The ``super`` situation
------------------------
+The super situation
+-------------------
 
-The final thing and extension I'd like to discuss for our custom class based views is the case
-where you want to use the functionality of more than one mixins for the same thing. For example, let's suppose
+The final (and most complex) thing and extension I'd like to discuss for our custom class based views is the case
+where you want to use the functionality of more than one mixins for the *same thing*. For example, let's suppose
 that we had a mixin that added some data to the context and a different mixing that added
 some different data to the context. Both would use the ``get_context`` method
 and you'd like to have the context data of both of them to your context. But
 this is not possible using the implementations above because when a
 ``get_context`` is found in the MRO list it will be called and the MRO search
-will finish there.
-
+will finish there!
 
 So how could we add the functionality of both these mixins to a class based view? This is the same problem as
 if we wanted to inherit from a mixin (or a class view) and override one of its methods
-but *also* call its parent (overriden) method for example to get its output and use it as the base
-of the output for the overriden method. Both are the same because what stays in the end is
+but *also* call its parent (overridden) method for example to get its output and use it as the base
+of the output for the overridden method. Both are the same because what stays in the end is
 the MRO list. For example say we we had the following base class
 
 .. code::
@@ -573,12 +617,11 @@ As we can see in both cases the base class V is the last one and between there a
 the classes that define the extra (mixin) functionality: ``M2`` and ``M1`` (start from
 left to right) in the first case and ``M2M1V`` and ``M1V`` (follow the inheritance hierarchy)
 in the second case. So in both cases when calling a method they will be searched using
-the MRO list and when the method is found it will be exetuted and the search will stop.
+the MRO list and when the method is found it will be executed and the search will stop.
 
 But what if we needed to re-use some method from ``V`` (or from some other ancestor) and
 a class on the left of the MRO list has the same method?
-The answer, as you should have guessed by now if you have some Python knowledge is ``super``.
-
+The answer, as you should have guessed by now if you have some Python knowledge is ``super()``.
 
 The ``super`` method can be used by a class method to call a method of *its ancestors* respecting
 the MRO. Thus, running ``super().x()`` from a method instance will try to find method ``x()``
@@ -649,8 +692,11 @@ Here's the output:
 
 Notice when each message is printed: Because x() first calls its ``super()`` method
 and then it prints the message in both cases first the ``From V`` message is printed
-from the base class and then from the following classes in the hierarch (as per the MRO)
-ending with the class of the isntance (either ``MIXIN`` or ``INHERITANCE``).
+from the base class and then from the following classes in the hierarchy (as per the MRO)
+ending with the class of the instance (either ``MIXIN`` or ``INHERITANCE``).
+
+Using super in our hierarchy
+----------------------------
 
 Using super and mixins it is easy to mix and match functionality to create new
 classes. Here's how we could add a prefix to
@@ -745,7 +791,8 @@ from using all those mixins together!
         ):
         pass
 
-This will have the desired behavior!
+This will have the desired behaviour of adding a prefix to the header, having a default header if not one was defined
+and adding the extra context from both mixins!
 
 A high level overview of CBVs
 =============================
@@ -1156,14 +1203,52 @@ that the form will be actually saved and the redirect will go to the proper succ
             model = Article
 
 
+Improve queryset of the CBV
+---------------------------
+
+All CBVs that inherit from ``SingleObjectMixin`` or ``MultipleObjectMixin`` (``ListView``, ``DetailView``, ``UpdateView`` and ``DeleteView``)
+have a ``model`` and a ``queryset`` property that can be used (either one or the other) to define the queryset that will be used for
+querying the database for that CBVs results. This queryset can be further dynamically refined by overriding the ``get_queryset()`` method. 
+What I usually do is that I define the ``model`` attribute and then override ``get_querset`` in order to add some more info. For example,
+let's say that I wanted to add a count of articles and documents per each category. Here's how the ``CategoryListView`` could be done:
+
+.. code-block:: python
+
+    class CategoryListView(ExportCsvMixin, AdminOrPublisherPermissionRequiredMixin, ListView):
+        model = Category
+        context_object_name = 'categories'
+
+        def get_queryset(self):
+            qs = super().get_queryset()
+            return qs.annotate(article_cnt=Count('article'), document_cnt=Count('document'))
+
+Notice that I also use some more mixins for this ``ListView`` (they'll be explained later). The ``get_queryset`` adds
+the annotation to the ``super()`` queryset (which will be ``Category.objects.all()``). One final comment is that instead
+of this, I could have more or less the same functionality by implementing ``CategoryListView``:
+
+.. code-block:: python
+
+    class CategoryListView(ExportCsvMixin, AdminOrPublisherPermissionRequiredMixin, ListView):
+        context_object_name = 'categories'
+        query = Category.objects.all().annotate(article_cnt=Count('article'), document_cnt=Count('document'))        
+        
+This has the same functionality (return all categories with the number of articles and documents for each one) and 
+saves some typing from overriding the ``get_queryset``  method. However as I said most of the time I use the model
+attribute and override the ``get_queryset`` method because it seems more explicit and descriptive to me and most of
+the time I'll need to add some more filtering (based on the current user, based on some query parameter etc) that
+can only be implemented on the ``get_queryset``.
+
+
 Allow each user to list/view/edit/delete only his own items
 -----------------------------------------------------------
 
 Let's suppose that we want to create a managerial backend where each user would be able to list the items (articles and
 documents) he has created and view/edit/delete them. We also want to allow superusers to view/edit everything.
 
-Since the ``Article`` and ``Document`` models both have a ``created_by`` element we can use use this to filter
-the results returned by ``get_queryset()``. Here's how this mixin could be implemented:
+Since the ``Article`` and ``Document`` models both have an ``owned_by`` element we can use use this to filter
+the results returned by ``get_queryset()``. For example, here's a mixin that checks if the current user is
+admin or publisher. If he is a publisher then he will just return the ``super()`` queryset. If however he is a simple
+user it will return only the results that are owned by the current user with ``qs.filter(owned_by=self.request.user)``.
 
 
 .. code-block:: python
@@ -1171,9 +1256,9 @@ the results returned by ``get_queryset()``. Here's how this mixin could be imple
     class LimitAccessMixin:
         def get_queryset(self):
             qs = super().get_queryset()
-            if self.request.user.is_superuser:
+            if self.request.user.has_perm('djangocbv.admin_access') or self.request.user.has_perm('djangocbv.publisher_access') :
                 return qs
-            return qs.filter(created_by=self.request.user)
+            return qs.filter(owned_by=self.request.user)
 
 
 Configure the form's initial values from GET parameters
@@ -1225,7 +1310,6 @@ We use ``pop`` to remove the request from the received ``kwargs`` and only then 
 parent constructor.
 
 
-
 Add values to the context
 -------------------------
 
@@ -1257,6 +1341,71 @@ one extra query for all page loads (even if the data is not needed). On the othe
 the template tag will query the database only on specific views but it makes debugging and
 reasoning about your template more difficult since if you have a lot of template tags you'll have
 various context variables appearing from thing air!
+
+One final comment is that overriding the ``get_context_data`` method will probably be the most
+common thing you're going to do when using CBVs (you'll definitely need to add things to the context)
+so try to remember the following 3 needed lines:
+
+.. code-block:: python
+
+        def get_context_data(self, **kwargs):
+            ctx = super().get_context_data(**kwargs)
+            # ... here we add stuff to the ctx
+            return ctx
+
+
+Add a simple filter to a ListView
+---------------------------------
+
+For filtering I recommend using the excellent `django-filter`_ package as I've already
+presented in `my essential Django package list`_. Here's how a mixin can be created that
+adds a filter to the context:
+
+.. code-block:: python
+
+    class AddFilterMixin:
+        filter_class = None
+        
+        def get_context_data(self, **kwargs):
+            ctx = super().get_context_data(**kwargs)
+            if not self.filter_class:
+                raise NotImplementedError("Please define filter_class when using AddFilterMixin")
+            filter = self.filter_class(self.request.GET, queryset=self.get_queryset())
+            ctx['filter'] = filter
+            if self.context_object_name:
+                ctx[self.context_object_name] = filter.qs
+            return ctx
+
+Notice that the ``get_context_data`` checks to see if the ``filter_class`` attribute has been 
+defined (if not it will raise a useful explanation). It will then instantiate the filter class
+passing it the ``self.request.GET`` and the current queryset (``self.get_queryset()``) - so for
+example any extra filtering you are doing to the queryset (for example only show content owned by the
+current user) will be also used. Finally, pass the filter to the context and assign the
+contect_object_name to the filtered queryset. 
+
+Here's for example how this mixin is used for ``ArticleListView``:
+
+.. code-block:: python
+
+    class ArticleListView(AddFilterMixin, ListView):
+        model = Article
+        context_object_name = 'articles'
+        filter_class = ArticleFilter
+
+And then just add the following to the ``article_list.html`` template:
+
+.. code-block:: python 
+
+
+    <form method='GET'>
+        {{ filter.form }}
+        <input type='submit' value='Filter' />
+    </form>
+    {% for article in articles %}
+        Display article info - only filtered articles will be here
+    {% endfor %}
+
+
 
 Support for success messages
 ----------------------------
@@ -1453,12 +1602,37 @@ enumerates the ``object_list`` value of the context (remember that this is added
 result of the ``ListView``). It will then use the object's ``__dict__`` attribute to write the headers (for the first time) and then
 write the values of all objects.
 
+Use one TemplateView for multiple templates
+-------------------------------------------
 
-Using dynamic templates
------------------------
+Using a ``TemplateView`` you could display an html template without much problem just by
+settings the ``template`` attribute of your class. What if you wanted to have a single
+``TemplateView`` that would display many templates based on the query path? Simple, just 
+override ``get_template_names`` to return a different template based on the path. For example,
+using this view:
 
-Some people think that they may never need to override the ``get_template_names`` method of
-``TemplateResponseMixin``. However overriding this method can be used to create a DRY Ajax view
+.. code-block:: html
+
+    class DynamicTemplateView(TemplateView):
+        def get_template_names(self):
+            what = self.kwargs['what']
+            return '{0}.html'.format(what)
+
+You can render any template you have depending on the value of the ``what`` kwarg. To allow
+only specific template names you can either add a check to the above implementation (i.e that
+what is ``help`` or ``about``) or you may do it to the urls.py if you use a regular expression. Thus,
+to only allow ``help.html`` and ``about.html`` to be rendered with this method add it to your urls like this:
+
+.. code-block:: html
+
+    re_path(r'^show/(?P<what>help|about)/', views.DynamicTemplateView.as_view(), name='template-show'),
+
+Finally, to use it to render the ``help.html`` you'll just call it like <a href='{% url "template-show" "help" %}'>Help</a>
+
+Implement a partial Ajax view
+-----------------------------
+
+``TemplateResponseMixin``. However overriding ``get_template_names``  can also be used to create a DRY Ajax view
 of your data! For example, let's say that you have a ``DetailView`` for one of your models that
 has overriden the ``get_template_names`` like this:
 
@@ -1589,6 +1763,9 @@ Notice that for this to work properly you must setup your urls like this:
     url(r'^list/(?P<kind>type1|type2)/$', UmbrellaListView.as_view() ) , name='umbrella_list' ),
     ...
     
+    
+
+    
 A heavy CBV user project
 ========================
 
@@ -1621,3 +1798,6 @@ asdasd
 .. _`essential guide for outputting PDFs in Django`: https://spapas.github.io/2015/11/27/pdf-in-django/#using-a-cbv
 .. _`dynamic tables and filters for similar models`: https://spapas.github.io/2015/10/05/django-dynamic-tables-similar-models/
 .. _`Django non-HTML responses`: https://spapas.github.io/2014/09/15/django-non-html-responses/
+.. _django-filter: https://github.com/carltongibson/django-filter
+.. _`my essential Django package list`: https://spapas.github.io/2017/10/11/essential-django-packages/
+.. _login: https://docs.djangoproject.com/en/2.0/topics/auth/default/#django.contrib.auth.views.login

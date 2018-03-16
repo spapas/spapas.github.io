@@ -1300,7 +1300,7 @@ that the form will be actually saved and the redirect will go to the proper succ
             model = Article
 
 
-Change the  queryset of the CBV
+Change the queryset of the CBV
 -------------------------------
 
 All CBVs that inherit from ``SingleObjectMixin`` or ``MultipleObjectMixin`` (``ListView``, ``DetailView``, ``UpdateView`` and ``DeleteView``)
@@ -1357,6 +1357,38 @@ user it will return only the results that are owned by him with ``qs.filter(owne
             if self.request.user.has_perm('djangocbv.admin_access') or self.request.user.has_perm('djangocbv.publisher_access') :
                 return qs
             return qs.filter(owned_by=self.request.user)
+            
+Another similar mixin that is used is the ``HideRemovedMixin`` that, for simple users, excludes from the queryset the objects that
+are removed:
+
+.. code-block:: python
+
+    class HideRemovedMixin:
+        def get_queryset(self):
+            qs = super().get_queryset()
+            if self.request.user.has_perm('djangocbv.admin_access') or self.request.user.has_perm('djangocbv.publisher_access'):
+                return qs
+            return qs.exclude(status='REMOVED')
+            
+One thing that needs a little discussion is that for both of these mixins I am using ``get_queryset`` to implement access control to
+allow using the same mixin for views that inherit from both ``SingleObjectMixin`` and ``MultipleObjectMixin`` (since the ``get_queryset`` is
+used in both of them). This
+means that when a user tries to access an object that has not access to he'll get a nice 404 error. 
+
+Beyond this, instead of filtering the queryset,
+for views inheriting from ``SingleObjectMixin`` (i.e ``DetailView``, ``UpdateView`` and ``DeleteView``)
+we could have overridden the ``get_object`` method to raise an access denied exception. Here's how ``get_object`` could be
+overridden to raise a 403 Forbidden status when a user tries to access an object that does not belong to him:
+
+.. code-block:: python
+
+    from django.core.exceptions import PermissionDenied
+
+    def get_object(self, queryset=None):
+        obj = super().get_object()
+        if obj.owned_by=self.request.user:
+            raise PermissionDenied
+        return obj
 
 
 Configure the form's initial values from GET parameters
@@ -1556,31 +1588,28 @@ It is easy to implement some moderation to our model publishing. For example, le
 allow publishers to publish a model. Here's how it can be done:
 
 .. code-block:: python
+           
+    def form_valid(self, form):
+        if form.instance.status != 'REMOVED':
+            if self.request.user.has_perm('djangocbv.publisher_access'):
+                form.instance.status = 'PUBLISHED'
+            else:
+                form.instance.status = 'DRAFT'
+        
+        return super().form_valid(form)
 
-    class ModerationMixin:
-        def form_valid(self, form):
-            redirect_to = super().form_valid(form)
-            if self.object.status != 'REMOVED':
-                if self.request.user.has_perm('spots.publisher_access'):
-                    self.object.status = 'PUBLISHED'
-                else:
-                    self.object.status = 'DRAFT'
-                self.object.save()
-
-            return redirect_to
-
-So, first of all we call the parent ``form_valid`` to properly save the form and save
-the redirect to value. We then make sure that the object is not ``REMOVED`` (if it is
+So, first of all we make sure that the object is not ``REMOVED`` (if it is
 remove it we don't do anything else). Next we check if the current user has
 ``publisher_access`` if yes we change the object's status to ``PUBLISHED`` - on any
 other case we change its status to ``DRAFT``. Notice that this means that whenever a
 publisher saves the object it will be published and whenever a non-publisher saves it
-it will be made a draft.
+it will be made a draft. We then call our ancestor's ``form_valid`` to save the object
+and return to success url.
 
 I'd like to repeat here that this mixin, since it calls super, can work concurrently
 with any other mixins that override ``form_valid`` (and also call their super method
 of course), for example it can be used together with the audit (auto-fill created_by
-and moderated_by) and the success mixins we defined previously!
+and moderated_by) and the success mixin we defined previously!
 
 
 Allow access to a view if a user has one out of a group of permissions
@@ -1901,75 +1930,6 @@ Let's start with the mixins (I won't show the mixins I've already talked about i
             return super().form_valid(form)
 
 
-    class RemoveMixin:
-        def form_valid(self, form, ):
-            form.instance.status = 'REMOVED'
-            return super().form_valid(form)
-
-
-    class UnpublishMixin:
-        def form_valid(self, form, ):
-            form.instance.status = 'DRAFT'
-            return super().form_valid(form)
-
-
-    class ContentCreateMixin(CreateSuccessMessageMixin,
-                            AuditableMixin,
-                            SetOwnerIfNeeded,
-                            RequestArgMixin,
-                            SetInitialMixin,
-                            ModerationMixin,
-                            LoginRequiredMixin):
-        pass
-
-
-    class ContentUpdateMixin(UpdateSuccessMessageMixin,
-                            AuditableMixin,
-                            SetOwnerIfNeeded,
-                            RequestArgMixin,
-                            SetInitialMixin,
-                            ModerationMixin,
-                            LimitAccessMixin,
-                            LoginRequiredMixin):
-        pass
-
-
-    class ContentListMixin(ExportCsvMixin, AddFilterMixin, HideRemovedMixin, ):
-        pass
-
-
-    class ContentRemoveMixin(AdminOrPublisherPermissionRequiredMixin,
-                             AuditableMixin,
-                             RemoveSuccessMessageMixin,
-                             RemoveMixin,):
-        http_method_names = ['post',]
-        fields = []
-
-
-    class ContentUnpublishMixin(AdminOrPublisherPermissionRequiredMixin,
-                                AuditableMixin,
-                                UnpublishSuccessMessageMixin,
-                                UnpublishMixin,):
-        http_method_names = ['post',]
-        fields = []
-
-The ``SetOwnerIfNeeded``, ``RemoveMixin`` and ``UnpublishMixin`` are simple mixins that override ``form_valid`` to
-introduce some functionality before saving the object). The other mixins are used to gather functionality of 
-other mixins together. Thus, ``ContentCreateMixin`` has the mixin functionality needed to create something (i.e an
-``Article`` or a ``Document``) i.e show a success message, add auditing information, set the object's owner,
-pass the request to the form, set the form's initial values, do some moderation and only allow logged in users. On
-a similar fashion, the ``ContentUpdateMixin`` collects the functionality needed to update something and is similar to
-``ContentCreateMixin`` (with the difference that it also as the ``LimitAccessMixin`` to only allow simple users to
-edit their own content). The ``ContentListMixin`` adds functionality for export to CSV, simple filter and hiding removed
-things. 
-
-Finally, the ``ContentRemoveMixin`` and ``ContentUnpublishMixin`` are used to change an object's status to ``REMOVED``
-and ``DRAFT`` they are mor or less similar with the difference that they use ``RemoveMixin`` and ``UnpublishMixin``. 
-One interesting thing I'd like to comment here about these two is that instead of having both a ``RemoveMixin`` and an
-``UnpublishMixin``, I could instead add a ``ChangeStatusMixin`` like this:
-
-.. code-block:: python
-
     class ChangeStatusMixin:
         new_status = None 
         
@@ -1979,10 +1939,70 @@ One interesting thing I'd like to comment here about these two is that instead o
             form.instance.status = new_status
             return super().form_valid(form)
 
-Thus I could define both ``ContentRemoveMixin`` and ``ContentUnpublishMixin``` as inheriting from ``ChangeStatusMixin``
-and one having ``new_status = 'REMOVED'`` while the other having ``new_status = 'DRAFT'``.
+        
+    class ContentCreateMixin(SuccessMessageMixin,
+                            AuditableMixin,
+                            SetOwnerIfNeeded,
+                            RequestArgMixin,
+                            SetInitialMixin,
+                            ModerationMixin,
+                            LoginRequiredMixin):
+        success_message = 'Object successfully created!'
 
-Furthermore, continuing in this
+
+    class ContentUpdateMixin(SuccessMessageMixin,
+                            AuditableMixin,
+                            SetOwnerIfNeeded,
+                            RequestArgMixin,
+                            SetInitialMixin,
+                            ModerationMixin,
+                            LimitAccessMixin,
+                            LoginRequiredMixin):
+        success_message = 'Object successfully updated!'
+
+
+    class ContentListMixin(ExportCsvMixin, AddFilterMixin, HideRemovedMixin, ):
+        pass
+
+
+    class ContentRemoveMixin(SuccessMessageMixin
+                             AdminOrPublisherPermissionRequiredMixin,
+                             AuditableMixin,
+                             HideRemovedMixin,
+                             ChangeStatusMixin,):
+        http_method_names = ['post',]
+        new_status = 'REMOVED'
+        fields = []
+        success_message = 'Object successfully removed!'
+
+
+    class ContentUnpublishMixin(SuccessMessageMixin
+                                AdminOrPublisherPermissionRequiredMixin,
+                                AuditableMixin,
+                                UnpublishSuccessMessageMixin,
+                                ChangeStatusMixin,):
+        http_method_names = ['post',]
+        new_status = 'DRAFT'
+        fields = []
+        success_message = 'Object successfully unpublished!'
+
+The ``SetOwnerIfNeeded`` and  ``ChangeStatusMixin`` are simple mixins that override ``form_valid`` to
+introduce some functionality before saving the object). The other mixins are used to gather functionality of 
+other mixins together. Thus, ``ContentCreateMixin`` has the mixin functionality needed to create something (i.e an
+``Article`` or a ``Document``) i.e show a success message, add auditing information, set the object's owner,
+pass the request to the form, set the form's initial values, do some moderation and only allow logged in users. On
+a similar fashion, the ``ContentUpdateMixin`` collects the functionality needed to update something and is similar to
+``ContentCreateMixin`` (with the difference that it also as the ``LimitAccessMixin`` to only allow simple users to
+edit their own content). The ``ContentListMixin`` adds functionality for export to CSV, simple filter and hiding removed
+things. 
+ 
+ 
+The ``ContentRemoveMixin`` and ``ContentUnpublishMixin`` are used to implement Views for Removing and Unpublishing
+an object. Both of them inherit from ``ChangeStatusMixin`` - one setting
+the ``new_status`` to ``REMOVED`` the other to ``DRAFT``. 
+
+
+Continuing in this
 fashion I could remove both ``ContentRemoveMixin`` and ``ContentUnpublishMixin`` and add a ``ContentChangeStatusMixin`` like this:
 
     class ContentChangeStatusMixin(AdminOrPublisherPermissionRequiredMixin,
@@ -1992,9 +2012,13 @@ fashion I could remove both ``ContentRemoveMixin`` and ``ContentUnpublishMixin``
         http_method_names = ['post',]
         fields = []
 
-Thus, my ``*RemoveView`` and ``*UnpublishView`` would all inherit from this mixin (and define the ``new_status`` field differently of course).
-This is definitely valid (and more DRY) but less explicit than the initial case - i.e you may wanted to not allow publishers to remove 
-objects, only admins.
+Thus the ``new_status`` attribute wouldn't be there so my ``*RemoveView`` and ``*UnpublishView`` would 
+all inherit from this mixin and define the ``new_status`` field differently.
+This is definitely valid (and more DRY) but less explicit than the way I've implemented this - i.e you may 
+wanted to not allow publishers to remove objects, only admins (so you could implement that in the ``get_queryset``
+or ``dispatch`` method of ``ContentRemoveMixin`` and ``ContentUpdateMixin``.
+
+Now let's take a look at the views:
         
 
     class ArticleListView(ContentListMixin, ListView):

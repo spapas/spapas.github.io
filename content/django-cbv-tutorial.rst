@@ -2188,7 +2188,8 @@ much quicker will be to create your views. Also, if
 you followed closely the first and second chapters you should be able to understand everything that is
 needed for CBVs and be able to properly understand which method or attribute you need to override to 
 implement some specific functionality. Finally, the list of examples in the third chapter should help
-you get started in all your CBV needs!
+you get started in all your CBV needs - if you have some specific question about CBVs or you'd like
+another use case added to the list feel free to ask and I'll try to add it!
 
 
 .. _`CBV inspector`: http://ccbv.co.uk`

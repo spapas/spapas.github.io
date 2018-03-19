@@ -1,8 +1,7 @@
 A comprehensive Django CBV guide
 ################################
 
-:status: draft
-:date: 2018-03-15 12:20
+:date: 2018-03-19 12:20
 :tags: python, cbv, class-based-views, django
 :category: django
 :slug: comprehensive-django-cbv-guide
@@ -510,8 +509,8 @@ of finding out the MRO for each class you define to see which method will be act
 (hint: that ``get_context`` would be used and the ``get_context`` of ``DefaultContextBetterCustomClassView``
 would be ignored).
 
-Before finising this interlude, I'd like to make a confession: The Python MRO is *a little more* complex
-than the procedure I described. It uses an algorithm called ``C3 linearization`_ which seems way too complex
+Before finishing this interlude, I'd like to make a confession: The Python MRO algorithm is not as simple as
+than the procedure I described. It uses an algorithm called `C3 linearization`_ which seems way too complex
 to start explaining or understanding if you not a CS student. What you'll need to remember is that the
 procedure I described works fine in normal cases when you don't try to do something stupid. Here's a
 `post that explains the theory more`_. However if you  follow along my recommendations below you won't
@@ -1357,7 +1356,7 @@ user it will return only the results that are owned by him with ``qs.filter(owne
             if self.request.user.has_perm('djangocbv.admin_access') or self.request.user.has_perm('djangocbv.publisher_access') :
                 return qs
             return qs.filter(owned_by=self.request.user)
-            
+
 Another similar mixin that is used is the ``HideRemovedMixin`` that, for simple users, excludes from the queryset the objects that
 are removed:
 
@@ -1369,11 +1368,11 @@ are removed:
             if self.request.user.has_perm('djangocbv.admin_access') or self.request.user.has_perm('djangocbv.publisher_access'):
                 return qs
             return qs.exclude(status='REMOVED')
-            
+
 One thing that needs a little discussion is that for both of these mixins I am using ``get_queryset`` to implement access control to
 allow using the same mixin for views that inherit from both ``SingleObjectMixin`` and ``MultipleObjectMixin`` (since the ``get_queryset`` is
 used in both of them). This
-means that when a user tries to access an object that has not access to he'll get a nice 404 error. 
+means that when a user tries to access an object that has not access to he'll get a nice 404 error.
 
 Beyond this, instead of filtering the queryset,
 for views inheriting from ``SingleObjectMixin`` (i.e ``DetailView``, ``UpdateView`` and ``DeleteView``)
@@ -1588,14 +1587,14 @@ It is easy to implement some moderation to our model publishing. For example, le
 allow publishers to publish a model. Here's how it can be done:
 
 .. code-block:: python
-           
+
     def form_valid(self, form):
         if form.instance.status != 'REMOVED':
             if self.request.user.has_perm('djangocbv.publisher_access'):
                 form.instance.status = 'PUBLISHED'
             else:
                 form.instance.status = 'DRAFT'
-        
+
         return super().form_valid(form)
 
 So, first of all we make sure that the object is not ``REMOVED`` (if it is
@@ -1655,8 +1654,8 @@ and configuring the permissions list to each one, the DRY way to implement this 
 
 .. code-block:: python
 
-    class AdminorUserPermissionRequiredMixin(AnyPermissionRequiredMixin):
-        permissions = ['app.admin', 'app.curator']
+    class AdminOrPublisherPermissionRequiredMixin(AnyPermissionRequiredMixin):
+        permissions = ['djangocbv.admin_access', 'djangocbv.publisher_access']
 
 
 Disable a view based on some condition
@@ -1722,13 +1721,15 @@ can just add this link to your template:
     <a class='button' href='?csv=true'>Export csv</a>
 
 So if the view needs to be exported to CSV, it will create a new ``HttpResponse`` object with the correct content type.
-The next line will add a header that (``Content-Disposition``) will mark the response as an attachment and give it a default filename.
+The next line will add a header that (``Content-Disposition``) will mark the response as an attachment and give it a default file name.
 We then crate a new ``csv.writer`` passing the just-created response as the place to write the csv. The ``for`` loop that follows
 enumerates the ``object_list`` value of the context (remember that this is added by the ``MultipleObjectMixin`` and contains the
 result of the ``ListView``). It will then use the object's ``__dict__`` attribute to write the headers (for the first time) and then
 write the values of all objects.
 
 As another simple example, let's create a quick JSON output mixin for our DetailViews:
+
+.. code-block:: python
 
     class JsonDetailMixin:
         def render_to_response(self, context, **response_kwargs):
@@ -1737,8 +1738,8 @@ As another simple example, let's create a quick JSON output mixin for our Detail
                 response.write(json.dumps(dict( (k,str(v)) for k,v in self.object.__dict__.items() )))
                 return response
             return super().render_to_response(context, **response_kwargs)
-            
-If you add this to a view inheriting from ``DetailView`` and pass it the ``?json=true`` queryparameter
+
+If you add this to a view inheriting from ``DetailView`` and pass it the ``?json=true`` query parameter
 you'll get a JSON response!
 
 
@@ -1915,14 +1916,13 @@ Notice that for this to work properly you must setup your urls like this:
 A heavy CBV user project
 ========================
 
-In this small chapter I'd like to present a bunch of mixins and views that I've defined to the 
-accompanying project (https://github.com/spapas/cbv-tutorial). 
+In this small chapter I'd like to present a bunch of mixins and views that I've defined to the
+accompanying project (https://github.com/spapas/cbv-tutorial).
 
-Let's start with the mixins (I won't show the mixins I've already talked about in the previous chapter): 
+Let's start with the mixins (I won't show the mixins I've already talked about in the previous chapter):
 
 .. code-block:: python
 
-        
     class SetOwnerIfNeeded:
         def form_valid(self, form, ):
             if not form.instance.owned_by_id:
@@ -1931,15 +1931,15 @@ Let's start with the mixins (I won't show the mixins I've already talked about i
 
 
     class ChangeStatusMixin:
-        new_status = None 
-        
+        new_status = None
+
         def form_valid(self, form, ):
             if not self.new_status:
                 raise NotImplementedError("Please define new_status when using ChangeStatusMixin")
             form.instance.status = new_status
             return super().form_valid(form)
 
-        
+
     class ContentCreateMixin(SuccessMessageMixin,
                             AuditableMixin,
                             SetOwnerIfNeeded,
@@ -1987,23 +1987,26 @@ Let's start with the mixins (I won't show the mixins I've already talked about i
         success_message = 'Object successfully unpublished!'
 
 The ``SetOwnerIfNeeded`` and  ``ChangeStatusMixin`` are simple mixins that override ``form_valid`` to
-introduce some functionality before saving the object). The other mixins are used to gather functionality of 
-other mixins together. Thus, ``ContentCreateMixin`` has the mixin functionality needed to create something (i.e an
-``Article`` or a ``Document``) i.e show a success message, add auditing information, set the object's owner,
+introduce some functionality before saving the object).
+
+The mixins that follow are used to group functionality of
+other mixins together and will be inherited by the views. Thus, ``ContentCreateMixin`` has the mixin functionality needed to create something (for example
+an ``Article`` or a ``Document``) i.e show a success message, add auditing information, set the object's owner,
 pass the request to the form, set the form's initial values, do some moderation and only allow logged in users. On
 a similar fashion, the ``ContentUpdateMixin`` collects the functionality needed to update something and is similar to
 ``ContentCreateMixin`` (with the difference that it also as the ``LimitAccessMixin`` to only allow simple users to
 edit their own content). The ``ContentListMixin`` adds functionality for export to CSV, simple filter and hiding removed
-things. 
- 
- 
-The ``ContentRemoveMixin`` and ``ContentUnpublishMixin`` are used to implement Views for Removing and Unpublishing
+things.
+
+Finally, the ``ContentRemoveMixin`` and ``ContentUnpublishMixin`` are used to implement Views for removing and unpublishing
 an object. Both of them inherit from ``ChangeStatusMixin`` - one setting
-the ``new_status`` to ``REMOVED`` the other to ``DRAFT``. 
+the ``new_status`` to ``REMOVED`` the other to ``DRAFT``.
 
 
-Continuing in this
-fashion I could remove both ``ContentRemoveMixin`` and ``ContentUnpublishMixin`` and add a ``ContentChangeStatusMixin`` like this:
+Notice that they share much functionality so I could
+remove both ``ContentRemoveMixin`` and ``ContentUnpublishMixin`` and add a single ``ContentChangeStatusMixin`` like this:
+
+.. code-block:: python
 
     class ContentChangeStatusMixin(AdminOrPublisherPermissionRequiredMixin,
                                 AuditableMixin,
@@ -2012,29 +2015,68 @@ fashion I could remove both ``ContentRemoveMixin`` and ``ContentUnpublishMixin``
         http_method_names = ['post',]
         fields = []
 
-Thus the ``new_status`` attribute wouldn't be there so my ``*RemoveView`` and ``*UnpublishView`` would 
-all inherit from this mixin and define the ``new_status`` field differently.
-This is definitely valid (and more DRY) but less explicit than the way I've implemented this - i.e you may 
-wanted to not allow publishers to remove objects, only admins (so you could implement that in the ``get_queryset``
-or ``dispatch`` method of ``ContentRemoveMixin`` and ``ContentUpdateMixin``.
+Thus the ``new_status`` attribute wouldn't be there so the views inheriting from this ``ContentChangeStatusMixin``
+(i.e ``*RemoveView`` and ``*UnpublishView``) would need to define the ``new_status`` field themselves.
+This is definitely valid (and more DRY) but less explicit than the way I've implemented this - i.e you may
+wanted to not allow publishers to remove objects, only admins (so you could implement that differently in the ``get_queryset``
+or ``dispatch`` method of ``ContentRemoveMixin`` and ``ContentUpdateMixin``) this is easier if you have both the
+``ContentRemoveMixin`` and ``ContentUnpublishMixin``.
 
 Now let's take a look at the views:
+
+.. code-block:: python
         
+    class CategoryListView(ExportCsvMixin, AdminOrPublisherPermissionRequiredMixin, ListView):
+        model = Category
+        context_object_name = 'categories'
+
+        def get_queryset(self):
+            qs = super().get_queryset()
+            return qs.annotate(article_cnt=Count('article'), document_cnt=Count('document'))
+
+
+    class CategoryCreateView(SuccessMessageMixin, AdminOrPublisherPermissionRequiredMixin, CreateView):
+        model = Category
+        fields = ['name']
+        success_message = 'Category created!'
+        success_url = reverse_lazy('category-list')
+
+
+    class CategoryUpdateView(SuccessMessageMixin, AdminOrPublisherPermissionRequiredMixin, UpdateView):
+        model = Category
+        fields = ['name']
+        success_message = 'Category updated!'
+        success_url = reverse_lazy('category-list')
+
+
+    class CategoryDetailView(CategoriesContextMixin, DetailView):
+        model = Category
+        context_object_name = 'category'
+
+        def get_context_data(self, **kwargs):
+            ctx = super().get_context_data(**kwargs)
+            ctx['article_number'] = Article.objects.filter(category=self.object).count()
+            ctx['document_number'] = Document.objects.filter(category=self.object).count()
+            return ctx    
+
 
     class ArticleListView(ContentListMixin, ListView):
         model = Article
         context_object_name = 'articles'
         filter_class = ArticleFilter
-        
 
-    class ArticleCreateView(ContentCreateMixin, RedirectToArticlesMixin, CreateView):
+
+    class ArticleCreateView(ContentCreateMixin, CreateView):
         model = Article
         form_class = ArticleForm
+        success_url = reverse_lazy('article-list')
 
 
-    class ArticleUpdateView(ContentUpdateMixin, RedirectToArticlesMixin, UpdateView):
+    class ArticleUpdateView(ContentUpdateMixin, UpdateView):
         model = Article
         form_class = ArticleForm
+        success_url = reverse_lazy('article-list')
+
 
     class ArticleDetailView(HideRemovedMixin, JsonDetailMixin, DetailView):
         model = Article
@@ -2046,42 +2088,15 @@ Now let's take a look at the views:
             return super().get_template_names()
 
 
-    class ArticleRemoveView(ContentRemoveMixin, RedirectToArticlesMixin, UpdateView):
+    class ArticleRemoveView(ContentRemoveMixin, UpdateView):
         model = Article
+        success_url = reverse_lazy('article-list')
 
 
-    class ArticleUnpublishView(ContentUnpublishMixin, RedirectToArticlesMixin, UpdateView):
+    class ArticleUnpublishView(ContentUnpublishMixin, UpdateView):
         model = Article
+        success_url = reverse_lazy('article-list')
 
-
-    class CategoryListView(ExportCsvMixin, AdminOrPublisherPermissionRequiredMixin, ListView):
-        model = Category
-        context_object_name = 'categories'
-
-        def get_queryset(self):
-            qs = super().get_queryset()
-            return qs.annotate(article_cnt=Count('article'), document_cnt=Count('document'))
-
-
-    class CategoryCreateView(CreateSuccessMessageMixin, RedirectToHomeMixin, AdminOrPublisherPermissionRequiredMixin, CreateView):
-        model = Category
-        fields = ['name']
-
-
-    class CategoryUpdateView(UpdateSuccessMessageMixin, RedirectToHomeMixin, AdminOrPublisherPermissionRequiredMixin, UpdateView):
-        model = Category
-        fields = ['name']
-        
-        
-    class CategoryDetailView(CategoriesContextMixin, DetailView):
-        model = Category
-        context_object_name = 'category'
-        
-        def get_context_data(self, **kwargs):
-            ctx = super().get_context_data(**kwargs)
-            ctx['article_number'] = Article.objects.filter(category=self.object).count()
-            ctx['document_number'] = Document.objects.filter(category=self.object).count()
-            return ctx
 
     class DocumentListView(ContentListMixin, ListView):
         model = Document
@@ -2089,14 +2104,16 @@ Now let's take a look at the views:
         filter_class = DocumentFilter
 
 
-    class DocumentCreateView(ContentCreateMixin, RedirectToDocumentsMixin, CreateView):
+    class DocumentCreateView(ContentCreateMixin, CreateView):
         model = Document
         form_class = DocumentForm
+        success_url = reverse_lazy('document-list')
 
 
-    class DocumentUpdateView(ContentUpdateMixin, RedirectToDocumentsMixin, UpdateView):
+    class DocumentUpdateView(ContentUpdateMixin, UpdateView):
         model = Document
         form_class = DocumentForm
+        success_url = reverse_lazy('document-list')
 
 
     class DocumentDetailView(HideRemovedMixin, JsonDetailMixin, DetailView):
@@ -2104,23 +2121,74 @@ Now let's take a look at the views:
         context_object_name = 'document'
 
 
-    class DocumentRemoveView(ContentRemoveMixin, RedirectToDocumentsMixin, UpdateView):
+    class DocumentRemoveView(ContentRemoveMixin, UpdateView):
         model = Document
+        success_url = reverse_lazy('document-list')
 
 
-    class DocumentUnpublishView(ContentUnpublishMixin, RedirectToDocumentsMixin, UpdateView):
+    class DocumentUnpublishView(ContentUnpublishMixin, UpdateView):
         model = Document
+        success_url = reverse_lazy('document-list')
 
-        
+
     class DynamicTemplateView(TemplateView):
         def get_template_names(self):
             what = self.kwargs['what']
             return '{0}.html'.format(what)
+            
+As you will see there are 
 
+* 4 views related to categories (Create, Detail, Update and List)
+* 6 views related to articles (Create, Detail, Update, List, Unpublish and Remove) and 
+* another 6 views related to documents (same as articles). 
+
+The views for ``Article`` and ``Document`` are more or less the same: They inherit
+from the corresponding mixin we defined previously (``CreateContentMixin``, ``UpdateContentMixin`` etc) add a
+redirect to their corresponding list view (I am using ``redirect_lazy`` there because ``redirect`` wouldn't work
+because it will lead to a cyclic dependency between urls and views) and define their corresponding form and model.
+For the the DetailViews I don't use a group mixin like the others but I just add the ``HideRemovedMixin`` and 
+``JsonDetailMixin`` directly to their ancestor list. This is to make clear that the group mixins (``ContentCreateMixin`` etc)
+are optional and I could for example define ``ArticleCreateView`` like this:
+
+.. code-block:: python
+
+    class ArticleCreateView(SuccessMessageMixin,
+                        AuditableMixin,
+                        SetOwnerIfNeeded,
+                        RequestArgMixin,
+                        SetInitialMixin,
+                        ModerationMixin,
+                        LoginRequiredMixin, 
+                        CreateView):
+        model = Article
+        form_class = ArticleForm
+        success_url = reverse_lazy('article-list')
+        success_message = 'Object successfully created!'
+
+What's the advantage of using the  ``ContentCreateMixin``  then? Well since the same mixins are used from ``DocumentCreateView``
+I won't need to re-define this list there. Also if for example I want to allow users that have a specific permission to create
+articles and document I will remove the ``LoginRequireMixin`` and add the ``AllowCreateContentMixin`` only to the ``ContentCreateMixin``
+and not to both ``ArticleCreateView`` and ``DocumentCreateView`` (and I won't be in danger of forgetting to change it somewhere). 
+Of course all this depends on your requirements and how DRY you need to be.
+
+The category related views are simpler and override their mixins directly. Finally there's a ``DynamicTemplateView`` to 
+display templates based on their filename as discussed previously.
+
+Before continuing, please try to understand how much more DRY this project is when compared to using a traditional
+functional one (or if not using mixins). For example, there's a ``RequestArgMixin`` that is used by all views that create/update content. If INHERITANCE
+didn't use that mixin I'd need to re-define the same functionality (pass the current request to the form's constructor) to
+4 views (Article/Document Create/Update). Or for the ``AuditableMixin`` I'd need to remember to upgrade the created/modified by
+to 8 views (Article/Document Create/Update/Unpublish/Remove)! 
+        
 Conclusion
 ==========
 
-asdasd
+The previous discussion should convince you how much more DRY your views will be when using CBVs and how
+much quicker will be to create your views. Also, if
+you followed closely the first and second chapters you should be able to understand everything that is
+needed for CBVs and be able to properly understand which method or attribute you need to override to 
+implement some specific functionality. Finally, the list of examples in the third chapter should help
+you get started in all your CBV needs!
 
 
 .. _`CBV inspector`: http://ccbv.co.uk`

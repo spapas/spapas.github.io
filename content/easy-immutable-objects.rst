@@ -338,8 +338,12 @@ programming and also you'll need to include an extra library to your project (ev
 want this specific capability). 
 
 For completeness, here's the `the docs on lens`_ from Ramda_ which is a well known Javascript functional library.
+This needs you to understand what is ``prop``, what is ``assoc`` and then how to use the lens with ``view``,
+``set`` and ``over``. For me, these are way too much things to remember for such a specific thing. Yes if I wanted
+to fully use Ramda or a similar library I'd be delighted to use all these techniques - however most people
+prefer to stick with more familiar (and more procodural) concepts.
 
-The helper's I'm going to present here are more or less a poor man's lens, i.e you will be able to use the basic
+The helpers I'm going to present here are more or less a poor man's lens, i.e you will be able to use the basic
 functionality of a lens but...
 
 * without the peculiar syntax and 
@@ -359,11 +363,48 @@ a path inside that object and retrieves the value at that path. The path could b
 Thus, for the object ``{'a': [{'b': {'c': {'d': 32} }}]}`` when the lens getter is called with either
 ``'a.0.b.c'`` or ['a', 0, 'b', 'c'] as the path it should return ``{'d': 32}``.
 
+To implement the get helper I will use a functional concept, ``reduce``. I've already explained this concept
+in my `previous react-redux tutorial`_ so I urge you to read that article for more info. Using reduce we
+can apply one by one accumulatively the members of the path to the initial object and the result will be 
+the value of that path. Here's the implementation:
 
+.. code-block:: javascript
 
-a complex objec
-
+    const objgetter = (accumulator, currentValue) => accumulator[currentValue];
+    const pget = (obj, path) =>  (
+        (typeof path === 'string' || path instanceof String)?path.split('.'):path
+    ).reduce(objgetter, obj)
     
+I have defined an objgetter reducer function that gets an accumulated object and the current
+value of the path and just returns the ``currentValue`` index of that accumulated object. Finally,
+for the get lens (named ``pget``) I just check to see if the path is a string or an array (if it's
+a string I split it on dots) and then I "reduce" the path using the objgetter defined above and
+starting by the original object as the initial value. To understand how it is working, let's try calling it
+for an object:
+
+.. code-block:: javascript
+
+    const s1 = {'a': [{'b': {'c': {'d': 32} }}]}
+    console.log(pget(s1, ['a', 0, 'b', 'c']))
+
+The above ``pget`` will call ``reduce`` on the passed array using the defined ``objgetter`` above
+as the reducer function and ``s1`` as the original object. So, the reducer function will be called with
+the following values each time:
+
+==========================  ============
+accumulator                 currentvalue
+==========================  ============
+``s1``                      ``'a'``
+``s1['a']``                 ``0``
+``s1['a'][0]``              ``'b'``
+``s1['a'][0]['b']``         ``'c'``
+``s1['a'][0]['b']['c']``        
+==========================  ============
+
+Thus the result will be exactly what we wanted ``{'d' :32}``. An interesting thing is that it's working
+fine without the need to differentiate between arrays and objects because of how index access ``[]`` work.
+
+
 .. _`Redux`: https://redux.js.org
 .. _`Hyperapp`: https://hyperapp.js.org
 .. _`created from the beginning`: https://redux.js.org/basics/reducers
@@ -376,3 +417,4 @@ a complex objec
 .. _`shorthand syntax`: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Object_initializer#Syntax
 .. _`the docs on lens`: http://ramdajs.com/docs/#lens
 .. _Ramda: http://ramdajs.com
+.. _`previous react-redux tutorial`: https://spapas.github.io/2016/03/02/react-redux-tutorial/#interlude-so-what-s-a-reducer

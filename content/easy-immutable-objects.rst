@@ -6,7 +6,7 @@ Easy immutable objects in Javascript
 :category: javascript
 :slug: easy-immutable-objects
 :author: Serafeim Papastefanos
-:summary: How to install and use both Python 2.x and 3.x on Windows
+:summary: How to avoid mutations in your objects and a poor man's lens!
 :status: draft
 
 With the rise of Redux_ and other similar frameworks (e.g Hyperapp_) that
@@ -306,7 +306,7 @@ The state now will be
       ] 
     }
 
-How can we add the missing 'id' attribute to the first group? "Easy" (depending on what your defintion of easy is):
+How can we add the missing ``id`` attribute to the first group? "Easy" (depending on what your defintion of easy is):
 
 .. code-block:: javascript
 
@@ -324,6 +324,44 @@ One more time what the above does?
 * For the first element of that array it copies all attributes of the first element of state['groups'] and assings it an ``id=1`` attribute
 * For the remaining elements of that array it copies all elements of state['groups] after the first one
 
+Immutability's little helpers
+-----------------------------
+
+As you've seen from the previous examples, using immutable objects is not as easy as seems from
+the toy examples. Actually, drilling down into complex immutable 
+objects and returning new ones that have
+some values changed  is a well-known problem in the functional world and has already a solution 
+called "lenses". This is a funny name but it more or less means that you use a lens to look at
+exactly the value you want and modify it. The problem with lenses is that although they solve
+the problem I mention is that if you want to use them you'll need to dive deep into functional
+programming and also you'll need to include an extra library to your project (even if you only
+want this specific capability). 
+
+For completeness, here's the `the docs on lens`_ from Ramda_ which is a well known Javascript functional library.
+
+The helper's I'm going to present here are more or less a poor man's lens, i.e you will be able to use the basic
+functionality of a lens but...
+
+* without the peculiar syntax and 
+* without the need to learn more functional concepts than what you'll want and 
+* without the need to include any more external dependencies
+
+Pretty good deal, no? 
+
+In any case, a lens has two parts, a get and a set. The get will be used to drill down and retrieve a value from a 
+complex object while the set will be used to drill down and assign a value to a complex object. The set does not 
+modify the object but returns a new one.
+
+We'll start with the get which seems easier. For this, I'll just create a function that get an object and 
+a path inside that object and retrieves the value at that path. The path could be either a string of the form
+'a.0.c.d' or an array ['a', '0', 'c', 'd'] - for numerical indeces we'll consider an array at that point.
+
+Thus, for the object ``{'a': [{'b': {'c': {'d': 32} }}]}`` when the lens getter is called with either
+``'a.0.b.c'`` or ['a', 0, 'b', 'c'] as the path it should return ``{'d': 32}``.
+
+
+
+a complex objec
 
     
 .. _`Redux`: https://redux.js.org
@@ -336,3 +374,5 @@ One more time what the above does?
 .. _`Array.concat`: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/concat
 .. _`playground I've created on repl.it`: https://repl.it/@spapas/JS-Drill-Down-objectarray-immutable
 .. _`shorthand syntax`: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Object_initializer#Syntax
+.. _`the docs on lens`: http://ramdajs.com/docs/#lens
+.. _Ramda: http://ramdajs.com

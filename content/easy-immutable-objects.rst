@@ -37,11 +37,17 @@ Notice that if you'd like to see a non-toy React + Redux application or you'd li
 introduction to the concepts I talked about (state, reducers, actions etc)
 you can follow along my `React Redux tutorial`_.
 
+In the following, I'll do a quick introduction on how to keep your state objects immutable
+using modern Javascript techniques, I'll present how complex it is to modify non-trivial 
+immutable objects and finally I'll give you a quick recipe for modifying your non-trivial
+immutable objects. If you want to play with the concepts I'll introduce you can do it at a
+`playground I've created on repl.it`_
+
 Immutable objects
 -----------------
 
-The previous example was easy and nice however usually you won't have such a small state! Let's suppose that you had something
-more complex, for example your state was like this:
+The example I gave in the introduction was easy and nice however usually you won't have such 
+a small state! Let's suppose that you had something a little more complex, for example your state was like this:
 
 .. code-block:: javascript
 
@@ -94,7 +100,8 @@ This means that it will create a new object which will copy all current attribut
 ``counter`` attribute. 
 
 I'd like to also add here that instead of using the ``Object.assign`` method you could use the `spread syntax`_
-to more or less do the same. You can use the spread syntax to create an new object that has the same attributes
+to more or less do the same. The spread syntax on an object takes this object's attributes and outputs them as key-value
+dictionary pairs (for them to be used to initialize other objects). Thus, you can use the spread syntax to create an new object that has the same attributes
 of another object like this:
 
 .. code-block:: javascript
@@ -143,7 +150,180 @@ arguments
     
 This will append ``new element`` to a new object that will have the elements of state (it won't modify the 
 existing state) and is easier if you have this exact requirement. The advantage of slice is that you can 
-use it to add 
+use it to add/remove/modify elements from any place in the original array. For example, here's how you can
+add an element after the first element of an array:
+
+.. code-block:: javascript
+
+    let x = ['a', 'b', 'c' ]
+    let y = x.slice(0,1).concat(['second' ], x.slice(1,3))
+
+Now ``y`` will be equal to ``[ 'a', 'second', 'b', 'c' ]``. So the above will get the first (0-th) element from the ``x``
+array and concat it with another element (``second``) and the remaining elements of ``x``. Remember that ``x`` is not
+modifyied since ``concat`` will create a new array.
+
+In a similar fashion to objects, instead of using concat it is much easier to use the spread syntax. The spread syntax for
+an array will output its elements one after the other for them to be used by other arrays. Thus, continuing from the
+previous example, ``[...x]`` will return a new array with the elements of ``x`` (so it is similar to ``x.slice()`` or ``x.concat()``),
+thus to re-generate the previous example you'll do something like 
+
+.. code-block:: javascript
+
+    let y = y=[...x.slice(0,1), 'second', ...x.slice(1,3)]
+
+
+More complex cases
+------------------
+
+We'll now take a look at some more complex cases and see how quickly it gets difficult. Let's suppose that our state is the following:
+
+.. code-block:: javascript
+
+    const state = {
+      'user': {
+        'first_name': 'John',
+        'last_name': 'Doe',
+        'address': {
+          'city': 'Athens',
+          'country': 'Greece',
+          'zip': '12345'
+        }
+      }
+    }
+    
+and we want to assign a ``group`` attribute to the state. This can be easily done with ``assign``:
+
+.. code-block:: javascript
+
+    let groups = [{
+        'name': 'group1'
+    }]
+
+    state = Object.assign({}, state, {
+      'groups': groups
+    })
+    
+or spread:
+
+.. code-block:: javascript
+
+    state = { 
+      ...state, 'groups': groups
+    }
+
+Notice that instead of ``'groups': groups`` I could have used the `shorthand syntax`_ and written only ``groups`` and it would still work 
+(i.e ``state = {...state, groups}`` is the same). In all cases, the resulting state will be:     
+
+.. code-block:: javascript
+
+    {
+      'user': {
+        'first_name': 'John',
+        'last_name': 'Doe',
+        'address': {
+          'city': 'Athens',
+          'country': 'Greece',
+          'zip': '12345'
+        }
+      },
+      'groups': [{
+        'name': 'group1'
+      }]
+    }
+
+From now on I'll only use the spread syntax which is more compact.  
+    
+Let's try to change the user's name. This is not as easy as the first example because we need to:
+
+* Create a new copy of the ``user`` object with the new first name
+* Create a new copy of the ``state`` object with the new user object created above
+
+This can be done in two steps like this:
+
+.. code-block:: javascript
+
+    let user ={...state['user'], 'first_name': 'Jack'}
+    state = {...state, user}
+
+or in one step like this:
+
+.. code-block:: javascript
+
+    state = {...state, 'user':{
+      ...state['user'], 'first_name': 'Jack'}
+    }
+
+The single step assignment is the combination of the two step described above. It is a little more complex
+but it saves typing and is prefered because it allows the reducer function to have a single expression. This 
+will be made more clear with the third example, trying to modify the user's zip code. Let's do it in three
+steps first:
+
+.. code-block:: javascript
+
+    let address ={...state['user']['address'], 'zip': '54321'}
+    user ={...state['user'], address}
+    state = {...state, user}
+    
+And now in one:
+
+.. code-block:: javascript
+   
+    state = {...state, 'user': {
+      ...state['user'], 'address': {
+        ...state['user']['address'], 'zip': 54321
+      }
+    }}
+    
+Now, as can be seen in the above examples, modifying (without mutating) a compex state object 
+this is not very easy - it needs much thinking and is too error prone! This will be even more
+apparent when we also get the array modifications into the equation, for example by adding another
+two groups: 
+
+.. code-block:: javascript
+   
+    state = {
+      ...state, groups: [
+        ...state['groups'].slice(), 
+        {name: 'group2', id: 2},
+        {name: 'group3', id: 3}
+      ]
+    }
+
+The state now will be 
+
+.. code-block:: javascript
+
+    { 
+      user: { 
+        first_name: 'Jack',
+        last_name: 'Doe',
+        address: { city: 'Athens', country: 'Greece', zip: 54321 } 
+      },
+      groups: [ 
+        { name: 'group1' },
+        { name: 'group2', id: 2 },
+        { name: 'group3', id: 3 } 
+      ] 
+    }
+
+How can we add the missing 'id' attribute to the first group? "Easy" (depending on what your defintion of easy is):
+
+.. code-block:: javascript
+
+    state = {
+      ...state, groups: [
+        {...state['groups'][0], 'id': 1},
+        ...state['groups'].slice(1)
+      ]
+    }    
+
+One more time what the above does? 
+
+* Creates a new object and copies all existing properties of state to it
+* Creates a new array which assigns it to the new state's groups
+* For the first element of that array it copies all attributes of the first element of state['groups'] and assings it an ``id=1`` attribute
+* For the remaining elements of that array it copies all elements of state['groups] after the first one
+
 
     
 .. _`Redux`: https://redux.js.org
@@ -154,3 +334,5 @@ use it to add
 .. _`spread syntax`: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax
 .. _`Array.slice`: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice
 .. _`Array.concat`: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/concat
+.. _`playground I've created on repl.it`: https://repl.it/@spapas/JS-Drill-Down-objectarray-immutable
+.. _`shorthand syntax`: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Object_initializer#Syntax

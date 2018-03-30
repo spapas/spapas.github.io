@@ -41,7 +41,11 @@ In the following, I'll do a quick introduction on how to keep your state objects
 using modern Javascript techniques, I'll present how complex it is to modify non-trivial 
 immutable objects and finally I'll give you a quick recipe for modifying your non-trivial
 immutable objects. If you want to play with the concepts I'll introduce you can do it at a
-`playground I've created on repl.it`_
+`playground I've created on repl.it`_.
+
+Please keep in mind that this article has been written for ES6 - take a look at my
+`browserify with ES6`_ article to see how you can also use it in your projects with
+Browserify.
 
 Immutable objects
 -----------------
@@ -366,7 +370,7 @@ Thus, for the object ``{'a': [{'b': {'c': {'d': 32} }}]}`` when the lens getter 
 To implement the get helper I will use a functional concept, ``reduce``. I've already explained this concept
 in my `previous react-redux tutorial`_ so I urge you to read that article for more info. Using reduce we
 can apply one by one accumulatively the members of the path to the initial object and the result will be 
-the value of that path. Here's the implementation:
+the value of that path. Here's the implementation of ``pget`` (from property get):
 
 .. code-block:: javascript
 
@@ -574,6 +578,10 @@ And here's the result:
         }
     }
 
+Conclusion
+----------
+
+
 
 .. _`Redux`: https://redux.js.org
 .. _`Hyperapp`: https://hyperapp.js.org
@@ -588,3 +596,4 @@ And here's the result:
 .. _`the docs on lens`: http://ramdajs.com/docs/#lens
 .. _Ramda: http://ramdajs.com
 .. _`previous react-redux tutorial`: https://spapas.github.io/2016/03/02/react-redux-tutorial/#interlude-so-what-s-a-reducer
+.. _`browserify with ES6`: https://spapas.github.io/2015/11/16/using-browserify-es6/

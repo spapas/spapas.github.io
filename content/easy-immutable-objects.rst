@@ -1,7 +1,7 @@
 Easy immutable objects in Javascript
 ####################################
 
-:date: 2018-03-28 11:20
+:date: 2018-03-30 13:20
 :tags: javascript, react, redux, hyperapp, immutable, es6
 :category: javascript
 :slug: easy-immutable-objects
@@ -9,7 +9,7 @@ Easy immutable objects in Javascript
 :summary: How to avoid mutations in your objects and a poor man's lens!
 :status: draft
 
-With the rise of Redux_ and other similar frameworks (e.g Hyperapp_) that
+With the rise of Redux_ and other similar frameworks (e.g Hyperapp_), i.e frameworks that
 try to be a little more *functional* (functional as in functional programming), a 
 new problem was introduced to Javascript programmers (at least to those that weren't
 familair with functional programming): How to keep their application's
@@ -403,6 +403,176 @@ accumulator                 currentvalue
 
 Thus the result will be exactly what we wanted ``{'d' :32}``. An interesting thing is that it's working
 fine without the need to differentiate between arrays and objects because of how index access ``[]`` work.
+
+Continuing for the set lens (which will be more difficult), I'll first represent a simple version that
+works only with objects but displays the main idea of how this will work: It uses recursion i.e it will
+call itself to gradually build the new object. Here's how it is implemented
+
+.. code-block:: javascript
+
+    const pset0 = (obj, path, val) => {
+      let idx = path[0]
+      
+      if(path.length==1) {
+        return {
+          ...obj, [idx]: val
+        }
+      } else {
+        let remaining = path.slice(1)
+        return {
+          ...obj,
+          [idx]: pset0(...[obj[idx]], remaining, val)
+        }
+      }
+    }
+
+I have assumed that the path is an array of indeces and that the ``obj`` is a complex object (no arrays in it please); the
+function returns a new object with the old object's value at the path be replaced with ``val``. Let's see how it works
+for the following call:
+
+.. code-block:: javascript
+
+    const s2 = {a0: 0, a: {b0: 0, b: {c0: 0, c: 3}}}
+    console.log(pset0(s2, ['a', 'b', 'c'], 4))
+
+====== ============================= ======    
+# Call Call parameters               Return 
+====== ============================= ======
+1      pset0(s2, ['a', 'b', 'c'], 4) {...s2, ['b']: pset0(s2['a'], ['b', 'c'], 4) }
+2      pset0(s2['a'], ['b', 'c'], 4) {...s2['a'], ['c']: pset0(s2['a']['b'], ['c'], 4) }
+3      pset0(s2['a']['b'], ['c'], 4) {...s2['a']['b'], ['c']: 4}
+====== ============================= ======
+
+Thus, the first time it will be called it will return a new object with the attributes of ``s2``
+but overriding its ``'b'`` index with the return of the second call. The second call will return
+a new object with the attributes of ``s2['a']`` but override it's ``'c'`` index with the return
+of the third call. Finally, the 3rd call will return an object with the attributes of ``s2['a']['b']``
+and setting the ``'c'`` index to ``4``. The result will be as expected equal to:
+
+.. code-block:: javascript
+
+    {a0: 0, a: {b0: 0, b: {c0: 0, c: 4 }}}
+
+Now that we've understood the logic we can extend the above function with the following extras:
+
+* support for arrays in the object using numerical indeces
+* support for array (``['a', 'b']``) or string path (``'a.b'``)
+* support for a direct value to set on the path or a function that will be applied on that value
+
+Here's the resulting set lens:
+
+.. code-block:: javascript
+
+    const pset = (obj, path, val) => {
+      let parts = (typeof path === 'string' || path instanceof String)?path.split('.'):path
+      const cset = (obj, cidx, val) => {
+        let newval = val
+        if (typeof val === "function") {
+          newval = val(obj[cidx])
+        } 
+        if(Array.isArray(obj)) {
+          return [
+            ...obj.slice(0, cidx*1),
+            newval,
+            ...obj.slice(cidx*1+1)
+            ]
+        } else {
+          return {
+            ...obj, [cidx]: newval
+          }
+        }
+      }
+      
+      let pidx = parts[0]
+      if(parts.length==1) {
+        return cset(obj, pidx, val) 
+      } else {
+        let remaining = parts.slice(1)
+        return cset(obj, pidx, pset(obj[pidx], remaining, val)) 
+      }
+    }
+
+It may seem a little complex but I think it's easy to be understood: The parts in the beginning
+will just check to see if the path is an array or a string and split the string to its parts.
+The ``cset`` function that follows is a local function that is used to make the copy of the object
+or array and set the new value. Here's how it is working: It will first check to see if the ``val``
+parameter is a function or a not. If it is a function it apply this function to the object's index
+to get the ``newvalue`` else it will just use ``val`` as the ``newvalue``. After that it checks if the
+object it got is an array or not. If it is an array it will do the slice trick we saw before to copy
+the elements of the array except the ``newval`` which will put it at the index (notice that the index
+at that point must be numerical but that's up to you to assert). If the current ``obj`` is not an array
+then it must be an object thus it uses the spread syntax to copy the object's attributes and reassign
+the current index to ``newval``.
+
+The last part of ``pset`` is similar to the ``pset0`` it just uses ``cset`` to do the new objec/array
+generation instead of doing it in place like ``pset0`` - as already explained, ``pset`` is called recursively
+until only one element remains on the path in which case the ``newval`` will be assigned to the current index of 
+the current ``obj``.
+
+Let's try to use ``pset`` for the following rather complex state:
+
+.. code-block:: javascript
+
+    let state2 = {
+      'users': {
+        'results': [
+          {'name': 'Sera', 'groups': ['g1', 'g2', 'g3']},
+          {'name': 'John', 'groups': ['g1', 'g2', 'g3']},
+          {'name': 'Joe', 'groups': []}
+        ],
+        'pagination': {
+          'total': 100,
+          'perpage': 5,
+          'number': 0
+        }
+      },
+      'groups': {
+        'results': [
+        ]
+        ,
+        'total': 0
+      }
+    }
+
+Let's call it three times one after the other to change various attributes one after the other: 
+
+.. code-block:: javascript
+    
+    let new_state2 = pset(
+        pset(
+            pset(
+                pset(state2, "users.results.2.groups.0", 'aa'), 
+            "users.results.0.name", x=>x.toUpperCase()), 
+        "users.total", x=>x+1), 
+    'users.results.1.name', 'Jack')
+
+And here's the result:
+    
+.. code-block:: javascript
+
+    {
+        "users": {
+            "results": [{
+                "name": "SERA",
+                "groups": ["g1", "g2", "g3"]
+            }, {
+                "name": "Jack",
+                "groups": ["g1", "g2", "g3"]
+            }, {
+                "name": "Joe",
+                "groups": ["aa"]
+            }],
+            "pagination": {
+                "total": 101,
+                "perpage": 5,
+                "number": 0
+            }
+        },
+        "groups": {
+            "results": [],
+            "total": 0
+        }
+    }
 
 
 .. _`Redux`: https://redux.js.org

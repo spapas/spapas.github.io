@@ -9,18 +9,19 @@ Easy immutable objects in Javascript
 :summary: How to avoid mutations in your objects and a poor man's lens!
 :status: draft
 
-With the rise of Redux_ and other similar frameworks (e.g Hyperapp_), i.e frameworks that
+With the rise of Redux_ and other similar Javascript frameworks (e.g Hyperapp_) that
 try to be a little more *functional* (functional as in functional programming), a 
 new problem was introduced to Javascript programmers (at least to those that weren't
 familair with functional programming): How to keep their application's
 state "immutable". 
 
 Immutable means that the state should be an object that does not change (mutates) - instead
-of changing it, Redux needs the state object to be `created from the beginning`_. So when
-something happens in your application you need to discard 
+of changing it, Redux needs the state object to be `created from the beginning`_.
+
+So when something happens in your application you need to discard 
 the existing state object and create a new one from scratch by modifying and copying the previous state values.
 This is easy
-in most toy-apps that are used when introducing the concept for example if your state is ``{counter: 0}``
+in most toy-apps that are used when introducing the concept, for example if your state is ``{counter: 0}``
 then you could just define the reducer for the ``ADD`` action (i.e when the user clicks the ``+`` button) like this:
 
 .. code-block:: javascript
@@ -31,11 +32,8 @@ then you could just define the reducer for the ``ADD`` action (i.e when the user
         default: return state
       }
     }
-    
 
-Notice that if you'd like to see a non-toy React + Redux application or you'd like a gentle
-introduction to the concepts I talked about (state, reducers, actions etc)
-you can follow along my `React Redux tutorial`_.
+Unfortunately, your application will definitely have a much more complex state than this!
 
 In the following, I'll do a quick introduction on how to keep your state objects immutable
 using modern Javascript techniques, I'll present how complex it is to modify non-trivial 
@@ -47,11 +45,18 @@ Please keep in mind that this article has been written for ES6 - take a look at 
 `browserify with ES6`_ article to see how you can also use it in your projects with
 Browserify.
 
+Also, if you'd like to see a non-toy React + Redux application or you'd like a gentle
+introduction to the concepts I talked about (state, reducers, actions etc)
+you can follow along my `React Redux tutorial`_. This is a rather old article 
+(considering how quickly the Javascript framework state change) but the basic concepts
+introduced there are true today.
+
+
 Immutable objects
 -----------------
 
-The example I gave in the introduction was easy and nice however usually you won't have such 
-a small state! Let's suppose that you had something a little more complex, for example your state was like this:
+Let's start our descent into avoiding mutations by supposing that you had 
+something a little more complex than the initial example, for example your state was like this:
 
 .. code-block:: javascript
 
@@ -73,15 +78,17 @@ If you continued the same example then your ``ADD`` reducer would need to return
     
 This gets difficult and error prone very soon - and what happens if you later need to add another attribute to your state? 
 
-Thankfully, there's the `Object.assign`_ method! This method will copy all attributes from a list of objects 
+The correct way to implement this would be to enumerate all properties of state except 'counter', copy them to a new
+object, and then assign counter+1 to the new object's counter attribute. You could implement this by hand however,
+thankfully, there's the `Object.assign`_ method! This method will copy all attributes from a list of objects 
 to an object which will return as a result and is defined like this:
 
 .. code-block:: javascript
 
     Object.assign(target, ...sources)
     
-The ``target`` parameter is the object that will retrieve all attributes from ``sourcess`` (which is a variadic argument you can
-have as many sources as you want - even 0; in this case the target will be returned). For a quick example, running
+The ``target`` parameter is the object that will retrieve all attributes from ``sources`` (which is a variadic argument - you can
+have as many sources as you want - even 0; in this case the target will be returned). For a quick example, running:
 
 .. code-block:: javascript
 
@@ -121,12 +128,44 @@ for example for the ``ADD`` reducer:
 
     return {...state, 'counter': state.counter+1 }
 
-One final comment is that nothing stops you from using ``...`` multiple times to copy the attributes of multiple objects
+Like ``Object.assign``, you can have as many sources as you want in your spread syntax thus nothing stops you from using ``...`` multiple times to copy the attributes of multiple objects
 for example you could define ``ADD`` like this: 
 
 .. code-block:: javascript
 
     return {...state, ...{'counter': state.counter+1 } }
+    
+The order is similar to Object.assign, i.e the attributes that follow will override the previous ones. 
+
+One final comment is that both ``Object.assign`` and copying objects with the spread syntax will do a "shallow"
+copy i.e it will copy only the outer object, not the objects its keys refer to. An example of this behavior is that
+if you run the following:
+
+.. code-block:: javascript
+
+    let a = {'val': 3 }
+    let x = {a }
+    let y = {...x}
+    console.log(x, y)
+    x['val2'] = 4
+    y['val2'] = 5
+    a['val'] = 33
+    console.log(x, y)
+
+you'll get:
+
+.. code-block:: javascript
+
+    { a: { val: 3 } } { a: { val: 3 } }
+    { a: { val: 33 }, val2: 4 } { a: { val: 33 }, val2: 5 }   
+    
+i.e ``x`` and ``y`` got a different ``val2`` attribute since they not the same object, however both ``x`` and ``y``
+have a reference to the *same* ``a`` thus when it's ``val`` attribute was changed this change appears to both ``x`` and ``y``!
+
+    
+What the above means is that if you have a state object containing
+other objects (or arrays) you will also need to copy these children 
+objects to keep your state immutable. We'll see examples on this later.
 
 Immutable arrays
 ----------------    
@@ -175,7 +214,9 @@ thus to re-generate the previous example you'll do something like
 
     let y = y=[...x.slice(0,1), 'second', ...x.slice(1,3)]
 
-
+Both the slice or the spread syntax slice will do a shallow copy (similar to how Object.assign works) so the same
+conclusions from the previous section are true here.
+    
 More complex cases
 ------------------
 

@@ -7,7 +7,6 @@ Easy immutable objects in Javascript
 :slug: easy-immutable-objects
 :author: Serafeim Papastefanos
 :summary: How to avoid mutations in your objects and a poor man's lens!
-:status: draft
 
 With the rise of Redux_ and other similar Javascript frameworks (e.g Hyperapp_) that
 try to be a little more *functional* (functional as in functional programming), a 

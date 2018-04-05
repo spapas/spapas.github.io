@@ -644,7 +644,7 @@ Conclusion
 
 Using the above techniques you should be able to easily keep your state objects immutable. For simple cases you
 can stick to the spread syntax or Object.assign / Array.slice but for more complex cases you may want to consider
-either copying directly the pset and pget utils I explained above or just using the `poor-man-lens npm package`. 
+either copying directly the pset and pget utils I explained above or just using the `poor-man-lens npm package`_. 
 
 
 .. _`Redux`: https://redux.js.org

@@ -1,7 +1,7 @@
 Easy immutable objects in Javascript
 ####################################
 
-:date: 2018-03-30 13:20
+:date: 2018-04-05 12:20
 :tags: javascript, react, redux, hyperapp, immutable, es6
 :category: javascript
 :slug: easy-immutable-objects
@@ -214,13 +214,15 @@ thus to re-generate the previous example you'll do something like
 
     let y = y=[...x.slice(0,1), 'second', ...x.slice(1,3)]
 
-Both the slice or the spread syntax slice will do a shallow copy (similar to how Object.assign works) so the same
-conclusions from the previous section are true here.
+All three of concat, slice or the spread syntax will do a shallow copy (similar to how Object.assign works) so the same
+conclusions from the previous section are true here: If you have arrays inside other arrays (or objects) you'll need to copy the inner
+arrays recursively.
     
 More complex cases
 ------------------
 
-We'll now take a look at some more complex cases and see how quickly it gets difficult. Let's suppose that our state is the following:
+We'll now take a look at some more complex cases and see how quickly it gets difficult because of the shallow copying. 
+Let's suppose that our state is the following:
 
 .. code-block:: javascript
 
@@ -299,9 +301,8 @@ or in one step like this:
     }
 
 The single step assignment is the combination of the two step described above. It is a little more complex
-but it saves typing and is prefered because it allows the reducer function to have a single expression. This 
-will be made more clear with the third example, trying to modify the user's zip code. Let's do it in three
-steps first:
+but it saves typing and is prefered because it allows the reducer function to have a single expression. Now
+let's try to modify the user's zip code. We'll do it in three steps first:
 
 .. code-block:: javascript
 
@@ -320,7 +321,7 @@ And now in one:
     }}
     
 Now, as can be seen in the above examples, modifying (without mutating) a compex state object 
-this is not very easy - it needs much thinking and is too error prone! This will be even more
+is not very easy - it needs much thinking and is too error prone! This will be even more
 apparent when we also get the array modifications into the equation, for example by adding another
 two groups: 
 
@@ -334,7 +335,8 @@ two groups:
       ]
     }
 
-The state now will be 
+The above copies the existing state and assigns to it a new ``groups`` object by copying
+the existing groups and appending two more groups to that array! The state now will be:
 
 .. code-block:: javascript
 
@@ -351,7 +353,8 @@ The state now will be
       ] 
     }
 
-How can we add the missing ``id`` attribute to the first group? "Easy" (depending on what your defintion of easy is):
+As a final examply, how can we add the missing ``id`` attribute to the first group? 
+Following the above techniques:
 
 .. code-block:: javascript
 
@@ -365,9 +368,11 @@ How can we add the missing ``id`` attribute to the first group? "Easy" (dependin
 One more time what the above does? 
 
 * Creates a new object and copies all existing properties of state to it
-* Creates a new array which assigns it to the new state's groups
+* Creates a new array which assigns it to the new state's ``groups`` attribute
 * For the first element of that array it copies all attributes of the first element of state['groups'] and assings it an ``id=1`` attribute
 * For the remaining elements of that array it copies all elements of state['groups] after the first one
+
+Now think what would happen if we had an even more complex state with 3 or 4 nested levels!
 
 Immutability's little helpers
 -----------------------------
@@ -376,17 +381,18 @@ As you've seen from the previous examples, using immutable objects is not as eas
 the toy examples. Actually, drilling down into complex immutable 
 objects and returning new ones that have
 some values changed  is a well-known problem in the functional world and has already a solution 
-called "lenses". This is a funny name but it more or less means that you use a lens to look at
-exactly the value you want and modify it. The problem with lenses is that although they solve
+called "lenses". This is a funny name but it more or less means that you use a magnifying lens to look at
+exactly the value you want and modify or retrieve it. The problem with lenses is that although they solve
 the problem I mention is that if you want to use them you'll need to dive deep into functional
 programming and also you'll need to include an extra library to your project (even if you only
 want this specific capability). 
 
 For completeness, here's the `the docs on lens`_ from Ramda_ which is a well known Javascript functional library.
 This needs you to understand what is ``prop``, what is ``assoc`` and then how to use the lens with ``view``,
-``set`` and ``over``. For me, these are way too much things to remember for such a specific thing. Yes if I wanted
-to fully use Ramda or a similar library I'd be delighted to use all these techniques - however most people
-prefer to stick with more familiar (and more procodural) concepts.
+``set`` and ``over``. For me, these are way too much things to remember for such a specific thing. Also, notice
+that the minified version of Ramda is around 45 kb which is not small. Yes, if I wanted
+to fully use Ramda or a similar library I'd be delighted to use all these techniques and include it as a 
+dependency - however most people prefer to stick with more familiar (and more procedural) concepts.
 
 The helpers I'm going to present here are more or less a poor man's lens, i.e you will be able to use the basic
 functionality of a lens but...
@@ -399,14 +405,15 @@ Pretty good deal, no?
 
 In any case, a lens has two parts, a get and a set. The get will be used to drill down and retrieve a value from a 
 complex object while the set will be used to drill down and assign a value to a complex object. The set does not 
-modify the object but returns a new one.
+modify the object but returns a new one. The get lens is not really needed since you can easily drill down to an
+object using the good old index syntax but I'll include it here for completenes.
 
-We'll start with the get which seems easier. For this, I'll just create a function that get an object and 
-a path inside that object and retrieves the value at that path. The path could be either a string of the form
+We'll start with the get which seems easier. For this, I'll just create a function that will take an object and 
+a path inside that object as parameter and retrieve the value at that path. The path could be either a string of the form
 'a.0.c.d' or an array ['a', '0', 'c', 'd'] - for numerical indeces we'll consider an array at that point.
 
 Thus, for the object ``{'a': [{'b': {'c': {'d': 32} }}]}`` when the lens getter is called with either
-``'a.0.b.c'`` or ['a', 0, 'b', 'c'] as the path it should return ``{'d': 32}``.
+``'a.0.b.c'`` or ['a', 0, 'b', 'c'] as the path, it should return ``{'d': 32}``.
 
 To implement the get helper I will use a functional concept, ``reduce``. I've already explained this concept
 in my `previous react-redux tutorial`_ so I urge you to read that article for more info. Using reduce we
@@ -447,11 +454,11 @@ accumulator                 currentvalue
 ==========================  ============
 
 Thus the result will be exactly what we wanted ``{'d' :32}``. An interesting thing is that it's working
-fine without the need to differentiate between arrays and objects because of how index access ``[]`` work.
+fine without the need to differentiate between arrays and objects because of how index access ``[]`` works.
 
 Continuing for the set lens (which will be more difficult), I'll first represent a simple version that
-works only with objects but displays the main idea of how this will work: It uses recursion i.e it will
-call itself to gradually build the new object. Here's how it is implemented
+works only with objects and an array path but displays the main idea of how this will work: It uses \
+recursion i.e it will call itself to gradually build the new object. Here's how it is implemented:
 
 .. code-block:: javascript
 
@@ -471,9 +478,11 @@ call itself to gradually build the new object. Here's how it is implemented
       }
     }
 
-I have assumed that the path is an array of indeces and that the ``obj`` is a complex object (no arrays in it please); the
-function returns a new object with the old object's value at the path be replaced with ``val``. Let's see how it works
-for the following call:
+As already explained, I have assumed that the path is an array of indeces and that the ``obj`` is a complex object 
+(no arrays in it please); the function returns a new object with the old object's value at the path be replaced 
+with ``val``. This function checks to see if the path has only one element, if yes it will assign the value to that
+attribute of the object it retrieve. If not, it will call itself recursively by skipping the current index and assign the return value to the
+current index of the curent object. Let's see how it works for the following call:
 
 .. code-block:: javascript
 
@@ -501,7 +510,7 @@ and setting the ``'c'`` index to ``4``. The result will be as expected equal to:
 Now that we've understood the logic we can extend the above function with the following extras:
 
 * support for arrays in the object using numerical indeces
-* support for array (``['a', 'b']``) or string path (``'a.b'``)
+* support for array (``['a', 'b']``) or string path (``'a.b'``) parameter
 * support for a direct value to set on the path or a function that will be applied on that value
 
 Here's the resulting set lens:
@@ -541,7 +550,7 @@ It may seem a little complex but I think it's easy to be understood: The parts i
 will just check to see if the path is an array or a string and split the string to its parts.
 The ``cset`` function that follows is a local function that is used to make the copy of the object
 or array and set the new value. Here's how it is working: It will first check to see if the ``val``
-parameter is a function or a not. If it is a function it apply this function to the object's index
+parameter is a function or a not. If it is a function it will apply this function to the object's index
 to get the ``newvalue`` else it will just use ``val`` as the ``newvalue``. After that it checks if the
 object it got is an array or not. If it is an array it will do the slice trick we saw before to copy
 the elements of the array except the ``newval`` which will put it at the index (notice that the index
@@ -549,7 +558,7 @@ at that point must be numerical but that's up to you to assert). If the current 
 then it must be an object thus it uses the spread syntax to copy the object's attributes and reassign
 the current index to ``newval``.
 
-The last part of ``pset`` is similar to the ``pset0`` it just uses ``cset`` to do the new objec/array
+The last part of ``pset`` is similar to the ``pset0`` it just uses ``cset`` to do the new object/array
 generation instead of doing it in place like ``pset0`` - as already explained, ``pset`` is called recursively
 until only one element remains on the path in which case the ``newval`` will be assigned to the current index of 
 the current ``obj``.
@@ -579,7 +588,7 @@ Let's try to use ``pset`` for the following rather complex state:
       }
     }
 
-Let's call it three times one after the other to change various attributes one after the other: 
+Let's call it three times one after the other to change various attributes: 
 
 .. code-block:: javascript
     
@@ -618,10 +627,24 @@ And here's the result:
             "total": 0
         }
     }
+    
+This should be self explanatory.
+
+I've published the above immutable little helpers as an npm package: https://www.npmjs.com/package/poor-man-lens (yes I
+decided to use the poor man lens name instead of the immutable little helpers) - they are too simple and could be easily
+copied and pasted to your project but I've seen even smaller npm packages and I wanted to try to see if it is easy to
+publish a package to npm (answer: it is very easy - easier than python's pip). Also there's a github repository for
+these utils in case somebody wants to contribute anything or look at the source: https://github.com/spapas/poor-man-lens.
+
+Notice that this package has been written in ES5 (and actually has a polyfil for Object.assign) thus you should probably
+be able to use it anywhere you want, even directly from the browser by directly including the ``pml.js`` file.
 
 Conclusion
 ----------
 
+Using the above techniques you should be able to easily keep your state objects immutable. For simple cases you
+can stick to the spread syntax or Object.assign / Array.slice but for more complex cases you may want to consider
+either copying directly the pset and pget utils I explained above or just using the `poor-man-lens npm package`. 
 
 
 .. _`Redux`: https://redux.js.org
@@ -638,3 +661,4 @@ Conclusion
 .. _Ramda: http://ramdajs.com
 .. _`previous react-redux tutorial`: https://spapas.github.io/2016/03/02/react-redux-tutorial/#interlude-so-what-s-a-reducer
 .. _`browserify with ES6`: https://spapas.github.io/2015/11/16/using-browserify-es6/
+.. _`poor-man-lens npm package`: https://www.npmjs.com/package/poor-man-lens

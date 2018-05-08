@@ -1,7 +1,7 @@
 Adding a delay to Django HTTP responses
 #######################################
 
-:date: 2018-05-08 15:20
+:date: 2018-05-08 23:20
 :tags: python, django, cbv, middleware, class-based-views
 :category: django
 :slug: django-reponse-add-delay
@@ -23,7 +23,7 @@ that the button is actually disabled!
 I will propose two methods for adding this delay to your responses. One that will affect all (or most) your views using
 a middleware_ and another that you can add to any CBV you want using a mixin; please see my previous `CBV guide`_ for more on
 Django CBVs and mixins. For the middleware solution we'll also take a quick look at what is the Django middleware mechanism and
-what it 
+how it can be used to add functionality.
 
 Using middleware
 ----------------
@@ -121,8 +121,7 @@ When you define ``MIDDLEWARE = ['M1', 'M2']`` you'll see the following:
     # Return the response
 
 
-Please notice
-a middleware may not call ``self.get_response`` to continue the chain but return directly a response (for example a 403 Forbiden response).
+Please notice a middleware may not call ``self.get_response`` to continue the chain but return directly a response (for example a 403 Forbiden response).
 
 
 After this quick introduction to how middleware works, let's take a look at a skeleton for the time-delay middleware:
@@ -190,7 +189,7 @@ Now, to install this middleware, you can configure your ``MIDDLEWARE`` like this
 
 The other middleware are the default ones in Django. One more thing to consider is that if
 you have a single settings.py this middleware will be called; one way to override the delay
-is to check for settings.DEBUG and not call ``time.sleep`` for ``DEBUG == False``. However,
+is to check for settings.DEBUG and only call ``time.sleep`` when ``DEBUG == True``. However,
 the proper way to do it is to have different settings for your development and production
 environments and add the ``TimeDelayMiddleware`` only to your development ``MIDDLEWARE`` list.
 Having different settings for each development is a `common practice in Django`_ and I totally
@@ -201,9 +200,10 @@ Using CBVs
 
 Another method to add a delay to the execution of a view is to implement a TimeDelayMixin and inherit
 your Class Based View from it. As we've seen in the `CBV guide`_, the ``dispatch`` method is the one
-that is always called when your CBV is rendered, thus your ``TimeDelayMixin`` must be implemented like this:
+that is always called when your CBV is rendered, thus your ``TimeDelayMixin`` could be implemented like this:
 
 .. code-block:: python
+
     import time
 
     class TimeDelayMixin(object, ):
@@ -213,7 +213,7 @@ that is always called when your CBV is rendered, thus your ``TimeDelayMixin`` mu
             return super().dispatch(request, *args, **kwargs)
 
 This is very simple (and you can use similar techniques as described for the middleware above to configure
-the delay time, or delay only ``POST`` or add the delay only when settings.DEBUG == True etc) - to actually use it, just inherit your
+the delay time or add the delay only when ``settings.DEBUG == True`` etc) - to actually use it, just inherit your
 view from this mixin, f.e:
 
 .. code-block:: python
@@ -224,7 +224,9 @@ view from this mixin, f.e:
 Now whenever you call your ``DelayedSampleListView`` you'll see it after the configured delay!
 
 What is really interesting is that the ``dispatch`` method actually exists (and has the same functionality) also
-in Django Rest Framework CBVs, thus using the same mixin you can delay not only your normal CBVs but also your DRF API views!
+in Django Rest Framework CBVs, thus using the same mixin you can add the delay not only your normal CBVs but 
+also your DRF API views!
+
 
 
 

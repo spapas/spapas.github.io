@@ -77,3 +77,6 @@ IGNORE_FILES = ['.ipynb_checkpoints']
 GITHUB_USER = 'spapas'
 GITHUB_SHOW_USER_LINK = True
 GITHUB_SKIP_FORK = True
+
+YEAR_ARCHIVE_SAVE_AS = u'posts/{date:%Y}/index.html'
+#MONTH_ARCHIVE_SAVE_AS = u'posts/{date:%Y}/{date:%M}/index.html'

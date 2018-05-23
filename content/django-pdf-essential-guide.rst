@@ -10,6 +10,13 @@ PDFs in Django: The essential guide
 
 .. contents::
 
+**Upgrade 23/05/2018** I've upgraded the sample project (https://github.com/spapas/django-pdf-guide) for usage with Django 2.0 and Python 3.x.
+There were very few changes between the old, Django 1.8 compatible project and the new one. To see the differences, you can just clone it
+and do a ``git diff django-1.8 django-2.0``: Most are related to changes between django 1.8 and django 2.0 (in the URL configuration use ``path`` instead of ``url``,
+use new style middleware etc) and between python 2.7 and 3.x (small changes in import syntax, ``StringIO`` has been moved to the ``io`` package). There's also
+a couple of requirement upgrades, the most important are the upgrade to ``xhtml2pdf 0.2.2`` and using my own fork of ``django_xhtml2pdf`` since django_xhtml2pdf
+does not seem to be maintained anymore.
+
 
 Introduction
 ------------

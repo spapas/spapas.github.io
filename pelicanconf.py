@@ -38,7 +38,7 @@ ARTICLE_SAVE_AS = '{date:%Y}/{date:%m}/{date:%d}/{slug}/index.html'
 #)
 
 DEFAULT_PAGINATION = 5
-STATIC_PATHS  = ['images',]
+STATIC_PATHS  = ['images',  ]
 
 # Uncomment following line if you want document-relative URLs when developing
 RELATIVE_URLS = True

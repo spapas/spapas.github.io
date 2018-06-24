@@ -166,7 +166,7 @@ in my ``settings.py`` so I wouldn't need to set these options per-class I'd add 
             'rest_framework.authentication.TokenAuthentication',
         ),
         'DEFAULT_PERMISSION_CLASSES': (
-            'rest_framework.authentication.IsAuthenticated',
+            'rest_framework.permissions.IsAuthenticated',
         ),
     }
 

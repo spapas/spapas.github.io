@@ -15,6 +15,15 @@ packages for Python 2.x) and the venv module which is included in the Python 3.x
 to create a virtualenv for Python 2 we'll run ``py -2 -m virtualenv name-of-virtualenv``
 and for Python 3 ``py -3 -m venv name-of-virtualenv``.
 
+.. raw:: html
+
+    ss 
+    <script type="text/javascript" >
+    console.log("X")
+    alert("Y")
+    </script>
+    dd
+
 .. code::
 
     C:\progr\py>py -2 -m virtualenv venv-2

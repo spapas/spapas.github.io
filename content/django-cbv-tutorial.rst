@@ -1241,6 +1241,8 @@ can be overridden to do various things before (or after) the form is saved. For 
 you may want have a field whose value is calculated from other fields in the form or you want to
 create an extra object. Let's see a generic example of overriding a ``CreateView`` or ``UpdateView`` with comments:
 
+.. code-block:: python
+
     def form_valid(self, form, ):
         # let's calculate a field value
         form.instance.calculated_field = form.cleaned_data['data1'] + form.cleaned_data['data2']

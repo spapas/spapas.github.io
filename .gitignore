@@ -1,3 +1,4 @@
 output
 .ipynb_checkpoints
 *.pyc
+tags*

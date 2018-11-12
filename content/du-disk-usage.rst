@@ -79,7 +79,11 @@ directories, i.e run ``du -h -s $(echo */)`` or ``du -h -s `echo */```.
 
 One thing that you must be aware of is that this command may take *a long time*
 especially if you have lots of small files somewhere. Just let it run and it
-should finish after some time. Also, if you awant a nice interactive output
+should finish after some time. If it takes too long time try to exclude any 
+mounted network
+directories (either with SMB or NFS) since these will take extra long time.
+
+Also, if you awant a nice interactive output
 using ncurses you can download and compile the `ncdu tool`_ (NCurses Disk Usage).
 
 .. _`ncdu tool`: https://dev.yorhel.nl/ncdu

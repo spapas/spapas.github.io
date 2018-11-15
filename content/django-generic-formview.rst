@@ -135,7 +135,7 @@ Let's write a new version of our GenericObjectFormView that actually resolves th
           return HttpResponseRedirect( obj.get_absolute_url() )
 
       def get_context_data(self, **kwargs):
-          context = super(GenericYesNoFormView, self).get_context_data(**kwargs)
+          context = super(GenericYesNoFormView2, self).get_context_data(**kwargs)
           context['title'] = self.title
           context['question'] = self.question
           return context    

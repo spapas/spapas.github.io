@@ -208,7 +208,7 @@ also won't explain the ``Auth.*`` functions; all these are created by phoenix in
 The view
 --------
 
-The `UserView` module contains a simple but very important function:
+The ``UserView`` module contains a simple but very important function:
 
 .. code-block:: elixir
 
@@ -228,6 +228,17 @@ the current authority of that instance. However, when you submit an edited user 
 because you forgot to fill the username) you want to display the authority that *was submitted* in the form. So the
 ``changeset.changes`` contains the changes that were submitted just before while the ``changeset.data`` contain the
 initial value of the struct. 
+
+**Update 02/07/2019:** Please notice that instead of using the 
+``get_select_value`` I presented before you can use the 
+``Ecto.Changeset.get_field`` function that does exactly this! So
+``get_select_value`` could be defined like this:
+
+.. code-block:: elixir
+
+  def get_select_value(changeset, attr) do
+    changeset |> Ecto.Changeset.get_field(attr)
+  end
 
 The form template
 -----------------

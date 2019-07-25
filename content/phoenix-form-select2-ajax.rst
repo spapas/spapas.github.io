@@ -6,7 +6,7 @@ Phoenix forms integration with select2 and ajax
 :category: elixir
 :slug: phoenix-form-select2-ajax
 :author: Serafeim Papastefanos
-:summary: How create a proper ajax-autocomplete solution for your foreign key fields with Phoenix Forms and select2
+:summary: How to create a proper ajax-autocomplete solution for your foreign key fields with Phoenix Forms and select2
 
 During the past months I've tried to implement a project using `Elixir`_ and the `Phoenix framework`_. Old 
 visitors of my blog will probably remember that I mainly use Django for back-end development but I decided to

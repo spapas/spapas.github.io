@@ -89,7 +89,7 @@ If you try to add a unicode text, for example "Καλημέρα ελλάδα", y
 
 .. image:: /images/hellopdf2.png
   :alt: Hello PDF
-  :width: 280 px
+  :width: 480 px
 
 It seems that the default font that ReportLab uses does not have a good support for accented greek characters
 since they are missing  (and probably for various other characters).

@@ -979,7 +979,7 @@ It is interesting to take a look at the list of its
 ancestors: ``TemplateResponseMixin``, ``BaseFormView``, ``FormMixin``, ``ContextMixin``, ``ProcessFormView`` and ``View``.
 We are familiar with ``TemplateResponseMixin``, ``ContextMixin`` and ``View`` but not with
 the others. Before discussing these classes let's take a look at the FormView
-hierarchy, courtesy of http://ccbv.cco.uk and http://yuml.me:
+hierarchy, courtesy of http://ccbv.co.uk and http://yuml.me:
 
 .. raw:: html
 
@@ -1018,7 +1018,7 @@ The ListView and DetailView
 
 Next in our Django CBV tour is the ListView_. The ``ListView`` is used to render multiple
 objects in a template, for example in a list or table. Here's a diagram of the class
-hierarchy (courtesy of http://ccbv.cco.uk and http://yuml.me):
+hierarchy (courtesy of http://ccbv.co.uk and http://yuml.me):
 
 .. raw:: html
 
@@ -2192,6 +2192,10 @@ needed for CBVs and be able to properly understand which method or attribute you
 implement some specific functionality. Finally, the list of examples in the third chapter should help
 you get started in all your CBV needs - if you have some specific question about CBVs or you'd like
 another use case added to the list feel free to ask and I'll try to add it!
+
+*Update 21/04/2020* As per commenter's Ahmed I. Elsayed comment, there are sites with a similar
+functionality with the CBV inspector for the Django Rest Framework (http://www.cdrf.co/) and 
+Django Forms (https://cdf.9vo.lt/)! They are an excellent resource for reference!!
 
 
 .. _`CBV inspector`: http://ccbv.co.uk`

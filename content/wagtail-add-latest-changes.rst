@@ -10,14 +10,25 @@ Adding a latest-changes list to your Wagtail site
 
 
 I think that a very important tool for a new production Wagtail_ site is to have a list
-where you'll be able to take a look at the latest changes. Most editors are not 
-experienced enough when using a new tool so it's easy to make bad quality edits. A 
+where you'll be able to take a look at the latest changes. Most editors are not
+experienced enough when using a new tool so it's easy to make bad quality edits. A
 user could take a look at their changes and guide them if something's not up to good standards.
 
 In this article I'll present a simple way to add a latest-changes list in your Wagtail site.
-This is working excellent with Wagtail 2.8, I haven't tested it with other wagtail versions
+This is working excellent with Wagtail 2.9, I haven't tested it with other wagtail versions
 so your milage may vary. In the meantime, I'll also introduce a bunch of concepts of Wagtail
 I find interesting.
+
+**Update 08/05/2020** Please notice that this article was originally written for Wagtail 2.8
+projects. However, Wagtail 2.8 didn't have an official API for adding reports thus I had to
+check the source code for some things. Those things since were not part of any API have
+been changed and are not working in Wagtail 2.9.
+
+Thus I've updated
+the project to use the proper APIs and work with Wagtail 2.9 (and hopefully the next versions).
+If you want to see what's changed between the two versions you can take a look at
+`this commit`_ from the companion project. You may also want to take a look at the
+`adding reports`_ tutorial on the Wagtail docs.
 
 
 A starter project
@@ -26,7 +37,7 @@ A starter project
 Let's create a simple wagtail-starter project (this is for windows you should be able to easily follow the same steps in Unix like systems):
 
 
-.. code:: 
+.. code::
 
   C:\progr\py3>mkdir wagtail-starter
   C:\progr\py3>cd wagtail-starter
@@ -56,7 +67,7 @@ Start with a new app
 To start the menu implementation I recommend putting everything related to it in a separate django application
 so you can easily re-use it to multiple sites. For this, let's create a new django app using:
 
-.. code:: 
+.. code::
 
   (venv) C:\progr\py3\wagtail-starter\wagtail_starter>python manage.py startapp latest_changes
 
@@ -67,15 +78,15 @@ Add the view
 
 Let's add the code for the view that will display the latest changes page. Modify the latest_changes/views.py file like this:
 
-.. code:: 
+.. code::
 
   from django.shortcuts import render
-  from wagtail.admin.views.reports import ReportView
+  from wagtail.admin.views.reports import PageReportView
   from wagtail.core.models import UserPagePermissionsProxy
   from wagtail.core.models import Page
 
 
-  class LatestChangesView(ReportView):
+  class LatestChangesView(PageReportView):
       template_name = "reports/latest_changes.html"
       title = "Latest changes"
       header_icon = "date"
@@ -90,12 +101,15 @@ Let's add the code for the view that will display the latest changes page. Modif
           return super().dispatch(request, *args, **kwargs)
 
 
-As you can see the above code adds a very small view that overrides ``ReportView`` which is used
+As you can see the above code adds a very small view that overrides ``PageReportView`` which is used
 also by the locked pages view so most things are already implemented by that view. The only thing we do
-here is to override the ``get_queryset`` method to denote which pages we want to display and 
+here is to override the ``get_queryset`` method to denote which pages we want to display and
 the ``dispatch`` to add some permission checks. Here we check that a user ``can_remove_locks`` but we
 could do other checks if needed. Finally, notice that we have overriden the template name which we'll
 define in a minute.
+
+Beyond ``PageReportView`` that should be used for generating ``Page`` reports, you can override
+``ReportView`` which can be used to implement generic reports.
 
 To properly add that view in our urls.py we can use a wagtail hook named ``register_admin_py``. Wagtail hooks
 are a great way to excend the wagtail admin; to use them, you have to generate a file name ``wagtail_hooks.py``
@@ -113,12 +127,12 @@ Thus, in our case we'll add a ``wagtail_hooks.py`` file in the ``latest_changes`
   @hooks.register('register_admin_urls')
   def urlconf_time():
     return [
-      url(r'^latest_changes/$', admin_view, name='latest_changes'),
+      url(r'^latest_changes/$', LatestChangesView.as_view(), name='latest_changes'),
     ]
 
-The above just hooks up the ``LatestChangesView`` we defined before to the ``/admin/latest_changes/`` url. 
+The above just hooks up the ``LatestChangesView`` we defined before to the ``/admin/latest_changes/`` url.
 
-If everything's ok till now you should be able to visit: http://127.0.0.1:8000/admin/latest_changes/ and 
+If everything's ok till now you should be able to visit: http://127.0.0.1:8000/admin/latest_changes/ and
 get an error for a missing template - remember that we haven't yet defined ``utils/reports/latest_changes.html``.
 
 Add the template
@@ -130,7 +144,7 @@ the ``latest_changes.html`` should be: ``wagtail_starter\latest_changes\template
 
 .. code::
 
-  {% extends 'wagtailadmin/reports/base_report.html' %}
+  {% extends 'wagtailadmin/reports/base_page_report.html' %}
   {% load i18n %}
   {% block listing %}
       {% include "reports/_list_latest.html" %}
@@ -141,13 +155,14 @@ the ``latest_changes.html`` should be: ``wagtail_starter\latest_changes\template
   {% endblock %}
 
 I've selected the ``reports`` subfolder just to be compatible with what wagtail does, you can just put ``latest_changes.html``  directly
-under ``templates``; don't forget to update the ``LatestChangesView`` defined before though! The above page includes a 
-snippet named ``reports/_list_latest.html" thus you also need to add a ``_list_latest.html`` file in the same folder with the 
+under ``templates``; don't forget to update the ``LatestChangesView`` defined before though! This template extends the
+``base_page_report.html`` template that Wagtail provides for page reports. It also includes a
+snippet named ``reports/_list_latest.html" thus you also need to add a ``_list_latest.html`` file in the same folder with the
 following contents:
 
 
 .. code::
-  
+
   {% extends "wagtailadmin/pages/listing/_list_explore.html" %}
 
   {% load i18n wagtailadmin_tags %}
@@ -168,7 +183,7 @@ following contents:
       </td>
   {% endblock %}
 
-Please notice that my ``_list_latest.html`` snippet extends the wagtail provided ``_list_explore.html`` template and
+Please notice that my ``_list_latest.html`` snippet extends the Wagtail provided ``_list_explore.html`` template and
 overrides some things that can be overriden from that file. If you want to do more changes you'll need to copy over
 everything and change things as you wish instead of extending.
 
@@ -218,10 +233,10 @@ the code from adding the url):
           "Latest changes", reverse("latest_changes"), classnames="icon icon-date", order=100,
       )
 
-The above code uses the ``register_reports_menu_item`` which is a hook that can be used to add a child 
+The above code uses the ``register_reports_menu_item`` which is a hook that can be used to add a child
 specifically to the Reports menu item. Notice that it uses the ``LatestChangesPagesMenuItem`` which
 is a class that inherits from ``MenuItem``; the only thing that is overriden there is the ``is_shown``
-method so it will have the same permissions as the ``LatestChangesView`` we defined above so user 
+method so it will have the same permissions as the ``LatestChangesView`` we defined above so user
 that will see the menu item will also have permissions to display the view. Here's the final menu item:
 
 .. image:: /images/latest_changes_menu.png
@@ -240,7 +255,10 @@ with this I've included the whole code of this project in the https://github.com
 
 You can either clone this repository to see the functionality or just copy over the ``latest_changes`` folder to
 your wagtail project to include the functionality directly (don't forget to fix the ``INSTALLED_APPS`` setting)!
+It should work with all Wagtail 2.9 and later projects.
 
 
 
 .. _Wagtail: https://wagtail.io
+.. _`this commit`: https://github.com/spapas/wagtail-latest-changes/commit/d751cd7978fc99c3b2f10e84c2f9b72c555f0930
+.. _`adding reports`: https://docs.wagtail.io/en/stable/advanced_topics/adding_reports.html

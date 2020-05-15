@@ -14,10 +14,10 @@ enable the ``:os_mon`` erlang application by adding it (along with ``:logger`` a
 your ``extra_applications`` setting `as described here`_.
 
 When I enabled the ``os_mon`` application I immediately saw a warning in my logs that one of disks is almost full (which is 
-a fact). I knew that I wanted to understand how these warniings are generated and if I could handle them with
+a fact). I knew that I wanted to understand how these warnings are generated and if I could handle them with
 some custom code to send an email for example.
 
-This journey lead me to an interesting erlang rabit hole which I'll describe in this small post.
+This journey lead me to an interesting erlang rabbit hole which I'll describe in this small post.
 
 The os_mon erlang application
 -----------------------------

@@ -46,7 +46,7 @@ actual reason of why gen_event is not very loved).
 The SASL alarm handler (the gen_event event manager) 
 is implemented in a module named ``:alarm_handler``. A rather
 unfortunate decision is that the default simple alarm handler 
-(the gen_event eevent handler) is *also* implemented
+(the gen_event event handler) is *also* implemented
 in the same module so in the following you'll see ``:alarm_handler`` twice!
 
 The default simple alarm handler can be exchanged with your own custom implementation or 
@@ -157,7 +157,7 @@ disk usage threshold to 90% and will not start the cpu_sup process to get CPU in
 Testing with the terminal
 -------------------------
 
-If no alerts are active in your systemm, you can test your custom event handler using something like this
+If no alerts are active in your system, you can test your custom event handler using something like this
 from an ``iex -S mix`` terminal:
 
 .. code-block:: elixir

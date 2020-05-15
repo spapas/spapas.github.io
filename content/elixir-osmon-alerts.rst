@@ -179,7 +179,16 @@ Also you can see some of the current data or configuration options:
 
 Please notice that the check interval is in seconds when you set it, in ms when you retrieve it.
 
+Conclusion
+----------
 
+The above should help you if you also want to better understand alert_handler, os_mon and 
+how to configure it to run your own custom alert handlers. Of course in a production server
+you should have proper monitoring tools for the health of your server but since os_mon is more
+or less free thanks to erlang, why not add another safety valve?
+
+If you want to take a look at an application that has everything configured, take a 
+look at my `Phoenix template application`_.
 
 
 .. _`Phoenix template application`: https://github.com/spapas/phxcrd/

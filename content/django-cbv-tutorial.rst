@@ -202,8 +202,8 @@ normally use a functional view:
 
 This doesn't actually render anything since both header and context are empty on
 the created instance -- remember that ``as_view`` returns a functional view that
-instantiates a ``CustomClassView`` objet and returns an ``HttpResponse`` filling it
-with the object's ``render()`` reuslts. To add some output we can either
+instantiates a ``CustomClassView`` object and returns an ``HttpResponse`` filling it
+with the object's ``render()`` results. To add some output we can either
 create another class that inherits from ``CustomClassView`` or
 initialize the attributes from the constructor of the class (using the kwargs functionality described above).
 
@@ -313,7 +313,7 @@ Here's how we could improve the ``CustomClassView`` to make it more DRY:
                     header=self.get_header(), body=self.render_context(),
                 )
 
-So what happens here? First of all we inherit from ``ClassClassView`` to keep the
+So what happens here? First of all we inherit from ``CustomClassView`` to keep the
 ``as_view`` method which doesn't need changing. Beyond this, the render
 uses methods (``get_header`` and ``render_context``) to retrieve the values from the header and the body - this means
 that we could re-define these methods to an inherited class in order to override
@@ -427,7 +427,7 @@ like
 
 What will happen here? Notice that the methods ``get_header`` and ``as_view`` exist in *both* ancestor classes! So
 which one will be used in each case? Actually, there's a (rather complex) rule for that called
-MRO (Method Resolution Order). The MRO is also what can used to know which ``get_header``
+MRO (Method Resolution Order). The MRO is also what can be used to know which ``get_header``
 and ``as_view`` will be used in each case in the previous example.
 
 
@@ -437,7 +437,7 @@ Interlude: An MRO primer
 What is MRO? For every class that Python sees, it tries to create a *list* (MRO list) of ancestor classes containing that class as
 the first element and its ancestors in a specific order I'll discuss in the next paragraph. When a method
 of an object of that specific class needs to be
-called, then the method will be searched in the MRO list (from the first element of the MRO list i.e. starting with the class it self) - when a class is found
+called, then the method will be searched in the MRO list (from the first element of the MRO list i.e. starting with the class itself) - when a class is found
 in the list that defines the method then that method instance (i.e. the method defined in this class) will be called and the search will stop (careful readers: I haven't
 yet talked about *super* so please be patient).
 
@@ -457,7 +457,7 @@ from the leftmost one):
 ``[DefaultHeaderJsonCustomClassView, DefaultHeaderBetterCustomClassView, BetterCustomClassView, CustomClassView, JsonCustomClassView, object]``, while
 for ``JsonDefaultHeaderCustomClassView`` is
 ``[JsonDefaultHeaderCustomClassView, JsonCustomClassView, DefaultHeaderBetterCustomClassView, BetterCustomClassView, CustomClassView, object]``. What this
-means is that for ``DefaultHeaderJsonCustomClassView`` the ``CustomClassView.as_view()`` and ``DefaultHeaderBetterCustomClassView.get_header()``  (thus
+means is that for ``DefaultHeaderJsonCustomClassView`` the ``CustomClassView.as_view()`` and ``DefaultHeaderBetterCustomClassView.get_header()`` will be used (thus
 we will not get the JSON output) and for ``JsonDefaultHeaderCustomClassView`` the ``JsonCustomClassView.as_view()`` and ``JsonCustomClassView.get_header()``
 will be used (so we won't get the default header functionality) - i.e none of those two options will result to the desired behaviour.
 
@@ -488,7 +488,7 @@ Initially, the MRO will be the following:
     Starting with the initial class
     1. DefaultHeaderContextCustomClassView
     Follows the leftmost class (DefaultHeaderBetterCustomClassView) MRO
-    2. DefaultHeaderContextCustomClassView, 3. BetterCustomClassView, 4. CustomClassView, 5. object
+    2. DefaultHeaderBetterCustomClassView, 3. BetterCustomClassView, 4. CustomClassView, 5. object
     And finally the next class (DefaultContextBetterCustomClassView) MRO
     6. DefaultContextBetterCustomClassView, 7. BetterCustomClassView, 8. CustomClassView, 9. object
 

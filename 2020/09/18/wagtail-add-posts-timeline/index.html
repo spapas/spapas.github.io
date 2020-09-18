@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="google-site-verification" content="5_8DTmIiEq4gFvNAfxAD6TsGOgrMAjp8lQFQvfA6zZc" />
-    <title>django-rq redux: advanced techniques and tools &mdash; /var/</title>
+    <title>Adding a timeline of your wagtail Posts &mdash; /var/</title>
     <meta name="author" content="Serafeim Papastefanos">
 
 
@@ -66,7 +66,7 @@ border-radius: 5px;
       <li >
         <a href="https://spapas.github.io/category/css.html">Css</a>
       </li>
-      <li class="active">
+      <li >
         <a href="https://spapas.github.io/category/django.html">Django</a>
       </li>
       <li >
@@ -99,7 +99,7 @@ border-radius: 5px;
       <li >
         <a href="https://spapas.github.io/category/unix.html">Unix</a>
       </li>
-      <li >
+      <li class="active">
         <a href="https://spapas.github.io/category/wagtail.html">Wagtail</a>
       </li>
 </ul></nav>
@@ -113,330 +113,200 @@ border-radius: 5px;
 <div>
   <article class="hentry" role="article">
 <header>
-      <h1 class="entry-title">django-rq redux: advanced techniques and tools</h1>
+      <h1 class="entry-title">Adding a timeline of your wagtail Posts</h1>
     <p class="meta">
-<time datetime="2015-09-01T14:20:00+03:00" pubdate>Τρι 01 Σεπτέμβριος 2015</time>    </p>
+<time datetime="2020-09-18T16:20:00+03:00" pubdate>Παρ 18 Σεπτέμβριος 2020</time>    </p>
 </header>
 
-<div class="entry-content"><div class="contents topic" id="contents">
-<p class="topic-title first">Contents</p>
-<ul class="simple">
-<li><a class="reference internal" href="#introduction" id="id1">Introduction</a></li>
-<li><a class="reference internal" href="#displaying-your-task-progress" id="id2">Displaying your task&nbsp;progress</a></li>
-<li><a class="reference internal" href="#displaying-your-queue-statistics" id="id3">Displaying your queue&nbsp;statistics</a></li>
-<li><a class="reference internal" href="#making-sure-that-workers-for-your-queue-are-actually-running" id="id4">Making sure that workers for your queue are actually&nbsp;running</a></li>
-<li><a class="reference internal" href="#checking-how-many-jobs-are-in-the-queue" id="id5">Checking how many jobs are in the&nbsp;queue</a></li>
-<li><a class="reference internal" href="#better-exception-handling" id="id6">Better exception&nbsp;handling</a></li>
-<li><a class="reference internal" href="#multiple-django-apps-single-redis-db" id="id7">Multiple django-apps, single redis&nbsp;db</a></li>
-<li><a class="reference internal" href="#low-level-debugging" id="id8">Low level&nbsp;debugging</a></li>
-<li><a class="reference internal" href="#conclusion" id="id9">Conclusion</a></li>
-</ul>
+<div class="entry-content"><div class="section" id="intro">
+<h2>Intro</h2>
+<p>In this small post I&#8217;ll present a small tutorial on how to add a timelne of your <a class="reference external" href="https://wagtail.io/">Wagtail</a>
+posts using the <a class="reference external" href="http://horizontal-timeline.ycodetech.co.uk/">Horizontal Timeline</a> jquery&nbsp;plugin.</p>
+<p>This will be a step by step tutorial to help you understand the concepts. As a base
+we&#8217;ll use the <cite>bakerydemo</cite> wagtail demo. After you&#8217;ve properly followed the instructions
+you&#8217;ll see that this demo site has a &#8220;Blog&#8221; that contains articles about breads. Following
+we&#8217;ll add a timeline of these articles grouped by their publish&nbsp;month.</p>
 </div>
-<div class="section" id="introduction">
-<h2><a class="toc-backref" href="#id1">Introduction</a></h2>
-<p>In the <a class="reference external" href="https://spapas.github.io/2015/01/27/async-tasks-with-django-rq/">previous django-rq article</a>
-we presented a quick introduction to asynchronous job queues and created a
-small (but complete) project that used rq and django-rq to implement asynchronous
-job queues in a django&nbsp;project.</p>
-<p>In this article, we will present some more advanced techniques and tools
-for improving the capabilities of our asynchronous tasks and
-integrate them to the <a class="reference external" href="https://github.com/spapas/django-test-rq">https://github.com/spapas/django-test-rq</a> project (please
-checkout tag django-rq-redux
-<tt class="docutils literal">git checkout <span class="pre">django-rq-redux</span></tt>)</p>
+<div class="section" id="decisions-decisions">
+<h2>Decisions,&nbsp;decisions</h2>
+<p>For this demo we&#8217;ll include <em>all</em> the &#8220;blog&#8221; pages in the timeline. However we may
+wanted to select which pages we want to include in the timeline. This could be done
+either by adding an extra field in our blog pages (class <cite>blog.models.BlogPage</cite>) like
+<cite>include_in_timeline</cite> or by using the Wagtail <a class="reference external" href="https://docs.wagtail.io/en/latest/reference/contrib/modeladmin/">ModelAdmin</a> functionality. For the ModelAdmin
+we&#8217;d create an extra Django model (i.e <cite>BlogTimeLineEntry</cite>) that would contain a link
+to the original page. We could enchance this field with extra fields that we may
+want to display in the timeline, for example a smaller description. Something like&nbsp;this:</p>
+<!-- code
+
+class TimeLineEntry(models.Model):
+        description = RichTextField()
+        page = models.ForeignKey("blog.BlogPage", on_delete=models.PROTECT)
+        panels = [ FieldPanel("description"), PageChooserPanel("page")]
+
+        def pub_date(self):
+                return self.page.date_published
+
+        pub_date.admin_order_field = "page__date_published" -->
+<p>The other decision is where to actually output the timeline. For the demo we&#8217;ll just put it
+in the <cite>BlogIndexPage</cite> page. If we wanted to add the timeline in a number of different
+page types then we&#8217;d need to add a template tag that would include it. But since it will be
+available only to a single page type we&#8217;ll just need to override the <cite>get_context</cite> method and
+the template of that particular&nbsp;type.</p>
 </div>
-<div class="section" id="displaying-your-task-progress">
-<h2><a class="toc-backref" href="#id2">Displaying your task&nbsp;progress</a></h2>
-<p>Sometimes, especially for long-running tasks it is useful to let
-the user (task initiator) know what is the status of each task he&#8217;s started. For this,
-I recommend creating a task-description model that will hold the required information for this
-task with more or less the following fields (please also check <tt class="docutils literal">LongTask</tt> model of&nbsp;django-test-rq):</p>
+<div class="section" id="overriding-the-get-context">
+<h2>Overriding the&nbsp;get_context</h2>
+<p>As we described above, we want to group the timeline entries based on their publish month. For
+this, we&#8217;ll use the following code in the <tt class="docutils literal">BlogIndexPage.get_context</tt> method:</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+    <span class="n">context</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">BlogIndexPage</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_context</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="n">context</span><span class="p">[</span><span class="s1">&#39;posts&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">BlogPage</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">descendant_of</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">live</span><span class="p">()</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span>
+        <span class="s1">&#39;-date_published&#39;</span><span class="p">)</span>
+
+    <span class="n">entries</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="s1">&#39;posts&#39;</span><span class="p">]</span>
+    <span class="n">dentries</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">entries</span><span class="p">:</span>
+        <span class="n">month</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">date_published</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%m/%Y&quot;</span><span class="p">)</span>
+        <span class="n">month_entries</span> <span class="o">=</span> <span class="n">dentries</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">month</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">month_entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="n">dentries</span><span class="p">[</span><span class="n">month</span><span class="p">]</span> <span class="o">=</span> <span class="n">month_entries</span>
+
+    <span class="n">lentries</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;date_small&quot;</span><span class="p">:</span> <span class="n">k</span><span class="p">,</span>
+                <span class="s2">&quot;date_large&quot;</span><span class="p">:</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">date_published</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%B %Y&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;entries&quot;</span><span class="p">:</span> <span class="n">v</span><span class="p">,</span>
+            <span class="p">}</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">dentries</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">],</span>
+        <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">z</span><span class="p">:</span> <span class="n">z</span><span class="p">[</span><span class="s2">&quot;entries&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">date_published</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">context</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">timeline</span><span class="o">=</span><span class="n">lentries</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">context</span>
+</pre></div>
+<p>So what&#8217;s the purpose of the above? First of all we use <cite>super</cite> to retrieve the context that
+any parent classes may have setup. After that we add a <cite>posts</cite> attribute to the context
+that is a queryset of all the published children of the current page (which is the <cite>BlogIndexPage</cite>),
+sorted by their published&nbsp;date.</p>
+<p>In the <cite>for</cite> loop that follows, do some dict trickery to &#8220;gather&#8221; all entries for a particlular month/year
+in a list under that particular key in the <cite>dentries</cite> dict.</p>
+<p>Finally, we create the <cite>lentries</cite> list which will be a list of the&nbsp;form:</p>
+<div class="highlight"><pre><span></span><span class="p">[{</span>
+        <span class="s2">&quot;date_small&quot;</span><span class="p">:</span> <span class="s2">&quot;09/2020&quot;</span>
+        <span class="s2">&quot;date_large&quot;</span><span class="p">:</span> <span class="s2">&quot;September 2020&quot;</span>
+        <span class="s2">&quot;entries: [BlogPage, BlogPage, BlogPage...]</span>
+<span class="p">},</span> <span class="p">{</span><span class="o">...</span><span class="p">},</span> <span class="o">...</span><span class="p">]</span>
+</pre></div>
+<p>This struct will help us in the next step when we implement the timeline&nbsp;template.</p>
+</div>
+<div class="section" id="fixing-the-template">
+<h2>Fixing the&nbsp;template</h2>
+<p>To use the horizontal timeline we need to add a couple of css/js dependencies to our template. For this,
+we&#8217;ll first go to the bakerydemotemplatesbase.html file and add the following snippet near the end of the file just before
+<tt class="docutils literal">&lt;/body&gt;</tt>:</p>
 <pre class="code literal-block">
-class LongTask(models.Model):
-  created_on = models.DateTimeField(auto_now_add=True)
-  name = models.CharField(max_length=128, help_text='Enter a unique name for the task',)
-  progress = models.PositiveIntegerField(default=0)
-  result = models.CharField(max_length=128, blank=True, null=True)
+{% block extra_script %}
+{% endblock %}
 </pre>
-<p>Now, when the view that starts the task is <tt class="docutils literal"><span class="caps">POST</span></tt> ed, you&#8217;ll first create
-the <tt class="docutils literal">LongTask</tt> model instance with a result of <tt class="docutils literal">'<span class="caps">QUEUED</span>'</tt> and a progress
-of 0 (and a name that identifies your task) and then you&#8217;ll start the real task
-asynchronously by passing the LongTask instance, something like this (also check
-<tt class="docutils literal">LongTaskCreateView</tt>):</p>
+<p>The above is required to give us a placeholder for adding some needed js dependencies and&nbsp;code.</p>
+<p>After that we&#8217;ll go to the <tt class="docutils literal">bakerydemo\templates\blog\blog_index_page.html</tt> file and add the following just before
+<tt class="docutils literal">{% block content %}</tt></p>
 <pre class="code literal-block">
-long_task = LongTask.objects.create(...)
-long_runnig_task.delay(long_task)
+{% block head-extra %}
+        &lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;//cdn.jsdelivr.net/gh/ycodetech/horizontal-timeline-2.0&#64;2/css/horizontal_timeline.2.0.min.css&quot;&gt;
+        &lt;style&gt;
+
+                .timeline .selected {
+                        font-size: 24px;
+                        font-weight: bold;
+                }
+
+                #timeline ol {
+                        list-style: none;
+                }
+
+                .horizontal-timeline .events-content li {
+                        background: #f2f2f2;
+                        font-size: .8em;
+                }
+
+                #timeline img {
+                        width: 200px;
+                }
+        &lt;/style&gt;
+
+{% endblock head-extra %}
 </pre>
-<p>In your asynchronous job, the first thing you&#8217;ll need to do is to set its result
-to &#8216;<span class="caps">STARTED</span>&#8217; and save it so that the user will immediately see when he&#8217;s job is
-actually started. Also, if you can estimate its progress, you can update its
-progress value with the current value so that the user will know how close he
-is to finishing. Finally, when the job finished (or if it throws an expectable
-exception) you&#8217;ll update its status accordingly. Here&#8217;s an example of my
-long_running_task that just waits for the specifid amount of&nbsp;seconds:</p>
+<p>And the following at the end of the&nbsp;file</p>
 <pre class="code literal-block">
-&#64;job('django-test-rq-low')
-def long_runnig_task(task):
-  job = get_current_job()
-  task.job_id = job.get_id()
+{% block extra_script %}
 
-  task.result = 'STARTED'
+        &lt;script src=&quot;//cdn.jsdelivr.net/gh/ycodetech/horizontal-timeline-2.0&#64;2/JavaScript/horizontal_timeline.2.0.min.js&quot;&gt;&lt;/script&gt;
 
-  duration_in_second_persentages = task.duration*1.0 / 100
-  for i in range(100):
-      task.progress = i
-      task.save()
-      print task.progress
-      time.sleep(duration_in_second_persentages)
+        &lt;script&gt;
 
-  task.result = 'FINISHED'
-  task.save()
-  return task.result
+        $(function() {
+                $('#timeline').horizontalTimeline({
+                dateIntervals: {
+                        &quot;desktop&quot;: 200,
+                        &quot;tablet&quot;: 150,
+                        &quot;mobile&quot;: 120,
+                        &quot;minimal&quot;: true
+                }
+                });
+        })
+
+        &lt;/script&gt;
+{% endblock %}
 </pre>
-<p>To have proper feedback I propose to have your task-description model instance
-created by the view that starts the asynchronous task and <em>not</em> by the
-actual task! This is important since the worker may be full so the asynchronous
-task will need a lot of time until is actually started (or maybe there are no
-running workers - more on this later) and the user will not be able to see
-his task instance anywhere (unless of course you provide him access to the actual task
-queue but I don&#8217;t recommend&nbsp;this).</p>
-</div>
-<div class="section" id="displaying-your-queue-statistics">
-<h2><a class="toc-backref" href="#id3">Displaying your queue&nbsp;statistics</a></h2>
-<p>django-rq has a really nice dashboard with a lot of queue statistics (
-instructions here
-<a class="reference external" href="https://github.com/ui/django-rq#queue-statistics">https://github.com/ui/django-rq#queue-statistics</a> and also on django-test-rq
-project) which I recommend to always&nbsp;enable.</p>
-<p>Also, there&#8217;s the individual use <a class="reference external" href="https://github.com/brutasse/django-rq-dashboard">django-rq-dashboard</a> project that could
-be installed to display some more statistics, however the only extra
-statistic that you can see throuh django-rq-dashboard is the status of
-your scheduled jobs so I don&#8217;t recommend installing it if you don&#8217;t
-use&nbsp;scheduling.</p>
-</div>
-<div class="section" id="making-sure-that-workers-for-your-queue-are-actually-running">
-<h2><a class="toc-backref" href="#id4">Making sure that workers for your queue are actually&nbsp;running</a></h2>
-<p>Using the django-rq dashboard you can make sure that all queues
-have at least one worker. However, sometimes workers fail, or
-maybe you&#8217;ve forgotten to start your workers or not configured
-your application correctly (this happens to me all the time for
-test/uat projects). So, for tasks that you want to display feedback
-to the user, you can easily add a check to make sure that there are
-active workers using the following&nbsp;code:</p>
+<p>Notice that the <tt class="docutils literal"><span class="pre">head-extra</span></tt> block is already there in the base.html file so we don&#8217;t need to add it again. It just has some
+styling changes for the timeline to be displayed nice. Also the <tt class="docutils literal">&lt;script&gt;</tt> tags we added just include the needed dependency
+and initialize the timeline&nbsp;component.</p>
+<p>Of course we haven&#8217;t yet added the actual timeline! To do that, we&#8217;ll  need to add a file named <tt class="docutils literal">timeline_partial.html</tt> under the
+<tt class="docutils literal">blog/templates/blog</tt> folder (same folder that <tt class="docutils literal">blog_index_page.html</tt> is) with the&nbsp;following:</p>
 <pre class="code literal-block">
-from rq import Worker
-import django_rq
+{% load wagtailcore_tags wagtailimages_tags %}
+&lt;div class=&quot;horizontal-timeline&quot; id=&quot;timeline&quot;&gt;
+  &lt;div class=&quot;events-content&quot;&gt;
+        &lt;ol&gt;
 
-redis_conn = django_rq.get_connection('default')
-if len([
-    x for x in Worker.all(connection=redis_conn)
-        if 'django-test-rq-low' in x.queue_names()
-]) == 0:
-    # Error -- no workers
+          {% for month in timeline %}
+                &lt;li class=&quot;{% if forloop.last %}selected{% endif %}&quot; data-horizontal-timeline='{&quot;date&quot;: &quot;{{ month.date_small }}&quot;}'&gt;
+                  &lt;h3&gt;{{ month.date_large }}&lt;/h3&gt;
+
+                  {% for te in month.entries %}
+                        &lt;div class='row'&gt;
+
+                                &lt;div class='col-md-6'&gt;
+                                  &lt;h4&gt;&lt;a href='{% pageurl te %}'&gt;{{ te.title }}&lt;/a&gt;&lt;/h4&gt;
+                                  &lt;span&gt;{{ te.introduction }}&lt;/span&gt;
+                                &lt;/div&gt;
+                                &lt;div class='col-md-6'&gt;
+                                  {% with img=te.image %}
+                                        {% image img width-200 as img_thumb %}
+                                        &lt;img class=&quot;&quot; src=&quot;{{ img_thumb.url }}&quot; alt=&quot;{{ img.title }}&quot;&gt;
+                                  {% endwith %}
+                                &lt;/div&gt;
+
+                        &lt;/div&gt;
+                        &lt;div class=&quot;clear bottommargin-sm&quot;&gt;&lt;/div&gt;
+                  {% endfor %}
+                &lt;/li&gt;
+          {% endfor %}
+
+        &lt;/ol&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
 </pre>
-<p>With <tt class="docutils literal">Worker.all()</tt> you get all workers for a connection and the <tt class="docutils literal">queue_names()</tt>
-method returns the names that each worker serves. So we check that we have at least one
-worker for that&nbsp;queue.</p>
-<p>This check can be added when the job is started and display a feedback error
-to the user (check example in&nbsp;django-test-rq).</p>
-<p>For quick tasks (for example sending emails etc) you should not display anything
-to the user even if no workers are running (since the task <em>will</em> be queued and
-will be executed eventually when the workers are started) but instead send an email to the administrators
-so that they will start the&nbsp;workers.</p>
-</div>
-<div class="section" id="checking-how-many-jobs-are-in-the-queue">
-<h2><a class="toc-backref" href="#id5">Checking how many jobs are in the&nbsp;queue</a></h2>
-<p>To find out programatically how many jobs are actually in the queue (and display a message
-if the queue has too many jobs etc) you&#8217;ll need to use the <tt class="docutils literal">Queue</tt> class, something like&nbsp;this:</p>
-<pre class="code literal-block">
-from rq import Queue
-
-redis_conn = django_rq.get_connection('default')
-queue = Queue('django-test-rq-default', connection=redis_conn)
-print queue.name
-print len(queue.jobs)
-</pre>
-</div>
-<div class="section" id="better-exception-handling">
-<h2><a class="toc-backref" href="#id6">Better exception&nbsp;handling</a></h2>
-<p>When a job fails, rq will put it in a failed jobs queue and finish with it. You (as administrator)
-won&#8217;t get any feedback and the user (unless he has access to that failed jobs queue) won&#8217;t be
-able to do anything aboutt this&nbsp;job.</p>
-<p>In almost all cases you can&#8217;t rely only on this behavior but instead you have to
-<a class="reference external" href="http://python-rq.org/docs/exceptions/">install a custom exception handler</a>. Using the custom exception handler you can
-do whatever you want for each failed job. For instance, you can create a new instance
-of a <tt class="docutils literal">FailedTask</tt> model which will have information about the failure and the
-original task allow the user (or administrator) to restart the failed task after
-he&#8217;s fixed the error&nbsp;conditions.</p>
-<p>Or, if you want to be informed when a job is failed, you can just send an email
-to <tt class="docutils literal"><span class="caps">ADMINS</span></tt> and fall back to the default behavior to enqueue the failed task the
-failed jobs queue (since job exception handlers can be&nbsp;chained).</p>
-<p>A simple management command that starts a worker for a specific queue and installs
-a custom exception handler&nbsp;follows:</p>
-<pre class="code literal-block">
-from django.conf import settings
-from django.core.management.base import BaseCommand
-
-import django_rq
-from rq import Queue, Worker
-
-def my_handler(job, *exc_info):
-    print &quot;FAILURE&quot;
-    print job
-    print exc_info
-
-class Command(BaseCommand):
-    def handle(self, *args, **options):
-        redis_conn = django_rq.get_connection('default')
-
-        q = Queue(settings.DJANGO_TEST_RQ_LOW_QUEUE, connection=redis_conn)
-        worker = Worker([q], exc_handler=my_handler, connection=redis_conn)
-        worker.work()
-</pre>
-<p>This handler is for demonstration purposes since it just prints a message to the console
-(so please do not use&nbsp;it)!</p>
-</div>
-<div class="section" id="multiple-django-apps-single-redis-db">
-<h2><a class="toc-backref" href="#id7">Multiple django-apps, single redis&nbsp;db</a></h2>
-<p>One thing to keep in mind is that the only thing that seperates the queues are
-their name. If you have many django applications that define a &#8220;default&#8221; (or &#8220;low&#8221;, &#8220;hight&#8221; etc)
-and they all use the <em>same</em> redis database to store their queue, the workers
-of each application won&#8217;t know which jobs belong to them and they&#8217;ll end up
-dequeuing the wrong job types. This will lead to an exception or, if you
-are really unlucky to a very nasty&nbsp;bug!</p>
-<p>To avoid this, you can either use a different redis database (not database server)
-for each of your apps or add a prefix with the name of your app to your queue&nbsp;names:</p>
-<p>Each redis database server can host a number of databases that are identified
-by a number (that&#8217;s what the /0 you see in <tt class="docutils literal"><span class="pre">redis://127.0.0.1:6379/0</span></tt> means)
-and each one of them has a totally different keyspace. So, if you use /0 in an
-application and /1 in another application, you&#8217;ll have no problems. This solution
-has the disadvantage that you need to be really careful to use different database
-numbers for your projects and also the number of possible databases that redis
-can use is limited by a configuration file (so if you reach the maximum you&#8217;ll
-need to also increase that&nbsp;number)!</p>
-<p>Instead of this, you can avoid using the &#8216;default&#8217; queue, and use queues that
-contain your application name in their name, for example, for the sample project
-you could create something like &#8216;django-test-rq-default&#8217;, &#8216;django-test-rq-low&#8217;,
-&#8216;django-test-rq-high&#8217; etc. You need to configure the extra queues by adding them
-to the <tt class="docutils literal">RQ_QUEUES</tt> dictionary (check settings.py of django-test-rq) and then
-put the jobs to these queues using for example the job decorator
-(<tt class="docutils literal"><span class="pre">&#64;job('django-test-rq-default')</span></tt>)
-and run your workers so that they will retrieve jobs from these queues
-(<tt class="docutils literal">python manage.py rqworker <span class="pre">django-test-rq-default</span></tt>) and not the
-default one (which may contain jobs of other&nbsp;applications).</p>
-<p>If you use the default queue, and because you&#8217;ll need to use its name to
-many places, I recommend to add a (f.i) <tt class="docutils literal">QUEUE_NAME = <span class="pre">'django-test-rq-default'</span></tt>
-setting and use this instead of just a string to be totally <span class="caps">DRY</span>.</p>
-<p><strong>Update 13/09/2015</strong>: Please notice that using a <em>single</em> redis database server
-(either with multiple numeric databases or in the same database using a keyword
-in keys to differentiate the apps) <a class="reference external" href="https://redislabs.com/blog/benchmark-shared-vs-dedicated-redis-instances#.VfUl0xHtmko">is not recommended</a> as commenter
-Itamar Haber pointed out to&nbsp;me!</p>
-<p>This is because for speed reasons redis uses a single thread to handle all requests
-(regardless if they are in the same or different numerical databases), so all
-resources may be used by a single, redis hungry, application and leave all others to&nbsp;starve!</p>
-<p>Therefore, the recommended solution is to have a <em>different redis</em> server for each different
-application. This does not mean that you need to have different servers, just to run
-different instances of redis binding to different <span class="caps">IP</span> ports. Redis uses very little
-resourecs when it is idle (<a class="reference external" href="http://redis.io/topics/faq">empty instance uses ~ 1 <span class="caps">MB</span> <span class="caps">RAM</span></a>) so you can run a lot
-of instances in a single&nbsp;server.</p>
-<p>Long story short, my proposal is to have a redis.conf <em>inside</em> your application root tree
-(next to manage.py and requirements.txt) which has the redis options for each
-application. The options in redis.conf that need to be changed per application
-is the port that this redis instance will bind (this port also needs to be passed to
-django settings.py) and the pid filename if you daemonize redis &#8212; I recommend using
-a tool like <a class="reference external" href="http://supervisord.org/">supervisord</a> instead so that you won&#8217;t need any daemonizing and pid files for
-each&nbsp;per-app-redis-instance!</p>
-</div>
-<div class="section" id="low-level-debugging">
-<h2><a class="toc-backref" href="#id8">Low level&nbsp;debugging</a></h2>
-<p>In this section I&#8217;ll present some commands that you can issue to your redis
-server using a simple telnet connection to get various info about your queues. You
-probably will never need to issue these commands to actually debug, but they
-will answer some of your (scientific) questions! In the following, <tt class="docutils literal">&gt;</tt> is
-things I type, <tt class="docutils literal">#</tt> are comments, <tt class="docutils literal"><span class="pre">[...]</span></tt> is more output and everything else is the output I&nbsp;get:</p>
-<pre class="code literal-block">
-&gt; telnet 127.0.0.1 6379
-
-# You won't see anything at first but you'll be connected and you can try typing things
-
-&gt; INFO
-
-$1020
-redis_version:2.4.10
-redis_git_sha1:00000000
-# [...]
-db0:keys=83,expires=2
-db1:keys=26,expires=1 # My redis server has two databases
-
-# Now you'll see what you type!
-
-&gt; SELECT 1
-+ OK # Now queries will be issued to database 1
-&gt; SELECT 0
-+ OK # Now queries will be issued to database 0
-
-KEYS rq* # List all rq related queues
-*25
-$43
-rq:job:1d7afa32-3f90-4502-912f-d58eaa049fb1
-$43
-rq:queue:django-test-rq-low
-$43
-[...]
-
-&gt; SMEMBERS rq:workers # See workers
-*1
-$26
-rq:worker:SERAFEIM-PC.6892
-
-&gt; LRANGE rq:queue:django-test-rq-low 0 100 # Check queued jobs
-*2
-$36
-def896f4-84cb-4833-be6a-54d917f05271
-$36
-53cb1367-2fb5-46b3-99b2-7680397203b9
-
-&gt; HGETALL rq:job:def896f4-84cb-4833-be6a-54d917f05271 # Get info about this job
-*16
-$6
-status
-$6
-queued
-$11
-description
-$57
-tasks.tasks.long_runnig_task(&lt;LongTask: LongTask object&gt;)
-$10
-created_at
-$20
-2015-09-01T09:04:38Z
-$7
-timeout
-$3
-180
-$6
-origin
-$18
-django-test-rq-low
-$11
-enqueued_at
-$20
-2015-09-01T09:04:38Z
-$4
-data
-$409
-[...] # data is the pickled parameters passed to the job !
-
-&gt; HGET rq:job:def896f4-84cb-4833-be6a-54d917f05271 status # Get only status
-$6
-queued
-</pre>
-<p>For more info on querying redis you can check the <a class="reference external" href="http://redis.io/documentation">redis documentation</a> and especially
-<a class="reference external" href="http://redis.io/topics/data-types">http://redis.io/topics/data-types</a> and <a class="reference external" href="http://redis.io/commands">http://redis.io/commands</a>.</p>
-</div>
-<div class="section" id="conclusion">
-<h2><a class="toc-backref" href="#id9">Conclusion</a></h2>
-<p>Using some of the above techniques will help you in your asynchronous
-task adventures with rq. I&#8217;ll try to keep this article updated with
-any new techniques or tools I find in the&nbsp;future!</p>
+<p>The above will generate a <tt class="docutils literal">&lt;li <span class="pre">data-horizontal-timeline='{&quot;date&quot;:</span> <span class="pre">&quot;01/2020&quot;}&gt;</span></tt> list element for all months and
+inside that it will add an <tt class="docutils literal">&lt;h3&gt;</tt> with the full name of the month and a bunch of bootstrap rows, one for the
+entries of that particular month (including its title, description and  their image at the side). It should be easy enough to&nbsp;follow.</p>
+<p>Finally, we need to incldue the above partial template. So add the line <tt class="docutils literal">{% include &quot;blog/timeline_partial.html&quot; %}</tt>
+immediately above the <tt class="docutils literal">&lt;div <span class="pre">class=&quot;row</span> <span class="pre">row-eq-height</span> <span class="pre">blog-list&quot;&gt;</span></tt> line in the file <tt class="docutils literal">blog_index_page.html</tt>.</p>
+<p>If you&#8217;ve followed the instructions you should be able to see something like&nbsp;this:</p>
+<img alt="The timeline" src="/images/tl-demo.gif" style="width: 640px;" />
 </div>
 </div>
     <footer>
@@ -446,13 +316,13 @@ any new techniques or tools I find in the&nbsp;future!</p>
         Serafeim Papastefanos
     </span>
   </span>
-<time datetime="2015-09-01T14:20:00+03:00" pubdate>Τρι 01 Σεπτέμβριος 2015</time>  <span class="categories">
-    <a class='category' href='https://spapas.github.io/category/django.html'>django</a>
+<time datetime="2020-09-18T16:20:00+03:00" pubdate>Παρ 18 Σεπτέμβριος 2020</time>  <span class="categories">
+    <a class='category' href='https://spapas.github.io/category/wagtail.html'>wagtail</a>
   </span>
   <span class="categories">
-    <a class="category" href="https://spapas.github.io/tag/django.html">django</a>,    <a class="category" href="https://spapas.github.io/tag/python.html">python</a>,    <a class="category" href="https://spapas.github.io/tag/tasks.html">tasks</a>,    <a class="category" href="https://spapas.github.io/tag/jobs.html">jobs</a>,    <a class="category" href="https://spapas.github.io/tag/rq.html">rq</a>,    <a class="category" href="https://spapas.github.io/tag/django-rq.html">django-rq</a>,    <a class="category" href="https://spapas.github.io/tag/asynchronous.html">asynchronous</a>,    <a class="category" href="https://spapas.github.io/tag/scheduling.html">scheduling</a>,    <a class="category" href="https://spapas.github.io/tag/redis.html">redis</a>  </span>
+    <a class="category" href="https://spapas.github.io/tag/django.html">django</a>,    <a class="category" href="https://spapas.github.io/tag/wagtail.html">wagtail</a>  </span>
 </p><div class="sharing">
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="https://spapas.github.io/2015/09/01/django-rq-redux/" data-via="" data-counturl="https://spapas.github.io/2015/09/01/django-rq-redux/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="https://spapas.github.io/2020/09/18/wagtail-add-posts-timeline/" data-via="" data-counturl="https://spapas.github.io/2020/09/18/wagtail-add-posts-timeline/" >Tweet</a>
 </div>    </footer>
   </article>
 
@@ -675,9 +545,9 @@ any new techniques or tools I find in the&nbsp;future!</p>
     </script>
   <script type="text/javascript">
     var disqus_shortname = 'spapas-github-io';
-    var disqus_identifier = '/2015/09/01/django-rq-redux/';
-    var disqus_url = 'https://spapas.github.io/2015/09/01/django-rq-redux/';
-    var disqus_title = 'django-rq redux: advanced techniques and&nbsp;tools';
+    var disqus_identifier = '/2020/09/18/wagtail-add-posts-timeline/';
+    var disqus_url = 'https://spapas.github.io/2020/09/18/wagtail-add-posts-timeline/';
+    var disqus_title = 'Adding a timeline of your wagtail&nbsp;Posts';
     (function() {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
       dsq.src = "//" + disqus_shortname + '.disqus.com/embed.js';

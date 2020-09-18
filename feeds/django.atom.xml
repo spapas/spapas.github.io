@@ -642,8 +642,8 @@ normally use a functional&amp;nbsp;view:&lt;/p&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;This doesn&amp;#8217;t actually render anything since both header and context are empty on
 the created instance &amp;#8212; remember that &lt;tt class="docutils literal"&gt;as_view&lt;/tt&gt; returns a functional view that
-instantiates a &lt;tt class="docutils literal"&gt;CustomClassView&lt;/tt&gt; objet and returns an &lt;tt class="docutils literal"&gt;HttpResponse&lt;/tt&gt; filling it
-with the object&amp;#8217;s &lt;tt class="docutils literal"&gt;render()&lt;/tt&gt; reuslts. To add some output we can either
+instantiates a &lt;tt class="docutils literal"&gt;CustomClassView&lt;/tt&gt; object and returns an &lt;tt class="docutils literal"&gt;HttpResponse&lt;/tt&gt; filling it
+with the object&amp;#8217;s &lt;tt class="docutils literal"&gt;render()&lt;/tt&gt; results. To add some output we can either
 create another class that inherits from &lt;tt class="docutils literal"&gt;CustomClassView&lt;/tt&gt; or
 initialize the attributes from the constructor of the class (using the kwargs functionality described&amp;nbsp;above).&lt;/p&gt;
 &lt;p&gt;The inherited class can just override the values of the&amp;nbsp;attributes:&lt;/p&gt;
@@ -731,7 +731,7 @@ part of its functionality is implemented by a different&amp;nbsp;method.&lt;/p&g
                 &lt;span class="n"&gt;header&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get_header&lt;/span&gt;&lt;span class="p"&gt;(),&lt;/span&gt; &lt;span class="n"&gt;body&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;render_context&lt;/span&gt;&lt;span class="p"&gt;(),&lt;/span&gt;
             &lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;So what happens here? First of all we inherit from &lt;tt class="docutils literal"&gt;ClassClassView&lt;/tt&gt; to keep the
+&lt;p&gt;So what happens here? First of all we inherit from &lt;tt class="docutils literal"&gt;CustomClassView&lt;/tt&gt; to keep the
 &lt;tt class="docutils literal"&gt;as_view&lt;/tt&gt; method which doesn&amp;#8217;t need changing. Beyond this, the render
 uses methods (&lt;tt class="docutils literal"&gt;get_header&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;render_context&lt;/tt&gt;) to retrieve the values from the header and the body - this means
 that we could re-define these methods to an inherited class in order to override
@@ -826,7 +826,7 @@ inherits from both &lt;tt class="docutils literal"&gt;JsonCustomClassView&lt;/tt
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;What will happen here? Notice that the methods &lt;tt class="docutils literal"&gt;get_header&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;as_view&lt;/tt&gt; exist in &lt;em&gt;both&lt;/em&gt; ancestor classes! So
 which one will be used in each case? Actually, there&amp;#8217;s a (rather complex) rule for that called
-&lt;span class="caps"&gt;MRO&lt;/span&gt; (Method Resolution Order). The &lt;span class="caps"&gt;MRO&lt;/span&gt; is also what can used to know which &lt;tt class="docutils literal"&gt;get_header&lt;/tt&gt;
+&lt;span class="caps"&gt;MRO&lt;/span&gt; (Method Resolution Order). The &lt;span class="caps"&gt;MRO&lt;/span&gt; is also what can be used to know which &lt;tt class="docutils literal"&gt;get_header&lt;/tt&gt;
 and &lt;tt class="docutils literal"&gt;as_view&lt;/tt&gt; will be used in each case in the previous&amp;nbsp;example.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="interlude-an-mro-primer"&gt;
@@ -834,7 +834,7 @@ and &lt;tt class="docutils literal"&gt;as_view&lt;/tt&gt; will be used in each c
 &lt;p&gt;What is &lt;span class="caps"&gt;MRO&lt;/span&gt;? For every class that Python sees, it tries to create a &lt;em&gt;list&lt;/em&gt; (&lt;span class="caps"&gt;MRO&lt;/span&gt; list) of ancestor classes containing that class as
 the first element and its ancestors in a specific order I&amp;#8217;ll discuss in the next paragraph. When a method
 of an object of that specific class needs to be
-called, then the method will be searched in the &lt;span class="caps"&gt;MRO&lt;/span&gt; list (from the first element of the &lt;span class="caps"&gt;MRO&lt;/span&gt; list i.e. starting with the class it self) - when a class is found
+called, then the method will be searched in the &lt;span class="caps"&gt;MRO&lt;/span&gt; list (from the first element of the &lt;span class="caps"&gt;MRO&lt;/span&gt; list i.e. starting with the class itself) - when a class is found
 in the list that defines the method then that method instance (i.e. the method defined in this class) will be called and the search will stop (careful readers: I haven&amp;#8217;t
 yet talked about &lt;em&gt;super&lt;/em&gt; so please be&amp;nbsp;patient).&lt;/p&gt;
 &lt;p&gt;Now, how is the &lt;span class="caps"&gt;MRO&lt;/span&gt; list created? As I explained, the first element
@@ -852,7 +852,7 @@ from the leftmost one):
 &lt;tt class="docutils literal"&gt;[DefaultHeaderJsonCustomClassView, DefaultHeaderBetterCustomClassView, BetterCustomClassView, CustomClassView, JsonCustomClassView, object]&lt;/tt&gt;, while
 for &lt;tt class="docutils literal"&gt;JsonDefaultHeaderCustomClassView&lt;/tt&gt; is
 &lt;tt class="docutils literal"&gt;[JsonDefaultHeaderCustomClassView, JsonCustomClassView, DefaultHeaderBetterCustomClassView, BetterCustomClassView, CustomClassView, object]&lt;/tt&gt;. What this
-means is that for &lt;tt class="docutils literal"&gt;DefaultHeaderJsonCustomClassView&lt;/tt&gt; the &lt;tt class="docutils literal"&gt;CustomClassView.as_view()&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;DefaultHeaderBetterCustomClassView.get_header()&lt;/tt&gt;  (thus
+means is that for &lt;tt class="docutils literal"&gt;DefaultHeaderJsonCustomClassView&lt;/tt&gt; the &lt;tt class="docutils literal"&gt;CustomClassView.as_view()&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;DefaultHeaderBetterCustomClassView.get_header()&lt;/tt&gt; will be used (thus
 we will not get the &lt;span class="caps"&gt;JSON&lt;/span&gt; output) and for &lt;tt class="docutils literal"&gt;JsonDefaultHeaderCustomClassView&lt;/tt&gt; the &lt;tt class="docutils literal"&gt;JsonCustomClassView.as_view()&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;JsonCustomClassView.get_header()&lt;/tt&gt;
 will be used (so we won&amp;#8217;t get the default header functionality) - i.e none of those two options will result to the desired&amp;nbsp;behaviour.&lt;/p&gt;
 &lt;p&gt;Let&amp;#8217;s try an example that has the same base class twice in the hierarchy (actually the previous examples also had a class twice in
@@ -873,7 +873,7 @@ the hierarchy - &lt;tt class="docutils literal"&gt;object&lt;/tt&gt; but let&amp
 Starting with the initial class
 1. DefaultHeaderContextCustomClassView
 Follows the leftmost class (DefaultHeaderBetterCustomClassView) MRO
-2. DefaultHeaderContextCustomClassView, 3. BetterCustomClassView, 4. CustomClassView, 5. object
+2. DefaultHeaderBetterCustomClassView, 3. BetterCustomClassView, 4. CustomClassView, 5. object
 And finally the next class (DefaultContextBetterCustomClassView) MRO
 6. DefaultContextBetterCustomClassView, 7. BetterCustomClassView, 8. CustomClassView, 9. object
 &lt;/pre&gt;

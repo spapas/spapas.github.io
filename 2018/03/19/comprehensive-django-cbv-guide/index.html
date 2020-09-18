@@ -336,8 +336,8 @@ normally use a functional&nbsp;view:</p>
 </pre></div>
 <p>This doesn&#8217;t actually render anything since both header and context are empty on
 the created instance &#8212; remember that <tt class="docutils literal">as_view</tt> returns a functional view that
-instantiates a <tt class="docutils literal">CustomClassView</tt> objet and returns an <tt class="docutils literal">HttpResponse</tt> filling it
-with the object&#8217;s <tt class="docutils literal">render()</tt> reuslts. To add some output we can either
+instantiates a <tt class="docutils literal">CustomClassView</tt> object and returns an <tt class="docutils literal">HttpResponse</tt> filling it
+with the object&#8217;s <tt class="docutils literal">render()</tt> results. To add some output we can either
 create another class that inherits from <tt class="docutils literal">CustomClassView</tt> or
 initialize the attributes from the constructor of the class (using the kwargs functionality described&nbsp;above).</p>
 <p>The inherited class can just override the values of the&nbsp;attributes:</p>
@@ -425,7 +425,7 @@ part of its functionality is implemented by a different&nbsp;method.</p>
                 <span class="n">header</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_header</span><span class="p">(),</span> <span class="n">body</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">render_context</span><span class="p">(),</span>
             <span class="p">)</span>
 </pre></div>
-<p>So what happens here? First of all we inherit from <tt class="docutils literal">ClassClassView</tt> to keep the
+<p>So what happens here? First of all we inherit from <tt class="docutils literal">CustomClassView</tt> to keep the
 <tt class="docutils literal">as_view</tt> method which doesn&#8217;t need changing. Beyond this, the render
 uses methods (<tt class="docutils literal">get_header</tt> and <tt class="docutils literal">render_context</tt>) to retrieve the values from the header and the body - this means
 that we could re-define these methods to an inherited class in order to override
@@ -520,7 +520,7 @@ inherits from both <tt class="docutils literal">JsonCustomClassView</tt> and <tt
 </pre></div>
 <p>What will happen here? Notice that the methods <tt class="docutils literal">get_header</tt> and <tt class="docutils literal">as_view</tt> exist in <em>both</em> ancestor classes! So
 which one will be used in each case? Actually, there&#8217;s a (rather complex) rule for that called
-<span class="caps">MRO</span> (Method Resolution Order). The <span class="caps">MRO</span> is also what can used to know which <tt class="docutils literal">get_header</tt>
+<span class="caps">MRO</span> (Method Resolution Order). The <span class="caps">MRO</span> is also what can be used to know which <tt class="docutils literal">get_header</tt>
 and <tt class="docutils literal">as_view</tt> will be used in each case in the previous&nbsp;example.</p>
 </div>
 <div class="section" id="interlude-an-mro-primer">
@@ -528,7 +528,7 @@ and <tt class="docutils literal">as_view</tt> will be used in each case in the p
 <p>What is <span class="caps">MRO</span>? For every class that Python sees, it tries to create a <em>list</em> (<span class="caps">MRO</span> list) of ancestor classes containing that class as
 the first element and its ancestors in a specific order I&#8217;ll discuss in the next paragraph. When a method
 of an object of that specific class needs to be
-called, then the method will be searched in the <span class="caps">MRO</span> list (from the first element of the <span class="caps">MRO</span> list i.e. starting with the class it self) - when a class is found
+called, then the method will be searched in the <span class="caps">MRO</span> list (from the first element of the <span class="caps">MRO</span> list i.e. starting with the class itself) - when a class is found
 in the list that defines the method then that method instance (i.e. the method defined in this class) will be called and the search will stop (careful readers: I haven&#8217;t
 yet talked about <em>super</em> so please be&nbsp;patient).</p>
 <p>Now, how is the <span class="caps">MRO</span> list created? As I explained, the first element
@@ -546,7 +546,7 @@ from the leftmost one):
 <tt class="docutils literal">[DefaultHeaderJsonCustomClassView, DefaultHeaderBetterCustomClassView, BetterCustomClassView, CustomClassView, JsonCustomClassView, object]</tt>, while
 for <tt class="docutils literal">JsonDefaultHeaderCustomClassView</tt> is
 <tt class="docutils literal">[JsonDefaultHeaderCustomClassView, JsonCustomClassView, DefaultHeaderBetterCustomClassView, BetterCustomClassView, CustomClassView, object]</tt>. What this
-means is that for <tt class="docutils literal">DefaultHeaderJsonCustomClassView</tt> the <tt class="docutils literal">CustomClassView.as_view()</tt> and <tt class="docutils literal">DefaultHeaderBetterCustomClassView.get_header()</tt>  (thus
+means is that for <tt class="docutils literal">DefaultHeaderJsonCustomClassView</tt> the <tt class="docutils literal">CustomClassView.as_view()</tt> and <tt class="docutils literal">DefaultHeaderBetterCustomClassView.get_header()</tt> will be used (thus
 we will not get the <span class="caps">JSON</span> output) and for <tt class="docutils literal">JsonDefaultHeaderCustomClassView</tt> the <tt class="docutils literal">JsonCustomClassView.as_view()</tt> and <tt class="docutils literal">JsonCustomClassView.get_header()</tt>
 will be used (so we won&#8217;t get the default header functionality) - i.e none of those two options will result to the desired&nbsp;behaviour.</p>
 <p>Let&#8217;s try an example that has the same base class twice in the hierarchy (actually the previous examples also had a class twice in
@@ -567,7 +567,7 @@ the hierarchy - <tt class="docutils literal">object</tt> but let&#8217;s be more
 Starting with the initial class
 1. DefaultHeaderContextCustomClassView
 Follows the leftmost class (DefaultHeaderBetterCustomClassView) MRO
-2. DefaultHeaderContextCustomClassView, 3. BetterCustomClassView, 4. CustomClassView, 5. object
+2. DefaultHeaderBetterCustomClassView, 3. BetterCustomClassView, 4. CustomClassView, 5. object
 And finally the next class (DefaultContextBetterCustomClassView) MRO
 6. DefaultContextBetterCustomClassView, 7. BetterCustomClassView, 8. CustomClassView, 9. object
 </pre>
@@ -2095,6 +2095,9 @@ Django Forms (<a class="reference external" href="https://cdf.9vo.lt/">https://c
     <h1>Recent Posts</h1>
     <ul id="recent_posts">
       <li class="post">
+        <a href="https://spapas.github.io/2020/09/18/wagtail-add-posts-timeline/">Adding a timeline of your wagtail Posts</a>
+      </li>
+      <li class="post">
         <a href="https://spapas.github.io/2020/05/15/elixir-osmon-alerts/">Getting alerts from OS Mon in your Elixir application</a>
       </li>
       <li class="post">
@@ -2105,9 +2108,6 @@ Django Forms (<a class="reference external" href="https://cdf.9vo.lt/">https://c
       </li>
       <li class="post">
         <a href="https://spapas.github.io/2019/10/17/declarative-ecto-query-sorting/">Declarative Ecto query sorting</a>
-      </li>
-      <li class="post">
-        <a href="https://spapas.github.io/2019/10/03/html-form-submit-php/">How to properly handle an HTML form</a>
       </li>
     </ul>
   </section>

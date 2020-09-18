@@ -112,6 +112,70 @@ border-radius: 5px;
   		<article>
 <header>
       <h1 class="entry-title">
+        <a href="https://spapas.github.io/2016/04/27/python-nested-list-comprehensions/">Understanding nested list comprehension syntax in Python</a>
+      </h1>
+    <p class="meta">
+<time datetime="2016-04-27T11:20:00+03:00" pubdate>Τετ 27 Απρίλιος 2016</time>    </p>
+</header>
+
+<div class="entry-content"><p>List comprehensions are one of the really nice and powerful features of Python. It
+is actually a smart way to introduce new users to functional programming concepts
+(after all a list comprehension is just a combination of map and filter) and compact&nbsp;statements.</p>
+<p>However, one thing that always troubled me when using list comprehensions is their
+non intuitive syntax when nesting was needed. For example, let&#8217;s say that we just
+want to flatten a list of lists using a nested list&nbsp;comprehension:</p>
+<div class="highlight"><pre><span></span><span class="n">non_flat</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">],</span> <span class="p">[</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">]</span> <span class="p">]</span>
+</pre></div>
+<p>To write that, somebody would think: For a simple list
+comprehension I need to
+write <tt class="docutils literal">[ x for x in non_flat ]</tt> to get all its items - however I want to retrieve each element of the <tt class="docutils literal">x</tt> list so I&#8217;ll write something like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="p">[</span><span class="n">y</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">non_flat</span><span class="p">]</span>
+<span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">]</span>
+</pre></div>
+<p>Well duh! At this time I&#8217;d need research google for a working list comprehension syntax and adjust it to my needs (or give up and write it as a double for&nbsp;loop).</p>
+<p>Here&#8217;s the correct nested list comprehension people&nbsp;wondering:</p>
+<div class="highlight"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="p">[</span><span class="n">y</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">non_flat</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">x</span><span class="p">]</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">]</span>
+</pre></div>
+<p>What if I wanted to add a third level of nesting or an if? Well I&#8217;d just bite the bullet and use for&nbsp;loops!</p>
+<p>However, if you take a look at the document describing list comprehensions in python (<cite><span class="caps">PEP</span> 202</cite>) you&#8217;ll see
+the following&nbsp;phrase:</p>
+<blockquote>
+It is proposed to allow conditional construction of list literals
+using for and if clauses. <strong>They would nest in the same way for
+loops and if statements nest now.</strong></blockquote>
+<p>This statement explains everything! <em>Just think in for-loops syntax</em>. So, If I used for loops for the previous flattening, I&#8217;d do something&nbsp;like:</p>
+<div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">non_flat</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
+        <span class="n">y</span>
+</pre></div>
+<p>which, if <cite>y</cite> is moved to the front and joined in one line would be the correct nested list&nbsp;comprehension!</p>
+<p>So that&#8217;s the way&#8230; What If I wanted to include only lists with more than 2 elements in the flattening
+(so <cite>[7,8]</cite> should not be included)? I&#8217;ll write it with for loops&nbsp;first:</p>
+<div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">non_flat</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span>
+        <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
+            <span class="n">y</span>
+</pre></div>
+<p>so by convering this to list comprehension we&nbsp;get:</p>
+<div class="highlight"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="p">[</span> <span class="n">y</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">non_flat</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">x</span> <span class="p">]</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]</span>
+</pre></div>
+<p>Success!</p>
+<p>One final, more complex example: Let&#8217;s say that we have a list
+of lists of words and we want to get a list of all the letters of these words
+along with the index of the list they belong to
+but only for words with more than two characters. Using the same
+for-loop syntax for the nested list comprehensions we&#8217;ll&nbsp;get:</p>
+<div class="highlight"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">strings</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;baz&#39;</span><span class="p">,</span> <span class="s1">&#39;taz&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="s1">&#39;koko&#39;</span><span class="p">]</span> <span class="p">]</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="p">[</span> <span class="p">(</span><span class="n">letter</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span> <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">lst</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">strings</span><span class="p">)</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">lst</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">word</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">2</span> <span class="k">for</span> <span class="n">letter</span> <span class="ow">in</span> <span class="n">word</span><span class="p">]</span>
+<span class="p">[(</span><span class="s1">&#39;f&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;z&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;t&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;z&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)]</span>
+</pre></div>
+</div>
+  		</article>
+  		<article>
+<header>
+      <h1 class="entry-title">
         <a href="https://spapas.github.io/2016/03/31/spring-boot-settings/">Configuring Spring Boot</a>
       </h1>
     <p class="meta">
@@ -3767,227 +3831,6 @@ is smooth so don&#8217;t afraid to create PDFs from&nbsp;Django!</p>
 </div>
 </div>
   		</article>
-  		<article>
-<header>
-      <h1 class="entry-title">
-        <a href="https://spapas.github.io/2015/11/16/using-browserify-es6/">Improve your client-side-javascript workflow more by using ES6</a>
-      </h1>
-    <p class="meta">
-<time datetime="2015-11-16T14:20:00+02:00" pubdate>Δευ 16 Νοέμβριος 2015</time>    </p>
-</header>
-
-<div class="entry-content"><div class="contents topic" id="contents">
-<p class="topic-title first">Contents</p>
-<ul class="simple">
-<li><a class="reference internal" href="#introduction" id="id1">Introduction</a></li>
-<li><a class="reference internal" href="#npm-save-save-dev-and-avoiding-global-deps" id="id2"><span class="caps">NPM</span>, &#8212;save, &#8212;save-dev and avoiding global&nbsp;deps</a></li>
-<li><a class="reference internal" href="#using-babel" id="id3">Using&nbsp;babel</a></li>
-<li><a class="reference internal" href="#integrate-babel-with-browserify" id="id4">Integrate babel with&nbsp;browserify</a></li>
-<li><a class="reference internal" href="#the-object-spread-operator" id="id5">The object-spread&nbsp;operator</a></li>
-<li><a class="reference internal" href="#conclusion" id="id6">Conclusion</a></li>
-</ul>
-</div>
-<p><strong>Update 22/12/2015:</strong> Add section for the object-spread&nbsp;operator.</p>
-<div class="section" id="introduction">
-<h2><a class="toc-backref" href="#id1">Introduction</a></h2>
-<p>In a <a class="reference external" href="https://spapas.github.io/2015/05/27/using-browserify-watchify/">previous article</a>
-we presented a simple workflow to improve your client-side (javascript) workflow
-by including a bunch of tools from the node-js world i.e <a class="reference external" href="http://browserify.org/">browserify</a> and
-its friends, <a class="reference external" href="https://github.com/substack/watchify">watchify</a> and <a class="reference external" href="https://www.npmjs.com/package/uglify-js">uglify-js</a>.</p>
-<p>Using these tools we were able to properly manage our client side dependencies
-(no more script tags in our html templates) and modularize our code
-(so we could avoid monolithic javascript files that contained all our code).
-Another great improvement to our workflow would be to include <span class="caps">ES6</span> to the&nbsp;mix!</p>
-<p><span class="caps">ES6</span> (or EcmaScript 2015) is more or less &#8220;Javascript: <span class="caps">TNG</span>&#8221;. It has many features
-that greatly improve the readability and writability of javascript code - for instance,
-thick arrows, better classes, better modules, iterators/generators, template strings,
-default function parameters and many others!
-More info on these features and how they could be used can be found on the <a class="reference external" href="https://github.com/lukehoban/es6features">es6features</a>&nbsp;repository.</p>
-<p>Unfortunately, these features are either not supported at all, or they are partially supported
-on current (November 2015) browsers. However all is <em>not</em> lost yet: Since we already use browserify
-to our client side workflow, we can easily enable it to read source files with <span class="caps">ES6</span> syntax
-and transform them to normal javascript using a transformation through the <a class="reference external" href="https://babeljs.io/">babel</a>&nbsp;tool.</p>
-<p>In the following, we&#8217;ll talk a bit more about the node-js package manager (npm) features,
-talk a little about babel and finally
-modify our workflow so that it will be able to use <span class="caps">ES6</span>! Please notice that to properly follow this article
-you need to first read the <a class="reference external" href="https://spapas.github.io/2015/05/27/using-browserify-watchify/">previous one</a>.</p>
-</div>
-<div class="section" id="npm-save-save-dev-and-avoiding-global-deps">
-<h2><a class="toc-backref" href="#id2"><span class="caps">NPM</span>, &#8212;save, &#8212;save-dev and avoiding global&nbsp;deps</a></h2>
-<p>In the previous article, I had recommended to install the needed tools
-(needed to create the output bundle browserify, watchify, uglify) globally
-using npm install -g package (of course the normal dependencies like moment.js
-would be installed locally).
-This has one advantage and two disadvantages: It
-puts these tools to the path so they can be called immediately (i.e browserify)
-but you will need root access to install a package globally and nothing is
-saved on <tt class="docutils literal">package.json</tt> so you don&#8217;t know which packages must be installed
-in order to start developing the&nbsp;project!</p>
-<p>This could be ok for the introductionary article, however for this one I
-will propose another alternative: Install all the tools <em>locally</em> using just
-<tt class="docutils literal">npm install package <span class="pre">--save</span></tt>. These tools will be put to the <tt class="docutils literal">node_modules</tt> folder. They
-<em>will not</em> be put to the path, but if you want to execute a binary by yourself
-to debug the output, you can find it in <tt class="docutils literal">node_modules/bin</tt>, for example,
-for browserify you can run <tt class="docutils literal">node_modules/bin/browserify</tt>. Another intersting
-thing is that if you create executable scripts in your <tt class="docutils literal">package.json</tt> you
-don&#8217;t actually need to include the full path but the binaries will be&nbsp;found.</p>
-<p>Another thing I&#8217;d like to discuss here is the difference between <tt class="docutils literal"><span class="pre">--save</span></tt>
-and <tt class="docutils literal"><span class="pre">--save-dev</span></tt> options that can be passed to npm install. If you take
-a look at other guides you&#8217;ll see that people are using <tt class="docutils literal"><span class="pre">--save-dev</span></tt> for
-development dependencies (i.e testing) and <tt class="docutils literal"><span class="pre">--save</span></tt> for normal dependencies.
-The difference is that these dependencies are saved in different places in
-<tt class="docutils literal">package.json</tt> and if you run <tt class="docutils literal">npm install <span class="pre">--production</span></tt> you&#8217;ll get only
-the normal dependencies (while, if you run <tt class="docutils literal">npm install</tt> all dependencies
-will be installed). In these articles, I chose to just use <tt class="docutils literal"><span class="pre">--save</span></tt> everywhere,
-after all the only thing that would be needed for production would be the
-<tt class="docutils literal">bundle.js</tt> output&nbsp;file.</p>
-</div>
-<div class="section" id="using-babel">
-<h2><a class="toc-backref" href="#id3">Using&nbsp;babel</a></h2>
-<p>The <a class="reference external" href="https://babeljs.io/">babel</a> library &#8220;is a JavaScript compiler&#8221;. It gets input files in a variant
-of javascript (for example, <span class="caps">ES6</span>) and produces normal javascript files &#8212; something
-like what browserify transforms do. However, what babel does (and I think its
-the only tool that does this) is that it allows you to use <span class="caps">ES6</span> features <em>now</em> by
-transpiling them to normal (<span class="caps">ES5</span>) javascript. Also, babel has <a class="reference external" href="https://babeljs.io/docs/plugins/">various other transforms</a>,
-including a react transform
-(so you can use this instead of the reactify&nbsp;browserify-transform)!</p>
-<p>In any case, to be able to use <span class="caps">ES6</span>, we&#8217;ll need to install babel and its es6 presets
-(don&#8217;t forget that you need to have a <tt class="docutils literal">package.json</tt> for the dependencies to be
-saved so either do an <tt class="docutils literal">npm init</tt> or create a <tt class="docutils literal">package.json</tt> file containing only
-<tt class="docutils literal">{}</tt>):</p>
-<pre class="code literal-block">
-npm install  babel babel-preset-es2015 --save
-</pre>
-<p>If we wanted to also use babel for react we&#8217;d need to install&nbsp;babel-preset-react.</p>
-<p>To configure babel we can either add a <tt class="docutils literal">babel</tt>
-section in our <tt class="docutils literal">package.json</tt> or create a new file named .babelrc and put the configuration&nbsp;there.</p>
-<p>I prefer the first one since we are already using the <tt class="docutils literal">package.json</tt>. So add the following attribute
-to your <tt class="docutils literal">package.json</tt>:</p>
-<pre class="code literal-block">
-&quot;babel&quot;: {
-  &quot;presets&quot;: [
-    &quot;es2015&quot;
-  ]
-}
-</pre>
-<p>If you wanted to configure it through <tt class="docutils literal">.babelrc</tt> then you&#8217;d just copy to it the contents of <tt class="docutils literal">&quot;babel&quot;</tt>.</p>
-<p>To do some tests with babel, you can install its cli (it&#8217;s not included in the babel package) through
-<tt class="docutils literal">npm install <span class="pre">babel-cli</span></tt>. Now, you can run <tt class="docutils literal"><span class="pre">node_modules/.bin/babel</span></tt>. For example, create a
-file named <tt class="docutils literal">testbabel.js</tt> with the following contents (thick&nbsp;arrow):</p>
-<pre class="code literal-block">
-[1,2,3].forEach(x =&gt; console.log(x) );
-</pre>
-<p>when you pass it to babel you&#8217;ll see the following&nbsp;output:</p>
-<pre class="code literal-block">
-&gt;node_modules\.bin\babel testbabel.js
-&quot;use strict&quot;;
-
-[1, 2, 3].forEach(function (x) {
-  return console.log(x);
-});
-</pre>
-</div>
-<div class="section" id="integrate-babel-with-browserify">
-<h2><a class="toc-backref" href="#id4">Integrate babel with&nbsp;browserify</a></h2>
-<p>To call babel from browserify we&#8217;re going to use the <a class="reference external" href="https://github.com/babel/babelify">babelify</a> browserify transform which
-actually uses babel to transpile the browserify input. After installing it&nbsp;with</p>
-<pre class="code literal-block">
-npm install babelify --save
-</pre>
-<p>you need to tell browserify to use it. To do this, you&#8217;ll just pass a -t babelify parameter to
-browserify. So if you run it with the <tt class="docutils literal">testbabel.js</tt> file as input you&#8217;ll see the following&nbsp;output:</p>
-<pre class="code literal-block">
-&gt;node_modules\.bin\browserify -t babelify testbabel.js
-[...] browserify gibberish
-&quot;use strict&quot;;
-
-[1, 2, 3].forEach(function (x) {
-  return console.log(x);
-});
-
-[...] more browserify gibberish
-</pre>
-<p>yey &#8212; the code is transpiled to <span class="caps">ES5</span>!</p>
-<p>To create a complete project, let&#8217;s add a normal requirement&nbsp;(moment.js):</p>
-<pre class="code literal-block">
-npm install moment --save
-</pre>
-<p>and a file named <tt class="docutils literal">src\main.js</tt> that uses it with <span class="caps">ES6</span>&nbsp;syntax:</p>
-<pre class="code literal-block">
-import moment from 'moment';
-
-const arr = [1,2,3,4,5];
-arr.forEach(x =&gt; setTimeout(() =&gt; console.log(`Now: ${moment().format(&quot;HH:mm:ss&quot;)}, Later: ${moment().add(x, &quot;days&quot;).format(&quot;L&quot;)}...`), x*1000));
-</pre>
-<p>To create the output javascript file, we&#8217;ll use the browserify and watchify commands with the
-addition of the -t babelify switch. Here&#8217;s the complete <tt class="docutils literal">package.json</tt> for this&nbsp;project:</p>
-<pre class="code literal-block">
-{
-  &quot;dependencies&quot;: {
-    &quot;babel&quot;: &quot;^6.1.18&quot;,
-    &quot;babel-preset-es2015&quot;: &quot;^6.1.18&quot;,
-    &quot;babelify&quot;: &quot;^7.2.0&quot;,
-    &quot;browserify&quot;: &quot;^12.0.1&quot;,
-    &quot;moment&quot;: &quot;^2.10.6&quot;,
-    &quot;uglify-js&quot;: &quot;^2.6.0&quot;,
-    &quot;watchify&quot;: &quot;^3.6.1&quot;
-  },
-  &quot;scripts&quot;: {
-    &quot;watch&quot;: &quot;watchify src/main.js -o dist/bundle.js -v -t babelify&quot;,
-    &quot;build&quot;: &quot;browserify src/main.js -t babelify | uglifyjs -mc warnings=false &gt; dist/bundle.js&quot;
-  },
-  &quot;babel&quot;: {
-    &quot;presets&quot;: [
-      &quot;es2015&quot;
-    ]
-  }
-}
-</pre>
-<p>Running <tt class="docutils literal">npm run build</tt> should create a <tt class="docutils literal">dist/bundle.js</tt> file. If you include this in an html,
-you should see something like this in the&nbsp;console:</p>
-<pre class="code literal-block">
-Now: 13:52:09, Later: 11/17/2015...
-Now: 13:52:10, Later: 11/18/2015...
-</pre>
-</div>
-<div class="section" id="the-object-spread-operator">
-<h2><a class="toc-backref" href="#id5">The object-spread&nbsp;operator</a></h2>
-<p>Many examples in the internet use the <a class="reference external" href="https://facebook.github.io/react/docs/jsx-spread.html#spread-attributes">object spread operator</a> which is <a class="reference external" href="http://stackoverflow.com/questions/31115276/ecmascript-6-spread-operator-in-object-deconstruction-support-in-typescript-and">not part of es6</a> so our
-proposed babel configuration does not support it!
-To be able to use this syntax, we&#8217;ll need to install the corresponding babel plugin by using
-<tt class="docutils literal">npm install <span class="pre">babel-plugin-transform-object-rest-spread</span> <span class="pre">--save</span></tt> and add it to our babel configuration
-in the plugins section, something like&nbsp;this:</p>
-<pre class="code literal-block">
-&quot;presets&quot;: [
-  &quot;es2015&quot;,
-  &quot;react&quot;
-],
-&quot;plugins&quot;: [
-  &quot;transform-object-rest-spread&quot;
-]
-</pre>
-<p>If everything is ok this should be transpiled without errors using <tt class="docutils literal"><span class="pre">node_modules\.bin\browserify</span> testbabe.js <span class="pre">-t</span> babelify</tt></p>
-<pre class="code literal-block">
-let x = {a:1 , b:2 };
-let y = {...x, c: 3};
-</pre>
-</div>
-<div class="section" id="conclusion">
-<h2><a class="toc-backref" href="#id6">Conclusion</a></h2>
-<p>Using the combination of babel and javascript we can easily write <span class="caps">ES6</span> code in our modules! This,
-along with the modularization of our code and the management of client-side dependencies should
-make client side development a&nbsp;breeze!</p>
-<p>Please notice that to keep the presented workflow simple and easy to
-replicate and configure, we have not used any external
-task runners (like gulp or grunt) &#8212; all configuration is kept in a single file (package.json) and
-the whole environment can be replicated just by doing a <tt class="docutils literal">npm install</tt>. Of course, the capabilities of
-browserify are not unlimited, so if you wanted to do something more complicated
-(for instance, lint your code before passing it to browserify) you&#8217;d need to use the mentioned
-task runners (or webpack which is the current trend in javascript bundlers and actually replaces
-the task&nbsp;runners).</p>
-</div>
-</div>
-  		</article>
 <div class="pagination">
     <a class="prev" href="https://spapas.github.io/index7.html">&larr; Older</a>
 
@@ -4102,6 +3945,9 @@ the task&nbsp;runners).</p>
     <h1>Recent Posts</h1>
     <ul id="recent_posts">
       <li class="post">
+        <a href="https://spapas.github.io/2020/09/18/wagtail-add-posts-timeline/">Adding a timeline of your wagtail Posts</a>
+      </li>
+      <li class="post">
         <a href="https://spapas.github.io/2020/05/15/elixir-osmon-alerts/">Getting alerts from OS Mon in your Elixir application</a>
       </li>
       <li class="post">
@@ -4112,9 +3958,6 @@ the task&nbsp;runners).</p>
       </li>
       <li class="post">
         <a href="https://spapas.github.io/2019/10/17/declarative-ecto-query-sorting/">Declarative Ecto query sorting</a>
-      </li>
-      <li class="post">
-        <a href="https://spapas.github.io/2019/10/03/html-form-submit-php/">How to properly handle an HTML form</a>
       </li>
     </ul>
   </section>

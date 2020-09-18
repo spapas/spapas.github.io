@@ -1,5 +1,196 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>/var/ - wagtail</title><link href="https://spapas.github.io/" rel="alternate"></link><link href="https://spapas.github.io/feeds/wagtail.atom.xml" rel="self"></link><id>https://spapas.github.io/</id><updated>2020-03-27T14:20:00+02:00</updated><subtitle>Various programming stuff</subtitle><entry><title>Adding a latest-changes list to your Wagtail site</title><link href="https://spapas.github.io/2020/03/27/wagtail-add-latest-changes/" rel="alternate"></link><published>2020-03-27T14:20:00+02:00</published><updated>2020-03-27T14:20:00+02:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2020-03-27:/2020/03/27/wagtail-add-latest-changes/</id><summary type="html">&lt;p class="first last"&gt;How to add a list of the latest changes to your wagtail&amp;nbsp;site&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>/var/ - wagtail</title><link href="https://spapas.github.io/" rel="alternate"></link><link href="https://spapas.github.io/feeds/wagtail.atom.xml" rel="self"></link><id>https://spapas.github.io/</id><updated>2020-09-18T16:20:00+03:00</updated><subtitle>Various programming stuff</subtitle><entry><title>Adding a timeline of your wagtail Posts</title><link href="https://spapas.github.io/2020/09/18/wagtail-add-posts-timeline/" rel="alternate"></link><published>2020-09-18T16:20:00+03:00</published><updated>2020-09-18T16:20:00+03:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2020-09-18:/2020/09/18/wagtail-add-posts-timeline/</id><summary type="html">&lt;p class="first last"&gt;How to add a timeline wagtail&amp;nbsp;Posts&lt;/p&gt;
+</summary><content type="html">&lt;div class="section" id="intro"&gt;
+&lt;h2&gt;Intro&lt;/h2&gt;
+&lt;p&gt;In this small post I&amp;#8217;ll present a small tutorial on how to add a timelne of your &lt;a class="reference external" href="https://wagtail.io/"&gt;Wagtail&lt;/a&gt;
+posts using the &lt;a class="reference external" href="http://horizontal-timeline.ycodetech.co.uk/"&gt;Horizontal Timeline&lt;/a&gt; jquery&amp;nbsp;plugin.&lt;/p&gt;
+&lt;p&gt;This will be a step by step tutorial to help you understand the concepts. As a base
+we&amp;#8217;ll use the &lt;cite&gt;bakerydemo&lt;/cite&gt; wagtail demo. After you&amp;#8217;ve properly followed the instructions
+you&amp;#8217;ll see that this demo site has a &amp;#8220;Blog&amp;#8221; that contains articles about breads. Following
+we&amp;#8217;ll add a timeline of these articles grouped by their publish&amp;nbsp;month.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="decisions-decisions"&gt;
+&lt;h2&gt;Decisions,&amp;nbsp;decisions&lt;/h2&gt;
+&lt;p&gt;For this demo we&amp;#8217;ll include &lt;em&gt;all&lt;/em&gt; the &amp;#8220;blog&amp;#8221; pages in the timeline. However we may
+wanted to select which pages we want to include in the timeline. This could be done
+either by adding an extra field in our blog pages (class &lt;cite&gt;blog.models.BlogPage&lt;/cite&gt;) like
+&lt;cite&gt;include_in_timeline&lt;/cite&gt; or by using the Wagtail &lt;a class="reference external" href="https://docs.wagtail.io/en/latest/reference/contrib/modeladmin/"&gt;ModelAdmin&lt;/a&gt; functionality. For the ModelAdmin
+we&amp;#8217;d create an extra Django model (i.e &lt;cite&gt;BlogTimeLineEntry&lt;/cite&gt;) that would contain a link
+to the original page. We could enchance this field with extra fields that we may
+want to display in the timeline, for example a smaller description. Something like&amp;nbsp;this:&lt;/p&gt;
+&lt;!-- code
+
+class TimeLineEntry(models.Model):
+        description = RichTextField()
+        page = models.ForeignKey("blog.BlogPage", on_delete=models.PROTECT)
+        panels = [ FieldPanel("description"), PageChooserPanel("page")]
+
+        def pub_date(self):
+                return self.page.date_published
+
+        pub_date.admin_order_field = "page__date_published" --&gt;
+&lt;p&gt;The other decision is where to actually output the timeline. For the demo we&amp;#8217;ll just put it
+in the &lt;cite&gt;BlogIndexPage&lt;/cite&gt; page. If we wanted to add the timeline in a number of different
+page types then we&amp;#8217;d need to add a template tag that would include it. But since it will be
+available only to a single page type we&amp;#8217;ll just need to override the &lt;cite&gt;get_context&lt;/cite&gt; method and
+the template of that particular&amp;nbsp;type.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="overriding-the-get-context"&gt;
+&lt;h2&gt;Overriding the&amp;nbsp;get_context&lt;/h2&gt;
+&lt;p&gt;As we described above, we want to group the timeline entries based on their publish month. For
+this, we&amp;#8217;ll use the following code in the &lt;tt class="docutils literal"&gt;BlogIndexPage.get_context&lt;/tt&gt; method:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;get_context&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="n"&gt;context&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;super&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;BlogIndexPage&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get_context&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;context&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;posts&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;BlogPage&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;objects&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;descendant_of&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+        &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;live&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;order_by&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+        &lt;span class="s1"&gt;&amp;#39;-date_published&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+    &lt;span class="n"&gt;entries&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;context&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;posts&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+    &lt;span class="n"&gt;dentries&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{}&lt;/span&gt;
+    &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;e&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;entries&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="n"&gt;month&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;date_published&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;strftime&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;%m/%Y&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;month_entries&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;dentries&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;month&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;[])&lt;/span&gt;
+        &lt;span class="n"&gt;month_entries&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;append&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;dentries&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;month&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;month_entries&lt;/span&gt;
+
+    &lt;span class="n"&gt;lentries&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;sorted&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+        &lt;span class="p"&gt;[&lt;/span&gt;
+            &lt;span class="p"&gt;{&lt;/span&gt;
+                &lt;span class="s2"&gt;&amp;quot;date_small&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;k&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                &lt;span class="s2"&gt;&amp;quot;date_large&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;v&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;date_published&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;strftime&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;%B %Y&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+                &lt;span class="s2"&gt;&amp;quot;entries&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;v&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+            &lt;span class="p"&gt;}&lt;/span&gt;
+            &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;k&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;v&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;dentries&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;items&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+        &lt;span class="p"&gt;],&lt;/span&gt;
+        &lt;span class="n"&gt;key&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;lambda&lt;/span&gt; &lt;span class="n"&gt;z&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;z&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;entries&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;][&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;date_published&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="p"&gt;)&lt;/span&gt;
+
+    &lt;span class="n"&gt;context&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;update&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;timeline&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;lentries&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;context&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;So what&amp;#8217;s the purpose of the above? First of all we use &lt;cite&gt;super&lt;/cite&gt; to retrieve the context that
+any parent classes may have setup. After that we add a &lt;cite&gt;posts&lt;/cite&gt; attribute to the context
+that is a queryset of all the published children of the current page (which is the &lt;cite&gt;BlogIndexPage&lt;/cite&gt;),
+sorted by their published&amp;nbsp;date.&lt;/p&gt;
+&lt;p&gt;In the &lt;cite&gt;for&lt;/cite&gt; loop that follows, do some dict trickery to &amp;#8220;gather&amp;#8221; all entries for a particlular month/year
+in a list under that particular key in the &lt;cite&gt;dentries&lt;/cite&gt; dict.&lt;/p&gt;
+&lt;p&gt;Finally, we create the &lt;cite&gt;lentries&lt;/cite&gt; list which will be a list of the&amp;nbsp;form:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;[{&lt;/span&gt;
+        &lt;span class="s2"&gt;&amp;quot;date_small&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;09/2020&amp;quot;&lt;/span&gt;
+        &lt;span class="s2"&gt;&amp;quot;date_large&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;September 2020&amp;quot;&lt;/span&gt;
+        &lt;span class="s2"&gt;&amp;quot;entries: [BlogPage, BlogPage, BlogPage...]&lt;/span&gt;
+&lt;span class="p"&gt;},&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="o"&gt;...&lt;/span&gt;&lt;span class="p"&gt;},&lt;/span&gt; &lt;span class="o"&gt;...&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;This struct will help us in the next step when we implement the timeline&amp;nbsp;template.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="fixing-the-template"&gt;
+&lt;h2&gt;Fixing the&amp;nbsp;template&lt;/h2&gt;
+&lt;p&gt;To use the horizontal timeline we need to add a couple of css/js dependencies to our template. For this,
+we&amp;#8217;ll first go to the bakerydemotemplatesbase.html file and add the following snippet near the end of the file just before
+&lt;tt class="docutils literal"&gt;&amp;lt;/body&amp;gt;&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+{% block extra_script %}
+{% endblock %}
+&lt;/pre&gt;
+&lt;p&gt;The above is required to give us a placeholder for adding some needed js dependencies and&amp;nbsp;code.&lt;/p&gt;
+&lt;p&gt;After that we&amp;#8217;ll go to the &lt;tt class="docutils literal"&gt;bakerydemo\templates\blog\blog_index_page.html&lt;/tt&gt; file and add the following just before
+&lt;tt class="docutils literal"&gt;{% block content %}&lt;/tt&gt;&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+{% block head-extra %}
+        &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; type=&amp;quot;text/css&amp;quot; href=&amp;quot;//cdn.jsdelivr.net/gh/ycodetech/horizontal-timeline-2.0&amp;#64;2/css/horizontal_timeline.2.0.min.css&amp;quot;&amp;gt;
+        &amp;lt;style&amp;gt;
+
+                .timeline .selected {
+                        font-size: 24px;
+                        font-weight: bold;
+                }
+
+                #timeline ol {
+                        list-style: none;
+                }
+
+                .horizontal-timeline .events-content li {
+                        background: #f2f2f2;
+                        font-size: .8em;
+                }
+
+                #timeline img {
+                        width: 200px;
+                }
+        &amp;lt;/style&amp;gt;
+
+{% endblock head-extra %}
+&lt;/pre&gt;
+&lt;p&gt;And the following at the end of the&amp;nbsp;file&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+{% block extra_script %}
+
+        &amp;lt;script src=&amp;quot;//cdn.jsdelivr.net/gh/ycodetech/horizontal-timeline-2.0&amp;#64;2/JavaScript/horizontal_timeline.2.0.min.js&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
+
+        &amp;lt;script&amp;gt;
+
+        $(function() {
+                $('#timeline').horizontalTimeline({
+                dateIntervals: {
+                        &amp;quot;desktop&amp;quot;: 200,
+                        &amp;quot;tablet&amp;quot;: 150,
+                        &amp;quot;mobile&amp;quot;: 120,
+                        &amp;quot;minimal&amp;quot;: true
+                }
+                });
+        })
+
+        &amp;lt;/script&amp;gt;
+{% endblock %}
+&lt;/pre&gt;
+&lt;p&gt;Notice that the &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;head-extra&lt;/span&gt;&lt;/tt&gt; block is already there in the base.html file so we don&amp;#8217;t need to add it again. It just has some
+styling changes for the timeline to be displayed nice. Also the &lt;tt class="docutils literal"&gt;&amp;lt;script&amp;gt;&lt;/tt&gt; tags we added just include the needed dependency
+and initialize the timeline&amp;nbsp;component.&lt;/p&gt;
+&lt;p&gt;Of course we haven&amp;#8217;t yet added the actual timeline! To do that, we&amp;#8217;ll  need to add a file named &lt;tt class="docutils literal"&gt;timeline_partial.html&lt;/tt&gt; under the
+&lt;tt class="docutils literal"&gt;blog/templates/blog&lt;/tt&gt; folder (same folder that &lt;tt class="docutils literal"&gt;blog_index_page.html&lt;/tt&gt; is) with the&amp;nbsp;following:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+{% load wagtailcore_tags wagtailimages_tags %}
+&amp;lt;div class=&amp;quot;horizontal-timeline&amp;quot; id=&amp;quot;timeline&amp;quot;&amp;gt;
+  &amp;lt;div class=&amp;quot;events-content&amp;quot;&amp;gt;
+        &amp;lt;ol&amp;gt;
+
+          {% for month in timeline %}
+                &amp;lt;li class=&amp;quot;{% if forloop.last %}selected{% endif %}&amp;quot; data-horizontal-timeline='{&amp;quot;date&amp;quot;: &amp;quot;{{ month.date_small }}&amp;quot;}'&amp;gt;
+                  &amp;lt;h3&amp;gt;{{ month.date_large }}&amp;lt;/h3&amp;gt;
+
+                  {% for te in month.entries %}
+                        &amp;lt;div class='row'&amp;gt;
+
+                                &amp;lt;div class='col-md-6'&amp;gt;
+                                  &amp;lt;h4&amp;gt;&amp;lt;a href='{% pageurl te %}'&amp;gt;{{ te.title }}&amp;lt;/a&amp;gt;&amp;lt;/h4&amp;gt;
+                                  &amp;lt;span&amp;gt;{{ te.introduction }}&amp;lt;/span&amp;gt;
+                                &amp;lt;/div&amp;gt;
+                                &amp;lt;div class='col-md-6'&amp;gt;
+                                  {% with img=te.image %}
+                                        {% image img width-200 as img_thumb %}
+                                        &amp;lt;img class=&amp;quot;&amp;quot; src=&amp;quot;{{ img_thumb.url }}&amp;quot; alt=&amp;quot;{{ img.title }}&amp;quot;&amp;gt;
+                                  {% endwith %}
+                                &amp;lt;/div&amp;gt;
+
+                        &amp;lt;/div&amp;gt;
+                        &amp;lt;div class=&amp;quot;clear bottommargin-sm&amp;quot;&amp;gt;&amp;lt;/div&amp;gt;
+                  {% endfor %}
+                &amp;lt;/li&amp;gt;
+          {% endfor %}
+
+        &amp;lt;/ol&amp;gt;
+  &amp;lt;/div&amp;gt;
+&amp;lt;/div&amp;gt;
+&lt;/pre&gt;
+&lt;p&gt;The above will generate a &lt;tt class="docutils literal"&gt;&amp;lt;li &lt;span class="pre"&gt;data-horizontal-timeline='{&amp;quot;date&amp;quot;:&lt;/span&gt; &lt;span class="pre"&gt;&amp;quot;01/2020&amp;quot;}&amp;gt;&lt;/span&gt;&lt;/tt&gt; list element for all months and
+inside that it will add an &lt;tt class="docutils literal"&gt;&amp;lt;h3&amp;gt;&lt;/tt&gt; with the full name of the month and a bunch of bootstrap rows, one for the
+entries of that particular month (including its title, description and  their image at the side). It should be easy enough to&amp;nbsp;follow.&lt;/p&gt;
+&lt;p&gt;Finally, we need to incldue the above partial template. So add the line &lt;tt class="docutils literal"&gt;{% include &amp;quot;blog/timeline_partial.html&amp;quot; %}&lt;/tt&gt;
+immediately above the &lt;tt class="docutils literal"&gt;&amp;lt;div &lt;span class="pre"&gt;class=&amp;quot;row&lt;/span&gt; &lt;span class="pre"&gt;row-eq-height&lt;/span&gt; &lt;span class="pre"&gt;blog-list&amp;quot;&amp;gt;&lt;/span&gt;&lt;/tt&gt; line in the file &lt;tt class="docutils literal"&gt;blog_index_page.html&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;If you&amp;#8217;ve followed the instructions you should be able to see something like&amp;nbsp;this:&lt;/p&gt;
+&lt;img alt="The timeline" src="/images/tl-demo.gif" style="width: 640px;" /&gt;
+&lt;/div&gt;
+</content><category term="wagtail"></category><category term="django"></category><category term="wagtail"></category></entry><entry><title>Adding a latest-changes list to your Wagtail site</title><link href="https://spapas.github.io/2020/03/27/wagtail-add-latest-changes/" rel="alternate"></link><published>2020-03-27T14:20:00+02:00</published><updated>2020-03-27T14:20:00+02:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2020-03-27:/2020/03/27/wagtail-add-latest-changes/</id><summary type="html">&lt;p class="first last"&gt;How to add a list of the latest changes to your wagtail&amp;nbsp;site&lt;/p&gt;
 </summary><content type="html">&lt;p&gt;I think that a very important tool for a new production &lt;a class="reference external" href="https://wagtail.io"&gt;Wagtail&lt;/a&gt; site is to have a list
 where you&amp;#8217;ll be able to take a look at the latest changes. Most editors are not
 experienced enough when using a new tool so it&amp;#8217;s easy to make bad quality edits. A

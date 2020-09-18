@@ -5,29 +5,36 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>https://spapas.github.io/</loc>
-<lastmod>2020-05-15T15:14:35-00:00</lastmod>
+<lastmod>2020-09-18T16:11:12-00:00</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>https://spapas.github.io/archives.html</loc>
-<lastmod>2020-05-15T15:14:35-00:00</lastmod>
+<lastmod>2020-09-18T16:11:12-00:00</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>https://spapas.github.io/tags.html</loc>
-<lastmod>2020-05-15T15:14:35-00:00</lastmod>
+<lastmod>2020-09-18T16:11:12-00:00</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>https://spapas.github.io/categories.html</loc>
-<lastmod>2020-05-15T15:14:35-00:00</lastmod>
+<lastmod>2020-09-18T16:11:12-00:00</lastmod>
 <changefreq>weekly</changefreq>
+<priority>0.5</priority>
+</url>
+
+<url>
+<loc>https://spapas.github.io/2020/09/18/wagtail-add-posts-timeline/</loc>
+<lastmod>2020-09-18T16:20:00+03:00</lastmod>
+<changefreq>monthly</changefreq>
 <priority>0.5</priority>
 </url>
 
@@ -481,7 +488,7 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>https://spapas.github.io/category/wagtail.html</loc>
-<lastmod>2020-03-27T14:20:00+01:35</lastmod>
+<lastmod>2020-09-18T16:20:00+01:35</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.5</priority>
 </url>
@@ -1125,7 +1132,7 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>https://spapas.github.io/tag/wagtail.html</loc>
-<lastmod>2020-03-27T14:20:00+01:35</lastmod>
+<lastmod>2020-09-18T16:20:00+01:35</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.5</priority>
 </url>
@@ -1419,7 +1426,7 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>https://spapas.github.io/tag/django.html</loc>
-<lastmod>2020-03-27T14:20:00+01:35</lastmod>
+<lastmod>2020-09-18T16:20:00+01:35</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.5</priority>
 </url>
@@ -1454,7 +1461,7 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>https://spapas.github.io/author/serafeim-papastefanos.html</loc>
-<lastmod>2020-05-15T14:20:00+01:35</lastmod>
+<lastmod>2020-09-18T16:20:00+01:35</lastmod>
 <changefreq>weekly</changefreq>
 <priority>0.5</priority>
 </url>

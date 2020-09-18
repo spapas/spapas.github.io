@@ -112,6 +112,494 @@ border-radius: 5px;
   		<article>
 <header>
       <h1 class="entry-title">
+        <a href="https://spapas.github.io/2018/03/01/django-rest-auth/">Authentication for django-rest-framework with django-rest-auth</a>
+      </h1>
+    <p class="meta">
+<time datetime="2018-03-01T22:40:00+02:00" pubdate>Πεμ 01 Μάρτιος 2018</time>    </p>
+</header>
+
+<div class="entry-content"><div class="section" id="introduction">
+<h2>Introduction</h2>
+<p>Most of the times I need authentication with any <span class="caps">REST</span> APIs defined through <a class="reference external" href="http://www.django-rest-framework.org">django-rest-framework</a>
+I will use  <a class="reference external" href="http://www.django-rest-framework.org/api-guide/authentication/#sessionauthentication">SessionAuthentication</a> method. This method uses the session cookie (which is set through the
+normal Django login and logout views)
+to check out if there&#8217;s an authenticated user and get his username. This method works only in the
+same session (browser window) as the one that actually did the login but this should be enough for most&nbsp;cases.</p>
+<p>However, sometimes instead of using the normal Django login/logout views, you&#8217;ll want
+to authentication through <span class="caps">REST</span> end-points, for example for using them with SPAs (where
+you don&#8217;t want to use the traditional views for authentication but through <span class="caps">REST</span> end-points) or
+because you have implemented a mobile (or desktop) application that needs to authenticate with
+your&nbsp;script.</p>
+<p>There are various ways this could be done but one of the simplest is using <a class="reference external" href="https://github.com/Tivix/django-rest-auth">django-rest-auth</a>.
+This project adds a number of <span class="caps">REST</span> end-points to your project that can be used for user login
+and registration (and even social login when combined with <a class="reference external" href="https://github.com/pennersr/django-allauth">django-allauth</a>).
+In the following I am going to write a simple tutorial on how to actually use django-rest-auth to
+authenticate with django-rest-framework using the provided <span class="caps">REST</span> end points and how to call a
+<span class="caps">REST</span> <span class="caps">API</span> as an authenticated&nbsp;user.</p>
+<p>Before continuing with the tutorial, let&#8217;s take a look at what we&#8217;ll build&nbsp;here:</p>
+<img alt="Our project" src="/images/rest-auth.gif" style="width: 640px;" />
+<p>This is a single html page (styled with <a class="reference external" href="https://picturepan2.github.io/spectre/">spectre.css</a>) that checks if the user is logged in
+and either displays the login or logout button (using javascript). When you click the login you&#8217;ll get a modal in which you
+can enter your credentials which will be submitted through <span class="caps">REST</span> to the django-rest-auth endpoint and
+depending on the response will set a javascript variable (and a corresponding session/local storage key).
+Then you can use the &#8220;Test auth&#8221; button that works only on authenticated users and returns their username.
+Finally, notice that after you log out the &#8220;test auth&#8221; button returns a 403 access&nbsp;denied.</p>
+<p>If you want to play with this project yourself, you can clone it here <a class="reference external" href="https://github.com/spapas/rest_authenticate">https://github.com/spapas/rest_authenticate</a>.
+Just create a venv, install requirements, create a superuser and you should be good to&nbsp;go!</p>
+</div>
+<div class="section" id="some-theory">
+<h2>Some&nbsp;theory</h2>
+<p>After you log in with Django, your authentication information is saved to the &#8220;session&#8221;_. The session is a bucket of information
+that the Django application saves about your visit &#8212; to distinguish between different visitors a cookie with a unique
+value named <tt class="docutils literal">sessionid</tt> will be used. So, your web browser will send this cookie with each page request thus allowing Django
+to know which bucket of information is yours (and if you&#8217;ve authenticated know who are you). This is not a Django
+related concept but a general one (supported by most if not all <span class="caps">HTTP</span> frameworks) and is used to add state to an otherwise
+stateless medium (<span class="caps">HTTP</span>).</p>
+<p>Since the <tt class="docutils literal">sessionid</tt> cookie is sent not only with traditional but also with Ajax request it can be used to authenticate
+<span class="caps">REST</span> requests after you&#8217;ve logged in. This is what is used by default in django-rest-framework and as I said in the
+introduction it is a very good solution for most use cases: You login to django and you can go ahead and call the <span class="caps">REST</span>
+<span class="caps">API</span> through Ajax; the <tt class="docutils literal">sessionid</tt> cookie will be sent along with the request and you&#8217;ll be&nbsp;authenticated.</p>
+<p>Now, although the session authentication is nice for using in browsers, you may need to access your <span class="caps">API</span> through a desktop
+or a mobile application where, setting the cookies yourself is not the optimal solution. Also, you may have an <span class="caps">SPA</span> that needs
+to access an <span class="caps">API</span> in a different domain; using <a class="reference external" href="https://stackoverflow.com/questions/3342140/cross-domain-cookies">using cookies for this is not easy</a> - if possible at&nbsp;all.</p>
+<p>For such cases, django-rest-framework
+offers a different authentication method called <tt class="docutils literal">TokenAuthentication_</tt>. Using this method, each user of the Django application
+is correlated with a random string (Token) which is passed along with the request at its header thus the Django app can authenticate
+the user using this token! One thing that may seem strange is that since both the session cookie and a token are
+set through <span class="caps">HTTP</span> Headers why all the fuss about tokens? Why not just use the session cookie and be done with it. Well, there are
+various reasons - here&#8217;s a <cite>rather extensive article</cite> explaining some. Some of the reasons are that a token can be valid forever
+while the session is something ephemeral - beyond authorization information, sessions may keep various other data for a web
+application and are expired after some time to save space. Also, since tokens are used for exactly this (authentication) they
+are much easier to use and reason about. Finally, as I&#8217;ve already explained, sharing cookies by multiple sites is not something
+you&#8217;d like to&nbsp;do.</p>
+</div>
+<div class="section" id="installation-configuration">
+<h2>Installation <span class="amp">&amp;</span>&nbsp;configuration</h2>
+<p>To install django-rest-auth just follow <a class="reference external" href="http://django-rest-auth.readthedocs.io/en/latest/installation.html#installation">the instructions here</a> i.e just add
+<tt class="docutils literal">'rest_framework', 'rest_framework.authtoken'</tt> and <tt class="docutils literal">'rest_auth'</tt> to your <cite>INSTALLED_APPS</cite> in
+<tt class="docutils literal">settings.py</tt> and run&nbsp;migrate.</p>
+<p>Since I won&#8217;t be adding any other apps to this project (no models are actually needed), I&#8217;ve added
+two directories <tt class="docutils literal">static</tt> and <tt class="docutils literal">templates</tt> to put static files and templates there. This is configured
+by adding the <tt class="docutils literal">'<span class="caps">DIRS</span>'</tt> attribte to <tt class="docutils literal"><span class="caps">TEMPLATES</span></tt>, like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><span class="n">TEMPLATES</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s1">&#39;BACKEND&#39;</span><span class="p">:</span> <span class="s1">&#39;django.template.backends.django.DjangoTemplates&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;DIRS&#39;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">BASE_DIR</span><span class="p">,</span> <span class="s1">&#39;templates&#39;</span><span class="p">),</span>
+        <span class="p">],</span>
+        <span class="o">//</span> <span class="o">...</span>
+</pre></div>
+<p>and adding the <cite>STATICFILES_DIRS</cite> setting:</p>
+<div class="highlight"><pre><span></span><span class="n">STATICFILES_DIRS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">BASE_DIR</span><span class="p">,</span> <span class="s2">&quot;static&quot;</span><span class="p">),</span>
+<span class="p">]</span>
+</pre></div>
+<p>The remaining setting are the default as were created by <tt class="docutils literal"><span class="pre">django-admin</span> startproject</tt>.</p>
+<p>I have included the the following urls to <tt class="docutils literal">urls.py</tt>:</p>
+<div class="highlight"><pre><span></span><span class="n">urlpatterns</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">path</span><span class="p">(</span><span class="s1">&#39;admin/&#39;</span><span class="p">,</span> <span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">urls</span><span class="p">),</span>
+    <span class="n">path</span><span class="p">(</span><span class="s1">&#39;test_auth/&#39;</span><span class="p">,</span> <span class="n">TestAuthView</span><span class="o">.</span><span class="n">as_view</span><span class="p">(),</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;test_auth&#39;</span><span class="p">,</span> <span class="p">),</span>
+    <span class="n">path</span><span class="p">(</span><span class="s1">&#39;rest-auth/logout/&#39;</span><span class="p">,</span> <span class="n">LogoutViewEx</span><span class="o">.</span><span class="n">as_view</span><span class="p">(),</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;rest_logout&#39;</span><span class="p">,</span> <span class="p">),</span>
+    <span class="n">path</span><span class="p">(</span><span class="s1">&#39;rest-auth/login/&#39;</span><span class="p">,</span> <span class="n">LoginView</span><span class="o">.</span><span class="n">as_view</span><span class="p">(),</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;rest_login&#39;</span><span class="p">,</span> <span class="p">),</span>
+    <span class="n">path</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">HomeTemplateView</span><span class="o">.</span><span class="n">as_view</span><span class="p">(),</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;home&#39;</span><span class="p">,</span> <span class="p">),</span>
+<span class="p">]</span> <span class="o">+</span> <span class="n">static</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">STATIC_URL</span><span class="p">,</span> <span class="n">document_root</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">STATIC_ROOT</span><span class="p">)</span>
+</pre></div>
+<p>These are: The django-admin, a test_auth view (that works only for authenticated users and returns their username),
+<em>a view (LogoutViewEx) that overrides the rest-auth <span class="caps">REST</span> logout-view</em> (I&#8217;ll explain why this is needed in a minute),
+the rest-auth <span class="caps">REST</span> login-view, the home template view (which is the only view implemented) and finally a mapping
+of your static files to the <tt class="docutils literal">STATIC_URL</tt>.</p>
+</div>
+<div class="section" id="the-views">
+<h2>The&nbsp;views</h2>
+<p>There are three views in this application - the <tt class="docutils literal">HomeTemplateView</tt>, the <tt class="docutils literal">TestAuthView</tt>
+and the <tt class="docutils literal">LogoutViewEx</tt> view that overrides the normal <tt class="docutils literal">LogoutView</tt> of <tt class="docutils literal"><span class="pre">django-rest-auth</span></tt>.
+The first one is
+a simple <tt class="docutils literal">TemplateView</tt> that just
+displays an html page and loads the client side code - we&#8217;ll talk about it later in the front-side&nbsp;section.</p>
+<p>The <tt class="docutils literal">TestAuthView</tt> is implemented like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">TestAuthView</span><span class="p">(</span><span class="n">APIView</span><span class="p">):</span>
+    <span class="n">authentication_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">authentication</span><span class="o">.</span><span class="n">TokenAuthentication</span><span class="p">,)</span>
+    <span class="n">permission_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">permissions</span><span class="o">.</span><span class="n">IsAuthenticated</span><span class="p">,)</span>
+
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="s2">&quot;Hello {0}!&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">))</span>
+</pre></div>
+<p>This is very simple however I&#8217;d like to make a few comments about the above. First of all you see that
+I&#8217;ve defined <tt class="docutils literal">authentication_classes</tt> and <tt class="docutils literal">permission_classes</tt>. These options&nbsp;define</p>
+<ul class="simple">
+<li>which method will be used for authenticating access to the <span class="caps">REST</span> view i.e finding out if the user
+requesting access has logged in and if yes what&#8217;s his username (in our case the <tt class="docutils literal">TokenAuthentication</tt> will be&nbsp;used)</li>
+<li>if the user is authorized (has permission) to call this <span class="caps">REST</span> view (in our case only authenticated users will be&nbsp;allowed)</li>
+</ul>
+<p>The authentication and permission clases can be set globally
+in your <tt class="docutils literal">settings.py</tt> using <tt class="docutils literal"><span class="pre">REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES']</span></tt> and
+<tt class="docutils literal"><span class="pre">REST_FRAMEWORK['DEFAULT_PERMISSION_CLASSES']</span></tt>
+or defined per-class like this. If I wanted to have the same authentication and permission classes defined
+in my <tt class="docutils literal">settings.py</tt> so I wouldn&#8217;t need to set these options per-class I&#8217;d add the following to my <tt class="docutils literal">settings.py</tt>:</p>
+<div class="highlight"><pre><span></span><span class="n">REST_FRAMEWORK</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;DEFAULT_AUTHENTICATION_CLASSES&#39;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="s1">&#39;rest_framework.authentication.TokenAuthentication&#39;</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="s1">&#39;DEFAULT_PERMISSION_CLASSES&#39;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="s1">&#39;rest_framework.permissions.IsAuthenticated&#39;</span><span class="p">,</span>
+    <span class="p">),</span>
+<span class="p">}</span>
+</pre></div>
+<p>Finally, keep in mind that you haven&#8217;t defined these in your views or your settings, they will have the
+following <a class="reference external" href="http://www.django-rest-framework.org/api-guide/settings/#default_authentication_classes">default</a> <a class="reference external" href="http://www.django-rest-framework.org/api-guide/settings/#default_permission_classes">values</a>:</p>
+<div class="highlight"><pre><span></span><span class="n">REST_FRAMEWORK</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;DEFAULT_AUTHENTICATION_CLASSES&#39;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="s1">&#39;rest_framework.authentication.SessionAuthentication&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;rest_framework.authentication.BasicAuthentication&#39;</span>
+    <span class="p">),</span>
+    <span class="s1">&#39;DEFAULT_PERMISSION_CLASSES&#39;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="s1">&#39;rest_framework.permissions.AllowAny&#39;</span><span class="p">,</span>
+    <span class="p">),</span>
+<span class="p">}</span>
+</pre></div>
+<p>The above mean that if you don&#8217;t define authentication and permission classes anywhere then the <span class="caps">REST</span>
+views will use either session authentication (i.e the user has logged in normally using
+the Django login views as explained before) or basic authentication
+(the request provides the credentials in the header using traditional <span class="caps">HTTP</span> Basic authentication)
+and also that all users (logged in or not) will be allowed to call all APIs (this is
+probably not something you&nbsp;want).</p>
+<p>The <tt class="docutils literal">TokenAuthentication</tt> that we are using instead means that for every user there must be a valid token which will be provided
+for each request he does. The tokens are normal object instances of <tt class="docutils literal">rest_framework.authtoken.models.Token</tt>
+and you can take a look at them (or even add one) through the Django admin (auth token - tokens). You can also
+even do whatever you normally would do to an object instance, for&nbsp;example:</p>
+<div class="highlight"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="p">[</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">key</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">Token</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()]</span>
+<span class="p">[(</span><span class="o">&lt;</span><span class="n">User</span><span class="p">:</span> <span class="n">root</span><span class="o">&gt;</span><span class="p">,</span> <span class="s1">&#39;db4dcc1b9d00d1af74fb3cb41e1f9e673208485b&#39;</span><span class="p">)]</span>
+</pre></div>
+<p>To authenticate with a token (using <a class="reference external" href="http://www.django-rest-framework.org/api-guide/authentication/#tokenauthentication">TokenAuthentication</a>), you must add an extra header to your request with the format
+<tt class="docutils literal">Authorization: Token token</tt> for example in the previous case <tt class="docutils literal">root</tt> would add
+<tt class="docutils literal">Authorization: Token db4dcc1b9d00d1af74fb3cb41e1f9e673208485b</tt>. To do this you&#8217;ll need something
+client-side code which we&#8217;ll see in the next&nbsp;section.</p>
+<p>To do it with <a class="reference external" href="https://curl.haxx.se">curl</a> you can just do something like&nbsp;this:</p>
+<div class="highlight"><pre><span></span>curl http://127.0.0.1:8000/test_auth/ -H <span class="s2">&quot;Authorization:Token db4dcc1b9d00d1af74fb3cb41e1f9e673208485b&quot;</span>
+</pre></div>
+<p>Try it with a valid and invalid token and without providing a token at all and see the response each&nbsp;time.</p>
+<p>So, django-rest-framework provides the model (Token) and the mechanism (add the extra Authentication header) for
+authentication with Tokens. What it does not provide is a simple way to create/remove tokens for users: This
+is where <tt class="docutils literal"><span class="pre">django-rest-auth</span></tt> comes to the rescue! Its login and logout <span class="caps">REST</span> views will automatically
+create (and delete) tokens for the users that are logging in. They will also authenticate the user
+normally (using sessions) - this means that if a user logs in using the login <span class="caps">REST</span> endpoint he&#8217;ll then
+be logged in normally to the site and be able to access non-<span class="caps">REST</span> parts of the site (for example the django-admin).
+Also, if the user logs in through the django-rest-auth <span class="caps">REST</span> end point and if you have are using <tt class="docutils literal">SessionAuthentication</tt>
+to one of your views then he&#8217;ll be able to authenticate to these views <em>without</em> the need to pass the token (can
+you understand&nbsp;why?).</p>
+<p>Finally, let&#8217;s take a look at the <tt class="docutils literal">LogoutViewEx</tt>:</p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">LogoutViewEx</span><span class="p">(</span><span class="n">LogoutView</span><span class="p">):</span>
+    <span class="n">authentication_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">authentication</span><span class="o">.</span><span class="n">TokenAuthentication</span><span class="p">,)</span>
+</pre></div>
+<p>This class only defines the authentication_classes attribute. Is this really needed? Well, it depends on
+you project. If you take a look at the source code of <tt class="docutils literal">LogoutView</tt> (<a class="reference external" href="https://github.com/Tivix/django-rest-auth/blob/master/rest_auth/views.py#L99">https://github.com/Tivix/django-rest-auth/blob/master/rest_auth/views.py#L99</a>)
+you&#8217;ll see that it does not define <tt class="docutils literal">authentication_classes</tt>. This, as we&#8217;ve already discussed, means that it will
+fall-back to whatever you have defined in the settings (or the defaults of django-rest-framework). So, if you haven&#8217;t
+defined anything in the settings then you&#8217;ll get the by default the
+SessionAuthentication and BasicAuthentication methods (hint: <em>not</em> the <tt class="docutils literal">TokenAuthentication</tt>). This means that you won&#8217;t be able to
+logout when you pass the token (but <em>will</em> be able to logout from the web-app after you login - why?). So to make everything
+crystal and be able to reason better about the behavior I specifically define the <tt class="docutils literal">LogoutViewEx</tt> to use the <tt class="docutils literal">TokenAuthentication</tt> - that&#8217;s
+what you&#8217;d use if you developed a mobile or desktop app&nbsp;anyway.</p>
+</div>
+<div class="section" id="the-client-side-scripts">
+<h2>The client side&nbsp;scripts</h2>
+<p>I&#8217;ve included all client-side code to a <tt class="docutils literal">home.html</tt> template that is loaded
+from the <tt class="docutils literal">HomeTemplateView</tt>. The client-side code has been implemented only with jQuery because I think
+this is the library that most people are familiar with - and is really easy to be understood even if you
+are not familiar with it. It more or less consists of four sections in&nbsp;html:</p>
+<ul class="simple">
+<li>A user-is-logged-in section that displays the username and the logout&nbsp;button</li>
+<li>A user-is-not-logged-in section that displays a message and the login&nbsp;button</li>
+<li>A test-auth section that displays a button for calling the <tt class="docutils literal">TestAuthView</tt> defined previously and outputs its&nbsp;response</li>
+<li>The login&nbsp;modal</li>
+</ul>
+<p>Here&#8217;s the html (using spectre.css for&nbsp;styling):</p>
+<div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;container grid-lg&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">h2</span><span class="p">&gt;</span>Test<span class="p">&lt;/</span><span class="nt">h2</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;columns&quot;</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;non-logged-in&quot;</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#39;column col-3&#39;</span><span class="p">&gt;</span>
+            You have to log-in!
+        <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#39;column col-3&#39;</span><span class="p">&gt;</span>
+            <span class="p">&lt;</span><span class="nt">button</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;btn btn-primary&quot;</span>  <span class="na">id</span><span class="o">=</span><span class="s">&#39;loginButton&#39;</span><span class="p">&gt;</span>Login<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+        <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;columns&quot;</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;logged-in&quot;</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#39;column col-3&#39;</span><span class="p">&gt;</span>
+            Welcome <span class="p">&lt;</span><span class="nt">span</span> <span class="na">id</span><span class="o">=</span><span class="s">&#39;span-username&#39;</span><span class="p">&gt;&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>!
+        <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#39;column col-3&#39;</span><span class="p">&gt;</span>
+            <span class="p">&lt;</span><span class="nt">button</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;btn btn-primary&quot;</span>  <span class="na">id</span><span class="o">=</span><span class="s">&#39;logoutButton&#39;</span><span class="p">&gt;</span>Logout<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+        <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">hr</span> <span class="p">/&gt;</span>
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;columns&quot;</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;test&quot;</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#39;column col-3&#39;</span><span class="p">&gt;</span>
+            <span class="p">&lt;</span><span class="nt">button</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;btn btn-primary&quot;</span>  <span class="na">id</span><span class="o">=</span><span class="s">&#39;testAuthButton&#39;</span><span class="p">&gt;</span>Test auth<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+        <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#39;column col-9&#39;</span><span class="p">&gt;</span>
+            <span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">&#39;test-auth-response&#39;</span> <span class="p">&gt;&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+        <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+
+<span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;modal&quot;</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;login-modal&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;#close&quot;</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;modal-overlay close-modal&quot;</span> <span class="na">aria-label</span><span class="o">=</span><span class="s">&quot;Close&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;modal-container&quot;</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;modal-header&quot;</span><span class="p">&gt;</span>
+            <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;#close&quot;</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;btn btn-clear float-right close-modal&quot;</span> <span class="na">aria-label</span><span class="o">=</span><span class="s">&quot;Close&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+            <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;modal-title h5&quot;</span><span class="p">&gt;</span>Please login<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+        <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;modal-body&quot;</span><span class="p">&gt;</span>
+            <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;content&quot;</span><span class="p">&gt;</span>
+                <span class="p">&lt;</span><span class="nt">form</span><span class="p">&gt;</span>
+                    {% csrf_token %}
+                    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;form-group&quot;</span><span class="p">&gt;</span>
+                        <span class="p">&lt;</span><span class="nt">label</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;form-label&quot;</span> <span class="na">for</span><span class="o">=</span><span class="s">&quot;input-username&quot;</span><span class="p">&gt;</span>Username<span class="p">&lt;/</span><span class="nt">label</span><span class="p">&gt;</span>
+                        <span class="p">&lt;</span><span class="nt">input</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;form-input&quot;</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text&quot;</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;input-username&quot;</span> <span class="na">placeholder</span><span class="o">=</span><span class="s">&quot;Name&quot;</span><span class="p">&gt;</span>
+                    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+                    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;form-group&quot;</span><span class="p">&gt;</span>
+                        <span class="p">&lt;</span><span class="nt">label</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;form-label&quot;</span> <span class="na">for</span><span class="o">=</span><span class="s">&quot;input-password&quot;</span><span class="p">&gt;</span>Password<span class="p">&lt;/</span><span class="nt">label</span><span class="p">&gt;</span>
+                        <span class="p">&lt;</span><span class="nt">input</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;form-input&quot;</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;password&quot;</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;input-password&quot;</span> <span class="na">placeholder</span><span class="o">=</span><span class="s">&quot;Password&quot;</span><span class="p">&gt;</span>
+                    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+                    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;form-group&quot;</span><span class="p">&gt;</span>
+                        <span class="p">&lt;</span><span class="nt">label</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;form-checkbox&quot;</span> <span class="na">for</span><span class="o">=</span><span class="s">&quot;input-local-storage&quot;</span><span class="p">&gt;</span>
+                            <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;checkbox&quot;</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;input-local-storage&quot;</span> <span class="p">/&gt;</span> <span class="p">&lt;</span><span class="nt">i</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;form-icon&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">i</span><span class="p">&gt;</span>  Use local storage (remember me)
+                        <span class="p">&lt;/</span><span class="nt">label</span><span class="p">&gt;</span>
+                    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+                <span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+                <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#39;label label-error mt-1 d-invisible&#39;</span> <span class="na">id</span><span class="o">=</span><span class="s">&#39;modal-error&#39;</span><span class="p">&gt;</span>
+                    Unable to login!
+                <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+            <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+        <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;modal-footer&quot;</span><span class="p">&gt;</span>
+
+            <span class="p">&lt;</span><span class="nt">button</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;btn btn-primary&quot;</span> <span class="na">id</span><span class="o">=</span><span class="s">&#39;loginOkButton&#39;</span> <span class="p">&gt;</span>Ok<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+            <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;#close&quot;</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;btn close-modal&quot;</span> <span class="p">&gt;</span>Close<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+        <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</pre></div>
+<p>The html is very simple and I don&#8217;t think I need to explain much  - notice that the <cite>#logged-in</cite> and
+<cite>#non-logged-in</cite> sections are mutually exclusive (I use <tt class="docutils literal">$.show()</tt> and <tt class="docutils literal">$.hide()</tt> to show and hide them) but the <cite>#test</cite> section is always displayed
+so you&#8217;ll be able to call the test <span class="caps">REST</span> <span class="caps">API</span> when you are and are not authenticated. For the modal
+to be displayed you need to add an <tt class="docutils literal">active</tt> class to its <tt class="docutils literal">#modal</tt> container.</p>
+<p>For the javascript, let&#8217;s take a look at some initialization&nbsp;stuff:</p>
+<div class="highlight"><pre><span></span><span class="kd">var</span> <span class="nx">g_urls</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;login&#39;</span><span class="o">:</span> <span class="s1">&#39;{% url &quot;rest_login&quot; %}&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;logout&#39;</span><span class="o">:</span> <span class="s1">&#39;{% url &quot;rest_logout&quot; %}&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;test_auth&#39;</span><span class="o">:</span> <span class="s1">&#39;{% url &quot;test_auth&quot; %}&#39;</span><span class="p">,</span>
+<span class="p">};</span>
+<span class="kd">var</span> <span class="nx">g_auth</span> <span class="o">=</span> <span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s2">&quot;auth&quot;</span><span class="p">);</span>
+<span class="k">if</span><span class="p">(</span><span class="nx">g_auth</span> <span class="o">==</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">g_auth</span> <span class="o">=</span> <span class="nx">sessionStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s2">&quot;auth&quot;</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">if</span><span class="p">(</span><span class="nx">g_auth</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">try</span> <span class="p">{</span>
+        <span class="nx">g_auth</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">g_auth</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">g_auth</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">var</span> <span class="nx">getCookie</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">cookieValue</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">cookie</span> <span class="o">&amp;&amp;</span> <span class="nb">document</span><span class="p">.</span><span class="nx">cookie</span> <span class="o">!==</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">cookies</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">cookie</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">);</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">cookies</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+            <span class="kd">var</span> <span class="nx">cookie</span> <span class="o">=</span> <span class="nx">jQuery</span><span class="p">.</span><span class="nx">trim</span><span class="p">(</span><span class="nx">cookies</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
+            <span class="c1">// Does this cookie string begin with the name we want?</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">cookie</span><span class="p">.</span><span class="nx">substring</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">name</span><span class="p">.</span><span class="nx">length</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">===</span> <span class="p">(</span><span class="nx">name</span> <span class="o">+</span> <span class="s1">&#39;=&#39;</span><span class="p">))</span> <span class="p">{</span>
+                <span class="nx">cookieValue</span> <span class="o">=</span> <span class="nb">decodeURIComponent</span><span class="p">(</span><span class="nx">cookie</span><span class="p">.</span><span class="nx">substring</span><span class="p">(</span><span class="nx">name</span><span class="p">.</span><span class="nx">length</span> <span class="o">+</span> <span class="mi">1</span><span class="p">));</span>
+                <span class="k">break</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="nx">cookieValue</span><span class="p">;</span>
+<span class="p">};</span>
+<span class="kd">var</span> <span class="nx">g_csrftoken</span> <span class="o">=</span> <span class="nx">getCookie</span><span class="p">(</span><span class="s1">&#39;csrftoken&#39;</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">initLogin</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">if</span><span class="p">(</span><span class="nx">g_auth</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#non-logged-in&#39;</span><span class="p">).</span><span class="nx">hide</span><span class="p">();</span>
+        <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#logged-in&#39;</span><span class="p">).</span><span class="nx">show</span><span class="p">();</span>
+        <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#span-username&#39;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="nx">g_auth</span><span class="p">.</span><span class="nx">username</span><span class="p">);</span>
+        <span class="k">if</span><span class="p">(</span><span class="nx">g_auth</span><span class="p">.</span><span class="nx">remember_me</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">localStorage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="s2">&quot;auth&quot;</span><span class="p">,</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">g_auth</span><span class="p">));</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="nx">sessionStorage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="s2">&quot;auth&quot;</span><span class="p">,</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">g_auth</span><span class="p">));</span>
+        <span class="p">}</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#non-logged-in&#39;</span><span class="p">).</span><span class="nx">show</span><span class="p">();</span>
+        <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#logged-in&#39;</span><span class="p">).</span><span class="nx">hide</span><span class="p">();</span>
+        <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#span-username&#39;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">);</span>
+        <span class="nx">localStorage</span><span class="p">.</span><span class="nx">removeItem</span><span class="p">(</span><span class="s2">&quot;auth&quot;</span><span class="p">);</span>
+        <span class="nx">sessionStorage</span><span class="p">.</span><span class="nx">removeItem</span><span class="p">(</span><span class="s2">&quot;auth&quot;</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#test-auth-response&#39;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">);</span>
+<span class="p">};</span>
+</pre></div>
+<p>First of all, I define a <tt class="docutils literal">g_urls</tt> window/global object that will keep the required <span class="caps">REST</span> <span class="caps">URLS</span> (login/logout and test auth). These
+are retrieved from Django using the <tt class="docutils literal">{% url %}</tt> template tag and are not hard-coded.
+After that, I check to see if the user has authenticated before. Notice that because
+this is client-side code, I need to do that every time the page loads or else the <span class="caps">JS</span> won&#8217;t be initialized properly! The user login
+information is stored to an object named <tt class="docutils literal">g_auth</tt> and contains two attributes: <tt class="docutils literal">username</tt>, <tt class="docutils literal">key</tt> (token) and <tt class="docutils literal">remember_me</tt>.</p>
+<p>To keep the login information I use either a key named <tt class="docutils literal">auth</tt> to either the <tt class="docutils literal">localStorage</tt> or the <tt class="docutils literal">sessionStorage</tt>. The <tt class="docutils literal">sessionStorage</tt> is used to save
+info for the current browser tab (<em>not</em> window) while the <tt class="docutils literal">localStorage</tt> saves info for ever (until somebody deletes it). Thus,
+<tt class="docutils literal">localStorage</tt> can be used for implementing a &#8220;remember me&#8221; functionality. Notice that instead of using the session/local storage
+I could instead integrate the user login information with the Django back-end. To do this I&#8217;d need to see if the current user has
+a session login and if yes pass his username and token to  Javascript. These values would then be read by the login initialization
+code. I&#8217;m leaving this as an exercise for attentive&nbsp;readers.</p>
+<p>Getting the login information from the session probably is a better solution for web-apps however I think that using the local or session storage emulate better a more
+general (and completely stateless) behaviour especially considering that the <span class="caps">API</span> may be used for mobible/desktop&nbsp;apps.</p>
+<p>In any case, after you&#8217;ve initialized the <tt class="docutils literal">g_auth</tt> object you&#8217;ll need to read the <span class="caps">CSRF</span> cookie. By default Django requires
+<a class="reference external" href="https://docs.djangoproject.com/en/2.0/ref/csrf/"><span class="caps">CSRF</span> protection</a> for all <tt class="docutils literal"><span class="caps">POST</span></tt> requests (we do a <span class="caps">POST</span> request for login and logout). What happens here is that for pages that may
+need to do a <tt class="docutils literal"><span class="caps">POST</span></tt> request, Django will set a cookie (<span class="caps">CSRF</span> cookie) in its initial response. You&#8217;ll need to read that cookie and submit its
+value along with the rest of your form fields when you do the <span class="caps">POST</span>. So the <tt class="docutils literal">getCookie</tt> function is just used to set the <tt class="docutils literal">g_csrftoken</tt> with the value
+of the <span class="caps">CSRF</span>&nbsp;cookie.</p>
+<p>The final function we define here (which is called a little later) checks to see if there is login information and hides/displays the correct
+things in html. It will also set the local or session storage (depending on remember me&nbsp;value).</p>
+<p>After that, we have some client side code that is inside the <tt class="docutils literal">$()</tt> function which will be called after the page has completely&nbsp;loaded:</p>
+<div class="highlight"><pre><span></span><span class="nx">$</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="nx">initLogin</span><span class="p">();</span>
+
+    <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#loginButton&#39;</span><span class="p">).</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#login-modal&#39;</span><span class="p">).</span><span class="nx">addClass</span><span class="p">(</span><span class="s1">&#39;active&#39;</span><span class="p">);</span>
+    <span class="p">});</span>
+
+    <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;.close-modal&#39;</span><span class="p">).</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#login-modal&#39;</span><span class="p">).</span><span class="nx">removeClass</span><span class="p">(</span><span class="s1">&#39;active&#39;</span><span class="p">);</span>
+    <span class="p">});</span>
+
+    <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#testAuthButton&#39;</span><span class="p">).</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span>
+            <span class="nx">url</span><span class="o">:</span> <span class="nx">g_urls</span><span class="p">.</span><span class="nx">test_auth</span><span class="p">,</span>
+            <span class="nx">method</span><span class="o">:</span> <span class="s2">&quot;GET&quot;</span><span class="p">,</span>
+            <span class="nx">beforeSend</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">request</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">if</span><span class="p">(</span><span class="nx">g_auth</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="nx">request</span><span class="p">.</span><span class="nx">setRequestHeader</span><span class="p">(</span><span class="s2">&quot;Authorization&quot;</span><span class="p">,</span> <span class="s2">&quot;Token &quot;</span> <span class="o">+</span> <span class="nx">g_auth</span><span class="p">.</span><span class="nx">key</span><span class="p">);</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}).</span><span class="nx">done</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#test-auth-response&#39;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="s2">&quot;&lt;span class=&#39;label label-success&#39;&gt;Ok! Response: &quot;</span> <span class="o">+</span> <span class="nx">data</span><span class="p">);</span>
+        <span class="p">}).</span><span class="nx">fail</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#test-auth-response&#39;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="s2">&quot;&lt;span class=&#39;label label-error&#39;&gt;Fail! Response: &quot;</span> <span class="o">+</span> <span class="nx">data</span><span class="p">.</span><span class="nx">responseText</span> <span class="o">+</span> <span class="s2">&quot; (status: &quot;</span> <span class="o">+</span> <span class="nx">data</span><span class="p">.</span><span class="nx">status</span><span class="o">+</span><span class="s2">&quot;)&lt;/span&gt;&quot;</span><span class="p">);</span>
+        <span class="p">});</span>
+    <span class="p">});</span>
+
+
+    <span class="c1">// continuing below ...</span>
+</pre></div>
+<p>The first thing happening here is to call the <tt class="docutils literal">initLogin</tt> function to properly intiialize the page and then we add a couple of
+handlers to the click buttons of the <tt class="docutils literal">#loginButton</tt> (which just displays the modal by adding the <tt class="docutils literal">active</tt> class ),
+<tt class="docutils literal"><span class="pre">.close-modal</span></tt> class (there are multiple
+ways to close the modal thus I use a class which just removes that <tt class="docutils literal">active</tt> class) and finally to the <tt class="docutils literal">#testAuthButton</tt>. This
+button will do a <tt class="docutils literal"><span class="caps">GET</span></tt> request to the <tt class="docutils literal">g_urls.test_auth</tt> we defined before. The important thing to notice here is that we add
+a <tt class="docutils literal">beforeSend</tt> attribute to the <tt class="docutils literal">$.ajax</tt> request which, if <tt class="docutils literal">g_auth</tt> is defined adds an <tt class="docutils literal">Authorization</tt> header with the token
+in the form that django-rest-framework <tt class="docutils literal">TokenAuthentication</tt> expects and as we&#8217;ve already discussed&nbsp;above:</p>
+<div class="highlight"><pre><span></span><span class="nx">beforeSend</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">request</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span><span class="p">(</span><span class="nx">g_auth</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">request</span><span class="p">.</span><span class="nx">setRequestHeader</span><span class="p">(</span><span class="s2">&quot;Authorization&quot;</span><span class="p">,</span> <span class="s2">&quot;Token &quot;</span> <span class="o">+</span> <span class="nx">g_auth</span><span class="p">.</span><span class="nx">key</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+<p>If this ajax call returns ok (<tt class="docutils literal">done</tt> part) we just add the <tt class="docutils literal">Ok</tt> to a green label else if there&#8217;s an error (<tt class="docutils literal">fail</tt> part)
+we add the response text and status to a red label. You can try clicking the button and you see that only if you&#8217;ve logged in
+you will succeed in this&nbsp;call.</p>
+<p>Let&#8217;s now take a look at the <tt class="docutils literal">#loginOkbutton</tt> click handler (inside the&nbsp;modal):</p>
+<div class="highlight"><pre><span></span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#loginOkButton&#39;</span><span class="p">).</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">username</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#input-username&#39;</span><span class="p">).</span><span class="nx">val</span><span class="p">();</span>
+    <span class="kd">var</span> <span class="nx">password</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#input-password&#39;</span><span class="p">).</span><span class="nx">val</span><span class="p">();</span>
+    <span class="kd">var</span> <span class="nx">remember_me</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#input-local-storage&#39;</span><span class="p">).</span><span class="nx">prop</span><span class="p">(</span><span class="s1">&#39;checked&#39;</span><span class="p">);</span>
+    <span class="k">if</span><span class="p">(</span><span class="nx">username</span> <span class="o">&amp;&amp;</span> <span class="nx">password</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;Will try to login with &quot;</span><span class="p">,</span> <span class="nx">username</span><span class="p">,</span> <span class="nx">password</span><span class="p">);</span>
+        <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#modal-error&#39;</span><span class="p">).</span><span class="nx">addClass</span><span class="p">(</span><span class="s1">&#39;d-invisible&#39;</span><span class="p">);</span>
+        <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span>
+            <span class="nx">url</span><span class="o">:</span> <span class="nx">g_urls</span><span class="p">.</span><span class="nx">login</span><span class="p">,</span>
+            <span class="nx">method</span><span class="o">:</span> <span class="s2">&quot;POST&quot;</span><span class="p">,</span>
+            <span class="nx">data</span><span class="o">:</span> <span class="p">{</span>
+                <span class="nx">username</span><span class="o">:</span> <span class="nx">username</span><span class="p">,</span>
+                <span class="nx">password</span><span class="o">:</span> <span class="nx">password</span><span class="p">,</span>
+                <span class="nx">csrfmiddlewaretoken</span><span class="o">:</span> <span class="nx">g_csrftoken</span>
+            <span class="p">}</span>
+        <span class="p">}).</span><span class="nx">done</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;DONE: &quot;</span><span class="p">,</span> <span class="nx">username</span><span class="p">,</span> <span class="nx">data</span><span class="p">.</span><span class="nx">key</span><span class="p">);</span>
+            <span class="nx">g_auth</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="nx">username</span><span class="o">:</span> <span class="nx">username</span><span class="p">,</span>
+                <span class="nx">key</span><span class="o">:</span> <span class="nx">data</span><span class="p">.</span><span class="nx">key</span><span class="p">,</span>
+                <span class="nx">remember_me</span><span class="o">:</span> <span class="nx">remember_me</span>
+            <span class="p">};</span>
+            <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#login-modal&#39;</span><span class="p">).</span><span class="nx">removeClass</span><span class="p">(</span><span class="s1">&#39;active&#39;</span><span class="p">);</span>
+            <span class="nx">initLogin</span><span class="p">();</span>
+            <span class="c1">// CAREFUL! csrf token is rotated after login: https://docs.djangoproject.com/en/1.7/releases/1.5.2/#bugfixes</span>
+            <span class="nx">g_csrftoken</span> <span class="o">=</span> <span class="nx">getCookie</span><span class="p">(</span><span class="s1">&#39;csrftoken&#39;</span><span class="p">);</span>
+        <span class="p">}).</span><span class="nx">fail</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;FAIL&quot;</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
+            <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#modal-error&#39;</span><span class="p">).</span><span class="nx">removeClass</span><span class="p">(</span><span class="s1">&#39;d-invisible&#39;</span><span class="p">);</span>
+        <span class="p">});</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#modal-error&#39;</span><span class="p">).</span><span class="nx">removeClass</span><span class="p">(</span><span class="s1">&#39;d-invisible&#39;</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</pre></div>
+<p>All three user inputs (<tt class="docutils literal">username, password, remember_me</tt>) are read from the form and if both username and
+password have been defined an Ajax request will be done to the <tt class="docutils literal">g_urls.login</tt> url. We pass
+<tt class="docutils literal">username, password</tt> <em>and</em> <tt class="docutils literal">g_csrftoken</tt> (as discussed before) as the request data. Now, if there&#8217;s an
+error (<tt class="docutils literal">fail</tt>) I just display a generic message (by removing it&#8217;s <cite>d-invisible</cite> class) while, if the
+request was Ok I retrieve the <tt class="docutils literal">key</tt> (token) from the response, initialize the <tt class="docutils literal">g_auth</tt> object with the
+<tt class="docutils literal">username</tt>, <tt class="docutils literal">key</tt> and <tt class="docutils literal">remember_me</tt> values and call <tt class="docutils literal">initLogin</tt> to show the correct divs and save
+to the session/local&nbsp;storage.</p>
+<p>It is important to keep in mind that with the line <tt class="docutils literal">g_csrftoken = <span class="pre">getCookie('csrftoken')</span></tt>
+we re-read the <span class="caps">CSRF</span> cookie. This is needed because, as you can see in the mentioned link in the comment,
+after Django logs in, the csrf cookie value is rotated for security reasons so it must be re-read here (or else
+the <tt class="docutils literal">logout</tt> that is also a <span class="caps">POST</span> request will not&nbsp;work).</p>
+<p>Finally, here&#8217;s the code for logout (still inside the <tt class="docutils literal">$(function () {</tt>):</p>
+<div class="highlight"><pre><span></span>    <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#logoutButton&#39;</span><span class="p">).</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;Trying to logout&quot;</span><span class="p">);</span>
+        <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span>
+            <span class="nx">url</span><span class="o">:</span> <span class="nx">g_urls</span><span class="p">.</span><span class="nx">logout</span><span class="p">,</span>
+            <span class="nx">method</span><span class="o">:</span> <span class="s2">&quot;POST&quot;</span><span class="p">,</span>
+            <span class="nx">beforeSend</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">request</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">request</span><span class="p">.</span><span class="nx">setRequestHeader</span><span class="p">(</span><span class="s2">&quot;Authorization&quot;</span><span class="p">,</span> <span class="s2">&quot;Token &quot;</span> <span class="o">+</span> <span class="nx">g_auth</span><span class="p">.</span><span class="nx">key</span><span class="p">);</span>
+            <span class="p">},</span>
+            <span class="nx">data</span><span class="o">:</span> <span class="p">{</span>
+                <span class="nx">csrfmiddlewaretoken</span><span class="o">:</span> <span class="nx">g_csrftoken</span>
+            <span class="p">}</span>
+        <span class="p">}).</span><span class="nx">done</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;DONE: &quot;</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
+            <span class="nx">g_auth</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+            <span class="nx">initLogin</span><span class="p">();</span>
+        <span class="p">}).</span><span class="nx">fail</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;FAIL: &quot;</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
+        <span class="p">});</span>
+    <span class="p">});</span>
+
+<span class="p">});</span> <span class="c1">// End of $(function () {</span>
+</pre></div>
+<p>The code here is very simple - just do a <tt class="docutils literal"><span class="caps">POST</span></tt> to the <tt class="docutils literal">g_urls.logout</tt>  and if everything is ok delete the <tt class="docutils literal">g_auth</tt> values
+and call <tt class="docutils literal">initLogin()</tt> to show the correct divs and remove the <tt class="docutils literal">auth</tt> key from local/session storage. Notice that when
+you <tt class="docutils literal"><span class="caps">POST</span></tt> to the <tt class="docutils literal">logout</tt> <span class="caps">REST</span> end-point, you need to also add the <tt class="docutils literal">Authorization</tt> header with the token or else
+(since we&#8217;ve defined only <tt class="docutils literal">TokenAuthentication</tt> for the <tt class="docutils literal">authentication_classes</tt> for the <tt class="docutils literal">LogoutViewEx</tt> class)
+there won&#8217;t be any way to correlate the request with the user and log him&nbsp;out!</p>
+</div>
+<div class="section" id="conclusion">
+<h2>Conclusion</h2>
+<p>Using the info presented on this article you should be able to properly login and logout to Django using <span class="caps">REST</span> and
+also call <span class="caps">REST</span> end-points as an authenticated used. I recommend using the <tt class="docutils literal">curl</tt> utility to try to call the rest
+end point with various parameters to see the response. Also, you change the <tt class="docutils literal">LogoutViewEx</tt> with the
+default django-rest-auth <tt class="docutils literal">LogoutView</tt> and then try logging out through the web-app <em>and</em> through curl and see
+what happens when you try to access the test-auth&nbsp;end-point.</p>
+<p>Finally, the above project can be easily modified to use
+<tt class="docutils literal">SessionAuthentication</tt> instead of <tt class="docutils literal">TokenAuthentication</tt> (so you won&#8217;t need <tt class="docutils literal"><span class="pre">django-rest-auth</span></tt> at all) - I&#8217;m
+leaving it as an exercise to the&nbsp;reader.</p>
+</div>
+</div>
+  		</article>
+  		<article>
+<header>
+      <h1 class="entry-title">
         <a href="https://spapas.github.io/2017/12/20/python-2-3-windows/">Using both Python 2 and 3 in Windows</a>
       </h1>
     <p class="meta">
@@ -1336,124 +1824,6 @@ an excerise to the&nbsp;reader:</p>
 </div>
 </div>
   		</article>
-  		<article>
-<header>
-      <h1 class="entry-title">
-        <a href="https://spapas.github.io/2016/11/02/postgresql-backup/">Getting a logical backup of all databases of your Postgresql server</a>
-      </h1>
-    <p class="meta">
-<time datetime="2016-11-02T15:10:00+02:00" pubdate>Τετ 02 Νοέμβριος 2016</time>    </p>
-</header>
-
-<div class="entry-content"><p>In this small post I will present a small bash script that could be used to create logical backups of all the databases in a Postgresql server along
-with some other goodies. More specifically, the script&nbsp;will:</p>
-<ul class="simple">
-<li>Create two files at /tmp to output information (one for debugging and one with info for sending it through email at the&nbsp;end)</li>
-<li>Create a backup directory with the current&nbsp;date</li>
-<li>Create a list of all databases found on the&nbsp;server</li>
-<li>For each database, vacuum and analyze it, backup it, gzip it and put it in the backup&nbsp;directory</li>
-<li>Write info about the backup in the info log&nbsp;file</li>
-<li>Do the same for global&nbsp;objects</li>
-<li>Send an email when the backup is finished with the info&nbsp;log</li>
-</ul>
-<p>Now, in my system I&#8217;m using an external folder at <tt class="docutils literal">/mnt/backupdb</tt> to put my backups. You may either use the same technique or connect remotely to a
-postgresql database (so you need to change the parameters of <tt class="docutils literal">vacuumdb</tt>, <tt class="docutils literal">pg_dump</tt> and <tt class="docutils literal">pg_dumpall</tt> to define the server and credentials to connect to)
-and put the backups to a local&nbsp;disc.</p>
-<div class="highlight"><pre><span></span><span class="ch">#!/bin/sh</span>
-<span class="nb">echo</span> <span class="s2">&quot;&quot;</span> &gt; /tmp/db_backup.log
-<span class="nb">echo</span> <span class="s2">&quot;&quot;</span> &gt; /tmp/db_backup_info.log
-<span class="nv">date_str</span><span class="o">=</span><span class="k">$(</span>date +<span class="s2">&quot;%Y%m%d_%H%M%S&quot;</span><span class="k">)</span>
-<span class="nv">backup_dir</span><span class="o">=</span>/mnt/backupdb/pg_backup.<span class="nv">$date_str</span>
-
-mkdir <span class="nv">$backup_dir</span>
-<span class="nb">pushd</span> <span class="nv">$backup_dir</span> &gt; /dev/null
-
-<span class="nv">dbs</span><span class="o">=</span><span class="sb">`</span>sudo -u postgres psql -Upostgres -lt <span class="p">|</span> grep -v : <span class="p">|</span> cut -d <span class="se">\|</span> -f <span class="m">1</span> <span class="p">|</span> grep -v template <span class="p">|</span> grep -v -e <span class="s1">&#39;^\s*$&#39;</span> <span class="p">|</span> sed -e <span class="s1">&#39;s/  *$//&#39;</span><span class="p">|</span>  tr <span class="s1">&#39;\n&#39;</span> <span class="s1">&#39; &#39;</span><span class="sb">`</span>
-<span class="nb">echo</span> <span class="s2">&quot;Will backup: </span><span class="nv">$dbs</span><span class="s2"> to </span><span class="nv">$backup_dir</span><span class="s2">&quot;</span> &gt;&gt; /tmp/db_backup_info.log
-<span class="k">for</span> db in <span class="nv">$dbs</span><span class="p">;</span> <span class="k">do</span>
-  <span class="nb">echo</span> <span class="s2">&quot;Starting backup for </span><span class="nv">$db</span><span class="s2">&quot;</span> &gt;&gt; /tmp/db_backup_info.log
-  <span class="nv">filename</span><span class="o">=</span><span class="nv">$db</span>.<span class="nv">$date_str</span>.sql.gz
-  sudo -u postgres vacuumdb --analyze -Upostgres <span class="nv">$db</span> &gt;&gt; /tmp/db_backup.log
-  sudo -u postgres pg_dump -Upostgres -v <span class="nv">$db</span> -F p <span class="m">2</span>&gt;&gt; /tmp/db_backup.log <span class="p">|</span> gzip &gt; <span class="nv">$filename</span>
-  <span class="nv">size</span><span class="o">=</span><span class="sb">`</span>stat <span class="nv">$filename</span> --printf<span class="o">=</span><span class="s2">&quot;%s&quot;</span><span class="sb">`</span>
-  <span class="nv">kb_size</span><span class="o">=</span><span class="sb">`</span><span class="nb">echo</span> <span class="s2">&quot;scale=2; </span><span class="nv">$size</span><span class="s2"> / 1024.0&quot;</span> <span class="p">|</span> bc<span class="sb">`</span>
-  <span class="nb">echo</span> <span class="s2">&quot;Finished backup for </span><span class="nv">$db</span><span class="s2"> - size is </span><span class="nv">$kb_size</span><span class="s2"> KB&quot;</span> &gt;&gt; /tmp/db_backup_info.log
-<span class="k">done</span>
-
-<span class="nb">echo</span> <span class="s2">&quot;Backing up global objects&quot;</span> &gt;&gt; /tmp/db_backup_info.log
-<span class="nv">filename</span><span class="o">=</span>global.<span class="nv">$date_str</span>.sql.gz
-sudo -u postgres pg_dumpall -Upostgres -v -g <span class="m">2</span>&gt;&gt; /tmp/db_backup.log <span class="p">|</span> gzip &gt; <span class="nv">$filename</span>
-<span class="nv">size</span><span class="o">=</span><span class="sb">`</span>stat <span class="nv">$filename</span> --printf<span class="o">=</span><span class="s2">&quot;%s&quot;</span><span class="sb">`</span>
-<span class="nv">kb_size</span><span class="o">=</span><span class="sb">`</span><span class="nb">echo</span> <span class="s2">&quot;scale=2; </span><span class="nv">$size</span><span class="s2"> / 1024.0&quot;</span> <span class="p">|</span> bc<span class="sb">`</span>
-<span class="nb">echo</span> <span class="s2">&quot;Finished backup for global - size is </span><span class="nv">$kb_size</span><span class="s2"> KB&quot;</span> &gt;&gt; /tmp/db_backup_info.log
-
-<span class="nb">echo</span> <span class="s2">&quot;Ok!&quot;</span> &gt;&gt; /tmp/db_backup_info.log
-mail -s <span class="s2">&quot;Backup results&quot;</span> spapas@mymail.foo.bar  &lt; /tmp/db_backup_info.log
-<span class="nb">popd</span> &gt; /dev/null
-</pre></div>
-<p>Let&#8217;s explain a bit the above script: The two first lines (echo &#8230;)  will just clear out the two files <tt class="docutils literal">/tmp/db_backup.log</tt> and <tt class="docutils literal">/tmp/db_backup_info.log</tt>. The first
-will contain debug info from the commands and the second one will contain our info that will be sent through an email at the end of the backup. After that, we initialize
-<tt class="docutils literal">date_str</tt> with the current date in the form <tt class="docutils literal">20161102_145011</tt> and the backup_dir with the correct directory to save the backups to. We then create the backup directory
-and switch to it with <tt class="docutils literal">pushd</tt>.</p>
-<p>The following, rather long command will assign the names of the databases to the <tt class="docutils literal">dbs</tt> variable. So how is it working? <tt class="docutils literal">psql <span class="pre">-lt</span></tt> lists the names of the databases, but lists
-also more non-needed information which we remove with the following commands (grep, cut etc). The sed removes whitespace and the tr concatenates individual lines to a single line
-so dbs will have a value like &#8216;db1 db2 &#8230;&#8217;. For each one of these files then we assign its name and date to a filename and then, after we execute vacuumdb we use pg_dump with gzip to actually
-create the backup and output it to the file. The other two lines (size and kb_size) are used to calculate the size of the backup file (to be sure that something is actually created) - you&#8217;ll
-need to install bc for that. The same process is followed the to backup global objects (usernames etc) using <tt class="docutils literal">pg_dumpall <span class="pre">-g</span></tt>. Finally, we send a mail with a subject of &#8220;Backup results&#8221;
-and body the contents of <tt class="docutils literal">/tmp/db_backup_info.log</tt>.</p>
-<p>I&#8217;ve saved this file to <tt class="docutils literal">/var/lib/pgsql/db_backup_all.sh</tt>. To run I propose using cron &#8212; just edit your crontab (through <tt class="docutils literal">vi /etc/crontab</tt>) and add the&nbsp;line</p>
-<pre class="code literal-block">
-15 2  *  *  * root       /usr/bin/bash /var/lib/pgsql/db_backup_all.sh
-</pre>
-<p>This will run the backup every night at 2.15. Uses the root user to have access rights to the backup folder. One thing to be careful about is that on Redhat/Centos distributions,
-the above won&#8217;t work because sudo requires a tty to work and cron doesn&#8217;t have one. To fix this, comment out the&nbsp;line</p>
-<pre class="code literal-block">
-Defaults    requiretty
-</pre>
-<p>of your /etc/sudoers&nbsp;file.</p>
-<p><strong>Update 02/12/2016:</strong> Here&#8217;s a little better version of the above script&nbsp;that</p>
-<ol class="arabic simple">
-<li>Create two files for each database, one with <span class="caps">SQL</span> script backup, one with binary backup. Although with <span class="caps">SQL</span> backup you can check out the backup and maybe do changes before applying it, the binary backup is a more foolproof method of restoring everything to your database! Also, instead of restoring the database through <tt class="docutils literal">psql</tt> (as required by the <span class="caps">SQL</span> script backup), using the binary backup you can restore through the <tt class="docutils literal">pg_restore</tt> tool.</li>
-<li>Adds a function to output the file size (so the script is more <span class="caps">DRY</span>)</li>
-</ol>
-<div class="highlight"><pre><span></span><span class="ch">#!/bin/sh</span>
-
-<span class="k">function</span> output_file_size <span class="o">{</span>
-  <span class="nv">size</span><span class="o">=</span><span class="sb">`</span>stat <span class="nv">$1</span> --printf<span class="o">=</span><span class="s2">&quot;%s&quot;</span><span class="sb">`</span>
-  <span class="nv">kb_size</span><span class="o">=</span><span class="sb">`</span><span class="nb">echo</span> <span class="s2">&quot;scale=2; </span><span class="nv">$size</span><span class="s2"> / 1024.0&quot;</span> <span class="p">|</span> bc<span class="sb">`</span>
-  <span class="nb">echo</span> <span class="s2">&quot;Finished backup for </span><span class="nv">$2</span><span class="s2"> - size is </span><span class="nv">$kb_size</span><span class="s2"> KB&quot;</span> &gt;&gt; /tmp/db_backup_info.log
-<span class="o">}</span>
-
-<span class="nb">echo</span> <span class="s2">&quot;&quot;</span> &gt; /tmp/db_backup.log
-<span class="nb">echo</span> <span class="s2">&quot;&quot;</span> &gt; /tmp/db_backup_info.log
-<span class="nv">date_str</span><span class="o">=</span><span class="k">$(</span>date +<span class="s2">&quot;%Y%m%d_%H%M%S&quot;</span><span class="k">)</span>
-<span class="nv">backup_dir</span><span class="o">=</span>/mnt/backupdb/dbpg/pg_backup.<span class="nv">$date_str</span>
-
-mkdir <span class="nv">$backup_dir</span>
-<span class="nb">pushd</span> <span class="nv">$backup_dir</span> &gt; /dev/null
-<span class="nv">dbs</span><span class="o">=</span><span class="sb">`</span>sudo -u postgres psql -Upostgres -lt <span class="p">|</span> cut -d <span class="se">\|</span> -f <span class="m">1</span> <span class="p">|</span> grep -v template <span class="p">|</span> grep -v -e <span class="s1">&#39;^\s*$&#39;</span> <span class="p">|</span> sed -e <span class="s1">&#39;s/  *$//&#39;</span><span class="p">|</span>  tr <span class="s1">&#39;\n&#39;</span> <span class="s1">&#39; &#39;</span><span class="sb">`</span>
-<span class="c1">#dbs=&#39;dgul  hrms  mailer_server  missions  postgres&#39;</span>
-<span class="nb">echo</span> <span class="s2">&quot;Will backup: </span><span class="nv">$dbs</span><span class="s2"> to </span><span class="nv">$backup_dir</span><span class="s2">&quot;</span> &gt;&gt; /tmp/db_backup_info.log
-<span class="k">for</span> db in <span class="nv">$dbs</span><span class="p">;</span> <span class="k">do</span>
-  <span class="nb">echo</span> <span class="s2">&quot;Starting backup for </span><span class="nv">$db</span><span class="s2">&quot;</span> &gt;&gt; /tmp/db_backup_info.log
-  <span class="nv">filename</span><span class="o">=</span><span class="nv">$db</span>.<span class="nv">$date_str</span>.sql.gz
-  <span class="nv">filename_binary</span><span class="o">=</span><span class="nv">$db</span>.<span class="nv">$date_str</span>.bak.gz
-  sudo -u postgres vacuumdb --analyze -Upostgres <span class="nv">$db</span> &gt;&gt; /tmp/db_backup.log
-  sudo -u postgres pg_dump -Upostgres -v <span class="nv">$db</span> -F p <span class="m">2</span>&gt;&gt; /tmp/db_backup.log <span class="p">|</span> gzip &gt; <span class="nv">$filename</span>
-  sudo -u postgres pg_dump -Upostgres -v <span class="nv">$db</span> -F c <span class="m">2</span>&gt;&gt; /tmp/db_backup.log <span class="p">|</span> gzip &gt; <span class="nv">$filename_binary</span>
-  output_file_size <span class="nv">$filename</span> <span class="s2">&quot;</span><span class="nv">$db</span><span class="s2"> sql&quot;</span>
-  output_file_size <span class="nv">$filename_binary</span> <span class="s2">&quot;</span><span class="nv">$db</span><span class="s2"> bin&quot;</span>
-<span class="k">done</span>
-<span class="nb">echo</span> <span class="s2">&quot;Backing up global objects&quot;</span> &gt;&gt; /tmp/db_backup_info.log
-<span class="nv">filename</span><span class="o">=</span>global.<span class="nv">$date_str</span>.sql.gz
-sudo -u postgres pg_dumpall -Upostgres -v -g <span class="m">2</span>&gt;&gt; /tmp/db_backup.log <span class="p">|</span> gzip &gt; <span class="nv">$filename</span>
-output_file_size <span class="nv">$filename</span> global
-<span class="nb">echo</span> <span class="s2">&quot;Ok!&quot;</span> &gt;&gt; /tmp/db_backup_info.log
-mail -s <span class="s2">&quot;Backup results&quot;</span> spapas@hcg.gr  &lt; /tmp/db_backup_info.log
-<span class="nb">popd</span> &gt; /dev/null
-</pre></div>
-</div>
-  		</article>
 <div class="pagination">
     <a class="prev" href="https://spapas.github.io/index5.html">&larr; Older</a>
 
@@ -1568,6 +1938,9 @@ mail -s <span class="s2">&quot;Backup results&quot;</span> spapas@hcg.gr  &lt; /
     <h1>Recent Posts</h1>
     <ul id="recent_posts">
       <li class="post">
+        <a href="https://spapas.github.io/2020/09/18/wagtail-add-posts-timeline/">Adding a timeline of your wagtail Posts</a>
+      </li>
+      <li class="post">
         <a href="https://spapas.github.io/2020/05/15/elixir-osmon-alerts/">Getting alerts from OS Mon in your Elixir application</a>
       </li>
       <li class="post">
@@ -1578,9 +1951,6 @@ mail -s <span class="s2">&quot;Backup results&quot;</span> spapas@hcg.gr  &lt; /
       </li>
       <li class="post">
         <a href="https://spapas.github.io/2019/10/17/declarative-ecto-query-sorting/">Declarative Ecto query sorting</a>
-      </li>
-      <li class="post">
-        <a href="https://spapas.github.io/2019/10/03/html-form-submit-php/">How to properly handle an HTML form</a>
       </li>
     </ul>
   </section>

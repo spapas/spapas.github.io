@@ -4,7 +4,7 @@ Using hashids to hide ids of objects in Django
 :date: 2021-01-07 12:20
 :tags: django, hashids, python
 :category: django
-:slug: django-hashides
+:slug: django-hashids
 :author: Serafeim Papastefanos
 :summary: How to hide the ids (primary keys) of your objects in Django using the hashids library
 

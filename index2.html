@@ -112,6 +112,259 @@ border-radius: 5px;
   		<article>
 <header>
       <h1 class="entry-title">
+        <a href="https://spapas.github.io/2019/10/17/declarative-ecto-query-sorting/">Declarative Ecto query sorting</a>
+      </h1>
+    <p class="meta">
+<time datetime="2019-10-17T12:20:00+03:00" pubdate>Πεμ 17 Οκτώβριος 2019</time>    </p>
+</header>
+
+<div class="entry-content"><p>In a <a class="reference external" href="https://spapas.github.io/2019/07/25/declarative-ecto-query-filters/">previous article</a> I presented a method for declaring dynamic filters for your ecto queries.
+Continuing this article, I&#8217;ll present here a way to allow dynamic sorting for your queries using
+fields that may even span&nbsp;relations.</p>
+<div class="section" id="what-will-it-do">
+<h2>What will it&nbsp;do</h2>
+<p>The solution is a couple of function that can be put inside the <tt class="docutils literal">QueryFilterEx</tt> I mentioned
+in the <a class="reference external" href="https://spapas.github.io/2019/07/25/declarative-ecto-query-filters/">previous article</a>. Please make sure that you&#8217;ve completely read and understand this
+article before continuing&nbsp;here.</p>
+<p>To use the dynamic sorting function you&#8217;ll need to declare the fields that would allow sorting using
+a simple array of strings. The sort fields should then be added as links to your phoenix page which
+will then pass an <tt class="docutils literal">order_by=field_name</tt> query parameter to your&nbsp;controller.</p>
+<p>The module has a very simple <span class="caps">API</span> consisting of a single&nbsp;function:</p>
+<ul class="simple">
+<li><tt class="docutils literal">sort_by_params(query, params, allowed_sort_fields)</tt>: Pass it the query, the <tt class="docutils literal"><span class="caps">GET</span></tt> request parameters you got from your form and the declared sort fields array to return you a sorted&nbsp;query</li>
+</ul>
+<p>You can find a sample of the technique presented in this article in my <span class="caps">PHXCRD</span> repository:
+<a class="reference external" href="https://github.com/spapas/phxcrd">https://github.com/spapas/phxcrd</a>  for example in the <tt class="docutils literal">user_controller</tt> or <tt class="docutils literal">authority_controller</tt>.</p>
+</div>
+<div class="section" id="preparing-the-query">
+<h2>Preparing the&nbsp;query</h2>
+<p>In order to use dynamic sorting you&#8217;ll need to properly &#8220;prepare&#8221; your Ecto query by <em>naming all your relations</em>
+as I&#8217;ve already explained in the <a class="reference external" href="https://spapas.github.io/2019/07/25/declarative-ecto-query-filters/">previous article</a>.</p>
+</div>
+<div class="section" id="declaring-the-sort-fields">
+<h2>Declaring the sort&nbsp;fields</h2>
+<p>To declare the sort fields you&#8217;ll just add an array of fields you&#8217;ll want to allow sorting on. Each field
+should have the form <tt class="docutils literal">binding_name__field_name</tt> where <tt class="docutils literal">binding_name</tt> is the name of the table
+you&#8217;ve declared in your
+query and <tt class="docutils literal">field_name</tt> is the name of the field that the query will be sorted by. This is the way
+that the sort
+fields will also be declared in the phoenix html page. Django users will definitely remember the
+<tt class="docutils literal">model__field</tt> convention.</p>
+<p>Declaring the sort fields here and using them again in the html page may seem reduntant, however
+it is absolute necessary to declare a priori which fields are allowed because the sort http params
+will be received
+as strings and to be used in queries these strings will be converted to atoms. The number of atoms is
+finite (there&#8217;s an absolute limit of allowed atoms in an erlang program; if that limit is surpassed
+your program will crash) so you can&#8217;t allow the user to pass whatever he wants (so if the <tt class="docutils literal">order_by</tt>
+parameter does not contain one of the fields you declare here then no strings will be converted to&nbsp;atoms).</p>
+</div>
+<div class="section" id="integrating-with-a-controller">
+<h2>Integrating with a&nbsp;controller</h2>
+<p>As an example let&#8217;s see how the dynamic sort fields will be integrated with the phxcrd user_controller.
+The query I&#8217;d like to filter on is the following (see that everything I&#8217;ll need is named using <tt class="docutils literal">:as</tt>):</p>
+<div class="highlight"><pre><span></span><span class="n">from</span><span class="p">(</span><span class="n">u</span> <span class="ow">in</span> <span class="nc">User</span><span class="p">,</span> <span class="ss">as</span><span class="p">:</span> <span class="ss">:user</span><span class="p">,</span>
+  <span class="ss">left_join</span><span class="p">:</span> <span class="n">a</span> <span class="ow">in</span> <span class="nc">Authority</span><span class="p">,</span> <span class="ss">as</span><span class="p">:</span> <span class="ss">:authority</span><span class="p">,</span>
+  <span class="ss">on</span><span class="p">:</span> <span class="n">a</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">u</span><span class="o">.</span><span class="n">authority_id</span><span class="p">,</span>
+  <span class="ss">left_join</span><span class="p">:</span> <span class="n">up</span> <span class="ow">in</span> <span class="nc">UserPermission</span><span class="p">,</span>
+  <span class="ss">on</span><span class="p">:</span> <span class="n">up</span><span class="o">.</span><span class="n">user_id</span> <span class="o">==</span> <span class="n">u</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+  <span class="ss">left_join</span><span class="p">:</span> <span class="n">p</span> <span class="ow">in</span> <span class="nc">Permission</span><span class="p">,</span> <span class="ss">as</span><span class="p">:</span> <span class="ss">:permission</span><span class="p">,</span>
+  <span class="ss">on</span><span class="p">:</span> <span class="n">up</span><span class="o">.</span><span class="n">permission_id</span> <span class="o">==</span> <span class="n">p</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+  <span class="ss">preload</span><span class="p">:</span> <span class="p">[</span><span class="ss">authority</span><span class="p">:</span> <span class="n">a</span><span class="p">,</span> <span class="ss">permissions</span><span class="p">:</span> <span class="n">p</span><span class="p">]</span>
+<span class="p">)</span>
+</pre></div>
+<p>To declare the sort fields I like to create a module attribute ending with <tt class="docutils literal">sort_fields</tt>, something like
+<tt class="docutils literal">&#64;user_sort_fields</tt> for example. Here&#8217;s the sort fields I&#8217;m going to use for&nbsp;user_controller:</p>
+<div class="highlight"><pre><span></span><span class="na">@user_sort_fields</span> <span class="p">[</span>
+  <span class="s2">&quot;user__username&quot;</span><span class="p">,</span> <span class="s2">&quot;user__name&quot;</span><span class="p">,</span> <span class="s2">&quot;user__last_login&quot;</span>
+<span class="p">]</span>
+</pre></div>
+<p>So it will only allow the <tt class="docutils literal">user.username</tt>, <tt class="docutils literal">user.name</tt> and <tt class="docutils literal">user.last_login</tt> fields for sorting.
+I could easily sort by <tt class="docutils literal">authority.name</tt> or <tt class="docutils literal">permission.name</tt> in a similar&nbsp;fashion.</p>
+<p>Finally, here&#8217;s the full code of the index&nbsp;controller:</p>
+<div class="highlight"><pre><span></span><span class="kd">def</span> <span class="n">index</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span> <span class="k">do</span>
+  <span class="n">changeset</span> <span class="o">=</span> <span class="nc">QueryFilterEx</span><span class="o">.</span><span class="n">get_changeset_from_params</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="na">@user_filters</span><span class="p">)</span>
+
+  <span class="n">users</span> <span class="o">=</span>
+    <span class="n">from</span><span class="p">(</span><span class="n">u</span> <span class="ow">in</span> <span class="nc">User</span><span class="p">,</span>
+      <span class="ss">as</span><span class="p">:</span> <span class="ss">:user</span><span class="p">,</span>
+      <span class="ss">left_join</span><span class="p">:</span> <span class="n">a</span> <span class="ow">in</span> <span class="nc">Authority</span><span class="p">,</span> <span class="ss">as</span><span class="p">:</span> <span class="ss">:authority</span><span class="p">,</span>
+      <span class="ss">on</span><span class="p">:</span> <span class="n">a</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">u</span><span class="o">.</span><span class="n">authority_id</span><span class="p">,</span>
+
+      <span class="ss">left_join</span><span class="p">:</span> <span class="n">up</span> <span class="ow">in</span> <span class="nc">UserPermission</span><span class="p">,</span>
+      <span class="ss">on</span><span class="p">:</span> <span class="n">up</span><span class="o">.</span><span class="n">user_id</span> <span class="o">==</span> <span class="n">u</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+      <span class="ss">left_join</span><span class="p">:</span> <span class="n">p</span> <span class="ow">in</span> <span class="nc">Permission</span><span class="p">,</span> <span class="ss">as</span><span class="p">:</span> <span class="ss">:permission</span><span class="p">,</span>
+      <span class="ss">on</span><span class="p">:</span> <span class="n">up</span><span class="o">.</span><span class="n">permission_id</span> <span class="o">==</span> <span class="n">p</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+      <span class="ss">preload</span><span class="p">:</span> <span class="p">[</span><span class="ss">authority</span><span class="p">:</span> <span class="n">a</span><span class="p">,</span> <span class="ss">permissions</span><span class="p">:</span> <span class="n">p</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="o">|&gt;</span> <span class="nc">QueryFilterEx</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">changeset</span><span class="p">,</span> <span class="na">@user_filters</span><span class="p">)</span>
+    <span class="o">|&gt;</span> <span class="nc">QueryFilterEx</span><span class="o">.</span><span class="n">sort_by_params</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="na">@user_sort_fields</span><span class="p">)</span>
+    <span class="o">|&gt;</span> <span class="nc">Repo</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+  <span class="n">render</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;index.html&quot;</span><span class="p">,</span> <span class="ss">users</span><span class="p">:</span> <span class="n">users</span><span class="p">,</span> <span class="ss">changeset</span><span class="p">:</span> <span class="n">changeset</span><span class="p">)</span>
+<span class="k">end</span>
+</pre></div>
+<p>Notice that this is exactly the
+same as the controller I discussed in the dynamic filters article with the addition of the
+<tt class="docutils literal">QueryFilterEx.sort_by_params(params, &#64;user_sort_fields)</tt> pipe to do the&nbsp;sorting.</p>
+</div>
+<div class="section" id="the-template">
+<h2>The&nbsp;template</h2>
+<p>The template for the user index action is also the same with a couple of minor changes: Instead of
+using a static header for the table title I will use a link that will change the sorting&nbsp;order:</p>
+<div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">thead</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">tr</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">th</span><span class="p">&gt;</span>
+      <span class="err">&lt;</span>%= link gettext(&quot;Username&quot;), to: create_order_url(@conn, &quot;user__username&quot;) %&gt;
+    <span class="p">&lt;/</span><span class="nt">th</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">th</span><span class="p">&gt;</span>
+      <span class="err">&lt;</span>%= link gettext(&quot;Name&quot;), to: create_order_url(@conn, &quot;user__name&quot;) %&gt;
+    <span class="p">&lt;/</span><span class="nt">th</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">th</span><span class="p">&gt;</span>First name<span class="p">&lt;/</span><span class="nt">th</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">th</span><span class="p">&gt;</span>Last name<span class="p">&lt;/</span><span class="nt">th</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">th</span><span class="p">&gt;</span>Email<span class="p">&lt;/</span><span class="nt">th</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">th</span><span class="p">&gt;</span>Am / Am phxcrd<span class="p">&lt;/</span><span class="nt">th</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">th</span><span class="p">&gt;</span>Kind<span class="p">&lt;/</span><span class="nt">th</span><span class="p">&gt;</span>
+
+    <span class="p">&lt;</span><span class="nt">th</span><span class="p">&gt;</span>
+      <span class="err">&lt;</span>%= link gettext(&quot;Last login&quot;), to: create_order_url(@conn, &quot;user__last_login&quot;) %&gt;
+    <span class="p">&lt;/</span><span class="nt">th</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">th</span><span class="p">&gt;</span>Is enabled<span class="p">&lt;/</span><span class="nt">th</span><span class="p">&gt;</span>
+
+    <span class="p">&lt;</span><span class="nt">th</span><span class="p">&gt;&lt;/</span><span class="nt">th</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">tr</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">thead</span><span class="p">&gt;</span>
+</pre></div>
+<p>Notice that I just used the <tt class="docutils literal">create_order_url</tt> function passing it the <tt class="docutils literal">&#64;conn</tt> and the
+sort field. This <tt class="docutils literal">create_order_url</tt> function is implemented in a module I include in
+all my views and will properly add an <tt class="docutils literal">order_by=field</tt> in the url (it will also add
+an <tt class="docutils literal"><span class="pre">order_by=-field</span></tt> if the same header is clicked twice). I will explain it more
+in the following&nbsp;sections.</p>
+<p>Finally, please notice that if you use pagination and sorting you need to properly handle the <tt class="docutils literal">order_by</tt>
+query parameter when creating the next-previous page links. Actually, there are three things
+competing on their url parameter dominance; I&#8217;d like to talk about that in the next&nbsp;interlude.</p>
+<div class="section" id="interlude-http-get-parameter-priority">
+<h3>Interlude: <span class="caps">HTTP</span> <span class="caps">GET</span> parameter&nbsp;priority</h3>
+<p>Now, in an index page you will probably have three things all of which will want to put parameters
+to your urls to be&nbsp;activated:</p>
+<ul class="simple">
+<li>Query filtering; this will put a <tt class="docutils literal">filter</tt> query parameter to filter your query. Notice that because of how phoenix works (it allows maps in the query parameters) the filter can be a single query parameter but contain multiple filters (i.e the filter will be something like <tt class="docutils literal"><span class="pre">%{&quot;key1&quot;</span> =&gt; &quot;value1&quot;, &quot;key2&quot; =&gt; &quot;value2&quot;}</tt></li>
+<li>Order by: This will put an <tt class="docutils literal">order_by</tt> query parameter to denote the field that the query will be&nbsp;sorted</li>
+<li>Pagination: This will put an <tt class="docutils literal">page</tt> query parameter to denote the current&nbsp;page</li>
+</ul>
+<p>I like to give them a priority in the order I&#8217;ve listed them; when one of them is changed, it will
+<em>clear</em> the ones following it. So if the query filters are changed both the pagination and the order by
+fields will be cleared, if the order by field is changed then only the pagination field will be cleared
+but if the pagination field is changed both the query filters and the order by fields will be kept&nbsp;there.</p>
+<p>I think that&#8217;s the best way to do it from an <span class="caps">UX</span> point of view; try to think about it and you&#8217;ll probably&nbsp;agree.</p>
+</div>
+</div>
+<div class="section" id="how-does-this-work">
+<h2>How does this&nbsp;work?</h2>
+<p>In this section I&#8217;ll try to explain exactly how the dynamic sort fields&nbsp;work.</p>
+<p>So I&#8217;ll split this explanation in two parts: Explain <tt class="docutils literal">create_order_url</tt>
+and then explain <tt class="docutils literal">sort_by_params</tt>.</p>
+<div class="section" id="create-order-url">
+<h3><tt class="docutils literal">create_order_url</tt></h3>
+<p>This function receives three parameters: The current <tt class="docutils literal">&#64;conn</tt>, the name of a <tt class="docutils literal">field</tt> to
+sort by and an optional list of query parameters that need to be kept while creating the
+order by links. I&#8217;ve put this function in a <tt class="docutils literal">ViewHelpers</tt> module that I am including to
+all my views (by adding an <tt class="docutils literal">import PhxcrdWeb.ViewHelpers</tt> line to the <tt class="docutils literal">PhxcrdWeb</tt> module).</p>
+<p>Let&#8217;s take a look at the&nbsp;code:</p>
+<div class="highlight"><pre><span></span><span class="kd">def</span> <span class="n">create_order_url</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">field_name</span><span class="p">,</span> <span class="n">allowed_keys</span> <span class="p">\\</span> <span class="p">[</span><span class="s2">&quot;filter&quot;</span><span class="p">])</span> <span class="k">do</span>
+  <span class="nc">Phoenix.Controller</span><span class="o">.</span><span class="n">current_url</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">get_order_params</span><span class="p">(</span><span class="n">conn</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="n">allowed_keys</span><span class="p">,</span> <span class="n">field_name</span><span class="p">))</span>
+<span class="k">end</span>
+</pre></div>
+<p>This doesn&#8217;t do much, it just uses the phoenix&#8217;s <tt class="docutils literal">current_url</tt> that generates a new
+url to the current page, passing it a dictionary
+of http get parameters that should be appended to the url that
+are created through <tt class="docutils literal">get_order_params</tt>. Notice that there&#8217;s an
+<tt class="docutils literal">allowed_keys</tt> parameter that contains the query parameters that we need to keep after
+the sorting (see the previous interlude).
+By default I pass the <tt class="docutils literal">filter</tt> query parameter so if theres a filter (check
+my previous article) it will keep it when sorting (but any pagination will be cleared;
+if I sort by a new field I want to go to the first page there&#8217;s no reason for me to keep
+seeing the page I was on before changing the order&nbsp;by).</p>
+<p>The <tt class="docutils literal">get_order_params</tt> receives the query parameters of the current connection (as a map),
+the allowed keys I mentioned before and the actual name of the field to sort on. This method is a
+little more&nbsp;complex:</p>
+<div class="highlight"><pre><span></span><span class="kd">defp</span> <span class="n">get_order_params</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">allowed_keys</span><span class="p">,</span> <span class="n">order_key</span><span class="p">)</span> <span class="k">do</span>
+  <span class="n">params</span>
+  <span class="o">|&gt;</span> <span class="nc">Map</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">allowed_keys</span> <span class="o">++</span> <span class="p">[</span><span class="s2">&quot;order_by&quot;</span><span class="p">])</span>
+  <span class="o">|&gt;</span> <span class="nc">Enum</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">fn</span> <span class="p">{</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">}</span> <span class="o">-&gt;</span> <span class="p">{</span><span class="nc">String</span><span class="o">.</span><span class="n">to_atom</span><span class="p">(</span><span class="n">k</span><span class="p">),</span> <span class="n">v</span><span class="p">}</span> <span class="k">end</span><span class="p">)</span>
+  <span class="o">|&gt;</span> <span class="nc">Map</span><span class="o">.</span><span class="n">new</span><span class="p">()</span>
+  <span class="o">|&gt;</span> <span class="nc">Map</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+    <span class="ss">:order_by</span><span class="p">,</span>
+    <span class="n">order_key</span><span class="p">,</span>
+    <span class="o">&amp;</span><span class="k">case</span> <span class="ni">&amp;1</span> <span class="k">do</span>
+      <span class="s2">&quot;-&quot;</span> <span class="o">&lt;&gt;</span> <span class="o">^</span><span class="n">order_key</span> <span class="o">-&gt;</span> <span class="n">order_key</span>
+      <span class="o">^</span><span class="n">order_key</span> <span class="o">-&gt;</span> <span class="s2">&quot;-&quot;</span> <span class="o">&lt;&gt;</span> <span class="n">order_key</span>
+      <span class="bp">_</span> <span class="o">-&gt;</span> <span class="s2">&quot;-&quot;</span> <span class="o">&lt;&gt;</span> <span class="n">order_key</span>
+    <span class="k">end</span>
+  <span class="p">)</span>
+<span class="k">end</span>
+</pre></div>
+<p>It only keeps the parameters in the <tt class="docutils literal">allowed_keys</tt> list and the current <tt class="docutils literal">order_by</tt> parameter
+(if there&#8217;s one)  discarding everything else. It will then convert the keys of the map to atoms and
+put them in a new map. Finally, it will update the <tt class="docutils literal">order_by</tt> field (if exists) either by
+switching the <tt class="docutils literal">-</tt> in front of the field to declare asc/desc sorting or adding it for the field
+that was clicked. Actually the logic of that <tt class="docutils literal">Map.update</tt> is the&nbsp;following:</p>
+<ul class="simple">
+<li>If there&#8217;s no <tt class="docutils literal">:order_by</tt> key then add it and assign the passed <tt class="docutils literal">order_key</tt></li>
+<li>If the current value of <tt class="docutils literal">:order_by</tt> is equal to <tt class="docutils literal">order_key</tt> with or without a <tt class="docutils literal">-</tt> then toggle the <tt class="docutils literal">-</tt> (this happens when you click on a field that is already used for&nbsp;sorting)</li>
+<li>If the current value of <tt class="docutils literal">:order_by</tt> is anything else (i.e not the same as the <tt class="docutils literal">order_key</tt>) then just change <tt class="docutils literal">:order_by</tt> to <tt class="docutils literal"><span class="pre">-orderKey</span></tt> (this happens when there&#8217;s sorting but you click on a different field, not the one used for the&nbsp;sorting)</li>
+</ul>
+<p>Notice that this juggling between map, list of keywords and then map again (using <tt class="docutils literal">Enum.map</tt> and then
+<tt class="docutils literal">Map.new</tt> etc) is needed because
+the query parameters are in a map with strings as keys form (<tt class="docutils literal"><span class="pre">%{&quot;key&quot;</span> =&gt; &quot;value&quot;}</tt>) while
+the <tt class="docutils literal">current_url</tt> function needs the query params in a map with atoms as keys form
+(<tt class="docutils literal">%{key: &quot;value&quot;}</tt>).</p>
+</div>
+<div class="section" id="sort-by-params">
+<h3><tt class="docutils literal">sort_by_params</tt></h3>
+<p>The <tt class="docutils literal">sort_by_params</tt> method gets three parameters: The <tt class="docutils literal">query</tt> that will be sorted,
+the existing http parameters map (so as to retrieve the <tt class="docutils literal">order_by</tt> value)
+and the declared list of allowed sorting fields. Let&#8217;s take a look at&nbsp;it:</p>
+<div class="highlight"><pre><span></span><span class="kd">def</span> <span class="n">sort_by_params</span><span class="p">(</span><span class="n">qs</span><span class="p">,</span> <span class="p">%{</span><span class="s2">&quot;order_by&quot;</span> <span class="o">=&gt;</span> <span class="s2">&quot;-&quot;</span> <span class="o">&lt;&gt;</span> <span class="n">val</span><span class="p">},</span> <span class="n">allowed</span><span class="p">),</span>
+  <span class="ss">do</span><span class="p">:</span> <span class="n">do_sort_by_params</span><span class="p">(</span><span class="n">qs</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="ss">:asc</span><span class="p">,</span> <span class="n">allowed</span><span class="p">)</span>
+
+<span class="kd">def</span> <span class="n">sort_by_params</span><span class="p">(</span><span class="n">qs</span><span class="p">,</span> <span class="p">%{</span><span class="s2">&quot;order_by&quot;</span> <span class="o">=&gt;</span> <span class="n">val</span><span class="p">},</span> <span class="n">allowed</span><span class="p">),</span>
+  <span class="ss">do</span><span class="p">:</span> <span class="n">do_sort_by_params</span><span class="p">(</span><span class="n">qs</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="ss">:desc</span><span class="p">,</span> <span class="n">allowed</span><span class="p">)</span>
+
+<span class="kd">def</span> <span class="n">sort_by_params</span><span class="p">(</span><span class="n">qs</span><span class="p">,</span> <span class="bp">_</span><span class="p">,</span> <span class="bp">_</span><span class="p">),</span> <span class="ss">do</span><span class="p">:</span> <span class="n">qs</span>
+</pre></div>
+<p>This multi-legged function will only do something if there&#8217;s an <tt class="docutils literal">order_by</tt> parameter in the http
+parameters (else it will just return the query as is) and will call <tt class="docutils literal">do_sort_by_params</tt> passing
+it the received query,
+either <tt class="docutils literal">:asc</tt> or <tt class="docutils literal">:desc</tt> (depending if there&#8217;s a <tt class="docutils literal">-</tt> in front of the value) and the
+received allowed fields&nbsp;list.</p>
+<p>The <tt class="docutils literal">do_sort_by_params</tt> makes sure that the passed parameter is in the allowed list
+and if yes
+it creates the atoms of the binding and field name (using <tt class="docutils literal">String.to_atom</tt>) and
+does the actual sorting to the passed&nbsp;query:</p>
+<div class="highlight"><pre><span></span><span class="kd">defp</span> <span class="n">do_sort_by_params</span><span class="p">(</span><span class="n">qs</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">ord</span><span class="p">,</span> <span class="n">allowed</span><span class="p">)</span> <span class="k">do</span>
+  <span class="k">if</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">allowed</span> <span class="k">do</span>
+    <span class="p">[</span><span class="n">binding</span><span class="p">,</span> <span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span> <span class="o">|&gt;</span> <span class="nc">String</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;__&quot;</span><span class="p">)</span> <span class="o">|&gt;</span> <span class="nc">Enum</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="o">&amp;</span><span class="nc">String</span><span class="o">.</span><span class="n">to_atom</span><span class="o">/</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">qs</span> <span class="o">|&gt;</span> <span class="n">order_by</span><span class="p">([{</span><span class="o">^</span><span class="n">binding</span><span class="p">,</span> <span class="n">t</span><span class="p">}],</span> <span class="p">[{</span><span class="o">^</span><span class="n">ord</span><span class="p">,</span> <span class="n">field</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="o">^</span><span class="n">name</span><span class="p">)}])</span>
+  <span class="k">else</span>
+    <span class="n">qs</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+<p>The line <tt class="docutils literal">qs |&gt; <span class="pre">order_by([{^binding,</span> <span class="pre">t}],</span> <span class="pre">[{^ord,</span> field(t, <span class="pre">^name)}])</span></tt> may seem a little
+complex but it has been thoroughly explained in the previous&nbsp;article.</p>
+</div>
+</div>
+<div class="section" id="conclusion">
+<h2>Conclusion</h2>
+<p>By using the methods described here you can easily add a dynamic sorting to your queries
+through fields that may span relations just by creating a bunch of http <span class="caps">GET</span> links
+and passing them an <tt class="docutils literal">order_by</tt> query&nbsp;parameter.</p>
+</div>
+</div>
+  		</article>
+  		<article>
+<header>
+      <h1 class="entry-title">
         <a href="https://spapas.github.io/2019/10/03/html-form-submit-php/">How to properly handle an HTML form</a>
       </h1>
     <p class="meta">
@@ -1184,170 +1437,6 @@ discussed you can pass something more complex here. The <tt class="docutils lite
 </div>
 </div>
   		</article>
-  		<article>
-<header>
-      <h1 class="entry-title">
-        <a href="https://spapas.github.io/2019/02/25/django-fix-async-db/">Fixing your Django async job - database integration</a>
-      </h1>
-    <p class="meta">
-<time datetime="2019-02-25T15:20:00+02:00" pubdate>Δευ 25 Φεβρουάριος 2019</time>    </p>
-</header>
-
-<div class="entry-content"><p>I&#8217;ve already written
-<a class="reference external" href="https://spapas.github.io/2015/01/27/async-tasks-with-django-rq/">two</a>
-<a class="reference external" href="https://spapas.github.io/2015/09/01/django-rq-redux/">articles</a>
-about django-rq and implementing asynchronous tasks in Django. However I&#8217;ve found out
-that there&#8217;s a very important thing missing from them: How to properly integrate
-your asynchronous tasks with your Django database. This is very important because
-if it is not done right you will start experiencing strange errors about missing
-database objects or duplicate keys. The most troublesome thing about these errors is
-that they are not consistent. Your app may work fine but for some reason you&#8217;ll see some
-of your asynchronous tasks fail with these errors. When you re-queue the async jobs everything will
-be&nbsp;ok.</p>
-<p>Of course this behavior (code that runs <em>sometimes</em>) smells of a race condition but its not easy to debug
-it if you don&#8217;t know the full&nbsp;story.</p>
-<p>In the following I will describe the cause of this error and how you can fix it. As a companion
-to this article I&#8217;ve implemented a small project that can be used to test the error and the
-fix: <a class="reference external" href="https://github.com/spapas/async-job-db-fix">https://github.com/spapas/async-job-db-fix</a>.</p>
-<p>Notice that although this article is written for django-rq it should also help people that have
-the same problems with other async job systems (like celery or&nbsp;django-q).</p>
-<div class="section" id="description-of-the-project">
-<h2>Description of the&nbsp;project</h2>
-<p>The project is very simple, you can just add a url and it will retrieve its content asynchronously and
-report its length. For the models, it just has a <tt class="docutils literal">Task</tt> model which is used to provide information about
-what we want to the asynchronous task to do and retrieve the&nbsp;result:</p>
-<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
-
-<span class="k">class</span> <span class="nc">Task</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
-    <span class="n">created_on</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">auto_now_add</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-    <span class="n">url</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
-    <span class="n">url_length</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">PositiveIntegerField</span><span class="p">(</span><span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-    <span class="n">job_id</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-</pre></div>
-<p>It also has a home view that can be used to start new asynchronous tasks by creating a <tt class="docutils literal">Task</tt> object
-with the url we got and passing it to the asynchronous&nbsp;task:</p>
-<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">django.views.generic.edit</span> <span class="kn">import</span> <span class="n">FormView</span>
-<span class="kn">from</span> <span class="nn">.forms</span> <span class="kn">import</span> <span class="n">TaskForm</span>
-<span class="kn">from</span> <span class="nn">.tasks</span> <span class="kn">import</span> <span class="n">get_url_length</span>
-<span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">Task</span>
-
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">transaction</span>
-
-<span class="k">class</span> <span class="nc">TasksHomeFormView</span><span class="p">(</span><span class="n">FormView</span><span class="p">):</span>
-    <span class="n">form_class</span> <span class="o">=</span> <span class="n">TaskForm</span>
-    <span class="n">template_name</span> <span class="o">=</span> <span class="s1">&#39;tasks_home.html&#39;</span>
-    <span class="n">success_url</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span>
-
-    <span class="k">def</span> <span class="nf">form_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">):</span>
-        <span class="n">task</span> <span class="o">=</span> <span class="n">Task</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">])</span>
-        <span class="n">get_url_length</span><span class="o">.</span><span class="n">delay</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">TasksHomeFormView</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">form_valid</span><span class="p">(</span><span class="n">form</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">get_context_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">ctx</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TasksHomeFormView</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_context_data</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">ctx</span><span class="p">[</span><span class="s1">&#39;tasks&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Task</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;-created_on&#39;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">ctx</span>
-</pre></div>
-<p>And finally the asynchronous job itself that retrieves the task from the database,
-requests its url and saves its&nbsp;length:</p>
-<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
-<span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">Task</span>
-<span class="kn">from</span> <span class="nn">rq</span> <span class="kn">import</span> <span class="n">get_current_job</span>
-<span class="kn">from</span> <span class="nn">django_rq</span> <span class="kn">import</span> <span class="n">job</span>
-
-<span class="nd">@job</span>
-<span class="k">def</span> <span class="nf">get_url_length</span><span class="p">(</span><span class="n">task_id</span><span class="p">):</span>
-    <span class="n">jb</span> <span class="o">=</span> <span class="n">get_current_job</span><span class="p">()</span>
-    <span class="n">task</span> <span class="o">=</span> <span class="n">Task</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-        <span class="nb">id</span><span class="o">=</span><span class="n">task_id</span>
-    <span class="p">)</span>
-    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
-    <span class="n">task</span><span class="o">.</span><span class="n">url_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
-    <span class="n">task</span><span class="o">.</span><span class="n">job_id</span> <span class="o">=</span> <span class="n">jb</span><span class="o">.</span><span class="n">get_id</span><span class="p">()</span>
-    <span class="n">task</span><span class="o">.</span><span class="n">result</span> <span class="o">=</span> <span class="s1">&#39;OK&#39;</span>
-    <span class="n">task</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
-</pre></div>
-<p>The above should be fairly obvious: The user visits the homepage and enters a url at the input. When he presses submit
-the view will create a new <tt class="docutils literal">Task</tt> object with the url that the user entered and fire-off the <tt class="docutils literal">get_url_length</tt> asynchronous job passing the
-task id of the task that was just created. It will then return immediately without waiting for the asynchronous job to complete. The user will
-need to refresh to see the result of his job; this is the usual behavior with async&nbsp;jobs.</p>
-<p>The asynchronous job on the other hand will retrieve the task whose id got as a parameter from the database, do the work it needs to do
-and update the result when it is&nbsp;finished.</p>
-<p>Unfortunately, the above simple setup will <em>probably</em> behave erratically by randomly throwing database related&nbsp;errors!</p>
-</div>
-<div class="section" id="cause-of-the-problem">
-<h2>Cause of the&nbsp;problem</h2>
-<p>In the previous section I said <em>probably</em> because the erratic behavior is caused by a specific setting of your Django project; the <tt class="docutils literal">ATOMIC_REQUESTS</tt>.
-This setting can be set on your database connection and if it is <tt class="docutils literal"><span class="caps">TRUE</span></tt> then each request will be <em>atomic</em>. This means that each request will be tied with
-a database transaction i.e a transaction will be started when your request starts and commited only when your requests finishes; if for some reason your
-request throws an error then the transaction will be rolled back. An example of this setting&nbsp;is:</p>
-<div class="highlight"><pre><span></span><span class="n">DATABASES</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s1">&#39;ENGINE&#39;</span><span class="p">:</span> <span class="s1">&#39;django.db.backends.sqlite3&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;NAME&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">BASE_DIR</span><span class="p">,</span> <span class="s1">&#39;db.sqlite3&#39;</span><span class="p">),</span>
-        <span class="s1">&#39;ATOMIC_REQUESTS&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-<p>Now, in my opinion, <tt class="docutils literal">ATOMIC_REQUESTS</tt> is a great thing to have because it makes everything much easier. I always set it to <tt class="docutils literal">True</tt> to my projects because
-I don&#8217;t need to actually think about transactions and requests; I know that if there&#8217;s a problem in a request the whole transaction will be rolle back and no
-garbage will be left in the database. If on the other hand for some reason a request does not need to be tied to a transaction I just set it off
-for this specific transaction (using <cite>transaction.non_atomic_requests_</cite>). Please notice that by default the <tt class="docutils literal">ATOMIC_REQUESTS</tt> has a <tt class="docutils literal">False</tt> value which means that
-the database will be in autocommit mode meaning that every command will be executed&nbsp;immediately.</p>
-<p>So although the <tt class="docutils literal">ATOMIC_REQUESTS</tt> is great, it is actually the reason that there are problems with asynchronous tasks. Why? Let&#8217;s take a closer look at what the <tt class="docutils literal">form_valid</tt> of the view&nbsp;does:</p>
-<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">form_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">):</span>
-    <span class="n">task</span> <span class="o">=</span> <span class="n">Task</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">])</span> <span class="c1">#1</span>
-    <span class="n">get_url_length</span><span class="o">.</span><span class="n">delay</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="c1">#2</span>
-    <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">TasksHomeFormView</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">form_valid</span><span class="p">(</span><span class="n">form</span><span class="p">)</span> <span class="c1">#3</span>
-</pre></div>
-<p>It creates the task in #1, fires off the asynchronous task in #2 and continues the execution of the view processing in #3. The important thing to understand
-here is that the transaction will be commited <em>only after #3</em> is finished. This means that there&#8217;s a possibility that the asynchronous task will be started
-before #3 is finished thus it won&#8217;t find the task because the task will <em>not</em> be created yet(!) This is a little counter-intuitive but you must remember
-that the async task is run by a worker which is a different process than your application server; the worker may be able to start before the transaction is&nbsp;commited.</p>
-<p>If you want to actually see the problem <em>every time</em> you can add a small delay between the start of the async task and the <tt class="docutils literal">form_valid</tt> something like&nbsp;this:</p>
-<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">form_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">):</span>
-    <span class="n">task</span> <span class="o">=</span> <span class="n">Task</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">])</span>
-    <span class="n">get_url_length</span><span class="o">.</span><span class="n">delay</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
-    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-    <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">TasksHomeFormView</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">form_valid</span><span class="p">(</span><span class="n">form</span><span class="p">)</span>
-</pre></div>
-<p>This will make the view more slow so the asynchronous worker will always have time to start executing the task (and get the not found error). Also notice
-that if you had <tt class="docutils literal">ATOMIC_REQUESTS: False</tt> the above code would work fine because the task would be created immediately (auto-commited) and the async job would be able to find&nbsp;it.</p>
-</div>
-<div class="section" id="the-solution">
-<h2>The&nbsp;solution</h2>
-<p>So how is this problem solved? Well it&#8217;s not that difficult now that you know what&#8217;s causing&nbsp;it!</p>
-<p>One solution would be to set <tt class="docutils literal">ATOMIC_REQUESTS</tt> to <tt class="docutils literal">False</tt> but that would make all database commands auto-commit so you&#8217;ll lose
-request-transaction-tieing. Another solution would be to set <tt class="docutils literal">ATOMIC_REQUESTS</tt> to <tt class="docutils literal">True</tt> and disable atomic requests for the specific view that starts the
-asynchronous job using <cite>transaction.non_atomic_requests_</cite>. This is a viable solution however I don&#8217;t like it because I&#8217;d lose the comfort of transaction per request
-for this specific request and I would need to add my own transaction&nbsp;handling.</p>
-<p>A third solution is to avoid messing with the database in your view and create the task object in the async job. Any parameters you want to pass to the async job would be
-passed directly to the async function. This may work fine in some cases but I find it more safe to create the task in the database before starting the async job so that
-I have better control and error handling. This way even if there&#8217;s an error in my worker and for some reason the async job never starts or it breaks before being able to
-handle the database, I will have the task object in the database because it will have been created in the&nbsp;view.</p>
-<p>Is there anything better? Isn&#8217;t there a way to start the executing the async job <em>after</em> the transaction of the
-view is commited? Actually yes, there is! For this, <a class="reference external" href="https://docs.djangoproject.com/en/2.1/topics/db/transactions/#django.db.transaction.on_commit">transaction.on_commit</a> comes to the rescue! This function
-receives a callback that will be called after the transaction is commited! Thus, to properly fix you project, you should
-change the <tt class="docutils literal">form_valid</tt> method like&nbsp;this:</p>
-<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">form_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">):</span>
-    <span class="n">task</span> <span class="o">=</span> <span class="n">Task</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">])</span>
-    <span class="n">transaction</span><span class="o">.</span><span class="n">on_commit</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">get_url_length</span><span class="o">.</span><span class="n">delay</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
-    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-    <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">TasksHomeFormView</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">form_valid</span><span class="p">(</span><span class="n">form</span><span class="p">)</span>
-</pre></div>
-<p>Notice that I need to use <tt class="docutils literal">lambda</tt> to create a callback function that will call <tt class="docutils literal">get_url_length.delay(task.id)</tt> when the transaction is commited. Now
-even though I have the delay there the async job will start after the transaction is commited, ie after the view handler is finished (after the 1 second&nbsp;delay).</p>
-</div>
-<div class="section" id="conclusion">
-<h2>Conclusion</h2>
-<p>From the above you should be able to understand why sometimes you have problems when your async jobs use the database. To fix it you have various
-options but at least for me, the best solution is to start your async jobs <em>after</em> the transaction is commited using <tt class="docutils literal">transaction.on_commit</tt>. Just
-change each <tt class="docutils literal">async.job.delay(parameters)</tt> call to <tt class="docutils literal">transaction.on_commit(lambda: async.job.delay(parameters))</tt> and you will be&nbsp;fine!</p>
-</div>
-</div>
-  		</article>
 <div class="pagination">
     <a class="prev" href="https://spapas.github.io/index3.html">&larr; Older</a>
 
@@ -1462,6 +1551,9 @@ change each <tt class="docutils literal">async.job.delay(parameters)</tt> call t
     <h1>Recent Posts</h1>
     <ul id="recent_posts">
       <li class="post">
+        <a href="https://spapas.github.io/2021/01/07/django-hashides/">Using hashids to hide ids of objects in Django</a>
+      </li>
+      <li class="post">
         <a href="https://spapas.github.io/2020/09/18/wagtail-add-posts-timeline/">Adding a timeline of your wagtail Posts</a>
       </li>
       <li class="post">
@@ -1472,9 +1564,6 @@ change each <tt class="docutils literal">async.job.delay(parameters)</tt> call t
       </li>
       <li class="post">
         <a href="https://spapas.github.io/2020/03/18/django-crispy-form-quick-easy-layout/">Quick and easy layout of django forms using django-crispy-forms and django-widget-tweaks</a>
-      </li>
-      <li class="post">
-        <a href="https://spapas.github.io/2019/10/17/declarative-ecto-query-sorting/">Declarative Ecto query sorting</a>
       </li>
     </ul>
   </section>
@@ -1501,11 +1590,11 @@ change each <tt class="docutils literal">async.job.delay(parameters)</tt> call t
 
   <section>
     <h1>Tags</h1>
-    <a href="https://spapas.github.io/tag/less.html">less</a>,    <a href="https://spapas.github.io/tag/django-crispy-forms.html">django-crispy-forms</a>,    <a href="https://spapas.github.io/tag/rest.html">rest</a>,    <a href="https://spapas.github.io/tag/query.html">query</a>,    <a href="https://spapas.github.io/tag/ecto.html">ecto</a>,    <a href="https://spapas.github.io/tag/tables.html">tables</a>,    <a href="https://spapas.github.io/tag/pivot_table.html">pivot_table</a>,    <a href="https://spapas.github.io/tag/console.html">console</a>,    <a href="https://spapas.github.io/tag/async.html">async</a>,    <a href="https://spapas.github.io/tag/django-rq.html">django-rq</a>,    <a href="https://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="https://spapas.github.io/tag/forms.html">forms</a>,    <a href="https://spapas.github.io/tag/yaml.html">yaml</a>,    <a href="https://spapas.github.io/tag/404.html">404</a>,    <a href="https://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="https://spapas.github.io/tag/erlang.html">erlang</a>,    <a href="https://spapas.github.io/tag/immutable.html">immutable</a>,    <a href="https://spapas.github.io/tag/initd.html">init.d</a>,    <a href="https://spapas.github.io/tag/django-widget-tweaks.html">django-widget-tweaks</a>,    <a href="https://spapas.github.io/tag/youtube-dl.html">youtube-dl</a>,    <a href="https://spapas.github.io/tag/python.html">python</a>,    <a href="https://spapas.github.io/tag/django-extensions.html">django-extensions</a>,    <a href="https://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="https://spapas.github.io/tag/scipy.html">scipy</a>,    <a href="https://spapas.github.io/tag/grid.html">grid</a>,    <a href="https://spapas.github.io/tag/ag-grid.html">ag-grid</a>,    <a href="https://spapas.github.io/tag/du.html">du</a>,    <a href="https://spapas.github.io/tag/watchify.html">watchify</a>,    <a href="https://spapas.github.io/tag/settings.html">settings</a>,    <a href="https://spapas.github.io/tag/flux.html">flux</a>,    <a href="https://spapas.github.io/tag/fixeddatatable.html">FixedDataTable</a>,    <a href="https://spapas.github.io/tag/queries.html">queries</a>,    <a href="https://spapas.github.io/tag/debug.html">debug</a>,    <a href="https://spapas.github.io/tag/imgur.html">imgur</a>,    <a href="https://spapas.github.io/tag/security.html">security</a>,    <a href="https://spapas.github.io/tag/npm.html">npm</a>,    <a href="https://spapas.github.io/tag/hyperapp.html">hyperapp</a>,    <a href="https://spapas.github.io/tag/spring.html">spring</a>,    <a href="https://spapas.github.io/tag/react-redux.html">react-redux</a>,    <a href="https://spapas.github.io/tag/cron.html">cron</a>,    <a href="https://spapas.github.io/tag/babelify.html">babelify</a>,    <a href="https://spapas.github.io/tag/design.html">design</a>,    <a href="https://spapas.github.io/tag/tutorial.html">tutorial</a>,    <a href="https://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="https://spapas.github.io/tag/reportlab.html">reportlab</a>,    <a href="https://spapas.github.io/tag/rq.html">rq</a>,    <a href="https://spapas.github.io/tag/redis.html">redis</a>,    <a href="https://spapas.github.io/tag/python-3.html">python-3</a>,    <a href="https://spapas.github.io/tag/research.html">research</a>,    <a href="https://spapas.github.io/tag/werkzeug.html">werkzeug</a>,    <a href="https://spapas.github.io/tag/jobs.html">jobs</a>,    <a href="https://spapas.github.io/tag/redux-thunk.html">redux-thunk</a>,    <a href="https://spapas.github.io/tag/disk-usage.html">disk-usage</a>,    <a href="https://spapas.github.io/tag/javascript.html">javascript</a>,    <a href="https://spapas.github.io/tag/component.html">component</a>,    <a href="https://spapas.github.io/tag/ajax.html">ajax</a>,    <a href="https://spapas.github.io/tag/elixir.html">elixir</a>,    <a href="https://spapas.github.io/tag/ipython.html">ipython</a>,    <a href="https://spapas.github.io/tag/uglify.html">uglify</a>,    <a href="https://spapas.github.io/tag/configuration.html">configuration</a>,    <a href="https://spapas.github.io/tag/properties.html">properties</a>,    <a href="https://spapas.github.io/tag/bash.html">bash</a>,    <a href="https://spapas.github.io/tag/es6.html">es6</a>,    <a href="https://spapas.github.io/tag/spring-boot.html">spring-boot</a>,    <a href="https://spapas.github.io/tag/postgresql.html">postgresql</a>,    <a href="https://spapas.github.io/tag/kotlin.html">kotlin</a>,    <a href="https://spapas.github.io/tag/adapter.html">adapter</a>,    <a href="https://spapas.github.io/tag/filter.html">filter</a>,    <a href="https://spapas.github.io/tag/flask.html">flask</a>,    <a href="https://spapas.github.io/tag/notebook.html">notebook</a>,    <a href="https://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="https://spapas.github.io/tag/pdf.html">pdf</a>,    <a href="https://spapas.github.io/tag/react-notification.html">react-notification</a>,    <a href="https://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="https://spapas.github.io/tag/tasks.html">tasks</a>,    <a href="https://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="https://spapas.github.io/tag/unix.html">unix</a>,    <a href="https://spapas.github.io/tag/google.html">google</a>,    <a href="https://spapas.github.io/tag/linux.html">linux</a>,    <a href="https://spapas.github.io/tag/pivot.html">pivot</a>,    <a href="https://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="https://spapas.github.io/tag/git.html">git</a>,    <a href="https://spapas.github.io/tag/java.html">java</a>,    <a href="https://spapas.github.io/tag/introduction.html">introduction</a>,    <a href="https://spapas.github.io/tag/pusher.html">pusher</a>,    <a href="https://spapas.github.io/tag/fixed-data-tables.html">fixed-data-tables</a>,    <a href="https://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="https://spapas.github.io/tag/xhtml2pdf.html">xhtml2pdf</a>,    <a href="https://spapas.github.io/tag/numpy.html">numpy</a>,    <a href="https://spapas.github.io/tag/form.html">form</a>,    <a href="https://spapas.github.io/tag/django-rest-auth.html">django-rest-auth</a>,    <a href="https://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="https://spapas.github.io/tag/rst.html">rst</a>,    <a href="https://spapas.github.io/tag/python-2.html">python-2</a>,    <a href="https://spapas.github.io/tag/ffmpeg.html">ffmpeg</a>,    <a href="https://spapas.github.io/tag/middleware.html">middleware</a>,    <a href="https://spapas.github.io/tag/profiles.html">profiles</a>,    <a href="https://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="https://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="https://spapas.github.io/tag/error.html">error</a>,    <a href="https://spapas.github.io/tag/asynchronous.html">asynchronous</a>,    <a href="https://spapas.github.io/tag/react-router-redux.html">react-router-redux</a>,    <a href="https://spapas.github.io/tag/select2.html">select2</a>,    <a href="https://spapas.github.io/tag/history.html">history</a>,    <a href="https://spapas.github.io/tag/django-rest-framework.html">django-rest-framework</a>,    <a href="https://spapas.github.io/tag/redux-form.html">redux-form</a>,    <a href="https://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="https://spapas.github.io/tag/scheduling.html">scheduling</a>,    <a href="https://spapas.github.io/tag/plpgsql.html">plpgsql</a>,    <a href="https://spapas.github.io/tag/os-monitoring.html">os-monitoring</a>,    <a href="https://spapas.github.io/tag/boilerplate.html">boilerplate</a>,    <a href="https://spapas.github.io/tag/generic.html">generic</a>,    <a href="https://spapas.github.io/tag/babel.html">babel</a>,    <a href="https://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="https://spapas.github.io/tag/html.html">html</a>,    <a href="https://spapas.github.io/tag/android.html">android</a>,    <a href="https://spapas.github.io/tag/pandas.html">pandas</a>,    <a href="https://spapas.github.io/tag/css.html">css</a>,    <a href="https://spapas.github.io/tag/node.html">node</a>,    <a href="https://spapas.github.io/tag/phoenix.html">phoenix</a>,    <a href="https://spapas.github.io/tag/deploy.html">deploy</a>,    <a href="https://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="https://spapas.github.io/tag/react.html">react</a>,    <a href="https://spapas.github.io/tag/autocompelte.html">autocompelte</a>,    <a href="https://spapas.github.io/tag/declarative.html">declarative</a>,    <a href="https://spapas.github.io/tag/osmon.html">osmon</a>,    <a href="https://spapas.github.io/tag/php.html">php</a>,    <a href="https://spapas.github.io/tag/browserify.html">browserify</a>,    <a href="https://spapas.github.io/tag/branching.html">branching</a>,    <a href="https://spapas.github.io/tag/github.html">github</a>,    <a href="https://spapas.github.io/tag/jupyter.html">jupyter</a>,    <a href="https://spapas.github.io/tag/windows.html">windows</a>,    <a href="https://spapas.github.io/tag/youtube.html">youtube</a>,    <a href="https://spapas.github.io/tag/django.html">django</a>,    <a href="https://spapas.github.io/tag/q.html">q</a>,    <a href="https://spapas.github.io/tag/react-router.html">react-router</a>,    <a href="https://spapas.github.io/tag/redux.html">redux</a>,    <a href="https://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>  </section>
+    <a href="https://spapas.github.io/tag/less.html">less</a>,    <a href="https://spapas.github.io/tag/django-crispy-forms.html">django-crispy-forms</a>,    <a href="https://spapas.github.io/tag/rest.html">rest</a>,    <a href="https://spapas.github.io/tag/query.html">query</a>,    <a href="https://spapas.github.io/tag/ecto.html">ecto</a>,    <a href="https://spapas.github.io/tag/tables.html">tables</a>,    <a href="https://spapas.github.io/tag/pivot_table.html">pivot_table</a>,    <a href="https://spapas.github.io/tag/console.html">console</a>,    <a href="https://spapas.github.io/tag/async.html">async</a>,    <a href="https://spapas.github.io/tag/django-rq.html">django-rq</a>,    <a href="https://spapas.github.io/tag/hashids.html">hashids</a>,    <a href="https://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="https://spapas.github.io/tag/forms.html">forms</a>,    <a href="https://spapas.github.io/tag/yaml.html">yaml</a>,    <a href="https://spapas.github.io/tag/404.html">404</a>,    <a href="https://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="https://spapas.github.io/tag/erlang.html">erlang</a>,    <a href="https://spapas.github.io/tag/immutable.html">immutable</a>,    <a href="https://spapas.github.io/tag/initd.html">init.d</a>,    <a href="https://spapas.github.io/tag/django-widget-tweaks.html">django-widget-tweaks</a>,    <a href="https://spapas.github.io/tag/youtube-dl.html">youtube-dl</a>,    <a href="https://spapas.github.io/tag/python.html">python</a>,    <a href="https://spapas.github.io/tag/django-extensions.html">django-extensions</a>,    <a href="https://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="https://spapas.github.io/tag/scipy.html">scipy</a>,    <a href="https://spapas.github.io/tag/grid.html">grid</a>,    <a href="https://spapas.github.io/tag/ag-grid.html">ag-grid</a>,    <a href="https://spapas.github.io/tag/du.html">du</a>,    <a href="https://spapas.github.io/tag/watchify.html">watchify</a>,    <a href="https://spapas.github.io/tag/settings.html">settings</a>,    <a href="https://spapas.github.io/tag/flux.html">flux</a>,    <a href="https://spapas.github.io/tag/fixeddatatable.html">FixedDataTable</a>,    <a href="https://spapas.github.io/tag/queries.html">queries</a>,    <a href="https://spapas.github.io/tag/debug.html">debug</a>,    <a href="https://spapas.github.io/tag/imgur.html">imgur</a>,    <a href="https://spapas.github.io/tag/security.html">security</a>,    <a href="https://spapas.github.io/tag/npm.html">npm</a>,    <a href="https://spapas.github.io/tag/hyperapp.html">hyperapp</a>,    <a href="https://spapas.github.io/tag/spring.html">spring</a>,    <a href="https://spapas.github.io/tag/react-redux.html">react-redux</a>,    <a href="https://spapas.github.io/tag/cron.html">cron</a>,    <a href="https://spapas.github.io/tag/babelify.html">babelify</a>,    <a href="https://spapas.github.io/tag/design.html">design</a>,    <a href="https://spapas.github.io/tag/tutorial.html">tutorial</a>,    <a href="https://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="https://spapas.github.io/tag/reportlab.html">reportlab</a>,    <a href="https://spapas.github.io/tag/rq.html">rq</a>,    <a href="https://spapas.github.io/tag/redis.html">redis</a>,    <a href="https://spapas.github.io/tag/python-3.html">python-3</a>,    <a href="https://spapas.github.io/tag/research.html">research</a>,    <a href="https://spapas.github.io/tag/werkzeug.html">werkzeug</a>,    <a href="https://spapas.github.io/tag/jobs.html">jobs</a>,    <a href="https://spapas.github.io/tag/redux-thunk.html">redux-thunk</a>,    <a href="https://spapas.github.io/tag/disk-usage.html">disk-usage</a>,    <a href="https://spapas.github.io/tag/javascript.html">javascript</a>,    <a href="https://spapas.github.io/tag/component.html">component</a>,    <a href="https://spapas.github.io/tag/ajax.html">ajax</a>,    <a href="https://spapas.github.io/tag/elixir.html">elixir</a>,    <a href="https://spapas.github.io/tag/ipython.html">ipython</a>,    <a href="https://spapas.github.io/tag/uglify.html">uglify</a>,    <a href="https://spapas.github.io/tag/configuration.html">configuration</a>,    <a href="https://spapas.github.io/tag/properties.html">properties</a>,    <a href="https://spapas.github.io/tag/bash.html">bash</a>,    <a href="https://spapas.github.io/tag/es6.html">es6</a>,    <a href="https://spapas.github.io/tag/spring-boot.html">spring-boot</a>,    <a href="https://spapas.github.io/tag/postgresql.html">postgresql</a>,    <a href="https://spapas.github.io/tag/kotlin.html">kotlin</a>,    <a href="https://spapas.github.io/tag/adapter.html">adapter</a>,    <a href="https://spapas.github.io/tag/filter.html">filter</a>,    <a href="https://spapas.github.io/tag/flask.html">flask</a>,    <a href="https://spapas.github.io/tag/notebook.html">notebook</a>,    <a href="https://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="https://spapas.github.io/tag/pdf.html">pdf</a>,    <a href="https://spapas.github.io/tag/react-notification.html">react-notification</a>,    <a href="https://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="https://spapas.github.io/tag/tasks.html">tasks</a>,    <a href="https://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="https://spapas.github.io/tag/unix.html">unix</a>,    <a href="https://spapas.github.io/tag/google.html">google</a>,    <a href="https://spapas.github.io/tag/linux.html">linux</a>,    <a href="https://spapas.github.io/tag/pivot.html">pivot</a>,    <a href="https://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="https://spapas.github.io/tag/git.html">git</a>,    <a href="https://spapas.github.io/tag/java.html">java</a>,    <a href="https://spapas.github.io/tag/introduction.html">introduction</a>,    <a href="https://spapas.github.io/tag/pusher.html">pusher</a>,    <a href="https://spapas.github.io/tag/fixed-data-tables.html">fixed-data-tables</a>,    <a href="https://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="https://spapas.github.io/tag/xhtml2pdf.html">xhtml2pdf</a>,    <a href="https://spapas.github.io/tag/numpy.html">numpy</a>,    <a href="https://spapas.github.io/tag/form.html">form</a>,    <a href="https://spapas.github.io/tag/django-rest-auth.html">django-rest-auth</a>,    <a href="https://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="https://spapas.github.io/tag/rst.html">rst</a>,    <a href="https://spapas.github.io/tag/python-2.html">python-2</a>,    <a href="https://spapas.github.io/tag/ffmpeg.html">ffmpeg</a>,    <a href="https://spapas.github.io/tag/middleware.html">middleware</a>,    <a href="https://spapas.github.io/tag/profiles.html">profiles</a>,    <a href="https://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="https://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="https://spapas.github.io/tag/error.html">error</a>,    <a href="https://spapas.github.io/tag/asynchronous.html">asynchronous</a>,    <a href="https://spapas.github.io/tag/react-router-redux.html">react-router-redux</a>,    <a href="https://spapas.github.io/tag/select2.html">select2</a>,    <a href="https://spapas.github.io/tag/history.html">history</a>,    <a href="https://spapas.github.io/tag/django-rest-framework.html">django-rest-framework</a>,    <a href="https://spapas.github.io/tag/redux-form.html">redux-form</a>,    <a href="https://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="https://spapas.github.io/tag/scheduling.html">scheduling</a>,    <a href="https://spapas.github.io/tag/plpgsql.html">plpgsql</a>,    <a href="https://spapas.github.io/tag/os-monitoring.html">os-monitoring</a>,    <a href="https://spapas.github.io/tag/boilerplate.html">boilerplate</a>,    <a href="https://spapas.github.io/tag/generic.html">generic</a>,    <a href="https://spapas.github.io/tag/babel.html">babel</a>,    <a href="https://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="https://spapas.github.io/tag/html.html">html</a>,    <a href="https://spapas.github.io/tag/android.html">android</a>,    <a href="https://spapas.github.io/tag/pandas.html">pandas</a>,    <a href="https://spapas.github.io/tag/css.html">css</a>,    <a href="https://spapas.github.io/tag/node.html">node</a>,    <a href="https://spapas.github.io/tag/phoenix.html">phoenix</a>,    <a href="https://spapas.github.io/tag/deploy.html">deploy</a>,    <a href="https://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="https://spapas.github.io/tag/react.html">react</a>,    <a href="https://spapas.github.io/tag/autocompelte.html">autocompelte</a>,    <a href="https://spapas.github.io/tag/declarative.html">declarative</a>,    <a href="https://spapas.github.io/tag/osmon.html">osmon</a>,    <a href="https://spapas.github.io/tag/php.html">php</a>,    <a href="https://spapas.github.io/tag/browserify.html">browserify</a>,    <a href="https://spapas.github.io/tag/branching.html">branching</a>,    <a href="https://spapas.github.io/tag/github.html">github</a>,    <a href="https://spapas.github.io/tag/jupyter.html">jupyter</a>,    <a href="https://spapas.github.io/tag/windows.html">windows</a>,    <a href="https://spapas.github.io/tag/youtube.html">youtube</a>,    <a href="https://spapas.github.io/tag/django.html">django</a>,    <a href="https://spapas.github.io/tag/q.html">q</a>,    <a href="https://spapas.github.io/tag/react-router.html">react-router</a>,    <a href="https://spapas.github.io/tag/redux.html">redux</a>,    <a href="https://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>  </section>
 
   <section>
     <h1>Yearly archives</h1>
-    <a href="https://spapas.github.io/posts/2013/">2013</a>,    <a href="https://spapas.github.io/posts/2014/">2014</a>,    <a href="https://spapas.github.io/posts/2015/">2015</a>,    <a href="https://spapas.github.io/posts/2016/">2016</a>,    <a href="https://spapas.github.io/posts/2017/">2017</a>,    <a href="https://spapas.github.io/posts/2018/">2018</a>,    <a href="https://spapas.github.io/posts/2019/">2019</a>,    <a href="https://spapas.github.io/posts/2020/">2020</a>  </section>
+    <a href="https://spapas.github.io/posts/2013/">2013</a>,    <a href="https://spapas.github.io/posts/2014/">2014</a>,    <a href="https://spapas.github.io/posts/2015/">2015</a>,    <a href="https://spapas.github.io/posts/2016/">2016</a>,    <a href="https://spapas.github.io/posts/2017/">2017</a>,    <a href="https://spapas.github.io/posts/2018/">2018</a>,    <a href="https://spapas.github.io/posts/2019/">2019</a>,    <a href="https://spapas.github.io/posts/2020/">2020</a>,    <a href="https://spapas.github.io/posts/2021/">2021</a>  </section>
 
 
 
@@ -1549,7 +1638,7 @@ change each <tt class="docutils literal">async.job.delay(parameters)</tt> call t
 </aside>    </div>
   </div>
   <footer role="contentinfo"><p>
-    Copyright &copy;  2013&ndash;2020  Serafeim Papastefanos &mdash;
+    Copyright &copy;  2013&ndash;2021  Serafeim Papastefanos &mdash;
   <span class="credit">Powered by <a href="http://getpelican.com">Pelican</a></span>
 </p></footer>
   <script src="https://spapas.github.io/theme/js/modernizr-2.0.js"></script>

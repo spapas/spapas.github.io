@@ -112,6 +112,393 @@ border-radius: 5px;
   		<article>
 <header>
       <h1 class="entry-title">
+        <a href="https://spapas.github.io/2017/01/03/ag-grid-custom-components/">Creating custom components for ag-grid</a>
+      </h1>
+    <p class="meta">
+<time datetime="2017-01-03T09:55:00+02:00" pubdate>Τρι 03 Ιανουάριος 2017</time>    </p>
+</header>
+
+<div class="entry-content"><p>Recently I had to integrate an application with a javascript (client-side) excel-like grid. After some research
+I found out that <a class="reference external" href="https://www.ag-grid.com/">ag-grid</a> is (at least for me) the best javascript grid library. It has an open source version with a <span class="caps">MIT</span> license
+so it can safely be used by all your projects and a commercial, enteprise version that includes a bunch of
+extra features. The open source version should be sufficient for most projects however I really recommend
+buying the commercial version to support this very useful&nbsp;library.</p>
+<p>The greatest characteristic of ag-grid in my opinion is its openess and <span class="caps">API</span> that enables you to
+extend it to support all your needs! An example of this <span class="caps">API</span> will be presented in this article where
+I will implement two components that can be included in your&nbsp;grid:</p>
+<ul class="simple">
+<li>An array editor through which you will be able to create cells that can be used to insert a list of values. For example, if you have a grid of employees, you will be able to add a &#8220;children&#8221; cell that will contain the names of each employee&#8217;s children properly separated (one line per&nbsp;child)</li>
+<li>An object editor through which you will be able to create cells that can be used to insert flat objects. For example, for the grid of employees, you may add an &#8220;address&#8221; cell that, when edited will be expanded to seperate fields for Address, City, Zip code and&nbsp;Country.</li>
+</ul>
+<div class="section" id="a-common-ground">
+<h2>A common&nbsp;ground</h2>
+<p>First of all, let&#8217;s create a simple example that will act as a common ground for our&nbsp;components:</p>
+<div class="jsfiddle"><iframe width="100%" height="300" src="//jsfiddle.net/6vmvdmzj/6/embedded/js,resources,html,css,result/light/" allowfullscreen="allowfullscreen" frameborder="0"></iframe></div><p>As you can see, I have defined a bunch of columns for the grid and then create a new grid passing it the <tt class="docutils literal">myGrid</tt> div
+and the <tt class="docutils literal">gridOptions</tt> (which are kept to a minimum). Finally, there&#8217;s an event handler for button click that adds an
+empty&nbsp;row:</p>
+<div class="highlight"><pre><span></span><span class="kd">var</span> <span class="nx">columns</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="nx">headerName</span><span class="o">:</span> <span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="nx">field</span><span class="o">:</span> <span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="nx">width</span><span class="o">:</span> <span class="mi">50</span><span class="p">,</span> <span class="nx">editable</span><span class="o">:</span> <span class="kc">true</span>
+    <span class="p">},</span> <span class="p">{</span>
+        <span class="nx">headerName</span><span class="o">:</span> <span class="s1">&#39;Name&#39;</span><span class="p">,</span> <span class="nx">field</span><span class="o">:</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="nx">width</span><span class="o">:</span> <span class="mi">100</span><span class="p">,</span> <span class="nx">editable</span><span class="o">:</span> <span class="kc">true</span>
+    <span class="p">},</span> <span class="p">{</span>
+        <span class="nx">headerName</span><span class="o">:</span> <span class="s2">&quot;Address&quot;</span><span class="p">,</span> <span class="nx">field</span><span class="o">:</span> <span class="s2">&quot;address&quot;</span><span class="p">,</span> <span class="nx">width</span><span class="o">:</span> <span class="mi">200</span><span class="p">,</span> <span class="nx">editable</span><span class="o">:</span> <span class="kc">true</span>
+    <span class="p">},</span> <span class="p">{</span>
+        <span class="nx">headerName</span><span class="o">:</span> <span class="s2">&quot;Children&quot;</span><span class="p">,</span> <span class="nx">field</span><span class="o">:</span> <span class="s2">&quot;children&quot;</span><span class="p">,</span> <span class="nx">width</span><span class="o">:</span> <span class="mi">200</span><span class="p">,</span> <span class="nx">editable</span><span class="o">:</span> <span class="kc">true</span>
+    <span class="p">}</span>
+<span class="p">];</span>
+
+<span class="kd">var</span> <span class="nx">gridOptions</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="nx">columnDefs</span><span class="o">:</span> <span class="nx">columns</span><span class="p">,</span>
+    <span class="nx">rowData</span><span class="o">:</span> <span class="p">[]</span>
+<span class="p">};</span>
+
+<span class="k">new</span> <span class="nx">agGrid</span><span class="p">.</span><span class="nx">Grid</span><span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">&#39;#myGrid&#39;</span><span class="p">),</span> <span class="nx">gridOptions</span><span class="p">);</span>
+
+<span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">&#39;#addRow&#39;</span><span class="p">).</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s2">&quot;click&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">gridOptions</span><span class="p">.</span><span class="nx">api</span><span class="p">.</span><span class="nx">addItems</span><span class="p">([{}]);</span>
+<span class="p">});</span>
+</pre></div>
+<p>You may be able to edit both the address and the children of each employee in the above example however this is
+not intuitive. The editors will be able to enter any kind of address they want and add the children seperated by commas,
+spaces, dashes or whatever they want. Of course you could add validators to enforce some formatting for these fields
+however I think that using custom components has a much better user&nbsp;experience.</p>
+<p>Please notice that the above example along with the following components will be implemented in pure (no-framework) javascript. Integrating
+ag-grid with a javascript framework like angular or react in an <span class="caps">SPA</span> should not be difficult however I find it easier to adjust my <span class="caps">SPA</span>
+so that the grid component is seperate and does not need interoperability with other <span class="caps">SPA</span> components since all components like renderers
+and editors will be integrated to the&nbsp;grid!</p>
+<p>Also, using pure javascript for your
+custom components makes them faster than adding another layer of indirection through react as can be seen on the on <a class="reference external" href="https://www.ag-grid.com/best-react-data-grid/index.php">ag-grid react integration</a>:</p>
+<blockquote>
+If you do use React, be aware that you are adding an extra layer of indirection into ag-Grid. ag-Grid&#8217;s internal framework is already highly tuned to work incredibly fast and does not require React or anything else to make it faster. If you are looking for a lightning fast grid, even if you are using React and the ag-grid-react component, consider using plain ag-Grid Components (as explained on the pages for rendering etc) inside ag-Grid instead of creating React counterparts.</blockquote>
+</div>
+<div class="section" id="editors-and-renderers">
+<h2>Editors and&nbsp;renderers</h2>
+<p>A custom column in ag-grid actually has two distinctive parts: An object that is used for <a class="reference external" href="https://www.ag-grid.com/javascript-grid-cell-rendering/">rendering</a> and an object that is used
+for <a class="reference external" href="https://www.ag-grid.com/javascript-grid-cell-editing/">editing</a> the cell value. You can have columns with the built in editor and a custom renderer, columns with the built in renderer
+and a custom editor and cells with custom editors and rendererers. I urge you to read the <a class="reference external" href="https://www.ag-grid.com/documentation-main/documentation.php">documentation</a> on both renderers and
+editors in order to understand most of the decisions I have made for the implemented&nbsp;components.</p>
+<p>A renderer can&nbsp;be:</p>
+<ul class="simple">
+<li>a function that receives the value of the cell and returns either an <span class="caps">HTML</span> string or a complete <span class="caps">DOM</span>&nbsp;object</li>
+<li>a class that provides methods for returning the <span class="caps">HTML</span> string or <span class="caps">DOM</span> object for the&nbsp;cell</li>
+</ul>
+<p>The function is much easier to use however biting the bullet and providing a renderer class is better for non-trivial rendering.
+This is because the function will be called each time the cell needs to be <em>refreshed</em> (refer to the docs on what refreshing means)
+while, the class provides a specific <tt class="docutils literal">refresh()</tt> method that is called instead. This way, using the class you can generate the <span class="caps">DOM</span> structure
+for the cell once, when it is first created and then when its value changes you&#8217;ll only call its refresh method to update the value. We&#8217;ll
+see how this works&nbsp;later.</p>
+<p>An editor is a class that should provide methods for returning the <span class="caps">DOM</span> structure for the cell editing (for example an <tt class="docutils literal">&lt;input&gt;</tt> field)
+and the current value of the&nbsp;field.</p>
+<p>Both renderer and editor classes can be attached to columns using <tt class="docutils literal">cellEditor</tt> and <tt class="docutils literal">cellRenderer</tt> column properties. You also may
+pass per-column properties to each cell using the <tt class="docutils literal">cellEditorParams</tt> and <tt class="docutils literal">cellRendererParams</tt> propertie. For example, you may have
+a renderer for booleans that displays icons for true/false and you want to use different icons depending on the column type, or you
+may want to create a validation-editor that receives a function and accepts the value you enter only if the function returns true - the
+valid function could be different for different column&nbsp;types.</p>
+</div>
+<div class="section" id="creating-the-object-cell-editor">
+<h2>Creating the object cell&nbsp;editor</h2>
+<p>The first component we&#8217;ll present here is an object renderer/editor. This component will receiver a list of fields and will
+allow the user to edit them in a popup grouped together. Here&#8217;s a fiddle with the Address of each employee using the
+object editing&nbsp;component:</p>
+<div class="jsfiddle"><iframe width="100%" height="300" src="//jsfiddle.net/0o85uywr/4/embedded/js,resources,html,css,result/light/" allowfullscreen="allowfullscreen" frameborder="0"></iframe></div><p>To integrate it with the ag-grid I&#8217;ve added an addressFields list containg the fields of the object like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><span class="kd">var</span> <span class="nx">addressFields</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="o">:</span> <span class="s1">&#39;address&#39;</span><span class="p">,</span> <span class="s1">&#39;label&#39;</span><span class="o">:</span> <span class="s1">&#39;Address&#39;</span> <span class="p">},</span>
+  <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="o">:</span> <span class="s1">&#39;zip&#39;</span><span class="p">,</span> <span class="s1">&#39;label&#39;</span><span class="o">:</span> <span class="s1">&#39;ZIP&#39;</span> <span class="p">},</span>
+  <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="o">:</span> <span class="s1">&#39;city&#39;</span><span class="p">,</span> <span class="s1">&#39;label&#39;</span><span class="o">:</span> <span class="s1">&#39;City&#39;</span> <span class="p">},</span>
+<span class="p">]</span>
+</pre></div>
+<p>and then passed this as a parameter to both the renderer and editor for the address&nbsp;field:</p>
+<div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nx">headerName</span><span class="o">:</span> <span class="s2">&quot;Address&quot;</span><span class="p">,</span> <span class="nx">field</span><span class="o">:</span> <span class="s2">&quot;address&quot;</span><span class="p">,</span> <span class="nx">width</span><span class="o">:</span> <span class="mi">200</span><span class="p">,</span> <span class="nx">editable</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="nx">cellRenderer</span><span class="o">:</span> <span class="nx">ObjectCellRenderer</span><span class="p">,</span>
+    <span class="nx">cellEditor</span><span class="o">:</span> <span class="nx">ObjectEditor</span><span class="p">,</span>
+    <span class="nx">cellEditorParams</span><span class="o">:</span> <span class="p">{</span>
+      <span class="nx">fields</span><span class="o">:</span> <span class="nx">addressFields</span>
+    <span class="p">},</span>
+    <span class="nx">cellRendererParams</span><span class="o">:</span> <span class="p">{</span>
+      <span class="nx">fields</span><span class="o">:</span> <span class="nx">addressFields</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+<p>The <tt class="docutils literal">ObjectEditor</tt> and <tt class="docutils literal">ObjectCellRenderer</tt> are the actual editor and renderer of the component. I will start by representing the renderer&nbsp;first:</p>
+<div class="highlight"><pre><span></span><span class="kd">function</span> <span class="nx">ObjectCellRenderer</span><span class="p">()</span> <span class="p">{}</span>
+
+<span class="nx">ObjectCellRenderer</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">init</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">params</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// Create the DOM element to display</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">span</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">&#39;span&#39;</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">span</span><span class="p">.</span><span class="nx">innerHTML</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">refresh</span><span class="p">(</span><span class="nx">params</span><span class="p">)</span>
+<span class="p">};</span>
+</pre></div>
+<p>The ObjectCellRender is an javascript object to which we define an <tt class="docutils literal">init</tt> method. This method will be called by ag-grid when
+the component is first created, passing it a params object with various useful params, like the user-defined parameters (from <tt class="docutils literal">cellRendererParams</tt>)
+and the actual value of othe cell. We just create an empty span <span class="caps">DOM</span> element that will be used to display the value of the object and call <tt class="docutils literal">refresh</tt>.</p>
+<div class="highlight"><pre><span></span><span class="nx">ObjectCellRenderer</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">refresh</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">params</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">res</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">if</span><span class="p">(</span><span class="nx">params</span><span class="p">.</span><span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// If we have a value build the representation</span>
+        <span class="k">for</span><span class="p">(</span><span class="kd">var</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="nx">i</span><span class="o">&lt;</span><span class="nx">params</span><span class="p">.</span><span class="nx">fields</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span><span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">res</span> <span class="o">+=</span> <span class="nx">params</span><span class="p">.</span><span class="nx">fields</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">label</span> <span class="o">+</span> <span class="s1">&#39;: &#39;</span><span class="p">;</span>
+            <span class="nx">res</span> <span class="o">+=</span> <span class="nx">params</span><span class="p">.</span><span class="nx">value</span><span class="p">[</span><span class="nx">params</span><span class="p">.</span><span class="nx">fields</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">name</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="c1">// Put representation to the DOM element</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">span</span><span class="p">.</span><span class="nx">innerHTML</span><span class="o">=</span><span class="nx">res</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nx">ObjectCellRenderer</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">getGui</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">span</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+<p>The <tt class="docutils literal">refresh</tt> method generates the text value of the cell (that will be put inside the span we created in init). It first checks if the <tt class="docutils literal">value</tt> attribute
+of <tt class="docutils literal">params</tt> is defined and if yes, it appends the label of each object attribute (which we pass through <tt class="docutils literal">cellRendererParams.fields.label</tt>) along with its value
+(which is retrieved from the <tt class="docutils literal">params.value</tt> using <tt class="docutils literal">cellRendererParams.fields.name</tt>). Notice ag-grid puts the result of the <tt class="docutils literal">getGui</tt> method in the cell - so
+we just return the span we create. Also, we created the span element in init but filled it in refresh - to avoid it creating the same element lots of times (this would
+be more imporntant of course on more expensive&nbsp;operations).</p>
+<p>Now let&#8217;s continue with <tt class="docutils literal">ObjectEditor</tt>:</p>
+<div class="highlight"><pre><span></span><span class="kd">function</span> <span class="nx">ObjectEditor</span><span class="p">()</span> <span class="p">{}</span>
+
+<span class="c1">// Surpress some keypresses</span>
+<span class="kd">var</span> <span class="nx">onKeyDown</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">key</span> <span class="o">=</span> <span class="nx">event</span><span class="p">.</span><span class="nx">which</span> <span class="o">||</span> <span class="nx">event</span><span class="p">.</span><span class="nx">keyCode</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">key</span> <span class="o">==</span> <span class="mi">37</span> <span class="o">||</span>  <span class="c1">// left</span>
+        <span class="nx">key</span> <span class="o">==</span> <span class="mi">39</span> <span class="o">||</span> <span class="c1">// right</span>
+        <span class="nx">key</span> <span class="o">==</span> <span class="mi">9</span> <span class="p">)</span> <span class="p">{</span>  <span class="c1">// tab</span>
+        <span class="nx">event</span><span class="p">.</span><span class="nx">stopPropagation</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">ObjectEditor</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">init</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">params</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// Create the container DOM element</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">container</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">&#39;div&#39;</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">container</span><span class="p">.</span><span class="nx">style</span> <span class="o">=</span> <span class="s2">&quot;border-radius: 15px; border: 1px solid grey;background: #e6e6e6;padding: 10px; &quot;</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">container</span><span class="p">.</span><span class="nx">onkeydown</span> <span class="o">=</span> <span class="nx">onKeyDown</span>
+
+    <span class="c1">// Create the object-editing form</span>
+    <span class="k">for</span><span class="p">(</span><span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="nx">i</span><span class="o">&lt;</span><span class="nx">params</span><span class="p">.</span><span class="nx">fields</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span><span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">field</span> <span class="o">=</span> <span class="nx">params</span><span class="p">.</span><span class="nx">fields</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
+        <span class="kd">var</span> <span class="nx">label</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">&#39;label&#39;</span><span class="p">);</span>
+                <span class="nx">label</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">field</span><span class="p">.</span><span class="nx">label</span><span class="o">+</span><span class="s1">&#39;: &#39;</span><span class="p">;</span>
+        <span class="kd">var</span> <span class="nx">input</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">&#39;input&#39;</span><span class="p">);</span>
+        <span class="nx">input</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="nx">field</span><span class="p">.</span><span class="nx">name</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">params</span><span class="p">.</span><span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">input</span><span class="p">.</span><span class="nx">value</span> <span class="o">=</span> <span class="nx">params</span><span class="p">.</span><span class="nx">value</span><span class="p">[</span><span class="nx">field</span><span class="p">.</span><span class="nx">name</span><span class="p">];</span>
+        <span class="p">}</span>
+
+        <span class="k">this</span><span class="p">.</span><span class="nx">container</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">label</span><span class="p">);</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">container</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">input</span><span class="p">);</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">container</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">&#39;br&#39;</span><span class="p">));</span>
+    <span class="p">}</span>
+
+    <span class="c1">// Create a save button</span>
+    <span class="kd">var</span> <span class="nx">saveButton</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">&#39;button&#39;</span><span class="p">);</span>
+    <span class="nx">saveButton</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">createTextNode</span><span class="p">(</span><span class="s1">&#39;Ok&#39;</span><span class="p">))</span>
+    <span class="nx">saveButton</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&#39;click&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">params</span><span class="p">.</span><span class="nx">stopEditing</span><span class="p">();</span>
+    <span class="p">});</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">container</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">saveButton</span><span class="p">);</span>
+<span class="p">};</span>
+</pre></div>
+<p>The <tt class="docutils literal">init</tt> function of ObjectEditor ise used to create a container div element that will hold the actual input elements. Then, using the fields
+that were passed as a parameter to the editor it creates a <tt class="docutils literal">label</tt>, an <tt class="docutils literal">input</tt> and a <tt class="docutils literal">br</tt> element and inserts them one by one to the container div. The input is
+instantiated with the current value of each attribute while its name is taken from the name of the corresponding field (from the fields parameter).
+Finally, a saveButton is created that will stop the editing when&nbsp;clicked.</p>
+<div class="highlight"><pre><span></span><span class="nx">ObjectEditor</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">getGui</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">container</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="nx">ObjectEditor</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">afterGuiAttached</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">inputs</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">container</span><span class="p">.</span><span class="nx">getElementsByTagName</span><span class="p">(</span><span class="s1">&#39;input&#39;</span><span class="p">);</span>
+    <span class="nx">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">focus</span><span class="p">();</span>
+<span class="p">};</span>
+
+<span class="nx">ObjectEditor</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">getValue</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">res</span> <span class="o">=</span> <span class="p">{};</span>
+    <span class="c1">// Create the cell value (an object) from the inputs values</span>
+    <span class="kd">var</span> <span class="nx">inputs</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">container</span><span class="p">.</span><span class="nx">getElementsByTagName</span><span class="p">(</span><span class="s1">&#39;input&#39;</span><span class="p">);</span>
+    <span class="k">for</span><span class="p">(</span><span class="nx">j</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="nx">j</span><span class="o">&lt;</span><span class="nx">inputs</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span><span class="nx">j</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+          <span class="nx">res</span><span class="p">[</span><span class="nx">inputs</span><span class="p">[</span><span class="nx">j</span><span class="p">].</span><span class="nx">name</span><span class="p">]</span> <span class="o">=</span> <span class="nx">inputs</span><span class="p">[</span><span class="nx">j</span><span class="p">].</span><span class="nx">value</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/^\s+|\s+$/g</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="nx">res</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="nx">ObjectEditor</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">destroy</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+<span class="p">};</span>
+
+<span class="nx">ObjectEditor</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">isPopup</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+<p>The other methods of ObjectEditor are simpler: <tt class="docutils literal">getGui</tt> actually returns the container we built in the <tt class="docutils literal">init</tt>, <tt class="docutils literal">afterGuiAttached</tt>
+is called when the component is attached to the <span class="caps">DOM</span> and focuses on the first input element, <tt class="docutils literal">getValue</tt> enumerates the input elements,
+takes their value (and names) and return an object with the name/value pairs, <tt class="docutils literal">destroy</tt> dosn&#8217;t do anything however it must be defined
+and can be used for cleaning up if needed and <tt class="docutils literal">isPopup</tt> returns true to display the container as a popup instead of&nbsp;inline.</p>
+</div>
+<div class="section" id="creating-the-array-like-cell-editor">
+<h2>Creating the array-like cell&nbsp;editor</h2>
+<p>The multi-line renderer/editor will allow a cell to contain a list of values. Here&#8217;s the complete fiddle where the &#8220;children&#8221; column
+is using the multi-line&nbsp;component:</p>
+<div class="jsfiddle"><iframe width="100%" height="300" src="//jsfiddle.net/a6s7r4tq/1/embedded/js,resources,html,css,result/light/" allowfullscreen="allowfullscreen" frameborder="0"></iframe></div><p>To integrate it with ag-grid we just need to use the corresponding editor and&nbsp;renderer:</p>
+<div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nx">headerName</span><span class="o">:</span> <span class="s2">&quot;Children&quot;</span><span class="p">,</span> <span class="nx">field</span><span class="o">:</span> <span class="s2">&quot;children&quot;</span><span class="p">,</span> <span class="nx">width</span><span class="o">:</span> <span class="mi">200</span><span class="p">,</span> <span class="nx">editable</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="nx">cellRenderer</span><span class="o">:</span> <span class="nx">MultiLineCellRenderer</span><span class="p">,</span>
+    <span class="nx">cellEditor</span><span class="o">:</span> <span class="nx">MultiLineEditor</span>
+<span class="p">}</span>
+</pre></div>
+<p>The <tt class="docutils literal">MultiLineCellRenderer</tt> is similar to the <tt class="docutils literal">ObjectCellRenderer</tt>. A span/container element is created
+at the <tt class="docutils literal">init</tt> method and the <tt class="docutils literal">refresh</tt> method is called to fill it. The <tt class="docutils literal">refresh</tt> method outputs the
+number of items in the list (i.e it writes N items) and uses the span&#8217;s <tt class="docutils literal">title</tt> to display a tooltip with
+the values of the&nbsp;items:</p>
+<div class="highlight"><pre><span></span><span class="kd">function</span> <span class="nx">MultiLineCellRenderer</span><span class="p">()</span> <span class="p">{}</span>
+
+<span class="nx">MultiLineCellRenderer</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">init</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">params</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">span</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">&#39;span&#39;</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">span</span><span class="p">.</span><span class="nx">title</span><span class="o">=</span><span class="s1">&#39;&#39;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">span</span><span class="p">.</span><span class="nx">innerHTML</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">refresh</span><span class="p">(</span><span class="nx">params</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nx">MultiLineCellRenderer</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">refresh</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">params</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">params</span><span class="p">.</span><span class="nx">value</span> <span class="o">===</span> <span class="s2">&quot;&quot;</span> <span class="o">||</span> <span class="nx">params</span><span class="p">.</span><span class="nx">value</span> <span class="o">===</span> <span class="kc">undefined</span> <span class="o">||</span> <span class="nx">params</span><span class="p">.</span><span class="nx">value</span> <span class="o">===</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">span</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="s1">&#39;0 items&#39;</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">res</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="c1">// Create the tooltip for the cell</span>
+        <span class="k">for</span><span class="p">(</span><span class="kd">var</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="nx">i</span><span class="o">&lt;</span><span class="nx">params</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span><span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">res</span> <span class="o">+=</span> <span class="p">(</span><span class="nx">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;: &#39;</span> <span class="o">+</span> <span class="nx">params</span><span class="p">.</span><span class="nx">value</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>
+            <span class="nx">res</span><span class="o">+=</span><span class="s1">&#39;\n&#39;</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">span</span><span class="p">.</span><span class="nx">title</span> <span class="o">=</span> <span class="nx">res</span><span class="p">;</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">span</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">params</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">length</span> <span class="o">+</span> <span class="s1">&#39; item&#39;</span> <span class="o">+</span> <span class="p">(</span><span class="nx">params</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">length</span><span class="o">==</span><span class="mi">1</span><span class="o">?</span><span class="s2">&quot;&quot;</span><span class="o">:</span><span class="s2">&quot;s&quot;</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="nx">MultiLineCellRenderer</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">getGui</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">span</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+<p>The logic of the <tt class="docutils literal">MultiLineEditor</tt> is also similar to the <tt class="docutils literal">ObjectEditor</tt>:</p>
+<div class="highlight"><pre><span></span><span class="kd">function</span> <span class="nx">MultiLineEditor</span><span class="p">()</span> <span class="p">{}</span>
+
+<span class="nx">MultiLineEditor</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">onKeyDown</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">key</span> <span class="o">=</span> <span class="nx">event</span><span class="p">.</span><span class="nx">which</span> <span class="o">||</span> <span class="nx">event</span><span class="p">.</span><span class="nx">keyCode</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">key</span> <span class="o">==</span> <span class="mi">37</span> <span class="o">||</span>  <span class="c1">// left</span>
+        <span class="nx">key</span> <span class="o">==</span> <span class="mi">39</span> <span class="o">||</span> <span class="c1">// right</span>
+        <span class="nx">key</span> <span class="o">==</span> <span class="mi">9</span> <span class="p">)</span> <span class="p">{</span>  <span class="c1">// tab</span>
+        <span class="nx">event</span><span class="p">.</span><span class="nx">stopPropagation</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="c1">// Used to append list items (their value along with the remove button)</span>
+<span class="nx">MultiLineEditor</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">addLine</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">val</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">li</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">&#39;li&#39;</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">span</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">&#39;span&#39;</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">removeButton</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">&#39;button&#39;</span><span class="p">);</span>
+    <span class="nx">removeButton</span><span class="p">.</span><span class="nx">style</span><span class="o">=</span><span class="s1">&#39;margin-left: 5px; text-align: right; &#39;</span>
+    <span class="nx">removeButton</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="s1">&#39;Remove&#39;</span>
+    <span class="nx">span</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">val</span><span class="p">;</span>
+    <span class="nx">li</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">span</span><span class="p">)</span>
+    <span class="nx">li</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">removeButton</span><span class="p">)</span>
+
+    <span class="k">this</span><span class="p">.</span><span class="nx">ul</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">li</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">that</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+    <span class="nx">removeButton</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&#39;click&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">that</span><span class="p">.</span><span class="nx">ul</span><span class="p">.</span><span class="nx">removeChild</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">parentElement</span><span class="p">);</span>
+    <span class="p">});</span>
+<span class="p">}</span>
+
+<span class="nx">MultiLineEditor</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">init</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">params</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">that</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">container</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">&#39;div&#39;</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">container</span><span class="p">.</span><span class="nx">style</span> <span class="o">=</span> <span class="s2">&quot;border-radius: 15px; border: 1px solid grey;background: #e6e6e6;padding: 10px;&quot;</span><span class="p">;</span>
+
+    <span class="k">this</span><span class="p">.</span><span class="nx">ul</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">&#39;ol&#39;</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">params</span><span class="p">.</span><span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">for</span><span class="p">(</span><span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="nx">i</span><span class="o">&lt;</span><span class="nx">params</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span><span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">this</span><span class="p">.</span><span class="nx">addLine</span><span class="p">(</span><span class="nx">params</span><span class="p">.</span><span class="nx">value</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">container</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">ul</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">input</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">&#39;input&#39;</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">container</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">input</span><span class="p">);</span>
+
+    <span class="k">this</span><span class="p">.</span><span class="nx">addButton</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">&#39;button&#39;</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">addButton</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="s1">&#39;Add&#39;</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">addButton</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&#39;click&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">val</span> <span class="o">=</span> <span class="nx">that</span><span class="p">.</span><span class="nx">input</span><span class="p">.</span><span class="nx">value</span><span class="p">;</span>
+        <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">val</span> <span class="o">||</span> <span class="nx">val</span><span class="o">==</span><span class="kc">undefined</span> <span class="o">||</span> <span class="nx">val</span><span class="o">==</span><span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">return</span><span class="p">;</span>
+        <span class="nx">that</span><span class="p">.</span><span class="nx">addLine</span><span class="p">(</span><span class="nx">val</span><span class="p">,</span> <span class="nx">that</span><span class="p">.</span><span class="nx">ul</span><span class="p">);</span>
+        <span class="nx">that</span><span class="p">.</span><span class="nx">input</span><span class="p">.</span><span class="nx">value</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">;</span>
+    <span class="p">});</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">container</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">addButton</span><span class="p">);</span>
+
+    <span class="k">this</span><span class="p">.</span><span class="nx">saveButton</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">&#39;button&#39;</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">saveButton</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="s1">&#39;Ok&#39;</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">saveButton</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&#39;click&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">params</span><span class="p">.</span><span class="nx">stopEditing</span><span class="p">();</span>
+    <span class="p">});</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">container</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">saveButton</span><span class="p">);</span>
+
+<span class="p">};</span>
+</pre></div>
+<p>A <tt class="docutils literal">div</tt> element that will display the popup editor is created first. In this container we add a <tt class="docutils literal">ol</tt> element and then,
+if there are values in the list they will be
+appended in that <tt class="docutils literal">ol</tt> using the <tt class="docutils literal">addLine</tt> method. This method creates a <tt class="docutils literal">li</tt> element the value of each list item along with a
+remove <tt class="docutils literal">button</tt> which removes the corresponding <tt class="docutils literal">li</tt> element when clicked (that <tt class="docutils literal">that=this</tt> is needed because
+the click callback function of the button has a different <tt class="docutils literal">this</tt> than the <tt class="docutils literal">addLine</tt> method so <tt class="docutils literal">that</tt> needs
+to be used&nbsp;instead).</p>
+<p>After the list of the items, there&#8217;s an <tt class="docutils literal">input</tt> whose value will be inserted to the list when clicking the
+add <tt class="docutils literal">button</tt>. The same <tt class="docutils literal">addLine</tt> function we used when initializing the component is used here to append the
+input&#8217;s value to the <tt class="docutils literal">ol</tt>. Finally the save <tt class="docutils literal">button</tt> stops the list&nbsp;editing:</p>
+<div class="highlight"><pre><span></span><span class="nx">MultiLineEditor</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">getGui</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">container</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="nx">MultiLineEditor</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">afterGuiAttached</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">inputs</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">container</span><span class="p">.</span><span class="nx">getElementsByTagName</span><span class="p">(</span><span class="s1">&#39;input&#39;</span><span class="p">);</span>
+    <span class="nx">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">focus</span><span class="p">();</span>
+<span class="p">};</span>
+
+<span class="nx">MultiLineEditor</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">getValue</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">res</span> <span class="o">=</span> <span class="p">[];</span>
+    <span class="c1">// The value is the text of all the span items of the li items</span>
+    <span class="kd">var</span> <span class="nx">items</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">ul</span><span class="p">.</span><span class="nx">getElementsByTagName</span><span class="p">(</span><span class="s1">&#39;span&#39;</span><span class="p">);</span>
+    <span class="k">for</span><span class="p">(</span><span class="kd">var</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="nx">i</span><span class="o">&lt;</span><span class="nx">items</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span><span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">res</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">items</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">innerHTML</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="nx">res</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="nx">MultiLineEditor</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">destroy</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+<span class="p">};</span>
+
+<span class="nx">MultiLineEditor</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">isPopup</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+<p>For the value of this component, we just enumerate through the <tt class="docutils literal">li span</tt> items of the list we created through <tt class="docutils literal">addLine</tt>
+and add it to a normal javascript&nbsp;array.</p>
+</div>
+<div class="section" id="some-more-discussion-about-the-components">
+<h2>Some more discussion about the&nbsp;components</h2>
+<p>The above components can be used as they are however I think that their greatest value is that they should show-off some of
+the capabilities of ag-grid and used as templates to build up your own stuff. Beyond styling or changing the layout
+of the multi-line and the object editor, I can think of a great number of extensions for them. Some examples, left as
+an excerise to the&nbsp;reader:</p>
+<ul class="simple">
+<li>The renderer components are rather simple, you may create any <span class="caps">DOM</span> structure you want in&nbsp;them</li>
+<li>Pass a function as a parameter to the object or multi-line editor that will be used as a validator for the values (i.e not allow nulls or enforce a specific format) - then you can add another &#8220;error&#8221; <tt class="docutils literal">span</tt> that will be displayed if the validation does not&nbsp;pass</li>
+<li>Make the object editor smarter by passing the type of each attribute (i.e text, number, boolean, date) and check that each input corresponds to that&nbsp;type</li>
+<li>Pass a min/max number of list items for the multi-line&nbsp;editor</li>
+<li>The multi-line editor doesn&#8217;t really need to have only text values for each item. You could combine the multi-line editor with the object editor so that each line has a specific, object-like structure. For example, for each child we may have two attributes, name and date of&nbsp;birth</li>
+</ul>
+</div>
+</div>
+  		</article>
+  		<article>
+<header>
+      <h1 class="entry-title">
         <a href="https://spapas.github.io/2016/11/02/postgresql-backup/">Getting a logical backup of all databases of your Postgresql server</a>
       </h1>
     <p class="meta">
@@ -13674,100 +14061,6 @@ depending on your album id (also if the id is not a valid identifier, for exampl
 starts with number, use <tt class="docutils literal"><span class="pre">copy($r.props.album_image_store._.posts['aoi3T'].images</span></tt>).</p>
 </div>
   		</article>
-  		<article>
-<header>
-      <h1 class="entry-title">
-        <a href="https://spapas.github.io/2016/06/07/django-werkzeug-debugger/">Using Werkzeug debugger with Django</a>
-      </h1>
-    <p class="meta">
-<time datetime="2016-06-07T10:40:00+03:00" pubdate>Τρι 07 Ιούνιος 2016</time>    </p>
-</header>
-
-<div class="entry-content"><div class="section" id="introduction">
-<h2>Introduction</h2>
-<p><a class="reference external" href="http://werkzeug.pocoo.org/">Werkzeug</a> is a <span class="caps">WSGI</span> utility library for Python. Beyond others, it includes an interactive
-debugger - what this means is that when your python application throws an exception,
-Werkzeug will display the exception stacktrace in the browser (that&#8217;s not a big deal)
-and allow you to write python commands interactively wherever you want in that stacktrace
-(that&#8217;s the important&nbsp;stuff).</p>
-<p>Now, the even more important stuff is that you can <em>abuse</em> the above feature by adding
-code that will throw an exception in various parts of your application and, as a result
-get an interactive python prompt at <em>specific</em> parts of your application (for example,
-before validating your form, or when a method in your model is executed). All this,
-without the need to use a specific <span class="caps">IDE</span> to add&nbsp;breakpoints!</p>
-<p>This is an old trick however some people don&#8217;t use it and make their work more
-difficult. Actually, this one of the first things I learned when starting with django
-and use it all the time since then - I am writing this post mainly to emphasize
-its usefulness and to urge more people to use it. If you don&#8217;t already use it please try
-it (and thank me&nbsp;later).</p>
-</div>
-<div class="section" id="configuration">
-<h2>Configuration</h2>
-<p>There are two components you need to install in your django project to use the
-above&nbsp;technique:</p>
-<ul class="simple">
-<li><a class="reference external" href="https://github.com/django-extensions/django-extensions">django-extensions</a>: a swiss army knife toolset for django - beyond other useful tools it includes a management command (<tt class="docutils literal">runserver_plus</tt>) to start the Werkzeug interactive debugger with your&nbsp;project</li>
-<li>werkzeug: the werkzeug utility&nbsp;library</li>
-</ul>
-<p>Both of these can just be installed with pip (even on windows). After installing them, add <tt class="docutils literal">django_extensions</tt> to your <tt class="docutils literal">INSTALLED_APPS</tt> setting to enable
-the management&nbsp;command.</p>
-<p>After that, you can just run <tt class="docutils literal">python manage.py runserver_plus</tt> - if everything was installed successfully you should see something like this (in windows at&nbsp;least):</p>
-<pre class="code literal-block">
-(venv) C:\progr\py\werkzeug\testdebug&gt;python manage.py runserver_plus
- * Restarting with stat
-Performing system checks...
-
-System check identified no issues (0 silenced).
-
-Django version 1.9.7, using settings 'testdebug.settings'
-Development server is running at http://127.0.0.1:8000/
-Using the Werkzeug debugger (http://werkzeug.pocoo.org/)
-Quit the server with CTRL-BREAK.
- * Debugger is active!
- * Debugger pin code: 143-738-172
- * Debugger is active!
- * Debugger pin code: 174-740-467
- * Running on http://127.0.0.1:8000/ (Press CTRL+C to quit)
-</pre>
-<p>Now, the &#8220;debugger pin&#8221; you see is a way to protect your interactive debugger (i.e it asks for the pin
-before allowing you to enter the interactive prompt). Since this feature should <em>only</em> be used in your
-local development system I recommend to just disable it by setting the <tt class="docutils literal">WERKZEUG_DEBUG_PIN</tt> environment
-variable to <tt class="docutils literal">off</tt> (i.e <tt class="docutils literal">set WERKZEUG_DEBUG_PIN=off</tt> in windows). After that you should see the message
-&#8220; * Debugger pin disabled.  <span class="caps">DEBUGGER</span> <span class="caps">UNSECURED</span>!&#8220;. Please be careful with the interactive debugger
-and  <em>never, ever use it in a production deployment</em> even with the debug pin enabled. I also recommend to
-use it <em>only</em> on a local development server (i.e the server must be run on 127.0.0.1/local <span class="caps">IP</span> and not
-allow remote&nbsp;connections).</p>
-</div>
-<div class="section" id="usage">
-<h2>Usage</h2>
-<p>Now its time for the magic: Let&#8217;s add a django view that throws an exception, like&nbsp;this:</p>
-<pre class="code literal-block">
-def test(request):
-    a+=1
-</pre>
-<p>to your urls.py ( <tt class="docutils literal"><span class="pre">url(r'^test/',</span> test )</tt> ) and after you visit <cite>test</cite> you should see something like&nbsp;this:</p>
-<img alt="Werkzeug debugger" src="/images/werkzeug.png" style="width: 800px;" />
-<p>Since the <tt class="docutils literal">a</tt> variable was not defined you&#8217;ll get an exception when you try to increaseit.
-Now, notice the console icon in the lower right corner - when you click it you&#8217;ll get the interactive debugger!
-Now you can enter python commands exactly where the <tt class="docutils literal"><span class="pre">a+=1</span></tt> code was. For example, you can see what are the
-attributes of the <tt class="docutils literal">request</tt> object you receive (for example, just enter <tt class="docutils literal">request.<span class="caps">GET</span></tt> to output the <tt class="docutils literal"><span class="caps">GET</span></tt>
-dictionary to the interactive&nbsp;console).</p>
-<p>Notice that you can get interactive consoles wherever you want in the stacktrace, i.e I could get a console at line 147
-of <cite>django.core.handlers.base</cite> module on the <tt class="docutils literal">get_response</tt> method &#8212; this is needed sometimes especially when you
-want to see how your code is called by other&nbsp;modules.</p>
-</div>
-<div class="section" id="conclusion">
-<h2>Conclusion</h2>
-<p>As you can see, using the presented technique you can really quickly start an interactive console wherever you
-want and start entering commands. I use it whenever I need to write anything non trivial (or even trivial stuff -
-I sometimes prefer opening and interactive debugger to find out by trial and error how should I write a django
-<span class="caps">ORM</span> query than open models.py) and really miss it on other environments&nbsp;(Java).</p>
-<p>The above technique should also work with few modifications with other python web frameworks so it&#8217;s not&nbsp;django-only.</p>
-<p>Finally, please notice that both Werkzeug and django-extensions offer many more tools beyond the interactive debugger presented here -
-I encourage you to research them since - if you follow my advice - you&#8217;ll integrate these to <em>all</em> your django&nbsp;projects!</p>
-</div>
-</div>
-  		</article>
 <div class="pagination">
     <a class="prev" href="https://spapas.github.io/index6.html">&larr; Older</a>
 
@@ -13882,6 +14175,9 @@ I encourage you to research them since - if you follow my advice - you&#8217;ll 
     <h1>Recent Posts</h1>
     <ul id="recent_posts">
       <li class="post">
+        <a href="https://spapas.github.io/2021/01/07/django-hashides/">Using hashids to hide ids of objects in Django</a>
+      </li>
+      <li class="post">
         <a href="https://spapas.github.io/2020/09/18/wagtail-add-posts-timeline/">Adding a timeline of your wagtail Posts</a>
       </li>
       <li class="post">
@@ -13892,9 +14188,6 @@ I encourage you to research them since - if you follow my advice - you&#8217;ll 
       </li>
       <li class="post">
         <a href="https://spapas.github.io/2020/03/18/django-crispy-form-quick-easy-layout/">Quick and easy layout of django forms using django-crispy-forms and django-widget-tweaks</a>
-      </li>
-      <li class="post">
-        <a href="https://spapas.github.io/2019/10/17/declarative-ecto-query-sorting/">Declarative Ecto query sorting</a>
       </li>
     </ul>
   </section>
@@ -13921,11 +14214,11 @@ I encourage you to research them since - if you follow my advice - you&#8217;ll 
 
   <section>
     <h1>Tags</h1>
-    <a href="https://spapas.github.io/tag/less.html">less</a>,    <a href="https://spapas.github.io/tag/django-crispy-forms.html">django-crispy-forms</a>,    <a href="https://spapas.github.io/tag/rest.html">rest</a>,    <a href="https://spapas.github.io/tag/query.html">query</a>,    <a href="https://spapas.github.io/tag/ecto.html">ecto</a>,    <a href="https://spapas.github.io/tag/tables.html">tables</a>,    <a href="https://spapas.github.io/tag/pivot_table.html">pivot_table</a>,    <a href="https://spapas.github.io/tag/console.html">console</a>,    <a href="https://spapas.github.io/tag/async.html">async</a>,    <a href="https://spapas.github.io/tag/django-rq.html">django-rq</a>,    <a href="https://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="https://spapas.github.io/tag/forms.html">forms</a>,    <a href="https://spapas.github.io/tag/yaml.html">yaml</a>,    <a href="https://spapas.github.io/tag/404.html">404</a>,    <a href="https://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="https://spapas.github.io/tag/erlang.html">erlang</a>,    <a href="https://spapas.github.io/tag/immutable.html">immutable</a>,    <a href="https://spapas.github.io/tag/initd.html">init.d</a>,    <a href="https://spapas.github.io/tag/django-widget-tweaks.html">django-widget-tweaks</a>,    <a href="https://spapas.github.io/tag/youtube-dl.html">youtube-dl</a>,    <a href="https://spapas.github.io/tag/python.html">python</a>,    <a href="https://spapas.github.io/tag/django-extensions.html">django-extensions</a>,    <a href="https://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="https://spapas.github.io/tag/scipy.html">scipy</a>,    <a href="https://spapas.github.io/tag/grid.html">grid</a>,    <a href="https://spapas.github.io/tag/ag-grid.html">ag-grid</a>,    <a href="https://spapas.github.io/tag/du.html">du</a>,    <a href="https://spapas.github.io/tag/watchify.html">watchify</a>,    <a href="https://spapas.github.io/tag/settings.html">settings</a>,    <a href="https://spapas.github.io/tag/flux.html">flux</a>,    <a href="https://spapas.github.io/tag/fixeddatatable.html">FixedDataTable</a>,    <a href="https://spapas.github.io/tag/queries.html">queries</a>,    <a href="https://spapas.github.io/tag/debug.html">debug</a>,    <a href="https://spapas.github.io/tag/imgur.html">imgur</a>,    <a href="https://spapas.github.io/tag/security.html">security</a>,    <a href="https://spapas.github.io/tag/npm.html">npm</a>,    <a href="https://spapas.github.io/tag/hyperapp.html">hyperapp</a>,    <a href="https://spapas.github.io/tag/spring.html">spring</a>,    <a href="https://spapas.github.io/tag/react-redux.html">react-redux</a>,    <a href="https://spapas.github.io/tag/cron.html">cron</a>,    <a href="https://spapas.github.io/tag/babelify.html">babelify</a>,    <a href="https://spapas.github.io/tag/design.html">design</a>,    <a href="https://spapas.github.io/tag/tutorial.html">tutorial</a>,    <a href="https://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="https://spapas.github.io/tag/reportlab.html">reportlab</a>,    <a href="https://spapas.github.io/tag/rq.html">rq</a>,    <a href="https://spapas.github.io/tag/redis.html">redis</a>,    <a href="https://spapas.github.io/tag/python-3.html">python-3</a>,    <a href="https://spapas.github.io/tag/research.html">research</a>,    <a href="https://spapas.github.io/tag/werkzeug.html">werkzeug</a>,    <a href="https://spapas.github.io/tag/jobs.html">jobs</a>,    <a href="https://spapas.github.io/tag/redux-thunk.html">redux-thunk</a>,    <a href="https://spapas.github.io/tag/disk-usage.html">disk-usage</a>,    <a href="https://spapas.github.io/tag/javascript.html">javascript</a>,    <a href="https://spapas.github.io/tag/component.html">component</a>,    <a href="https://spapas.github.io/tag/ajax.html">ajax</a>,    <a href="https://spapas.github.io/tag/elixir.html">elixir</a>,    <a href="https://spapas.github.io/tag/ipython.html">ipython</a>,    <a href="https://spapas.github.io/tag/uglify.html">uglify</a>,    <a href="https://spapas.github.io/tag/configuration.html">configuration</a>,    <a href="https://spapas.github.io/tag/properties.html">properties</a>,    <a href="https://spapas.github.io/tag/bash.html">bash</a>,    <a href="https://spapas.github.io/tag/es6.html">es6</a>,    <a href="https://spapas.github.io/tag/spring-boot.html">spring-boot</a>,    <a href="https://spapas.github.io/tag/postgresql.html">postgresql</a>,    <a href="https://spapas.github.io/tag/kotlin.html">kotlin</a>,    <a href="https://spapas.github.io/tag/adapter.html">adapter</a>,    <a href="https://spapas.github.io/tag/filter.html">filter</a>,    <a href="https://spapas.github.io/tag/flask.html">flask</a>,    <a href="https://spapas.github.io/tag/notebook.html">notebook</a>,    <a href="https://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="https://spapas.github.io/tag/pdf.html">pdf</a>,    <a href="https://spapas.github.io/tag/react-notification.html">react-notification</a>,    <a href="https://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="https://spapas.github.io/tag/tasks.html">tasks</a>,    <a href="https://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="https://spapas.github.io/tag/unix.html">unix</a>,    <a href="https://spapas.github.io/tag/google.html">google</a>,    <a href="https://spapas.github.io/tag/linux.html">linux</a>,    <a href="https://spapas.github.io/tag/pivot.html">pivot</a>,    <a href="https://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="https://spapas.github.io/tag/git.html">git</a>,    <a href="https://spapas.github.io/tag/java.html">java</a>,    <a href="https://spapas.github.io/tag/introduction.html">introduction</a>,    <a href="https://spapas.github.io/tag/pusher.html">pusher</a>,    <a href="https://spapas.github.io/tag/fixed-data-tables.html">fixed-data-tables</a>,    <a href="https://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="https://spapas.github.io/tag/xhtml2pdf.html">xhtml2pdf</a>,    <a href="https://spapas.github.io/tag/numpy.html">numpy</a>,    <a href="https://spapas.github.io/tag/form.html">form</a>,    <a href="https://spapas.github.io/tag/django-rest-auth.html">django-rest-auth</a>,    <a href="https://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="https://spapas.github.io/tag/rst.html">rst</a>,    <a href="https://spapas.github.io/tag/python-2.html">python-2</a>,    <a href="https://spapas.github.io/tag/ffmpeg.html">ffmpeg</a>,    <a href="https://spapas.github.io/tag/middleware.html">middleware</a>,    <a href="https://spapas.github.io/tag/profiles.html">profiles</a>,    <a href="https://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="https://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="https://spapas.github.io/tag/error.html">error</a>,    <a href="https://spapas.github.io/tag/asynchronous.html">asynchronous</a>,    <a href="https://spapas.github.io/tag/react-router-redux.html">react-router-redux</a>,    <a href="https://spapas.github.io/tag/select2.html">select2</a>,    <a href="https://spapas.github.io/tag/history.html">history</a>,    <a href="https://spapas.github.io/tag/django-rest-framework.html">django-rest-framework</a>,    <a href="https://spapas.github.io/tag/redux-form.html">redux-form</a>,    <a href="https://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="https://spapas.github.io/tag/scheduling.html">scheduling</a>,    <a href="https://spapas.github.io/tag/plpgsql.html">plpgsql</a>,    <a href="https://spapas.github.io/tag/os-monitoring.html">os-monitoring</a>,    <a href="https://spapas.github.io/tag/boilerplate.html">boilerplate</a>,    <a href="https://spapas.github.io/tag/generic.html">generic</a>,    <a href="https://spapas.github.io/tag/babel.html">babel</a>,    <a href="https://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="https://spapas.github.io/tag/html.html">html</a>,    <a href="https://spapas.github.io/tag/android.html">android</a>,    <a href="https://spapas.github.io/tag/pandas.html">pandas</a>,    <a href="https://spapas.github.io/tag/css.html">css</a>,    <a href="https://spapas.github.io/tag/node.html">node</a>,    <a href="https://spapas.github.io/tag/phoenix.html">phoenix</a>,    <a href="https://spapas.github.io/tag/deploy.html">deploy</a>,    <a href="https://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="https://spapas.github.io/tag/react.html">react</a>,    <a href="https://spapas.github.io/tag/autocompelte.html">autocompelte</a>,    <a href="https://spapas.github.io/tag/declarative.html">declarative</a>,    <a href="https://spapas.github.io/tag/osmon.html">osmon</a>,    <a href="https://spapas.github.io/tag/php.html">php</a>,    <a href="https://spapas.github.io/tag/browserify.html">browserify</a>,    <a href="https://spapas.github.io/tag/branching.html">branching</a>,    <a href="https://spapas.github.io/tag/github.html">github</a>,    <a href="https://spapas.github.io/tag/jupyter.html">jupyter</a>,    <a href="https://spapas.github.io/tag/windows.html">windows</a>,    <a href="https://spapas.github.io/tag/youtube.html">youtube</a>,    <a href="https://spapas.github.io/tag/django.html">django</a>,    <a href="https://spapas.github.io/tag/q.html">q</a>,    <a href="https://spapas.github.io/tag/react-router.html">react-router</a>,    <a href="https://spapas.github.io/tag/redux.html">redux</a>,    <a href="https://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>  </section>
+    <a href="https://spapas.github.io/tag/less.html">less</a>,    <a href="https://spapas.github.io/tag/django-crispy-forms.html">django-crispy-forms</a>,    <a href="https://spapas.github.io/tag/rest.html">rest</a>,    <a href="https://spapas.github.io/tag/query.html">query</a>,    <a href="https://spapas.github.io/tag/ecto.html">ecto</a>,    <a href="https://spapas.github.io/tag/tables.html">tables</a>,    <a href="https://spapas.github.io/tag/pivot_table.html">pivot_table</a>,    <a href="https://spapas.github.io/tag/console.html">console</a>,    <a href="https://spapas.github.io/tag/async.html">async</a>,    <a href="https://spapas.github.io/tag/django-rq.html">django-rq</a>,    <a href="https://spapas.github.io/tag/hashids.html">hashids</a>,    <a href="https://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="https://spapas.github.io/tag/forms.html">forms</a>,    <a href="https://spapas.github.io/tag/yaml.html">yaml</a>,    <a href="https://spapas.github.io/tag/404.html">404</a>,    <a href="https://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="https://spapas.github.io/tag/erlang.html">erlang</a>,    <a href="https://spapas.github.io/tag/immutable.html">immutable</a>,    <a href="https://spapas.github.io/tag/initd.html">init.d</a>,    <a href="https://spapas.github.io/tag/django-widget-tweaks.html">django-widget-tweaks</a>,    <a href="https://spapas.github.io/tag/youtube-dl.html">youtube-dl</a>,    <a href="https://spapas.github.io/tag/python.html">python</a>,    <a href="https://spapas.github.io/tag/django-extensions.html">django-extensions</a>,    <a href="https://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="https://spapas.github.io/tag/scipy.html">scipy</a>,    <a href="https://spapas.github.io/tag/grid.html">grid</a>,    <a href="https://spapas.github.io/tag/ag-grid.html">ag-grid</a>,    <a href="https://spapas.github.io/tag/du.html">du</a>,    <a href="https://spapas.github.io/tag/watchify.html">watchify</a>,    <a href="https://spapas.github.io/tag/settings.html">settings</a>,    <a href="https://spapas.github.io/tag/flux.html">flux</a>,    <a href="https://spapas.github.io/tag/fixeddatatable.html">FixedDataTable</a>,    <a href="https://spapas.github.io/tag/queries.html">queries</a>,    <a href="https://spapas.github.io/tag/debug.html">debug</a>,    <a href="https://spapas.github.io/tag/imgur.html">imgur</a>,    <a href="https://spapas.github.io/tag/security.html">security</a>,    <a href="https://spapas.github.io/tag/npm.html">npm</a>,    <a href="https://spapas.github.io/tag/hyperapp.html">hyperapp</a>,    <a href="https://spapas.github.io/tag/spring.html">spring</a>,    <a href="https://spapas.github.io/tag/react-redux.html">react-redux</a>,    <a href="https://spapas.github.io/tag/cron.html">cron</a>,    <a href="https://spapas.github.io/tag/babelify.html">babelify</a>,    <a href="https://spapas.github.io/tag/design.html">design</a>,    <a href="https://spapas.github.io/tag/tutorial.html">tutorial</a>,    <a href="https://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="https://spapas.github.io/tag/reportlab.html">reportlab</a>,    <a href="https://spapas.github.io/tag/rq.html">rq</a>,    <a href="https://spapas.github.io/tag/redis.html">redis</a>,    <a href="https://spapas.github.io/tag/python-3.html">python-3</a>,    <a href="https://spapas.github.io/tag/research.html">research</a>,    <a href="https://spapas.github.io/tag/werkzeug.html">werkzeug</a>,    <a href="https://spapas.github.io/tag/jobs.html">jobs</a>,    <a href="https://spapas.github.io/tag/redux-thunk.html">redux-thunk</a>,    <a href="https://spapas.github.io/tag/disk-usage.html">disk-usage</a>,    <a href="https://spapas.github.io/tag/javascript.html">javascript</a>,    <a href="https://spapas.github.io/tag/component.html">component</a>,    <a href="https://spapas.github.io/tag/ajax.html">ajax</a>,    <a href="https://spapas.github.io/tag/elixir.html">elixir</a>,    <a href="https://spapas.github.io/tag/ipython.html">ipython</a>,    <a href="https://spapas.github.io/tag/uglify.html">uglify</a>,    <a href="https://spapas.github.io/tag/configuration.html">configuration</a>,    <a href="https://spapas.github.io/tag/properties.html">properties</a>,    <a href="https://spapas.github.io/tag/bash.html">bash</a>,    <a href="https://spapas.github.io/tag/es6.html">es6</a>,    <a href="https://spapas.github.io/tag/spring-boot.html">spring-boot</a>,    <a href="https://spapas.github.io/tag/postgresql.html">postgresql</a>,    <a href="https://spapas.github.io/tag/kotlin.html">kotlin</a>,    <a href="https://spapas.github.io/tag/adapter.html">adapter</a>,    <a href="https://spapas.github.io/tag/filter.html">filter</a>,    <a href="https://spapas.github.io/tag/flask.html">flask</a>,    <a href="https://spapas.github.io/tag/notebook.html">notebook</a>,    <a href="https://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="https://spapas.github.io/tag/pdf.html">pdf</a>,    <a href="https://spapas.github.io/tag/react-notification.html">react-notification</a>,    <a href="https://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="https://spapas.github.io/tag/tasks.html">tasks</a>,    <a href="https://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="https://spapas.github.io/tag/unix.html">unix</a>,    <a href="https://spapas.github.io/tag/google.html">google</a>,    <a href="https://spapas.github.io/tag/linux.html">linux</a>,    <a href="https://spapas.github.io/tag/pivot.html">pivot</a>,    <a href="https://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="https://spapas.github.io/tag/git.html">git</a>,    <a href="https://spapas.github.io/tag/java.html">java</a>,    <a href="https://spapas.github.io/tag/introduction.html">introduction</a>,    <a href="https://spapas.github.io/tag/pusher.html">pusher</a>,    <a href="https://spapas.github.io/tag/fixed-data-tables.html">fixed-data-tables</a>,    <a href="https://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="https://spapas.github.io/tag/xhtml2pdf.html">xhtml2pdf</a>,    <a href="https://spapas.github.io/tag/numpy.html">numpy</a>,    <a href="https://spapas.github.io/tag/form.html">form</a>,    <a href="https://spapas.github.io/tag/django-rest-auth.html">django-rest-auth</a>,    <a href="https://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="https://spapas.github.io/tag/rst.html">rst</a>,    <a href="https://spapas.github.io/tag/python-2.html">python-2</a>,    <a href="https://spapas.github.io/tag/ffmpeg.html">ffmpeg</a>,    <a href="https://spapas.github.io/tag/middleware.html">middleware</a>,    <a href="https://spapas.github.io/tag/profiles.html">profiles</a>,    <a href="https://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="https://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="https://spapas.github.io/tag/error.html">error</a>,    <a href="https://spapas.github.io/tag/asynchronous.html">asynchronous</a>,    <a href="https://spapas.github.io/tag/react-router-redux.html">react-router-redux</a>,    <a href="https://spapas.github.io/tag/select2.html">select2</a>,    <a href="https://spapas.github.io/tag/history.html">history</a>,    <a href="https://spapas.github.io/tag/django-rest-framework.html">django-rest-framework</a>,    <a href="https://spapas.github.io/tag/redux-form.html">redux-form</a>,    <a href="https://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="https://spapas.github.io/tag/scheduling.html">scheduling</a>,    <a href="https://spapas.github.io/tag/plpgsql.html">plpgsql</a>,    <a href="https://spapas.github.io/tag/os-monitoring.html">os-monitoring</a>,    <a href="https://spapas.github.io/tag/boilerplate.html">boilerplate</a>,    <a href="https://spapas.github.io/tag/generic.html">generic</a>,    <a href="https://spapas.github.io/tag/babel.html">babel</a>,    <a href="https://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="https://spapas.github.io/tag/html.html">html</a>,    <a href="https://spapas.github.io/tag/android.html">android</a>,    <a href="https://spapas.github.io/tag/pandas.html">pandas</a>,    <a href="https://spapas.github.io/tag/css.html">css</a>,    <a href="https://spapas.github.io/tag/node.html">node</a>,    <a href="https://spapas.github.io/tag/phoenix.html">phoenix</a>,    <a href="https://spapas.github.io/tag/deploy.html">deploy</a>,    <a href="https://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="https://spapas.github.io/tag/react.html">react</a>,    <a href="https://spapas.github.io/tag/autocompelte.html">autocompelte</a>,    <a href="https://spapas.github.io/tag/declarative.html">declarative</a>,    <a href="https://spapas.github.io/tag/osmon.html">osmon</a>,    <a href="https://spapas.github.io/tag/php.html">php</a>,    <a href="https://spapas.github.io/tag/browserify.html">browserify</a>,    <a href="https://spapas.github.io/tag/branching.html">branching</a>,    <a href="https://spapas.github.io/tag/github.html">github</a>,    <a href="https://spapas.github.io/tag/jupyter.html">jupyter</a>,    <a href="https://spapas.github.io/tag/windows.html">windows</a>,    <a href="https://spapas.github.io/tag/youtube.html">youtube</a>,    <a href="https://spapas.github.io/tag/django.html">django</a>,    <a href="https://spapas.github.io/tag/q.html">q</a>,    <a href="https://spapas.github.io/tag/react-router.html">react-router</a>,    <a href="https://spapas.github.io/tag/redux.html">redux</a>,    <a href="https://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>  </section>
 
   <section>
     <h1>Yearly archives</h1>
-    <a href="https://spapas.github.io/posts/2013/">2013</a>,    <a href="https://spapas.github.io/posts/2014/">2014</a>,    <a href="https://spapas.github.io/posts/2015/">2015</a>,    <a href="https://spapas.github.io/posts/2016/">2016</a>,    <a href="https://spapas.github.io/posts/2017/">2017</a>,    <a href="https://spapas.github.io/posts/2018/">2018</a>,    <a href="https://spapas.github.io/posts/2019/">2019</a>,    <a href="https://spapas.github.io/posts/2020/">2020</a>  </section>
+    <a href="https://spapas.github.io/posts/2013/">2013</a>,    <a href="https://spapas.github.io/posts/2014/">2014</a>,    <a href="https://spapas.github.io/posts/2015/">2015</a>,    <a href="https://spapas.github.io/posts/2016/">2016</a>,    <a href="https://spapas.github.io/posts/2017/">2017</a>,    <a href="https://spapas.github.io/posts/2018/">2018</a>,    <a href="https://spapas.github.io/posts/2019/">2019</a>,    <a href="https://spapas.github.io/posts/2020/">2020</a>,    <a href="https://spapas.github.io/posts/2021/">2021</a>  </section>
 
 
 
@@ -13969,7 +14262,7 @@ I encourage you to research them since - if you follow my advice - you&#8217;ll 
 </aside>    </div>
   </div>
   <footer role="contentinfo"><p>
-    Copyright &copy;  2013&ndash;2020  Serafeim Papastefanos &mdash;
+    Copyright &copy;  2013&ndash;2021  Serafeim Papastefanos &mdash;
   <span class="credit">Powered by <a href="http://getpelican.com">Pelican</a></span>
 </p></footer>
   <script src="https://spapas.github.io/theme/js/modernizr-2.0.js"></script>

@@ -141,7 +141,7 @@ and then use it in your urls.py like this:
         name="ship_detail",
     ),
 
-That's it! No other changes are needed to your CBVs! The ``hashid`` will match the hashid in the url and convert it to 
+That's it! Your CBVs do not need any other changes! The ``hashid`` will match the hashid in the url and convert it to 
 the model's pk using the to_python method we defined above!
 
 Of course you should also add the opposite direction (i.e convert from the primary key to the hashid). To do that we'll

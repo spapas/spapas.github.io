@@ -120,10 +120,139 @@ border-radius: 5px;
     <div id="content">
     <div id="gHPzseYvFrhZ123">
       Hello! I see that you have an ad blocker. If you find something useful here 
-      and want to support me somehow please consider disabling your ad blocker for this site. It won't cost you anything.
+      and want to support me somehow please consider disabling your ad blocker for this site. It won't cost you anything
+      but will convince me that there's actually useful info here!
       
     </div>
 <div class="blog-index">
+  		<article>
+<header>
+      <h1 class="entry-title">
+        <a href="https://spapas.github.io/2021/02/08/django-matplotlib/">Using matplotlib to generate graphs in Django</a>
+      </h1>
+    <p class="meta">
+<time datetime="2021-02-08T14:55:00+02:00" pubdate>Δευ 08 Φεβρουάριος 2021</time>    </p>
+</header>
+
+<div class="entry-content"><p>Nowadays the most common way to generate graphs in your Django apps (or web apps in general) is to
+pass the data as json to the page and use a javascript lib. The big advantage these javascript libs
+offer is interactivity: You can hover over points to see their values making studying the graph much&nbsp;easier.</p>
+<p>Yet, there are times where you need some simple (or not so simple) graphs and don&#8217;t care about
+offering interactivity through javascript nor you want to mess with javascript at all. For these cases
+you can generate the graphs server-side using django and the <a class="reference external" href="https://matplotlib.org/">matplotlib</a> plot&nbsp;library.</p>
+<p>matplotlib is a very popular library in the scientific cycles. It can be used to create more or less
+any kind of graph and has unlimited capabilities! I won&#8217;t go into much detail about matplotlib here
+because the subject is huge but I recommend you to take a look at the <a class="reference external" href="https://matplotlib.org/tutorials/index.html">comprehensive tutorials</a> on its&nbsp;homepage.</p>
+<p>To install matplotlib on unix you need to do a <tt class="docutils literal">pip install matplotlib</tt> while, for windows,
+you can download the proper ready-made binaries from the <a class="reference external" href="https://www.lfd.uci.edu/~gohlke/pythonlibs/">Unofficial Windows Binaries for Python Extension Packages</a>
+site that offers pre-compiled versions of almost all python packages! Just make sure to download the correct version
+for your python version and architecture (32bit or 64bit). After you&#8217;ve downloaded the file you can install it
+for your project using something like <tt class="docutils literal">pip install <span class="pre">matplotlib-3.3.4-cp38-cp38-win32</span></tt> from inside your virtual&nbsp;environment.</p>
+<p>Before actually creating a graph I recommend playing a bit with matplotlib to understand the basic concepts. Start a django shell
+and do the&nbsp;following:</p>
+<pre class="code literal-block">
+&gt;&gt;&gt; import matplotlib.pyplot as plt
+&gt;&gt;&gt; fig, ax = plt.subplots()
+&gt;&gt;&gt; ax.plot([1, 2, 3, 4], [1, 4, 2, 3])
+[&lt;matplotlib.lines.Line2D object at 0x0FBF5F58&gt;]
+&gt;&gt;&gt; fig.show()
+</pre>
+<p>The above should open a window and display the graph. This works fine on Window 10 with python 3.8 and matplotlib 3.3.4 but I
+can&#8217;t guarantee other versions. If however <tt class="docutils literal">fig.show()</tt> shows an error or does not display the graph, you can just do something&nbsp;like:</p>
+<pre class="code literal-block">
+&gt;&gt;&gt; fig.savefig('test')
+</pre>
+<p>that will output the figure in a file named <tt class="docutils literal">test.png</tt> which you can the view. Please notice that the above are with the default
+options; there are various ways that matplotlib can be&nbsp;configured.</p>
+<p>In any case, after you&#8217;ve played a bit with the shell and generate a nice figure (take a look at the <a class="reference external" href="https://matplotlib.org/3.1.1/gallery/index.html">matplotlib examples</a> for
+inspiration) you are ready to integrate matplotlib with&nbsp;Django!</p>
+<p>I can think of two ways which you can integrate matplotlib with&nbsp;Django:</p>
+<ul class="simple">
+<li>Use a special view that would render the graph and just return a <span class="caps">PNG</span> object. Use a normal <tt class="docutils literal">&lt;img&gt;</tt> element pointing to that view in your&nbsp;template.</li>
+<li>Put the graph in the context of a normal django view encoded as a base64 object and use a special <tt class="docutils literal">&lt;img&gt;</tt> with an <tt class="docutils literal">src</tt> attribute of <tt class="docutils literal"><span class="pre">data:image/png;base64,{{</span> graph }}</tt> to actually embed the image in the&nbsp;template!</li>
+</ul>
+<p>I prefer the second approach because it&#8217;s much more flexible since you don&#8217;t need to create a different Django view for each graph you
+want to generate. For this reason I will explain this approach right now and give you some hints if you need to follow the dedicated
+graph view&nbsp;approach.</p>
+<p>Our view&nbsp;should:</p>
+<ul class="simple">
+<li>Generate the&nbsp;graph</li>
+<li>Save it in a BytesIO&nbsp;object</li>
+<li>Convert that BytesIO to&nbsp;base64</li>
+<li>Put the string value of the base64 encoded graph to the&nbsp;template</li>
+</ul>
+<p>Then the template will just output that base64 value using the special img we mentioned&nbsp;above.</p>
+<p>Here&#8217;s a snippet of a view that does exactly&nbsp;this:</p>
+<pre class="code literal-block">
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+import io, base64
+from django.db.models.functions import TruncDay
+from matplotlib.ticker import LinearLocator
+
+class SampleListView(ListView):
+  model = Sample
+
+  def get_context_data(self, **kwargs):
+
+    by_days = get_queryset().annotate(day=TruncDay('created_on')).values('day').annotate(c=Count('id')).order_by('day')
+    days = [x['day'] for x in by_days]
+    counts = [x['c'] for x in by_days]
+
+    fig, ax = plt.subplots(figsize=(10,4))
+    ax.plot(days, counts, '--bo')
+
+    fig.autofmt_xdate()
+    ax.fmt_xdata = mdates.DateFormatter('%Y-%m-%d')
+    ax.set_title('By date')
+    ax.set_ylabel(&quot;Count&quot;)
+    ax.set_xlabel(&quot;Date&quot;)
+    ax.grid(linestyle=&quot;--&quot;, linewidth=0.5, color='.25', zorder=-10)
+    ax.yaxis.set_minor_locator(LinearLocator(25))
+
+    flike = io.BytesIO()
+    fig.savefig(flike)
+    b64 = base64.b64encode(flike.getvalue()).decode()
+    context['chart'] = b64
+    return context
+</pre>
+<p>Please notice that after importing <tt class="docutils literal">matplotlib</tt> I&#8217;m using the <tt class="docutils literal"><span class="pre">matplotlib.use('Agg')</span></tt> command to use
+the <tt class="docutils literal">Agg</tt> backend. You can <a class="reference external" href="https://matplotlib.org/faq/usage_faq.html#what-is-a-backend">learn more about backends here</a>, but it should be sufficient for now to
+know that using the <tt class="docutils literal">Agg</tt> you&#8217;ll be able to save your graphs in&nbsp;png.</p>
+<p>The above code uses some Django <span class="caps">ORM</span> trickery to group values by their created_on day value and then
+assings the days and counts to two arrays (<tt class="docutils literal">days</tt>, <tt class="docutils literal">counts</tt>). It then creates a new empty graph
+with a specific size using <tt class="docutils literal">fig, ax = <span class="pre">plt.subplots(figsize=(10,4))</span></tt> and plots the data with some
+fancy styles with <tt class="docutils literal">ax.plot(days, counts, <span class="pre">'--bo')</span></tt>. After that it sets various options in the graph
+like the labels, grid&nbsp;etc.</p>
+<p>The save and convert to base64 part follows: A new file like object is created using <tt class="docutils literal">io.BytesIO()</tt> and
+the figure is saved there (<tt class="docutils literal">fig.savefig(flike)</tt>). Then it is converted to a base64 string using the
+<tt class="docutils literal">b64 = <span class="pre">base64.b64encode(flike.getvalue()).decode()</span></tt>. Finally it is just passed to the context of
+the template as <tt class="docutils literal">chart</tt>.</p>
+<p>Now, inside the template I&#8217;ve got the following&nbsp;line:</p>
+<pre class="code literal-block">
+&lt;img src='data:image/png;base64,{{ chart }}'&gt;
+</pre>
+<p>This will include the data of the chart inline and display it as a png image. If you&#8217;ve followed along
+you should be able to see the graph when you load that&nbsp;view!</p>
+<p>If instead of including the graphs in your normal django template views you want to use a dedicated
+graph-generating view, you can follow my
+<a class="reference external" href="https://spapas.github.io/2014/09/15/django-non-html-responses/">Django non-<span class="caps">HTML</span> responses tutorial</a>. You could then
+modify the <tt class="docutils literal">render_to_response</tt> method of your view like&nbsp;this:</p>
+<pre class="code literal-block">
+def render_to_response(self, generator, **response_kwargs):
+    response = HttpResponse(content_type='image/png')
+
+    fig, ax = plt.subplots(figsize=(10,4))
+    # fill the report here
+
+    fig.savefig(response)
+    return response
+</pre>
+<p>Since <tt class="docutils literal">response</tt> is a file-like object you can save your graph directly&nbsp;there!</p>
+</div>
+  		</article>
   		<article>
 <header>
       <h1 class="entry-title">
@@ -834,109 +963,6 @@ It should work with all Wagtail 2.9 and later&nbsp;projects.</p>
 </div>
 </div>
   		</article>
-  		<article>
-<header>
-      <h1 class="entry-title">
-        <a href="https://spapas.github.io/2020/03/18/django-crispy-form-quick-easy-layout/">Quick and easy layout of django forms using django-crispy-forms and django-widget-tweaks</a>
-      </h1>
-    <p class="meta">
-<time datetime="2020-03-18T11:20:00+02:00" pubdate>Τετ 18 Μάρτιος 2020</time>    </p>
-</header>
-
-<div class="entry-content"><p>One of the first problems you have when you want to create a traditional <span class="caps">HTML</span> django site (i.e
-not an <span class="caps">SPA</span> one) is how to properly and beautifully layout your forms. In this small article I&#8217;ll
-talk about two very useful django packages that will help you have great layouts in your forms:
-<a class="reference external" href="https://github.com/django-crispy-forms/django-crispy-forms">django-crispy-forms</a>  and <a class="reference external" href="https://github.com/jazzband/django-widget-tweaks">django-widget-tweaks</a>.</p>
-<div class="section" id="django-crispy-forms">
-<h2>django-crispy-forms</h2>
-<p>The django-crispy-forms django package is a great way to properly format your forms. If you don&#8217;t
-already use it I totally recommend to check it out; it&#8217;s very useful and you&#8217;ll definitely love it
-if you are a heavy django forms user. It helps you properly layout your forms either implicitly or&nbsp;explicitly.</p>
-<p>For explicitly laying out your forms you should add a <tt class="docutils literal">FormHelper</tt> to your django form class and
-use the <tt class="docutils literal">{% crispy %}</tt> template tag. You can use this to explicitly define your form layout with
-as much detail as you want since you have full control. I won&#8217;t go into more details about this since it&#8217;s
-<a class="reference external" href="https://django-crispy-forms.readthedocs.io/en/latest/crispy_tag_forms.html#crispy-tag-with-forms">explained thoroughly in the docs</a>.</p>
-<p>For implicitly laying out your forms, you will just use the <tt class="docutils literal">|crispy</tt> template filter. This gets a
-normal django form (without any modifications) and converts it to a crispy form based on the <a class="reference external" href="https://django-crispy-forms.readthedocs.io/en/latest/install.html#template-packs">template pack</a>
-you are using. This works great for many situations however sometimes you&#8217;ll need to have more control
-over this without going to the extra effort to add a complete layout to each of your forms using
-the <tt class="docutils literal">FormHelper</tt>.</p>
-<p>So how do you resolve this? Enter the <tt class="docutils literal">|as_crispy_field</tt> template filter. To use that filter you&#8217;ll need
-to add the <tt class="docutils literal">{% load crispy_forms_tags %}</tt> lines to your template and then you can pass any one of your
-form&#8217;s fields to it so it will be properly &#8220;crispified&#8221;! Let&#8217;s see a quick example of adding the fields of
-a form in a <tt class="docutils literal">&lt;div <span class="pre">class='col-md-6'&gt;</span></tt> so they will be in two columns (using&nbsp;bootstrap):</p>
-<pre class="code literal-block">
-&lt;form class='form' method=&quot;POST&quot;&gt;
-    &lt;div class='row'&gt;
-        {% for field in form %}
-            &lt;div class='col-md-6'&gt;
-              {{ field|as_crispy_field }}
-            &lt;/div&gt;
-        {% endfor %}
-        {% csrf_token %}
-    &lt;/div&gt;
-    &lt;input class='btn btn-primary' type='submit'&gt;
-&lt;/form&gt;
-</pre>
-<p>So the above code enumerates all form fields and uses the <tt class="docutils literal">|as_crispy_field</tt> to properly add the
-crispified information to it. If you want to re-use the above two column layout in multiple forms and
-be more dry you can create a template snippet and <tt class="docutils literal">{% include %}</tt> it in the part of your code you
-want the form to be&nbsp;rendered.</p>
-</div>
-<div class="section" id="django-widget-tweaks">
-<h2>django-widget-tweaks</h2>
-<p>Using the <tt class="docutils literal">as_crispy_field</tt> is excellent however sometimes you may need even more control
-of your for fields, for example add an extra class (like <tt class="docutils literal"><span class="pre">form-control-lg</span></tt>) to your form controls.
-The answer to this is the django-widget-tweaks package: It enables you to easily modify form
-fields by adding classes, attributes etc to them from within your django&nbsp;templates.</p>
-<p>To use it you need to add a <tt class="docutils literal">{% load widget_tweaks %}</tt> to your templates. Then you&#8217;ll be
-able to use the <tt class="docutils literal">|add_class</tt> form field to add a class to your form field. For example the
-previous example can be modified like this to have smaller&nbsp;controls:</p>
-<pre class="code literal-block">
-&lt;form class='form' method=&quot;POST&quot;&gt;
-    &lt;div class='row'&gt;
-        {% for field in form %}
-            &lt;div class='col-md-6'&gt;
-              {{ field|add_class:&quot;form-control-sm&quot;|as_crispy_field }}
-            &lt;/div&gt;
-        {% endfor %}
-        {% csrf_token %}
-    &lt;/div&gt;
-    &lt;input class='btn btn-primary' type='submit'&gt;
-&lt;/form&gt;
-</pre>
-<p>Please notice that I use both <tt class="docutils literal">add_class</tt> and <tt class="docutils literal">as_crispy_fields</tt> together; notice the
-order, the <tt class="docutils literal">add_class</tt> needs to be <em>before</em> the <tt class="docutils literal">as_crispy_field</tt> or you&#8217;ll get an error. This
-way the django form field will have the <tt class="docutils literal"><span class="pre">form-control-sm</span></tt> class <em>and</em> then be rendered as a
-crispy&nbsp;field.</p>
-<p>Let&#8217;s now suppose that you need to more control over your fields. For example you need to add a class
-only to your select fields or even only to a particular field (depending on its name). To do that
-you can use the <tt class="docutils literal">name</tt> and <tt class="docutils literal">field.widget.input_type</tt> attributes of each for field. So, to make
-select fields smaller and with a <tt class="docutils literal">warning</tt> background and fields that have a name of <tt class="docutils literal">name</tt>
-or <tt class="docutils literal">year</tt> larger you can use something like&nbsp;this:</p>
-<pre class="code literal-block">
-&lt;form class='form' method=&quot;POST&quot;&gt;
-    &lt;div class='row'&gt;
-        {% for field in form %}
-          {% if field.name == 'name' or field.name == 'year' %}
-              {{ field|add_class:&quot;form-control-lg&quot;|as_crispy_field }}
-          {% elif field.field.widget.input_type == 'select' %}
-              {{ field|add_class:&quot;form-control-sm&quot;|add_class:&quot;bg-warning&quot;|as_crispy_field }}
-          {% else %}
-              {{ field|as_crispy_field }}
-          {% endif %}
-        {% endfor %}
-        {% csrf_token %}
-    &lt;/div&gt;
-    &lt;input class='btn btn-primary' type='submit'&gt;
-&lt;/form&gt;
-</pre>
-<p>Using the above techniques you should be able to quickly layout and format your form fields with
-much control! If you need something more I recommend going the <tt class="docutils literal">FormLayout</tt> route I mentioned
-in the&nbsp;beginning.</p>
-</div>
-</div>
-  		</article>
 <div class="pagination">
     <a class="prev" href="https://spapas.github.io/index2.html">&larr; Older</a>
 
@@ -1054,6 +1080,9 @@ in the&nbsp;beginning.</p>
     <h1>Recent Posts</h1>
     <ul id="recent_posts">
       <li class="post">
+        <a href="https://spapas.github.io/2021/02/08/django-matplotlib/">Using matplotlib to generate graphs in Django</a>
+      </li>
+      <li class="post">
         <a href="https://spapas.github.io/2021/01/07/django-hashids/">Using hashids to hide ids of objects in Django</a>
       </li>
       <li class="post">
@@ -1064,9 +1093,6 @@ in the&nbsp;beginning.</p>
       </li>
       <li class="post">
         <a href="https://spapas.github.io/2020/03/27/wagtail-add-latest-changes/">Adding a latest-changes list to your Wagtail site</a>
-      </li>
-      <li class="post">
-        <a href="https://spapas.github.io/2020/03/18/django-crispy-form-quick-easy-layout/">Quick and easy layout of django forms using django-crispy-forms and django-widget-tweaks</a>
       </li>
     </ul>
   </section>
@@ -1093,7 +1119,7 @@ in the&nbsp;beginning.</p>
 
   <section>
     <h1>Tags</h1>
-    <a href="https://spapas.github.io/tag/less.html">less</a>,    <a href="https://spapas.github.io/tag/django-crispy-forms.html">django-crispy-forms</a>,    <a href="https://spapas.github.io/tag/rest.html">rest</a>,    <a href="https://spapas.github.io/tag/query.html">query</a>,    <a href="https://spapas.github.io/tag/ecto.html">ecto</a>,    <a href="https://spapas.github.io/tag/tables.html">tables</a>,    <a href="https://spapas.github.io/tag/pivot_table.html">pivot_table</a>,    <a href="https://spapas.github.io/tag/console.html">console</a>,    <a href="https://spapas.github.io/tag/async.html">async</a>,    <a href="https://spapas.github.io/tag/django-rq.html">django-rq</a>,    <a href="https://spapas.github.io/tag/hashids.html">hashids</a>,    <a href="https://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="https://spapas.github.io/tag/forms.html">forms</a>,    <a href="https://spapas.github.io/tag/yaml.html">yaml</a>,    <a href="https://spapas.github.io/tag/404.html">404</a>,    <a href="https://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="https://spapas.github.io/tag/erlang.html">erlang</a>,    <a href="https://spapas.github.io/tag/immutable.html">immutable</a>,    <a href="https://spapas.github.io/tag/initd.html">init.d</a>,    <a href="https://spapas.github.io/tag/django-widget-tweaks.html">django-widget-tweaks</a>,    <a href="https://spapas.github.io/tag/youtube-dl.html">youtube-dl</a>,    <a href="https://spapas.github.io/tag/python.html">python</a>,    <a href="https://spapas.github.io/tag/django-extensions.html">django-extensions</a>,    <a href="https://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="https://spapas.github.io/tag/scipy.html">scipy</a>,    <a href="https://spapas.github.io/tag/grid.html">grid</a>,    <a href="https://spapas.github.io/tag/ag-grid.html">ag-grid</a>,    <a href="https://spapas.github.io/tag/du.html">du</a>,    <a href="https://spapas.github.io/tag/watchify.html">watchify</a>,    <a href="https://spapas.github.io/tag/settings.html">settings</a>,    <a href="https://spapas.github.io/tag/flux.html">flux</a>,    <a href="https://spapas.github.io/tag/fixeddatatable.html">FixedDataTable</a>,    <a href="https://spapas.github.io/tag/queries.html">queries</a>,    <a href="https://spapas.github.io/tag/debug.html">debug</a>,    <a href="https://spapas.github.io/tag/imgur.html">imgur</a>,    <a href="https://spapas.github.io/tag/security.html">security</a>,    <a href="https://spapas.github.io/tag/npm.html">npm</a>,    <a href="https://spapas.github.io/tag/hyperapp.html">hyperapp</a>,    <a href="https://spapas.github.io/tag/spring.html">spring</a>,    <a href="https://spapas.github.io/tag/react-redux.html">react-redux</a>,    <a href="https://spapas.github.io/tag/cron.html">cron</a>,    <a href="https://spapas.github.io/tag/babelify.html">babelify</a>,    <a href="https://spapas.github.io/tag/design.html">design</a>,    <a href="https://spapas.github.io/tag/tutorial.html">tutorial</a>,    <a href="https://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="https://spapas.github.io/tag/reportlab.html">reportlab</a>,    <a href="https://spapas.github.io/tag/rq.html">rq</a>,    <a href="https://spapas.github.io/tag/redis.html">redis</a>,    <a href="https://spapas.github.io/tag/python-3.html">python-3</a>,    <a href="https://spapas.github.io/tag/research.html">research</a>,    <a href="https://spapas.github.io/tag/werkzeug.html">werkzeug</a>,    <a href="https://spapas.github.io/tag/jobs.html">jobs</a>,    <a href="https://spapas.github.io/tag/redux-thunk.html">redux-thunk</a>,    <a href="https://spapas.github.io/tag/disk-usage.html">disk-usage</a>,    <a href="https://spapas.github.io/tag/javascript.html">javascript</a>,    <a href="https://spapas.github.io/tag/component.html">component</a>,    <a href="https://spapas.github.io/tag/ajax.html">ajax</a>,    <a href="https://spapas.github.io/tag/elixir.html">elixir</a>,    <a href="https://spapas.github.io/tag/ipython.html">ipython</a>,    <a href="https://spapas.github.io/tag/uglify.html">uglify</a>,    <a href="https://spapas.github.io/tag/configuration.html">configuration</a>,    <a href="https://spapas.github.io/tag/properties.html">properties</a>,    <a href="https://spapas.github.io/tag/bash.html">bash</a>,    <a href="https://spapas.github.io/tag/es6.html">es6</a>,    <a href="https://spapas.github.io/tag/spring-boot.html">spring-boot</a>,    <a href="https://spapas.github.io/tag/postgresql.html">postgresql</a>,    <a href="https://spapas.github.io/tag/kotlin.html">kotlin</a>,    <a href="https://spapas.github.io/tag/adapter.html">adapter</a>,    <a href="https://spapas.github.io/tag/filter.html">filter</a>,    <a href="https://spapas.github.io/tag/flask.html">flask</a>,    <a href="https://spapas.github.io/tag/notebook.html">notebook</a>,    <a href="https://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="https://spapas.github.io/tag/pdf.html">pdf</a>,    <a href="https://spapas.github.io/tag/react-notification.html">react-notification</a>,    <a href="https://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="https://spapas.github.io/tag/tasks.html">tasks</a>,    <a href="https://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="https://spapas.github.io/tag/unix.html">unix</a>,    <a href="https://spapas.github.io/tag/google.html">google</a>,    <a href="https://spapas.github.io/tag/linux.html">linux</a>,    <a href="https://spapas.github.io/tag/pivot.html">pivot</a>,    <a href="https://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="https://spapas.github.io/tag/git.html">git</a>,    <a href="https://spapas.github.io/tag/java.html">java</a>,    <a href="https://spapas.github.io/tag/introduction.html">introduction</a>,    <a href="https://spapas.github.io/tag/pusher.html">pusher</a>,    <a href="https://spapas.github.io/tag/fixed-data-tables.html">fixed-data-tables</a>,    <a href="https://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="https://spapas.github.io/tag/xhtml2pdf.html">xhtml2pdf</a>,    <a href="https://spapas.github.io/tag/numpy.html">numpy</a>,    <a href="https://spapas.github.io/tag/form.html">form</a>,    <a href="https://spapas.github.io/tag/django-rest-auth.html">django-rest-auth</a>,    <a href="https://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="https://spapas.github.io/tag/rst.html">rst</a>,    <a href="https://spapas.github.io/tag/python-2.html">python-2</a>,    <a href="https://spapas.github.io/tag/ffmpeg.html">ffmpeg</a>,    <a href="https://spapas.github.io/tag/middleware.html">middleware</a>,    <a href="https://spapas.github.io/tag/profiles.html">profiles</a>,    <a href="https://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="https://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="https://spapas.github.io/tag/error.html">error</a>,    <a href="https://spapas.github.io/tag/asynchronous.html">asynchronous</a>,    <a href="https://spapas.github.io/tag/react-router-redux.html">react-router-redux</a>,    <a href="https://spapas.github.io/tag/select2.html">select2</a>,    <a href="https://spapas.github.io/tag/history.html">history</a>,    <a href="https://spapas.github.io/tag/django-rest-framework.html">django-rest-framework</a>,    <a href="https://spapas.github.io/tag/redux-form.html">redux-form</a>,    <a href="https://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="https://spapas.github.io/tag/scheduling.html">scheduling</a>,    <a href="https://spapas.github.io/tag/plpgsql.html">plpgsql</a>,    <a href="https://spapas.github.io/tag/os-monitoring.html">os-monitoring</a>,    <a href="https://spapas.github.io/tag/boilerplate.html">boilerplate</a>,    <a href="https://spapas.github.io/tag/generic.html">generic</a>,    <a href="https://spapas.github.io/tag/babel.html">babel</a>,    <a href="https://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="https://spapas.github.io/tag/html.html">html</a>,    <a href="https://spapas.github.io/tag/android.html">android</a>,    <a href="https://spapas.github.io/tag/pandas.html">pandas</a>,    <a href="https://spapas.github.io/tag/css.html">css</a>,    <a href="https://spapas.github.io/tag/node.html">node</a>,    <a href="https://spapas.github.io/tag/phoenix.html">phoenix</a>,    <a href="https://spapas.github.io/tag/deploy.html">deploy</a>,    <a href="https://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="https://spapas.github.io/tag/react.html">react</a>,    <a href="https://spapas.github.io/tag/autocompelte.html">autocompelte</a>,    <a href="https://spapas.github.io/tag/declarative.html">declarative</a>,    <a href="https://spapas.github.io/tag/osmon.html">osmon</a>,    <a href="https://spapas.github.io/tag/php.html">php</a>,    <a href="https://spapas.github.io/tag/browserify.html">browserify</a>,    <a href="https://spapas.github.io/tag/branching.html">branching</a>,    <a href="https://spapas.github.io/tag/github.html">github</a>,    <a href="https://spapas.github.io/tag/jupyter.html">jupyter</a>,    <a href="https://spapas.github.io/tag/windows.html">windows</a>,    <a href="https://spapas.github.io/tag/youtube.html">youtube</a>,    <a href="https://spapas.github.io/tag/django.html">django</a>,    <a href="https://spapas.github.io/tag/q.html">q</a>,    <a href="https://spapas.github.io/tag/react-router.html">react-router</a>,    <a href="https://spapas.github.io/tag/redux.html">redux</a>,    <a href="https://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>  </section>
+    <a href="https://spapas.github.io/tag/less.html">less</a>,    <a href="https://spapas.github.io/tag/django-crispy-forms.html">django-crispy-forms</a>,    <a href="https://spapas.github.io/tag/rest.html">rest</a>,    <a href="https://spapas.github.io/tag/query.html">query</a>,    <a href="https://spapas.github.io/tag/ecto.html">ecto</a>,    <a href="https://spapas.github.io/tag/tables.html">tables</a>,    <a href="https://spapas.github.io/tag/pivot_table.html">pivot_table</a>,    <a href="https://spapas.github.io/tag/console.html">console</a>,    <a href="https://spapas.github.io/tag/async.html">async</a>,    <a href="https://spapas.github.io/tag/django-rq.html">django-rq</a>,    <a href="https://spapas.github.io/tag/hashids.html">hashids</a>,    <a href="https://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="https://spapas.github.io/tag/forms.html">forms</a>,    <a href="https://spapas.github.io/tag/yaml.html">yaml</a>,    <a href="https://spapas.github.io/tag/404.html">404</a>,    <a href="https://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="https://spapas.github.io/tag/erlang.html">erlang</a>,    <a href="https://spapas.github.io/tag/immutable.html">immutable</a>,    <a href="https://spapas.github.io/tag/initd.html">init.d</a>,    <a href="https://spapas.github.io/tag/django-widget-tweaks.html">django-widget-tweaks</a>,    <a href="https://spapas.github.io/tag/youtube-dl.html">youtube-dl</a>,    <a href="https://spapas.github.io/tag/python.html">python</a>,    <a href="https://spapas.github.io/tag/django-extensions.html">django-extensions</a>,    <a href="https://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="https://spapas.github.io/tag/scipy.html">scipy</a>,    <a href="https://spapas.github.io/tag/grid.html">grid</a>,    <a href="https://spapas.github.io/tag/ag-grid.html">ag-grid</a>,    <a href="https://spapas.github.io/tag/du.html">du</a>,    <a href="https://spapas.github.io/tag/watchify.html">watchify</a>,    <a href="https://spapas.github.io/tag/settings.html">settings</a>,    <a href="https://spapas.github.io/tag/flux.html">flux</a>,    <a href="https://spapas.github.io/tag/fixeddatatable.html">FixedDataTable</a>,    <a href="https://spapas.github.io/tag/queries.html">queries</a>,    <a href="https://spapas.github.io/tag/debug.html">debug</a>,    <a href="https://spapas.github.io/tag/imgur.html">imgur</a>,    <a href="https://spapas.github.io/tag/security.html">security</a>,    <a href="https://spapas.github.io/tag/npm.html">npm</a>,    <a href="https://spapas.github.io/tag/hyperapp.html">hyperapp</a>,    <a href="https://spapas.github.io/tag/spring.html">spring</a>,    <a href="https://spapas.github.io/tag/react-redux.html">react-redux</a>,    <a href="https://spapas.github.io/tag/cron.html">cron</a>,    <a href="https://spapas.github.io/tag/babelify.html">babelify</a>,    <a href="https://spapas.github.io/tag/design.html">design</a>,    <a href="https://spapas.github.io/tag/tutorial.html">tutorial</a>,    <a href="https://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="https://spapas.github.io/tag/reportlab.html">reportlab</a>,    <a href="https://spapas.github.io/tag/rq.html">rq</a>,    <a href="https://spapas.github.io/tag/redis.html">redis</a>,    <a href="https://spapas.github.io/tag/python-3.html">python-3</a>,    <a href="https://spapas.github.io/tag/research.html">research</a>,    <a href="https://spapas.github.io/tag/werkzeug.html">werkzeug</a>,    <a href="https://spapas.github.io/tag/jobs.html">jobs</a>,    <a href="https://spapas.github.io/tag/redux-thunk.html">redux-thunk</a>,    <a href="https://spapas.github.io/tag/disk-usage.html">disk-usage</a>,    <a href="https://spapas.github.io/tag/javascript.html">javascript</a>,    <a href="https://spapas.github.io/tag/component.html">component</a>,    <a href="https://spapas.github.io/tag/matplotlib.html">matplotlib</a>,    <a href="https://spapas.github.io/tag/ajax.html">ajax</a>,    <a href="https://spapas.github.io/tag/elixir.html">elixir</a>,    <a href="https://spapas.github.io/tag/ipython.html">ipython</a>,    <a href="https://spapas.github.io/tag/uglify.html">uglify</a>,    <a href="https://spapas.github.io/tag/configuration.html">configuration</a>,    <a href="https://spapas.github.io/tag/properties.html">properties</a>,    <a href="https://spapas.github.io/tag/bash.html">bash</a>,    <a href="https://spapas.github.io/tag/es6.html">es6</a>,    <a href="https://spapas.github.io/tag/spring-boot.html">spring-boot</a>,    <a href="https://spapas.github.io/tag/postgresql.html">postgresql</a>,    <a href="https://spapas.github.io/tag/kotlin.html">kotlin</a>,    <a href="https://spapas.github.io/tag/adapter.html">adapter</a>,    <a href="https://spapas.github.io/tag/filter.html">filter</a>,    <a href="https://spapas.github.io/tag/flask.html">flask</a>,    <a href="https://spapas.github.io/tag/notebook.html">notebook</a>,    <a href="https://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="https://spapas.github.io/tag/pdf.html">pdf</a>,    <a href="https://spapas.github.io/tag/react-notification.html">react-notification</a>,    <a href="https://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="https://spapas.github.io/tag/tasks.html">tasks</a>,    <a href="https://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="https://spapas.github.io/tag/unix.html">unix</a>,    <a href="https://spapas.github.io/tag/google.html">google</a>,    <a href="https://spapas.github.io/tag/linux.html">linux</a>,    <a href="https://spapas.github.io/tag/pivot.html">pivot</a>,    <a href="https://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="https://spapas.github.io/tag/git.html">git</a>,    <a href="https://spapas.github.io/tag/java.html">java</a>,    <a href="https://spapas.github.io/tag/introduction.html">introduction</a>,    <a href="https://spapas.github.io/tag/pusher.html">pusher</a>,    <a href="https://spapas.github.io/tag/fixed-data-tables.html">fixed-data-tables</a>,    <a href="https://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="https://spapas.github.io/tag/xhtml2pdf.html">xhtml2pdf</a>,    <a href="https://spapas.github.io/tag/numpy.html">numpy</a>,    <a href="https://spapas.github.io/tag/form.html">form</a>,    <a href="https://spapas.github.io/tag/django-rest-auth.html">django-rest-auth</a>,    <a href="https://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="https://spapas.github.io/tag/rst.html">rst</a>,    <a href="https://spapas.github.io/tag/python-2.html">python-2</a>,    <a href="https://spapas.github.io/tag/ffmpeg.html">ffmpeg</a>,    <a href="https://spapas.github.io/tag/middleware.html">middleware</a>,    <a href="https://spapas.github.io/tag/profiles.html">profiles</a>,    <a href="https://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="https://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="https://spapas.github.io/tag/error.html">error</a>,    <a href="https://spapas.github.io/tag/asynchronous.html">asynchronous</a>,    <a href="https://spapas.github.io/tag/react-router-redux.html">react-router-redux</a>,    <a href="https://spapas.github.io/tag/select2.html">select2</a>,    <a href="https://spapas.github.io/tag/history.html">history</a>,    <a href="https://spapas.github.io/tag/django-rest-framework.html">django-rest-framework</a>,    <a href="https://spapas.github.io/tag/redux-form.html">redux-form</a>,    <a href="https://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="https://spapas.github.io/tag/scheduling.html">scheduling</a>,    <a href="https://spapas.github.io/tag/plpgsql.html">plpgsql</a>,    <a href="https://spapas.github.io/tag/os-monitoring.html">os-monitoring</a>,    <a href="https://spapas.github.io/tag/boilerplate.html">boilerplate</a>,    <a href="https://spapas.github.io/tag/generic.html">generic</a>,    <a href="https://spapas.github.io/tag/babel.html">babel</a>,    <a href="https://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="https://spapas.github.io/tag/html.html">html</a>,    <a href="https://spapas.github.io/tag/android.html">android</a>,    <a href="https://spapas.github.io/tag/pandas.html">pandas</a>,    <a href="https://spapas.github.io/tag/css.html">css</a>,    <a href="https://spapas.github.io/tag/node.html">node</a>,    <a href="https://spapas.github.io/tag/phoenix.html">phoenix</a>,    <a href="https://spapas.github.io/tag/deploy.html">deploy</a>,    <a href="https://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="https://spapas.github.io/tag/react.html">react</a>,    <a href="https://spapas.github.io/tag/autocompelte.html">autocompelte</a>,    <a href="https://spapas.github.io/tag/declarative.html">declarative</a>,    <a href="https://spapas.github.io/tag/osmon.html">osmon</a>,    <a href="https://spapas.github.io/tag/php.html">php</a>,    <a href="https://spapas.github.io/tag/browserify.html">browserify</a>,    <a href="https://spapas.github.io/tag/branching.html">branching</a>,    <a href="https://spapas.github.io/tag/github.html">github</a>,    <a href="https://spapas.github.io/tag/jupyter.html">jupyter</a>,    <a href="https://spapas.github.io/tag/windows.html">windows</a>,    <a href="https://spapas.github.io/tag/youtube.html">youtube</a>,    <a href="https://spapas.github.io/tag/django.html">django</a>,    <a href="https://spapas.github.io/tag/q.html">q</a>,    <a href="https://spapas.github.io/tag/react-router.html">react-router</a>,    <a href="https://spapas.github.io/tag/redux.html">redux</a>,    <a href="https://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>  </section>
 
   <section>
     <h1>Yearly archives</h1>

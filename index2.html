@@ -120,10 +120,114 @@ border-radius: 5px;
     <div id="content">
     <div id="gHPzseYvFrhZ123">
       Hello! I see that you have an ad blocker. If you find something useful here 
-      and want to support me somehow please consider disabling your ad blocker for this site. It won't cost you anything.
+      and want to support me somehow please consider disabling your ad blocker for this site. It won't cost you anything
+      but will convince me that there's actually useful info here!
       
     </div>
 <div class="blog-index">
+  		<article>
+<header>
+      <h1 class="entry-title">
+        <a href="https://spapas.github.io/2020/03/18/django-crispy-form-quick-easy-layout/">Quick and easy layout of django forms using django-crispy-forms and django-widget-tweaks</a>
+      </h1>
+    <p class="meta">
+<time datetime="2020-03-18T11:20:00+02:00" pubdate>Τετ 18 Μάρτιος 2020</time>    </p>
+</header>
+
+<div class="entry-content"><p>One of the first problems you have when you want to create a traditional <span class="caps">HTML</span> django site (i.e
+not an <span class="caps">SPA</span> one) is how to properly and beautifully layout your forms. In this small article I&#8217;ll
+talk about two very useful django packages that will help you have great layouts in your forms:
+<a class="reference external" href="https://github.com/django-crispy-forms/django-crispy-forms">django-crispy-forms</a>  and <a class="reference external" href="https://github.com/jazzband/django-widget-tweaks">django-widget-tweaks</a>.</p>
+<div class="section" id="django-crispy-forms">
+<h2>django-crispy-forms</h2>
+<p>The django-crispy-forms django package is a great way to properly format your forms. If you don&#8217;t
+already use it I totally recommend to check it out; it&#8217;s very useful and you&#8217;ll definitely love it
+if you are a heavy django forms user. It helps you properly layout your forms either implicitly or&nbsp;explicitly.</p>
+<p>For explicitly laying out your forms you should add a <tt class="docutils literal">FormHelper</tt> to your django form class and
+use the <tt class="docutils literal">{% crispy %}</tt> template tag. You can use this to explicitly define your form layout with
+as much detail as you want since you have full control. I won&#8217;t go into more details about this since it&#8217;s
+<a class="reference external" href="https://django-crispy-forms.readthedocs.io/en/latest/crispy_tag_forms.html#crispy-tag-with-forms">explained thoroughly in the docs</a>.</p>
+<p>For implicitly laying out your forms, you will just use the <tt class="docutils literal">|crispy</tt> template filter. This gets a
+normal django form (without any modifications) and converts it to a crispy form based on the <a class="reference external" href="https://django-crispy-forms.readthedocs.io/en/latest/install.html#template-packs">template pack</a>
+you are using. This works great for many situations however sometimes you&#8217;ll need to have more control
+over this without going to the extra effort to add a complete layout to each of your forms using
+the <tt class="docutils literal">FormHelper</tt>.</p>
+<p>So how do you resolve this? Enter the <tt class="docutils literal">|as_crispy_field</tt> template filter. To use that filter you&#8217;ll need
+to add the <tt class="docutils literal">{% load crispy_forms_tags %}</tt> lines to your template and then you can pass any one of your
+form&#8217;s fields to it so it will be properly &#8220;crispified&#8221;! Let&#8217;s see a quick example of adding the fields of
+a form in a <tt class="docutils literal">&lt;div <span class="pre">class='col-md-6'&gt;</span></tt> so they will be in two columns (using&nbsp;bootstrap):</p>
+<pre class="code literal-block">
+&lt;form class='form' method=&quot;POST&quot;&gt;
+    &lt;div class='row'&gt;
+        {% for field in form %}
+            &lt;div class='col-md-6'&gt;
+              {{ field|as_crispy_field }}
+            &lt;/div&gt;
+        {% endfor %}
+        {% csrf_token %}
+    &lt;/div&gt;
+    &lt;input class='btn btn-primary' type='submit'&gt;
+&lt;/form&gt;
+</pre>
+<p>So the above code enumerates all form fields and uses the <tt class="docutils literal">|as_crispy_field</tt> to properly add the
+crispified information to it. If you want to re-use the above two column layout in multiple forms and
+be more dry you can create a template snippet and <tt class="docutils literal">{% include %}</tt> it in the part of your code you
+want the form to be&nbsp;rendered.</p>
+</div>
+<div class="section" id="django-widget-tweaks">
+<h2>django-widget-tweaks</h2>
+<p>Using the <tt class="docutils literal">as_crispy_field</tt> is excellent however sometimes you may need even more control
+of your for fields, for example add an extra class (like <tt class="docutils literal"><span class="pre">form-control-lg</span></tt>) to your form controls.
+The answer to this is the django-widget-tweaks package: It enables you to easily modify form
+fields by adding classes, attributes etc to them from within your django&nbsp;templates.</p>
+<p>To use it you need to add a <tt class="docutils literal">{% load widget_tweaks %}</tt> to your templates. Then you&#8217;ll be
+able to use the <tt class="docutils literal">|add_class</tt> form field to add a class to your form field. For example the
+previous example can be modified like this to have smaller&nbsp;controls:</p>
+<pre class="code literal-block">
+&lt;form class='form' method=&quot;POST&quot;&gt;
+    &lt;div class='row'&gt;
+        {% for field in form %}
+            &lt;div class='col-md-6'&gt;
+              {{ field|add_class:&quot;form-control-sm&quot;|as_crispy_field }}
+            &lt;/div&gt;
+        {% endfor %}
+        {% csrf_token %}
+    &lt;/div&gt;
+    &lt;input class='btn btn-primary' type='submit'&gt;
+&lt;/form&gt;
+</pre>
+<p>Please notice that I use both <tt class="docutils literal">add_class</tt> and <tt class="docutils literal">as_crispy_fields</tt> together; notice the
+order, the <tt class="docutils literal">add_class</tt> needs to be <em>before</em> the <tt class="docutils literal">as_crispy_field</tt> or you&#8217;ll get an error. This
+way the django form field will have the <tt class="docutils literal"><span class="pre">form-control-sm</span></tt> class <em>and</em> then be rendered as a
+crispy&nbsp;field.</p>
+<p>Let&#8217;s now suppose that you need to more control over your fields. For example you need to add a class
+only to your select fields or even only to a particular field (depending on its name). To do that
+you can use the <tt class="docutils literal">name</tt> and <tt class="docutils literal">field.widget.input_type</tt> attributes of each for field. So, to make
+select fields smaller and with a <tt class="docutils literal">warning</tt> background and fields that have a name of <tt class="docutils literal">name</tt>
+or <tt class="docutils literal">year</tt> larger you can use something like&nbsp;this:</p>
+<pre class="code literal-block">
+&lt;form class='form' method=&quot;POST&quot;&gt;
+    &lt;div class='row'&gt;
+        {% for field in form %}
+          {% if field.name == 'name' or field.name == 'year' %}
+              {{ field|add_class:&quot;form-control-lg&quot;|as_crispy_field }}
+          {% elif field.field.widget.input_type == 'select' %}
+              {{ field|add_class:&quot;form-control-sm&quot;|add_class:&quot;bg-warning&quot;|as_crispy_field }}
+          {% else %}
+              {{ field|as_crispy_field }}
+          {% endif %}
+        {% endfor %}
+        {% csrf_token %}
+    &lt;/div&gt;
+    &lt;input class='btn btn-primary' type='submit'&gt;
+&lt;/form&gt;
+</pre>
+<p>Using the above techniques you should be able to quickly layout and format your form fields with
+much control! If you need something more I recommend going the <tt class="docutils literal">FormLayout</tt> route I mentioned
+in the&nbsp;beginning.</p>
+</div>
+</div>
+  		</article>
   		<article>
 <header>
       <h1 class="entry-title">
@@ -1281,177 +1385,6 @@ that everything is a walk in the park by following the&nbsp;docs.</p>
 </div>
 </div>
   		</article>
-  		<article>
-<header>
-      <h1 class="entry-title">
-        <a href="https://spapas.github.io/2019/04/05/android-custom-filter-adapter/">How to create a custom filtered adapter in Android</a>
-      </h1>
-    <p class="meta">
-<time datetime="2019-04-05T12:20:00+03:00" pubdate>Παρ 05 Απρίλιος 2019</time>    </p>
-</header>
-
-<div class="entry-content"><div class="section" id="introduction">
-<h2>Introduction</h2>
-<p>Android offers a nice component named <a class="reference external" href="https://developer.android.com/reference/android/widget/AutoCompleteTextView">AutoCompleteTextView</a> that can be used to auto-fill a text box from a list of values.
-In its simplest form, you just create an array adapter passing it a list of objects (that have a proper <tt class="docutils literal">toString()</tt> method).
-Then you type some characters to the textbox and by default it will filter the results searching
-in the <em>beginning of the backing object&#8217;s toString() result</em>.</p>
-<p>However there are times that you don&#8217;t want to look at the beginning of the string (because you want to look at the middle of the string) or
-you don&#8217;t want to just to search in toString() method of the object or you want to do some more fancy things in object output. For this
-you must override the <tt class="docutils literal">ArrayAdapter</tt> and add a custom <tt class="docutils literal">Filter</tt>.</p>
-<p>Unfurtunately this isn&#8217;t as straightforward as I&#8217;d like and I couldn&#8217;t find a quick and easy tutorial on how it can be&nbsp;done.</p>
-<p>So here goes nothing: In the following I&#8217;ll show you a very simple android application that will have <em>the minimum viable</em> custom filtered
-adapter implementation. You can find the whole project in github: <a class="reference external" href="https://github.com/spapas/CustomFilteredAdapeter">https://github.com/spapas/CustomFilteredAdapeter</a> but I am going to discuss
-everything here&nbsp;also.</p>
-</div>
-<div class="section" id="the-application">
-<h2>The&nbsp;application</h2>
-<p>Just create a new project with an empty activity from Android Studio. Use kotlin as the&nbsp;language.</p>
-</div>
-<div class="section" id="the-layout">
-<h2>The&nbsp;layout</h2>
-<p>I&#8217;ll keep it as simple as&nbsp;possible:</p>
-<div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span>
-<span class="nt">&lt;LinearLayout</span>
-        <span class="na">xmlns:android=</span><span class="s">&quot;http://schemas.android.com/apk/res/android&quot;</span>
-        <span class="na">xmlns:tools=</span><span class="s">&quot;http://schemas.android.com/tools&quot;</span>
-        <span class="na">android:orientation=</span><span class="s">&quot;vertical&quot;</span>
-        <span class="na">android:layout_width=</span><span class="s">&quot;match_parent&quot;</span> <span class="na">android:layout_height=</span><span class="s">&quot;match_parent&quot;</span>
-        <span class="na">tools:context=</span><span class="s">&quot;.MainActivity&quot;</span><span class="nt">&gt;</span>
-    <span class="nt">&lt;TextView</span>
-            <span class="na">android:layout_width=</span><span class="s">&quot;match_parent&quot;</span> <span class="na">android:layout_height=</span><span class="s">&quot;wrap_content&quot;</span>
-            <span class="na">android:text=</span><span class="s">&quot;Hello World!&quot;</span>
-            <span class="na">android:textSize=</span><span class="s">&quot;32sp&quot;</span>
-            <span class="na">android:textAlignment=</span><span class="s">&quot;center&quot;</span><span class="nt">/&gt;</span>
-    <span class="nt">&lt;AutoCompleteTextView</span>
-            <span class="na">android:layout_marginTop=</span><span class="s">&quot;32dip&quot;</span>
-            <span class="na">android:layout_width=</span><span class="s">&quot;match_parent&quot;</span> <span class="na">android:layout_height=</span><span class="s">&quot;wrap_content&quot;</span>
-            <span class="na">android:id=</span><span class="s">&quot;@+id/autoCompleteTextView&quot;</span><span class="nt">/&gt;</span>
-<span class="nt">&lt;/LinearLayout&gt;</span>
-</pre></div>
-<p>You should just care about the <tt class="docutils literal">AutoCompleteTextView</tt> with an id of <tt class="docutils literal">autoCompleteTextView</tt>.</p>
-</div>
-<div class="section" id="the-backing-data-object">
-<h2>The backing data&nbsp;object</h2>
-<p>I&#8217;ll use a simple PoiDao Kotlin data class for&nbsp;this:</p>
-<div class="highlight"><pre><span></span><span class="k">data</span> <span class="k">class</span> <span class="nc">PoiDao</span><span class="p">(</span>
-    <span class="k">val</span> <span class="py">id</span><span class="p">:</span> <span class="n">Int</span><span class="p">,</span>
-    <span class="k">val</span> <span class="py">name</span><span class="p">:</span> <span class="n">String</span><span class="p">,</span>
-    <span class="k">val</span> <span class="py">city</span><span class="p">:</span> <span class="n">String</span><span class="p">,</span>
-    <span class="k">val</span> <span class="py">category_name</span><span class="p">:</span> <span class="n">String</span>
-<span class="p">)</span>
-</pre></div>
-<p>I&#8217;d like to be able to search to both name, city and category_name of each object. To create a list of the pois to be used to the adapter I can do something&nbsp;like:</p>
-<div class="highlight"><pre><span></span><span class="k">val</span> <span class="py">poisArray</span> <span class="p">=</span> <span class="n">listOf</span><span class="p">(</span>
-    <span class="n">PoiDao</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="s">&quot;Taco Bell&quot;</span><span class="p">,</span> <span class="s">&quot;Athens&quot;</span><span class="p">,</span> <span class="s">&quot;Restaurant&quot;</span><span class="p">),</span>
-    <span class="n">PoiDao</span><span class="p">(</span><span class="m">2</span><span class="p">,</span> <span class="s">&quot;McDonalds&quot;</span><span class="p">,</span> <span class="s">&quot;Athens&quot;</span><span class="p">,</span><span class="s">&quot;Restaurant&quot;</span><span class="p">),</span>
-    <span class="n">PoiDao</span><span class="p">(</span><span class="m">3</span><span class="p">,</span> <span class="s">&quot;KFC&quot;</span><span class="p">,</span> <span class="s">&quot;Piraeus&quot;</span><span class="p">,</span> <span class="s">&quot;Restaurant&quot;</span><span class="p">),</span>
-    <span class="n">PoiDao</span><span class="p">(</span><span class="m">4</span><span class="p">,</span> <span class="s">&quot;Shell&quot;</span><span class="p">,</span> <span class="s">&quot;Lamia&quot;</span><span class="p">,</span><span class="s">&quot;Gas Station&quot;</span><span class="p">),</span>
-    <span class="n">PoiDao</span><span class="p">(</span><span class="m">5</span><span class="p">,</span> <span class="s">&quot;BP&quot;</span><span class="p">,</span> <span class="s">&quot;Thessaloniki&quot;</span><span class="p">,</span> <span class="s">&quot;Gas Station&quot;</span><span class="p">)</span>
-<span class="p">)</span>
-</pre></div>
-</div>
-<div class="section" id="the-custom-adapter">
-<h2>The custom&nbsp;adapter</h2>
-<p>This will be an <tt class="docutils literal">ArrayAdapter&lt;PoiDao&gt;</tt> implementing also the <tt class="docutils literal">Filterable</tt> interface:</p>
-<div class="highlight"><pre><span></span><span class="k">inner</span> <span class="k">class</span> <span class="nc">PoiAdapter</span><span class="p">(</span><span class="n">context</span><span class="p">:</span> <span class="n">Context</span><span class="p">,</span> <span class="n">@LayoutRes</span> <span class="k">private</span> <span class="k">val</span> <span class="py">layoutResource</span><span class="p">:</span> <span class="n">Int</span><span class="p">,</span> <span class="k">private</span> <span class="k">val</span> <span class="py">allPois</span><span class="p">:</span> <span class="n">List</span><span class="p">&lt;</span><span class="n">PoiDao</span><span class="p">&gt;):</span>
-    <span class="n">ArrayAdapter</span><span class="p">&lt;</span><span class="n">PoiDao</span><span class="p">&gt;(</span><span class="n">context</span><span class="p">,</span> <span class="n">layoutResource</span><span class="p">,</span> <span class="n">allPois</span><span class="p">),</span>
-    <span class="n">Filterable</span> <span class="p">{</span>
-    <span class="k">private</span> <span class="k">var</span> <span class="py">mPois</span><span class="p">:</span> <span class="n">List</span><span class="p">&lt;</span><span class="n">PoiDao</span><span class="p">&gt;</span> <span class="p">=</span> <span class="n">allPois</span>
-
-    <span class="k">override</span> <span class="k">fun</span> <span class="nf">getCount</span><span class="p">():</span> <span class="n">Int</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="n">mPois</span><span class="p">.</span><span class="n">size</span>
-    <span class="p">}</span>
-
-    <span class="k">override</span> <span class="k">fun</span> <span class="nf">getItem</span><span class="p">(</span><span class="n">p0</span><span class="p">:</span> <span class="n">Int</span><span class="p">):</span> <span class="n">PoiDao</span><span class="p">?</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="n">mPois</span><span class="p">.</span><span class="k">get</span><span class="p">(</span><span class="n">p0</span><span class="p">)</span>
-    <span class="p">}</span>
-
-    <span class="k">override</span> <span class="k">fun</span> <span class="nf">getItemId</span><span class="p">(</span><span class="n">p0</span><span class="p">:</span> <span class="n">Int</span><span class="p">):</span> <span class="n">Long</span> <span class="p">{</span>
-        <span class="c1">// Or just return p0</span>
-        <span class="k">return</span> <span class="n">mPois</span><span class="p">.</span><span class="k">get</span><span class="p">(</span><span class="n">p0</span><span class="p">).</span><span class="n">id</span><span class="p">.</span><span class="n">toLong</span><span class="p">()</span>
-    <span class="p">}</span>
-
-    <span class="k">override</span> <span class="k">fun</span> <span class="nf">getView</span><span class="p">(</span><span class="n">position</span><span class="p">:</span> <span class="n">Int</span><span class="p">,</span> <span class="n">convertView</span><span class="p">:</span> <span class="n">View</span><span class="p">?,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">ViewGroup</span><span class="p">?):</span> <span class="n">View</span> <span class="p">{</span>
-        <span class="k">val</span> <span class="py">view</span><span class="p">:</span> <span class="n">TextView</span> <span class="p">=</span> <span class="n">convertView</span> <span class="k">as</span> <span class="n">TextView</span><span class="p">?</span> <span class="o">?:</span> <span class="n">LayoutInflater</span><span class="p">.</span><span class="n">from</span><span class="p">(</span><span class="n">context</span><span class="p">).</span><span class="n">inflate</span><span class="p">(</span><span class="n">layoutResource</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="k">false</span><span class="p">)</span> <span class="k">as</span> <span class="n">TextView</span>
-        <span class="n">view</span><span class="p">.</span><span class="n">text</span> <span class="p">=</span> <span class="s">&quot;${mPois[position].name} ${mPois[position].city} (${mPois[position].category_name})&quot;</span>
-        <span class="k">return</span> <span class="n">view</span>
-    <span class="p">}</span>
-
-    <span class="k">override</span> <span class="k">fun</span> <span class="nf">getFilter</span><span class="p">():</span> <span class="n">Filter</span> <span class="p">{</span>
-        <span class="c1">// See next section</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-<p>You&#8217;ll see that we add an instance variable named <tt class="docutils literal">mPois</tt> that gets initialized in the start with <tt class="docutils literal">allPois</tt> (which is the initial list of all pois that is passed to the adapter). The mPois
-will contain the <em>filtered</em> results. Then,
-for <tt class="docutils literal">getCount</tt> and <tt class="docutils literal">getItem</tt> we return the corresponding valeus from <tt class="docutils literal">mPois</tt>; the <tt class="docutils literal">getItemId</tt> is used when you have an sqlite backed adapter but I&#8217;m including it here for&nbsp;completeness.</p>
-<p>The <tt class="docutils literal">getView</tt> will create the specific line for each item in the dropdown. As you&#8217;ll see the layout that is passed must have a <tt class="docutils literal">text</tt> child which is set based on some of the attributes of
-the corresponding poi for each position. Notice that we can use whatever view layout we want for our dropdown result line (this is the <tt class="docutils literal">layoutResource</tt> parameter) but we need to configure
-it (i.e bind it with the values of the backing object) here&nbsp;properly.</p>
-<p>Finally we create a custom instance of the <tt class="docutils literal">Filter</tt>, explained in the next&nbsp;section.</p>
-</div>
-<div class="section" id="the-custom-filter">
-<h2>The custom&nbsp;filter</h2>
-<p>The <tt class="docutils literal">getFilter</tt> creates an object instance of a Filter and returns&nbsp;it:</p>
-<div class="highlight"><pre><span></span><span class="k">override</span> <span class="k">fun</span> <span class="nf">getFilter</span><span class="p">():</span> <span class="n">Filter</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="k">object</span> <span class="err">: </span><span class="nc">Filter</span><span class="p">()</span> <span class="p">{</span>
-        <span class="k">override</span> <span class="k">fun</span> <span class="nf">publishResults</span><span class="p">(</span><span class="n">charSequence</span><span class="p">:</span> <span class="n">CharSequence</span><span class="p">?,</span> <span class="n">filterResults</span><span class="p">:</span> <span class="n">Filter</span><span class="p">.</span><span class="n">FilterResults</span><span class="p">)</span> <span class="p">{</span>
-            <span class="n">mPois</span> <span class="p">=</span> <span class="n">filterResults</span><span class="p">.</span><span class="n">values</span> <span class="k">as</span> <span class="n">List</span><span class="p">&lt;</span><span class="n">PoiDao</span><span class="p">&gt;</span>
-            <span class="n">notifyDataSetChanged</span><span class="p">()</span>
-        <span class="p">}</span>
-
-        <span class="k">override</span> <span class="k">fun</span> <span class="nf">performFiltering</span><span class="p">(</span><span class="n">charSequence</span><span class="p">:</span> <span class="n">CharSequence</span><span class="p">?):</span> <span class="n">Filter</span><span class="p">.</span><span class="n">FilterResults</span> <span class="p">{</span>
-            <span class="k">val</span> <span class="py">queryString</span> <span class="p">=</span> <span class="n">charSequence</span><span class="o">?.</span><span class="n">toString</span><span class="p">()</span><span class="o">?.</span><span class="n">toLowerCase</span><span class="p">()</span>
-
-            <span class="k">val</span> <span class="py">filterResults</span> <span class="p">=</span> <span class="n">Filter</span><span class="p">.</span><span class="n">FilterResults</span><span class="p">()</span>
-            <span class="n">filterResults</span><span class="p">.</span><span class="n">values</span> <span class="p">=</span> <span class="k">if</span> <span class="p">(</span><span class="n">queryString</span><span class="p">==</span><span class="k">null</span> <span class="p">||</span> <span class="n">queryString</span><span class="p">.</span><span class="n">isEmpty</span><span class="p">())</span>
-                <span class="n">allPois</span>
-            <span class="k">else</span>
-                <span class="n">allPois</span><span class="p">.</span><span class="n">filter</span> <span class="p">{</span>
-                    <span class="n">it</span><span class="p">.</span><span class="n">name</span><span class="p">.</span><span class="n">toLowerCase</span><span class="p">().</span><span class="n">contains</span><span class="p">(</span><span class="n">queryString</span><span class="p">)</span> <span class="p">||</span>
-                    <span class="n">it</span><span class="p">.</span><span class="n">city</span><span class="p">.</span><span class="n">toLowerCase</span><span class="p">().</span><span class="n">contains</span><span class="p">(</span><span class="n">queryString</span><span class="p">)</span> <span class="p">||</span>
-                    <span class="n">it</span><span class="p">.</span><span class="n">category_name</span><span class="p">.</span><span class="n">toLowerCase</span><span class="p">().</span><span class="n">contains</span><span class="p">(</span><span class="n">queryString</span><span class="p">)</span>
-                <span class="p">}</span>
-            <span class="k">return</span> <span class="n">filterResults</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-<p>This object instance overrides two methods of <tt class="docutils literal">Filter</tt>: <tt class="docutils literal">performFiltering</tt> and <tt class="docutils literal">publishResults</tt>. The <tt class="docutils literal">performFiltering</tt> is where the actual filtering is done;
-it should return a <tt class="docutils literal">FilterResults</tt> object containing a <tt class="docutils literal">values</tt> attribute with the filtered values. In this method
-we retrieve the <tt class="docutils literal">charSequence</tt> parameter and converit it to lowercase. Then, if this parameter is not empty we filter the corresponding elements of <tt class="docutils literal">allPois</tt>
-(i.e name, city and category_name in our case) using contains. If the query parameter is empty then we just return all pois. Warning java developers; here the if
-is used as an expression (i.e its result will be assigned to <tt class="docutils literal">filterResults.values</tt>).</p>
-<p>After the performFiltering has finished, the <tt class="docutils literal">publishResults</tt> method is called. This method retrieves the filtered results in its <tt class="docutils literal">filterResults</tt> parameter. Thus it sets
-<tt class="docutils literal">mPois</tt> of the custom adapter is set to the result of the filter operation and calls <tt class="docutils literal">notifyDataSetChanged</tt> to display the&nbsp;results.</p>
-</div>
-<div class="section" id="using-the-custom-adapter">
-<h2>Using the custom&nbsp;adapter</h2>
-<p>To use the custom adapter you can do something like this in your activity&#8217;s&nbsp;onCreate:</p>
-<div class="highlight"><pre><span></span><span class="k">override</span> <span class="k">fun</span> <span class="nf">onCreate</span><span class="p">(</span><span class="n">savedInstanceState</span><span class="p">:</span> <span class="n">Bundle</span><span class="p">?)</span> <span class="p">{</span>
-    <span class="k">super</span><span class="p">.</span><span class="n">onCreate</span><span class="p">(</span><span class="n">savedInstanceState</span><span class="p">)</span>
-    <span class="n">setContentView</span><span class="p">(</span><span class="n">R</span><span class="p">.</span><span class="n">layout</span><span class="p">.</span><span class="n">activity_main</span><span class="p">)</span>
-
-    <span class="k">val</span> <span class="py">poisArray</span> <span class="p">=</span> <span class="n">listOf</span><span class="p">(</span>
-        <span class="c1">// See previous sections</span>
-    <span class="p">)</span>
-    <span class="k">val</span> <span class="py">adapter</span> <span class="p">=</span> <span class="n">PoiAdapter</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="n">android</span><span class="p">.</span><span class="n">R</span><span class="p">.</span><span class="n">layout</span><span class="p">.</span><span class="n">simple_list_item_1</span><span class="p">,</span> <span class="n">poisArray</span><span class="p">)</span>
-    <span class="n">autoCompleteTextView</span><span class="p">.</span><span class="n">setAdapter</span><span class="p">(</span><span class="n">adapter</span><span class="p">)</span>
-    <span class="n">autoCompleteTextView</span><span class="p">.</span><span class="n">threshold</span> <span class="p">=</span> <span class="m">3</span>
-
-    <span class="n">autoCompleteTextView</span><span class="p">.</span><span class="n">setOnItemClickListener</span><span class="p">()</span> <span class="p">{</span> <span class="n">parent</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">id</span> <span class="p">-&gt;</span>
-        <span class="k">val</span> <span class="py">selectedPoi</span> <span class="p">=</span> <span class="n">parent</span><span class="p">.</span><span class="n">adapter</span><span class="p">.</span><span class="n">getItem</span><span class="p">(</span><span class="n">position</span><span class="p">)</span> <span class="k">as</span> <span class="n">PoiDao</span><span class="p">?</span>
-        <span class="n">autoCompleteTextView</span><span class="p">.</span><span class="n">setText</span><span class="p">(</span><span class="n">selectedPoi</span><span class="o">?.</span><span class="n">name</span><span class="p">)</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-<p>We create the PoiAdapter passing it the poisArray and <tt class="docutils literal">android.R.layout.simple_list_item_1</tt> as the layout. That layout just contains a textview named text. As we&#8217;ve already
-discussed you can pass something more complex here. The <tt class="docutils literal">thresold</tt> defined the number of characters that the user that needs to enter to do the filtering (default is&nbsp;2).</p>
-<p>Please notice that when the user clicks (selects) on an item of the dropdown we set the contents of the textview (or else it will just use the object&#8217;s toString() method to set&nbsp;it).</p>
-</div>
-</div>
-  		</article>
 <div class="pagination">
     <a class="prev" href="https://spapas.github.io/index3.html">&larr; Older</a>
 
@@ -1570,6 +1503,9 @@ discussed you can pass something more complex here. The <tt class="docutils lite
     <h1>Recent Posts</h1>
     <ul id="recent_posts">
       <li class="post">
+        <a href="https://spapas.github.io/2021/02/08/django-matplotlib/">Using matplotlib to generate graphs in Django</a>
+      </li>
+      <li class="post">
         <a href="https://spapas.github.io/2021/01/07/django-hashids/">Using hashids to hide ids of objects in Django</a>
       </li>
       <li class="post">
@@ -1580,9 +1516,6 @@ discussed you can pass something more complex here. The <tt class="docutils lite
       </li>
       <li class="post">
         <a href="https://spapas.github.io/2020/03/27/wagtail-add-latest-changes/">Adding a latest-changes list to your Wagtail site</a>
-      </li>
-      <li class="post">
-        <a href="https://spapas.github.io/2020/03/18/django-crispy-form-quick-easy-layout/">Quick and easy layout of django forms using django-crispy-forms and django-widget-tweaks</a>
       </li>
     </ul>
   </section>
@@ -1609,7 +1542,7 @@ discussed you can pass something more complex here. The <tt class="docutils lite
 
   <section>
     <h1>Tags</h1>
-    <a href="https://spapas.github.io/tag/less.html">less</a>,    <a href="https://spapas.github.io/tag/django-crispy-forms.html">django-crispy-forms</a>,    <a href="https://spapas.github.io/tag/rest.html">rest</a>,    <a href="https://spapas.github.io/tag/query.html">query</a>,    <a href="https://spapas.github.io/tag/ecto.html">ecto</a>,    <a href="https://spapas.github.io/tag/tables.html">tables</a>,    <a href="https://spapas.github.io/tag/pivot_table.html">pivot_table</a>,    <a href="https://spapas.github.io/tag/console.html">console</a>,    <a href="https://spapas.github.io/tag/async.html">async</a>,    <a href="https://spapas.github.io/tag/django-rq.html">django-rq</a>,    <a href="https://spapas.github.io/tag/hashids.html">hashids</a>,    <a href="https://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="https://spapas.github.io/tag/forms.html">forms</a>,    <a href="https://spapas.github.io/tag/yaml.html">yaml</a>,    <a href="https://spapas.github.io/tag/404.html">404</a>,    <a href="https://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="https://spapas.github.io/tag/erlang.html">erlang</a>,    <a href="https://spapas.github.io/tag/immutable.html">immutable</a>,    <a href="https://spapas.github.io/tag/initd.html">init.d</a>,    <a href="https://spapas.github.io/tag/django-widget-tweaks.html">django-widget-tweaks</a>,    <a href="https://spapas.github.io/tag/youtube-dl.html">youtube-dl</a>,    <a href="https://spapas.github.io/tag/python.html">python</a>,    <a href="https://spapas.github.io/tag/django-extensions.html">django-extensions</a>,    <a href="https://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="https://spapas.github.io/tag/scipy.html">scipy</a>,    <a href="https://spapas.github.io/tag/grid.html">grid</a>,    <a href="https://spapas.github.io/tag/ag-grid.html">ag-grid</a>,    <a href="https://spapas.github.io/tag/du.html">du</a>,    <a href="https://spapas.github.io/tag/watchify.html">watchify</a>,    <a href="https://spapas.github.io/tag/settings.html">settings</a>,    <a href="https://spapas.github.io/tag/flux.html">flux</a>,    <a href="https://spapas.github.io/tag/fixeddatatable.html">FixedDataTable</a>,    <a href="https://spapas.github.io/tag/queries.html">queries</a>,    <a href="https://spapas.github.io/tag/debug.html">debug</a>,    <a href="https://spapas.github.io/tag/imgur.html">imgur</a>,    <a href="https://spapas.github.io/tag/security.html">security</a>,    <a href="https://spapas.github.io/tag/npm.html">npm</a>,    <a href="https://spapas.github.io/tag/hyperapp.html">hyperapp</a>,    <a href="https://spapas.github.io/tag/spring.html">spring</a>,    <a href="https://spapas.github.io/tag/react-redux.html">react-redux</a>,    <a href="https://spapas.github.io/tag/cron.html">cron</a>,    <a href="https://spapas.github.io/tag/babelify.html">babelify</a>,    <a href="https://spapas.github.io/tag/design.html">design</a>,    <a href="https://spapas.github.io/tag/tutorial.html">tutorial</a>,    <a href="https://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="https://spapas.github.io/tag/reportlab.html">reportlab</a>,    <a href="https://spapas.github.io/tag/rq.html">rq</a>,    <a href="https://spapas.github.io/tag/redis.html">redis</a>,    <a href="https://spapas.github.io/tag/python-3.html">python-3</a>,    <a href="https://spapas.github.io/tag/research.html">research</a>,    <a href="https://spapas.github.io/tag/werkzeug.html">werkzeug</a>,    <a href="https://spapas.github.io/tag/jobs.html">jobs</a>,    <a href="https://spapas.github.io/tag/redux-thunk.html">redux-thunk</a>,    <a href="https://spapas.github.io/tag/disk-usage.html">disk-usage</a>,    <a href="https://spapas.github.io/tag/javascript.html">javascript</a>,    <a href="https://spapas.github.io/tag/component.html">component</a>,    <a href="https://spapas.github.io/tag/ajax.html">ajax</a>,    <a href="https://spapas.github.io/tag/elixir.html">elixir</a>,    <a href="https://spapas.github.io/tag/ipython.html">ipython</a>,    <a href="https://spapas.github.io/tag/uglify.html">uglify</a>,    <a href="https://spapas.github.io/tag/configuration.html">configuration</a>,    <a href="https://spapas.github.io/tag/properties.html">properties</a>,    <a href="https://spapas.github.io/tag/bash.html">bash</a>,    <a href="https://spapas.github.io/tag/es6.html">es6</a>,    <a href="https://spapas.github.io/tag/spring-boot.html">spring-boot</a>,    <a href="https://spapas.github.io/tag/postgresql.html">postgresql</a>,    <a href="https://spapas.github.io/tag/kotlin.html">kotlin</a>,    <a href="https://spapas.github.io/tag/adapter.html">adapter</a>,    <a href="https://spapas.github.io/tag/filter.html">filter</a>,    <a href="https://spapas.github.io/tag/flask.html">flask</a>,    <a href="https://spapas.github.io/tag/notebook.html">notebook</a>,    <a href="https://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="https://spapas.github.io/tag/pdf.html">pdf</a>,    <a href="https://spapas.github.io/tag/react-notification.html">react-notification</a>,    <a href="https://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="https://spapas.github.io/tag/tasks.html">tasks</a>,    <a href="https://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="https://spapas.github.io/tag/unix.html">unix</a>,    <a href="https://spapas.github.io/tag/google.html">google</a>,    <a href="https://spapas.github.io/tag/linux.html">linux</a>,    <a href="https://spapas.github.io/tag/pivot.html">pivot</a>,    <a href="https://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="https://spapas.github.io/tag/git.html">git</a>,    <a href="https://spapas.github.io/tag/java.html">java</a>,    <a href="https://spapas.github.io/tag/introduction.html">introduction</a>,    <a href="https://spapas.github.io/tag/pusher.html">pusher</a>,    <a href="https://spapas.github.io/tag/fixed-data-tables.html">fixed-data-tables</a>,    <a href="https://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="https://spapas.github.io/tag/xhtml2pdf.html">xhtml2pdf</a>,    <a href="https://spapas.github.io/tag/numpy.html">numpy</a>,    <a href="https://spapas.github.io/tag/form.html">form</a>,    <a href="https://spapas.github.io/tag/django-rest-auth.html">django-rest-auth</a>,    <a href="https://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="https://spapas.github.io/tag/rst.html">rst</a>,    <a href="https://spapas.github.io/tag/python-2.html">python-2</a>,    <a href="https://spapas.github.io/tag/ffmpeg.html">ffmpeg</a>,    <a href="https://spapas.github.io/tag/middleware.html">middleware</a>,    <a href="https://spapas.github.io/tag/profiles.html">profiles</a>,    <a href="https://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="https://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="https://spapas.github.io/tag/error.html">error</a>,    <a href="https://spapas.github.io/tag/asynchronous.html">asynchronous</a>,    <a href="https://spapas.github.io/tag/react-router-redux.html">react-router-redux</a>,    <a href="https://spapas.github.io/tag/select2.html">select2</a>,    <a href="https://spapas.github.io/tag/history.html">history</a>,    <a href="https://spapas.github.io/tag/django-rest-framework.html">django-rest-framework</a>,    <a href="https://spapas.github.io/tag/redux-form.html">redux-form</a>,    <a href="https://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="https://spapas.github.io/tag/scheduling.html">scheduling</a>,    <a href="https://spapas.github.io/tag/plpgsql.html">plpgsql</a>,    <a href="https://spapas.github.io/tag/os-monitoring.html">os-monitoring</a>,    <a href="https://spapas.github.io/tag/boilerplate.html">boilerplate</a>,    <a href="https://spapas.github.io/tag/generic.html">generic</a>,    <a href="https://spapas.github.io/tag/babel.html">babel</a>,    <a href="https://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="https://spapas.github.io/tag/html.html">html</a>,    <a href="https://spapas.github.io/tag/android.html">android</a>,    <a href="https://spapas.github.io/tag/pandas.html">pandas</a>,    <a href="https://spapas.github.io/tag/css.html">css</a>,    <a href="https://spapas.github.io/tag/node.html">node</a>,    <a href="https://spapas.github.io/tag/phoenix.html">phoenix</a>,    <a href="https://spapas.github.io/tag/deploy.html">deploy</a>,    <a href="https://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="https://spapas.github.io/tag/react.html">react</a>,    <a href="https://spapas.github.io/tag/autocompelte.html">autocompelte</a>,    <a href="https://spapas.github.io/tag/declarative.html">declarative</a>,    <a href="https://spapas.github.io/tag/osmon.html">osmon</a>,    <a href="https://spapas.github.io/tag/php.html">php</a>,    <a href="https://spapas.github.io/tag/browserify.html">browserify</a>,    <a href="https://spapas.github.io/tag/branching.html">branching</a>,    <a href="https://spapas.github.io/tag/github.html">github</a>,    <a href="https://spapas.github.io/tag/jupyter.html">jupyter</a>,    <a href="https://spapas.github.io/tag/windows.html">windows</a>,    <a href="https://spapas.github.io/tag/youtube.html">youtube</a>,    <a href="https://spapas.github.io/tag/django.html">django</a>,    <a href="https://spapas.github.io/tag/q.html">q</a>,    <a href="https://spapas.github.io/tag/react-router.html">react-router</a>,    <a href="https://spapas.github.io/tag/redux.html">redux</a>,    <a href="https://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>  </section>
+    <a href="https://spapas.github.io/tag/less.html">less</a>,    <a href="https://spapas.github.io/tag/django-crispy-forms.html">django-crispy-forms</a>,    <a href="https://spapas.github.io/tag/rest.html">rest</a>,    <a href="https://spapas.github.io/tag/query.html">query</a>,    <a href="https://spapas.github.io/tag/ecto.html">ecto</a>,    <a href="https://spapas.github.io/tag/tables.html">tables</a>,    <a href="https://spapas.github.io/tag/pivot_table.html">pivot_table</a>,    <a href="https://spapas.github.io/tag/console.html">console</a>,    <a href="https://spapas.github.io/tag/async.html">async</a>,    <a href="https://spapas.github.io/tag/django-rq.html">django-rq</a>,    <a href="https://spapas.github.io/tag/hashids.html">hashids</a>,    <a href="https://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="https://spapas.github.io/tag/forms.html">forms</a>,    <a href="https://spapas.github.io/tag/yaml.html">yaml</a>,    <a href="https://spapas.github.io/tag/404.html">404</a>,    <a href="https://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="https://spapas.github.io/tag/erlang.html">erlang</a>,    <a href="https://spapas.github.io/tag/immutable.html">immutable</a>,    <a href="https://spapas.github.io/tag/initd.html">init.d</a>,    <a href="https://spapas.github.io/tag/django-widget-tweaks.html">django-widget-tweaks</a>,    <a href="https://spapas.github.io/tag/youtube-dl.html">youtube-dl</a>,    <a href="https://spapas.github.io/tag/python.html">python</a>,    <a href="https://spapas.github.io/tag/django-extensions.html">django-extensions</a>,    <a href="https://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="https://spapas.github.io/tag/scipy.html">scipy</a>,    <a href="https://spapas.github.io/tag/grid.html">grid</a>,    <a href="https://spapas.github.io/tag/ag-grid.html">ag-grid</a>,    <a href="https://spapas.github.io/tag/du.html">du</a>,    <a href="https://spapas.github.io/tag/watchify.html">watchify</a>,    <a href="https://spapas.github.io/tag/settings.html">settings</a>,    <a href="https://spapas.github.io/tag/flux.html">flux</a>,    <a href="https://spapas.github.io/tag/fixeddatatable.html">FixedDataTable</a>,    <a href="https://spapas.github.io/tag/queries.html">queries</a>,    <a href="https://spapas.github.io/tag/debug.html">debug</a>,    <a href="https://spapas.github.io/tag/imgur.html">imgur</a>,    <a href="https://spapas.github.io/tag/security.html">security</a>,    <a href="https://spapas.github.io/tag/npm.html">npm</a>,    <a href="https://spapas.github.io/tag/hyperapp.html">hyperapp</a>,    <a href="https://spapas.github.io/tag/spring.html">spring</a>,    <a href="https://spapas.github.io/tag/react-redux.html">react-redux</a>,    <a href="https://spapas.github.io/tag/cron.html">cron</a>,    <a href="https://spapas.github.io/tag/babelify.html">babelify</a>,    <a href="https://spapas.github.io/tag/design.html">design</a>,    <a href="https://spapas.github.io/tag/tutorial.html">tutorial</a>,    <a href="https://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="https://spapas.github.io/tag/reportlab.html">reportlab</a>,    <a href="https://spapas.github.io/tag/rq.html">rq</a>,    <a href="https://spapas.github.io/tag/redis.html">redis</a>,    <a href="https://spapas.github.io/tag/python-3.html">python-3</a>,    <a href="https://spapas.github.io/tag/research.html">research</a>,    <a href="https://spapas.github.io/tag/werkzeug.html">werkzeug</a>,    <a href="https://spapas.github.io/tag/jobs.html">jobs</a>,    <a href="https://spapas.github.io/tag/redux-thunk.html">redux-thunk</a>,    <a href="https://spapas.github.io/tag/disk-usage.html">disk-usage</a>,    <a href="https://spapas.github.io/tag/javascript.html">javascript</a>,    <a href="https://spapas.github.io/tag/component.html">component</a>,    <a href="https://spapas.github.io/tag/matplotlib.html">matplotlib</a>,    <a href="https://spapas.github.io/tag/ajax.html">ajax</a>,    <a href="https://spapas.github.io/tag/elixir.html">elixir</a>,    <a href="https://spapas.github.io/tag/ipython.html">ipython</a>,    <a href="https://spapas.github.io/tag/uglify.html">uglify</a>,    <a href="https://spapas.github.io/tag/configuration.html">configuration</a>,    <a href="https://spapas.github.io/tag/properties.html">properties</a>,    <a href="https://spapas.github.io/tag/bash.html">bash</a>,    <a href="https://spapas.github.io/tag/es6.html">es6</a>,    <a href="https://spapas.github.io/tag/spring-boot.html">spring-boot</a>,    <a href="https://spapas.github.io/tag/postgresql.html">postgresql</a>,    <a href="https://spapas.github.io/tag/kotlin.html">kotlin</a>,    <a href="https://spapas.github.io/tag/adapter.html">adapter</a>,    <a href="https://spapas.github.io/tag/filter.html">filter</a>,    <a href="https://spapas.github.io/tag/flask.html">flask</a>,    <a href="https://spapas.github.io/tag/notebook.html">notebook</a>,    <a href="https://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="https://spapas.github.io/tag/pdf.html">pdf</a>,    <a href="https://spapas.github.io/tag/react-notification.html">react-notification</a>,    <a href="https://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="https://spapas.github.io/tag/tasks.html">tasks</a>,    <a href="https://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="https://spapas.github.io/tag/unix.html">unix</a>,    <a href="https://spapas.github.io/tag/google.html">google</a>,    <a href="https://spapas.github.io/tag/linux.html">linux</a>,    <a href="https://spapas.github.io/tag/pivot.html">pivot</a>,    <a href="https://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="https://spapas.github.io/tag/git.html">git</a>,    <a href="https://spapas.github.io/tag/java.html">java</a>,    <a href="https://spapas.github.io/tag/introduction.html">introduction</a>,    <a href="https://spapas.github.io/tag/pusher.html">pusher</a>,    <a href="https://spapas.github.io/tag/fixed-data-tables.html">fixed-data-tables</a>,    <a href="https://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="https://spapas.github.io/tag/xhtml2pdf.html">xhtml2pdf</a>,    <a href="https://spapas.github.io/tag/numpy.html">numpy</a>,    <a href="https://spapas.github.io/tag/form.html">form</a>,    <a href="https://spapas.github.io/tag/django-rest-auth.html">django-rest-auth</a>,    <a href="https://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="https://spapas.github.io/tag/rst.html">rst</a>,    <a href="https://spapas.github.io/tag/python-2.html">python-2</a>,    <a href="https://spapas.github.io/tag/ffmpeg.html">ffmpeg</a>,    <a href="https://spapas.github.io/tag/middleware.html">middleware</a>,    <a href="https://spapas.github.io/tag/profiles.html">profiles</a>,    <a href="https://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="https://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="https://spapas.github.io/tag/error.html">error</a>,    <a href="https://spapas.github.io/tag/asynchronous.html">asynchronous</a>,    <a href="https://spapas.github.io/tag/react-router-redux.html">react-router-redux</a>,    <a href="https://spapas.github.io/tag/select2.html">select2</a>,    <a href="https://spapas.github.io/tag/history.html">history</a>,    <a href="https://spapas.github.io/tag/django-rest-framework.html">django-rest-framework</a>,    <a href="https://spapas.github.io/tag/redux-form.html">redux-form</a>,    <a href="https://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="https://spapas.github.io/tag/scheduling.html">scheduling</a>,    <a href="https://spapas.github.io/tag/plpgsql.html">plpgsql</a>,    <a href="https://spapas.github.io/tag/os-monitoring.html">os-monitoring</a>,    <a href="https://spapas.github.io/tag/boilerplate.html">boilerplate</a>,    <a href="https://spapas.github.io/tag/generic.html">generic</a>,    <a href="https://spapas.github.io/tag/babel.html">babel</a>,    <a href="https://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="https://spapas.github.io/tag/html.html">html</a>,    <a href="https://spapas.github.io/tag/android.html">android</a>,    <a href="https://spapas.github.io/tag/pandas.html">pandas</a>,    <a href="https://spapas.github.io/tag/css.html">css</a>,    <a href="https://spapas.github.io/tag/node.html">node</a>,    <a href="https://spapas.github.io/tag/phoenix.html">phoenix</a>,    <a href="https://spapas.github.io/tag/deploy.html">deploy</a>,    <a href="https://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="https://spapas.github.io/tag/react.html">react</a>,    <a href="https://spapas.github.io/tag/autocompelte.html">autocompelte</a>,    <a href="https://spapas.github.io/tag/declarative.html">declarative</a>,    <a href="https://spapas.github.io/tag/osmon.html">osmon</a>,    <a href="https://spapas.github.io/tag/php.html">php</a>,    <a href="https://spapas.github.io/tag/browserify.html">browserify</a>,    <a href="https://spapas.github.io/tag/branching.html">branching</a>,    <a href="https://spapas.github.io/tag/github.html">github</a>,    <a href="https://spapas.github.io/tag/jupyter.html">jupyter</a>,    <a href="https://spapas.github.io/tag/windows.html">windows</a>,    <a href="https://spapas.github.io/tag/youtube.html">youtube</a>,    <a href="https://spapas.github.io/tag/django.html">django</a>,    <a href="https://spapas.github.io/tag/q.html">q</a>,    <a href="https://spapas.github.io/tag/react-router.html">react-router</a>,    <a href="https://spapas.github.io/tag/redux.html">redux</a>,    <a href="https://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>  </section>
 
   <section>
     <h1>Yearly archives</h1>

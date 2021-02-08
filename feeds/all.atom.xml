@@ -1,5 +1,123 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>/var/</title><link href="https://spapas.github.io/" rel="alternate"></link><link href="https://spapas.github.io/feeds/all.atom.xml" rel="self"></link><id>https://spapas.github.io/</id><updated>2021-01-07T12:20:00+02:00</updated><subtitle>Various programming stuff</subtitle><entry><title>Using hashids to hide ids of objects in Django</title><link href="https://spapas.github.io/2021/01/07/django-hashids/" rel="alternate"></link><published>2021-01-07T12:20:00+02:00</published><updated>2021-01-07T12:20:00+02:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2021-01-07:/2021/01/07/django-hashids/</id><summary type="html">&lt;p class="first last"&gt;How to hide the ids (primary keys) of your objects in Django using the hashids&amp;nbsp;library&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>/var/</title><link href="https://spapas.github.io/" rel="alternate"></link><link href="https://spapas.github.io/feeds/all.atom.xml" rel="self"></link><id>https://spapas.github.io/</id><updated>2021-02-08T14:55:00+02:00</updated><subtitle>Various programming stuff</subtitle><entry><title>Using matplotlib to generate graphs in Django</title><link href="https://spapas.github.io/2021/02/08/django-matplotlib/" rel="alternate"></link><published>2021-02-08T14:55:00+02:00</published><updated>2021-02-08T14:55:00+02:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2021-02-08:/2021/02/08/django-matplotlib/</id><summary type="html">&lt;p class="first last"&gt;How to use the matplotlib library to generate server-side graphs with&amp;nbsp;Django&lt;/p&gt;
+</summary><content type="html">&lt;p&gt;Nowadays the most common way to generate graphs in your Django apps (or web apps in general) is to
+pass the data as json to the page and use a javascript lib. The big advantage these javascript libs
+offer is interactivity: You can hover over points to see their values making studying the graph much&amp;nbsp;easier.&lt;/p&gt;
+&lt;p&gt;Yet, there are times where you need some simple (or not so simple) graphs and don&amp;#8217;t care about
+offering interactivity through javascript nor you want to mess with javascript at all. For these cases
+you can generate the graphs server-side using django and the &lt;a class="reference external" href="https://matplotlib.org/"&gt;matplotlib&lt;/a&gt; plot&amp;nbsp;library.&lt;/p&gt;
+&lt;p&gt;matplotlib is a very popular library in the scientific cycles. It can be used to create more or less
+any kind of graph and has unlimited capabilities! I won&amp;#8217;t go into much detail about matplotlib here
+because the subject is huge but I recommend you to take a look at the &lt;a class="reference external" href="https://matplotlib.org/tutorials/index.html"&gt;comprehensive tutorials&lt;/a&gt; on its&amp;nbsp;homepage.&lt;/p&gt;
+&lt;p&gt;To install matplotlib on unix you need to do a &lt;tt class="docutils literal"&gt;pip install matplotlib&lt;/tt&gt; while, for windows,
+you can download the proper ready-made binaries from the &lt;a class="reference external" href="https://www.lfd.uci.edu/~gohlke/pythonlibs/"&gt;Unofficial Windows Binaries for Python Extension Packages&lt;/a&gt;
+site that offers pre-compiled versions of almost all python packages! Just make sure to download the correct version
+for your python version and architecture (32bit or 64bit). After you&amp;#8217;ve downloaded the file you can install it
+for your project using something like &lt;tt class="docutils literal"&gt;pip install &lt;span class="pre"&gt;matplotlib-3.3.4-cp38-cp38-win32&lt;/span&gt;&lt;/tt&gt; from inside your virtual&amp;nbsp;environment.&lt;/p&gt;
+&lt;p&gt;Before actually creating a graph I recommend playing a bit with matplotlib to understand the basic concepts. Start a django shell
+and do the&amp;nbsp;following:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;gt;&amp;gt;&amp;gt; import matplotlib.pyplot as plt
+&amp;gt;&amp;gt;&amp;gt; fig, ax = plt.subplots()
+&amp;gt;&amp;gt;&amp;gt; ax.plot([1, 2, 3, 4], [1, 4, 2, 3])
+[&amp;lt;matplotlib.lines.Line2D object at 0x0FBF5F58&amp;gt;]
+&amp;gt;&amp;gt;&amp;gt; fig.show()
+&lt;/pre&gt;
+&lt;p&gt;The above should open a window and display the graph. This works fine on Window 10 with python 3.8 and matplotlib 3.3.4 but I
+can&amp;#8217;t guarantee other versions. If however &lt;tt class="docutils literal"&gt;fig.show()&lt;/tt&gt; shows an error or does not display the graph, you can just do something&amp;nbsp;like:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;gt;&amp;gt;&amp;gt; fig.savefig('test')
+&lt;/pre&gt;
+&lt;p&gt;that will output the figure in a file named &lt;tt class="docutils literal"&gt;test.png&lt;/tt&gt; which you can the view. Please notice that the above are with the default
+options; there are various ways that matplotlib can be&amp;nbsp;configured.&lt;/p&gt;
+&lt;p&gt;In any case, after you&amp;#8217;ve played a bit with the shell and generate a nice figure (take a look at the &lt;a class="reference external" href="https://matplotlib.org/3.1.1/gallery/index.html"&gt;matplotlib examples&lt;/a&gt; for
+inspiration) you are ready to integrate matplotlib with&amp;nbsp;Django!&lt;/p&gt;
+&lt;p&gt;I can think of two ways which you can integrate matplotlib with&amp;nbsp;Django:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Use a special view that would render the graph and just return a &lt;span class="caps"&gt;PNG&lt;/span&gt; object. Use a normal &lt;tt class="docutils literal"&gt;&amp;lt;img&amp;gt;&lt;/tt&gt; element pointing to that view in your&amp;nbsp;template.&lt;/li&gt;
+&lt;li&gt;Put the graph in the context of a normal django view encoded as a base64 object and use a special &lt;tt class="docutils literal"&gt;&amp;lt;img&amp;gt;&lt;/tt&gt; with an &lt;tt class="docutils literal"&gt;src&lt;/tt&gt; attribute of &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;data:image/png;base64,{{&lt;/span&gt; graph }}&lt;/tt&gt; to actually embed the image in the&amp;nbsp;template!&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I prefer the second approach because it&amp;#8217;s much more flexible since you don&amp;#8217;t need to create a different Django view for each graph you
+want to generate. For this reason I will explain this approach right now and give you some hints if you need to follow the dedicated
+graph view&amp;nbsp;approach.&lt;/p&gt;
+&lt;p&gt;Our view&amp;nbsp;should:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Generate the&amp;nbsp;graph&lt;/li&gt;
+&lt;li&gt;Save it in a BytesIO&amp;nbsp;object&lt;/li&gt;
+&lt;li&gt;Convert that BytesIO to&amp;nbsp;base64&lt;/li&gt;
+&lt;li&gt;Put the string value of the base64 encoded graph to the&amp;nbsp;template&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Then the template will just output that base64 value using the special img we mentioned&amp;nbsp;above.&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s a snippet of a view that does exactly&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+import io, base64
+from django.db.models.functions import TruncDay
+from matplotlib.ticker import LinearLocator
+
+class SampleListView(ListView):
+  model = Sample
+
+  def get_context_data(self, **kwargs):
+
+    by_days = get_queryset().annotate(day=TruncDay('created_on')).values('day').annotate(c=Count('id')).order_by('day')
+    days = [x['day'] for x in by_days]
+    counts = [x['c'] for x in by_days]
+
+    fig, ax = plt.subplots(figsize=(10,4))
+    ax.plot(days, counts, '--bo')
+
+    fig.autofmt_xdate()
+    ax.fmt_xdata = mdates.DateFormatter('%Y-%m-%d')
+    ax.set_title('By date')
+    ax.set_ylabel(&amp;quot;Count&amp;quot;)
+    ax.set_xlabel(&amp;quot;Date&amp;quot;)
+    ax.grid(linestyle=&amp;quot;--&amp;quot;, linewidth=0.5, color='.25', zorder=-10)
+    ax.yaxis.set_minor_locator(LinearLocator(25))
+
+    flike = io.BytesIO()
+    fig.savefig(flike)
+    b64 = base64.b64encode(flike.getvalue()).decode()
+    context['chart'] = b64
+    return context
+&lt;/pre&gt;
+&lt;p&gt;Please notice that after importing &lt;tt class="docutils literal"&gt;matplotlib&lt;/tt&gt; I&amp;#8217;m using the &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;matplotlib.use('Agg')&lt;/span&gt;&lt;/tt&gt; command to use
+the &lt;tt class="docutils literal"&gt;Agg&lt;/tt&gt; backend. You can &lt;a class="reference external" href="https://matplotlib.org/faq/usage_faq.html#what-is-a-backend"&gt;learn more about backends here&lt;/a&gt;, but it should be sufficient for now to
+know that using the &lt;tt class="docutils literal"&gt;Agg&lt;/tt&gt; you&amp;#8217;ll be able to save your graphs in&amp;nbsp;png.&lt;/p&gt;
+&lt;p&gt;The above code uses some Django &lt;span class="caps"&gt;ORM&lt;/span&gt; trickery to group values by their created_on day value and then
+assings the days and counts to two arrays (&lt;tt class="docutils literal"&gt;days&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;counts&lt;/tt&gt;). It then creates a new empty graph
+with a specific size using &lt;tt class="docutils literal"&gt;fig, ax = &lt;span class="pre"&gt;plt.subplots(figsize=(10,4))&lt;/span&gt;&lt;/tt&gt; and plots the data with some
+fancy styles with &lt;tt class="docutils literal"&gt;ax.plot(days, counts, &lt;span class="pre"&gt;'--bo')&lt;/span&gt;&lt;/tt&gt;. After that it sets various options in the graph
+like the labels, grid&amp;nbsp;etc.&lt;/p&gt;
+&lt;p&gt;The save and convert to base64 part follows: A new file like object is created using &lt;tt class="docutils literal"&gt;io.BytesIO()&lt;/tt&gt; and
+the figure is saved there (&lt;tt class="docutils literal"&gt;fig.savefig(flike)&lt;/tt&gt;). Then it is converted to a base64 string using the
+&lt;tt class="docutils literal"&gt;b64 = &lt;span class="pre"&gt;base64.b64encode(flike.getvalue()).decode()&lt;/span&gt;&lt;/tt&gt;. Finally it is just passed to the context of
+the template as &lt;tt class="docutils literal"&gt;chart&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;Now, inside the template I&amp;#8217;ve got the following&amp;nbsp;line:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;lt;img src='data:image/png;base64,{{ chart }}'&amp;gt;
+&lt;/pre&gt;
+&lt;p&gt;This will include the data of the chart inline and display it as a png image. If you&amp;#8217;ve followed along
+you should be able to see the graph when you load that&amp;nbsp;view!&lt;/p&gt;
+&lt;p&gt;If instead of including the graphs in your normal django template views you want to use a dedicated
+graph-generating view, you can follow my
+&lt;a class="reference external" href="https://spapas.github.io/2014/09/15/django-non-html-responses/"&gt;Django non-&lt;span class="caps"&gt;HTML&lt;/span&gt; responses tutorial&lt;/a&gt;. You could then
+modify the &lt;tt class="docutils literal"&gt;render_to_response&lt;/tt&gt; method of your view like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+def render_to_response(self, generator, **response_kwargs):
+    response = HttpResponse(content_type='image/png')
+
+    fig, ax = plt.subplots(figsize=(10,4))
+    # fill the report here
+
+    fig.savefig(response)
+    return response
+&lt;/pre&gt;
+&lt;p&gt;Since &lt;tt class="docutils literal"&gt;response&lt;/tt&gt; is a file-like object you can save your graph directly&amp;nbsp;there!&lt;/p&gt;
+</content><category term="django"></category><category term="django"></category><category term="matplotlib"></category><category term="python"></category></entry><entry><title>Using hashids to hide ids of objects in Django</title><link href="https://spapas.github.io/2021/01/07/django-hashids/" rel="alternate"></link><published>2021-01-07T12:20:00+02:00</published><updated>2021-01-07T12:20:00+02:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2021-01-07:/2021/01/07/django-hashids/</id><summary type="html">&lt;p class="first last"&gt;How to hide the ids (primary keys) of your objects in Django using the hashids&amp;nbsp;library&lt;/p&gt;
 </summary><content type="html">&lt;p&gt;A common pattern in Django urls is to have the following setup for &lt;span class="caps"&gt;CRUD&lt;/span&gt; operations of your objects. Let&amp;#8217;s suppose we
 have a &lt;tt class="docutils literal"&gt;Ship&lt;/tt&gt; object. It&amp;#8217;s &lt;span class="caps"&gt;CRUD&lt;/span&gt; urls would be something&amp;nbsp;like:&lt;/p&gt;
 &lt;ul class="simple"&gt;

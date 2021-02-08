@@ -44,6 +44,20 @@ border-radius: 5px;
 </style>
 
 
+  <script>
+    if( window.canRunAds === undefined ){
+        // adblocker detected, show fallback
+        console.log("CANNOT RUN ADS");
+        document.getElementById('gHPzseYvFrhZ123').style.display='block';
+      }
+
+      function adBlockFunction() {
+        window.setTimeout(function() {
+          document.getElementById('gHPzseYvFrhZ123').style.display='block';
+        }, 1000);
+      }
+  </script>
+
     <script data-ad-client="ca-pub-7673322832689008" async
       src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
       onerror="adBlockFunction();"></script>
@@ -371,17 +385,7 @@ border-radius: 5px;
       document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
     })();
   </script>
-  <script>
-    if( window.canRunAds === undefined ){
-        // adblocker detected, show fallback
-        console.log("CANNOT RUN ADS");
-        document.getElementById('gHPzseYvFrhZ123').style.display='block';
-      }
 
-      function adBlockFunction() {
-        document.getElementById('gHPzseYvFrhZ123').style.display='block';
-      }
-  </script>
 </body>
 
 </html>

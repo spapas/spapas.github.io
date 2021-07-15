@@ -1,5 +1,5 @@
-Changing choice to a ForeignKey using Django migrations
-#######################################################
+Changing choices to a ForeignKey using Django migrations
+########################################################
 
 :date: 2021-07-15 09:50
 :tags: django, migrations, foreignkey

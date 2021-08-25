@@ -52,7 +52,7 @@ Here I will try to explain a bunch of important concepts:
 Sessions
 ========
 
-After you log in with Django normally, your authentication information is saved to the "session"_. 
+After you log in with Django normally, your authentication information is saved to the session_. 
 The session is a bucket of information
 that the Django application saves about your visit -- to distinguish between different visitors a cookie with a unique
 value named ``sessionid`` will be used. So, your web browser will send this cookie with each page request thus allowing Django
@@ -689,9 +689,9 @@ what happens when you try to access the test-auth end-point.
 .. _default: http://www.django-rest-framework.org/api-guide/settings/#default_authentication_classes
 .. _values: http://www.django-rest-framework.org/api-guide/settings/#default_permission_classes
 .. _TokenAuthentication: http://www.django-rest-framework.org/api-guide/authentication/#tokenauthentication
-.. _`CSRF protection`: https://docs.djangoproject.com/en/3.2/ref/csrf/
+.. _`CSRF protection`: https://docs.djangoproject.com/en/stable/ref/csrf/
 .. _`django-allauth`: https://github.com/pennersr/django-allauth
-.. _`"session"`: https://docs.djangoproject.com/en/2.0/topics/http/sessions/
+.. _session: https://docs.djangoproject.com/en/stable/topics/http/sessions/
 .. _`rather extensive article`: https://auth0.com/blog/angularjs-authentication-with-cookies-vs-token/
 .. _`using cookies for this is not easy`: https://stackoverflow.com/questions/3342140/cross-domain-cookies
 .. _curl: https://curl.haxx.se

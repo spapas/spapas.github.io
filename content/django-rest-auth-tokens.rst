@@ -1,28 +1,27 @@
 Token Authentication for django-rest-framework
 ##############################################
 
-:date: 2021-08-23 12:40
+:date: 2021-08-25 12:40
 :tags: django, dj-rest-auth, rest, django-rest-framework, authentication, python, tokens
 :category: django
 :slug: django-token-rest-auth
 :author: Serafeim Papastefanos
 :summary: How to authenticate django-rest-framework with tokens
-:status: draft
-
 
 Introduction
 ------------
 
 In a `a previous article <{filename}django-rest-auth.rst>`_ 
 I explained how to authenticate for your django-rest-framework API 
-using with django-rest-auth.
+using the django-rest-auth package.
 Since then I have observed that various things have changed and most importantly that 
 the library I used there (django-rest-auth) is not updated anymore and has been 
 superseded by another one. Also, some of my information there is contradictory, 
-especially the parts that deal with the csrf protection. 
+especially the parts that deal with the session authentication and csrf protection. 
 
-Thus I've written this new article that describes the authentication situation 
-nowadays. It is more or less the same as the previous one with some updates 
+Thus I've written this new article that betters describes a recommended
+authentication workflow using tokens. This workflow does not rely on sessions at all.
+Beyond that, is more or less the same as the previous one with some updates 
 and clarifications where needed. 
 
 I have also updated the accompanying project of the previous article which
@@ -42,13 +41,13 @@ Then you can use the "Test auth" button that works only on authenticated users a
 Finally, notice that after you log out the "test auth" button returns a 403 access denied. 
 
 The javascript client uses token authentication so you can run the client in the same server as the server or 
-in a completely different one if you are using the proper CORS headers of course. 
+in a completely different server (if you are using the proper CORS headers of course). 
 
 
 Some theory
 -----------
 
-Here I will try to explain a bunch of important concepts
+Here I will try to explain a bunch of important concepts:
 
 Sessions
 ========
@@ -92,22 +91,22 @@ there's no way for site B to submit the form on site A (for example, with TokenA
 token that site A has). 
 
 However if you *are* using sessions then you must be extra careful
-to protect your POST views against CSRF attacks. Thankfully, Django does this by default so you don't need to do anything 
-fancy. However, when you actually want to submit a form using an API you must be careful to also include the CSRF token
-as explained in the Django docs about the topic (`CSRF protection`_). 
+to protect your POST views against CSRF attacks. Django does this by default so you don't need to do anything 
+fancy. However, when you actually want to submit a form using an API with sessions you must be careful to also 
+include the CSRF token as explained in the Django docs about the topic (`CSRF protection`_). 
 
 Tokens
 ======
 
-For cases where you can't use the session, django-rest-framework
+For cases where you can't use the session to authenticate, django-rest-framework
 offers a different authentication method called ``TokenAuthentication_``. Using this method, each user of the Django application
-is correlated with a random string (Token) which is passed along with the request at its header thus the Django app can authenticate
-the user using this token! The token is retrieved when the user logs using his credentials in and is saved in the browser.
+is correlated with a random string (Token) which is passed along with each request at its header thus the Django app can authenticate
+the user using this token. The token is retrieved when the user logs using his credentials and is saved in the browser.
 
 One thing that may seem strange is that since both the session cookie and a token are 
 set through HTTP Headers why all the fuss about tokens? Why not just use the session cookie and be done with it?
 Well, there are
-various reasons - here's a _`rather extensive article` explaining some of them. Some of the reasons are that a token can be valid forever 
+various reasons - here's a `rather extensive article`_ explaining some of them. Some of the reasons are that a token can be valid forever 
 while the session is something ephemeral - beyond authorization information, sessions may keep various other data for a web
 application and are expired after some time to save space. Also, since tokens are used for exactly this (authentication) they
 are much easier to use and reason about. Finally, as I've already explained, sharing cookies by multiple sites is not something
@@ -126,7 +125,7 @@ Each server can be configured to allow cross-origin requests from other servers.
 if you have a server api.example.com that is used as a backend and a server www.example.com that will 
 serve your front-end, you can configure api.example.com to allow requests only from www.example.com.
 
-By default Django does not allow any cross origin requests and you need to use the django-cors-header_
+By default Django does not allow any cross origin requests and you need to use the django-cors-headers_
 package to properly configure it. 
 
 Notice that CORS protection is enforced by the Browser. For example if you have build a mobile app
@@ -136,9 +135,19 @@ and are consuming an API in api.example.com then CORS protection does not apply 
 Installation & configuration
 ----------------------------
 
-To install django-rest-auth just follow `the instructions here`_ i.e just add 
-``'rest_framework', 'rest_framework.authtoken'`` and ``'rest_auth'`` to your `INSTALLED_APPS` in
+The project will use django-rest-framework_, dj-rest-auth_ and django-cors-headers_.
+
+To install django-rest-framework and dj-rest-auth just follow `the instructions here`_ i.e just add 
+``'rest_framework', 'rest_framework.authtoken'`` and ``'dj_rest_auth'`` to your `INSTALLED_APPS` in
 ``settings.py`` and run migrate. 
+
+To install django-cors-headers follow the `the setup instructions`_: Add ``"corsheaders"`` to your ``INSTALLED_APPS`` and 
+``"django.middleware.common.CommonMiddleware"`` to your ``MIDDLEWARE`` in ``settings.py``. Then you can use the 
+``CORS_ALLOWED_ORIGINS`` setting to configure which origins are allowed to make requests to your project. Let's 
+suppose that you are running your project at 127.0.0.1:8000 and you want to allow requests from a client 
+running at 127.0.0.1:8001. You can do this by adding the following to your settings.py: 
+``CORS_ALLOWED_ORIGINS = ['http://127.0.0.1:8001', 'http://localhost:8001']``. Actually, try running the project 
+with and without that setting and see how the javascript client behaves.
 
 Since I won't be adding any other apps to this project (no models are actually needed), I've added
 two directories ``static`` and ``templates`` to put static files and templates there. This is configured
@@ -156,6 +165,7 @@ by adding the ``'DIRS'`` attribte to ``TEMPLATES``, like this:
             
 and adding the `STATICFILES_DIRS` setting:
 
+
 .. code-block:: python
 
     STATICFILES_DIRS = [
@@ -164,6 +174,9 @@ and adding the `STATICFILES_DIRS` setting:
             
 
 The remaining setting are the default as were created by ``django-admin startproject``. 
+
+Urls
+----
 
 I have included the the following urls to ``urls.py``:
 
@@ -177,19 +190,48 @@ I have included the the following urls to ``urls.py``:
         path('', HomeTemplateView.as_view(), name='home', ),
     ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
-These are: The django-admin, a test_auth view (that works only for authenticated users and returns their username),
-*a view (LogoutViewEx) that overrides the rest-auth REST logout-view* (I'll explain why this is needed in a minute),
+These are: The django-admin, a ``test_auth`` view (that works only for authenticated users and returns their username),
+a view (``LogoutViewEx``) that overrides the rest-auth REST logout-view (I'll explain why this is needed in a minute),
 the rest-auth REST login-view, the home template view (which is the only view implemented) and finally a mapping
 of your static files to the ``STATIC_URL``. 
+
+The ``LoginView`` is the default provided by the dj-rest-auth project. One thing to consider is that 
+this view will check if the credentials you pass are valid and return a valid token for your user. However, 
+it will also optionally login the user using sessions (i.e create a new session and return a sessionid cookie). This 
+is configured by the ``REST_SESSION_LOGIN`` option which by default is ``True``. 
+
+To test this functionality, try logging in using this login view with a superuser and then visit the django-admin. You 
+will see that you are already logged in. Now, logout and add (or change) ``REST_SESSION_LOGIN=False`` to your settings.py.
+Login again from the rest view and now if you visit the django-admin you should see that you need to login again.
+
+Another way to test this is by checking out the response headers of the ``POST`` to ``rest-auth/login/`` from your 
+browser's development tools. When you are using ``REST_SESSION_LOGIN=True`` (or you haven't defined it since by 
+default it is true) you'll see the following ``Set-Cookie`` line:
+
+.. code::
+
+    sessionid=pw8rp7l7yy33lk7geuxbczaleh35w9je; expires=Wed, 08 Sep 2021 08:29:40 GMT; HttpOnly; Max-Age=1209600; Path=/; SameSite=Lax
+
+This cookie won't be set if you login again with ``REST_SESSION_LOGIN=False``.
+
 
 The views
 ---------
 
-There are three views in this application - the ``HomeTemplateView``, the ``TestAuthView``
+I've defined three views in this application - the ``HomeTemplateView``, the ``TestAuthView``
 and the ``LogoutViewEx`` view that overrides the normal ``LogoutView`` of ``django-rest-auth``. 
-The first one is
+
+HomeTemplateView
+================
+
+The ``HomeTemplateView`` is
 a simple ``TemplateView`` that just
 displays an html page and loads the client side code - we'll talk about it later in the front-side section. 
+This is more or less similar (without the django-stuff) with the standalone client  page that can be found on 
+``client/index.html``.
+
+TestAuthView
+============
 
 The ``TestAuthView`` is implemented like this:
 
@@ -201,15 +243,24 @@ The ``TestAuthView`` is implemented like this:
 
         def get(self, request, format=None):
             return Response("Hello {0}!".format(request.user))
+        
+        def post(self, request, format=None):
+            return Response("Hello {0}! Posted!".format(request.user))
             
 This is very simple however I'd like to make a few comments about the above. First of all you see that
-I've defined ``authentication_classes`` and ``permission_classes``. These options define 
+I've defined both a ``get`` and a ``post`` method. When you use the token authentication you'll see that the 
+``post`` method will work without the need to provide a csrf token as already discussed before.
+
+Authentication and permission
+=============================
+
+Notice that both ``authentication_classes`` and ``permission_classes`` are included in the ``TestAuthView``. These options define:
 
 * which method will be used for authenticating access to the REST view i.e finding out if the user 
-  requesting access has logged in and if yes what's his username (in our case the ``TokenAuthentication`` will be used)
+  requesting access has logged in and if yes what's his username (in our case only ``TokenAuthentication`` will be used)
 * if the user is authorized (has permission) to call this REST view (in our case only authenticated users will be allowed)
 
-The authentication and permission clases can be set globally 
+The authentication and permission classes can be set globally 
 in your ``settings.py`` using ``REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES']`` and 
 ``REST_FRAMEWORK['DEFAULT_PERMISSION_CLASSES']``
 or defined per-class like this. If I wanted to have the same authentication and permission classes defined
@@ -226,7 +277,7 @@ in my ``settings.py`` so I wouldn't need to set these options per-class I'd add 
         ),
     }
 
-Finally, keep in mind that you haven't defined these in your views or your settings, they will have the 
+Please keep in mind that you haven't defined these in your views or your settings, they will have the 
 following default_ values_: 
 
 .. code-block:: python
@@ -243,13 +294,19 @@ following default_ values_:
 
 The above mean that if you don't define authentication and permission classes anywhere then the REST 
 views will use either session authentication (i.e the user has logged in normally using
-the Django login views as explained before) or basic authentication 
+the Django login views as explained before) or HTTP basic authentication 
 (the request provides the credentials in the header using traditional HTTP Basic authentication)
 and also that all users (logged in or not) will be allowed to call all APIs (this is
 probably not something you want).
 
-The ``TokenAuthentication`` that we are using instead means that for every user there must be a valid token which will be provided
-for each request he does. The tokens are normal object instances of ``rest_framework.authtoken.models.Token``
+Tokens
+======
+
+The ``TokenAuthentication`` that we are using for the ``TestAuthView``
+means that for every request a valid token must be passed (there's no concept of state 
+in HTTP so you need to pass it whenever you communicate with the server). 
+
+The tokens are normal object instances of ``rest_framework.authtoken.models.Token``
 and you can take a look at them (or even add one) through the Django admin (auth token - tokens). You can also
 even do whatever you normally would do to an object instance, for example:
 
@@ -263,7 +320,7 @@ To authenticate with a token (using TokenAuthentication_), you must add an extra
 ``Authorization: Token db4dcc1b9d00d1af74fb3cb41e1f9e673208485b``. To do this you'll need something
 client-side code which we'll see in the next section. 
 
-To do it with curl_ you can just do something like this:
+To debug your authentication with curl_ you can just do something like this:
 
 .. code-block:: bash
 
@@ -271,15 +328,25 @@ To do it with curl_ you can just do something like this:
     
 Try it with a valid and invalid token and without providing a token at all and see the response each time.    
 
+dj-rest-auth
+============
+
 So, django-rest-framework provides the model (Token) and the mechanism (add the extra Authentication header) for
 authentication with Tokens. What it does not provide is a simple way to create/remove tokens for users: This
-is where ``django-rest-auth`` comes to the rescue! Its login and logout REST views will automatically
-create (and delete) tokens for the users that are logging in. They will also authenticate the user
-normally (using sessions) - this means that if a user logs in using the login REST endpoint he'll then
+is where the dj-rest-auth project comes to the rescue! Its login and logout REST views will automatically
+create (and delete) tokens for the users that are logging in. 
+
+As already described above, the login view will also authenticate the user
+using the session when the REST_SESSION_LOGIN is set to True (default) - this means that if a user 
+logs in using the login REST endpoint he'll then
 be logged in normally to the site and be able to access non-REST parts of the site (for example the django-admin).
-Also, if the user logs in through the django-rest-auth REST end point and if you have are using ``SessionAuthentication``
-to one of your views then he'll be able to authenticate to these views *without* the need to pass the token (can
-you understand why?).
+
+Also, if the user logs in through the dj-rest-auth REST end point and if you have are using ``SessionAuthentication``
+to one of your views then he'll be able to authenticate to these views *without* the need to pass the token (make sure 
+you understand why).
+
+LogoutViewEx
+============
 
 Finally, let's take a look at the ``LogoutViewEx``:
 
@@ -289,27 +356,38 @@ Finally, let's take a look at the ``LogoutViewEx``:
         authentication_classes = (authentication.TokenAuthentication,)
         
 This class only defines the authentication_classes attribute. Is this really needed? Well, it depends on 
-you project. If you take a look at the source code of ``LogoutView`` (https://github.com/Tivix/django-rest-auth/blob/master/rest_auth/views.py#L99)
+you project. If you take a look at the source code of 
+``LogoutView`` (https://github.com/iMerica/dj-rest-auth/blob/master/dj_rest_auth/views.py#L131)
 you'll see that it does not define ``authentication_classes``. This, as we've already discussed, means that it will
-fall-back to whatever you have defined in the settings (or the defaults of django-rest-framework). So, if you haven't
+fall-back to whatever you have defined in the settings (or the defaults of django-rest-framework). 
+
+So, if you haven't
 defined anything in the settings then you'll get the by default the 
-SessionAuthentication and BasicAuthentication methods (hint: *not* the ``TokenAuthentication``). This means that you won't be able to
+``SessionAuthentication`` and ``BasicAuthentication`` methods (hint: *not* the ``TokenAuthentication``). 
+This means that you won't be able to
 logout when you pass the token (but *will* be able to logout from the web-app after you login - why?). So to make everything 
-crystal and be able to reason better about the behavior I specifically define the ``LogoutViewEx`` to use the ``TokenAuthentication`` - that's
-what you'd use if you developed a mobile or desktop app anyway.
+crystal and be able to reason better about the behavior I specifically define the ``LogoutViewEx`` to use 
+the ``TokenAuthentication`` to properly log out your user. This of course means that you need to pass 
+the token to your logout view also or else there won't be any way to associate the request with a user to log out.
         
 
 The client side scripts
 -----------------------
 
 I've included all client-side code to a ``home.html`` template that is loaded
-from the ``HomeTemplateView``. The client-side code has been implemented only with jQuery because I think
+from the ``HomeTemplateView``. Also, the same code has been included in ``client/index.html``. This is 
+a completely standalone javascript client that you can run in a different http server than your Django server, 
+for example by running ``py -3 -m  http.server 8001`` from the client folder and visiting http://127.0.0.1:8001.
+
+
+The client-side code has been implemented only with jQuery because I think
 this is the library that most people are familiar with - and is really easy to be understood even if you
-are not familiar with it. It more or less consists of four sections in html:
+are not familiar with it. It more or less consists of five sections in html:
 
 * A user-is-logged-in section that displays the username and the logout button
 * A user-is-not-logged-in section that displays a message and the login button
-* A test-auth section that displays a button for calling the ``TestAuthView`` defined previously and outputs its response
+* A test-auth section that displays a button for calling the ``TestAuthView`` with GET defined previously and outputs its response
+* A test-auth POST section that displays a button for calling the ``TestAuthView`` with POST defined previously and outputs its response
 * The login modal
 
 Here's the html (using spectre.css for styling):
@@ -317,32 +395,41 @@ Here's the html (using spectre.css for styling):
 .. code-block:: html
 
     <div class="container grid-lg">
-        <h2>Test</h2>
-        <div class="columns" id="non-logged-in">
-            <div class='column col-3'>
-                You have to log-in!
-            </div>
-            <div class='column col-3'>
-                <button class="btn btn-primary"  id='loginButton'>Login</button>
-            </div>
+    <h2>Test</h2>
+    <div class="columns" id="non-logged-in">
+        <div class='column col-3'>
+            You have to log-in!
         </div>
-        <div class="columns" id="logged-in">
-            <div class='column col-3'>
-                Welcome <span id='span-username'></span>!
-            </div>
-            <div class='column col-3'>
-                <button class="btn btn-primary"  id='logoutButton'>Logout</button>
-            </div>
+        <div class='column col-3'>
+            <button class="btn btn-primary"  id='loginButton'>Login</button>
         </div>
-        <hr />
-        <div class="columns" id="test">
-            <div class='column col-3'>
-                <button class="btn btn-primary"  id='testAuthButton'>Test auth</button>
-            </div>
-            <div class='column col-9'>
-                <div id='test-auth-response' ></div>
-            </div>
+    </div>
+    <div class="columns" id="logged-in">
+        <div class='column col-3'>
+            Welcome <span id='span-username'></span>!
         </div>
+        <div class='column col-3'>
+            <button class="btn btn-primary"  id='logoutButton'>Logout</button>
+        </div>
+    </div>
+    <hr />
+    <div class="columns" id="test">
+        <div class='column col-3'>
+            <button class="btn btn-primary"  id='testAuthButton'>Test auth</button>
+        </div>
+        <div class='column col-9'>
+            <div id='test-auth-response' ></div>
+        </div>
+    </div>
+    <hr />
+    <div class="columns" id="test">
+        <div class='column col-3'>
+            <button class="btn btn-primary"  id='testAuthPostButton'>Test auth (POST)</button>
+        </div>
+        <div class='column col-9'>
+            <div id='test-auth-post-response' ></div>
+        </div>
+    </div>
     </div>
     
     <div class="modal" id="login-modal">
@@ -383,8 +470,8 @@ Here's the html (using spectre.css for styling):
         </div>
     </div> 
     
-The html is very simple and I don't think I need to explain much  - notice that the `#logged-in` and 
-`#non-logged-in` sections are mutually exclusive (I use ``$.show()`` and ``$.hide()`` to show and hide them) but the `#test` section is always displayed
+The html is very simple and I don't think I need to explain much  - notice that the ``#logged-in`` and ``#non-logged-in`` 
+sections are mutually exclusive (I use ``$.show()`` and ``$.hide()`` to show and hide them) but the ``#test`` section is always displayed
 so you'll be able to call the test REST API when you are and are not authenticated. For the modal
 to be displayed you need to add an ``active`` class to its ``#modal`` container.
 
@@ -410,23 +497,6 @@ For the javascript, let's take a look at some initialization stuff:
         }
     }
 
-    var getCookie = function(name) {
-        var cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            var cookies = document.cookie.split(';');
-            for (var i = 0; i < cookies.length; i++) {
-                var cookie = jQuery.trim(cookies[i]);
-                // Does this cookie string begin with the name we want?
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    };
-    var g_csrftoken = getCookie('csrftoken');
-
     var initLogin = function() {
         if(g_auth) {
             $('#non-logged-in').hide();
@@ -445,32 +515,22 @@ For the javascript, let's take a look at some initialization stuff:
             sessionStorage.removeItem("auth");
         }
         $('#test-auth-response').html("");
+        $('#test-auth-post-response').html("");
     };
 
 First of all, I define a ``g_urls`` window/global object that will keep the required REST URLS (login/logout and test auth). These
-are retrieved from Django using the ``{% url %}`` template tag and are not hard-coded.
+are retrieved from Django using the ``{% url %}`` template tag and are not hard-coded (in the js only client they are hard-coded of course).
 After that, I check to see if the user has authenticated before. Notice that because
 this is client-side code, I need to do that every time the page loads or else the JS won't be initialized properly! The user login
-information is stored to an object named ``g_auth`` and contains two attributes: ``username``, ``key`` (token) and ``remember_me``.
+information is stored to an object named ``g_auth`` and contains three attributes: ``username``, ``key`` (token) and ``remember_me``.
 
 To keep the login information I use either a key named ``auth`` to either the ``localStorage`` or the ``sessionStorage``. The ``sessionStorage`` is used to save 
 info for the current browser tab (*not* window) while the ``localStorage`` saves info for ever (until somebody deletes it). Thus,
-``localStorage`` can be used for implementing a "remember me" functionality. Notice that instead of using the session/local storage
-I could instead integrate the user login information with the Django back-end. To do this I'd need to see if the current user has
-a session login and if yes pass his username and token to  Javascript. These values would then be read by the login initialization
-code. I'm leaving this as an exercise for attentive readers. 
+``localStorage`` can be used for implementing a "remember me" functionality.
 
-Getting the login information from the session probably is a better solution for web-apps however I think that using the local or session storage emulate better a more
-general (and completely stateless) behaviour especially considering that the API may be used for mobible/desktop apps. 
 
-In any case, after you've initialized the ``g_auth`` object you'll need to read the CSRF cookie. By default Django requires
-`CSRF protection`_ for all ``POST`` requests (we do a POST request for login and logout). What happens here is that for pages that may
-need to do a ``POST`` request, Django will set a cookie (CSRF cookie) in its initial response. You'll need to read that cookie and submit its
-value along with the rest of your form fields when you do the POST. So the ``getCookie`` function is just used to set the ``g_csrftoken`` with the value
-of the CSRF cookie.
-
-The final function we define here (which is called a little later) checks to see if there is login information and hides/displays the correct
-things in html. It will also set the local or session storage (depending on remember me value).
+The final function we define here, ``initLogin`` (which is called a little later) checks to see if there is login information 
+and hides/displays the correct things in html. It will also set the local or session storage (depending on remember me value).
 
 After that, we have some client side code that is inside the ``$()`` function which will be called after the page has completely loaded:
 
@@ -503,15 +563,21 @@ After that, we have some client side code that is inside the ``$()`` function wh
             });
         });
         
+        $('#testAuthPostButton').click(function() {
+            // Same as with the GET 
+        });
         
         // continuing below ...
 
-The first thing happening here is to call the ``initLogin`` function to properly intiialize the page and then we add a couple of
+The first thing happening here is to call the ``initLogin`` function to properly initialize the page and then we add a couple of
 handlers to the click buttons of the ``#loginButton`` (which just displays the modal by adding the ``active`` class ), 
 ``.close-modal`` class (there are multiple
-ways to close the modal thus I use a class which just removes that ``active`` class) and finally to the ``#testAuthButton``. This
-button will do a ``GET`` request to the ``g_urls.test_auth`` we defined before. The important thing to notice here is that we add
-a ``beforeSend`` attribute to the ``$.ajax`` request which, if ``g_auth`` is defined adds an ``Authorization`` header with the token
+ways to close the modal thus I use a class which just removes that ``active`` class) and finally to the ``#testAuthButton``
+and ``#testAuthPostButton#``. 
+These
+button will do a ``GET`` and ``POST`` request to the ``g_urls.test_auth`` we defined before. The important thing to notice 
+here is that we add
+a ``beforeSend`` attribute to the ``$.ajax`` request which, if ``g_auth`` is defined, adds an ``Authorization`` header with the token
 in the form that django-rest-framework ``TokenAuthentication`` expects and as we've already discussed above:
 
 .. code-block:: js
@@ -522,9 +588,11 @@ in the form that django-rest-framework ``TokenAuthentication`` expects and as we
         }
     }
 
-If this ajax call returns ok (``done`` part) we just add the ``Ok`` to a green label else if there's an error (``fail`` part)
-we add the response text and status to a red label. You can try clicking the button and you see that only if you've logged in
-you will succeed in this call.
+If this ajax call returns without errors (the ``done`` part of the ajax call) 
+we just add the ``data`` to a green label else if there's an error (``fail`` part)
+we add the response text and status to a red label. You can try clicking the buttons and you see that only if you've logged in
+you will succeed in this call. Also, notice that both GET and POST requests work normally without the need to also include 
+a csrf token (I hope you understand why by now).
 
 Let's now take a look at the ``#loginOkbutton`` click handler (inside the modal):
 
@@ -542,8 +610,7 @@ Let's now take a look at the ``#loginOkbutton`` click handler (inside the modal)
                     method: "POST", 
                     data: {
                         username: username,
-                        password: password,
-                        csrfmiddlewaretoken: g_csrftoken
+                        password: password
                     }
                 }).done(function(data) {
                     console.log("DONE: ", username, data.key);
@@ -554,8 +621,6 @@ Let's now take a look at the ``#loginOkbutton`` click handler (inside the modal)
                     };
                     $('#login-modal').removeClass('active');
                     initLogin();
-                    // CAREFUL! csrf token is rotated after login: https://docs.djangoproject.com/en/1.7/releases/1.5.2/#bugfixes
-                    g_csrftoken = getCookie('csrftoken');
                 }).fail(function(data) {
                     console.log("FAIL", data);
                     $('#modal-error').removeClass('d-invisible');
@@ -567,16 +632,11 @@ Let's now take a look at the ``#loginOkbutton`` click handler (inside the modal)
 
 All three user inputs (``username, password, remember_me``) are read from the form and if both username and
 password have been defined an Ajax request will be done to the ``g_urls.login`` url. We pass
-``username, password`` *and* ``g_csrftoken`` (as discussed before) as the request data. Now, if there's an
+``username`` and ``password`` as the request data. Now, if there's an
 error (``fail``) I just display a generic message (by removing it's `d-invisible` class) while, if the
 request was Ok I retrieve the ``key`` (token) from the response, initialize the ``g_auth`` object with the
 ``username``, ``key`` and ``remember_me`` values and call ``initLogin`` to show the correct divs and save
 to the session/local storage. 
-
-It is important to keep in mind that with the line ``g_csrftoken = getCookie('csrftoken')``
-we re-read the CSRF cookie. This is needed because, as you can see in the mentioned link in the comment,
-after Django logs in, the csrf cookie value is rotated for security reasons so it must be re-read here (or else
-the ``logout`` that is also a POST request will not work).
 
 Finally, here's the code for logout (still inside the ``$(function () {``):
 
@@ -589,9 +649,6 @@ Finally, here's the code for logout (still inside the ``$(function () {``):
                 method: "POST", 
                 beforeSend: function(request) {
                     request.setRequestHeader("Authorization", "Token " + g_auth.key);
-                }, 
-                data: {
-                    csrfmiddlewaretoken: g_csrftoken
                 }
             }).done(function(data) {
                 console.log("DONE: ", data);
@@ -614,20 +671,20 @@ Conclusion
 ----------
 
 Using the info presented on this article you should be able to properly login and logout to Django using REST and
-also call REST end-points as an authenticated used. I recommend using the ``curl`` utility to try to call the rest
+also call REST end-points using the ``TokenAuthentication``. 
+
+I recommend using the ``curl`` utility to try to call the rest
 end point with various parameters to see the response. Also, you change the ``LogoutViewEx`` with the 
 default django-rest-auth ``LogoutView`` and then try logging out through the web-app *and* through curl and see 
 what happens when you try to access the test-auth end-point.
 
-Finally, the above project can be easily modified to use
-``SessionAuthentication`` instead of ``TokenAuthentication`` (so you won't need ``django-rest-auth`` at all) - I'm
-leaving it as an exercise to the reader.
 
 
 .. _`SessionAuthentication`: http://www.django-rest-framework.org/api-guide/authentication/#sessionauthentication
-.. _`django-rest-auth`: https://github.com/Tivix/django-rest-auth
+.. _`dj-rest-auth`: https://github.com/iMerica/dj-rest-auth
 .. _`django-rest-framework`: http://www.django-rest-framework.org
-.. _`the instructions here`: http://django-rest-auth.readthedocs.io/en/latest/installation.html#installation
+.. _`the instructions here`: https://dj-rest-auth.readthedocs.io/en/latest/installation.html
+.. _`the setup instructions`: https://github.com/adamchainz/django-cors-headers#setup
 .. _spectre.css: https://picturepan2.github.io/spectre/
 .. _default: http://www.django-rest-framework.org/api-guide/settings/#default_authentication_classes
 .. _values: http://www.django-rest-framework.org/api-guide/settings/#default_permission_classes
@@ -638,5 +695,5 @@ leaving it as an exercise to the reader.
 .. _`rather extensive article`: https://auth0.com/blog/angularjs-authentication-with-cookies-vs-token/
 .. _`using cookies for this is not easy`: https://stackoverflow.com/questions/3342140/cross-domain-cookies
 .. _curl: https://curl.haxx.se
-.. CORS: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
-.. django-cors-header_: https://github.com/adamchainz/django-cors-headers
+.. _CORS: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
+.. _django-cors-headers: https://github.com/adamchainz/django-cors-headers

@@ -9,6 +9,12 @@ Authentication for django-rest-framework with django-rest-auth
 :summary: How to authenticate with django-rest-auth
 
 
+**Update: 25/08/2021** Please notice that I've written 
+a `a new article  <{filename}django-rest-auth-tokens.rst>`_ 
+concerning Token authentication in django rest framework which 
+I recommend to read instead of this one since most info here is 
+deprecated.
+
 Introduction
 ------------
 

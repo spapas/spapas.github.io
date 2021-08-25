@@ -666,7 +666,8 @@ and call ``initLogin()`` to show the correct divs and remove the ``auth`` key fr
 you ``POST`` to the ``logout`` REST end-point, you need to also add the ``Authorization`` header with the token or else
 (since we've defined only ``TokenAuthentication`` for the ``authentication_classes`` for the ``LogoutViewEx`` class)
 there won't be any way to correlate the request with the user and log him out!
-        
+
+
 Conclusion
 ----------
 
@@ -678,6 +679,10 @@ end point with various parameters to see the response. Also, you change the ``Lo
 default django-rest-auth ``LogoutView`` and then try logging out through the web-app *and* through curl and see 
 what happens when you try to access the test-auth end-point.
 
+As a final remark, a couple of thing to note:
+
+* You can use the django-rest-knox_ package to improve the functionality and security of your REST tokens (by allowing multiple tokens per user, storing them hashed in the database and configuring expiration times for the tokens)
+* If you are using Apache and mod_wsgi to run you Django project you need to set the WSGIPassAuthorization_ option to ``on`` in order to pass the Authorization header to your Django app.
 
 
 .. _`SessionAuthentication`: http://www.django-rest-framework.org/api-guide/authentication/#sessionauthentication
@@ -697,3 +702,5 @@ what happens when you try to access the test-auth end-point.
 .. _curl: https://curl.haxx.se
 .. _CORS: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
 .. _django-cors-headers: https://github.com/adamchainz/django-cors-headers
+.. _django-rest-knox: https://github.com/James1345/django-rest-knox
+.. _WSGIPassAuthorization: https://modwsgi.readthedocs.io/en/develop/configuration-directives/WSGIPassAuthorization.html

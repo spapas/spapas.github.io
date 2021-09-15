@@ -4,7 +4,7 @@ A forward and reverse proxy primer for the layman
 :date: 2021-09-21 14:20
 :tags: forward-proxy, reverse-proxy, proxy, networking, http
 :category: networking
-:slug: layman-prox-primer
+:slug: layman-proxy-primer
 :author: Serafeim Papastefanos
 :summary: A primer for explaining forward and reverse proxies to the layman 
 

@@ -1,7 +1,7 @@
 PDFs in Django like it's 2022!
 ##############################
 
-:date: 2022-02-14 10:20
+:date: 2022-02-14 12:20
 :tags: django, python, pdf, wkhtmltopdf
 :category: django
 :slug: django-pdfs-2022

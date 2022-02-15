@@ -163,7 +163,7 @@ the temporary file). Also, wkhtmltopdf will output some stuff while rendering th
   Printing pages (6/6)
   Done
 
-You can pass the ``--quit`` option to hide this output. However the output is useful to see what wkhtmltopdf is doing in
+You can pass the ``--quiet`` option to hide this output. However the output is useful to see what wkhtmltopdf is doing in
 case there are problems so I recommend leaving it on while developing. Let's take a look at a problematic output:
 
 .. code::

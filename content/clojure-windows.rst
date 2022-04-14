@@ -66,7 +66,9 @@ can be installed natively on Windows by downloading the .zip `from the releases 
 that executable it in your path. You can also rename it to clj.exe if you want. Also if you have the powershell installed you can run this command from cmd.exe
 ``PowerShell -Command "iwr -useb https://raw.githubusercontent.com/borkdude/deps.clj/master/install.ps1 | iex"`` to install it automatically.
 
-You can now run ``deps`` and you should get a clojure repl similar to ``lein repl``. To be able to create a new project you'll need to 
+You can now run ``deps`` and you should get a clojure repl similar to ``lein repl``. 
+
+To create a new project skeleton you can use the 
 use the deps-new_ project. To install it run the following command from cmd.exe: 
 ``deps -Ttools install io.github.seancorfield/deps-new "{:git/tag """v0.4.9"""}" :as new`` (please notice that there are various 
 `problems with the quoting on windows`_ but this command should work fine). 
@@ -98,6 +100,23 @@ To run the tests use: ``deps -T:build test``.
 To create the uberjar you'll run: 
 ``deps -T:build ci`` (tests must pass). Then execute it directly using 
 ``java -jar target\core-0.1.0-SNAPSHOT.jar``.
+
+Also, notice that it's really simple to create a new project with deps without the deps-new. For example,
+create a folder named ``manualapp`` and in this folder 
+create a ``deps.edn`` file containing just the string ``{}``. Then add another folder named ``src`` with a  ``hello.clj`` file
+containing something like:
+
+.. code-block:: clojure
+
+  (ns hello)
+
+  (defn foo []
+    "bar")
+
+  (defn run [opts]
+    (println "Hello world"))
+
+You can then open a REPL on the project using ``deps`` or run the run function using ``deps -X hello/run``.
 
 VSCode integration
 ------------------

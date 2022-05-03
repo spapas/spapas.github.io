@@ -10,6 +10,9 @@ Asynchronous tasks in django with django-rq
 
 .. contents::
 
+**Update 03/05/2022**: The github project has been updated to work with latest version of Django (4.0.4) and Python (3.10): https://github.com/spapas/django-test-rq
+
+
 **Update 01/09/15**: I've written a new post about rq and django with some
 `more advanced techniques <{filename}django-rq-redux.rst>`_
 ! 

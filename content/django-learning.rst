@@ -42,9 +42,12 @@ Database design
 ===============
 
 It is vital that you know and understand Database design. You need to know how to design a normalized database schema.
-What's a foreign key and when to use it. When to use one to many, one to one and many to many relation. What are indeces
-and when to use them. What's a primary key and what's the difference between a primary key and a foreign key. What's a
-composite key and when to use it. What's a unique key and when to use it. What's a check constraint and when to use it.
+What's a primary key and what's the difference between a primary key and a foreign key, what are the kinds of relations 
+you may have and when to use each one, i.e when to use one to many, one to one and many to many relation. What are 
+indeces, constraints, etc.
+
+I understand that this may be a lot to ask. However these are things that every CS or EE student should have learned in
+a Database course.
 
 SQL
 ===

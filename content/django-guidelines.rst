@@ -8,6 +8,10 @@ My essential guidelines for better Django development
 :author: Serafeim Papastefanos
 :summary: A list of guidelines that I follow in every non-toy Django project I develop
 
+
+.. contents::
+
+
 Introduction
 ============
 
@@ -132,24 +136,86 @@ Using a custom user model when starting a new project is already `advised in the
 easier to add custom fields to your user model and have better control over it. Also, although you may be able to add
 a ``Profile`` model with an one to one relation with the default ``django.auth.User`` model you'll still need to use
 a join to retrieve the profile for each user (something that won't be necessary when the extra fields are on your custom user model).
- 
+
+Another very important reason to use a custom user model is that you'll be able to easily add custom methods to your user model. 
+For example, there's the ``get_full_name`` method in builtin-Django that returns the first_name plus the last_name, with a space in between
+so you're able to call it like ``{{ user.get_full_name }}`` in your templates. If you don't have a custom user model, you'll need to
+add template tags for similar functionality; see the discussion about not adding template tags when you can use a method.
 
 There's no real disadvantage to using a custom user model except the 5 minute it is needed to set it up. I actually recommend
 create a ``users`` app that you're going to use to keep user related information (see 
 the `users app on my cookiecutter project`_).
 
 
-
-
-
 Views guidelines
 ================
+
+Use class based views
+---------------------
+
+I recommend always using class-based views instead of function-based views. This is because class-based views are easier to
+reuse and extend. I've written an extensive `comprehensive Django CBV guide <{filename}django-cbv-tutorial.rst>`_ that you can read to 
+learn everything about class based views!
+
 
 Template guidelines
 ===================
 
+Stick to the built-in Django templates
+-------------------------------------
+
+Django has its own built-in template engine but it also allows you to use the Jinja template engine or even 
+use a completely different one! The django template backend is considered "too restrictive" by some people mainly
+because you can only call functions without parameters from it.
+
+My opinion is to just stick to the builtin Django template. Its restriction is actually a strength, enabling you
+to create re-usable custom template tags (or object methods) instead of calling business logic from the template.
+Also, using a completely custom backend means that you'll add dependencies to your project; please see my the guideline 
+about the selection of using external packages. Finally, don't forget that any packages you'll use that provide 
+templates would be for the Django template backend, so you'll need to convert/re-write these templates to be used with 
+a different engine.
+
+I would consider the Jinja engine only if you already have a bunch of Jinja templates from a different project and 
+you want to quickly use them.
+
+Don't add tags when you can use a method
+----------------------------------------
+
+Continuing from the discussion on the previous guideline, I recommend you to add methods to your models instead of 
+adding template tags. For example, let's suppose that we want to get our pizza toppings order by their name. We could
+add a template tag that would do that like:
+
+.. code-block:: python 
+
+    def get_pizza_toppings(context, pizza):
+        return pizza.toppings.all().order_by('name')
+
+and use it like ``{% get_pizza_toppings pizza as pizza_toppings %}`` in our template. Notice that if you don't care about 
+the ordering you could instead do ``{{ pizza.toppings.all }}`` but you need to use the order_by and pass a parameter so you
+can't call the method.
+
+Instead of adding the template tag that I recommend  adding a method to your ``pizza`` model like:
+
+.. code-block:: python 
+
+    def get_toppings(self):
+        return self.toppings.all().order_by('name')
+
+and then call it like ``{{ pizza.get_toppings }}`` in your template. This is much cleaner and easier to understand.
+
+Please notice that this guideline is not a proposal towards the "fat models" approach. You can add 1 line methods to 
+your models that would only call the corresponding service methods if needed. 
+
 Settings guidelines
 ===================
+
+Use a package instead of module
+-------------------------------
+
+This is a well known guideline but I'd like to mention it here.
+
+Handle secrets properly
+-----------------------
 
 Debugging guidelines
 ====================

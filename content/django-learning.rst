@@ -4,7 +4,7 @@ A path to learn Django
 :date: 2022-09-28 11:10
 :tags: python, django
 :category: django
-:slug: django-guidelines
+:slug: django-learning
 :author: Serafeim Papastefanos
 :summary: A path to follow for people that are interested in learning the Django web framework
 

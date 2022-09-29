@@ -25,7 +25,7 @@ some of them running successfully for more than 10 years, since Django 1.4.
 
 
 4. trees
-5. custom user model
+
 	
 
 Model design guidelines
@@ -206,6 +206,36 @@ and then call it like ``{{ pizza.get_toppings }}`` in your template. This is muc
 Please notice that this guideline is not a proposal towards the "fat models" approach. You can add 1 line methods to 
 your models that would only call the corresponding service methods if needed. 
 
+Re-use templates with partials
+------------------------------
+
+When you have a part of a template that will be used in multiple places you can use partials to avoid repeating yourself.
+For example, let's suppose you like to display your pizza details. These details would be displayed in the list of 
+pizzas, in the cart page, in the receipt page etc. So can create an html page named ``_pizza_details.html`` under a 
+``partial`` folder (or whatever name you want but I recommend having a way to quickly check your partials) with contents
+similar to:
+
+.. code-block:: html
+    
+    <div class='pizza-details'>
+        <h3>{{ pizza.name }}</h3>
+        {% if show_photo %}
+            <img src='{{ pizza.photo.url }}'>
+        {% endif %}
+        <p>Toppings: {{ pizza.get_toppings|join:", " }}</p>
+    </div>
+
+and then include it in your templates like ``{% inlude "partials/_pizza_details.html" %}`` to display the info without photo or 
+``{% inlude "partials/_pizza_details.html" with show_photo=True %}`` to display the photo. Also notice that you can override the 
+{{ pizza }} context variable so, if you want to display two pizzas in a template you'll write something like
+
+
+.. code-block:: html
+    
+    {% inlude "partials/_pizza_details.html" with show_photo=True pizza=pizza1 %}
+    {% inlude "partials/_pizza_details.html" with show_photo=True pizza=pizza2 %}
+
+
 Settings guidelines
 ===================
 
@@ -216,6 +246,24 @@ This is a well known guideline but I'd like to mention it here.
 
 Handle secrets properly
 -----------------------
+
+Static and media guidelines
+===========================
+
+Use ManifestStaticFilesStorage
+------------------------------
+
+Organize your media files
+-------------------------
+
+Do not serve media through your application server
+--------------------------------------------------
+
+Secure your media properly
+--------------------------
+
+Handle stale media
+------------------
 
 Debugging guidelines
 ====================

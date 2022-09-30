@@ -157,12 +157,15 @@ I recommend always using class-based views instead of function-based views. This
 reuse and extend. I've written an extensive `comprehensive Django CBV guide <{filename}django-cbv-tutorial.rst>`_ that you can read to 
 learn everything about class based views!
 
+Use slim views
+--------------
+
 
 Template guidelines
 ===================
 
-Stick to the built-in Django templates
--------------------------------------
+Stick to the built-in Django template backend
+---------------------------------------------
 
 Django has its own built-in template engine but it also allows you to use the Jinja template engine or even 
 use a completely different one! The django template backend is considered "too restrictive" by some people mainly
@@ -178,8 +181,8 @@ a different engine.
 I would consider the Jinja engine only if you already have a bunch of Jinja templates from a different project and 
 you want to quickly use them.
 
-Don't add tags when you can use a method
-----------------------------------------
+Don't add template tags when you can use a method
+-------------------------------------------------
 
 Continuing from the discussion on the previous guideline, I recommend you to add methods to your models instead of 
 adding template tags. For example, let's suppose that we want to get our pizza toppings order by their name. We could
@@ -206,6 +209,8 @@ and then call it like ``{{ pizza.get_toppings }}`` in your template. This is muc
 Please notice that this guideline is not a proposal towards the "fat models" approach. You can add 1 line methods to 
 your models that would only call the corresponding service methods if needed. 
 
+
+
 Re-use templates with partials
 ------------------------------
 
@@ -225,8 +230,8 @@ similar to:
         <p>Toppings: {{ pizza.get_toppings|join:", " }}</p>
     </div>
 
-and then include it in your templates like ``{% inlude "partials/_pizza_details.html" %}`` to display the info without photo or 
-``{% inlude "partials/_pizza_details.html" with show_photo=True %}`` to display the photo. Also notice that you can override the 
+and then include it in your templates like ``{% inlude "pizzas/partials/_pizza_details.html" %}`` to display the info without photo or 
+``{% inlude "pizzas/partials/_pizza_details.html" with show_photo=True %}`` to display the photo. Also notice that you can override the 
 {{ pizza }} context variable so, if you want to display two pizzas in a template you'll write something like
 
 
@@ -242,7 +247,42 @@ Settings guidelines
 Use a package instead of module
 -------------------------------
 
-This is a well known guideline but I'd like to mention it here.
+This is a well known guideline but I'd like to mention it here. When you create a new project, Django will
+create a ``settings.py`` file. This file is a python module. I recommend to create a settings folder next to the
+``settings.py`` and put
+in it the ``settings.py`` renamed as ``base.py`` and an ``__init__.py`` file so the ``settings`` folder will be a 
+python package. So instead of ``project\settings.py`` you'll have ``project\settings\base.py`` and ``project\settings\__init__.py``.
+
+Now, you'll add an extra module inside settings for each kind of environment you are gonna use your app on. For example, you'll
+have something like 
+* ``project\settings\dev.py`` for your development environment
+* ``project\settings\uat.py`` for the UAT environment
+* ``project\settings\prod.py`` for the production environment
+
+Each of these files will import the ``base.py`` file and override the settings that are different from the base settings, i.e
+these files will start like: 
+
+.. code-block:: python
+
+    from .base import *
+
+    # And now all options that are different from the base settings
+
+All these files will be put in your version control. You won't put any secrets in these files. We'll see how to handle
+secrets later.
+
+When Django starts, it will by default look for the ``project/settings.py`` module. So, if you try to run ``python manage.py``
+now it will complain. To fix that, you have to set the ``DJANGO_SETTINGS_MODULE`` environment variable to point to
+the correct settings module you wanna use. For example, in the dev env you'll do ``DJANGO_SETTINGS_MODULE=project.settings.dev``.
+
+To avoid doing that every time I recommend creating a script that will initiate the project's virtual environment and set the 
+settings module. For example, in my projects I have a file named dovenv.bat (I use windows) with the following contents:
+
+.. code-block
+
+    call ..\venv\scripts\activate
+    set DJANGO_SETTINGS_MODULE=project.settings.dev
+
 
 Handle secrets properly
 -----------------------
@@ -253,17 +293,178 @@ Static and media guidelines
 Use ManifestStaticFilesStorage
 ------------------------------
 
+Django has a ``STATICFILES_STORAGE`` setting that can be used to specify the storage engine that will be used to store
+the static files. By default, Django uses the ``StaticFilesStorage`` engine which stores the files in the file system
+under the ``STATIC_ROOT`` folder and with a ``STATIC_URL`` url. 
+
+For example  if you've got a ``STATIC_ROOT=/static_root`` and a ``STATIC_URL=/static_url/`` and you've got a file named ``styles.css``
+which you include with ``{% static "styles.css" %}``. When you run ``python manage.py collectstatic`` the ``styles.css`` will be copied
+to ``/static_root/styles.css`` and you'll be able to access it with ``/static_url/styles.css``.
+
+Please notice that the above should be configured in your web server (i.e nginx). Thus, you need to configure your 
+web server so as to publish the files under ``/static_root`` on the ``/static_url`` url. This should work without Django,
+i.e if you have configured the web server properly you'll be able to visit ``example.com/static_url/styles.css`` even if
+your Django app isn't running. For more info see `how to deploy static files`_.
+
+Now, the problem with the ``StaticFilesStorage`` is that if you change the ``styles.css`` there won't be any 
+way for the user's browser to understand that the file has been changed so it will keep using the cached version.
+
+This is why I recommend using the ManifestStaticFilesStorage_ instead. This storage will append the md5 has of each static
+file when copying it so the ``styles.css`` will be copied to ``/static_root/styles.fb2be32168f5.css`` and the url will be 
+``/static_url/styles.fb2be32168f5.css``. When the ``styles.css`` is changed, its hash will also be changed so the users 
+are guaranteed to pick the correct file each time.
+
 Organize your media files
 -------------------------
+
+When you upload a file to your app, Django will store it in the ``MEDIA_ROOT`` folder and serve it through ``MEDIA_URL``
+similar to the static files as I explained before. The problem with this approach is that you'll end up with a lot of files
+in the same folder. This is why I recommend creating a folder structure for your media files. To create this structure
+you should set the upload_to_ attribute of ``FileField``. 
+
+So instead of having ``file = models.FileField`` or ``image = models.ImageField`` you'd do something like
+``file = models.FileField(upload_to='%Y/%m/files')`` or ``image = models.ImageField(upload_to='%Y/%m/images')`` to
+upload these files to their corresponding folder organized by year/month.
+
+Notice that instead of a string you can also pass a function to the ``upload_to`` attribute. This function will need to 
+return a string that will contain the path of the uploaded file *including* the filename. For example, an upload_to
+function can be similar to this:
+
+.. code-block:: python
+    import anyascii
+
+    def custom_upload_path(instance, filename):
+        dt_str = instance.created_on.strftime("%Y/%m/%d")
+        fname, ext = os.path.splitext(filename)
+        slug_fn = slugify(anyascii.anyascii(fname))
+        if ext:
+            slug_fn += "" + ext
+        return "protected/{0}/{1}/{2}".format(dt_str, instance.id, slug_fn)
+
+The above code will convert the filename to an ascii slug (i.e a file named ``δοκιμή.pdf`` will be 
+converted to ``dokime.pdf``) and will store it in a folder after the created date year/month/day and id of the
+object instance the file belongs to. So if for example the file ``δοκιμή.pdf`` belongs to the object with id 3242
+and created date 2022-09-30 will be stored on the directory ``protected/2022/09/30/3242/dokime.pdf``.
+
+The above code is just an example. You can use it as a starting point and modify it to fit your needs. Having the
+media files in separate folders will enable you to easily navigate the folder structure and for example back up
+only a portion of the files.
+
 
 Do not serve media through your application server
 --------------------------------------------------
 
+This is important. The media files of your app have to be served through your web server (i.e nginx) and *not* your 
+application server (i.e gunicorn). This is because the application server has a limited number of workers and if you
+serve the media files through them, it will be a bottleneck for your app. Thus you need to configure your web server
+to serve the media files by publishing the ``MEDIA_ROOT`` folder under the ``MEDIA_URL`` url similar to the static files
+as described above.
+
+Notice that by default Django will only serve your media files for development by using the following at the end of your
+``urls.py`` file:
+
+.. code-block:: python
+
+    if settings.DEBUG:
+        urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+Under no circumstances you should use this when ``settings.DEBUG = False`` (i.e on production).
+
 Secure your media properly
 --------------------------
 
+Continuing from the above, if you are not allowed to serve your media files through your application then how are 
+you supposed to secure them? For example you may want to allow a user to upload files to your app but you want only 
+that particular user to be able to download them and not anybody else. So you'll need to check somehow that the 
+user that tries to download the file is the same user that uploaded it. How can you do that?
+
+The answer is to use a functionality offered by most web servers called X SendFile. First of all I'd like to explain how this works:
+
+1. A user wants to download a file with id ``1234`` so he clicks the "download" button for that file
+2. The browser of the user will then visit a normal django view for example ``/download/1234``
+3. This view will check if the user is allowed to download the file by doing any permissions checks it needs to do, all in Django code
+4. If the user is not allowed to download, it will return a 403 (forbidden) or 404 (not-found) response
+5. However if the user is *allowed* to download the Django view will return an http response that *will not* contain the file but will have a special header with the path of the file to download (which is the path that file 1234 is saved on)
+6. When the web server (i.e nginx) receives the http response it will check if the response has the special header and if it does it will serve the response it got *along* with the file, directly from the file system without going through the application server (i.e gunicorn)
+
+The above gives us the best of both worlds: We are allowed to do any checks we want in Django and the file is served through nginx.
+
+A library that implements this functionality is django-sendfile2 which is a fork of the non-maintained anymore django-sendfile. 
+To use it you'll need to follow the instructions provided and depend on your web server. However, let's see a quick example for
+nginx from one production project:
+
+.. code-block:: python
+
+    # nginx conf 
+
+    server {
+        # other stuff 
+
+        location /media_project/protected/ {
+            internal;
+            alias /home/files/project/media/protected/;
+        }
+
+        location /media_project/ {
+            alias /home/files/project/media/;
+        }
+
+
+    }
+
+For nginx we add a new location block that will serve the files under the ``/media_project/protected/`` url. The ``internal;``
+directive will prevent the client from going directly to the URI, so visiting ``example.com/media_project/protected/file.pdf`` directly
+will not work. We also have a ``/media_project/`` location that serves the files under /media that are not protected. Please notice that
+nginx matches the most specific path first so all files under protected will be matched with the correct, internal location.
+
+.. code-block:: python
+
+    # django settings
+    MEDIA_ROOT = "/home/files/project/media"
+    SENDFILE_ROOT = "/home/files/project/media/protected"
+
+    MEDIA_URL = "/media_project/"
+    SENDFILE_URL = "/media_project/protected"
+    SENDFILE_BACKEND = "sendfile.backends.nginx"
+
+Notice the difference between the ``MEDIA_ROOT`` (that contains all our media files - some are not protected) and ``SENDFILE_ROOT``
+and same for ``MEDIA_URL`` and ``SENDFILE_URL``
+
+.. code-block:: python 
+
+    # django view 
+
+    def get_document(request, doc_id):
+        from django_sendfile import sendfile
+
+        doc = get_object_or_404(Document, pk=doc_id)
+        rules_light.require(request.user, "apps.app.read_docs", doc.app)
+        return sendfile(request, doc.file.path, attachment=True)
+
+So this view first gets the ``Document`` instance from its id and checks to see if the current user
+can read it. Finally, it returns the ``sendfile`` response that will serve the file directly from the file system passing
+the ``path`` of that file. This function view will have a url like ``path("get_doc/<int:doc_id>/", login_required(views.get_document), name="get_document", ),``
+
+A final comment is that for your ``dev`` environment you probably want to use the 
+``SENDFILE_BACKEND = "django_sendfile.backends.development"`` (please see the settings package guideline on how to 
+override settings per env).
+
 Handle stale media
 ------------------
+
+Django does never delete your media files. For example if you have an object that has a file field and the object is deleted,
+the file that this file field refers to will not be deleted. The same is true if you upload a new file on that file field,
+the old file will also be kept there! 
+
+This is very problematic in some cases, resulting to GB of unused files in your disk. To handle that, there are two solutions:
+
+* Add a signal in your models that checks if they are deleted or a file field is updated and delete the non-used file. This is implemented by the django-cleanup_ package.
+* Use a management command that will periodically check for stale files and delete them. This is implemented by the django-unused-media_ package.
+
+I've used both packages in various projects and they work great. I'd recommend the django-cleanup on greenfield projects so as to avoid stale files from the beginning.
+
+
+
 
 Debugging guidelines
 ====================
@@ -326,6 +527,12 @@ proposed here are:
 .. _`django-extensions`: https://github.com/django-extensions/django-extensions
 .. _`advised in the Django documentation`: https://docs.djangoproject.com/en/stable/topics/auth/customizing/#using-a-custom-user-model-when-starting-a-project
 .. _`users app on my cookiecutter project`: https://github.com/spapas/cookiecutter-django-starter/tree/master/%7B%7Bcookiecutter.project_name%7D%7D/%7B%7Bcookiecutter.project_name%7D%7D/users
+.. _ManifestStaticFilesStorage: https://docs.djangoproject.com/en/stable/ref/contrib/staticfiles/#django.contrib.staticfiles.storage.ManifestStaticFilesStorage\
+.. _upload_to: https://docs.djangoproject.com/en/4.1/ref/models/fields/#django.db.models.FileField.upload_to
+.. _`how to deploy static files`: https://docs.djangoproject.com/en/4.1/howto/static-files/deployment/
+.. _django-sendfile2: https://github.com/moggers87/django-sendfile2
+.. _django-cleanup: https://github.com/un1t/django-cleanup
+.. _django-unused-media: https://github.com/akolpakov/django-unused-media
 
 .. _`official website`: https://www.postgresql.org/download/windows/
 .. _`zip archives`: https://www.enterprisedb.com/download-postgresql-binaries

@@ -21,15 +21,20 @@ environment for many years. I am using django for more than 10 years as my day t
 day work tool to develop applications for the public sector organization I work for.
 
 My organization has got a number of different Django projects that cover its needs, with
-some of them running successfully for more than 10 years, since Django 1.4. 
+some of them running successfully for more than 10 years, since Django 1.4. I have
+been involved in the development of all of them, and I have learned a lot from them.
 
-
-4. trees
-
+I am not saying that these are the only guidelines that you should follow, but they
+are the ones that I follow and I believe that they are good enough to be shared.
 	
 
 Model design guidelines
 =======================
+
+Think of your models as database tables
+---------------------------------------
+
+
 
 Avoid using choices
 -------------------
@@ -507,6 +512,89 @@ Consider creating (or use an existing) cookiecutter project template.
 Be careful on your selecton of packages/addons
 ----------------------------------------------
 
+Don't be afraid to use threadlocals
+-----------------------------------
+
+One controversial aspect if Django is that it avoids using the threadlocals functionality. The `thread-local data`_ is a
+way to store data that is specific to the current running thread. This, combined with the fact that each one of the
+requests to your Django app *will be served by the same thread* (worker) gives you a super powerful way to store and then
+access data that is specific to the current request and would be very difficult (if at all possible) to do it otherwise.
+
+The usual way to work with thread locals in Django is to add a middleware that sets the current request in the thread local
+data. Then you can access this data from wherever you want in your code, like a global. You can either create that middleware
+yourself but I'd recommend using the django-tools_ library for adding this functionality. You'll add the 
+``'django_tools.middlewares.ThreadLocal.ThreadLocalMiddleware'`` to your list of middleware (at the end of the listt 
+unless you want to use the current user from another middleware) and then you'll use it like this:
+
+.. code-block:: python
+
+    from django_tools.middlewares import ThreadLocal
+
+    # Get the current request object:
+    request = ThreadLocal.get_current_request()
+    # You can get the current user directly with:
+    user = ThreadLocal.get_current_user()
+
+Please notice that Django recommends avoiding this technique because it hides the request/user dependency and makes
+testing more difficult. However I'd like to respectfully disagree with their rationale.
+
+* First of all, please notice that this is exactly how `Flask works`_ when you access the current request. It stores the request in the thread locals and then you can access it from anywhere in your code.
+* Second, there are things that are very difficult (or even not possible) without using the threadlocals. I'll give you an example in a little.
+* Third, you can be careful to use the thread locals functionality properly. After all it is a very simple concept. The fact that you are using thread locals can be integrated to your tests.
+
+One example of why thread locals are so useful is this abstract class that I use in almost all my projects and models:
+
+.. code-block:: python
+
+    class UserDateAbstractModel(models.Model):
+        created_on = models.DateTimeField(auto_now_add=True, )
+        modified_on = models.DateTimeField(auto_now=True)
+
+        created_by = models.ForeignKey(
+            settings.AUTH_USER_MODEL,
+            on_delete=models.PROTECT,
+            related_name="%(class)s_created",
+        )
+        modified_by = models.ForeignKey(
+            settings.AUTH_USER_MODEL,
+            on_delete=models.PROTECT,
+            related_name="%(class)s_modified",
+        )
+
+        class Meta:
+            abstract = True
+
+        def save(self, *args, **kwargs):
+            user = ThreadLocal.get_current_user()
+            if user:
+                if not self.pk:
+                    self.created_by = user
+
+                self.modified_by = user
+            super(UserDateAbstractModel, self).save(*args, **kwargs)
+
+Models that override this abstract model will automatically set the ``created_by`` and ``modified_by`` fields to the current user. This works
+the same no matter if I edit the object from the admin, or from a view. To use that functionality all I need to do is to inherit from that model i.e
+``class MyModel(UserDateAbstractModel)`` and that's it.
+
+What would I need to do if I didn't use the thread locals? I'd need to create a mixin from which *all my views* (that modify an object) 
+would inherit! This mixin would pick the current user from the request and set it up. Please consider the difference between these two approaches;
+using the model based approach with the thread locals I can be assured that no matter where I modify an object, the ``created_by`` and ``modified_by``
+will be set properly (unless of course I modify it through the database or django shell -- actually, I could make ``save`` throw if 
+the current use hasn't been setup so it wouldn't be possible to modify from the shell). If I use the mixin approach, I need to make sure that
+all my views inherit from that mixin and that I don't forget to do it. Also other people that add code to my project will also need to 
+remember that. This is a lot more error prone and difficult to maintain.
+
+The above is a *simple* example. I have seen many more cases where without the use of thread locals I'd need to replicate 3-4 classes 
+from an external library (this library was django-allauth for anybody interested) in order to be able to pass through the current user
+to where I needed to use this. This is a lot of code duplication and a maintenance hell.
+
+One final comment: I'm not recommending to do it like Flask, i.e use thread locals anywhere. For example, in your views and forms it is
+easy to get the current request, there's no need to use thread locals there. However, in places where there's no simple path for
+accessing the current user then definitely use thread locals and don't feel bad about it!
+
+
+
 
 Conclusion
 ----------
@@ -533,6 +621,9 @@ proposed here are:
 .. _django-sendfile2: https://github.com/moggers87/django-sendfile2
 .. _django-cleanup: https://github.com/un1t/django-cleanup
 .. _django-unused-media: https://github.com/akolpakov/django-unused-media
+.. _`thread-local data`: https://docs.python.org/3/library/threading.html#thread-local-data
+.. _`Flask works`: https://flask.palletsprojects.com/en/2.2.x/reqcontext/
+.. _django-tools: https://github.com/jedie/django-tools/
 
 .. _`official website`: https://www.postgresql.org/download/windows/
 .. _`zip archives`: https://www.enterprisedb.com/download-postgresql-binaries

@@ -279,6 +279,8 @@ and then include it in your templates like ``{% inlude "pizzas/partials/_pizza_d
     {% inlude "partials/_pizza_details.html" with show_photo=True pizza=pizza1 %}
     {% inlude "partials/_pizza_details.html" with show_photo=True pizza=pizza2 %}
 
+Cache your templates in production
+----------------------------------
 
 Settings guidelines
 ===================
@@ -579,8 +581,6 @@ This is very problematic in some cases, resulting to GB of unused files in your 
 I've used both packages in various projects and they work great. I'd recommend the django-cleanup on greenfield projects so as to avoid stale files from the beginning.
 
 
-
-
 Debugging guidelines
 ====================
 
@@ -609,11 +609,368 @@ More info on my `Django Werkzeug debugger article <{filename}django-debug-develo
 Querying guidelines
 ===================
 
+Avoid the n+1 problem
+---------------------
+
+The most common Django newbie mistake is not considering the n+1 problem when writing your queries.
+
+Because Django automatically follows relations it is very easy to write code that will result in the n+1 queries
+problem. A simple example is having something like 
+
+.. code-block:: python
+
+    class Category(models.Model):
+        name = models.CharField(max_length=255)
+
+    class Product(models.Model):
+        name = models.CharField(max_length=255)
+        category = models.ForeignKey(Category, on_delete=models.CASCADE)
+
+        def __str__(self):
+            return "{0} ({1})".format(self.name, self.category.name)
+
+and doing something like:
+
+.. code-block:: python
+
+    for product in Product.objects.all():
+        print(product)
+
+or even having ``products = Product.objects.all()`` as a context variabile in your template:
+
+.. code-block:: html
+
+    {% for product in products %}
+        {{ product }}
+    {% endfor %}
+
+If you've got 100 products, the above will run 101 queries to the database: The first one
+will get all the products and the other 100 will return each product's category one by one!
+Consider what may happen if you had thousands of products...
+
+To avoid this problem you should add the ``select_related``, so ``products = Product.objects.all().select_related('category')``.
+This will do an SQL JOIN between the products and categories table so each product will include its category instance. Now, when
+you've got a many to many relation the situation is a little different. Let's suppose you've got a ``tags = models.ManyToManyField(Tag)`` 
+field in your ``Product`` model. If you wanted to do something like ``{{ product.tags.all|join:", " }}`` to display the product tags you'd
+also get a n+1 situation because Django will do a query for each product to get its tags. To avoid this you cannot use 
+``select_related`` but should use the ``prefetch_related``
+method so ``products = Product.objects.all().prefetch_related('tags')``. This will result in 2 queries, one for 
+products and one for their tags, the joining will be done in python. 
+
+One final comment about the ``prefetch_related`` is that you must be very careful to use what you prefetch. Let's suppose that we
+had prefeched the tags but we wanted to display them ordered by name: Doing this ``", ".join([tag for tag in product.tags.all().order_by('name')])``
+will *not* use the prefetched tags but will do a new query for each product to get its tags resulting in the n+1 problem! Django has
+``tag.objects.all()`` for each product, *not* ``tag.objects.all().order_by('name')``. To fix that you need to use `Prefetch` like this:
+
+.. code-block:: html
+    from django.db.models import Prefetch
+
+    Product.objects.prefetch_related(Prefetch('tags', queryset=Tag.objects.order_by('name')))
+
+The same is true if you wanted to filter your tags etc.
+
+Now, one thing to understand is that this behavior of Django is intentional. Instead of automatically following the relationships,
+Django could throw an exception when you tried to follow a relationship that wasn't in a ``select_related``
+(this how it works in other frameworks). The disadvantage 
+of this is that it would make Django *more difficult* to use for new users. Also, there are cases that the n+1 problem isn't 
+really a big deal, for example you may have a DetailView fetching a single object so in this case the n+1 problem will be 1+1
+and wouldn't really matter. So, at least for Django, it's a case of premature optimization: Write your queries as good as you
+can (but keep in mind the n+1 problem), if you miss some cases that actually make your views slow, you can easily optimize them later.
+
+
+
 Learn to use the Django ORM
 ---------------------------
 
-Avoiding the n+1 problem
-------------------------
+The Django ORM is a very powerful tool that can help you write very complex queries. Before some years
+I was sometimes need to use raw SQL queries in my Django projects, however nowadays I never need to 
+since the Django ORM has all the SQL features I need. 
+
+So, if you want to use a raw SQL query, please think twice and research the possibility that this is possible 
+through the Django ORM instead.
+
+Re-use your queries
+-------------------
+
+You should re-use your queries to avoid re-writing them. You can either put them inside your models
+(as instance methods) or in a mixin for the queries of your views or even add a new manager for
+your model. Let's see some examples:
+
+Let's suppose I wanted to get the tags of my product: I'd add this method to my ``Product`` model:
+
+.. code-block:: python
+
+    class Product(models.Model):
+        # ...
+
+        def get_tags(self):
+            return self.tags.all().order_by('name')
+
+Please notice that if you haven't used a proper prefetch this will result in the n+1 queries problem. See the discussion above
+for more info. To get the products with their tags I could add a new manager like:
+
+.. code-block:: python
+
+    class ProductWithTagManager(models.Manager):
+        def get_queryset(self):
+            return super().get_queryset().prefetch_related(Prefetch('tags', queryset=Tag.objects.order_by('name')))
+
+    class Product(models.Model):
+        # ...
+
+        products_with_tags = ProductWithTagManager()
+
+Now I could do ``[p.get_tags() for p in Product.products_with_tags.all()]`` and not have a n+1 problem.
+
+Actually, if I knew that I would *always* wanted to display the product's tags I could override the default manager like
+
+.. code-block:: python
+
+    class Product(models.Model):
+        # ...
+
+        objects = ProductWithTagManager()
+
+However I would not recommend that since having a consistent behavior when you run Model.objects is very important. If you
+are to modify the default manager then you'll need to always remember what your default manager does. This is very problematic
+in old projects and when you want to quickly query your database from a shell. Also, even more problematic is if you 
+override your default manager to *filter* (hide) objects. Don't do that or you'll definitely regret it.
+
+
+The other query re-use option is through a mixin that would override the ``get_queryset`` of your models. This is mainly for 
+permission purpopses. Let's suppose that each user can only see his products: I could add a mixin like:
+
+.. code-block:: python
+
+    class ProductPermissionMixin:
+        def get_queryset(self):
+            return super().get_queryset().filter(created_by=self.request.user)
+
+
+Then I could inherit my ``ListView, DetailView, UpdateView`` and ``DeleteView`` i.e ``ProductListView(ProductPermissionMixin, ListView)`` from that mixin and I'd have a consistent behavior on
+which products each user can view. More on this can be found on my 
+`comprehensive Django CBV guide <{filename}django-cbv-tutorial.rst>`_.
+
+Forms guidelines
+================
+
+Always use django-forms
+-----------------------
+
+This is a no-brainer: The django-forms offers some great class-based functionality for your forms. I've
+seen people creating html forms "by hand" and missing all this. Don't be that guy; use django-forms!
+
+I understand that sometimes the requirements of your forms may be difficult to be implemented with 
+a django form and you prefer to use a custom form. This may seem fine at first but in the long run
+you're gonna need (and probably re-implement) most of the django-forms capabilities. So, do it from the
+start.
+
+Overriding Form methods guidelines
+----------------------------------
+
+Your ``CustomForm`` inherits from a Django ``Form`` so you can override some of its methods. Which ones
+should you override? 
+
+* The most usual method for overriding is ``clean(self)``. This is used to add your own server-side checks to the form. I'll talk a bit more about overriding clean later.
+* The second most usual to override is ``__init__(self, *args, **kwargs)``. You should override it to "pop"
+  any extra kwargs from the ``kwargs`` dict *before* calling ``super().__init__(*args, **kwargs)``. See the view method overriding guidelines for more info. Also you'll use it to
+  change.
+* I usually *avoid* overriding the form's ``save()`` method. The ``save()`` is almost always called from the view's ``form_valid`` method so I prefer to do any extra stuff from the view. This is mainly a personal preference in order to avoid having to hop between the form and view modules; by knowing that the form's save is always the default the behavior will be consistent. This is personal preference though.
+
+There shouldn't be a need to override any other method of a ``Form`` or ``ModelForm``. However please notice that you can easily
+use mixins to add extra functionality to your forms. For example, if you had a particular check that would be called from *many* forms,
+you could add a 
+
+.. code-block:: python
+
+    class CustomFormMixin:
+        def clean(self):
+            super().clean() # Not really needed here but I recommend to add it to keep the inheritance chain
+            # The common checks that does the mixin
+
+    class CustomForm(CustomFormMixin, Form):
+        # Other stuff
+
+        def clean(self):
+            super().clean() # This will run the mixin's clean
+            # Any checks that only this form needs to do 
+
+
+Proper cleaning
+---------------
+
+When you override the ``clean(self)`` method of a ``Form`` you should always use the ``self.cleaned_data`` to check the
+data of the form. The common way to mark errors is to use the ``self.add_error`` method, for example, if you have a 
+``date_from`` and ``date_to`` and date_from is after the ``date_to`` you can do your clean something like this:
+
+.. code-block:: python
+
+    def clean(self):
+
+        date_from = self.cleaned_data.get("date_from")
+        date_to = self.cleaned_data.get("date_to")
+
+        if date_from and date_to and date_from > date_to:
+            error_str = "Date from cannot be after date to"
+            self.add_error("date_from", error_str)
+            self.add_error("date_from", error_str)
+
+Please notice above that I am checking that both ``date_from`` and ``date_to`` are not null (or else it will try to compare
+null dates and will throw). Then I am adding the same error message to both fields. Django will see that the form has errors
+and run ``form_invalid`` on the view and re-display the form with the errors.
+
+Beyond the ``self.add_error`` method that adds the error to the field there's a possibility to add an error to the "whole"
+form using:
+
+.. code-block:: python
+
+    from django.core.exceptions import ValidationError
+
+    def clean(self):
+        if form_has_error:
+            raise ValidationError(u"The form has an error!")
+
+This kind of error won't be correlated with a field. You can use this approach when an error is correlated to multiple fields
+instead of adding the same error to multiple fields. 
+
+You must be very careful because if you are using a non-standard
+form layout method (i.e you enumerate the fields) you also need to display the ``{{ form.errors }}`` in your template or else
+you'll get a rejected form without any errors! This is a very common mistake.
+
+Another thing to notice is that when your clean method raises it will display only the first such error. So if you've got multiple
+checks like:
+
+.. code-block:: python
+
+    def clean(self):
+        if form_has_error:
+            raise ValidationError(u"The form has an error!")
+        if form_has_another_error:
+            raise ValidationError(u"The form has another error!")
+
+and your form has *both* errors only the 1st one will be displayed to the user. Then after he fixes it he'll also see the 2nd one. When
+you use ``self.add_error`` the user will get both at the same time.
+
+Overriding the __init__
+-----------------------
+
+You can override the ``__init__`` method of your forms for three main reasons:
+
+Retrieve the request or user from the view:
+
+.. code-block:: python
+
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop("request", None)
+        super().__init__(*args, **kwargs)
+
+Please notice that we must pop the ``request`` from the ``kwargs`` dict before calling ``super().__init__``. 
+
+Override some field attributes on a ModelForm. A Django ModelForm will automatically create a field for each model field. 
+Some times you may want to override some of the attributes of the field. For example, you may want to change the label of the field
+or make a field required. To do that, you can do something like:
+
+.. code-block:: python
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["my_field"].label = "My custom label" # Change the label
+        self.fields["my_field"].help_text = "My custom label" # Change the help text
+        self.fields["my_field"].required = True # change the required attribute
+        self.fields["my_field"].queryset = Model.objects.filter(is_active=True) # Only allow specific objects for the forein key
+
+Please notice that we need to use ``self.fields["my_field"]`` *after* we call ``super().__init__(*args, **kwargs)``.
+
+Add functionality related to the current user/request. For example, you may want to add a field that is only editable if
+the user is superuser:
+
+    .. code-block:: python
+
+        def __init__(self, *args, **kwargs):
+            self.request = kwargs.pop("request", None)
+            super().__init__(*args, **kwargs)
+            if not self.request.user.is_superuser:
+                self.fields["my_field"].widget.attrs['readonly'] = True
+
+
+Laying out forms
+----------------
+
+To lay out the forms I recommend using a library like django-crispy-forms_. This integrates your forms properly with your 
+front-end engine and helps you have proper styling. I've got some more info on 
+`form layout post <{filename}django-crispy-form-easy-layout.rst>`_
+
+Improve the formset functionality
+---------------------------------
+
+Beyond simple forms, Django allows you to use a functionality it calls formsets_. A formset is a collection of forms that
+can be used to edit multiple objects at the same time. This is usually used in combination with inlines which are a 
+way to edit models on the same page as a parent model. 
+For example you may have something like this:
+
+.. code-block:: python
+
+    class Pizza(models.Model):
+        name = models.CharField(max_length=128)
+        toppings = models.ManyToManyField('Topping', through='PizzaTopping')
+
+    class Topping(models.Model):
+        name = models.CharField(max_length=128)
+    
+    class PizzaTopping(models.Model):
+        amount = models.PositiveIntegerField()
+        pizza = models.ForeignKey('Pizza')
+        topping = models.ForeignKey('Topping')
+
+Now we'd like to have a form that allows us to edit a pizza by both changing the pizza name *and* the toppings of the pizza 
+along with their amounts. The pizza form will be the main form and the topping/amount will be the inline form. Notice that we
+won't also create/edit the topping name, we'll just select it from the existing toppings (we're gonna have a completely different
+view for adding/editing individual toppings).
+
+First of all, to create a class based view that includes a formset we can use the django-extra-views_
+package (this isn't supported by built-in django CBVs unless we implement the functionality ourselves). Then we'd do something
+like:
+
+.. code-block:: python
+
+    from extra_views import CreateWithInlinesView, InlineFormSetFactory
+
+
+    class ToppingInline(InlineFormSetFactory):
+        model = Topping
+        fields = ['topping', 'amount']
+
+
+    class CreatePizzaView(CreateWithInlinesView):
+        model = Pizza
+        inlines = [ToppingInline]
+        fields = ['name']
+
+This will create a form that will allow us to create a pizza and add toppings to it. Now, to display the formset we'd 
+modify our template to be similar to:
+
+.. code-block:: html 
+
+    <form method="post">
+    ...
+    {{ form }}
+
+    {% for formset in inlines %}
+        {{ formset }}
+    {% endfor %}
+    ...
+    <input type="submit" value="Submit" />
+    </form>
+
+This works however it will be very ugly. The default behavior is to display the ``Pizza`` form and three empty ``Topping`` forms.
+If we want to add more toppings we'll have to submit that form so it will be saved and then edit it. But once again we'll get our
+existing toppings and three more. I am not fond of this behavior.
+
+That's why my recommendation is to follow the instructions on my 
+`better django inlines <{filename}better-django-inlines.rst>`_ article that allows you to sprinkle some javascript on your
+template and get a much better, dynamic behavior. I.e you'll get an "add more" button to add extra toppings without the need t
+submit the form every time.
+
 
 General guidelines
 ==================
@@ -627,7 +984,7 @@ to create your projects or as an inspiration to create your own. It follows all 
 this post and it is very simple to use.
 
 Be careful on your selection of packages/addons
-----------------------------------------------
+-----------------------------------------------
 
 Django, because of its popularity, has an `abudance of packages/addons`_ that can help you do almost anything. 
 However, my experience has taught me that you should be very careful and do your research before adding a new 
@@ -779,7 +1136,9 @@ proposed here are:
 .. _`my own cookiecutter`: https://github.com/spapas/cookiecutter-django-starter
 .. _`abudance of packages/addons`: https://djangopackages.org/
 .. _django-auth-ldap: https://github.com/django-auth-ldap/django-auth-ldap
-
+.. _django-crispy-forms: https://github.com/django-crispy-forms/django-crispy-forms
+.. _formsets: https://docs.djangoproject.com/en/4.1/topics/forms/formsets/
+.. _django-extra-views: https://github.com/AndrewIngram/django-extra-views
 
 .. _`official website`: https://www.postgresql.org/download/windows/
 .. _`zip archives`: https://www.enterprisedb.com/download-postgresql-binaries

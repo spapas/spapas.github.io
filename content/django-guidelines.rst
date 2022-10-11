@@ -21,12 +21,9 @@ environment for many years. I am using django for more than 10 years as my day t
 day work tool to develop applications for the public sector organization I work for.
 
 My organization has got a number of different Django projects that cover its needs, with
-some of them running successfully for more than 10 years, since Django 1.4. I have
-been involved in the development of all of them, and I have learned a lot from them.
-
-I am not saying that these are the only guidelines that you should follow, but they
-are the ones that I follow and I believe that they are good enough to be shared.
-	
+some of them running successfully for a lot of years, since Django 1.4. I have
+been involved in the development of all of them, and I have learned a lot in the process.
+I understand that some of these may be controversial but they have served me well over these years. 
 
 Model design guidelines
 =======================
@@ -147,26 +144,39 @@ create a ``users`` app that you're going to use to keep user related information
 the `users app on my cookiecutter project`_).
 
 
-Think of your models as database tables
----------------------------------------
-
-Your models should be designed as database tables. They should have proper data types,
-relations, indeces and constraints. Your mindset must be of designing a database not only writing 
-Python code.
-
-Don't de-normalize your data (i.e by using JSONField or ArrayField) unless you *know* that you
-need to do that. 
-
-
 Views guidelines
 ================
 
 Use class based views
 ---------------------
 
-I recommend always using class-based views instead of function-based views. This is because class-based views are easier to
+I recommend to prefer using class-based views instead of function-based views. This is because class-based views are easier to
 reuse and extend. I've written an extensive `comprehensive Django CBV guide <{filename}django-cbv-tutorial.rst>`_ that you can read to 
 learn everything about class based views!
+
+Also, by properly using CBVs people reading your code will use sensible defaults and you be able to understand what you
+or others are doing much easier. Consider this
+
+.. code-block:: python
+
+    class FooDetailView(DetailView):
+        model = Foo
+
+vs 
+
+.. code-block:: python
+
+    def object_detail_view(request, pk):
+        foo = get_object_or_404(Foo, pk=pk)
+        return render(request, 'foo/foo_detail.html', {'foo': foo})
+
+These are more or less the same. However in the function-based view you need to actually write some logic for retrieving
+the Foo instance and then define the name of the template and the context object. Also notice that you use the ``get_object_or_404``
+function that helps you being DRY. Whereas in the class based view this is
+already done for you using well-known defaults. So, for example you'll know which is the name of the template without the
+need to check the code.
+
+
 
 View method overriding guidelines
 ---------------------------------
@@ -191,19 +201,13 @@ Some quick guidelines follow:
 * For views that return 1 or multiple objects (``DetailView, ListView, UpdateView`` etc) you almost always need to override the ``get_queryset(self)`` method, *not* the ``get_object``. I'll talk about that a little more later.
 * The ``get_object(self, queryset=None)`` method will use the queryset returned by ``get_queryset`` to get the object based on its pk, slug etc. I've observed that this rarely needs to be overridden since most of the time overriding ``get_queryset`` will suffice. One possible use case for overriding ``get_object`` is for views that don't care at all about the queryset; for example you may implement a ``/profile`` detail view that will pick the current user and display some stuff. This can be implemented by a ``get_object`` similar to ``return self.request.user``. 
 
-Use slim views
---------------
-
-Try to avoid putting business logic in your views. This is because views are hard to test and hard to reuse. There are two places
-you can put your business logic instead. Either in your models (fat models) or in some other service-module (this will be simple
-functions or classes).
 
 
 Querying guidelines
 ===================
 
-Avoid the n+1 problem
----------------------
+Guidelines for the n+1 problem
+------------------------------
 
 The most common Django newbie mistake is not considering the n+1 problem when writing your queries.
 
@@ -271,17 +275,6 @@ and wouldn't really matter. So, at least for Django, it's a case of premature op
 can (but keep in mind the n+1 problem), if you miss some cases that actually make your views slow, you can easily optimize them later.
 
 
-
-Learn to use the Django ORM
----------------------------
-
-The Django ORM is a very powerful tool that can help you write very complex queries. Before some years
-I was sometimes need to use raw SQL queries in my Django projects, however nowadays I never need to 
-since the Django ORM has all the SQL features I need. 
-
-So, if you want to use a raw SQL query, please think twice and research the possibility that this is possible 
-through the Django ORM instead.
-
 Re-use your queries
 -------------------
 
@@ -330,8 +323,8 @@ in old projects and when you want to quickly query your database from a shell. A
 override your default manager to *filter* (hide) objects. Don't do that or you'll definitely regret it.
 
 
-The other query re-use option is through a mixin that would override the ``get_queryset`` of your models. This is mainly for 
-permission purpopses. Let's suppose that each user can only see his products: I could add a mixin like:
+The other query re-use option is through a mixin that would override the ``get_queryset`` of your models. 
+Let's suppose that each user can only see his products: I could add a mixin like:
 
 .. code-block:: python
 
@@ -340,7 +333,8 @@ permission purpopses. Let's suppose that each user can only see his products: I 
             return super().get_queryset().filter(created_by=self.request.user)
 
 
-Then I could inherit my ``ListView, DetailView, UpdateView`` and ``DeleteView`` i.e ``ProductListView(ProductPermissionMixin, ListView)`` from that mixin and I'd have a consistent behavior on
+Then I could inherit my ``ListView, DetailView, UpdateView`` and ``DeleteView`` 
+i.e ``ProductListView(ProductPermissionMixin, ListView)`` from that mixin and I'd have a consistent behavior on
 which products each user can view. More on this can be found on my 
 `comprehensive Django CBV guide <{filename}django-cbv-tutorial.rst>`_.
 
@@ -355,8 +349,7 @@ seen people creating html forms "by hand" and missing all this. Don't be that gu
 
 I understand that sometimes the requirements of your forms may be difficult to be implemented with 
 a django form and you prefer to use a custom form. This may seem fine at first but in the long run
-you're gonna need (and probably re-implement) most of the django-forms capabilities. So, do it from the
-start.
+you're gonna need (and probably re-implement) most of the django-forms capabilities. 
 
 Overriding Form methods guidelines
 ----------------------------------
@@ -449,17 +442,8 @@ Overriding the __init__
 
 You can override the ``__init__`` method of your forms for three main reasons:
 
-Retrieve the request or user from the view:
 
-.. code-block:: python
-
-    def __init__(self, *args, **kwargs):
-        self.request = kwargs.pop("request", None)
-        super().__init__(*args, **kwargs)
-
-Please notice that we must pop the ``request`` from the ``kwargs`` dict before calling ``super().__init__``. 
-
-Override some field attributes on a ModelForm. A Django ModelForm will automatically create a field for each model field. 
+1. Override some field attributes on a ModelForm. A Django ModelForm will automatically create a field for each model field. 
 Some times you may want to override some of the attributes of the field. For example, you may want to change the label of the field
 or make a field required. To do that, you can do something like:
 
@@ -474,16 +458,39 @@ or make a field required. To do that, you can do something like:
 
 Please notice that we need to use ``self.fields["my_field"]`` *after* we call ``super().__init__(*args, **kwargs)``.
 
-Add functionality related to the current user/request. For example, you may want to add a field that is only editable if
+2. Retrieve parameters (usually the request or user) from the view. A view (either a function-based or a CBV through ``get_form_kwargs``) 
+can pass parameters to the form's constructor. You need to override ``__init__`` to handle these parameters:
+
+.. code-block:: python
+
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop("request", None)
+        super().__init__(*args, **kwargs)
+
+Please notice that we must pop the ``request`` from the ``kwargs`` dict before calling ``super().__init__`` or else 
+we'll get an exception since the ``Form.__init__`` method accepts only specific kwargs.
+
+
+3. Add functionality related to the current user/request. For example, you may want to add a field that is only editable if
 the user is superuser:
 
-    .. code-block:: python
+.. code-block:: python
 
-        def __init__(self, *args, **kwargs):
-            self.request = kwargs.pop("request", None)
-            super().__init__(*args, **kwargs)
-            if not self.request.user.is_superuser:
-                self.fields["my_field"].widget.attrs['readonly'] = True
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop("request", None)
+        super().__init__(*args, **kwargs)
+        if not self.request.user.is_superuser:
+            self.fields["my_field"].widget.attrs['readonly'] = True
+
+or you may want to allow some custom validation logic only for non - superusers:
+
+.. code-block:: python
+
+    def clean(self):
+        if not self.request.user.is_superuser:
+            if not cleaned_data['my_field']:
+                self.add_error("my_field", "Please field this field")
+
 
 
 Laying out forms
@@ -491,7 +498,13 @@ Laying out forms
 
 To lay out the forms I recommend using a library like django-crispy-forms_. This integrates your forms properly with your 
 front-end engine and helps you have proper styling. I've got some more info on 
-`form layout post <{filename}django-crispy-form-easy-layout.rst>`_
+`form layout post <{filename}django-crispy-form-easy-layout.rst>`_.
+
+Please notice that the django-crispy-forms_ supports specific front-end frameworks like bootstrap or tailwind (see its docs
+for all available options). If you're using a non-supported front-end framework you can 
+`create a custom template pack`_. This seems like a lot of work but I recommend to do it. Also you don't need to implement
+everything, only the functionality you're going to need, when you need it.
+
 
 Improve the formset functionality
 ---------------------------------
@@ -565,7 +578,6 @@ template and get a much better, dynamic behavior. I.e you'll get an "add more" b
 submit the form every time.
 
 
-
 Template guidelines
 ===================
 
@@ -583,8 +595,8 @@ about the selection of using external packages. Finally, don't forget that any p
 templates would be for the Django template backend, so you'll need to convert/re-write these templates to be used with 
 a different engine.
 
-I would consider the Jinja engine only if you already have a bunch of Jinja templates from a different project and 
-you want to quickly use them.
+I would consider the Jinja engine only if I already had a bunch of Jinja templates from a different project and 
+wanted to quickly use them on my project.
 
 Don't add template tags when you can use a method
 -------------------------------------------------
@@ -949,13 +961,13 @@ Debugging guidelines
 Be careful when using django-debug-toolbar
 ------------------------------------------
 
-The `django-debug-toolbar`_ is a great and very popular library that can help you debug your Django application
+The `django-debug-toolbar`_ is a great and very popular library that can help you debug your Django applications
 and identify slow views and n+1 query problems. However I have observed that it makes your development app *much slower*.
-For some views I am seeing like 10x decrease in speed i.e instead of 500 ms we'll get more than 5 seconds slower to display
+For some views I am seeing like 10x decrease in speed i.e instead of 500 ms we'll need more than 5 seconds to display
 that view! Since Django development (at least for me) is based on a very quick feedback loop, this is a huge problem.
 
 Thus, I recommend to keep it disabled when you are doing normal development and only enable it when you need it, 
-for example to identify problematic views.
+for example to identify n+1 query problems.
 
 Use the Werkzeug debugger
 -------------------------
@@ -973,7 +985,6 @@ never want to go back to the traditional runserver.
 More info on my `Django Werkzeug debugger article <{filename}django-debug-developing.rst>`_.
 
 
-
 General guidelines
 ==================
 
@@ -988,7 +999,7 @@ this post and it is very simple to use.
 Be careful on your selection of packages/addons
 -----------------------------------------------
 
-Django, because of its popularity, has an `abudance of packages/addons`_ that can help you do almost anything. 
+Django, because of its popularity, has an `abundance of packages/addons`_ that can help you do almost anything. 
 However, my experience has taught me that you should be very careful and do your research before adding a new 
 package to your project. I've been left many times with projects that I was not able to upgrade because they 
 heavily relied on functionality from an external package that was abandoned by its creator. I also have lost 
@@ -1111,16 +1122,31 @@ solutions. I've already written a
 `posts <{filename}django-fix-async-db.rst>`_.
 about this topic.
 
-However, my recommendation is to be very careful and think twice before adding support for async tasks for your project.
+First of all let's understand *why* we need async tasks: When you serve Djagno (or any Python web app) in production, you'll
+start a number of worker processes that will be used to serve the users. These usually are normal OS processes. The guidelines
+are to start a finite amount of such processes, equal to 2-4 times the number of the CPU cores of your server. So with 2 cores
+you'll have like 8 workers. This means your Django app can handle up to 8 concurrent requests at the same time. If we have a
+view that takes too long to response (e.g. because it runs a slow query), we'll have many workers
+"stuck" on that view, resulting in delays for the other users since the number of workers always stays the same.
+
+To resolve that issue we can use async tasks to offload the work to the "background". I.e instead of the view waiting
+for the slow query to finish, it will now add a task in a queue and return immediately. The tasks in the queue will then be run 
+by the async worker one after another. The other way to resolve that is to increase the number of workers, but that is not
+a good idea since each worker takes a certain amount of memory and resources and we still can't be positive that we'll be able 
+to handle all traffic peaks to our slow views.
+
+So, although I believe that async tasks are essential for *some* situations, 
+my recommendation here is to be very careful and think twice before adding support for async tasks for your project.
 Because of how python works, the *only* way to have support for async tasks is to have *one or more extra* moving parts
-to your project. These moving parts will be absolutely a task worker process (that would pick the async tasks from the queue
-and execute them asynchronously) and probably a process that would store your queue. Actually the queue process may be redis
+to your project. 
+
+These moving parts will be always a task worker process (that would pick the async tasks from the queue
+and execute them asynchronously) and probably an external process that would store your queue. Actually the queue process may be redis
 if you already use it for caching or even the database but also there are projects that use a separate application for the queue
 like Rabbitmq. 
 
-But even if the queue is stored in the database you'll *still* have the task worker process. 
 This may look like a small thing but in a production environment this means that instead of running 1 thing for 
-your django app (a gunicorn or uwsgi app server) you need to add another thing (the worker). This results tp
+your django app (a gunicorn or uwsgi app server) you need to add at least another thing (the worker). This results tp
 
 * Make sure that the worker *sees* and handles your tasks
 * Monitoring the worker (getting alerts when the worker stops, make sure it runs etc)
@@ -1132,19 +1158,13 @@ your django app (a gunicorn or uwsgi app server) you need to add another thing (
 All this adds up especially if you need to do for every new app.
 
 Taking this into account, I'd recommend to think twice before adding support for async tasks in you Django app. If you really need it, then
-of course, you'll need to bite the bullet and add it. But try your project without any async task support at first and only add is as a
-last resort.
+of course, you'll need to bite the bullet and add it. But lately my understanding is that people tend to add support for async tasks
+even though they don't really need it. Let's see some examples:
 
-Conclusion
-==========
+* *I've got a view that sends mails and it is too slow*. If the view opens a connection to an SMTP server and sends the email then probably it will be slow. However, before using the async task situation, consider using a service like sendgrid or mailgun that will send your mails for you and will be much faster.
+* *I need to run slow queries*. Well... no you don't. Your queries should *not* be slow. You should try to optimize your queries to run faster. If you have done all optimizations and still your queries are slow then you should consider de-normalizing your data to increase performance. This (at least in my book) is preferable over adding async tasks. 
+* *I need to do bulk operations*. This probably is a reason to run async tasks. But before biting the bullet, consider: how many of your users are going to run such bulk operations at the same time? 
 
-Using the above steps you can easily setup a postgres database server on windows for development. Some advantages of the method
-proposed here are:
-
-* Since you configure the data directory you can have as many clusters as you want (run initdb with different data directories and pass them to postgres)
-* Since nothing is installed globally, you can have as many postgresql versions as you want, each one having its own data directory. Then you'll start the one you want each time! For example I've got Postgresql 12,13 and 14.5.
-* Using the trust authentication makes it easy to connect with whatever user
-* Running the database from postgresql.exe so it has a dedicated window makes it easy to know what the database is doing, peeking at the logs and stopping it (using ctrl+c)
 
 .. _`surrogate key`: https://en.wikipedia.org/wiki/Surrogate_key
 .. _`choices for a field`: https://docs.djangoproject.com/en/stable/ref/models/fields/#choices
@@ -1167,11 +1187,12 @@ proposed here are:
 .. _python-dotenv: https://github.com/theskumar/python-dotenv
 .. _cookiecutter: https://github.com/cookiecutter/cookiecutter
 .. _`my own cookiecutter`: https://github.com/spapas/cookiecutter-django-starter
-.. _`abudance of packages/addons`: https://djangopackages.org/
+.. _`abundance of packages/addons`: https://djangopackages.org/
 .. _django-auth-ldap: https://github.com/django-auth-ldap/django-auth-ldap
 .. _django-crispy-forms: https://github.com/django-crispy-forms/django-crispy-forms
 .. _formsets: https://docs.djangoproject.com/en/4.1/topics/forms/formsets/
 .. _django-extra-views: https://github.com/AndrewIngram/django-extra-views
+.. _`create a custom template pack`: https://django-crispy-forms.readthedocs.io/en/latest/template_packs.html
 
 .. _`official website`: https://www.postgresql.org/download/windows/
 .. _`zip archives`: https://www.enterprisedb.com/download-postgresql-binaries

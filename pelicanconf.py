@@ -13,6 +13,7 @@ SITESUBTITLE =u'Various programming stuff'
 SITEURL = 'https://spapas.github.io'
 TIMEZONE = 'Europe/Athens'
 DEFAULT_LANG = u'en'
+LOCALE = "C"
 
 # Feed generation is usually not desired when developing
 FEED_ALL_RSS = None

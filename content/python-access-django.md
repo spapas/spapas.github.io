@@ -19,7 +19,9 @@ that. So, in this article we'll do the following:
 * Create a models.py based on the exported data
 * Import the json data that was exported into the newly created models
 
-## Conneting to a Microsoft Access database from python
+For the first two steps we'll only use python. For the last two we'll also need some Django.
+
+## Connecting to a Microsoft Access database from python
 
 To be able to connect to an Access database from python you'll need you should use the
 [pypyodbc](https://github.com/pypyodbc/pypyodbc). This is a pure-python library that can connect
@@ -43,7 +45,7 @@ on a python shell:
 
 ```python
 import pypyodbc
-print(pypyodbc.drivers())
+print('\n'.join(pypyodbc.drivers()))
 ```
 
 If you have installed the correct Microsoft Access Database Engine 2010 Redistributable you should see .accdb somewhere in the output, like this:
@@ -57,3 +59,135 @@ If on the other hand you can't access .accdb files you'll get much less options:
 ```python
 ['SQL Server', 'PostgreSQL ANSI(x64)', 'PostgreSQL Unicode(x64)', 'PostgreSQL ANSI', 'PostgreSQL Unicode', 'SQL Server Native Client 11.0', 'ODBC Driver 17 for SQL Server', 'ODBC Driver 17 for SQL Server']
 ```
+
+In any case, after you've installed the correct drivers you can connect to the database (let's suppose it's nameed `access_data.accdb` on the parent directory) like this:
+
+```python
+import pypyodbc
+
+pypyodbc.lowercase = False
+conn = pypyodbc.connect(
+    r"Driver={Microsoft Access Driver (*.mdb, *.accdb)};"
+    + r"Dbq=..\\access_data.accdb;"
+)
+cur = conn.cursor()
+
+for row in cur.tables(tableType="TABLE"):
+    print(row)
+
+```
+
+If everything's ok the above will print all the tables that are contained in the database.
+
+## Exporting the data from the Access database to a json file
+
+After you're able to connect to the database you can export all the data to a json file. Actually we'll export both the data of the database and a "description" of the data (the names of the tables along with their columns and types). The description of the data will be useful later. 
+
+The general idea is:
+
+
+1. Connect the database
+1. Get the names of the tables in a list
+1. For each table
+    * Export a description of its columns
+    * Export all its data
+1. Write the description and the data to two json files
+
+
+This is done by running the following snippet:
+
+```python
+import pypyodbc
+import struct
+import json
+from datetime import datetime, date
+import decimal
+
+print("running as {0}-bit".format(struct.calcsize("P") * 8))
+
+def fix(s):
+    """A simla function to normalize table names"""
+    return s.lower().replace(" ", "_")
+
+
+conn = pypyodbc.connect(
+    r"Driver={Microsoft Access Driver (*.mdb, *.accdb)};"
+    + r"Dbq=..\\access_data.accdb;"
+)
+cur = conn.cursor()
+tables = []
+for row in cur.tables(tableType="TABLE"):
+    # Only get the table names
+    tables.append(row[2])
+
+# data will contain the data of all tables. It will have the following structure:
+# {"table_1": [{"column_1": value, "column_2": value}, ...], "table_2": ...}
+data = {}
+# descriptions will have  a description of all the tables. It will have the following structure:
+# [
+#   {
+#       "table_name": "table 1",
+#       "fixed_table_name": "table_1",
+#       "columns": [
+#           {"name": "column_1", "fixed_name": "column_1","type": "str"},
+#           {"name": "column_2", "fixed_name": "column_2","type": "int"},
+# ]
+descriptions = []
+
+for table_name in tables:
+    fixed_table_name = fix(table_name)
+    print(f"~~~~~~~~~~~~~{table_name} {fixed_table_name}~~~~~~~~~~~~~")
+    q = f'SELECT * FROM "{table_name}"'
+    description = {
+        "table_name": table_name,
+        "fixed_table_name": fixed_table_name,
+        "columns": [],
+    }
+    descriptions.append(description)
+
+    cur.execute(q)
+    # Here we get the description of the columns of the table from the cursor; we'll use that to fill the description.columns list
+    columns = cur.description
+    for c in columns:
+        description["columns"].append(
+            {"name": c[0], "fixed_name": fix(c[0]), "type": c[1].__name__}
+        )
+
+    print("")
+
+    # And here we retrieve the data of the whole table
+    # Notice we use some double for loop comprehension to 
+    # create a json object with a column_name: value structure
+    # for each row
+    data[fixed_table_name] = [
+        {fix(columns[index][0]): column for index, column in enumerate(value)}
+        for value in cur.fetchall()
+    ]
+
+cur.close()
+conn.close()
+
+# This is a function to serialize datetime and decimal objects 
+# to json; without it the json.dump function will fail if the 
+# results contain dates or decimals
+def json_serial(obj):
+    """JSON serializer for objects not serializable by default json code"""
+
+    if isinstance(obj, (datetime, date)):
+        return obj.isoformat()
+    elif isinstance(obj, decimal.Decimal):
+        return str(obj)
+    raise TypeError("Type %s not serializable" % type(obj))
+
+
+with open("..\\access_description.json", "w") as outfile:
+    # Notice the default=json_serial 
+    json.dump(descriptions, outfile, default=json_serial)
+
+with open("..\\access_data.json", "w") as outfile:
+    json.dump(data, outfile, default=json_serial)
+```
+
+If you run the above code and don't see any errors you should have two json files in the parent directory: `access_description.json` and `access_data.json`. The dump of your access database is complete!
+
+## Creating a models.py based on the exported data

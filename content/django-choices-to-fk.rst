@@ -42,7 +42,7 @@ You will need to convert it like this
   
   class Sample(models.Model):
     name = models.CharField(max_length=100)
-    category = models.ForeignKey('Category', on_delete=models.PROTECT))
+    category = models.ForeignKey('Category', on_delete=models.PROTECT)
 
 
 There are various reasons that you may be forced to convert the choices field to a ForeignKey, some are:

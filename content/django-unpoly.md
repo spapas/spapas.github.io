@@ -315,3 +315,200 @@ So we can do something like
   <p>Navigation links have the <code>[up-follow]</code> attribute. Clicking such links only updates a <b>page fragment</b>. The remaining DOM is not changed.</p>
 {% endtourdot %}
 ```
+
+### Advanced layers
+
+Opening layers for popups or for viewing links that doesn't have interactivity is simple. However, when you open forms with layers 
+and need to handle these the situation unfortunately starts to get more complex. I recommend to start by reading the 
+[subinteractions](https://unpoly.com/subinteractions) section of the unpoly documentation to understand how these things work. Then we'll talk about specific cases and how to handle them with layers and django. In the next sections we'll see some of these cases and how to handle them with Django.
+
+### Opening new layers *over* existing ones
+
+How open a new layer *over* an existing layer (i.e a modal inside a modal) would work? All links and forms that are handled in an existing layer will be handled in the same layer. If we want to open a new layer we need to use the `up-layer='new'` attribute on that link. In the demo, if you click on an existing company to see its details you'll get a layer. If you try to edit that company the edit for will be opened *in the same layer* (notice that if you press the X button to close it you'll go back to the company list without layers). Compare this with the behavior when adding a new project or viewing an existing one. You'll get a layer *inside* a layer (both layers should be visible). You need to close both layers to go back to the company detail. 
+
+Even more impressive: Go to the company detail layer, click an existing project to get to the project detail layer, click *edit*; this will be opened on the *project detail* layer! All this also works fine from the project detail list *without* any modifications! Also if you use the links directly (which will not open a layer you'll also get the proper behavior).
+
+The thing to remember here is that the layer behavior is very intuitive and is compatible with how a server side application works. Everything should work the same no matter if the link is opened in an overlay or in a new page. My recommendation when working with layers is to make sure that the links work fine when are opened on an overlay and when are opened on a new page (by using the URL directly). 
+
+### Closing layers
+
+There are three main ways to [close the layer](https://unpoly.com/closing-overlays) (beyond of course using the (X) button or esc etc):
+
+* Visiting a pre-defined link
+* Explicitly closing the layer from the server
+* Emitting an unpoly event
+
+Also, when a layer is closed we can decide if the layer did something (i.e the user saved the form) or not (i.e the user clicked the X button). This is called `accepted` or `dismissed` respectively. We can use this to do different things. All the methods of closing a layer have a version for accepting or dismissing the layer.
+
+
+#### Closing the layer on visiting a link
+
+To close the layer on visiting a link we'll use the `up-accept-location` and `up-dismiss-location` respectively. For example, let's take a peek on the new company link:
+
+```html
+  <a
+    class='btn btn-primary'
+    up-layer='new'
+    up-on-accepted="up.reload('.table', { focus: ':main' })"
+    up-accept-location='/core/companies/detail/$id/'
+    href='{% url "company-create" %}'>New company</a>
+```
+
+The important thing here is the `up-accept-location`. When Django creates a new object it redirects to the detail view of that object. In our case this detail view is `'/core/companies/detail/$id/'`; the `$id` is an unpoly thingie that will be replaced by the id of the new object and will be [the result value of the overlay](https://unpoly.com/closing-overlays#overlay-result-values). This value (the id) can then be used on the `up-on-accepted` callback if we want.
+
+Now, let's suppose that we want to close the layer when the user clicks on a *cancel* button that returns to the list of companies. We can do that by adding the `up-dismiss-location` attribute to that `<a>`
+
+```html
+up-dismiss-location='{% url "company-list" %}'
+```
+
+The difference between these two is that the `up-on-accepted` event will only be called when the overlay is accepted and not on dismissed.
+
+#### Handling hardcoded urls
+
+One thing that Django developers may not like is that the url is hardcoded here. This is because using `{% url "company-detail" "$id" %}` will not work with our urls since we use have the following path for the company detail `"companies/detail/<int:pk>/"`. We can change it to `"companies/detail/<str:pk>/",` to make it work but then it will allow strings in the url and it will throw 500 error instead of 404 when the user uses a string there (to improve that we have to override the `get_object` of the `DetailView` to handle the string case). Another way to improve that is to create a urlid template tag like this:
+
+```python
+from django.urls import reverse
+
+@register.simple_tag
+def urlid(path, arg):
+    if arg == "$id":
+        arg = 999
+    
+    url = reverse(path, args=[arg])
+    return url.replace("999", "$id")
+```
+
+And then using it like this on the up-accept-location:
+
+```html
+up-accept-location='{% urlid "company-detail" "$id" %}'
+```
+
+#### Explicitly closing the layer
+
+To close the layer from the server you can you use the
+
+or [`X-Up-Dismiss-Layer`](https://unpoly.com/X-Up-Dismiss-Layer)
+response header. When unpoly sees this header in a response it will close the overlay by accepting/dismissing it.
+
+To do that from Django you can have integrated the unpoly middleware call `request.up.layer.accept()` and `request.up.layer.dismiss()` respectively (passing
+an optional value if you want).
+
+The same can be used to close the layer from the client side. For example, if you want to close the layer when the user clicks on a *cancel* button that returns to the list of companies you can do that by adding the `up-accept` or `up-dismiss` attribute, like:
+
+```html
+<a href='{% urlid "company-detail" "$id" %}' up-dismiss>Return</a>
+```
+
+Please notice that the `href` here could be like `href='#'` since this is javascript only, however we added the correct href to make sure the return button will also work when we open the link in a new page (without any layer). Please notice that difference between this and `up-accept-location` or `up-dismiss-location` we mentioned before. In this case the `up-accept/dismiss` directive in placed in the a link that *closes* the overlay. In the former case the `up-accept/dismiss-location` directive is placed in the link that *opens* the overlay.
+
+#### Closing the layer by emitting an unpoly event
+
+The final way to close an overlay is by emitting an event. Unpoly can emit events both from the server, using the [`X-Up-Event`](https://unpoly.com/X-Up-Events) response header or using `request.up.emit(event_type, data)` from the unpoly Django integration. Also events can be emitted from the client side using [`up-emit`](https://unpoly.com/up.emit).
+
+To close the overlay from an event we need to use `up-accept-event` and `up-dismiss-event`.
+
+Let's see what happens when we delete a company. We've got a form like this:
+
+```html
+<form up-submit up-confirm='Really?' class="d-inline" method='POST' action='{% url "company-delete" company.id %}'>
+  {% csrf_token %}
+  <input type='submit' value='Delete' class='btn btn-danger mr-3' />
+</form>
+
+This form asks the user for confirmation (using the `up-confirm` directive) and then submits the form on the company delete view. The `CompanyDeleteView` is like this:
+
+```python
+class CompanyDeleteView(DeleteView):
+    model = models.Company
+
+    def get_success_url(self):
+        return reverse("company-list")
+
+    def form_valid(self, form):
+        self.request.up.layer.emit("company:destroyed", {})
+        return super().form_valid(form)
+````        
+
+So, it will emit the `company:destroyed` event and redirect to the list of companies (this is needed to make sure that delete works fine if we call it from a full page instead of an overlay). When we call it from an overlay it will be from the following tag to display the company detail view:
+
+```html
+            <a
+              up-layer='new'
+              up-on-dismissed="up.reload('.table', { focus: ':main' })"
+              up-dismiss-event='company:destroyed'
+              href="{% url 'company-detail' company.id %}">{{ company.name }}</a>
+```              
+
+Notice that we have the `up-dismiss-event` here. If we didn't have that then the overlay wouldn't be closed when we deleted the company but we'd see the list of companies because of the redirect! Also, instead of the `up-dismiss-event` we could use the `up-dismiss-location='{% url "company-list" %}'` similar to how we discussed before. If we did it this way we wouldn't even need to do anything unpoly related in our DeleteView, however using events for this is useful for educational reasons.
+
+
+### Doing stuff when a layer is closed
+
+After a layer is closed (and depending if it was accepted or dismissed) unpoly allows us to use callbacks to do stuff. The most obvious things are to reload the list of results if a result is added/edited/deleted or to choose a result in a form if we used the overlay as an object picker.
+
+The callbacks are `up-on-accepted` and `up-on-dismissed`.
+
+Let's see some examples from the demo.
+
+On on the new company link we've got `up-on-accepted="up.reload('.table', { focus: ':main' })"` . However on the show details company link we've got `up-on-dismissed="up.reload('.table', { focus: ':main' })"`. This is a little strange at first but we can explain it. First of all, the [up.reload](https://unpoly.com/up.reload) method will do an HTTP request and reload that specific element from the server (in our case the `.table` element that contains the list of companies). The focus option that is passed instructs unopoly to move the focus to (that element)[https://unpoly.com/focus-option]. For the "Add new" company we reload the companies when the form is accepted (when the user clicks on the "Save" button). However for the show details we'll reload every time the overlay is dismissed because when the user edits a company the layer will not be closed but will display the edit company data. Also when we delete the company the layer will be dismissed. Notice that if the user clicks the company details and then presses the (X) button *we'll still do a reload* even though it's not needed because we can't know if the user actually edit a company or not. This is a little bit of a tradeoff but it's not a big deal.
+
+On the company detail we've got `up-on-accepted='up.reload(".projects")'` for adding a new project but (same as before we've got `up-on-dismissed='up.reload(".projects")'`). The `.projects` element is the projects holder inside the company detail. This is exactly the same as the project list but with `up.reload('.table', { focus: ':main' })`  instead of `.projects`.
+
+On the project form we've got `up-on-accepted` both on the suggest name and on the new company button. In the first case, we are opening the name suggestion overlay like this:
+
+```html
+<a
+    up-layer='new popup'
+    up-align='left'
+    up-size='large'
+    up-accept-event='name:select'
+    up-on-accepted="up.fragment.get('#id_name').value = value.name"
+    href='{% url "project-suggest-name" %}'>Suggest name</a>
+```
+
+Notice that this overlay will be accepted when it receives the `name:select` event. This event passes it the selected name so it will  put it on the `#id_name` input. The [`up.fragment.get`](https://unpoly.com/up.fragment.get) is used to retrieve the input. To understand how this works we need to also see the name suggestion overlay. This is more or less similar to:
+
+```html
+  {% for n in names %}
+    <a up-emit="name:select"
+       up-emit-props='{"name": "{{ n }}"}'
+       class="btn btn-info text-light mb-2 mr-1"
+       tabindex="0">
+      {{ n }}
+    </a>
+  {% endfor %}
+```
+
+So we are using the `up-emit` directive here to emit the `name:select` event *and* we pass it some data which must be a json object. Then this data will be available as a javascript object named `value` on the `up-on-accepted` callback.
+
+This may seem a little complex at first but it isn't after you understand it:
+
+1. We open a new overlay and wait for the `name:select` event to be emitted. We don't care if we are a full page or already inside an overlay
+2. The overlay displays a link of client side `<a>` elements that emit the `name:select` event when clicked and also pass the selected name
+3. The overlay opener receives the `name:select` event and closes the overlay. It then uses the data to fill an input
+
+The second case is similar but instead of filling an input it opens a new overlay to create and select a new company. This is the create company link from inside the project form:
+
+```html
+  <a href='{% url "company-create" %}'
+      up-layer='new'
+      up-accept-location='{% urlid "company-detail" "$id" %}'
+      up-on-accepted="up.validate('form', { params: { 'company': value.id } })"
+  >
+      New company
+  </a>
+```
+
+Nothing extra is needed from the company form side! We use the `up-accept-location` to accept the overlay when the company is created (so the user will be redirect to the company-detail view). Then we call the following after the overlay is accepted: `up.validate('form', { params: { 'company': value.id } })`. First of all, please remember that when we use the `up-accept-location` the overlay result 
+[will be an object with the captured parts of the url](https://unpoly.com/a-up-layer-new#up-accept-location). In this case we capture the new company id. Then, we call `up.validate` passing it the form and the company id we just retrieved.
+
+It is important that we do `up.validate` here instead of simply setting the value of the select to the newly created id (similar to what we did before with the name) because the newly created value *is not* in the options that this select contains so it can't be picked! If we wanted to do that instead we'd need to first add a new option to the select with the correct id and then set it to that value (which is a little bit more complex since we don't know the name fo the new company at this point).
+
+
+
+### Layers and messages
+
+## Troubleshooting

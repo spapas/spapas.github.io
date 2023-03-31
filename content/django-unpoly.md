@@ -230,7 +230,88 @@ Beyond these, unpoly offers a [bunch of form helpers](https://unpoly.com/up.form
 
 ## Using layers
 
-One of the most powerful features of unpoly is [layers](https://unpoly.com/up.layer). A layer is an overlay that can be rendered like a modal / popup / drawer. 
+One of the most powerful features of unpoly is [layers](https://unpoly.com/up.layer). A layer is an overlay that can be rendered like a modal / popup / drawer. The simplest way to use a layer is to add an `up-layer='new'` attribute to a link. For example, in the demo app, the link to open a company is like this:
+
+```html
+  <a
+    up-layer='new'
+    up-on-dismissed="up.reload('.table', { focus: ':main' })"
+    up-dismiss-event='company:destroyed'
+    href="{% url 'company-detail' company.id %}">{{ company.name }}</a>
+```
+
+(ignore the other dismiss-related attributes for now). This opens a new modal dialog with the contents of the company detail. It will render the `up-main` inside the modal since we don't provide an `up-target`. If we added an `up-target='.projects'` attribute to this it would render *only* the `.projects` element inside the modal (but remember that it will retrieve the *whole* response since the /companies/detail/id is a normal django DetailView).
+
+You can use `up-mode` attribute to [change the kind of overlay](https://unpoly.com/layer-terminology#available-modes); the default is a `modal`. Also if you want to configure the ways this modal closes you can use the 
+`up-dismissable` [attribute](https://unpoly.com/closing-overlays#customizing-dismiss-controls), for example add 
+`up-dismissable='button'` to allow closing only with the X button on the top right. Another useful thing is that there's an 
+`up-size` attribute for changing the [size of the overlay](https://unpoly.com/customizing-overlays#overlay-sizes).
+
+### Static layers content
+
+A layer can also contain "static" content (i.e not follow a link) by using the `up-content` [attribute](https://unpoly.com/a-up-follow#up-content). This is how the green dots are actually implemented, their html is similar to this:
+
+```html
+<a href="#" class="tour-dot viewed" up-layer="new popup" up-content="<p>Navigation links have the <code>[up-follow]</code> attribute. 
+        <p>
+            <a href=&quot;#&quot; up-dismiss class=&quot;btn btn-success btn-sm&quot;>OK</a>
+        </p>
+        " up-position="right" up-align="top" up-class="tour-hint" up-size="medium">
+        </a>
+```
+
+This is implemented in Django using the following template tag:
+
+```python
+
+@register.tag("tourdot")
+def do_tourdot(parser, token):
+    nodelist = parser.parse(("endtourdot",))
+    parser.delete_first_token()
+    return TourDotNode(nodelist)
 
 
+class TourDotNode(template.Node):
+    def __init__(self, nodelist):
+        self.nodelist = nodelist
 
+    def render(self, context):
+        rendered = self.nodelist.render(context).strip()
+        size = "medium"
+        if len(strip_tags(rendered)) > 400:
+            size = "large"
+        if not rendered.startswith("<p"):
+            rendered = "<p>{}</p>".format(rendered)
+
+        rendered += """
+        <p>
+            <a href="#" up-dismiss class="btn btn-success btn-sm">OK</a>
+        </p>
+        """
+        from django.utils.html import escape
+
+        output = escape(rendered)
+        return """
+        <a 
+            href="#" 
+            class="tour-dot"
+            up-layer="new popup"
+            up-content="{}"
+            up-position="right"
+            up-align="top"
+            up-class="tour-hint"
+            up-size="{}"
+            >
+        </a>
+        """.format(
+            output, size
+        )
+```
+
+So we can do something like
+
+```html
+{% tourdot %}
+  <p>Navigation links have the <code>[up-follow]</code> attribute. Clicking such links only updates a <b>page fragment</b>. The remaining DOM is not changed.</p>
+{% endtourdot %}
+```

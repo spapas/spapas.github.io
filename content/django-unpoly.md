@@ -747,7 +747,7 @@ up.compiler('.datepicker', (element) => {
 So when unpoly sees a `.datepicker` element it will call that callback function and initialize it!
 
 
-## Passing context from unpoly to server
+### Passing context from unpoly to server
 
 Unpoly has an `up-context` attribute that can be used to pass context to the server. This must be a json object and can then be used to change the response based on that context. If we are using the unpoly python package then the context will be available in the `request.up.context` dictionary.
 
@@ -798,4 +798,20 @@ when the new task is created.
 
 Please notice that if we were to use `up-target='.task'` for both the new and edit form we'd get an error when
 the new task form was submitted because it wouldn't be able to match the target `.task` element!
+
+### Listening to unpoly events
+
+For most things happening in unpoly you'll find out that there are events that you can listen to and add behavior. There are cases where handling these is useful. For example, I've observed that if you're using bootstrap dropdowns and click a link while the dropdowns are *opened*, the dropdowns *will remain open* when the fragment has been loaded! This is very annoying. One simple way to resolve that is include the navigation inside your `up-main` element so the dropdowns will be reloaded. However there's a better way by using the events
+like in the following snippet:
+
+```js
+    up.on('up:link:follow', function(event, link) {
+      // Hide visible dropdowns
+      const dropdownElementList = document.querySelectorAll('.dropdown-toggle.show')
+      const dropdownList = [...dropdownElementList].map(dropdownToggleEl => new bootstrap.Dropdown(dropdownToggleEl))
+      dropdownList.forEach(dropdown => dropdown.hide())
+    })
+```
+
+Please notice that this code is for bootstrap 5 (not 4 as the remaining code in the demo since it's from a different project). So what happens is that whenever a link is followed from unpoly we'll clear the open dropdowns (the code isn't very important here).
 

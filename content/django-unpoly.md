@@ -27,11 +27,11 @@ In this guide, we'll go over how to use Unpoly with Django. Specifically, we'll 
 * Integration with (some) django packages
 * More advanced concepts
 
-## An unpoly demo
+## The unpoly demo
 
 Unpoly provides a [demo application](https://demo.unpoly.com/) written in Ruby. I've re-implemented this in Django
 so you can quickly take a peek at how Unpoly can improve your app. The code is at https://github.com/spapas/django-unpoly-demo
-and the actual demo is at: https://unpoly-demo.spapas.net or https://unpoly-demo.onrender.com/ (deployed on render.com). Please
+and the actual demo is at: https://unpoly-demo.spapas.net or https://unpoly-demo.fly.dev/ (deployed on fly.io). Please
 notice this site uses an ephemeral database so the data may be deleted at any time.
 
 Try navigating the site and you'll see things like:
@@ -43,6 +43,69 @@ Try navigating the site and you'll see things like:
 * Form validation feedback without page reloads
 
 All this is implemented mostly with traditional Django class based views and templates in addition to a few unpoly attributes.
+
+To understand how much of a difference this makes, after you have take a peek at the companies functionality in the demo, take 
+a look at the actual code that implementation:
+
+```python
+
+class FormMixin:
+    def form_valid(self, form):
+
+        if form.is_valid() and not self.request.up.validate:
+            if hasattr(self, "success_message"):
+                messages.success(self.request, self.success_message)
+            return super().form_valid(form)
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_initial(self):
+        initial = super().get_initial()
+
+        initial.update(self.request.GET.dict())
+        return initial
+
+
+class CompanyListView(ListView):
+    model = models.Company
+
+
+class CompanyDetailView(DetailView):
+    model = models.Company
+
+
+class CompanyCreateView(FormMixin, CreateView):
+    success_message = "Company created successfully"
+    model = models.Company
+    fields = ["name", "address"]
+
+
+class CompanyUpdateView(FormMixin, UpdateView):
+    model = models.Company
+    success_message = "Company updated successfully"
+    fields = ["name", "address"]
+
+
+class CompanyDeleteView(DeleteView):
+    model = models.Company
+
+    def get_success_url(self):
+        return reverse("company-list")
+
+    def form_valid(self, form):
+        self.request.up.layer.emit("company:destroyed", {})
+        messages.success(self.request, "Company deleted successfully")
+        return super().form_valid(form)
+
+```
+
+Experienced Django developers will immediately recognize that the above code has only two small diferences 
+from what a traditional Django app would have:
+
+* the check for `self.request.up.validate` on the `form_valid` of the `FormMixin`
+* the `self.request.up.layer.emit` on the `DeleteView` `form_valid`
+
+We'll explain these later. However the thing to keep is that this is the same as a good-old Django app,
+without the need to implement special functionallity like checks for ajax views, fragments, special form handling etc.
 
 ## Integrating unpoly with Django
 

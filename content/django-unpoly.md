@@ -24,6 +24,8 @@ In this guide, we'll go over how to use Unpoly with Django. Specifically, we'll 
 * Navigation improvements
 * Form improvements
 * Modal improvements (layers)
+* Integration with (some) django packages
+* More advanced concepts
 
 ## An unpoly demo
 
@@ -116,7 +118,7 @@ If there's no `up-main` element, unpoly will replace the whole `body` element.
 It is possible to make all links (or links that follow a selector) [followable by default](https://unpoly.com/handling-everything#following-all-links) by using the `up.link.config.followSelectors` option. 
 I would recommend to only do this on greenfield projects where you'll test the functionality anyway. For existing projects I think it's better to add the `up-follow` attribute explicitly to the links you want to make followable.
 
-This is recommend it because there are cases where using unpoly will break some pages, especially if you have some JavaScript code that relies on the page being reloaded. We'll talk about this in the troubleshooting section.
+This is recommend it because there are cases where using unpoly will break some pages, especially if you have some JavaScript code that relies on the page being reloaded. We'll talk about this in the up.compiler section.
 
 If you have made all the links followable but you want to skip some links and do a full page reload instead, add the `up-follow=false` attribute to the link or use the `up.link.config.noFollowSelectors` to make multiple links non-followable.
 
@@ -157,14 +159,13 @@ Please notice that it is recommended to have a proper url hierarchy for this to 
 One final remark is that it is possible to do some trickery to automatically add up-alias to all your nav links, for example, using this code:
 
 ```javascript
-  up.macro('nav a[href]', (link) => {
+  up.compiler('nav a[href]', (link) => {
     if(!link.href.endsWith('#')) link.setAttribute('up-alias', link.href + '*')
   })
 ```
 
-an `up-alias` attribute will be added to all links. The callback of the macro will be called when the selector is matched and
-in this case add the `up-alias` attribute to the link. Notice that we use `up.macro` to run this code
-[before unpoly compilers](https://unpoly.com/up.macro). We'll talk later about compilers.
+an `up-alias` attribute will be added to all links. The callback of the compiler will be called when the selector is matched and
+in this case add the `up-alias` attribute to the link. We'll talk later about compilers more.
 
 ## Handling forms
 
@@ -222,7 +223,7 @@ def form_valid(self, form):
 
 So if the form is not valid or we get an unpoly validate request from unpoly we'll render the response - this will render the form with or without errors. However if the form is actually valid and this is not an unpoly validate request we'll do the usual form save and redirect to the success url. This is enough to handle all cases and is very simple and straightforward. It works fine without unpoly as well since the `up.validate` will be always `False` in this case.
 
-One thing to keep in mind is that this works fine in most cases but may result to problematic behavior if you use components that rely on javascript onload events. The `up-validate` will behave more or less the same as with `up-follow` links. We'll cover this more on the troubleshooting.
+One thing to keep in mind is that this works fine in most cases but may result to problematic behavior if you use components that rely on javascript onload events. The `up-validate` will behave more or less the same as with `up-follow` links. 
 
 ### Other form helpers
 
@@ -430,7 +431,7 @@ class CompanyDeleteView(DeleteView):
     def form_valid(self, form):
         self.request.up.layer.emit("company:destroyed", {})
         return super().form_valid(form)
-````        
+```
 
 So, it will emit the `company:destroyed` event and redirect to the list of companies (this is needed to make sure that delete works fine if we call it from a full page instead of an overlay). When we call it from an overlay it will be from the following tag to display the company detail view:
 
@@ -453,7 +454,10 @@ The callbacks are `up-on-accepted` and `up-on-dismissed`.
 
 Let's see some examples from the demo.
 
-On on the new company link we've got `up-on-accepted="up.reload('.table', { focus: ':main' })"` . However on the show details company link we've got `up-on-dismissed="up.reload('.table', { focus: ':main' })"`. This is a little strange at first but we can explain it. First of all, the [up.reload](https://unpoly.com/up.reload) method will do an HTTP request and reload that specific element from the server (in our case the `.table` element that contains the list of companies). The focus option that is passed instructs unopoly to move the focus to (that element)[https://unpoly.com/focus-option]. For the "Add new" company we reload the companies when the form is accepted (when the user clicks on the "Save" button). However for the show details we'll reload every time the overlay is dismissed because when the user edits a company the layer will not be closed but will display the edit company data. Also when we delete the company the layer will be dismissed. Notice that if the user clicks the company details and then presses the (X) button *we'll still do a reload* even though it's not needed because we can't know if the user actually edit a company or not. This is a little bit of a tradeoff but it's not a big deal.
+On on the new company link we've got `up-on-accepted="up.reload('.table', { focus: ':main' })"`. However on the show details company link we've got `up-on-dismissed="up.reload('.table', { focus: ':main' })"`. This is a little strange at first but we can explain it. First of all, the [up.reload](https://unpoly.com/up.reload) method will do an HTTP request and reload that specific element from the server (in our case the `.table` element that contains the list of companies). The focus option that is passed instructs unopoly to move the focus to (that element)[https://unpoly.com/focus-option]. For the "Add new" company we reload the companies when the form is accepted (when the user clicks on the "Save" button). However for the show details we'll reload every time the overlay is dismissed because when the user edits a company the layer will not be closed but will display the edit company data. Also when we delete the company the layer will be dismissed. 
+
+Notice that if the user clicks the company details and then presses the (X) button *we'll still do a reload* even though it may not be needed because we can't know if the user actually edit a company or not. This is a little bit of a tradeoff but it's not a big deal. Actually, it *is* possible to know if the overlay was dismissed because the user clicked the (X) button (or pressed escape) or if the overlay was dismissed because the object was deleted. In this case this doesn't matter however if we wanted to display a message to the user when the company was deleted we'd need to differentiate between these cases. We'll see how the section about overlays and messages.
+
 
 On the company detail we've got `up-on-accepted='up.reload(".projects")'` for adding a new project but (same as before we've got `up-on-dismissed='up.reload(".projects")'`). The `.projects` element is the projects holder inside the company detail. This is exactly the same as the project list but with `up.reload('.table', { focus: ':main' })`  instead of `.projects`.
 
@@ -509,8 +513,289 @@ It is important that we do `up.validate` here instead of simply setting the valu
 
 If we wanted to do that instead we'd need to first add a new option to the select with the correct id and then set it to that value (which is a little bit more complex since we don't know the name fo the new company at this point). To properly implement that and to further understand how unpoly works, we'd need to emit a `company:create` event from our CreateCompanyView which would contain as data both the id and the name of the newly created company. Then we'd change our accept condition to `up-accept-event='company:create'`. Finally, our `up-on-accepted` would be able to add a new option with the `value.name` and `value.id` it received from the event and select *that* option.
 
-
-
 ### Layers and messages
 
-## Troubleshooting
+This probably is the most complex part of integrating unpoly with Django. The problem is that when we do an action the messages will 
+be displayed on the page that our response redirects to. If we don't display that page but we only use it as `on-accept-location` we'll
+miss these messages. There are various solutions on how this can be fixed, and there also is a [long discussion](https://github.com/unpoly/unpoly/discussions/400) in the unpoly repo about this. 
+
+We've already discussed about the `up-hungry` in your messages container element that will reread that from all responses. This will resolev all cases where the response is *not* discarded. For example, try to edit a project and you'll see the edit message *on* the overlay (insteead of the main page). This is because the overlay is contained in the `up-main` element so it will be rendered in the response in the overlay.
+
+The problematic behavior is when creating a new project or deleting one. In both these cases we discard the response so the messages are lost. The simplest way to actually fix this is to ignore the server side message and render again the message *from unpoly*. This avoids changing anything on your server-side code. So, in order to implement this, we'll use this function which we add on `application.js`:
+
+```javascript
+async function reloadWithFlash(selector, flash) {
+  await up.reload(selector)
+  up.element.affix(document.getElementById('flash-messages'), '.alert.fade.show.alert-success', { text: flash })
+}
+```
+
+This function will call `up.reload` with a selection we pass to it (f.e `up.reload('.table')`) and wait until this function finished.
+Then it will add a new element on the `flash-messages` container with the flash text we pass to it. In order to use it, we'll change 
+the new company link to:
+
+```html
+      <a
+        class='btn btn-primary'
+        up-layer='new'
+        up-on-accepted="reloadWithFlash('.table', 'Company created!')"
+        up-accept-location='{% urlid "company-detail" "$id" %}'
+        href='{% url "company-create" %}'>New company</a>
+```
+
+(remember that `up-on-accepted` before was `up-on-accepted="up.reload('.table', { focus: ':main' })")`, let's skip `focus` for now it's not important). If we try it this way we'll notice that we'll get the `Company created` message after the overlay is closed! As I said before, the problem with this is that we need to duplicate the message both on server and on client side. The Django side message will be used when we open the /companies/new link on a new page (not an overlay) so the overlay functionality won't be used and the message will be rendered properly on the response. When we use an overlay this message will be rendered instead.
+
+Another solution would be to change our `CompanyCreateView` to redirect to the companies list page (instead of the newly created page). In this case, we can change the new company form like:
+
+```html
+  <form up-submit up-validate method="POST" up-layer='root'>
+    ...
+  </form>
+```    
+
+Adding the `up-layer='root'` will render the response in the root layer which will close the overlay and render everything on the `up-main` element. Since we redirect to the companies list, we'll get the list of companies along with the server-side message. This solution is actually simpler but modifies our server-side app (instead of the usual behavior of redirecting to the new company detail well'll redirect to the companies list).
+
+Let's now talk about delete. As we've already discussed above, the company detail overlay will be closed either when the user closes it explicitly by clicking the (X) button or because the company was deleted. In both cases we want to reload the companies but when the company is deleted we also want to display a message. Right now we've got 
+
+```html
+<a
+              up-layer='new'
+              up-dismissable='button'
+              up-on-dismissed="console.log(value, event); up.reload('.table', { focus: ':main' })"
+              up-dismiss-event='company:destroyed'
+              href="{% url 'company-detail' company.id %}">{{ company.name }}</a>
+```              
+
+For starters, we'll add the following function:
+
+```javascript
+async function reloadWithFlashIfEvent(selector, flash, value) {
+  await up.reload(selector, { focus: ':main' })
+  if(value instanceof Event) {
+    up.element.affix(document.getElementById('flash-messages'), '.alert.fade.show.alert-danger', { text: flash })
+  }
+}
+```
+
+and change `up-on-dismissed` to `up-on-dismissed="reloadWithFlashIfEvent('.table', 'Company deleted!', value)"`.
+
+The `up-on-dismissed` and `up-on-accepted` callbacks are passed [these paremeters](https://unpoly.com/a-up-layer-new#up-on-dismissed):
+* `this` The link that originally opened the overlay
+* `layer` An up.Layer object for the dismissed overlay
+* `value` The overlay's dismissal value
+* `event` An up:layer:dismissed event
+
+If the event was dismissed because the user clicked the (X) button, the `value` would have a value of `:button`. However if it was dismissed because of the `company:destroyed` event, the value would be an `Event` object. So we pass the `value` to our `reloadWithFlashIfEvent` callback and check if the value is an `Event` object. If it is, we know that the overlay was dismissed because the company was deleted and we can display the flash message. If it's not, we know that the overlay was dismissed because the user clicked the (X) button and we won't display the flash message.
+
+Another way we could implement this would be if we closed the company detail overlay when the company was deleted and returned the response (which is the company list view) to the root layer. Something like this:
+
+```html
+<form up-submit up-confirm='Really?' class="d-inline" method='POST' action='{% url "company-delete" company.id %}' up-layer='root'>
+```
+
+(notice we added the `up-layer='root'` attribute). For this to work we need to *not*  `reload` in the `up-on-dismissed` function because if we reload the companies list the contents of the flash-messages will be re-read (because it has the `up-hungry` attr) and be immediately cleared out! However in this case we need to reload because a company may be edited!
+
+#### Improving delete
+
+Right now, the delete button is a form, similar to this:
+
+```html
+      <form up-submit up-confirm='Really?' class="d-inline" method='POST' action='{% url "company-delete" company.id %}'>
+        {% csrf_token %}
+        <input type='submit' value='Delete' class='btn btn-danger mr-3'  />
+      </form>
+```
+
+So this is an unpoly-handled form and will display a `Really?` javascript message to make sure the user really wants to delete the company. 
+
+I have to confess that I don't like javascript messages because they can't be styled and seem out of context from the app. However we can improve that behavior with unpoly. Here's an improved version of the delete functionality:
+
+```html
+<a class='btn btn-danger' up-layer="new" up-content='
+      <h3>Delete company {{ company.name }}</h3>
+      Do you want to delete the company? 
+      <form up-submit up-target=".table" up-layer="root" class="d-inline" method="POST" action="{% url "company-delete" company.id %}">
+        {% csrf_token %}
+        <input type="submit" value="Yes" class="btn btn-danger mr-3"/>
+        <a href="#" class="btn btn-secondary"  up-dismiss>No</a>
+      </form>
+      '>Delete</a>
+```
+
+We changed the delete button to open a new layer. Instead of having a special view for the delete confirmation, we're using the `up-content` attribute to directly pass the HTML for the confirmation, which actually includes the delete form like before. Notice that we also include an `up-dismiss` button that clears the overlay. The up-layer of the form is `root` so when the form is submitted it will close both the confirmation overlay and the company detail overlay! Now, we'll change the `reloadWithFlashIfEvent` like this:
+
+```javascript
+async function reloadWithFlashIfEvent(selector, flash, value) {
+  await up.reload(selector, { focus: ':main' })
+  if(value instanceof Event || value == ':peel') {
+    up.element.affix(document.getElementById('flash-messages'), '.alert.fade.show.alert-danger', { text: flash })
+  }
+}
+```
+
+This checks if the value is an event *or* `:peel`; this is the value that is passed when the overlay is dismissed because we use the `up-lyer='root'` from the delete form.
+
+## Improving interaction with Django packages
+
+There are two very important packages that I use on almost all my projects: [django-tables2](https://django-tables2.readthedocs.io/en/latest/) and [django-filter](https://django-filter.readthedocs.io/en/stable/). You can see these in action at the `/core/tf/` path on the demo app. You'll see that:
+
+* Filtering is instant (when enter a character it will filter without the need to submit the form explicitly )
+* The row detail links open in an overlay
+* Sorting and pagination are handled by unpoly (so they don't do full page reloads)
+
+To have the instant filtering we've changed our filter form like this:
+
+```html
+<form up-autosubmit up-delay='250' class='form-inline' method='GET' action='' up-target='.form-data'>
+    {{ filter.form|crispy }}
+    <input class='btn btn-info' type='submit' value='Filter'>
+    <a up-follow href='{{ request.path }}' class='btn btn-secondary'>Reset</a>
+</form>
+```
+
+Notice the `up-autosubmit`; this will submit the form when a field changes. Also  the `up-delay` adds a small
+delay before the form is submitted so when the user writes `foo` it will do 1 query instead of 3 (if he writes
+fast enough of course). The `up-target` attribute is used to specify the element that will be updated with the
+response. In this case we're using a `form-data` element that includes the whole table (using django-tables2 of course):
+
+```html
+<div class='form-data'>
+  {% render_table table %}
+</div>
+```
+
+To open the links in a layer we only need to pass the correct parameters to the table field, for example in our case the table is like this:
+
+
+```python
+class CompanyTable(tables.Table):
+    id = tables.LinkColumn(
+        "company-detail",
+        args=[A("id")],
+        attrs={
+            "a": {
+                "class": "btn btn-primary btn-sm",
+                "up-on-dismissed": "up.reload('.table', { focus: ':main' })",
+                "up-layer": "new",
+            }
+        },
+    )
+
+    class Meta:
+        model = models.Company
+        template_name = "django_tables2/bootstrap4.html"
+        fields = ("id", "name", "address")
+```
+
+So we a pass the attributes directly to the link's `a` element. Nothing really fancy is needed.
+
+Furthermore, notice that we use the builtin bootstrap4 template. We don't change the template at all.
+
+However, the original template does *not* have `unpoly` interation! So if we leave it like this the pagination
+and header links will start a full request/response. To fix that, we could override the template with our
+own however this is not the ideal solution for me. 
+
+Instead, we can use `up.compiler`: 
+
+```js
+
+up.compiler('.pagination .page-item a.page-link', (link) => {
+  link.setAttribute('up-target', ".table-container")
+})
+
+up.compiler('th.orderable a[href]', (link) => {
+  link.setAttribute('up-target', ".table-container")
+})
+```
+
+The `up.compiler` function takes a CSS selector and a callback function. The callback function is called
+when a snippet matching the selector is added to the DOM. In this case we're adding the `up-target='.table-container'` unpoly attributes
+to both the pagination and the table header order links. The `.table-container` is the element that contains the table (it is added by 
+django-tables2).
+
+This way, when unpoly sees these links it will add the `up-target` attribute (and functionality) to these without 
+the need to override any templates.
+
+## More advanced concepts
+
+We'll discuss some more advanced concepts of unpoly now.
+
+### More about up.compiler
+
+The `up.compiler` function is [very powerful](https://unpoly.com/up.compiler). We already used it to add functionality to
+all our nav links (see the navigation aliases before) to avoid forgetting it and to add the `up-target` to our table links
+to avoid overriding the django-table2 templates.
+
+Beyond these, the most important functionality of `up.compiler` is to replace the javascript `onload` (or jquery `$(function() {})`) event.
+Most common javascript libraries will be initialized when the document is ready. Unfortunately, when a page is loaded through unpoly
+this event will *not* be trigger, so the javascript elements will not be initialized! Let's suppose that we've got a bunch traditional jquery ui datepicker elements and all these have the `.datepicker` css class. Normally we'd initialize it like
+
+```js
+$(function() {
+  $('.datepicker').datepicker()
+})
+```
+
+If we are to load a form with these elements through unpoly we won't get the datepicker functionality. To fix this we can use `up.compiler`:
+
+```js
+up.compiler('.datepicker', (element) => {
+  $(element).datepicker()
+})
+```
+
+So when unpoly sees a `.datepicker` element it will call that callback function and initialize it!
+
+
+## Passing context from unpoly to server
+
+Unpoly has an `up-context` attribute that can be used to pass context to the server. This must be a json object and can then be used to change the response based on that context. If we are using the unpoly python package then the context will be available in the `request.up.context` dictionary.
+
+Let's see a particular example from the demo. When we create a new task we've got the following link:
+
+```html
+<a
+        class='btn btn-primary'
+        up-layer='new'
+        up-context='{"new_task": true}'
+        up-accept-location='/core/tasks/detail/$id/'
+        up-on-accepted="reloadWithFlash('.tasks', 'Task created!')"
+        href='{% url "task-create" %}'>New task</a>
+    </div>
+```
+
+Compare this with the edit link: 
+
+```html
+<a up-target='.task' href='{% url "task-update" task.id %}' class='btn btn-sm btn-outline-secondary'  >Edit</a>
+```
+
+Notice that the `up-context` is only included in the new link. Now, let's see how the task form is implemented:
+
+```html
+<form up-submit {% if not up.context.new_task %}up-target='.task'{% endif %} class='task card' method="POST">
+    {% csrf_token %}
+    <div class="card-body d-flex flex-column">
+        <div class="form-group flex-grow-1 mb-0">
+            {{ form|crispy }}
+        </div>
+        <div class="flex-grow-0">
+            <input type='submit' class='btn btn-primary mt-2' value='Save'>
+        </div>
+    </div>
+</form>
+```
+
+So, we check to see if there's `new_task` in the context and add an `up-target='.task'` if *not*. So if we click the 
+edit task button we'll get an `up-target='.task'`. Beyond this the form 
+is the same for both the new and edit links. 
+
+This is needed because when we open the edit task it will be loaded in the same `.task` element we clicked the edit 
+link from (notice that unpoly is smart enough [to match closer elements](https://unpoly.com/fragment-placement#interaction-origin-is-considered)). The when the form is submitted we want the detail view of 
+the task to also be rendered on the same `.task` element so we use the `up-target='.task'`. This isn't needed in
+the create new since it will be rendered in a new layer and we want to reload the the tasks with the flash message
+when the new task is created. 
+
+Please notice that if we were to use `up-target='.task'` for both the new and edit form we'd get an error when
+the new task form was submitted because it wouldn't be able to match the target `.task` element!
+

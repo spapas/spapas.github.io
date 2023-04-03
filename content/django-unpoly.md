@@ -1,11 +1,12 @@
 Title: Using Unpoly with Django
-Date: 2023-03-31 15:20
+Date: 2023-04-03 15:20
 Tags: python, django, unpoly, javascript
 Category: django
 Slug: using-unpoly-with-django
 Author: Serafeim Papastefanos
 Summary: A guide on using Unpoly with Django
 
+[TOC]
 
 Over the past few years, there has been a surge in the popularity of frontend frameworks, such as React and Vue. While there are certainly valid use cases for these frameworks, I believe that they are often unnecessary, as most web applications can be adequately served by traditional request/response web pages without any frontend framework. The high usage of these frameworks is largely driven by FOMO and lack of knowledge about alternatives. However, using such frameworks can add unnecessary complexity to your project, as you now have to develop two projects in parallel (the frontend and the backend) and maintain two separate codebases.
 
@@ -31,8 +32,9 @@ In this guide, we'll go over how to use Unpoly with Django. Specifically, we'll 
 
 Unpoly provides a [demo application](https://demo.unpoly.com/) written in Ruby. I've re-implemented this in Django
 so you can quickly take a peek at how Unpoly can improve your app. The code is at https://github.com/spapas/django-unpoly-demo
-and the actual demo is at: https://unpoly-demo.spapas.net or https://unpoly-demo.fly.dev/ (deployed on fly.io). Please
-notice this site uses an ephemeral database so the data may be deleted at any time.
+and the actual demo is at: https://unpoly-demo.spapas.net or https://unpoly-demo.fly.dev/ (deployed on fly.io)
+or https://unpoly-demo.onrender.com/ (deployed on render.com; notice the free tier of render.com is very slow, this isn't
+related to the app). The demo app uses an ephemeral database so the data may be deleted at any time.
 
 Try navigating the site and you'll see things like:
 
@@ -789,7 +791,7 @@ The `up.compiler` function is [very powerful](https://unpoly.com/up.compiler). W
 all our nav links (see the navigation aliases before) to avoid forgetting it and to add the `up-target` to our table links
 to avoid overriding the django-table2 templates.
 
-Beyond these, the most important functionality of `up.compiler` is to replace the javascript `onload` (or jquery `$(function() {})`) event.
+Beyond these, the most important functionality of `up.compiler` is to replace the javascript on load (or jquery `$(function() {})`) event.
 Most common javascript libraries will be initialized when the document is ready. Unfortunately, when a page is loaded through unpoly
 this event will *not* be trigger, so the javascript elements will not be initialized! Let's suppose that we've got a bunch traditional jquery ui datepicker elements and all these have the `.datepicker` css class. Normally we'd initialize it like
 
@@ -878,3 +880,29 @@ like in the following snippet:
 
 Please notice that this code is for bootstrap 5 (not 4 as the remaining code in the demo since it's from a different project). So what happens is that whenever a link is followed from unpoly we'll clear the open dropdowns (the code isn't very important here).
 
+
+### Troubleshooting
+
+As I've already mentioned, the most common problem you are going to have with unpoly is when you use javascript on your page ready event. Unfortunately there's a lot of functionality that relies on that event and pages will break when you use unpoly in these cases. That's why I recommend to use `up-follow` and `up-submit` for your links and forms on a case-by-case basis on non greenfield projects so you've got more control on what works with unpoly and what is not working. Another thing that is very important to notice here is that I've stumbled upon libraries that not only rely on the load event but actually *there's no other way to initialize them*! For example, there' are js libraries that have code like 
+
+```js
+$(function() {
+  let initElement = function(el) {
+    ...
+  }
+  $('.selected-elements').each(function() {
+    initElement(this)
+  })
+})
+```
+
+so the actual function that does the initialization (`initElement`) isn't public and you can't call it from the `up.compiler`. In these cases you'll need to somehow make the `initElement` public so you can call it from the `up.compiler` or use a different library!
+
+The other major case for headaches in unpoly layers. Although they are very powerful I recommend to *not* abuse them and use them only when you feel that are really needed and would improve the UX of the user. For example, I'd recommend using them to add new options on a select list (similar to how the project form works for companies and of course similar to how django admin does it). Also you could use layers to have a functionality similar to django-inlines (see how the projects are added to the company) however I'd probably prefer to do that using normal inlines especially when the standalone child edit functionality isn't needed.
+
+Special care must be taken for the integration between layers and messages. I have tried to provide a solution in the previous sections by proposing flashing the message with javascript on the cases where the message will be "eaten" by a discarded response however I'm afraid that depending on how you've architectured your app you'll may still get problems. The important thing is to understand how messages work (or not) and in which cases you may not use messages at all since the feedback would be immediate and the users don't really need messages.
+
+
+## Conclusion
+
+In conclusion, using unpoly with your Django apps can enhance the UX of your users by reducing page reloads and providing a more responsive and intuitive interface with little work from the developer. I recommend everybody to start integrating unpoly in their projects and see how it can improve the UX of your users!

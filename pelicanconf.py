@@ -86,3 +86,16 @@ GITHUB_SKIP_FORK = True
 
 YEAR_ARCHIVE_SAVE_AS = u'posts/{date:%Y}/index.html'
 #MONTH_ARCHIVE_SAVE_AS = u'posts/{date:%Y}/{date:%M}/index.html'
+
+
+MARKDOWN = {
+  'extension_configs': {
+    'markdown.extensions.toc': {
+      'title': 'Table of contents:' 
+    },
+    'markdown.extensions.codehilite': {'css_class': 'highlight'},
+    'markdown.extensions.extra': {},
+    'markdown.extensions.meta': {},
+  },
+  'output_format': 'html5',
+}

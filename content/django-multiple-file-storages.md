@@ -1,4 +1,4 @@
-Title: Multiple storages for the same FielField in Django
+Title: Multiple storages for the same FileField in Django
 Date: 2023-04-11 14:20
 Tags: python, django, media, storage
 Category: django

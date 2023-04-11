@@ -4,8 +4,9 @@ from __future__ import unicode_literals
 
 # Fix for ipynb plugin https://github.com/danielfrg/pelican-ipynb/issues/49
 import sys
+from importlib import reload
 reload(sys)
-sys.setdefaultencoding("utf-8")
+# sys.setdefaultencoding("utf-8")
 
 AUTHOR = u'Serafeim Papastefanos'
 SITENAME = u'/var/'

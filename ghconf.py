@@ -19,5 +19,3 @@ CATEGORY_FEED_ATOM = 'feeds/{slug}.atom.xml'
 DISQUS_SITENAME='spapas-github-io'
 PLUGIN_PATHS = ['pelican-plugins']
 THEME = "pelican-octopress-theme"
-
-#DISPLAY_FEEDS_ON_MENU=True

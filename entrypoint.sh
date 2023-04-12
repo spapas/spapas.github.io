@@ -19,17 +19,13 @@ echo 'Building site 👷 '
 pelican content -o output -s ghconf.py
 pelican content -o output2 -s ghconf2.py
 
-echo 'Publishing to GitHub Pages 📤 '
+echo 'Publishing to GitHub Pages master 📤 '
 pushd output
 git init
 git remote add deploy "$remote_repo"
 git checkout master || git checkout --orphan master
 git config user.name "${GITHUB_ACTOR}"
 git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
-if [ "$GH_PAGES_CNAME" != "none" ]
-then
-    echo "$GH_PAGES_CNAME" > CNAME
-fi
 git add .
 
 echo -n 'Files to Commit:' && ls -l | wc -l
@@ -38,16 +34,14 @@ git push deploy master --force
 rm -fr .git
 popd
 
+echo 'Publishing to GitHub Pages master2 📤 '
 pushd output2
 git init
 git remote add deploy "$remote_repo"
 git checkout master2 || git checkout --orphan master2
 git config user.name "${GITHUB_ACTOR}"
 git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
-if [ "$GH_PAGES_CNAME" != "none" ]
-then
-    echo "$GH_PAGES_CNAME" > CNAME
-fi
+
 git add .
 
 echo -n 'Files to Commit:' && ls -l | wc -l

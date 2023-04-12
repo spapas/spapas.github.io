@@ -60,7 +60,7 @@ PLUGIN_PATHS = ['../pelican-plugins']
 PLUGINS = [
     'sitemap',
     'pelican_jsfiddle',
-    'ipynb.markup',
+    'liquid_tags',
 ]
 
 SITEMAP = {
@@ -78,7 +78,6 @@ SITEMAP = {
 }
 
 MARKUP = ('rst', 'md', 'ipynb', )
-#MARKUP = ('rst', 'md', )
 IGNORE_FILES = ['.ipynb_checkpoints']
 
 GITHUB_USER = 'spapas'
@@ -100,3 +99,7 @@ MARKDOWN = {
   },
   'output_format': 'html5',
 }
+
+LIQUID_TAGS = ['notebook']
+from io import open
+EXTRA_HEADER = open('_nb_header.html', encoding='utf-8').read()

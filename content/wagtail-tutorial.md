@@ -38,7 +38,7 @@ the pypi (so *don't* do a ``pip install wagtail``).
 
 **Warning:** Unfortuanately, no official binaries for libsass (which is a django-libsass requirement) are (yet) available for Windows. I
 have compiled a version for win32 and python 2.7 (which I use) using the [instructions found here]. You can download this version 
-[as a wheel package]({filename}images/libsass-0.3.0-cp27-none-win32.whl). Notice that because libsass was compiled with VC Express 2013
+[as a wheel package]({static}images/libsass-0.3.0-cp27-none-win32.whl). Notice that because libsass was compiled with VC Express 2013
 you should also install the [Visual C++ 2013 redistributable] package from Microsoft.
 
 *Please use it at your own risk !!!*
@@ -313,7 +313,7 @@ page -- congratulations !
 The homepage is rather simple (for now!) but you may already navigate to http://127.0.0.1:8000/admin and from there, login to Wagtail admin with the superuser you created earlier. 
 Now you may start experiencing Wagtail ! 
 
-![Wagtail admin index]({filename}images/wagtail-index.png)
+![Wagtail admin index]({static}images/wagtail-index.png)
 
 Exploring Wagtail admin
 -----------------------
@@ -374,7 +374,7 @@ Now, if you visit again the /admin and click on the "Add Child Page" action of "
 
 In our declaration of BlogPage we added three ``FieldPanel``s on its content_panes. A ``FieldPanel`` is a special edit handler for each Field. That is why when you try to edit the body you will see a rich text toolbar that enables you to not only format text but also embed images, documents and even oembed links. If you hadn't included the ``FieldPanel('body', classname="full")`` then you wouldn't see the rich text editor.
 
-![Editing pages in Wagtail]({filename}images/wagtail-edit-page.png)
+![Editing pages in Wagtail]({static}images/wagtail-edit-page.png)
 
 So now we can add as many posts as we like! 
 
@@ -480,7 +480,7 @@ A normal Django template can be used to display each page type. Wagtail either g
 
 So self is the context name of the  BlogPageIndex instance that is used to render this page. Beyond that, it's normal django.
 
-![Rendering the Blog Index]({filename}images/wagtail-index-template.png)
+![Rendering the Blog Index]({static}images/wagtail-index-template.png)
 
 Now you can view your Blog Index -- however before clicking on a link to also view your posts add the template for your ``BlogPost`` (``tutorial/blog_page.html``):
 

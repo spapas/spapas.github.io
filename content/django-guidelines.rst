@@ -573,7 +573,7 @@ If we want to add more toppings we'll have to submit that form so it will be sav
 existing toppings and three more. I am not fond of this behavior.
 
 That's why my recommendation is to follow the instructions on my 
-`better django inlines <{filename}better-django-inlines.rst>`_ article that allows you to sprinkle some javascript on your
+`better django inlines <{filename}django-inlines.rst>`_ article that allows you to sprinkle some javascript on your
 template and get a much better, dynamic behavior. I.e you'll get an "add more" button to add extra toppings without the need t
 submit the form every time.
 

@@ -1,4 +1,4 @@
-FROM python:3.7-slim
+FROM python:3.10-slim
 
 LABEL "com.github.actions.name"="Pelican for GitHub Pages"
 LABEL "com.github.actions.description"="Builds and deploys the Pelican project to GitHub Pages"

@@ -29,7 +29,7 @@ git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
 git add .
 
 echo -n 'Files to Commit:' && ls -l | wc -l
-git commit -m "[ci skip] Automated deployment to GitHub Pages on $(date +%s%3N)"
+git commit -m "Automated deployment to GitHub Pages on $(date +%s%3N)"
 git push deploy master --force
 rm -fr .git
 popd
@@ -45,7 +45,7 @@ git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
 git add .
 
 echo -n 'Files to Commit:' && ls -l | wc -l
-git commit -m "[ci skip] Automated deployment to GitHub Pages on $(date +%s%3N)"
+git commit -m "Automated deployment to GitHub Pages on $(date +%s%3N)"
 git push deploy master2 --force
 rm -fr .git
 popd

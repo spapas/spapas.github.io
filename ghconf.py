@@ -19,3 +19,5 @@ CATEGORY_FEED_ATOM = 'feeds/{slug}.atom.xml'
 DISQUS_SITENAME='spapas-github-io'
 PLUGIN_PATHS = ['pelican-plugins']
 THEME = "pelican-octopress-theme"
+
+PLAUSIBLE_URL='<script defer data-domain="spapas.github.io" src="https://plausible.hcg.gr/js/script.js"></script>'

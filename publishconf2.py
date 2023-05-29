@@ -18,6 +18,6 @@ FEED_ALL_ATOM = 'feeds/all.atom.xml'
 CATEGORY_FEED_ATOM = 'feeds/{slug}.atom.xml'
 DISQUS_SITENAME='spapas-github-io'
 
-
+PLAUSIBLE_URL='<script defer data-domain="spapas.net" src="https://plausible.hcg.gr/js/script.js"></script>'
 
 #DISPLAY_FEEDS_ON_MENU=True

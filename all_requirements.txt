@@ -40,7 +40,7 @@ pelican==4.2.0
 pickleshare==0.7.5
 prometheus-client==0.5.0
 prompt-toolkit==1.0.15
-Pygments==2.3.1
+Pygments==2.15.0
 python-dateutil==2.7.5
 pytz==2018.9
 pywinpty==0.5.5

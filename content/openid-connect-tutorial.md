@@ -46,7 +46,7 @@ This is also explained in the section 1.3.  Overview of the [OpenID Connect spec
 For the Authentication server for our tutorial we'll use [Keycloak](https://www.keycloak.org/), an open source Identity and Access Management server that implements OpenID Connect. I won't go into details on how to install and configure Keycloak,
 the thing is that you need to setup a new client for your realm, enable authentication and add a client secret that will be used later.
 
-Let's suppose that you have created a realm with the name `sample-realm` and your keycloak server is hosted on `https://keycloak.example.com`. This realm will have a *base* url with the value: `https://kc.example.gr/realms/sample-realm/`. This base url will be used to build other urls and will be stored as `OIDC_BASE_PROVIDER_URL`.
+Let's suppose that you have created a realm with the name `sample-realm` and your keycloak server is hosted on `https://kc.example.com`. This realm will have a *base* url with the value: `https://kc.example.gr/realms/sample-realm/`. This base url will be used to build other urls and will be stored as `OIDC_BASE_PROVIDER_URL`.
 
 If you are using a different OpenID Connect server, you'll need to have the client id and client secret for your server and the token and authorization endpoints of your server.
 
@@ -75,7 +75,7 @@ token_endpoint = finger["token_endpoint"]
 The first step of the authentication flow is to generate an authentication url and redirect the user to that. This means that when the user tries to log in to your app (by clicking a button or visiting some url etc) your web application will redirect the user to the authentication url.
 
 The authentication url is the authorization endpoint of the authorization server with some parameters. The parameters are
-(see 3.1.2.1.  Authentication Request of the [OpenID Connect specification](https://openid.net/specs/openid-connect-core-1_0.html)) for more info if you want:
+(see 3.1.2.1.  Authentication Request of the [OpenID Connect specification](https://openid.net/specs/openid-connect-core-1_0.html) for more info if you want):
 
 - `client_id`: The client id of your application. This will be used by the authorization server to identify your application
 - `response_type`: The response type, in our case it's `code`. There are various response types that can be used however `code` is the one that should be used to initiate the *Authorization Code Flow* which is used for server-side applications (there are two more flows described in the sections 3.2 and 3.3 but they aren't used for traditional web applications).
@@ -99,11 +99,12 @@ state = rndstr()
 authorization_url = f"{authorization_endpoint}?client_id={settings.OIDC_CLIENT_ID}&response_type=code&scope=openid&redirect_uri={settings.OIDC_REDIRECT_URIS[0]}&state={state}"
 ```
 
-and we'll get something like:
+and the uri will be similar to:
 
 ```
 https://kc.example.gr/realms/sample-realm/protocol/openid-connect/auth?client_id=sample-client&response_type=code&scope=openid&redirect_uri=http://localhost:8000/auth/callback&state=skldfj98sdfjio12
 ```
+
 
 ## User Authentication and redirect
 

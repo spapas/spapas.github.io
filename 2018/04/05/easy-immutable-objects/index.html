@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="google-site-verification" content="5_8DTmIiEq4gFvNAfxAD6TsGOgrMAjp8lQFQvfA6zZc" />
+    <title>Easy immutable objects in Javascript &mdash; /var/</title>
+    <meta name="author" content="Serafeim Papastefanos">
+
+
+    
+<style type="text/css">
+pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: var(--jp-cell-editor-active-background) }
+.highlight { background: var(--jp-cell-editor-background); color: var(--jp-mirror-editor-variable-color) }
+.highlight .c { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment */
+.highlight .err { color: var(--jp-mirror-editor-error-color) } /* Error */
+.highlight .k { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword */
+.highlight .o { color: var(--jp-mirror-editor-operator-color); font-weight: bold } /* Operator */
+.highlight .p { color: var(--jp-mirror-editor-punctuation-color) } /* Punctuation */
+.highlight .ch { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Preproc */
+.highlight .cpf { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Single */
+.highlight .cs { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Special */
+.highlight .kc { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Pseudo */
+.highlight .kr { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Type */
+.highlight .m { color: var(--jp-mirror-editor-number-color) } /* Literal.Number */
+.highlight .s { color: var(--jp-mirror-editor-string-color) } /* Literal.String */
+.highlight .ow { color: var(--jp-mirror-editor-operator-color); font-weight: bold } /* Operator.Word */
+.highlight .pm { color: var(--jp-mirror-editor-punctuation-color) } /* Punctuation.Marker */
+.highlight .w { color: var(--jp-mirror-editor-variable-color) } /* Text.Whitespace */
+.highlight .mb { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Bin */
+.highlight .mf { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Float */
+.highlight .mh { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Hex */
+.highlight .mi { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Integer */
+.highlight .mo { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Oct */
+.highlight .sa { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Affix */
+.highlight .sb { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Backtick */
+.highlight .sc { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Char */
+.highlight .dl { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Delimiter */
+.highlight .sd { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Doc */
+.highlight .s2 { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Double */
+.highlight .se { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Escape */
+.highlight .sh { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Heredoc */
+.highlight .si { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Interpol */
+.highlight .sx { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Other */
+.highlight .sr { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Regex */
+.highlight .s1 { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Single */
+.highlight .ss { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Symbol */
+.highlight .il { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Integer.Long */
+</style>
+
+<style type="text/css">
+/* Overrides of notebook CSS for static HTML export */
+div.entry-content {
+  overflow: visible;
+  padding: 8px;
+}
+.input_area {
+  padding: 0.2em;
+}
+
+a.heading-anchor {
+ white-space: normal;
+}
+
+.rendered_html
+code {
+ font-size: .8em;
+}
+
+pre.ipynb {
+  color: black;
+  background: #f7f7f7;
+  border: none;
+  box-shadow: none;
+  margin-bottom: 0;
+  padding: 0;
+  margin: 0px;
+  font-size: 13px;
+}
+
+/* remove the prompt div from text cells */
+div.text_cell .prompt {
+    display: none;
+}
+
+/* remove horizontal padding from text cells, */
+/* so it aligns with outer body text */
+div.text_cell_render {
+    padding: 0.5em 0em;
+}
+
+img.anim_icon{padding:0; border:0; vertical-align:middle; -webkit-box-shadow:none; -box-shadow:none}
+
+div.collapseheader {
+    width=100%;
+    background-color:#d3d3d3;
+    padding: 2px;
+    cursor: pointer;
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+</style>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true,
+        displayMath: [['$$','$$'], ["\\[","\\]"]]
+    }
+});
+</script>
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+    $("div.collapseheader").click(function () {
+    $header = $(this).children("span").first();
+    $codearea = $(this).children(".input_area");
+    console.log($(this).children());
+    $codearea.slideToggle(500, function () {
+        $header.text(function () {
+            return $codearea.is(":visible") ? "Collapse Code" : "Expand Code";
+        });
+    });
+});
+});
+</script>
+
+
+
+
+
+
+    <!-- http://t.co/dKP3o1e -->
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+    <link href="https://www.spapas.net/favicon.png" rel="icon">
+
+    <link href="https://www.spapas.net/theme/css/main.css" media="screen, projection" rel="stylesheet"
+      type="text/css">
+
+    <link href="https://www.spapas.net/theme/css/extra_style.css" media="screen, projection" rel="stylesheet"
+      type="text/css">
+
+    <link href="https://fonts.googleapis.com/css?family=Fira+Mono|Fira+Sans:400,700&amp;subset=greek" rel="stylesheet">
+
+<style>
+#gHPzseYvFrhZ123 {
+  padding: 5px !important;
+  display: block;
+  margin-bottom: 10px !important;
+  background: #900;
+  color: #fff;
+  border-radius: 5px;
+  font-size: 1.0rem !important;
+}
+</style>
+
+
+  <script>
+    
+      
+  </script>
+
+    <script data-ad-client="ca-pub-7673322832689008" async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
+      onerror="adBlockFunction();"></script>
+  </head>
+
+<body>
+  <header role="banner"><hgroup>
+  <h1><a href="https://www.spapas.net/">/var/</a></h1>
+    <h2>Various programming stuff</h2>
+</hgroup></header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+</ul>
+
+
+<ul class="main-navigation">
+      <li >
+        <a href="https://www.spapas.net/category/ai.html">Ai</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/android.html">Android</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/clojure.html">Clojure</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/css.html">Css</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/django.html">Django</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/elixir.html">Elixir</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/flask.html">Flask</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/gaming.html">Gaming</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/git.html">Git</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/html.html">Html</a>
+      </li>
+      <li class="active">
+        <a href="https://www.spapas.net/category/javascript.html">Javascript</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/networking.html">Networking</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/pelican.html">Pelican</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/postgresql.html">Postgresql</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/python.html">Python</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/spring.html">Spring</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/unix.html">Unix</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/wagtail.html">Wagtail</a>
+      </li>
+</ul></nav>
+  <div id="main">
+    <div id="content">
+    <div id="gHPzseYvFrhZ123">
+      Hello! If you are using an ad blocker but find something useful here 
+      and want to support me please consider disabling your ad blocker for this site. 
+      <br />
+      <br />
+      Thank you,<br />
+      Serafeim
+      
+    </div>
+<div>
+  <article class="hentry" role="article">
+<header>
+      <h1 class="entry-title">Easy immutable objects in Javascript</h1>
+    <p class="meta">
+<time datetime="2018-04-05T12:20:00+03:00" pubdate>Thu 05 April 2018</time>    </p>
+</header>
+
+<div class="entry-content"><p>With the rise of <a class="reference external" href="https://redux.js.org">Redux</a> and other similar Javascript frameworks (e.g <a class="reference external" href="https://hyperapp.js.org">Hyperapp</a>) that
+try to be a little more <em>functional</em> (functional as in functional programming), a
+new problem was introduced to Javascript programmers (at least to those that weren&#8217;t
+familair with functional programming): How to keep their application&#8217;s
+state&nbsp;&#8220;immutable&#8221;.</p>
+<p>Immutable means that the state should be an object that does not change (mutates) - instead
+of changing it, Redux needs the state object to be <a class="reference external" href="https://redux.js.org/basics/reducers">created from the beginning</a>.</p>
+<p>So when something happens in your application you need to discard
+the existing state object and create a new one from scratch by modifying and copying the previous state values.
+This is easy
+in most toy-apps that are used when introducing the concept, for example if your state is <tt class="docutils literal">{counter: 0}</tt>
+then you could just define the reducer for the <tt class="docutils literal"><span class="caps">ADD</span></tt> action (i.e when the user clicks the <tt class="docutils literal">+</tt> button) like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="nx">reducer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">state</span><span class="o">=</span><span class="p">{</span><span class="nx">counter</span><span class="o">:</span><span class="w"> </span><span class="mf">0</span><span class="p">},</span><span class="w"> </span><span class="nx">action</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="nx">action</span><span class="p">.</span><span class="nx">type</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="s1">&#39;ADD&#39;</span><span class="o">:</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s1">&#39;counter&#39;</span><span class="o">:</span><span class="w"> </span><span class="nx">state</span><span class="p">.</span><span class="nx">counter</span><span class="o">+</span><span class="mf">1</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="k">default</span><span class="o">:</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="nx">state</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+<p>Unfortunately, your application will definitely have a much more complex state than&nbsp;this!</p>
+<p>In the following, I&#8217;ll do a quick introduction on how to keep your state objects immutable
+using modern Javascript techniques, I&#8217;ll present how complex it is to modify non-trivial
+immutable objects and finally I&#8217;ll give you a quick recipe for modifying your non-trivial
+immutable objects. If you want to play with the concepts I&#8217;ll introduce you can do it at a
+<a class="reference external" href="https://repl.it/&#64;spapas/JS-Drill-Down-objectarray-immutable">playground I&#8217;ve created on repl.it</a>.</p>
+<p>Please keep in mind that this article has been written for <span class="caps">ES6</span> - take a look at my
+<a class="reference external" href="https://spapas.github.io/2015/11/16/using-browserify-es6/">browserify with <span class="caps">ES6</span></a> article to see how you can also use it in your projects with&nbsp;Browserify.</p>
+<p>Also, if you&#8217;d like to see a non-toy React + Redux application or you&#8217;d like a gentle
+introduction to the concepts I talked about (state, reducers, actions etc)
+you can follow along my <a class="reference external" href="https://spapas.github.io/2016/03/02/react-redux-tutorial/">React Redux tutorial</a>. This is a rather old article
+(considering how quickly the Javascript framework state change) but the basic concepts
+introduced there are true&nbsp;today.</p>
+<div class="section" id="immutable-objects">
+<h2>Immutable&nbsp;objects</h2>
+<p>Let&#8217;s start our descent into avoiding mutations by supposing that you had
+something a little more complex than the initial example, for example your state was like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="nx">state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="s1">&#39;counter&#39;</span><span class="o">:</span><span class="w"> </span><span class="mf">0</span><span class="p">,</span>
+<span class="w">    </span><span class="s1">&#39;name&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;John&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="s1">&#39;age&#39;</span><span class="o">:</span><span class="w"> </span><span class="mf">36</span>
+<span class="p">}</span>
+</pre></div>
+<p>If you continued the same example then your <tt class="docutils literal"><span class="caps">ADD</span></tt> reducer would need to return something like&nbsp;this</p>
+<div class="highlight"><pre><span></span><span class="k">return</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="s1">&#39;counter&#39;</span><span class="o">:</span><span class="w"> </span><span class="nx">state</span><span class="p">.</span><span class="nx">counter</span><span class="o">+</span><span class="mf">1</span><span class="p">,</span>
+<span class="w">    </span><span class="s1">&#39;name&#39;</span><span class="o">:</span><span class="w"> </span><span class="nx">state</span><span class="p">.</span><span class="nx">name</span><span class="p">,</span>
+<span class="w">    </span><span class="s1">&#39;age&#39;</span><span class="o">:</span><span class="w"> </span><span class="nx">state</span><span class="p">.</span><span class="nx">age</span>
+<span class="p">}</span>
+</pre></div>
+<p>This gets difficult and error prone very soon - and what happens if you later need to add another attribute to your&nbsp;state?</p>
+<p>The correct way to implement this would be to enumerate all properties of state except &#8216;counter&#8217;, copy them to a new
+object, and then assign counter+1 to the new object&#8217;s counter attribute. You could implement this by hand however,
+thankfully, there&#8217;s the <a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign">Object.assign</a> method! This method will copy all attributes from a list of objects
+to an object which will return as a result and is defined like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><span class="nb">Object</span><span class="p">.</span><span class="nx">assign</span><span class="p">(</span><span class="nx">target</span><span class="p">,</span><span class="w"> </span><span class="p">...</span><span class="nx">sources</span><span class="p">)</span>
+</pre></div>
+<p>The <tt class="docutils literal">target</tt> parameter is the object that will retrieve all attributes from <tt class="docutils literal">sources</tt> (which is a variadic argument - you can
+have as many sources as you want - even 0; in this case the target will be returned). For a quick example,&nbsp;running:</p>
+<div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="nx">o</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="o">:</span><span class="w"> </span><span class="mf">1</span><span class="p">}</span>
+<span class="kd">let</span><span class="w"> </span><span class="nx">oo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">Object</span><span class="p">.</span><span class="nx">assign</span><span class="p">(</span><span class="nx">o</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="s1">&#39;b&#39;</span><span class="o">:</span><span class="w"> </span><span class="mf">2</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;c&#39;</span><span class="o">:</span><span class="w"> </span><span class="mf">1</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="s1">&#39;c&#39;</span><span class="o">:</span><span class="w"> </span><span class="mf">3</span><span class="p">})</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">oo</span><span class="p">,</span><span class="w"> </span><span class="nx">o</span><span class="o">===</span><span class="nx">oo</span><span class="p">)</span>
+</pre></div>
+<p>will return <tt class="docutils literal">{ a: 1, b: 2, c: 3 } true</tt> i.e the attributes &#8216;b&#8217; and &#8216;c&#8217; were copied to <tt class="docutils literal">o</tt> and it was assigned to <tt class="docutils literal">oo</tt> &#8212; notice
+that o and oo are the same object (thus <tt class="docutils literal">o</tt> is modified now). Also, notice that the the attributes of objects to the right
+have priority over the attributes of the objects to the left (<tt class="docutils literal">'c': 1</tt> was overriden by <tt class="docutils literal">'c': 3</tt>).</p>
+<p>As you should have guessed by now, you should never pass the
+state as the <tt class="docutils literal">target</tt> but instead you should create a new object, thus the <tt class="docutils literal"><span class="caps">ADD</span></tt> reducer should return the&nbsp;following:</p>
+<div class="highlight"><pre><span></span><span class="k">return</span><span class="w"> </span><span class="nb">Object</span><span class="p">.</span><span class="nx">assign</span><span class="p">({},</span><span class="w"> </span><span class="nx">state</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="s1">&#39;counter&#39;</span><span class="o">:</span><span class="w"> </span><span class="nx">state</span><span class="p">.</span><span class="nx">counter</span><span class="o">+</span><span class="mf">1</span><span class="p">)</span>
+</pre></div>
+<p>This means that it will create a new object which will copy all current attributes of state and increase the existing
+<tt class="docutils literal">counter</tt> attribute.</p>
+<p>I&#8217;d like to also add here that instead of using the <tt class="docutils literal">Object.assign</tt> method you could use the <a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax">spread syntax</a>
+to more or less do the same. The spread syntax on an object takes this object&#8217;s attributes and outputs them as key-value
+dictionary pairs (for them to be used to initialize other objects). Thus, you can use the spread syntax to create an new object that has the same attributes
+of another object like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="nx">newState</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{...</span><span class="nx">state</span><span class="p">}</span>
+<span class="c1">// which is similar to</span>
+<span class="nx">newState</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">Object</span><span class="p">.</span><span class="nx">assign</span><span class="p">({},</span><span class="w"> </span><span class="nx">state</span><span class="p">)</span>
+</pre></div>
+<p>Of course you usually need to override some attributes, which can be passed directly to the newly created object,
+for example for the <tt class="docutils literal"><span class="caps">ADD</span></tt> reducer:</p>
+<div class="highlight"><pre><span></span><span class="k">return</span><span class="w"> </span><span class="p">{...</span><span class="nx">state</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;counter&#39;</span><span class="o">:</span><span class="w"> </span><span class="nx">state</span><span class="p">.</span><span class="nx">counter</span><span class="o">+</span><span class="mf">1</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+<p>Like <tt class="docutils literal">Object.assign</tt>, you can have as many sources as you want in your spread syntax thus nothing stops you from using <tt class="docutils literal">...</tt> multiple times to copy the attributes of multiple objects
+for example you could define <tt class="docutils literal"><span class="caps">ADD</span></tt> like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><span class="k">return</span><span class="w"> </span><span class="p">{...</span><span class="nx">state</span><span class="p">,</span><span class="w"> </span><span class="p">...{</span><span class="s1">&#39;counter&#39;</span><span class="o">:</span><span class="w"> </span><span class="nx">state</span><span class="p">.</span><span class="nx">counter</span><span class="o">+</span><span class="mf">1</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+<p>The order is similar to Object.assign, i.e the attributes that follow will override the previous&nbsp;ones.</p>
+<p>One final comment is that both <tt class="docutils literal">Object.assign</tt> and copying objects with the spread syntax will do a &#8220;shallow&#8221;
+copy i.e it will copy only the outer object, not the objects its keys refer to. An example of this behavior is that
+if you run the&nbsp;following:</p>
+<div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="nx">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s1">&#39;val&#39;</span><span class="o">:</span><span class="w"> </span><span class="mf">3</span><span class="w"> </span><span class="p">}</span>
+<span class="kd">let</span><span class="w"> </span><span class="nx">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="nx">a</span><span class="w"> </span><span class="p">}</span>
+<span class="kd">let</span><span class="w"> </span><span class="nx">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{...</span><span class="nx">x</span><span class="p">}</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span><span class="w"> </span><span class="nx">y</span><span class="p">)</span>
+<span class="nx">x</span><span class="p">[</span><span class="s1">&#39;val2&#39;</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">4</span>
+<span class="nx">y</span><span class="p">[</span><span class="s1">&#39;val2&#39;</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">5</span>
+<span class="nx">a</span><span class="p">[</span><span class="s1">&#39;val&#39;</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">33</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span><span class="w"> </span><span class="nx">y</span><span class="p">)</span>
+</pre></div>
+<p>you&#8217;ll&nbsp;get:</p>
+<div class="highlight"><pre><span></span><span class="p">{</span><span class="w"> </span><span class="nx">a</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">val</span><span class="o">:</span><span class="w"> </span><span class="mf">3</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">a</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">val</span><span class="o">:</span><span class="w"> </span><span class="mf">3</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span>
+<span class="p">{</span><span class="w"> </span><span class="nx">a</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">val</span><span class="o">:</span><span class="w"> </span><span class="mf">33</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="nx">val2</span><span class="o">:</span><span class="w"> </span><span class="mf">4</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">a</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">val</span><span class="o">:</span><span class="w"> </span><span class="mf">33</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="nx">val2</span><span class="o">:</span><span class="w"> </span><span class="mf">5</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+<p>i.e <tt class="docutils literal">x</tt> and <tt class="docutils literal">y</tt> got a different <tt class="docutils literal">val2</tt> attribute since they not the same object, however both <tt class="docutils literal">x</tt> and <tt class="docutils literal">y</tt>
+have a reference to the <em>same</em> <tt class="docutils literal">a</tt> thus when it&#8217;s <tt class="docutils literal">val</tt> attribute was changed this change appears to both <tt class="docutils literal">x</tt> and <tt class="docutils literal">y</tt>!</p>
+<p>What the above means is that if you have a state object containing
+other objects (or arrays) you will also need to copy these children
+objects to keep your state immutable. We&#8217;ll see examples on this&nbsp;later.</p>
+</div>
+<div class="section" id="immutable-arrays">
+<h2>Immutable&nbsp;arrays</h2>
+<p>One thing we haven&#8217;t talked about yet is what happens if there&#8217;s an array in the state, for example your state is
+<tt class="docutils literal">let <span class="pre">state=[]</span></tt> and you have and <tt class="docutils literal"><span class="caps">APPEND</span></tt> reducer that puts something in the end of that array. The naive (and wrong)
+way to do it is to call <tt class="docutils literal">push</tt> directly to the state - this will mutate your state and is not be&nbsp;allowed!</p>
+<p>You need to copy the array elements and the tool for this job is <a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice">Array.slice</a>. This methods takes two optional arguments (<tt class="docutils literal">begin</tt>
+and <tt class="docutils literal">end</tt>) that define the range of elements that will be copied; if you call it without arguments then it will copy
+the whole array. Using slice, your <tt class="docutils literal"><span class="caps">APPEND</span></tt> reducer can be like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="nx">newState</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">state</span><span class="p">.</span><span class="nx">slice</span><span class="p">()</span>
+<span class="nx">newState</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s1">&#39;new element&#39;</span><span class="p">)</span>
+<span class="k">return</span><span class="w"> </span><span class="nx">newState</span>
+</pre></div>
+<p>Also, you could use the <cite>Array.concat</cite> method which will return a new array by copying all the elements of its&nbsp;arguments</p>
+<div class="highlight"><pre><span></span><span class="k">return</span><span class="w"> </span><span class="nx">state</span><span class="p">.</span><span class="nx">concat</span><span class="p">([</span><span class="s1">&#39;new element&#39;</span><span class="p">])</span>
+</pre></div>
+<p>This will append <tt class="docutils literal">new element</tt> to a new object that will have the elements of state (it won&#8217;t modify the
+existing state) and is easier if you have this exact requirement. The advantage of slice is that you can
+use it to add/remove/modify elements from any place in the original array. For example, here&#8217;s how you can
+add an element after the first element of an&nbsp;array:</p>
+<div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="nx">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;b&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;c&#39;</span><span class="w"> </span><span class="p">]</span>
+<span class="kd">let</span><span class="w"> </span><span class="nx">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">x</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span><span class="mf">1</span><span class="p">).</span><span class="nx">concat</span><span class="p">([</span><span class="s1">&#39;second&#39;</span><span class="w"> </span><span class="p">],</span><span class="w"> </span><span class="nx">x</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span><span class="mf">3</span><span class="p">))</span>
+</pre></div>
+<p>Now <tt class="docutils literal">y</tt> will be equal to <tt class="docutils literal">[ 'a', 'second', 'b', 'c' ]</tt>. So the above will get the first (0-th) element from the <tt class="docutils literal">x</tt>
+array and concat it with another element (<tt class="docutils literal">second</tt>) and the remaining elements of <tt class="docutils literal">x</tt>. Remember that <tt class="docutils literal">x</tt> is not
+modifyied since <tt class="docutils literal">concat</tt> will create a new&nbsp;array.</p>
+<p>In a similar fashion to objects, instead of using concat it is much easier to use the spread syntax. The spread syntax for
+an array will output its elements one after the other for them to be used by other arrays. Thus, continuing from the
+previous example, <tt class="docutils literal"><span class="pre">[...x]</span></tt> will return a new array with the elements of <tt class="docutils literal">x</tt> (so it is similar to <tt class="docutils literal">x.slice()</tt> or <tt class="docutils literal">x.concat()</tt>),
+thus to re-generate the previous example you&#8217;ll do something&nbsp;like</p>
+<div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="nx">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">y</span><span class="o">=</span><span class="p">[...</span><span class="nx">x</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span><span class="mf">1</span><span class="p">),</span><span class="w"> </span><span class="s1">&#39;second&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">...</span><span class="nx">x</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span><span class="mf">3</span><span class="p">)]</span>
+</pre></div>
+<p>All three of concat, slice or the spread syntax will do a shallow copy (similar to how Object.assign works) so the same
+conclusions from the previous section are true here: If you have arrays inside other arrays (or objects) you&#8217;ll need to copy the inner
+arrays&nbsp;recursively.</p>
+</div>
+<div class="section" id="more-complex-cases">
+<h2>More complex&nbsp;cases</h2>
+<p>We&#8217;ll now take a look at some more complex cases and see how quickly it gets difficult because of the shallow copying.
+Let&#8217;s suppose that our state is the&nbsp;following:</p>
+<div class="highlight"><pre><span></span><span class="kd">const</span><span class="w"> </span><span class="nx">state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="s1">&#39;user&#39;</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="s1">&#39;first_name&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;John&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="s1">&#39;last_name&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Doe&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="s1">&#39;address&#39;</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="s1">&#39;city&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Athens&#39;</span><span class="p">,</span>
+<span class="w">      </span><span class="s1">&#39;country&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Greece&#39;</span><span class="p">,</span>
+<span class="w">      </span><span class="s1">&#39;zip&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;12345&#39;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+<p>and we want to assign a <tt class="docutils literal">group</tt> attribute to the state. This can be easily done with <tt class="docutils literal">assign</tt>:</p>
+<div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="nx">groups</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[{</span>
+<span class="w">    </span><span class="s1">&#39;name&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;group1&#39;</span>
+<span class="p">}]</span>
+
+<span class="nx">state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">Object</span><span class="p">.</span><span class="nx">assign</span><span class="p">({},</span><span class="w"> </span><span class="nx">state</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="s1">&#39;groups&#39;</span><span class="o">:</span><span class="w"> </span><span class="nx">groups</span>
+<span class="p">})</span>
+</pre></div>
+<p>or&nbsp;spread:</p>
+<div class="highlight"><pre><span></span><span class="nx">state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="p">...</span><span class="nx">state</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;groups&#39;</span><span class="o">:</span><span class="w"> </span><span class="nx">groups</span>
+<span class="p">}</span>
+</pre></div>
+<p>Notice that instead of <tt class="docutils literal">'groups': groups</tt> I could have used the <a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Object_initializer#Syntax">shorthand syntax</a> and written only <tt class="docutils literal">groups</tt> and it would still work
+(i.e <tt class="docutils literal">state = <span class="pre">{...state,</span> groups}</tt> is the same). In all cases, the resulting state will&nbsp;be:</p>
+<div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="s1">&#39;user&#39;</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="s1">&#39;first_name&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;John&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="s1">&#39;last_name&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Doe&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="s1">&#39;address&#39;</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="s1">&#39;city&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Athens&#39;</span><span class="p">,</span>
+<span class="w">      </span><span class="s1">&#39;country&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Greece&#39;</span><span class="p">,</span>
+<span class="w">      </span><span class="s1">&#39;zip&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;12345&#39;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="s1">&#39;groups&#39;</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span>
+<span class="w">    </span><span class="s1">&#39;name&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;group1&#39;</span>
+<span class="w">  </span><span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+<p>From now on I&#8217;ll only use the spread syntax which is more&nbsp;compact.</p>
+<p>Let&#8217;s try to change the user&#8217;s name. This is not as easy as the first example because we need&nbsp;to:</p>
+<ul class="simple">
+<li>Create a new copy of the <tt class="docutils literal">user</tt> object with the new first&nbsp;name</li>
+<li>Create a new copy of the <tt class="docutils literal">state</tt> object with the new user object created&nbsp;above</li>
+</ul>
+<p>This can be done in two steps like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="nx">user</span><span class="w"> </span><span class="o">=</span><span class="p">{...</span><span class="nx">state</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">],</span><span class="w"> </span><span class="s1">&#39;first_name&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Jack&#39;</span><span class="p">}</span>
+<span class="nx">state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{...</span><span class="nx">state</span><span class="p">,</span><span class="w"> </span><span class="nx">user</span><span class="p">}</span>
+</pre></div>
+<p>or in one step like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><span class="nx">state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{...</span><span class="nx">state</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;user&#39;</span><span class="o">:</span><span class="p">{</span>
+<span class="w">  </span><span class="p">...</span><span class="nx">state</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">],</span><span class="w"> </span><span class="s1">&#39;first_name&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Jack&#39;</span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+<p>The single step assignment is the combination of the two step described above. It is a little more complex
+but it saves typing and is prefered because it allows the reducer function to have a single expression. Now
+let&#8217;s try to modify the user&#8217;s zip code. We&#8217;ll do it in three steps&nbsp;first:</p>
+<div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="nx">address</span><span class="w"> </span><span class="o">=</span><span class="p">{...</span><span class="nx">state</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">][</span><span class="s1">&#39;address&#39;</span><span class="p">],</span><span class="w"> </span><span class="s1">&#39;zip&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;54321&#39;</span><span class="p">}</span>
+<span class="nx">user</span><span class="w"> </span><span class="o">=</span><span class="p">{...</span><span class="nx">state</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">],</span><span class="w"> </span><span class="nx">address</span><span class="p">}</span>
+<span class="nx">state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{...</span><span class="nx">state</span><span class="p">,</span><span class="w"> </span><span class="nx">user</span><span class="p">}</span>
+</pre></div>
+<p>And now in&nbsp;one:</p>
+<div class="highlight"><pre><span></span><span class="nx">state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{...</span><span class="nx">state</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;user&#39;</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="p">...</span><span class="nx">state</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">],</span><span class="w"> </span><span class="s1">&#39;address&#39;</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="p">...</span><span class="nx">state</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">][</span><span class="s1">&#39;address&#39;</span><span class="p">],</span><span class="w"> </span><span class="s1">&#39;zip&#39;</span><span class="o">:</span><span class="w"> </span><span class="mf">54321</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}}</span>
+</pre></div>
+<p>Now, as can be seen in the above examples, modifying (without mutating) a compex state object
+is not very easy - it needs much thinking and is too error prone! This will be even more
+apparent when we also get the array modifications into the equation, for example by adding another
+two&nbsp;groups:</p>
+<div class="highlight"><pre><span></span><span class="nx">state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="p">...</span><span class="nx">state</span><span class="p">,</span><span class="w"> </span><span class="nx">groups</span><span class="o">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">...</span><span class="nx">state</span><span class="p">[</span><span class="s1">&#39;groups&#39;</span><span class="p">].</span><span class="nx">slice</span><span class="p">(),</span>
+<span class="w">    </span><span class="p">{</span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;group2&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="mf">2</span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;group3&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="mf">3</span><span class="p">}</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+<p>The above copies the existing state and assigns to it a new <tt class="docutils literal">groups</tt> object by copying
+the existing groups and appending two more groups to that array! The state now will&nbsp;be:</p>
+<div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nx">user</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">first_name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Jack&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">last_name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Doe&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">address</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">city</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Athens&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">country</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Greece&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">zip</span><span class="o">:</span><span class="w"> </span><span class="mf">54321</span><span class="w"> </span><span class="p">}</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nx">groups</span><span class="o">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;group1&#39;</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;group2&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="mf">2</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;group3&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="mf">3</span><span class="w"> </span><span class="p">}</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+<p>As a final examply, how can we add the missing <tt class="docutils literal">id</tt> attribute to the first group?
+Following the above&nbsp;techniques:</p>
+<div class="highlight"><pre><span></span><span class="nx">state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="p">...</span><span class="nx">state</span><span class="p">,</span><span class="w"> </span><span class="nx">groups</span><span class="o">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{...</span><span class="nx">state</span><span class="p">[</span><span class="s1">&#39;groups&#39;</span><span class="p">][</span><span class="mf">0</span><span class="p">],</span><span class="w"> </span><span class="s1">&#39;id&#39;</span><span class="o">:</span><span class="w"> </span><span class="mf">1</span><span class="p">},</span>
+<span class="w">    </span><span class="p">...</span><span class="nx">state</span><span class="p">[</span><span class="s1">&#39;groups&#39;</span><span class="p">].</span><span class="nx">slice</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+<p>One more time what the above&nbsp;does?</p>
+<ul class="simple">
+<li>Creates a new object and copies all existing properties of state to&nbsp;it</li>
+<li>Creates a new array which assigns it to the new state&#8217;s <tt class="docutils literal">groups</tt> attribute</li>
+<li>For the first element of that array it copies all attributes of the first element of state[&#8216;groups&#8217;] and assings it an <tt class="docutils literal">id=1</tt> attribute</li>
+<li>For the remaining elements of that array it copies all elements of state[&#8216;groups] after the first&nbsp;one</li>
+</ul>
+<p>Now think what would happen if we had an even more complex state with 3 or 4 nested&nbsp;levels!</p>
+</div>
+<div class="section" id="immutability-s-little-helpers">
+<h2>Immutability&#8217;s little&nbsp;helpers</h2>
+<p>As you&#8217;ve seen from the previous examples, using immutable objects is not as easy as seems from
+the toy examples. Actually, drilling down into complex immutable
+objects and returning new ones that have
+some values changed  is a well-known problem in the functional world and has already a solution
+called &#8220;lenses&#8221;. This is a funny name but it more or less means that you use a magnifying lens to look at
+exactly the value you want and modify or retrieve it. The problem with lenses is that although they solve
+the problem I mention is that if you want to use them you&#8217;ll need to dive deep into functional
+programming and also you&#8217;ll need to include an extra library to your project (even if you only
+want this specific&nbsp;capability).</p>
+<p>For completeness, here&#8217;s the <a class="reference external" href="http://ramdajs.com/docs/#lens">the docs on lens</a> from <a class="reference external" href="http://ramdajs.com">Ramda</a> which is a well known Javascript functional library.
+This needs you to understand what is <tt class="docutils literal">prop</tt>, what is <tt class="docutils literal">assoc</tt> and then how to use the lens with <tt class="docutils literal">view</tt>,
+<tt class="docutils literal">set</tt> and <tt class="docutils literal">over</tt>. For me, these are way too much things to remember for such a specific thing. Also, notice
+that the minified version of Ramda is around 45 kb which is not small. Yes, if I wanted
+to fully use Ramda or a similar library I&#8217;d be delighted to use all these techniques and include it as a
+dependency - however most people prefer to stick with more familiar (and more procedural)&nbsp;concepts.</p>
+<p>The helpers I&#8217;m going to present here are more or less a poor man&#8217;s lens, i.e you will be able to use the basic
+functionality of a lens&nbsp;but&#8230;</p>
+<ul class="simple">
+<li>without the peculiar syntax&nbsp;and</li>
+<li>without the need to learn more functional concepts than what you&#8217;ll want&nbsp;and</li>
+<li>without the need to include any more external&nbsp;dependencies</li>
+</ul>
+<p>Pretty good deal,&nbsp;no?</p>
+<p>In any case, a lens has two parts, a get and a set. The get will be used to drill down and retrieve a value from a
+complex object while the set will be used to drill down and assign a value to a complex object. The set does not
+modify the object but returns a new one. The get lens is not really needed since you can easily drill down to an
+object using the good old index syntax but I&#8217;ll include it here for&nbsp;completenes.</p>
+<p>We&#8217;ll start with the get which seems easier. For this, I&#8217;ll just create a function that will take an object and
+a path inside that object as parameter and retrieve the value at that path. The path could be either a string of the form
+&#8216;a.0.c.d&#8217; or an array [&#8216;a&#8217;, &#8216;0&#8217;, &#8216;c&#8217;, &#8216;d&#8217;] - for numerical indeces we&#8217;ll consider an array at that&nbsp;point.</p>
+<p>Thus, for the object <tt class="docutils literal">{'a': <span class="pre">[{'b':</span> {'c': {'d': 32} <span class="pre">}}]}</span></tt> when the lens getter is called with either
+<tt class="docutils literal">'a.0.b.c'</tt> or [&#8216;a&#8217;, 0, &#8216;b&#8217;, &#8216;c&#8217;] as the path, it should return <tt class="docutils literal">{'d': 32}</tt>.</p>
+<p>To implement the get helper I will use a functional concept, <tt class="docutils literal">reduce</tt>. I&#8217;ve already explained this concept
+in my <a class="reference external" href="https://spapas.github.io/2016/03/02/react-redux-tutorial/#interlude-so-what-s-a-reducer">previous react-redux tutorial</a> so I urge you to read that article for more info. Using reduce we
+can apply one by one accumulatively the members of the path to the initial object and the result will be
+the value of that path. Here&#8217;s the implementation of <tt class="docutils literal">pget</tt> (from property&nbsp;get):</p>
+<div class="highlight"><pre><span></span><span class="kd">const</span><span class="w"> </span><span class="nx">objgetter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">accumulator</span><span class="p">,</span><span class="w"> </span><span class="nx">currentValue</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">accumulator</span><span class="p">[</span><span class="nx">currentValue</span><span class="p">];</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">pget</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">obj</span><span class="p">,</span><span class="w"> </span><span class="nx">path</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w">  </span><span class="p">(</span>
+<span class="w">    </span><span class="p">(</span><span class="ow">typeof</span><span class="w"> </span><span class="nx">path</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">&#39;string&#39;</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nx">path</span><span class="w"> </span><span class="ow">instanceof</span><span class="w"> </span><span class="nb">String</span><span class="p">)</span><span class="o">?</span><span class="nx">path</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span><span class="o">:</span><span class="nx">path</span>
+<span class="p">).</span><span class="nx">reduce</span><span class="p">(</span><span class="nx">objgetter</span><span class="p">,</span><span class="w"> </span><span class="nx">obj</span><span class="p">)</span>
+</pre></div>
+<p>I have defined an objgetter reducer function that gets an accumulated object and the current
+value of the path and just returns the <tt class="docutils literal">currentValue</tt> index of that accumulated object. Finally,
+for the get lens (named <tt class="docutils literal">pget</tt>) I just check to see if the path is a string or an array (if it&#8217;s
+a string I split it on dots) and then I &#8220;reduce&#8221; the path using the objgetter defined above and
+starting by the original object as the initial value. To understand how it is working, let&#8217;s try calling it
+for an&nbsp;object:</p>
+<div class="highlight"><pre><span></span><span class="kd">const</span><span class="w"> </span><span class="nx">s1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span><span class="s1">&#39;b&#39;</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="s1">&#39;c&#39;</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="s1">&#39;d&#39;</span><span class="o">:</span><span class="w"> </span><span class="mf">32</span><span class="p">}</span><span class="w"> </span><span class="p">}}]}</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">pget</span><span class="p">(</span><span class="nx">s1</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span><span class="w"> </span><span class="mf">0</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;b&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;c&#39;</span><span class="p">]))</span>
+</pre></div>
+<p>The above <tt class="docutils literal">pget</tt> will call <tt class="docutils literal">reduce</tt> on the passed array using the defined <tt class="docutils literal">objgetter</tt> above
+as the reducer function and <tt class="docutils literal">s1</tt> as the original object. So, the reducer function will be called with
+the following values each&nbsp;time:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="68%" />
+<col width="32%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">accumulator</th>
+<th class="head">currentvalue</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td><tt class="docutils literal">s1</tt></td>
+<td><tt class="docutils literal">'a'</tt></td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">s1['a']</span></tt></td>
+<td><tt class="docutils literal">0</tt></td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">s1['a'][0]</span></tt></td>
+<td><tt class="docutils literal">'b'</tt></td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">s1['a'][0]['b']</span></tt></td>
+<td><tt class="docutils literal">'c'</tt></td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">s1['a'][0]['b']['c']</span></tt></td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<p>Thus the result will be exactly what we wanted <tt class="docutils literal">{'d' :32}</tt>. An interesting thing is that it&#8217;s working
+fine without the need to differentiate between arrays and objects because of how index access <tt class="docutils literal">[]</tt> works.</p>
+<p>Continuing for the set lens (which will be more difficult), I&#8217;ll first represent a simple version that
+works only with objects and an array path but displays the main idea of how this will work: It uses recursion i.e it will call itself to gradually build the new object. Here&#8217;s how it is&nbsp;implemented:</p>
+<div class="highlight"><pre><span></span><span class="kd">const</span><span class="w"> </span><span class="nx">pset0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">obj</span><span class="p">,</span><span class="w"> </span><span class="nx">path</span><span class="p">,</span><span class="w"> </span><span class="nx">val</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kd">let</span><span class="w"> </span><span class="nx">idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">path</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span>
+
+<span class="w">  </span><span class="k">if</span><span class="p">(</span><span class="nx">path</span><span class="p">.</span><span class="nx">length</span><span class="o">==</span><span class="mf">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="p">...</span><span class="nx">obj</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="nx">idx</span><span class="p">]</span><span class="o">:</span><span class="w"> </span><span class="nx">val</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="nx">remaining</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">path</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="p">...</span><span class="nx">obj</span><span class="p">,</span>
+<span class="w">      </span><span class="p">[</span><span class="nx">idx</span><span class="p">]</span><span class="o">:</span><span class="w"> </span><span class="nx">pset0</span><span class="p">(...[</span><span class="nx">obj</span><span class="p">[</span><span class="nx">idx</span><span class="p">]],</span><span class="w"> </span><span class="nx">remaining</span><span class="p">,</span><span class="w"> </span><span class="nx">val</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+<p>As already explained, I have assumed that the path is an array of indeces and that the <tt class="docutils literal">obj</tt> is a complex object
+(no arrays in it please); the function returns a new object with the old object&#8217;s value at the path be replaced
+with <tt class="docutils literal">val</tt>. This function checks to see if the path has only one element, if yes it will assign the value to that
+attribute of the object it retrieve. If not, it will call itself recursively by skipping the current index and assign the return value to the
+current index of the curent object. Let&#8217;s see how it works for the following&nbsp;call:</p>
+<div class="highlight"><pre><span></span><span class="kd">const</span><span class="w"> </span><span class="nx">s2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="nx">a0</span><span class="o">:</span><span class="w"> </span><span class="mf">0</span><span class="p">,</span><span class="w"> </span><span class="nx">a</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="nx">b0</span><span class="o">:</span><span class="w"> </span><span class="mf">0</span><span class="p">,</span><span class="w"> </span><span class="nx">b</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="nx">c0</span><span class="o">:</span><span class="w"> </span><span class="mf">0</span><span class="p">,</span><span class="w"> </span><span class="nx">c</span><span class="o">:</span><span class="w"> </span><span class="mf">3</span><span class="p">}}}</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">pset0</span><span class="p">(</span><span class="nx">s2</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;b&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;c&#39;</span><span class="p">],</span><span class="w"> </span><span class="mf">4</span><span class="p">))</span>
+</pre></div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="34%" />
+<col width="59%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head"># Call</th>
+<th class="head">Call parameters</th>
+<th class="head">Return</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>1</td>
+<td>pset0(s2, [&#8216;a&#8217;, &#8216;b&#8217;, &#8216;c&#8217;], 4)</td>
+<td>{&#8230;s2, [&#8216;b&#8217;]: pset0(s2[&#8216;a&#8217;], [&#8216;b&#8217;, &#8216;c&#8217;], 4) }</td>
+</tr>
+<tr><td>2</td>
+<td>pset0(s2[&#8216;a&#8217;], [&#8216;b&#8217;, &#8216;c&#8217;], 4)</td>
+<td>{&#8230;s2[&#8216;a&#8217;], [&#8216;c&#8217;]: pset0(s2[&#8216;a&#8217;][&#8216;b&#8217;], [&#8216;c&#8217;], 4) }</td>
+</tr>
+<tr><td>3</td>
+<td>pset0(s2[&#8216;a&#8217;][&#8216;b&#8217;], [&#8216;c&#8217;], 4)</td>
+<td>{&#8230;s2[&#8216;a&#8217;][&#8216;b&#8217;], [&#8216;c&#8217;]: 4}</td>
+</tr>
+</tbody>
+</table>
+<p>Thus, the first time it will be called it will return a new object with the attributes of <tt class="docutils literal">s2</tt>
+but overriding its <tt class="docutils literal">'b'</tt> index with the return of the second call. The second call will return
+a new object with the attributes of <tt class="docutils literal"><span class="pre">s2['a']</span></tt> but override it&#8217;s <tt class="docutils literal">'c'</tt> index with the return
+of the third call. Finally, the 3rd call will return an object with the attributes of <tt class="docutils literal"><span class="pre">s2['a']['b']</span></tt>
+and setting the <tt class="docutils literal">'c'</tt> index to <tt class="docutils literal">4</tt>. The result will be as expected equal&nbsp;to:</p>
+<div class="highlight"><pre><span></span><span class="p">{</span><span class="nx">a0</span><span class="o">:</span><span class="w"> </span><span class="mf">0</span><span class="p">,</span><span class="w"> </span><span class="nx">a</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="nx">b0</span><span class="o">:</span><span class="w"> </span><span class="mf">0</span><span class="p">,</span><span class="w"> </span><span class="nx">b</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="nx">c0</span><span class="o">:</span><span class="w"> </span><span class="mf">0</span><span class="p">,</span><span class="w"> </span><span class="nx">c</span><span class="o">:</span><span class="w"> </span><span class="mf">4</span><span class="w"> </span><span class="p">}}}</span>
+</pre></div>
+<p>Now that we&#8217;ve understood the logic we can extend the above function with the following&nbsp;extras:</p>
+<ul class="simple">
+<li>support for arrays in the object using numerical&nbsp;indeces</li>
+<li>support for array (<tt class="docutils literal">['a', 'b']</tt>) or string path (<tt class="docutils literal">'a.b'</tt>)&nbsp;parameter</li>
+<li>support for a direct value to set on the path or a function that will be applied on that&nbsp;value</li>
+</ul>
+<p>Here&#8217;s the resulting set&nbsp;lens:</p>
+<div class="highlight"><pre><span></span><span class="kd">const</span><span class="w"> </span><span class="nx">pset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">obj</span><span class="p">,</span><span class="w"> </span><span class="nx">path</span><span class="p">,</span><span class="w"> </span><span class="nx">val</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kd">let</span><span class="w"> </span><span class="nx">parts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="ow">typeof</span><span class="w"> </span><span class="nx">path</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">&#39;string&#39;</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nx">path</span><span class="w"> </span><span class="ow">instanceof</span><span class="w"> </span><span class="nb">String</span><span class="p">)</span><span class="o">?</span><span class="nx">path</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span><span class="o">:</span><span class="nx">path</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">cset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">obj</span><span class="p">,</span><span class="w"> </span><span class="nx">cidx</span><span class="p">,</span><span class="w"> </span><span class="nx">val</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="nx">newval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">val</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="ow">typeof</span><span class="w"> </span><span class="nx">val</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s2">&quot;function&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nx">newval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">val</span><span class="p">(</span><span class="nx">obj</span><span class="p">[</span><span class="nx">cidx</span><span class="p">])</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="nb">Array</span><span class="p">.</span><span class="nx">isArray</span><span class="p">(</span><span class="nx">obj</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">...</span><span class="nx">obj</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span><span class="w"> </span><span class="nx">cidx</span><span class="o">*</span><span class="mf">1</span><span class="p">),</span>
+<span class="w">        </span><span class="nx">newval</span><span class="p">,</span>
+<span class="w">        </span><span class="p">...</span><span class="nx">obj</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="nx">cidx</span><span class="o">*</span><span class="mf">1</span><span class="o">+</span><span class="mf">1</span><span class="p">)</span>
+<span class="w">        </span><span class="p">]</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="p">...</span><span class="nx">obj</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="nx">cidx</span><span class="p">]</span><span class="o">:</span><span class="w"> </span><span class="nx">newval</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="kd">let</span><span class="w"> </span><span class="nx">pidx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">parts</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span>
+<span class="w">  </span><span class="k">if</span><span class="p">(</span><span class="nx">parts</span><span class="p">.</span><span class="nx">length</span><span class="o">==</span><span class="mf">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">cset</span><span class="p">(</span><span class="nx">obj</span><span class="p">,</span><span class="w"> </span><span class="nx">pidx</span><span class="p">,</span><span class="w"> </span><span class="nx">val</span><span class="p">)</span>
+<span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="nx">remaining</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">parts</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">cset</span><span class="p">(</span><span class="nx">obj</span><span class="p">,</span><span class="w"> </span><span class="nx">pidx</span><span class="p">,</span><span class="w"> </span><span class="nx">pset</span><span class="p">(</span><span class="nx">obj</span><span class="p">[</span><span class="nx">pidx</span><span class="p">],</span><span class="w"> </span><span class="nx">remaining</span><span class="p">,</span><span class="w"> </span><span class="nx">val</span><span class="p">))</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+<p>It may seem a little complex but I think it&#8217;s easy to be understood: The parts in the beginning
+will just check to see if the path is an array or a string and split the string to its parts.
+The <tt class="docutils literal">cset</tt> function that follows is a local function that is used to make the copy of the object
+or array and set the new value. Here&#8217;s how it is working: It will first check to see if the <tt class="docutils literal">val</tt>
+parameter is a function or a not. If it is a function it will apply this function to the object&#8217;s index
+to get the <tt class="docutils literal">newvalue</tt> else it will just use <tt class="docutils literal">val</tt> as the <tt class="docutils literal">newvalue</tt>. After that it checks if the
+object it got is an array or not. If it is an array it will do the slice trick we saw before to copy
+the elements of the array except the <tt class="docutils literal">newval</tt> which will put it at the index (notice that the index
+at that point must be numerical but that&#8217;s up to you to assert). If the current <tt class="docutils literal">obj</tt> is not an array
+then it must be an object thus it uses the spread syntax to copy the object&#8217;s attributes and reassign
+the current index to <tt class="docutils literal">newval</tt>.</p>
+<p>The last part of <tt class="docutils literal">pset</tt> is similar to the <tt class="docutils literal">pset0</tt> it just uses <tt class="docutils literal">cset</tt> to do the new object/array
+generation instead of doing it in place like <tt class="docutils literal">pset0</tt> - as already explained, <tt class="docutils literal">pset</tt> is called recursively
+until only one element remains on the path in which case the <tt class="docutils literal">newval</tt> will be assigned to the current index of
+the current <tt class="docutils literal">obj</tt>.</p>
+<p>Let&#8217;s try to use <tt class="docutils literal">pset</tt> for the following rather complex&nbsp;state:</p>
+<div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="nx">state2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="s1">&#39;users&#39;</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="s1">&#39;results&#39;</span><span class="o">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Sera&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;groups&#39;</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">&#39;g1&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;g2&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;g3&#39;</span><span class="p">]},</span>
+<span class="w">      </span><span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;John&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;groups&#39;</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">&#39;g1&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;g2&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;g3&#39;</span><span class="p">]},</span>
+<span class="w">      </span><span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Joe&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;groups&#39;</span><span class="o">:</span><span class="w"> </span><span class="p">[]}</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="s1">&#39;pagination&#39;</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="s1">&#39;total&#39;</span><span class="o">:</span><span class="w"> </span><span class="mf">100</span><span class="p">,</span>
+<span class="w">      </span><span class="s1">&#39;perpage&#39;</span><span class="o">:</span><span class="w"> </span><span class="mf">5</span><span class="p">,</span>
+<span class="w">      </span><span class="s1">&#39;number&#39;</span><span class="o">:</span><span class="w"> </span><span class="mf">0</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="s1">&#39;groups&#39;</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="s1">&#39;results&#39;</span><span class="o">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="w">    </span><span class="p">,</span>
+<span class="w">    </span><span class="s1">&#39;total&#39;</span><span class="o">:</span><span class="w"> </span><span class="mf">0</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+<p>Let&#8217;s call it three times one after the other to change various&nbsp;attributes:</p>
+<div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="nx">new_state2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">pset</span><span class="p">(</span>
+<span class="w">    </span><span class="nx">pset</span><span class="p">(</span>
+<span class="w">        </span><span class="nx">pset</span><span class="p">(</span>
+<span class="w">            </span><span class="nx">pset</span><span class="p">(</span><span class="nx">state2</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;users.results.2.groups.0&quot;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;aa&#39;</span><span class="p">),</span>
+<span class="w">        </span><span class="s2">&quot;users.results.0.name&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">x</span><span class="p">=&gt;</span><span class="nx">x</span><span class="p">.</span><span class="nx">toUpperCase</span><span class="p">()),</span>
+<span class="w">    </span><span class="s2">&quot;users.total&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">x</span><span class="p">=&gt;</span><span class="nx">x</span><span class="o">+</span><span class="mf">1</span><span class="p">),</span>
+<span class="s1">&#39;users.results.1.name&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;Jack&#39;</span><span class="p">)</span>
+</pre></div>
+<p>And here&#8217;s the&nbsp;result:</p>
+<div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">    </span><span class="s2">&quot;users&quot;</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="s2">&quot;results&quot;</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span>
+<span class="w">            </span><span class="s2">&quot;name&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;SERA&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;groups&quot;</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;g1&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;g2&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;g3&quot;</span><span class="p">]</span>
+<span class="w">        </span><span class="p">},</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="s2">&quot;name&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;Jack&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;groups&quot;</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;g1&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;g2&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;g3&quot;</span><span class="p">]</span>
+<span class="w">        </span><span class="p">},</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="s2">&quot;name&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;Joe&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;groups&quot;</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;aa&quot;</span><span class="p">]</span>
+<span class="w">        </span><span class="p">}],</span>
+<span class="w">        </span><span class="s2">&quot;pagination&quot;</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="s2">&quot;total&quot;</span><span class="o">:</span><span class="w"> </span><span class="mf">101</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;perpage&quot;</span><span class="o">:</span><span class="w"> </span><span class="mf">5</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;number&quot;</span><span class="o">:</span><span class="w"> </span><span class="mf">0</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="s2">&quot;groups&quot;</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="s2">&quot;results&quot;</span><span class="o">:</span><span class="w"> </span><span class="p">[],</span>
+<span class="w">        </span><span class="s2">&quot;total&quot;</span><span class="o">:</span><span class="w"> </span><span class="mf">0</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+<p>This should be self&nbsp;explanatory.</p>
+<p>I&#8217;ve published the above immutable little helpers as an npm package: <a class="reference external" href="https://www.npmjs.com/package/poor-man-lens">https://www.npmjs.com/package/poor-man-lens</a> (yes I
+decided to use the poor man lens name instead of the immutable little helpers) - they are too simple and could be easily
+copied and pasted to your project but I&#8217;ve seen even smaller npm packages and I wanted to try to see if it is easy to
+publish a package to npm (answer: it is very easy - easier than python&#8217;s pip). Also there&#8217;s a github repository for
+these utils in case somebody wants to contribute anything or look at the source: <a class="reference external" href="https://github.com/spapas/poor-man-lens">https://github.com/spapas/poor-man-lens</a>.</p>
+<p>Notice that this package has been written in <span class="caps">ES5</span> (and actually has a polyfil for Object.assign) thus you should probably
+be able to use it anywhere you want, even directly from the browser by directly including the <tt class="docutils literal">pml.js</tt> file.</p>
+</div>
+<div class="section" id="conclusion">
+<h2>Conclusion</h2>
+<p>Using the above techniques you should be able to easily keep your state objects immutable. For simple cases you
+can stick to the spread syntax or Object.assign / Array.slice but for more complex cases you may want to consider
+either copying directly the pset and pget utils I explained above or just using the <a class="reference external" href="https://www.npmjs.com/package/poor-man-lens">poor-man-lens npm package</a>.</p>
+</div>
+</div>
+    <footer>
+<p class="meta">
+  <span class="byline author vcard">
+    Posted by <span class="fn">
+        Serafeim Papastefanos
+    </span>
+  </span>
+<time datetime="2018-04-05T12:20:00+03:00" pubdate>Thu 05 April 2018</time>  <span class="categories">
+    <a class='category' href='https://www.spapas.net/category/javascript.html'>javascript</a>
+  </span>
+  <span class="categories">
+    <a class="category" href="https://www.spapas.net/tag/javascript.html">javascript</a>,    <a class="category" href="https://www.spapas.net/tag/react.html">react</a>,    <a class="category" href="https://www.spapas.net/tag/redux.html">redux</a>,    <a class="category" href="https://www.spapas.net/tag/hyperapp.html">hyperapp</a>,    <a class="category" href="https://www.spapas.net/tag/immutable.html">immutable</a>,    <a class="category" href="https://www.spapas.net/tag/es6.html">es6</a>  </span>
+</p><div class="sharing">
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="https://www.spapas.net/2018/04/05/easy-immutable-objects/" data-via="" data-counturl="https://www.spapas.net/2018/04/05/easy-immutable-objects/" >Tweet</a>
+</div>    </footer>
+  </article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript></div>
+  </section>
+</div>
+<aside class="sidebar">
+  
+  <section>
+    <br />
+    <a href='/feeds/all.atom.xml'>Atom</a>
+    |
+    <a href='/feeds/all.rss.xml'>RSS</a>
+  </section>
+
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <!-- Sidebar unit -->
+  <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7673322832689008" data-ad-slot="2720624730"
+    data-ad-format="auto" data-full-width-responsive="true"></ins>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+
+
+  <script async src="https://cse.google.com/cse.js?cx=612920e5ca9da850c"></script>
+  <div class="gcse-search"></div>
+
+  
+  <section>
+    <h1>Support me</h1>
+
+    You can show your appreciation for anything useful you've found here by 
+    buying me a coffee 
+    <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="spapas" data-color="#FFDD00" data-emoji=""  data-font="Lato" data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff" ></script>
+
+    or donating me some bitcoin to this address:
+    <small><pre>bc1qx42vp8napheaewhnx0rk0mttdrdrtvw6czvxhl</pre></small>
+    <svg shape-rendering="crispEdges" height="200" width="200" viewBox="0 0 29 29" class="qrcode">
+      <path fill="#FFFFFF" d="M0,0 h29v29H0z"></path><path fill="#000000" d="M0 0h7v1H0zM9 0h2v1H9zM12 0h1v1H12zM14 0h2v1H14zM18 0h2v1H18zM22,0 h7v1H22zM0 1h1v1H0zM6 1h1v1H6zM8 1h1v1H8zM11 1h1v1H11zM14 1h5v1H14zM22 1h1v1H22zM28,1 h1v1H28zM0 2h1v1H0zM2 2h3v1H2zM6 2h1v1H6zM8 2h4v1H8zM17 2h1v1H17zM22 2h1v1H22zM24 2h3v1H24zM28,2 h1v1H28zM0 3h1v1H0zM2 3h3v1H2zM6 3h1v1H6zM9 3h2v1H9zM14 3h3v1H14zM18 3h1v1H18zM22 3h1v1H22zM24 3h3v1H24zM28,3 h1v1H28zM0 4h1v1H0zM2 4h3v1H2zM6 4h1v1H6zM8 4h1v1H8zM11 4h1v1H11zM13 4h1v1H13zM15 4h2v1H15zM18 4h1v1H18zM22 4h1v1H22zM24 4h3v1H24zM28,4 h1v1H28zM0 5h1v1H0zM6 5h1v1H6zM8 5h2v1H8zM14 5h2v1H14zM19 5h2v1H19zM22 5h1v1H22zM28,5 h1v1H28zM0 6h7v1H0zM8 6h1v1H8zM10 6h1v1H10zM12 6h1v1H12zM14 6h1v1H14zM16 6h1v1H16zM18 6h1v1H18zM20 6h1v1H20zM22,6 h7v1H22zM8 7h2v1H8zM11 7h1v1H11zM15 7h1v1H15zM17 7h2v1H17zM0 8h2v1H0zM3 8h1v1H3zM6 8h2v1H6zM10 8h1v1H10zM12 8h3v1H12zM20 8h1v1H20zM22 8h3v1H22zM26 8h2v1H26zM1 9h1v1H1zM3 9h3v1H3zM8 9h1v1H8zM10 9h1v1H10zM12 9h2v1H12zM16 9h2v1H16zM20 9h1v1H20zM22 9h1v1H22zM25 9h1v1H25zM27,9 h2v1H27zM0 10h1v1H0zM3 10h2v1H3zM6 10h1v1H6zM8 10h3v1H8zM12 10h2v1H12zM16 10h1v1H16zM19 10h1v1H19zM22 10h3v1H22zM27 10h1v1H27zM0 11h1v1H0zM2 11h1v1H2zM4 11h2v1H4zM7 11h1v1H7zM13 11h4v1H13zM18 11h4v1H18zM26 11h2v1H26zM0 12h1v1H0zM2 12h3v1H2zM6 12h1v1H6zM11 12h1v1H11zM13 12h1v1H13zM15 12h3v1H15zM20 12h1v1H20zM22 12h2v1H22zM27,12 h2v1H27zM4 13h1v1H4zM8 13h3v1H8zM12 13h1v1H12zM14 13h1v1H14zM17 13h4v1H17zM25 13h2v1H25zM0 14h1v1H0zM4 14h3v1H4zM8 14h2v1H8zM11 14h3v1H11zM16 14h1v1H16zM21 14h2v1H21zM24,14 h5v1H24zM3 15h3v1H3zM7 15h2v1H7zM10 15h1v1H10zM12 15h2v1H12zM15 15h1v1H15zM17 15h2v1H17zM20 15h2v1H20zM23 15h1v1H23zM1 16h1v1H1zM4 16h1v1H4zM6 16h4v1H6zM16 16h2v1H16zM20 16h1v1H20zM23 16h1v1H23zM25 16h1v1H25zM28,16 h1v1H28zM2 17h1v1H2zM5 17h1v1H5zM7 17h2v1H7zM11 17h3v1H11zM17 17h1v1H17zM22 17h1v1H22zM25 17h1v1H25zM27,17 h2v1H27zM0 18h1v1H0zM3 18h1v1H3zM5 18h4v1H5zM10 18h1v1H10zM12 18h1v1H12zM18 18h1v1H18zM20 18h1v1H20zM22 18h2v1H22zM25,18 h4v1H25zM2 19h3v1H2zM8 19h1v1H8zM16 19h2v1H16zM21 19h1v1H21zM23 19h1v1H23zM25 19h1v1H25zM27 19h1v1H27zM0 20h1v1H0zM2 20h5v1H2zM8 20h2v1H8zM13 20h4v1H13zM19 20h6v1H19zM26 20h1v1H26zM28,20 h1v1H28zM8 21h2v1H8zM12 21h3v1H12zM16 21h1v1H16zM20 21h1v1H20zM24 21h1v1H24zM26,21 h3v1H26zM0 22h7v1H0zM8 22h3v1H8zM17 22h1v1H17zM20 22h1v1H20zM22 22h1v1H22zM24 22h2v1H24zM27 22h1v1H27zM0 23h1v1H0zM6 23h1v1H6zM10 23h2v1H10zM13 23h2v1H13zM19 23h2v1H19zM24,23 h5v1H24zM0 24h1v1H0zM2 24h3v1H2zM6 24h1v1H6zM9 24h2v1H9zM12 24h2v1H12zM17 24h1v1H17zM20 24h6v1H20zM28,24 h1v1H28zM0 25h1v1H0zM2 25h3v1H2zM6 25h1v1H6zM8 25h3v1H8zM12 25h1v1H12zM14 25h1v1H14zM18 25h1v1H18zM22 25h3v1H22zM26 25h1v1H26zM0 26h1v1H0zM2 26h3v1H2zM6 26h1v1H6zM10 26h5v1H10zM16 26h3v1H16zM21 26h1v1H21zM24 26h1v1H24zM26 26h1v1H26zM28,26 h1v1H28zM0 27h1v1H0zM6 27h1v1H6zM8 27h3v1H8zM12 27h4v1H12zM17 27h1v1H17zM20 27h1v1H20zM23 27h2v1H23zM27 27h1v1H27zM0 28h7v1H0zM8 28h3v1H8zM14 28h1v1H14zM16 28h3v1H16zM20 28h1v1H20zM22 28h1v1H22zM24 28h2v1H24zM27 28h1v1H27z"></path>
+    </svg>
+  </section>
+  
+
+  <section>
+    <h1>Subscribe</h1>
+    Do you want to get notified via email when I post new content?
+    <style>
+      .subscribe-button {
+        /* margin: 10px !important; */
+        padding: 10px !important;
+        background-color: black;
+        display: inline-block;
+        color: white !important;
+        text-decoration: none;
+
+        line-height: 36px !important;
+        height: 37px !important;
+        text-decoration: none !important;
+        display: inline-block !important;
+        color: #ffffff !important;
+        background-color: #000000 !important;
+        border-radius: 3px !important;
+        border: 1px solid transparent !important;
+        padding: 1px 9px !important;
+        font-size: 23px !important;
+        letter-spacing: 0.6px !important;
+        box-shadow: 0px 1px 2px rgba(190, 190, 190, 0.5) !important;
+        -webkit-box-shadow: 0px 1px 2px 2px rgba(190, 190, 190, 0.5) !important;
+        margin: 0 auto !important;
+        font-family: 'Cookie', cursive !important;
+        -webkit-box-sizing: border-box !important;
+        box-sizing: border-box !important;
+        -o-transition: 0.3s all linear !important;
+        -webkit-transition: 0.3s all linear !important;
+        -moz-transition: 0.3s all linear !important;
+        -ms-transition: 0.3s all linear !important;
+        transition: 0.3s all linear !important;
+
+      }
+    </style>
+    <a class='subscribe-button' target="_blank" href="http://eepurl.com/dxI3PP">Click here to subscribe!</a>
+  </section>
+
+
+  <section>
+    <h1>Recent Posts</h1>
+    <ul id="recent_posts">
+      <li class="post">
+        <a href="https://www.spapas.net/2024/08/22/multiple-erl-elixir-windows/">Multiple Erlang/Elixir versions in Windows</a>
+      </li>
+      <li class="post">
+        <a href="https://www.spapas.net/2023/11/29/openid-connect-tutorial/">A simple OpenID connect tutorial</a>
+      </li>
+      <li class="post">
+        <a href="https://www.spapas.net/2023/05/23/simple-django-datatables-integration/">Simple Django - DataTables integration</a>
+      </li>
+      <li class="post">
+        <a href="https://www.spapas.net/2023/05/22/ai-auto-subtitling/">AI auto-subtitling</a>
+      </li>
+      <li class="post">
+        <a href="https://www.spapas.net/2023/05/12/disable-your-forms/">HTML form disable after submit</a>
+      </li>
+    </ul>
+  </section>
+  <section>
+
+    <h1>Categories</h1>
+    <ul id="recent_posts">
+      <li><a href="https://www.spapas.net/category/ai.html">ai</a></li>
+      <li><a href="https://www.spapas.net/category/android.html">android</a></li>
+      <li><a href="https://www.spapas.net/category/clojure.html">clojure</a></li>
+      <li><a href="https://www.spapas.net/category/css.html">css</a></li>
+      <li><a href="https://www.spapas.net/category/django.html">django</a></li>
+      <li><a href="https://www.spapas.net/category/elixir.html">elixir</a></li>
+      <li><a href="https://www.spapas.net/category/flask.html">flask</a></li>
+      <li><a href="https://www.spapas.net/category/gaming.html">gaming</a></li>
+      <li><a href="https://www.spapas.net/category/git.html">git</a></li>
+      <li><a href="https://www.spapas.net/category/html.html">html</a></li>
+      <li><a href="https://www.spapas.net/category/javascript.html">javascript</a></li>
+      <li><a href="https://www.spapas.net/category/networking.html">networking</a></li>
+      <li><a href="https://www.spapas.net/category/pelican.html">pelican</a></li>
+      <li><a href="https://www.spapas.net/category/postgresql.html">postgresql</a></li>
+      <li><a href="https://www.spapas.net/category/python.html">python</a></li>
+      <li><a href="https://www.spapas.net/category/spring.html">spring</a></li>
+      <li><a href="https://www.spapas.net/category/unix.html">unix</a></li>
+      <li><a href="https://www.spapas.net/category/wagtail.html">wagtail</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Tags</h1>
+    <a href="https://www.spapas.net/tag/erlang.html">erlang</a>,    <a href="https://www.spapas.net/tag/elixir.html">elixir</a>,    <a href="https://www.spapas.net/tag/windows.html">windows</a>,    <a href="https://www.spapas.net/tag/openid.html">openid</a>,    <a href="https://www.spapas.net/tag/openid-connect.html">openid-connect</a>,    <a href="https://www.spapas.net/tag/oidc.html">oidc</a>,    <a href="https://www.spapas.net/tag/http.html">http</a>,    <a href="https://www.spapas.net/tag/keycloak.html">keycloak</a>,    <a href="https://www.spapas.net/tag/python.html">python</a>,    <a href="https://www.spapas.net/tag/django.html">django</a>,    <a href="https://www.spapas.net/tag/jquery.html">jquery</a>,    <a href="https://www.spapas.net/tag/datatables.html">datatables</a>,    <a href="https://www.spapas.net/tag/ai.html">ai</a>,    <a href="https://www.spapas.net/tag/whisper.html">whisper</a>,    <a href="https://www.spapas.net/tag/whispercpp.html">whisper.cpp</a>,    <a href="https://www.spapas.net/tag/subtitles.html">subtitles</a>,    <a href="https://www.spapas.net/tag/video.html">video</a>,    <a href="https://www.spapas.net/tag/auto-subtitling.html">auto-subtitling</a>,    <a href="https://www.spapas.net/tag/subtitiling.html">subtitiling</a>,    <a href="https://www.spapas.net/tag/transcribe.html">transcribe</a>,    <a href="https://www.spapas.net/tag/html.html">html</a>,    <a href="https://www.spapas.net/tag/javascript.html">javascript</a>,    <a href="https://www.spapas.net/tag/media.html">media</a>,    <a href="https://www.spapas.net/tag/storage.html">storage</a>,    <a href="https://www.spapas.net/tag/unpoly.html">unpoly</a>,    <a href="https://www.spapas.net/tag/access.html">access</a>,    <a href="https://www.spapas.net/tag/database.html">database</a>,    <a href="https://www.spapas.net/tag/accdb.html">accdb</a>,    <a href="https://www.spapas.net/tag/mdb.html">mdb</a>,    <a href="https://www.spapas.net/tag/postgresql.html">postgresql</a>,    <a href="https://www.spapas.net/tag/development.html">development</a>,    <a href="https://www.spapas.net/tag/inlines.html">inlines</a>,    <a href="https://www.spapas.net/tag/clojure.html">clojure</a>,    <a href="https://www.spapas.net/tag/cmd.html">cmd</a>,    <a href="https://www.spapas.net/tag/pdf.html">pdf</a>,    <a href="https://www.spapas.net/tag/wkhtmltopdf.html">wkhtmltopdf</a>,    <a href="https://www.spapas.net/tag/forward-proxy.html">forward-proxy</a>,    <a href="https://www.spapas.net/tag/reverse-proxy.html">reverse-proxy</a>,    <a href="https://www.spapas.net/tag/proxy.html">proxy</a>,    <a href="https://www.spapas.net/tag/networking.html">networking</a>,    <a href="https://www.spapas.net/tag/dj-rest-auth.html">dj-rest-auth</a>,    <a href="https://www.spapas.net/tag/rest.html">rest</a>,    <a href="https://www.spapas.net/tag/django-rest-framework.html">django-rest-framework</a>,    <a href="https://www.spapas.net/tag/authentication.html">authentication</a>,    <a href="https://www.spapas.net/tag/tokens.html">tokens</a>,    <a href="https://www.spapas.net/tag/migrations.html">migrations</a>,    <a href="https://www.spapas.net/tag/foreignkey.html">foreignkey</a>,    <a href="https://www.spapas.net/tag/dark-souls.html">dark-souls</a>,    <a href="https://www.spapas.net/tag/dark-souls-2.html">dark-souls-2</a>,    <a href="https://www.spapas.net/tag/dark-souls-3.html">dark-souls-3</a>,    <a href="https://www.spapas.net/tag/autohotkey.html">autohotkey</a>,    <a href="https://www.spapas.net/tag/matplotlib.html">matplotlib</a>,    <a href="https://www.spapas.net/tag/hashids.html">hashids</a>,    <a href="https://www.spapas.net/tag/wagtail.html">wagtail</a>,    <a href="https://www.spapas.net/tag/osmon.html">osmon</a>,    <a href="https://www.spapas.net/tag/phoenix.html">phoenix</a>,    <a href="https://www.spapas.net/tag/os-monitoring.html">os-monitoring</a>,    <a href="https://www.spapas.net/tag/forms.html">forms</a>,    <a href="https://www.spapas.net/tag/django-crispy-forms.html">django-crispy-forms</a>,    <a href="https://www.spapas.net/tag/django-widget-tweaks.html">django-widget-tweaks</a>,    <a href="https://www.spapas.net/tag/ecto.html">ecto</a>,    <a href="https://www.spapas.net/tag/queries.html">queries</a>,    <a href="https://www.spapas.net/tag/declarative.html">declarative</a>,    <a href="https://www.spapas.net/tag/form.html">form</a>,    <a href="https://www.spapas.net/tag/php.html">php</a>,    <a href="https://www.spapas.net/tag/select2.html">select2</a>,    <a href="https://www.spapas.net/tag/autocompelte.html">autocompelte</a>,    <a href="https://www.spapas.net/tag/ajax.html">ajax</a>,    <a href="https://www.spapas.net/tag/android.html">android</a>,    <a href="https://www.spapas.net/tag/kotlin.html">kotlin</a>,    <a href="https://www.spapas.net/tag/adapter.html">adapter</a>,    <a href="https://www.spapas.net/tag/filter.html">filter</a>,    <a href="https://www.spapas.net/tag/async.html">async</a>,    <a href="https://www.spapas.net/tag/tasks.html">tasks</a>,    <a href="https://www.spapas.net/tag/django-rq.html">django-rq</a>,    <a href="https://www.spapas.net/tag/rq.html">rq</a>,    <a href="https://www.spapas.net/tag/du.html">du</a>,    <a href="https://www.spapas.net/tag/unix.html">unix</a>,    <a href="https://www.spapas.net/tag/linux.html">linux</a>,    <a href="https://www.spapas.net/tag/disk-usage.html">disk-usage</a>,    <a href="https://www.spapas.net/tag/cbv.html">cbv</a>,    <a href="https://www.spapas.net/tag/middleware.html">middleware</a>,    <a href="https://www.spapas.net/tag/class-based-views.html">class-based-views</a>,    <a href="https://www.spapas.net/tag/react.html">react</a>,    <a href="https://www.spapas.net/tag/redux.html">redux</a>,    <a href="https://www.spapas.net/tag/hyperapp.html">hyperapp</a>,    <a href="https://www.spapas.net/tag/immutable.html">immutable</a>,    <a href="https://www.spapas.net/tag/es6.html">es6</a>,    <a href="https://www.spapas.net/tag/youtube.html">youtube</a>,    <a href="https://www.spapas.net/tag/youtube-dl.html">youtube-dl</a>,    <a href="https://www.spapas.net/tag/ffmpeg.html">ffmpeg</a>,    <a href="https://www.spapas.net/tag/django-rest-auth.html">django-rest-auth</a>,    <a href="https://www.spapas.net/tag/python-2.html">python-2</a>,    <a href="https://www.spapas.net/tag/python-3.html">python-3</a>,    <a href="https://www.spapas.net/tag/plpgsql.html">plpgsql</a>,    <a href="https://www.spapas.net/tag/component.html">component</a>,    <a href="https://www.spapas.net/tag/ag-grid.html">ag-grid</a>,    <a href="https://www.spapas.net/tag/grid.html">grid</a>,    <a href="https://www.spapas.net/tag/bash.html">bash</a>,    <a href="https://www.spapas.net/tag/cron.html">cron</a>,    <a href="https://www.spapas.net/tag/pandas.html">pandas</a>,    <a href="https://www.spapas.net/tag/scipy.html">scipy</a>,    <a href="https://www.spapas.net/tag/numpy.html">numpy</a>,    <a href="https://www.spapas.net/tag/pivot.html">pivot</a>,    <a href="https://www.spapas.net/tag/pivot_table.html">pivot_table</a>,    <a href="https://www.spapas.net/tag/ipython.html">ipython</a>,    <a href="https://www.spapas.net/tag/jupyter.html">jupyter</a>,    <a href="https://www.spapas.net/tag/notebook.html">notebook</a>,    <a href="https://www.spapas.net/tag/query.html">query</a>,    <a href="https://www.spapas.net/tag/q.html">q</a>,    <a href="https://www.spapas.net/tag/imgur.html">imgur</a>,    <a href="https://www.spapas.net/tag/console.html">console</a>,    <a href="https://www.spapas.net/tag/research.html">research</a>,    <a href="https://www.spapas.net/tag/debug.html">debug</a>,    <a href="https://www.spapas.net/tag/werkzeug.html">werkzeug</a>,    <a href="https://www.spapas.net/tag/django-extensions.html">django-extensions</a>,    <a href="https://www.spapas.net/tag/404.html">404</a>,    <a href="https://www.spapas.net/tag/error.html">error</a>,    <a href="https://www.spapas.net/tag/spring.html">spring</a>,    <a href="https://www.spapas.net/tag/spring-boot.html">spring-boot</a>,    <a href="https://www.spapas.net/tag/java.html">java</a>,    <a href="https://www.spapas.net/tag/ldap.html">ldap</a>,    <a href="https://www.spapas.net/tag/profiles.html">profiles</a>,    <a href="https://www.spapas.net/tag/settings.html">settings</a>,    <a href="https://www.spapas.net/tag/properties.html">properties</a>,    <a href="https://www.spapas.net/tag/yaml.html">yaml</a>,    <a href="https://www.spapas.net/tag/configuration.html">configuration</a>,    <a href="https://www.spapas.net/tag/deploy.html">deploy</a>,    <a href="https://www.spapas.net/tag/initd.html">init.d</a>,    <a href="https://www.spapas.net/tag/react-redux.html">react-redux</a>,    <a href="https://www.spapas.net/tag/redux-thunk.html">redux-thunk</a>,    <a href="https://www.spapas.net/tag/redux-form.html">redux-form</a>,    <a href="https://www.spapas.net/tag/react-router.html">react-router</a>,    <a href="https://www.spapas.net/tag/react-router-redux.html">react-router-redux</a>,    <a href="https://www.spapas.net/tag/react-notification.html">react-notification</a>,    <a href="https://www.spapas.net/tag/history.html">history</a>,    <a href="https://www.spapas.net/tag/babel.html">babel</a>,    <a href="https://www.spapas.net/tag/babelify.html">babelify</a>,    <a href="https://www.spapas.net/tag/browserify.html">browserify</a>,    <a href="https://www.spapas.net/tag/watchify.html">watchify</a>,    <a href="https://www.spapas.net/tag/uglify.html">uglify</a>,    <a href="https://www.spapas.net/tag/boilerplate.html">boilerplate</a>,    <a href="https://www.spapas.net/tag/tutorial.html">tutorial</a>,    <a href="https://www.spapas.net/tag/introduction.html">introduction</a>,    <a href="https://www.spapas.net/tag/fixed-data-tables.html">fixed-data-tables</a>,    <a href="https://www.spapas.net/tag/fixeddatatable.html">FixedDataTable</a>,    <a href="https://www.spapas.net/tag/reportlab.html">reportlab</a>,    <a href="https://www.spapas.net/tag/xhtml2pdf.html">xhtml2pdf</a>,    <a href="https://www.spapas.net/tag/node.html">node</a>,    <a href="https://www.spapas.net/tag/npm.html">npm</a>,    <a href="https://www.spapas.net/tag/generic.html">generic</a>,    <a href="https://www.spapas.net/tag/tables.html">tables</a>,    <a href="https://www.spapas.net/tag/flux.html">flux</a>,    <a href="https://www.spapas.net/tag/jobs.html">jobs</a>,    <a href="https://www.spapas.net/tag/asynchronous.html">asynchronous</a>,    <a href="https://www.spapas.net/tag/scheduling.html">scheduling</a>,    <a href="https://www.spapas.net/tag/redis.html">redis</a>,    <a href="https://www.spapas.net/tag/pusher.html">pusher</a>,    <a href="https://www.spapas.net/tag/auditing.html">auditing</a>,    <a href="https://www.spapas.net/tag/css.html">css</a>,    <a href="https://www.spapas.net/tag/design.html">design</a>,    <a href="https://www.spapas.net/tag/boostrap-material-design.html">boostrap-material-design</a>,    <a href="https://www.spapas.net/tag/less.html">less</a>,    <a href="https://www.spapas.net/tag/nodejs.html">node.js</a>,    <a href="https://www.spapas.net/tag/gmail.html">gmail</a>,    <a href="https://www.spapas.net/tag/security.html">security</a>,    <a href="https://www.spapas.net/tag/google.html">google</a>,    <a href="https://www.spapas.net/tag/flask.html">flask</a>,    <a href="https://www.spapas.net/tag/mongodb.html">mongodb</a>,    <a href="https://www.spapas.net/tag/heroku.html">heroku</a>,    <a href="https://www.spapas.net/tag/spring-security.html">spring-security</a>,    <a href="https://www.spapas.net/tag/git.html">git</a>,    <a href="https://www.spapas.net/tag/github.html">github</a>,    <a href="https://www.spapas.net/tag/branching.html">branching</a>,    <a href="https://www.spapas.net/tag/static-html.html">static-html</a>,    <a href="https://www.spapas.net/tag/githubio.html">github.io</a>,    <a href="https://www.spapas.net/tag/pelican.html">pelican</a>,    <a href="https://www.spapas.net/tag/github-pages.html">github-pages</a>,    <a href="https://www.spapas.net/tag/rst.html">rst</a>  </section>
+
+  <section>
+    <h1>Yearly archives</h1>
+    <a href="https://www.spapas.net/posts/2013/">2013</a>,    <a href="https://www.spapas.net/posts/2014/">2014</a>,    <a href="https://www.spapas.net/posts/2015/">2015</a>,    <a href="https://www.spapas.net/posts/2016/">2016</a>,    <a href="https://www.spapas.net/posts/2017/">2017</a>,    <a href="https://www.spapas.net/posts/2018/">2018</a>,    <a href="https://www.spapas.net/posts/2019/">2019</a>,    <a href="https://www.spapas.net/posts/2020/">2020</a>,    <a href="https://www.spapas.net/posts/2021/">2021</a>,    <a href="https://www.spapas.net/posts/2022/">2022</a>,    <a href="https://www.spapas.net/posts/2023/">2023</a>,    <a href="https://www.spapas.net/posts/2024/">2024</a>  </section>
+
+
+
+  <section>
+    <h1>GitHub Repos</h1>
+    <ul id="gh_repos">
+      <li class="loading">Status updating...</li>
+    </ul>
+      <a href="https://github.com/spapas">@spapas</a> on GitHub
+    <script  src="//code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      $(function(){
+          if (!window.jXHR){
+              var jxhr = document.createElement('script');
+              jxhr.type = 'text/javascript';
+              jxhr.src = 'https://www.spapas.net/theme/js/jXHR.js';
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(jxhr, s);
+          }
+
+          github.showRepos({
+              user: 'spapas',
+              count: 5,
+              skip_forks: true,
+              target: '#gh_repos'
+          });
+      });
+    </script>
+    <script src="https://www.spapas.net/theme/js/github.js" type="text/javascript"> </script>
+  </section>
+
+
+  <section>
+    <a href="https://twitter.com/_serafeim_?ref_src=twsrc%5Etfw" class="twitter-follow-button"
+      data-show-count="false">Follow @_serafeim_</a>
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+  </section>
+
+</aside>    </div>
+  </div>
+  <footer role="contentinfo"><p>
+    Copyright &copy;  2013&ndash;2024  Serafeim Papastefanos &mdash;
+  <span class="credit">Powered by <a href="http://getpelican.com">Pelican</a></span>
+</p></footer>
+  <script src="https://www.spapas.net/theme/js/modernizr-2.0.js"></script>
+  <script src="https://www.spapas.net/theme/js/ender.js"></script>
+  <script src="https://www.spapas.net/theme/js/octopress.js" type="text/javascript"></script>
+  <script src="https://www.spapas.net/theme/js/ads.js"></script>
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-44750952-1', 'auto');
+
+    ga('send', 'pageview');
+    </script>
+
+<script defer data-domain="spapas.net" src="https://plausible.hcg.gr/js/script.js"></script>  <script type="text/javascript">
+    var disqus_shortname = 'spapas-github-io';
+    var disqus_identifier = '/2018/04/05/easy-immutable-objects/';
+    var disqus_url = 'https://www.spapas.net/2018/04/05/easy-immutable-objects/';
+    var disqus_title = 'Easy immutable objects in&nbsp;Javascript';
+    (function() {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = "//" + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+     })();
+  </script>
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+</body>
+
+</html>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>/var/ - css</title><link href="https://spapas.github.io/" rel="alternate"></link><link href="https://spapas.github.io/feeds/css.atom.xml" rel="self"></link><id>https://spapas.github.io/</id><updated>2014-12-16T16:20:00+02:00</updated><subtitle>Various programming stuff</subtitle><entry><title>Change the primary color of bootstrap material design</title><link href="https://spapas.github.io/2014/12/16/change-bootstrap-material-primary-color/" rel="alternate"></link><published>2014-12-16T16:20:00+02:00</published><updated>2014-12-16T16:20:00+02:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2014-12-16:/2014/12/16/change-bootstrap-material-primary-color/</id><summary type="html">&lt;p class="first last"&gt;A tutorial to help users change the primary color of Bootstrap material&amp;nbsp;design&lt;/p&gt;
+</summary><content type="html">&lt;div class="section" id="introduction"&gt;
+&lt;h2&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://github.com/FezVrasta/bootstrap-material-design"&gt;Bootstrap Material Design&lt;/a&gt; is a great theme that sits on top of &lt;a class="reference external" href="http://getbootstrap.com/"&gt;Bootstrap&lt;/a&gt; and transforms it to
+&lt;a class="reference external" href="http://www.google.com/design/spec/material-design/introduction.html"&gt;Material Design&lt;/a&gt;! The great thing about Bootstrap Material Design is that you just need to include
+its css and js files after your Bootstrap files and&amp;nbsp;&amp;#8230;&lt;/p&gt;
+&lt;p&gt;boom! Your page is Material Design&amp;nbsp;compatible!&lt;/p&gt;
+&lt;object data="https://google.github.io/material-design-icons/action/svg/ic_thumb_up_24px.svg" type="image/svg+xml"&gt;&lt;/object&gt;
+&lt;p&gt;A nice feature of Bootstrap Material Design is that you can change its default color to a new one (I
+don&amp;#8217;t really like the current - greenish one). This is easy for people with less skills however I
+found it rather challenging when I tried it. That&amp;#8217;s why I will present a step by step tutorial on
+changing the default primary color of the Bootstrap Material Design&amp;nbsp;theme:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="step-1-get-the-code"&gt;
+&lt;h2&gt;Step 1: Get the&amp;nbsp;code&lt;/h2&gt;
+&lt;p&gt;Use git to make a local clone of the project with &lt;tt class="docutils literal"&gt;git clone &lt;span class="pre"&gt;https://github.com/FezVrasta/bootstrap-material-design.git&lt;/span&gt;&lt;/tt&gt;. This will create a directory
+named &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;bootstrap-material-design&lt;/span&gt;&lt;/tt&gt;. Or you can download the latest version of the code using (&lt;a class="reference external" href="https://github.com/FezVrasta/bootstrap-material-design/archive/master.zip"&gt;https://github.com/FezVrasta/bootstrap-material-design/archive/master.zip&lt;/a&gt;)
+and unzip it to the &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;bootstrap-material-design&lt;/span&gt;&lt;/tt&gt; directory.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="step-2-install-node-js-and-npm"&gt;
+&lt;h2&gt;Step 2: Install node.js and&amp;nbsp;npm&lt;/h2&gt;
+&lt;p&gt;You need to have &lt;a class="reference external" href="http://nodejs.org/"&gt;node.js&lt;/a&gt; and npm installed in your system - this is something very easy so I won&amp;#8217;t go into any details about this. After you have installed
+both node.js and npm you need to put them in your path so that you&amp;#8217;ll be able to run &lt;tt class="docutils literal"&gt;npm &lt;span class="pre"&gt;-v&lt;/span&gt;&lt;/tt&gt; without errors and receive something like &lt;tt class="docutils literal"&gt;1.4.14&lt;/tt&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="step-3-install-less"&gt;
+&lt;h2&gt;Step 3: Install&amp;nbsp;less&lt;/h2&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://lesscss.org/"&gt;less&lt;/a&gt; is a &lt;span class="caps"&gt;CSS&lt;/span&gt; preprocessor in which Bootstrap Material Design has been written. To install it, just enter the command &lt;tt class="docutils literal"&gt;npm install &lt;span class="pre"&gt;-g&lt;/span&gt; less&lt;/tt&gt;. After that
+you should have a command named &lt;tt class="docutils literal"&gt;lessc&lt;/tt&gt; which, when run would output something like: &lt;tt class="docutils literal"&gt;lessc 2.1.1 (Less Compiler) [JavaScript]&lt;/tt&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="step-4-create-the-customizations-files"&gt;
+&lt;h2&gt;Step 4: Create the customizations&amp;nbsp;files&lt;/h2&gt;
+&lt;p&gt;Go to the directory where you cloned (or unzipped) the Bootstrap Material Design code and create a file named &lt;tt class="docutils literal"&gt;custom.less&lt;/tt&gt; (so, that file should be
+in the same folder as with &lt;tt class="docutils literal"&gt;bower.json&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;Gruntfile.js&lt;/tt&gt; etc) with the following&amp;nbsp;contents:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;#64;import &amp;quot;less/material.less&amp;quot;;
+
+// Override &amp;#64;primary color with one took from _colors.less
+&amp;#64;primary: &amp;#64;indigo;
+&lt;/pre&gt;
+&lt;p&gt;(I wanted to use the indigo color as my primary one - you may of course use whichever color from the ones defined in &lt;tt class="docutils literal"&gt;less/_variables.less&lt;/tt&gt; you&amp;nbsp;like)&lt;/p&gt;
+&lt;p&gt;This file may contain other default values for variables - if I find anything useful I will add it to this post (also please reply with any&amp;nbsp;recommendations).&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Update 13/10/2015&lt;/strong&gt; After a request from commenter Jofferson Ramirez Tiquez, here&amp;#8217;s a custom.less that overrides more colors from &lt;tt class="docutils literal"&gt;_variables.css&lt;/tt&gt;
+(beyond the primary color, it changes the success color to teal and info and warning to the corresponding hex color&amp;nbsp;values):&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;#64;import &amp;quot;less/material.less&amp;quot;;
+
+&amp;#64;primary: &amp;#64;indigo;
+&amp;#64;success: &amp;#64;teal;
+&amp;#64;info: #CFD8DC;
+&amp;#64;warning:#455A64;
+&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;Update 08/02/2017&lt;/strong&gt; Commenter Enrique SIlva informed me that the names of these color variables have been changed to
+&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;&amp;#64;brand-primary&lt;/span&gt;&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;&amp;#64;brand-success&lt;/span&gt;&lt;/tt&gt; etc (as can be seen on &lt;tt class="docutils literal"&gt;less/_variables.less&lt;/tt&gt;) so you must change them accordingly when overriding&amp;nbsp;them!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="step-5-create-your-custom-material-css-file"&gt;
+&lt;h2&gt;Step 5: Create your custom material css&amp;nbsp;file&lt;/h2&gt;
+&lt;p&gt;Finally, run the following command: &lt;tt class="docutils literal"&gt;lessc custom.less&amp;nbsp; &amp;gt; &lt;span class="pre"&gt;material-custom.css&lt;/span&gt;&lt;/tt&gt;. This will create a file named &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;material-custom.css&lt;/span&gt;&lt;/tt&gt; that contains your
+custom version of Bootstrap Material Design! If you want your &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;material-custom.css&lt;/span&gt;&lt;/tt&gt; to be compressed, add the &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;-x&lt;/span&gt;&lt;/tt&gt; option like this:  &lt;tt class="docutils literal"&gt;lessc &lt;span class="pre"&gt;-x&lt;/span&gt; custom.less&amp;nbsp; &amp;gt; &lt;span class="pre"&gt;material-custom.css&lt;/span&gt;&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;You may now include &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;material-custom.css&lt;/span&gt;&lt;/tt&gt; instead of &lt;tt class="docutils literal"&gt;material.css&lt;/tt&gt; (or the minified version of it) to your projects and you&amp;#8217;ll have your own primary&amp;nbsp;color!&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Update 09/06/2016&lt;/strong&gt;: After some comments I returned to this blog post and tried to re-create the custom
+css file. Unfortunately, for the latest versions of the bootstrap-material-design, the above step by step instructions need to be changed in two&amp;nbsp;places:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Step 1: Instead of only the bootstrap-material-design code, you also need to retrieve the code of the original bootstrap. To do that you can do a &lt;tt class="docutils literal"&gt;git clone &lt;span class="pre"&gt;https://github.com/twbs/bootstrap.git&lt;/span&gt;&lt;/tt&gt; so that you&amp;#8217;ll have the bootstrap directory next to the bootstrap-material-design directory. Be careful on that, you should have two directories side by side, one containing the bootstrap code and another containing the bootstrap-material-design code. This is required because bootstrap-material-design references some bootstrap variables (from &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;less/_import-bs-less.less&lt;/span&gt;&lt;/tt&gt;).&lt;/li&gt;
+&lt;li&gt;Step 4: For the customizations file (&lt;tt class="docutils literal"&gt;custom.less&lt;/tt&gt;), you should change the line &lt;tt class="docutils literal"&gt;&amp;#64;import &amp;quot;less/material.less&amp;quot;;&lt;/tt&gt; to &lt;tt class="docutils literal"&gt;&amp;#64;import &lt;span class="pre"&gt;&amp;quot;less/bootstrap-material-design.less&amp;quot;;&lt;/span&gt;&lt;/tt&gt; because the name of that file has been&amp;nbsp;changed.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;After these two changes you should once again be able to create your custom css&amp;nbsp;file!&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Update 03/07/2017&lt;/strong&gt; Commenter Nuraan Bader informed of an &lt;cite&gt;NameError: variable &amp;#64;line-height-base is undefined&lt;/cite&gt; error when
+creating the custom css file. This is because bootstrap has changed the default branch from &lt;cite&gt;master&lt;/cite&gt; to &lt;cite&gt;v4-dev&lt;/cite&gt;
+so when you clone you&amp;#8217;ll get the &lt;cite&gt;v4-dev&lt;/cite&gt; branch instead of the &lt;cite&gt;master&lt;/cite&gt; one! To fix this, after you clone (check out
+my 09/06/2016 update) do the&amp;nbsp;following:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+cd bootstrap
+git checkout master
+&lt;/pre&gt;
+&lt;p&gt;This should change the current branch to master and you should see the &lt;cite&gt;less&lt;/cite&gt; folder inside the &lt;cite&gt;bootstrap&lt;/cite&gt; folder. After that everything should work as&amp;nbsp;expected.&lt;/p&gt;
+&lt;/div&gt;
+</content><category term="css"></category><category term="css"></category><category term="design"></category><category term="boostrap-material-design"></category><category term="less"></category><category term="node.js"></category></entry></feed>

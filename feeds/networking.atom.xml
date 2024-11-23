@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>/var/ - networking</title><link href="https://spapas.github.io/" rel="alternate"></link><link href="https://spapas.github.io/feeds/networking.atom.xml" rel="self"></link><id>https://spapas.github.io/</id><updated>2021-09-21T14:20:00+03:00</updated><subtitle>Various programming stuff</subtitle><entry><title>A forward and reverse proxy primer for the layman</title><link href="https://spapas.github.io/2021/09/21/layman-proxy-primer/" rel="alternate"></link><published>2021-09-21T14:20:00+03:00</published><updated>2021-09-21T14:20:00+03:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2021-09-21:/2021/09/21/layman-proxy-primer/</id><summary type="html">&lt;p class="first last"&gt;A primer for explaining forward and reverse proxies to the&amp;nbsp;layman&lt;/p&gt;
+</summary><content type="html">&lt;p&gt;Before some days I&amp;#8217;d &lt;a class="reference external" href="https://news.ycombinator.com/item?id=28381220"&gt;written an answer on &lt;span class="caps"&gt;HN&lt;/span&gt;&lt;/a&gt; where I explained as simply as possible
+how a forward and a reverse proxy is working and what is the difference between them. In this article
+I&amp;#8217;m going to extend this answer a bit to make it a full post and clarify some things even&amp;nbsp;more.&lt;/p&gt;
+&lt;p&gt;Forward and reverse proxies is an important concept that a lot of technical people aren&amp;#8217;t familiar with.
+&lt;span class="caps"&gt;HTTP&lt;/span&gt; Proxying is a process of forwarding (&lt;span class="caps"&gt;HTTP&lt;/span&gt;) requests from one server to the other. So when an &lt;span class="caps"&gt;HTTP&lt;/span&gt;
+client issues a request to the server, the request will pass through the proxy server and be forwarded to the
+destination server (called the origin server). This explanation is true both for forward and reverse&amp;nbsp;proxying.&lt;/p&gt;
+&lt;div class="section" id="forward-proxy"&gt;
+&lt;h2&gt;Forward&amp;nbsp;Proxy&lt;/h2&gt;
+&lt;p&gt;A forward proxy is used when an &lt;span class="caps"&gt;HTTP&lt;/span&gt; Client (i.e a browser) wants to access resources in the internet
+but isn&amp;#8217;t allowed to connect directly to the public internet so instead uses the&amp;nbsp;proxy.&lt;/p&gt;
+&lt;p&gt;Usually companies don&amp;#8217;t allow unrestricted access to the internet from their internal network.
+Thus the internal users would need to use a proxy to access the internet. This is the concept of the forward proxy.
+What happens is that when an internal user want to access an internet resource (i.e www.google.com) her client (i.e browser)
+will ask a specific server (the proxy server) for that resource. The client needs to be configured properly with the address
+of the proxy&amp;nbsp;server.&lt;/p&gt;
+&lt;p&gt;So instead of &lt;a class="reference external" href="http://www.google.com"&gt;http://www.google.com&lt;/a&gt; the browser will access &lt;a class="reference external" href="http://proxy.company.com/?url=www.google.com"&gt;http://proxy.company.com/?url=www.google.com&lt;/a&gt; and the
+proxy will fetch the results and return them to you. If the browser wants to access &lt;a class="reference external" href="https://www.google.com"&gt;https://www.google.com&lt;/a&gt; &lt;em&gt;without&lt;/em&gt;
+a configured proxy server it will get a network&amp;nbsp;error.&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s an image that explains&amp;nbsp;this:&lt;/p&gt;
+&lt;img alt="Forward proxy" src="/images/fw_proxy.png" style="width: 800px;" /&gt;
+&lt;p&gt;The internal client can access the internal web server directly without problems. However he cannot access
+the internet server directly so he needs to use the proxy to access&amp;nbsp;it.&lt;/p&gt;
+&lt;p&gt;One thing that needs to be made crystal is that the fact that your browser works with the proxy does not mean
+that any other &lt;span class="caps"&gt;HTTP&lt;/span&gt; clients you use will also work. For example, you may want to run &lt;tt class="docutils literal"&gt;curl&lt;/tt&gt; or &lt;tt class="docutils literal"&gt;wget&lt;/tt&gt; to download
+some files from an external server; these programs will not work without setting a proxy (usually by setting the http_proxy
+and https_proxy environment variables or by passing a parameter). Also, the proxy only works for &lt;span class="caps"&gt;HTTP&lt;/span&gt; requests. If you are
+in a private network without external access you will &lt;em&gt;not&lt;/em&gt; be able to access non-&lt;span class="caps"&gt;HTTP&lt;/span&gt; resources. For example you will not be able
+to access your non-company mail server (which uses either &lt;span class="caps"&gt;IMAP&lt;/span&gt; or &lt;span class="caps"&gt;POP3&lt;/span&gt;) from behind your company&amp;#8217;s network. Typically, you&amp;#8217;ll use
+a web client for accessing your&amp;nbsp;mails.&lt;/p&gt;
+&lt;p&gt;So it seems that using a proxy heavily restricts the internal users usage of internet. What are the advantages of using a forward&amp;nbsp;proxy?&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Security: Since the internal computers of a company will not have internet access there&amp;#8217;s no easy way for attackers to access these&amp;nbsp;computers.&lt;/li&gt;
+&lt;li&gt;Content moderation: The company through the proxy can block access to various internet sites (i.e social network, gaming etc) that the users shouldn&amp;#8217;t access during&amp;nbsp;work.&lt;/li&gt;
+&lt;li&gt;Caching: The proxy server can have a cache so when multiple users access the same internet resource it will downloaded only once saving the company&amp;#8217;s&amp;nbsp;bandwidth.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Especially the security thing is so important that almost all corporate (or university etc) networks will use a proxy server and never
+allow direct access to the&amp;nbsp;internet.&lt;/p&gt;
+&lt;p&gt;A well known, open source forward proxy server is &lt;a class="reference external" href="http://www.squid-cache.org/"&gt;Squid&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="reverse-proxy"&gt;
+&lt;h2&gt;Reverse&amp;nbsp;proxy&lt;/h2&gt;
+&lt;p&gt;A reverse proxy is an &lt;span class="caps"&gt;HTTP&lt;/span&gt; server that &amp;#8220;proxies&amp;#8221; (i.e forwards) some (or all) requests it receives to a different &lt;span class="caps"&gt;HTTP&lt;/span&gt;
+server and returns the answer back. For example, a company may have a couple of &lt;span class="caps"&gt;HTTP&lt;/span&gt; servers in its internal network. These
+servers have private addresses and cannot be accessed through the internet. To allow external users to access these servers,
+the company will configure a reverse proxy server that will forward the requests to the internal servers as seen in the&amp;nbsp;picture:&lt;/p&gt;
+&lt;img alt="Reverse proxy" src="/images/reverseproxy.png" style="width: 800px;" /&gt;
+&lt;p&gt;What happens is that the proxy server will forward requests that fulfill some specific
+criteria to other web servers. The criteria may be requests that have
+* a specific host (forward the requests that have a hostname of &lt;tt class="docutils literal"&gt;www.server1.company.com&lt;/tt&gt; to the internal server named &lt;tt class="docutils literal"&gt;server1&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;www.server2.company.com&lt;/tt&gt; to the internal server named &lt;tt class="docutils literal"&gt;server2&lt;/tt&gt;)
+* or a specific port (forward requests in the port 81 to &lt;tt class="docutils literal"&gt;server1&lt;/tt&gt; and requests in the port 82 to &lt;tt class="docutils literal"&gt;server2&lt;/tt&gt;)
+* or even a particular path (forward requests with the path &lt;tt class="docutils literal"&gt;www.company.com/server1&lt;/tt&gt; to &lt;tt class="docutils literal"&gt;server1&lt;/tt&gt; and requests with the path &lt;tt class="docutils literal"&gt;www.company.com/server2&lt;/tt&gt; to &lt;tt class="docutils literal"&gt;server2&lt;/tt&gt;)&lt;/p&gt;
+&lt;p&gt;or even other criteria that may be&amp;nbsp;decided.&lt;/p&gt;
+&lt;p&gt;Let&amp;#8217;s see some example of reverse&amp;nbsp;proxying:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;A characteristic example of reverse proxy is the well-known 3-tier architecture  (web server / app server / database server). The web server is used to serve all requests but it &amp;#8220;proxies&amp;#8221;  (forwards) some of the requests to the app server. This is used because the web server cannot serve dynamic  replies but can serve static replies like for example&amp;nbsp;files.&lt;/li&gt;
+&lt;li&gt;Offloading the &lt;span class="caps"&gt;SSL&lt;/span&gt; (https) security to a particular web server. This server will store the private key of your certificate and terminate the &lt;span class="caps"&gt;SSL&lt;/span&gt; connections. It will then forward the requests to the internal web servers using plain &lt;span class="caps"&gt;HTTP&lt;/span&gt;.&lt;/li&gt;
+&lt;li&gt;An &lt;span class="caps"&gt;HTTP&lt;/span&gt; load balancer will proxy the requests to a set of other servers based on some algorithm to share the load (i.e the HAProxy software load balancer or even a hardware load&amp;nbsp;balancer)&lt;/li&gt;
+&lt;li&gt;A reverse proxy can be used to act as a security and &lt;span class="caps"&gt;DOS&lt;/span&gt; &amp;#8220;shield&amp;#8221; for your web servers. It will check the requests for common attack patterns and forward them to your servers only if they are&amp;nbsp;safe&lt;/li&gt;
+&lt;li&gt;A reverse proxy can be used for caching; it will return cached versions of resources if they are available to avoid overloading the application&amp;nbsp;servers&lt;/li&gt;
+&lt;li&gt;A &lt;span class="caps"&gt;CDN&lt;/span&gt; (content delivery network) is more or less a set of glorified reverse proxy servers that act as a first step for serving the user&amp;#8217;s requests (based on the geographic location) also offering security protection and caching (this is what akamai or cloudflare&amp;nbsp;do)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;As can be seen from the previous examples there are a lot of apps that do reverse proxying, for example apache &lt;span class="caps"&gt;HTTP&lt;/span&gt;, nginx, HAProxy, varnish cache et&amp;nbsp;al.&lt;/p&gt;
+&lt;p&gt;Notice that while there&amp;#8217;s only one forward proxy, there could be a (large) chain of reverse proxies when accessing a remote server.
+Let&amp;#8217;s take a look at a rather complex scenario: A user in a corporate network will access an application in another network. In this case the user&amp;#8217;s request
+may pass&amp;nbsp;through:&lt;/p&gt;
+&lt;p&gt;forward proxy (squid) -&amp;gt;
+security server / &lt;span class="caps"&gt;CDN&lt;/span&gt; (akamai) -&amp;gt;
+ssl termination (nginx) -&amp;gt;
+caching (varnish) -&amp;gt;
+web server (nginx again) -&amp;gt;
+app server (tomcat or gunicorn or &lt;span class="caps"&gt;IIS&lt;/span&gt; etc)
+as can be seen on the following&amp;nbsp;image:&lt;/p&gt;
+&lt;img alt="Reverse proxy" src="/images/reverseproxy2.png" style="width: 800px;" /&gt;
+&lt;p&gt;Notice that is this case (which is not uncommon) there are six (05) servers between your client and the application&amp;nbsp;server!&lt;/p&gt;
+&lt;p&gt;One common problem with this is that unless &lt;em&gt;all&lt;/em&gt; the intermediate servers are configured properly
+(by properly modifying and passing the &lt;a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For"&gt;X-Forwarded-For&lt;/a&gt; header)
+you won&amp;#8217;t be able to retrieve the &lt;span class="caps"&gt;IP&lt;/span&gt; of the user that did the initial&amp;nbsp;request.&lt;/p&gt;
+&lt;/div&gt;
+</content><category term="networking"></category><category term="forward-proxy"></category><category term="reverse-proxy"></category><category term="proxy"></category><category term="networking"></category><category term="http"></category></entry></feed>

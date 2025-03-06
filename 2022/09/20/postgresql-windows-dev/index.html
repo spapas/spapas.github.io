@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="google-site-verification" content="5_8DTmIiEq4gFvNAfxAD6TsGOgrMAjp8lQFQvfA6zZc" />
+    <title>Setting up Postgres on Windows for development &mdash; /var/</title>
+    <meta name="author" content="Serafeim Papastefanos">
+
+
+    
+<style type="text/css">
+pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: var(--jp-cell-editor-active-background) }
+.highlight { background: var(--jp-cell-editor-background); color: var(--jp-mirror-editor-variable-color) }
+.highlight .c { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment */
+.highlight .err { color: var(--jp-mirror-editor-error-color) } /* Error */
+.highlight .k { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword */
+.highlight .o { color: var(--jp-mirror-editor-operator-color); font-weight: bold } /* Operator */
+.highlight .p { color: var(--jp-mirror-editor-punctuation-color) } /* Punctuation */
+.highlight .ch { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Preproc */
+.highlight .cpf { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Single */
+.highlight .cs { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Special */
+.highlight .kc { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Pseudo */
+.highlight .kr { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Type */
+.highlight .m { color: var(--jp-mirror-editor-number-color) } /* Literal.Number */
+.highlight .s { color: var(--jp-mirror-editor-string-color) } /* Literal.String */
+.highlight .ow { color: var(--jp-mirror-editor-operator-color); font-weight: bold } /* Operator.Word */
+.highlight .pm { color: var(--jp-mirror-editor-punctuation-color) } /* Punctuation.Marker */
+.highlight .w { color: var(--jp-mirror-editor-variable-color) } /* Text.Whitespace */
+.highlight .mb { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Bin */
+.highlight .mf { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Float */
+.highlight .mh { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Hex */
+.highlight .mi { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Integer */
+.highlight .mo { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Oct */
+.highlight .sa { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Affix */
+.highlight .sb { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Backtick */
+.highlight .sc { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Char */
+.highlight .dl { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Delimiter */
+.highlight .sd { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Doc */
+.highlight .s2 { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Double */
+.highlight .se { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Escape */
+.highlight .sh { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Heredoc */
+.highlight .si { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Interpol */
+.highlight .sx { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Other */
+.highlight .sr { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Regex */
+.highlight .s1 { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Single */
+.highlight .ss { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Symbol */
+.highlight .il { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Integer.Long */
+</style>
+
+<style type="text/css">
+/* Overrides of notebook CSS for static HTML export */
+div.entry-content {
+  overflow: visible;
+  padding: 8px;
+}
+.input_area {
+  padding: 0.2em;
+}
+
+a.heading-anchor {
+ white-space: normal;
+}
+
+.rendered_html
+code {
+ font-size: .8em;
+}
+
+pre.ipynb {
+  color: black;
+  background: #f7f7f7;
+  border: none;
+  box-shadow: none;
+  margin-bottom: 0;
+  padding: 0;
+  margin: 0px;
+  font-size: 13px;
+}
+
+/* remove the prompt div from text cells */
+div.text_cell .prompt {
+    display: none;
+}
+
+/* remove horizontal padding from text cells, */
+/* so it aligns with outer body text */
+div.text_cell_render {
+    padding: 0.5em 0em;
+}
+
+img.anim_icon{padding:0; border:0; vertical-align:middle; -webkit-box-shadow:none; -box-shadow:none}
+
+div.collapseheader {
+    width=100%;
+    background-color:#d3d3d3;
+    padding: 2px;
+    cursor: pointer;
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+</style>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true,
+        displayMath: [['$$','$$'], ["\\[","\\]"]]
+    }
+});
+</script>
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+    $("div.collapseheader").click(function () {
+    $header = $(this).children("span").first();
+    $codearea = $(this).children(".input_area");
+    console.log($(this).children());
+    $codearea.slideToggle(500, function () {
+        $header.text(function () {
+            return $codearea.is(":visible") ? "Collapse Code" : "Expand Code";
+        });
+    });
+});
+});
+</script>
+
+
+
+
+
+
+    <!-- http://t.co/dKP3o1e -->
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+    <link href="https://www.spapas.net/favicon.png" rel="icon">
+
+    <link href="https://www.spapas.net/theme/css/main.css" media="screen, projection" rel="stylesheet"
+      type="text/css">
+
+    <link href="https://www.spapas.net/theme/css/extra_style.css" media="screen, projection" rel="stylesheet"
+      type="text/css">
+
+    <link href="https://fonts.googleapis.com/css?family=Fira+Mono|Fira+Sans:400,700&amp;subset=greek" rel="stylesheet">
+
+<style>
+#gHPzseYvFrhZ123 {
+  padding: 5px !important;
+  display: block;
+  margin-bottom: 10px !important;
+  background: #900;
+  color: #fff;
+  border-radius: 5px;
+  font-size: 1.0rem !important;
+}
+</style>
+
+
+  <script>
+    
+      
+  </script>
+
+    <script data-ad-client="ca-pub-7673322832689008" async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
+      onerror="adBlockFunction();"></script>
+  </head>
+
+<body>
+  <header role="banner"><hgroup>
+  <h1><a href="https://www.spapas.net/">/var/</a></h1>
+    <h2>Various programming stuff</h2>
+</hgroup></header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+</ul>
+
+
+<ul class="main-navigation">
+      <li >
+        <a href="https://www.spapas.net/category/ai.html">Ai</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/android.html">Android</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/clojure.html">Clojure</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/css.html">Css</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/django.html">Django</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/elixir.html">Elixir</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/flask.html">Flask</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/gaming.html">Gaming</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/git.html">Git</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/html.html">Html</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/javascript.html">Javascript</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/networking.html">Networking</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/pelican.html">Pelican</a>
+      </li>
+      <li class="active">
+        <a href="https://www.spapas.net/category/postgresql.html">Postgresql</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/python.html">Python</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/spring.html">Spring</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/unix.html">Unix</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/wagtail.html">Wagtail</a>
+      </li>
+</ul></nav>
+  <div id="main">
+    <div id="content">
+    <div id="gHPzseYvFrhZ123">
+      Hello! If you are using an ad blocker but find something useful here 
+      and want to support me please consider disabling your ad blocker for this site. 
+      <br />
+      <br />
+      Thank you,<br />
+      Serafeim
+      
+    </div>
+<div>
+  <article class="hentry" role="article">
+<header>
+      <h1 class="entry-title">Setting up Postgres on Windows for development</h1>
+    <p class="meta">
+<time datetime="2022-09-20T11:10:00+03:00" pubdate>Tue 20 September 2022</time>    </p>
+</header>
+
+<div class="entry-content"><div class="section" id="introduction">
+<h2>Introduction</h2>
+<p>To install Postgresql for a production server on Windows you&#8217;d usually go to the
+<a class="reference external" href="https://www.postgresql.org/download/windows/">official website</a> and use the download link. This will give you an executable
+installer that would install Postgresql on your server and help you configure&nbsp;it.</p>
+<p>However, since I only use Windows for development (and never running any in
+production on Windows) I&#8217;ve found out that there&#8217;s a much better and easier way to install
+postgresql for development and windows which I&#8217;ll describe in this&nbsp;post.</p>
+<p>If you want to avoid reading the whole post, you can just follow the steps described on the
+<a class="reference internal" href="#tl-dr-below"><span class="caps">TL</span>;<span class="caps">DR</span> below</a> however I&#8217;d recommend reading to understand&nbsp;everything.</p>
+</div>
+<div class="section" id="downloading-the-server">
+<h2>Downloading the&nbsp;server</h2>
+<p>First, you&#8217;ll
+click the <a class="reference external" href="https://www.enterprisedb.com/download-postgresql-binaries">zip archives</a> link on the . <a class="reference external" href="https://www.postgresql.org/download/windows/">official website</a> and then
+download the zip archive of the Postgres version you&#8217;ll want to install. Right now there are
+archives for every current version like 14.5, 13.8, 12.12 etc. Let&#8217;s get the latest one,&nbsp;14.5.</p>
+<p>This will give me a zip file named <tt class="docutils literal"><span class="pre">postgresql-14.5-1-windows-x64-binaries.zip</span></tt> which contains a
+single folder named <tt class="docutils literal">pgsql</tt>. I&#8217;ll extract that folder, rename it to <tt class="docutils literal">pgsql145</tt> and move it to <tt class="docutils literal"><span class="pre">c:\progr</span></tt>
+(I keep stuff there to avoid putting everything on C:). Now you should have a folder named
+<tt class="docutils literal"><span class="pre">c:\progr\pgsql145</span></tt> that contains a bunch of folder named <tt class="docutils literal">bin</tt>, <tt class="docutils literal">doc</tt>, <tt class="docutils literal">include</tt> etc.</p>
+</div>
+<div class="section" id="setting-up-the-server">
+<h2>Setting up the&nbsp;server</h2>
+<p>Now we are ready to setup Postgresql. Open a command line and move to the <tt class="docutils literal">pgsql145\bin</tt> folder:</p>
+<pre class="code literal-block">
+cd c:\progr\pgsql145\bin
+</pre>
+<p>The bin folder contains <em>all</em> executables of your server and client, like <tt class="docutils literal">psql.exe</tt> (the <span class="caps">CUI</span> client),
+<tt class="docutils literal">pg_dump.exe</tt> (backup), <tt class="docutils literal">initdb.exe</tt> (create a new <span class="caps">DB</span> cluster), <tt class="docutils literal">createdb/dropdb/createuser/dropuser.exe ``
+(create/drop database/user - these can also be run from <span class="caps">SQL</span>)
+and ``postgres.exe</tt> which is the actual server&nbsp;executable.</p>
+<p>Our first step is to create a database cluster using initdb. We need to pass it a folder that will
+contain the data of our cluster. So we&#8217;ll run it&nbsp;like:</p>
+<pre class="code literal-block">
+initdb.exe -D c:\progr\pgsql145\data
+</pre>
+<p>(also you could run <tt class="docutils literal">initdb.exe <span class="pre">-D</span> <span class="pre">..\data</span></tt>, since we are on the bin folder). We&#8217;ll get output similar&nbsp;to:</p>
+<pre class="code literal-block">
+The files belonging to this database system will be owned by user &quot;serafeim&quot;.
+This user must also own the server process.
+
+The database cluster will be initialized with locale &quot;Greek_Greece.1252&quot;.
+The default database encoding has accordingly been set to &quot;WIN1252&quot;.
+The default text search configuration will be set to &quot;greek&quot;.
+
+Data page checksums are disabled.
+
+fixing permissions on existing directory c:/progr/pgsql145/data ... ok
+creating subdirectories ... ok
+selecting dynamic shared memory implementation ... windows
+selecting default max_connections ... 100
+selecting default shared_buffers ... 128MB
+selecting default time zone ... Europe/Bucharest
+creating configuration files ... ok
+running bootstrap script ... ok
+performing post-bootstrap initialization ... ok
+syncing data to disk ... ok
+
+initdb: warning: enabling &quot;trust&quot; authentication for local connections
+You can change this by editing pg_hba.conf or using the option -A, or
+--auth-local and --auth-host, the next time you run initdb.
+
+Success. You can now start the database server using:
+
+    pg_ctl -D ^&quot;c^:^\progr^\pgsql145^\data^&quot; -l logfile start
+</pre>
+<p>And now we&#8217;ll have a folder named <tt class="docutils literal"><span class="pre">c:\progr\pgsql145\data</span></tt> that contains files like
+<tt class="docutils literal">pg_hba.conf</tt>, <tt class="docutils literal">pg_ident.conf</tt>, <tt class="docutils literal">postgresql.conf</tt> and various folders that will keep our
+database server data. All these can be configured but we&#8217;re going to keep using the default config
+since it fits our&nbsp;needs!</p>
+<p>Notice&nbsp;that:</p>
+<ul class="simple">
+<li>The files of our database belong to the &#8220;serafeim&#8221; role. This role is automatically created by initdb. This is the same username that I&#8217;m using to log in to windows (i.e my home folder is <tt class="docutils literal"><span class="pre">c:\users\serafeim\</span></tt> folder) so this will be different for you. If you wanted to use a different user name or the classic <tt class="docutils literal">postgres</tt> you could pass it to <tt class="docutils literal">initdb</tt> with the -U parameter, for example: <tt class="docutils literal">initdb.exe <span class="pre">-D</span> <span class="pre">c:\progr\pgsql145\data_postgres</span> <span class="pre">-U</span> postgres</tt>.</li>
+<li>By default &#8220;trust&#8221; authentication has been configured. This means, copying from <a class="reference external" href="https://www.postgresql.org/docs/current/auth-trust.html">postgres trust authentication page</a> that &#8220;[&#8230;] PostgreSQL assumes that anyone who can connect to the server is authorized to access the database with whatever database user name they specify (even superuser names)&#8221;. So local connections will always be accepted with the username we are passing. We&#8217;ll see how this works in a&nbsp;minute.</li>
+<li>The default database encoding will be <span class="caps">WIN1252</span> (on my system). We&#8217;ll talk about that a little more later (hint: it&#8217;s better to pass -E utf-8 to set your cluster encodign to&nbsp;utf-8)</li>
+</ul>
+</div>
+<div class="section" id="starting-the-server">
+<h2>Starting the&nbsp;server</h2>
+<p>We could use the <tt class="docutils literal">pg_ctl.exe</tt> executable as proposed by the initdb to start the server as a a background process.
+However, for our purposes it&#8217;s better to start the server as a foreground process on a dedicated window. So we&#8217;ll run the <tt class="docutils literal">postgres.exe</tt> directly&nbsp;like:</p>
+<pre class="code literal-block">
+postgres.exe -D c:\progr\pgsql145\data
+</pre>
+<p>or, from the <tt class="docutils literal">bin</tt> directory we could run <tt class="docutils literal">postgres.exe <span class="pre">-D</span> <span class="pre">..\data</span></tt>. The output will&nbsp;be</p>
+<pre class="code literal-block">
+2022-09-20 09:34:10.184 EEST [10648] LOG:  starting PostgreSQL 14.5, compiled by Visual C++ build 1914, 64-bit
+2022-09-20 09:34:10.189 EEST [10648] LOG:  listening on IPv6 address &quot;::1&quot;, port 5432
+2022-09-20 09:34:10.189 EEST [10648] LOG:  listening on IPv4 address &quot;127.0.0.1&quot;, port 5432
+2022-09-20 09:34:10.330 EEST [3084] LOG:  database system was shut down at 2022-09-20 09:34:08 EEST
+2022-09-20 09:34:10.369 EEST [10648] LOG:  database system is ready to accept connections
+</pre>
+<p>Success! Our server is running and listening on 127.0.0.1 port 5432. This means that it accepts connection <em>only</em> from our local machine
+(which is what we want for our purposes). We can now connect to it using the <tt class="docutils literal">psql.exe</tt> client. Open another cmd, go to <tt class="docutils literal"><span class="pre">C:\progr\pgsql145\bin</span></tt>
+and run <tt class="docutils literal">psql.exe</tt>: You&#8217;ll probably get an error similar to <tt class="docutils literal">psql: error: connection to server at &quot;localhost&quot; <span class="pre">(::1),</span> port 5432 failed: <span class="caps">FATAL</span>:&nbsp; database &quot;serafeim&quot; does not exist</tt>
+(unless your windows username is <tt class="docutils literal">postgres</tt>).</p>
+<p>By default psql.exe tries to connect with a role with the username of your Windows user and to a database named after the user you are
+connecting with. Our database server <em>has</em> a role named <tt class="docutils literal">serafeim</tt> (it is created by default by the initdb as described before) but it doesn&#8217;t have a database named <tt class="docutils literal">serafeim</tt>! Let&#8217;s connect
+to the <tt class="docutils literal">postgres</tt> database instead by passing it as a parameter <tt class="docutils literal">psql postgres</tt>:</p>
+<pre class="code literal-block">
+C:\progr\pgsql145\bin&gt;psql postgres
+psql (14.5)
+WARNING: Console code page (437) differs from Windows code page (1252)
+        8-bit characters might not work correctly. See psql reference
+        page &quot;Notes for Windows users&quot; for details.
+Type &quot;help&quot; for help.
+
+postgres=# select version();
+                          version
+------------------------------------------------------------
+PostgreSQL 14.5, compiled by Visual C++ build 1914, 64-bit
+(1 row)
+</pre>
+<p>Success!</p>
+<p>Let&#8217;s cerate a sample user and database to make user that everything&#8217;s working fine <tt class="docutils literal">createuser.exe koko</tt>,
+<tt class="docutils literal">createdb kokodb</tt> and connect to the <tt class="docutils literal">kokodb</tt> as <tt class="docutils literal">koko</tt>: <tt class="docutils literal">psql <span class="pre">-U</span> koko kokodb</tt>.</p>
+<pre class="code literal-block">
+kokodb=&gt; create table kokotable(foo varchar);
+CREATE TABLE
+kokodb=&gt; insert into kokotable values('kokoko');
+INSERT 0 1
+kokodb=&gt; select * from kokotable;
+  foo
+--------
+kokoko
+(1 row)
+</pre>
+<p>Everything&#8217;s working fine! In the meantime, we should get useful output on our postgres dedicated windows, like
+<tt class="docutils literal"><span class="pre">2022-09-20</span> 09:36:01.899 <span class="caps">EEST</span> [9704] <span class="caps">FATAL</span>:&nbsp; database &quot;serafeim&quot; does not exist</tt>. To stop it, just press <tt class="docutils literal">Ctrl+C</tt>
+on that window and you should get output similar&nbsp;to:</p>
+<pre class="code literal-block">
+2022-09-20 09:46:45.178 EEST [10648] LOG:  background worker &quot;logical replication launcher&quot; (PID 7860) exited with exit code 1
+2022-09-20 09:46:45.185 EEST [10048] LOG:  shutting down
+2022-09-20 09:46:45.278 EEST [10648] LOG:  database system is shut down
+</pre>
+<p>I usually add a <tt class="docutils literal">pg.bat</tt> file on my <tt class="docutils literal"><span class="pre">c:\progr\pgsql145\</span></tt> that will start the database with its data folder. It&#8217;s contents are only
+<tt class="docutils literal">bin\postgres.exe <span class="pre">-D</span> data</tt></p>
+<p>So let&#8217;s create the pg.bat like&nbsp;this:</p>
+<pre class="code literal-block">
+c:\&gt;cd c:\progr\pgsql145
+
+c:\progr\pgsql145&gt;copy con pg.bat
+bin\postgres.exe -D data
+^Z
+        1 file(s) copied.
+
+c:\progr\pgsql145&gt;pg.bat
+2022-09-20 09:49:53.642 EEST [11660] LOG:  starting PostgreSQL 14.5, compiled by Visual C++ build 1914, 64-bit
+...
+</pre>
+<p>One final thing to notice is that, since we use the trust authentication there&#8217;s no check for the password, so if we
+tried to pass a password like <tt class="docutils literal">psql <span class="pre">-U</span> koko <span class="pre">-W</span> kokodb</tt> it will work no matter what password we&nbsp;type.</p>
+</div>
+<div class="section" id="encoding-stuff">
+<h2>Encoding&nbsp;stuff</h2>
+<div class="section" id="the-default-encoding-situation">
+<h3>The default encoding&nbsp;situation</h3>
+<p>You may have noticed before that the default encoding for databases will be <tt class="docutils literal"><span class="caps">WIN1252</span></tt> (or some other
+similar 8-bit character set). You never want that (I guess this default is there for compatibility reasons),
+you want to have utf-8 encoding. So you should either
+pass the proper encoding to initdb,&nbsp;like:</p>
+<pre class="code literal-block">
+initdb -D ..\datautf8 -E utf-8
+</pre>
+<p>This will create a new cluster with utf-8 encoding. All databases created on that cluster will be utf-8 by&nbsp;default.</p>
+<p>If you&#8217;ve already got a non-utf-8  cluster, you should force utf-8 for your new database&nbsp;instead:</p>
+<pre class="code literal-block">
+createdb -E utf-8 -T template0 dbutf8
+</pre>
+<p>Notice that I also passed the <tt class="docutils literal"><span class="pre">-T</span> template0</tt> parameter to use the <tt class="docutils literal">template0</tt> <a class="reference external" href="https://www.postgresql.org/docs/current/manage-ag-templatedbs.html">template database</a>. If I
+tried to run <tt class="docutils literal">createdb <span class="pre">-E</span> <span class="pre">utf-8</span> dbutf8</tt> (so it would use the <tt class="docutils literal">template1</tt>) I&#8217;d get an error similar&nbsp;to:</p>
+<pre class="code literal-block">
+createdb: error: database creation failed: ERROR:  new encoding (UTF8) is incompatible with the encoding of the template database (WIN1252)
+HINT:  Use the same encoding as in the template database, or use template0 as template.
+</pre>
+</div>
+<div class="section" id="about-the-psql-codepage-warning">
+<h3>About the psql codepage&nbsp;warning</h3>
+<p>You may (or may not) have noticed a warning similar to this when starting the&nbsp;server:</p>
+<pre class="code literal-block">
+WARNING: Console code page (437) differs from Windows code page (1252)
+      8-bit characters might not work correctly. See psql reference
+      page &quot;Notes for Windows users&quot; for details.
+</pre>
+<p>Some more info about this can be found in the <a class="reference external" href="https://www.postgresql.org/docs/14/app-psql.html`">psql reference page</a> and
+<a class="reference external" href="https://stackoverflow.com/questions/20794035/postgresql-warning-console-code-page-437-differs-from-windows-code-page-125">this <span class="caps">SO</span> issue</a>. To avoid this warning you&#8217;ll use <tt class="docutils literal">chcp 1252</tt> to set the console code page to 1252
+before running&nbsp;psql.</p>
+<p>I have to warn you though that using psql.exe from the windows console <strong>will be problematic</strong> anyway
+because of not good unicode support. You can use it fine as long as you write only ascii characters but
+I&#8217;d avoid anything&nbsp;else.</p>
+<p>That&#8217;s why I&#8217;d recommend using a graphical database client like for example <a class="reference external" href="https://dbeaver.io/">dbeaver</a>.</p>
+</div>
+</div>
+<div class="section" id="a-tl-dr-walkthrough">
+<span id="tl-dr-below"></span><h2>A <span class="caps">TL</span>;<span class="caps">DR</span>&nbsp;walkthrough</h2>
+<p>Here are the steps to follow to get a working postgresql server on&nbsp;windows:</p>
+<ol class="arabic simple">
+<li>Download the postgresql windows binaries of the version you want from the <a class="reference external" href="https://www.enterprisedb.com/download-postgresql-binaries">zip archives</a> page and extract it to a folder, let&#8217;s name it <tt class="docutils literal">pgsql</tt>.</li>
+<li>Go to <tt class="docutils literal">pgsql\bin</tt> folder on a command&nbsp;line</li>
+<li>Run <tt class="docutils literal">initdb.exe <span class="pre">-D</span> <span class="pre">..\data</span> <span class="pre">-E</span> <span class="pre">utf-8</span></tt> from inside the <tt class="docutils literal">pgsql\bin</tt> folder of the  to create a new database cluster with utf-8 encoding on the <tt class="docutils literal">data</tt> directory</li>
+<li>Run <tt class="docutils literal">postgresql.exe <span class="pre">-D</span> <span class="pre">..\data</span></tt> to start the database&nbsp;server</li>
+<li>Go to <tt class="docutils literal">pgsql\bin</tt> folder on another command&nbsp;line</li>
+<li>Run <tt class="docutils literal">psql postgres</tt> to connect to the <tt class="docutils literal">postgres</tt> database with a role similar to your windows&nbsp;username</li>
+<li>Profit!</li>
+</ol>
+</div>
+<div class="section" id="conclusion">
+<h2>Conclusion</h2>
+<p>Using the above steps you can easily setup a postgres database server on windows for development. Some advantages of the method
+proposed here&nbsp;are:</p>
+<ul class="simple">
+<li>Since you configure the data directory you can have as many clusters as you want (run initdb with different data directories and pass them to&nbsp;postgres)</li>
+<li>Since nothing is installed globally, you can have as many postgresql versions as you want, each one having its own data directory. Then you&#8217;ll start the one you want each time! For example I&#8217;ve got Postgresql 12,13 and&nbsp;14.5.</li>
+<li>Using the trust authentication makes it easy to connect with whatever&nbsp;user</li>
+<li>Running the database from postgresql.exe so it has a dedicated window makes it easy to know what the database is doing, peeking at the logs and stopping it (using&nbsp;ctrl+c)</li>
+</ul>
+</div>
+</div>
+    <footer>
+<p class="meta">
+  <span class="byline author vcard">
+    Posted by <span class="fn">
+        Serafeim Papastefanos
+    </span>
+  </span>
+<time datetime="2022-09-20T11:10:00+03:00" pubdate>Tue 20 September 2022</time>  <span class="categories">
+    <a class='category' href='https://www.spapas.net/category/postgresql.html'>postgresql</a>
+  </span>
+  <span class="categories">
+    <a class="category" href="https://www.spapas.net/tag/windows.html">windows</a>,    <a class="category" href="https://www.spapas.net/tag/postgresql.html">postgresql</a>,    <a class="category" href="https://www.spapas.net/tag/development.html">development</a>  </span>
+</p><div class="sharing">
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="https://www.spapas.net/2022/09/20/postgresql-windows-dev/" data-via="" data-counturl="https://www.spapas.net/2022/09/20/postgresql-windows-dev/" >Tweet</a>
+</div>    </footer>
+  </article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript></div>
+  </section>
+</div>
+<aside class="sidebar">
+  
+  <section>
+    <br />
+    <a href='/feeds/all.atom.xml'>Atom</a>
+    |
+    <a href='/feeds/all.rss.xml'>RSS</a>
+  </section>
+
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <!-- Sidebar unit -->
+  <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7673322832689008" data-ad-slot="2720624730"
+    data-ad-format="auto" data-full-width-responsive="true"></ins>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+
+
+  <script async src="https://cse.google.com/cse.js?cx=612920e5ca9da850c"></script>
+  <div class="gcse-search"></div>
+
+  
+  <section>
+    <h1>Support me</h1>
+
+    You can show your appreciation for anything useful you've found here by 
+    buying me a coffee 
+    <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="spapas" data-color="#FFDD00" data-emoji=""  data-font="Lato" data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff" ></script>
+
+    or donating me some bitcoin to this address:
+    <small><pre>bc1qx42vp8napheaewhnx0rk0mttdrdrtvw6czvxhl</pre></small>
+    <svg shape-rendering="crispEdges" height="200" width="200" viewBox="0 0 29 29" class="qrcode">
+      <path fill="#FFFFFF" d="M0,0 h29v29H0z"></path><path fill="#000000" d="M0 0h7v1H0zM9 0h2v1H9zM12 0h1v1H12zM14 0h2v1H14zM18 0h2v1H18zM22,0 h7v1H22zM0 1h1v1H0zM6 1h1v1H6zM8 1h1v1H8zM11 1h1v1H11zM14 1h5v1H14zM22 1h1v1H22zM28,1 h1v1H28zM0 2h1v1H0zM2 2h3v1H2zM6 2h1v1H6zM8 2h4v1H8zM17 2h1v1H17zM22 2h1v1H22zM24 2h3v1H24zM28,2 h1v1H28zM0 3h1v1H0zM2 3h3v1H2zM6 3h1v1H6zM9 3h2v1H9zM14 3h3v1H14zM18 3h1v1H18zM22 3h1v1H22zM24 3h3v1H24zM28,3 h1v1H28zM0 4h1v1H0zM2 4h3v1H2zM6 4h1v1H6zM8 4h1v1H8zM11 4h1v1H11zM13 4h1v1H13zM15 4h2v1H15zM18 4h1v1H18zM22 4h1v1H22zM24 4h3v1H24zM28,4 h1v1H28zM0 5h1v1H0zM6 5h1v1H6zM8 5h2v1H8zM14 5h2v1H14zM19 5h2v1H19zM22 5h1v1H22zM28,5 h1v1H28zM0 6h7v1H0zM8 6h1v1H8zM10 6h1v1H10zM12 6h1v1H12zM14 6h1v1H14zM16 6h1v1H16zM18 6h1v1H18zM20 6h1v1H20zM22,6 h7v1H22zM8 7h2v1H8zM11 7h1v1H11zM15 7h1v1H15zM17 7h2v1H17zM0 8h2v1H0zM3 8h1v1H3zM6 8h2v1H6zM10 8h1v1H10zM12 8h3v1H12zM20 8h1v1H20zM22 8h3v1H22zM26 8h2v1H26zM1 9h1v1H1zM3 9h3v1H3zM8 9h1v1H8zM10 9h1v1H10zM12 9h2v1H12zM16 9h2v1H16zM20 9h1v1H20zM22 9h1v1H22zM25 9h1v1H25zM27,9 h2v1H27zM0 10h1v1H0zM3 10h2v1H3zM6 10h1v1H6zM8 10h3v1H8zM12 10h2v1H12zM16 10h1v1H16zM19 10h1v1H19zM22 10h3v1H22zM27 10h1v1H27zM0 11h1v1H0zM2 11h1v1H2zM4 11h2v1H4zM7 11h1v1H7zM13 11h4v1H13zM18 11h4v1H18zM26 11h2v1H26zM0 12h1v1H0zM2 12h3v1H2zM6 12h1v1H6zM11 12h1v1H11zM13 12h1v1H13zM15 12h3v1H15zM20 12h1v1H20zM22 12h2v1H22zM27,12 h2v1H27zM4 13h1v1H4zM8 13h3v1H8zM12 13h1v1H12zM14 13h1v1H14zM17 13h4v1H17zM25 13h2v1H25zM0 14h1v1H0zM4 14h3v1H4zM8 14h2v1H8zM11 14h3v1H11zM16 14h1v1H16zM21 14h2v1H21zM24,14 h5v1H24zM3 15h3v1H3zM7 15h2v1H7zM10 15h1v1H10zM12 15h2v1H12zM15 15h1v1H15zM17 15h2v1H17zM20 15h2v1H20zM23 15h1v1H23zM1 16h1v1H1zM4 16h1v1H4zM6 16h4v1H6zM16 16h2v1H16zM20 16h1v1H20zM23 16h1v1H23zM25 16h1v1H25zM28,16 h1v1H28zM2 17h1v1H2zM5 17h1v1H5zM7 17h2v1H7zM11 17h3v1H11zM17 17h1v1H17zM22 17h1v1H22zM25 17h1v1H25zM27,17 h2v1H27zM0 18h1v1H0zM3 18h1v1H3zM5 18h4v1H5zM10 18h1v1H10zM12 18h1v1H12zM18 18h1v1H18zM20 18h1v1H20zM22 18h2v1H22zM25,18 h4v1H25zM2 19h3v1H2zM8 19h1v1H8zM16 19h2v1H16zM21 19h1v1H21zM23 19h1v1H23zM25 19h1v1H25zM27 19h1v1H27zM0 20h1v1H0zM2 20h5v1H2zM8 20h2v1H8zM13 20h4v1H13zM19 20h6v1H19zM26 20h1v1H26zM28,20 h1v1H28zM8 21h2v1H8zM12 21h3v1H12zM16 21h1v1H16zM20 21h1v1H20zM24 21h1v1H24zM26,21 h3v1H26zM0 22h7v1H0zM8 22h3v1H8zM17 22h1v1H17zM20 22h1v1H20zM22 22h1v1H22zM24 22h2v1H24zM27 22h1v1H27zM0 23h1v1H0zM6 23h1v1H6zM10 23h2v1H10zM13 23h2v1H13zM19 23h2v1H19zM24,23 h5v1H24zM0 24h1v1H0zM2 24h3v1H2zM6 24h1v1H6zM9 24h2v1H9zM12 24h2v1H12zM17 24h1v1H17zM20 24h6v1H20zM28,24 h1v1H28zM0 25h1v1H0zM2 25h3v1H2zM6 25h1v1H6zM8 25h3v1H8zM12 25h1v1H12zM14 25h1v1H14zM18 25h1v1H18zM22 25h3v1H22zM26 25h1v1H26zM0 26h1v1H0zM2 26h3v1H2zM6 26h1v1H6zM10 26h5v1H10zM16 26h3v1H16zM21 26h1v1H21zM24 26h1v1H24zM26 26h1v1H26zM28,26 h1v1H28zM0 27h1v1H0zM6 27h1v1H6zM8 27h3v1H8zM12 27h4v1H12zM17 27h1v1H17zM20 27h1v1H20zM23 27h2v1H23zM27 27h1v1H27zM0 28h7v1H0zM8 28h3v1H8zM14 28h1v1H14zM16 28h3v1H16zM20 28h1v1H20zM22 28h1v1H22zM24 28h2v1H24zM27 28h1v1H27z"></path>
+    </svg>
+  </section>
+  
+
+  <section>
+    <h1>Subscribe</h1>
+    Do you want to get notified via email when I post new content?
+    <style>
+      .subscribe-button {
+        /* margin: 10px !important; */
+        padding: 10px !important;
+        background-color: black;
+        display: inline-block;
+        color: white !important;
+        text-decoration: none;
+
+        line-height: 36px !important;
+        height: 37px !important;
+        text-decoration: none !important;
+        display: inline-block !important;
+        color: #ffffff !important;
+        background-color: #000000 !important;
+        border-radius: 3px !important;
+        border: 1px solid transparent !important;
+        padding: 1px 9px !important;
+        font-size: 23px !important;
+        letter-spacing: 0.6px !important;
+        box-shadow: 0px 1px 2px rgba(190, 190, 190, 0.5) !important;
+        -webkit-box-shadow: 0px 1px 2px 2px rgba(190, 190, 190, 0.5) !important;
+        margin: 0 auto !important;
+        font-family: 'Cookie', cursive !important;
+        -webkit-box-sizing: border-box !important;
+        box-sizing: border-box !important;
+        -o-transition: 0.3s all linear !important;
+        -webkit-transition: 0.3s all linear !important;
+        -moz-transition: 0.3s all linear !important;
+        -ms-transition: 0.3s all linear !important;
+        transition: 0.3s all linear !important;
+
+      }
+    </style>
+    <a class='subscribe-button' target="_blank" href="http://eepurl.com/dxI3PP">Click here to subscribe!</a>
+  </section>
+
+
+  <section>
+    <h1>Recent Posts</h1>
+    <ul id="recent_posts">
+      <li class="post">
+        <a href="https://www.spapas.net/2024/08/22/multiple-erl-elixir-windows/">Multiple Erlang/Elixir versions in Windows</a>
+      </li>
+      <li class="post">
+        <a href="https://www.spapas.net/2023/11/29/openid-connect-tutorial/">A simple OpenID connect tutorial</a>
+      </li>
+      <li class="post">
+        <a href="https://www.spapas.net/2023/05/23/simple-django-datatables-integration/">Simple Django - DataTables integration</a>
+      </li>
+      <li class="post">
+        <a href="https://www.spapas.net/2023/05/22/ai-auto-subtitling/">AI auto-subtitling</a>
+      </li>
+      <li class="post">
+        <a href="https://www.spapas.net/2023/05/12/disable-your-forms/">HTML form disable after submit</a>
+      </li>
+    </ul>
+  </section>
+  <section>
+
+    <h1>Categories</h1>
+    <ul id="recent_posts">
+      <li><a href="https://www.spapas.net/category/ai.html">ai</a></li>
+      <li><a href="https://www.spapas.net/category/android.html">android</a></li>
+      <li><a href="https://www.spapas.net/category/clojure.html">clojure</a></li>
+      <li><a href="https://www.spapas.net/category/css.html">css</a></li>
+      <li><a href="https://www.spapas.net/category/django.html">django</a></li>
+      <li><a href="https://www.spapas.net/category/elixir.html">elixir</a></li>
+      <li><a href="https://www.spapas.net/category/flask.html">flask</a></li>
+      <li><a href="https://www.spapas.net/category/gaming.html">gaming</a></li>
+      <li><a href="https://www.spapas.net/category/git.html">git</a></li>
+      <li><a href="https://www.spapas.net/category/html.html">html</a></li>
+      <li><a href="https://www.spapas.net/category/javascript.html">javascript</a></li>
+      <li><a href="https://www.spapas.net/category/networking.html">networking</a></li>
+      <li><a href="https://www.spapas.net/category/pelican.html">pelican</a></li>
+      <li><a href="https://www.spapas.net/category/postgresql.html">postgresql</a></li>
+      <li><a href="https://www.spapas.net/category/python.html">python</a></li>
+      <li><a href="https://www.spapas.net/category/spring.html">spring</a></li>
+      <li><a href="https://www.spapas.net/category/unix.html">unix</a></li>
+      <li><a href="https://www.spapas.net/category/wagtail.html">wagtail</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Tags</h1>
+    <a href="https://www.spapas.net/tag/erlang.html">erlang</a>,    <a href="https://www.spapas.net/tag/elixir.html">elixir</a>,    <a href="https://www.spapas.net/tag/windows.html">windows</a>,    <a href="https://www.spapas.net/tag/openid.html">openid</a>,    <a href="https://www.spapas.net/tag/openid-connect.html">openid-connect</a>,    <a href="https://www.spapas.net/tag/oidc.html">oidc</a>,    <a href="https://www.spapas.net/tag/http.html">http</a>,    <a href="https://www.spapas.net/tag/keycloak.html">keycloak</a>,    <a href="https://www.spapas.net/tag/python.html">python</a>,    <a href="https://www.spapas.net/tag/django.html">django</a>,    <a href="https://www.spapas.net/tag/jquery.html">jquery</a>,    <a href="https://www.spapas.net/tag/datatables.html">datatables</a>,    <a href="https://www.spapas.net/tag/ai.html">ai</a>,    <a href="https://www.spapas.net/tag/whisper.html">whisper</a>,    <a href="https://www.spapas.net/tag/whispercpp.html">whisper.cpp</a>,    <a href="https://www.spapas.net/tag/subtitles.html">subtitles</a>,    <a href="https://www.spapas.net/tag/video.html">video</a>,    <a href="https://www.spapas.net/tag/auto-subtitling.html">auto-subtitling</a>,    <a href="https://www.spapas.net/tag/subtitiling.html">subtitiling</a>,    <a href="https://www.spapas.net/tag/transcribe.html">transcribe</a>,    <a href="https://www.spapas.net/tag/html.html">html</a>,    <a href="https://www.spapas.net/tag/javascript.html">javascript</a>,    <a href="https://www.spapas.net/tag/media.html">media</a>,    <a href="https://www.spapas.net/tag/storage.html">storage</a>,    <a href="https://www.spapas.net/tag/unpoly.html">unpoly</a>,    <a href="https://www.spapas.net/tag/access.html">access</a>,    <a href="https://www.spapas.net/tag/database.html">database</a>,    <a href="https://www.spapas.net/tag/accdb.html">accdb</a>,    <a href="https://www.spapas.net/tag/mdb.html">mdb</a>,    <a href="https://www.spapas.net/tag/postgresql.html">postgresql</a>,    <a href="https://www.spapas.net/tag/development.html">development</a>,    <a href="https://www.spapas.net/tag/inlines.html">inlines</a>,    <a href="https://www.spapas.net/tag/clojure.html">clojure</a>,    <a href="https://www.spapas.net/tag/cmd.html">cmd</a>,    <a href="https://www.spapas.net/tag/pdf.html">pdf</a>,    <a href="https://www.spapas.net/tag/wkhtmltopdf.html">wkhtmltopdf</a>,    <a href="https://www.spapas.net/tag/forward-proxy.html">forward-proxy</a>,    <a href="https://www.spapas.net/tag/reverse-proxy.html">reverse-proxy</a>,    <a href="https://www.spapas.net/tag/proxy.html">proxy</a>,    <a href="https://www.spapas.net/tag/networking.html">networking</a>,    <a href="https://www.spapas.net/tag/dj-rest-auth.html">dj-rest-auth</a>,    <a href="https://www.spapas.net/tag/rest.html">rest</a>,    <a href="https://www.spapas.net/tag/django-rest-framework.html">django-rest-framework</a>,    <a href="https://www.spapas.net/tag/authentication.html">authentication</a>,    <a href="https://www.spapas.net/tag/tokens.html">tokens</a>,    <a href="https://www.spapas.net/tag/migrations.html">migrations</a>,    <a href="https://www.spapas.net/tag/foreignkey.html">foreignkey</a>,    <a href="https://www.spapas.net/tag/dark-souls.html">dark-souls</a>,    <a href="https://www.spapas.net/tag/dark-souls-2.html">dark-souls-2</a>,    <a href="https://www.spapas.net/tag/dark-souls-3.html">dark-souls-3</a>,    <a href="https://www.spapas.net/tag/autohotkey.html">autohotkey</a>,    <a href="https://www.spapas.net/tag/matplotlib.html">matplotlib</a>,    <a href="https://www.spapas.net/tag/hashids.html">hashids</a>,    <a href="https://www.spapas.net/tag/wagtail.html">wagtail</a>,    <a href="https://www.spapas.net/tag/osmon.html">osmon</a>,    <a href="https://www.spapas.net/tag/phoenix.html">phoenix</a>,    <a href="https://www.spapas.net/tag/os-monitoring.html">os-monitoring</a>,    <a href="https://www.spapas.net/tag/forms.html">forms</a>,    <a href="https://www.spapas.net/tag/django-crispy-forms.html">django-crispy-forms</a>,    <a href="https://www.spapas.net/tag/django-widget-tweaks.html">django-widget-tweaks</a>,    <a href="https://www.spapas.net/tag/ecto.html">ecto</a>,    <a href="https://www.spapas.net/tag/queries.html">queries</a>,    <a href="https://www.spapas.net/tag/declarative.html">declarative</a>,    <a href="https://www.spapas.net/tag/form.html">form</a>,    <a href="https://www.spapas.net/tag/php.html">php</a>,    <a href="https://www.spapas.net/tag/select2.html">select2</a>,    <a href="https://www.spapas.net/tag/autocompelte.html">autocompelte</a>,    <a href="https://www.spapas.net/tag/ajax.html">ajax</a>,    <a href="https://www.spapas.net/tag/android.html">android</a>,    <a href="https://www.spapas.net/tag/kotlin.html">kotlin</a>,    <a href="https://www.spapas.net/tag/adapter.html">adapter</a>,    <a href="https://www.spapas.net/tag/filter.html">filter</a>,    <a href="https://www.spapas.net/tag/async.html">async</a>,    <a href="https://www.spapas.net/tag/tasks.html">tasks</a>,    <a href="https://www.spapas.net/tag/django-rq.html">django-rq</a>,    <a href="https://www.spapas.net/tag/rq.html">rq</a>,    <a href="https://www.spapas.net/tag/du.html">du</a>,    <a href="https://www.spapas.net/tag/unix.html">unix</a>,    <a href="https://www.spapas.net/tag/linux.html">linux</a>,    <a href="https://www.spapas.net/tag/disk-usage.html">disk-usage</a>,    <a href="https://www.spapas.net/tag/cbv.html">cbv</a>,    <a href="https://www.spapas.net/tag/middleware.html">middleware</a>,    <a href="https://www.spapas.net/tag/class-based-views.html">class-based-views</a>,    <a href="https://www.spapas.net/tag/react.html">react</a>,    <a href="https://www.spapas.net/tag/redux.html">redux</a>,    <a href="https://www.spapas.net/tag/hyperapp.html">hyperapp</a>,    <a href="https://www.spapas.net/tag/immutable.html">immutable</a>,    <a href="https://www.spapas.net/tag/es6.html">es6</a>,    <a href="https://www.spapas.net/tag/youtube.html">youtube</a>,    <a href="https://www.spapas.net/tag/youtube-dl.html">youtube-dl</a>,    <a href="https://www.spapas.net/tag/ffmpeg.html">ffmpeg</a>,    <a href="https://www.spapas.net/tag/django-rest-auth.html">django-rest-auth</a>,    <a href="https://www.spapas.net/tag/python-2.html">python-2</a>,    <a href="https://www.spapas.net/tag/python-3.html">python-3</a>,    <a href="https://www.spapas.net/tag/plpgsql.html">plpgsql</a>,    <a href="https://www.spapas.net/tag/component.html">component</a>,    <a href="https://www.spapas.net/tag/ag-grid.html">ag-grid</a>,    <a href="https://www.spapas.net/tag/grid.html">grid</a>,    <a href="https://www.spapas.net/tag/bash.html">bash</a>,    <a href="https://www.spapas.net/tag/cron.html">cron</a>,    <a href="https://www.spapas.net/tag/pandas.html">pandas</a>,    <a href="https://www.spapas.net/tag/scipy.html">scipy</a>,    <a href="https://www.spapas.net/tag/numpy.html">numpy</a>,    <a href="https://www.spapas.net/tag/pivot.html">pivot</a>,    <a href="https://www.spapas.net/tag/pivot_table.html">pivot_table</a>,    <a href="https://www.spapas.net/tag/ipython.html">ipython</a>,    <a href="https://www.spapas.net/tag/jupyter.html">jupyter</a>,    <a href="https://www.spapas.net/tag/notebook.html">notebook</a>,    <a href="https://www.spapas.net/tag/query.html">query</a>,    <a href="https://www.spapas.net/tag/q.html">q</a>,    <a href="https://www.spapas.net/tag/imgur.html">imgur</a>,    <a href="https://www.spapas.net/tag/console.html">console</a>,    <a href="https://www.spapas.net/tag/research.html">research</a>,    <a href="https://www.spapas.net/tag/debug.html">debug</a>,    <a href="https://www.spapas.net/tag/werkzeug.html">werkzeug</a>,    <a href="https://www.spapas.net/tag/django-extensions.html">django-extensions</a>,    <a href="https://www.spapas.net/tag/404.html">404</a>,    <a href="https://www.spapas.net/tag/error.html">error</a>,    <a href="https://www.spapas.net/tag/spring.html">spring</a>,    <a href="https://www.spapas.net/tag/spring-boot.html">spring-boot</a>,    <a href="https://www.spapas.net/tag/java.html">java</a>,    <a href="https://www.spapas.net/tag/ldap.html">ldap</a>,    <a href="https://www.spapas.net/tag/profiles.html">profiles</a>,    <a href="https://www.spapas.net/tag/settings.html">settings</a>,    <a href="https://www.spapas.net/tag/properties.html">properties</a>,    <a href="https://www.spapas.net/tag/yaml.html">yaml</a>,    <a href="https://www.spapas.net/tag/configuration.html">configuration</a>,    <a href="https://www.spapas.net/tag/deploy.html">deploy</a>,    <a href="https://www.spapas.net/tag/initd.html">init.d</a>,    <a href="https://www.spapas.net/tag/react-redux.html">react-redux</a>,    <a href="https://www.spapas.net/tag/redux-thunk.html">redux-thunk</a>,    <a href="https://www.spapas.net/tag/redux-form.html">redux-form</a>,    <a href="https://www.spapas.net/tag/react-router.html">react-router</a>,    <a href="https://www.spapas.net/tag/react-router-redux.html">react-router-redux</a>,    <a href="https://www.spapas.net/tag/react-notification.html">react-notification</a>,    <a href="https://www.spapas.net/tag/history.html">history</a>,    <a href="https://www.spapas.net/tag/babel.html">babel</a>,    <a href="https://www.spapas.net/tag/babelify.html">babelify</a>,    <a href="https://www.spapas.net/tag/browserify.html">browserify</a>,    <a href="https://www.spapas.net/tag/watchify.html">watchify</a>,    <a href="https://www.spapas.net/tag/uglify.html">uglify</a>,    <a href="https://www.spapas.net/tag/boilerplate.html">boilerplate</a>,    <a href="https://www.spapas.net/tag/tutorial.html">tutorial</a>,    <a href="https://www.spapas.net/tag/introduction.html">introduction</a>,    <a href="https://www.spapas.net/tag/fixed-data-tables.html">fixed-data-tables</a>,    <a href="https://www.spapas.net/tag/fixeddatatable.html">FixedDataTable</a>,    <a href="https://www.spapas.net/tag/reportlab.html">reportlab</a>,    <a href="https://www.spapas.net/tag/xhtml2pdf.html">xhtml2pdf</a>,    <a href="https://www.spapas.net/tag/node.html">node</a>,    <a href="https://www.spapas.net/tag/npm.html">npm</a>,    <a href="https://www.spapas.net/tag/generic.html">generic</a>,    <a href="https://www.spapas.net/tag/tables.html">tables</a>,    <a href="https://www.spapas.net/tag/flux.html">flux</a>,    <a href="https://www.spapas.net/tag/jobs.html">jobs</a>,    <a href="https://www.spapas.net/tag/asynchronous.html">asynchronous</a>,    <a href="https://www.spapas.net/tag/scheduling.html">scheduling</a>,    <a href="https://www.spapas.net/tag/redis.html">redis</a>,    <a href="https://www.spapas.net/tag/pusher.html">pusher</a>,    <a href="https://www.spapas.net/tag/auditing.html">auditing</a>,    <a href="https://www.spapas.net/tag/css.html">css</a>,    <a href="https://www.spapas.net/tag/design.html">design</a>,    <a href="https://www.spapas.net/tag/boostrap-material-design.html">boostrap-material-design</a>,    <a href="https://www.spapas.net/tag/less.html">less</a>,    <a href="https://www.spapas.net/tag/nodejs.html">node.js</a>,    <a href="https://www.spapas.net/tag/gmail.html">gmail</a>,    <a href="https://www.spapas.net/tag/security.html">security</a>,    <a href="https://www.spapas.net/tag/google.html">google</a>,    <a href="https://www.spapas.net/tag/flask.html">flask</a>,    <a href="https://www.spapas.net/tag/mongodb.html">mongodb</a>,    <a href="https://www.spapas.net/tag/heroku.html">heroku</a>,    <a href="https://www.spapas.net/tag/spring-security.html">spring-security</a>,    <a href="https://www.spapas.net/tag/git.html">git</a>,    <a href="https://www.spapas.net/tag/github.html">github</a>,    <a href="https://www.spapas.net/tag/branching.html">branching</a>,    <a href="https://www.spapas.net/tag/static-html.html">static-html</a>,    <a href="https://www.spapas.net/tag/githubio.html">github.io</a>,    <a href="https://www.spapas.net/tag/pelican.html">pelican</a>,    <a href="https://www.spapas.net/tag/github-pages.html">github-pages</a>,    <a href="https://www.spapas.net/tag/rst.html">rst</a>  </section>
+
+  <section>
+    <h1>Yearly archives</h1>
+    <a href="https://www.spapas.net/posts/2013/">2013</a>,    <a href="https://www.spapas.net/posts/2014/">2014</a>,    <a href="https://www.spapas.net/posts/2015/">2015</a>,    <a href="https://www.spapas.net/posts/2016/">2016</a>,    <a href="https://www.spapas.net/posts/2017/">2017</a>,    <a href="https://www.spapas.net/posts/2018/">2018</a>,    <a href="https://www.spapas.net/posts/2019/">2019</a>,    <a href="https://www.spapas.net/posts/2020/">2020</a>,    <a href="https://www.spapas.net/posts/2021/">2021</a>,    <a href="https://www.spapas.net/posts/2022/">2022</a>,    <a href="https://www.spapas.net/posts/2023/">2023</a>,    <a href="https://www.spapas.net/posts/2024/">2024</a>  </section>
+
+
+
+  <section>
+    <h1>GitHub Repos</h1>
+    <ul id="gh_repos">
+      <li class="loading">Status updating...</li>
+    </ul>
+      <a href="https://github.com/spapas">@spapas</a> on GitHub
+    <script  src="//code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      $(function(){
+          if (!window.jXHR){
+              var jxhr = document.createElement('script');
+              jxhr.type = 'text/javascript';
+              jxhr.src = 'https://www.spapas.net/theme/js/jXHR.js';
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(jxhr, s);
+          }
+
+          github.showRepos({
+              user: 'spapas',
+              count: 5,
+              skip_forks: true,
+              target: '#gh_repos'
+          });
+      });
+    </script>
+    <script src="https://www.spapas.net/theme/js/github.js" type="text/javascript"> </script>
+  </section>
+
+
+  <section>
+    <a href="https://twitter.com/_serafeim_?ref_src=twsrc%5Etfw" class="twitter-follow-button"
+      data-show-count="false">Follow @_serafeim_</a>
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+  </section>
+
+</aside>    </div>
+  </div>
+  <footer role="contentinfo"><p>
+    Copyright &copy;  2013&ndash;2024  Serafeim Papastefanos &mdash;
+  <span class="credit">Powered by <a href="http://getpelican.com">Pelican</a></span>
+</p></footer>
+  <script src="https://www.spapas.net/theme/js/modernizr-2.0.js"></script>
+  <script src="https://www.spapas.net/theme/js/ender.js"></script>
+  <script src="https://www.spapas.net/theme/js/octopress.js" type="text/javascript"></script>
+  <script src="https://www.spapas.net/theme/js/ads.js"></script>
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-44750952-1', 'auto');
+
+    ga('send', 'pageview');
+    </script>
+
+<script defer data-domain="spapas.net" src="https://plausible.hcg.gr/js/script.js"></script>  <script type="text/javascript">
+    var disqus_shortname = 'spapas-github-io';
+    var disqus_identifier = '/2022/09/20/postgresql-windows-dev/';
+    var disqus_url = 'https://www.spapas.net/2022/09/20/postgresql-windows-dev/';
+    var disqus_title = 'Setting up Postgres on Windows for&nbsp;development';
+    (function() {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = "//" + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+     })();
+  </script>
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+</body>
+
+</html>

@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="google-site-verification" content="5_8DTmIiEq4gFvNAfxAD6TsGOgrMAjp8lQFQvfA6zZc" />
+    <title>Using Unpoly with Django &mdash; /var/</title>
+    <meta name="author" content="Serafeim Papastefanos">
+
+
+    
+<style type="text/css">
+pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: var(--jp-cell-editor-active-background) }
+.highlight { background: var(--jp-cell-editor-background); color: var(--jp-mirror-editor-variable-color) }
+.highlight .c { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment */
+.highlight .err { color: var(--jp-mirror-editor-error-color) } /* Error */
+.highlight .k { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword */
+.highlight .o { color: var(--jp-mirror-editor-operator-color); font-weight: bold } /* Operator */
+.highlight .p { color: var(--jp-mirror-editor-punctuation-color) } /* Punctuation */
+.highlight .ch { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Preproc */
+.highlight .cpf { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Single */
+.highlight .cs { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Special */
+.highlight .kc { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Pseudo */
+.highlight .kr { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Type */
+.highlight .m { color: var(--jp-mirror-editor-number-color) } /* Literal.Number */
+.highlight .s { color: var(--jp-mirror-editor-string-color) } /* Literal.String */
+.highlight .ow { color: var(--jp-mirror-editor-operator-color); font-weight: bold } /* Operator.Word */
+.highlight .pm { color: var(--jp-mirror-editor-punctuation-color) } /* Punctuation.Marker */
+.highlight .w { color: var(--jp-mirror-editor-variable-color) } /* Text.Whitespace */
+.highlight .mb { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Bin */
+.highlight .mf { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Float */
+.highlight .mh { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Hex */
+.highlight .mi { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Integer */
+.highlight .mo { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Oct */
+.highlight .sa { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Affix */
+.highlight .sb { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Backtick */
+.highlight .sc { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Char */
+.highlight .dl { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Delimiter */
+.highlight .sd { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Doc */
+.highlight .s2 { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Double */
+.highlight .se { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Escape */
+.highlight .sh { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Heredoc */
+.highlight .si { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Interpol */
+.highlight .sx { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Other */
+.highlight .sr { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Regex */
+.highlight .s1 { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Single */
+.highlight .ss { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Symbol */
+.highlight .il { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Integer.Long */
+</style>
+
+<style type="text/css">
+/* Overrides of notebook CSS for static HTML export */
+div.entry-content {
+  overflow: visible;
+  padding: 8px;
+}
+.input_area {
+  padding: 0.2em;
+}
+
+a.heading-anchor {
+ white-space: normal;
+}
+
+.rendered_html
+code {
+ font-size: .8em;
+}
+
+pre.ipynb {
+  color: black;
+  background: #f7f7f7;
+  border: none;
+  box-shadow: none;
+  margin-bottom: 0;
+  padding: 0;
+  margin: 0px;
+  font-size: 13px;
+}
+
+/* remove the prompt div from text cells */
+div.text_cell .prompt {
+    display: none;
+}
+
+/* remove horizontal padding from text cells, */
+/* so it aligns with outer body text */
+div.text_cell_render {
+    padding: 0.5em 0em;
+}
+
+img.anim_icon{padding:0; border:0; vertical-align:middle; -webkit-box-shadow:none; -box-shadow:none}
+
+div.collapseheader {
+    width=100%;
+    background-color:#d3d3d3;
+    padding: 2px;
+    cursor: pointer;
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+</style>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true,
+        displayMath: [['$$','$$'], ["\\[","\\]"]]
+    }
+});
+</script>
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+    $("div.collapseheader").click(function () {
+    $header = $(this).children("span").first();
+    $codearea = $(this).children(".input_area");
+    console.log($(this).children());
+    $codearea.slideToggle(500, function () {
+        $header.text(function () {
+            return $codearea.is(":visible") ? "Collapse Code" : "Expand Code";
+        });
+    });
+});
+});
+</script>
+
+
+
+
+
+
+    <!-- http://t.co/dKP3o1e -->
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+    <link href="https://spapas.github.io/favicon.png" rel="icon">
+
+    <link href="https://spapas.github.io/theme/css/main.css" media="screen, projection" rel="stylesheet"
+      type="text/css">
+
+    <link href="https://spapas.github.io/theme/css/extra_style.css" media="screen, projection" rel="stylesheet"
+      type="text/css">
+
+    <link href="https://fonts.googleapis.com/css?family=Fira+Mono|Fira+Sans:400,700&amp;subset=greek" rel="stylesheet">
+
+<style>
+#gHPzseYvFrhZ123 {
+  padding: 5px !important;
+  display: block;
+  margin-bottom: 10px !important;
+  background: #900;
+  color: #fff;
+  border-radius: 5px;
+  font-size: 1.0rem !important;
+}
+</style>
+
+
+  <script>
+    
+      
+  </script>
+
+    <script data-ad-client="ca-pub-7673322832689008" async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
+      onerror="adBlockFunction();"></script>
+  </head>
+
+<body>
+  <header role="banner"><hgroup>
+  <h1><a href="https://spapas.github.io/">/var/</a></h1>
+    <h2>Various programming stuff</h2>
+</hgroup></header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+</ul>
+
+
+<ul class="main-navigation">
+      <li >
+        <a href="https://spapas.github.io/category/ai.html">Ai</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/android.html">Android</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/clojure.html">Clojure</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/css.html">Css</a>
+      </li>
+      <li class="active">
+        <a href="https://spapas.github.io/category/django.html">Django</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/elixir.html">Elixir</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/flask.html">Flask</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/gaming.html">Gaming</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/git.html">Git</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/html.html">Html</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/javascript.html">Javascript</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/networking.html">Networking</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/pelican.html">Pelican</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/postgresql.html">Postgresql</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/python.html">Python</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/spring.html">Spring</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/unix.html">Unix</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/wagtail.html">Wagtail</a>
+      </li>
+</ul></nav>
+  <div id="main">
+    <div id="content">
+    <div id="gHPzseYvFrhZ123">
+      Hello! If you are using an ad blocker but find something useful here 
+      and want to support me please consider disabling your ad blocker for this site. 
+      <br />
+      <br />
+      Thank you,<br />
+      Serafeim
+      
+    </div>
+<div>
+  <article class="hentry" role="article">
+<header>
+      <h1 class="entry-title">Using Unpoly with Django</h1>
+    <p class="meta">
+<time datetime="2023-04-04T10:20:00+03:00" pubdate>Tue 04 April 2023</time>    </p>
+</header>
+
+<div class="entry-content"><div class="toc"><span class="toctitle">Table of contents:</span><ul>
+<li><a href="#the-unpoly-demo">The unpoly&nbsp;demo</a></li>
+<li><a href="#integrating-unpoly-with-django">Integrating unpoly with&nbsp;Django</a></li>
+<li><a href="#unpoly-configuration">Unpoly&nbsp;configuration</a></li>
+<li><a href="#navigation-improvements">Navigation improvements</a><ul>
+<li><a href="#using-the-up-main">Using the&nbsp;up-main</a></li>
+<li><a href="#make-all-links-followable">Make all links&nbsp;followable</a></li>
+<li><a href="#navigation-feedback">Navigation&nbsp;feedback</a></li>
+<li><a href="#aliases-for-navigation-feedback">Aliases for navigation&nbsp;feedback</a></li>
+</ul>
+</li>
+<li><a href="#handling-forms">Handling forms</a><ul>
+<li><a href="#integrating-with-messages">Integrating with&nbsp;messages</a></li>
+<li><a href="#immediate-form-validation">Immediate form&nbsp;validation</a></li>
+<li><a href="#other-form-helpers">Other form&nbsp;helpers</a></li>
+</ul>
+</li>
+<li><a href="#understanding-layers">Understanding layers</a><ul>
+<li><a href="#static-overlay-content">Static overlay&nbsp;content</a></li>
+<li><a href="#advanced-layersoverlays">Advanced&nbsp;layers/overlays</a></li>
+<li><a href="#opening-new-layers-over-existing-ones">Opening new layers over existing&nbsp;ones</a></li>
+<li><a href="#closing-overlays">Closing overlays</a><ul>
+<li><a href="#closing-the-overlay-when-visiting-a-link">Closing the overlay when visiting a&nbsp;link</a></li>
+<li><a href="#handling-hardcoded-urls">Handling hardcoded&nbsp;urls</a></li>
+<li><a href="#explicitly-closing-the-layer">Explicitly closing the&nbsp;layer</a></li>
+<li><a href="#closing-the-layer-by-emitting-an-unpoly-event">Closing the layer by emitting an unpoly&nbsp;event</a></li>
+</ul>
+</li>
+<li><a href="#doing-stuff-when-a-layer-is-closed">Doing stuff when a layer is&nbsp;closed</a></li>
+<li><a href="#overlays-and-messages">Overlays and messages</a><ul>
+<li><a href="#improving-delete">Improving&nbsp;delete</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#improving-interaction-with-django-packages">Improving interaction with Django&nbsp;packages</a></li>
+<li><a href="#advanced-concepts">Advanced concepts</a><ul>
+<li><a href="#more-about-upcompiler">More about&nbsp;up.compiler</a></li>
+<li><a href="#passing-context-from-unpoly-to-server">Passing context from unpoly to&nbsp;server</a></li>
+<li><a href="#listening-to-unpoly-events">Listening to unpoly&nbsp;events</a></li>
+<li><a href="#updating-history">Updating&nbsp;history</a></li>
+<li><a href="#troubleshooting">Troubleshooting</a></li>
+</ul>
+</li>
+<li><a href="#conclusion">Conclusion</a></li>
+</ul>
+</div>
+<p>Over the past few years, there has been a surge in the popularity of frontend frameworks, such as React and Vue. While there are certainly valid use cases for these frameworks, I believe that they are often unnecessary, as most web applications can be adequately served by traditional request/response web pages without any frontend framework. The high usage of these frameworks is largely driven by <span class="caps">FOMO</span> and lack of knowledge about alternatives. However, using such frameworks can add unnecessary complexity to your project, as you now have to develop two projects in parallel (the frontend and the backend) and maintain two separate&nbsp;codebases.</p>
+<p>That being said, I understand that some projects may require extra <span class="caps">UX</span> enhancements such as modals, navigation and form submissions without full page reloads, immediate form validation feedback, page fragment updates etc. If you want some of this functionality but do not want to hop on the <span class="caps">JS</span> framework train, you can use the
+<a href="https://unpoly.com/">Unpoly</a>&nbsp;library. </p>
+<p>Unpoly is similar to other libraries like intercooler, htmx or turbo however I find it to be the easiest to be used in the kind of projects I work on. These libraries allow you to write dynamic web applications with minimal changes to your existing server-side&nbsp;code. </p>
+<p>In this guide, we&#8217;ll go over how to use Unpoly with Django. Specifically, we&#8217;ll cover the following&nbsp;topics:</p>
+<ul>
+<li>An unpoly&nbsp;demo</li>
+<li>Integrating unpoly with&nbsp;Django</li>
+<li>Navigation&nbsp;improvements</li>
+<li>Form&nbsp;improvements</li>
+<li>Modal improvements&nbsp;(layers)</li>
+<li>Integration with (some) django&nbsp;packages</li>
+<li>More advanced&nbsp;concepts</li>
+</ul>
+<h2 id="the-unpoly-demo">The unpoly&nbsp;demo</h2>
+<p>Unpoly provides a <a href="https://demo.unpoly.com/">demo application</a> written in Ruby. You can go on and play with it for a bit to understand what it offers compared to a traditional web&nbsp;app.</p>
+<p>I&#8217;ve re-implemented this in Django
+so you can compare the code with a non-unpoly Django app. It can be found on  https://github.com/spapas/django-unpoly-demo
+and the actual demo in Django is at: https://unpoly-demo.spapas.net or https://unpoly-demo.fly.dev/ (deployed on fly.io)
+or https://unpoly-demo.onrender.com/ (deployed on render.com; notice the free tier of render.com is very slow, this isn&#8217;t
+related to the app). The demo app uses an ephemeral database so the data may be deleted at any&nbsp;time.</p>
+<p>Try navigating the demo site and you&#8217;ll see things&nbsp;like:</p>
+<ul>
+<li>Navigation&nbsp;feedback</li>
+<li>Navigation without page&nbsp;reloads</li>
+<li>Forms opening in&nbsp;modals</li>
+<li>Modals over&nbsp;modals</li>
+<li>Form submissions without page&nbsp;reloads</li>
+<li>Form validation feedback without page&nbsp;reloads</li>
+</ul>
+<p>All this is implemented mostly with traditional Django class based views and templates in addition to a few unpoly&nbsp;attributes.</p>
+<p>To understand how much of a difference this makes, after you have taken a peek at the &#8220;companies&#8221; functionality in the demo, take 
+a look at the actual code that implementation (I&#8217;m only pasting the views, the other components are exactly the same as in a normal Django&nbsp;app):</p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">FormMixin</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">form_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">up</span><span class="o">.</span><span class="n">validate</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;success_message&quot;</span><span class="p">):</span>
+                <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">success_message</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">form_valid</span><span class="p">(</span><span class="n">form</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">render_to_response</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_context_data</span><span class="p">(</span><span class="n">form</span><span class="o">=</span><span class="n">form</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_initial</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">initial</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_initial</span><span class="p">()</span>
+
+        <span class="n">initial</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">dict</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">initial</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">CompanyListView</span><span class="p">(</span><span class="n">ListView</span><span class="p">):</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">Company</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">CompanyDetailView</span><span class="p">(</span><span class="n">DetailView</span><span class="p">):</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">Company</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">CompanyCreateView</span><span class="p">(</span><span class="n">FormMixin</span><span class="p">,</span> <span class="n">CreateView</span><span class="p">):</span>
+    <span class="n">success_message</span> <span class="o">=</span> <span class="s2">&quot;Company created successfully&quot;</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">Company</span>
+    <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;address&quot;</span><span class="p">]</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">CompanyUpdateView</span><span class="p">(</span><span class="n">FormMixin</span><span class="p">,</span> <span class="n">UpdateView</span><span class="p">):</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">Company</span>
+    <span class="n">success_message</span> <span class="o">=</span> <span class="s2">&quot;Company updated successfully&quot;</span>
+    <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;address&quot;</span><span class="p">]</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">CompanyDeleteView</span><span class="p">(</span><span class="n">DeleteView</span><span class="p">):</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">Company</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_success_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">reverse</span><span class="p">(</span><span class="s2">&quot;company-list&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">form_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">up</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s2">&quot;company:destroyed&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;Company deleted successfully&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">form_valid</span><span class="p">(</span><span class="n">form</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Experienced Django developers will immediately recognize that the above code has only two small diferences 
+from what a traditional Django app would&nbsp;have:</p>
+<ul>
+<li>the check for <code>self.request.up.validate</code> on the <code>form_valid</code> of the <code>FormMixin</code></li>
+<li>the <code>self.request.up.layer.emit</code> on the <code>DeleteView</code> <code>form_valid</code></li>
+</ul>
+<p>We&#8217;ll explain these later. However the thing to keep is that this is the same as a good-old Django app,
+without the need to implement special functionality like checks for ajax views, fragments, special form handling&nbsp;etc.</p>
+<h2 id="integrating-unpoly-with-django">Integrating unpoly with&nbsp;Django</h2>
+<p>To integrate unpoly with Django you only need to include the unpoly JavaScript and <span class="caps">CSS</span> library to your project. This is a normal .js file
+that you can retrieve from the <a href="https://unpoly.com/install">unpoly install page</a>. Also, if you are using Bootstrap 3,4 or 5 I recommend to also download the corresponding unpoly-bootstrapX.js&nbsp;file.</p>
+<p>Unpoly communicates with your backend through custom X-<span class="caps">HTTP</span>-<span class="caps">UP</span> headers. You could use the headers directly however it is also possible to install the <a href="https://gitlab.com/rocketduck/python-unpoly">python-unpoly</a>
+library to make things easier. After installing that library you&#8217;ll add the <code>unpoly.contrib.django.UnpolyMiddleware</code> in your <code>MIDDLEWARE</code> list resulting in an extra <code>up</code> attribute to your request. You can then use this <code>up</code> attribute through the <a href="https://unpoly.readthedocs.io/en/latest/usage.html"><span class="caps">API</span></a> for easier access to the unpoly&nbsp;headers.</p>
+<p>To access <code>up</code> through your Django templates you can use <code>request.up</code> or add it to the default context using a context processor so you can access it&nbsp;directly.</p>
+<p>To make sure that everything works, add the <code>up-follow</code> to one of your links, i.e change <code>&lt;a href='linkto'&gt;link&lt;/a&gt;</code>
+to <code>&lt;a up-follow href='linkto'&gt;link&lt;/a&gt;</code>. When you click on this link you should observe that instead of a full-page reload
+you&#8217;ll get the response immediately! What really happens is that unpoly will make an <span class="caps">AJAX</span> request to the server, retrieve the response and render it on the current page making the response seem much&nbsp;faster! </p>
+<h2 id="unpoly-configuration">Unpoly&nbsp;configuration</h2>
+<p>The main way to use unpoly is to add <code>up-x</code> attributes to your html elements to enable unpoly behavior. However it is possible to use the unpoly js <span class="caps">API</span> (<code>window.up</code> or <code>up</code>) to set some global configuration. For example, you can use <code>up.log.enable()</code> and <code>up.log.disable()</code> to enable/disable the unpoly logging to your console. I recommend enabling it for your development environment because it will help you debug when things don&#8217;t seem to be&nbsp;working. </p>
+<p>To use <code>up</code> to configure unpoly you only need to add it on a <code>&lt;script&gt;</code> element after loading the unpoly library, for&nbsp;example:</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;{% static &#39;unpoly/unpoly.min.js&#39; %}&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;{% static &#39;unpoly/unpoly-bootstrap4.min.js&#39; %}&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;{% static &#39;application.js&#39; %}&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>And in <code>application.js</code> you can use <code>up</code> directly, for example to enable&nbsp;logging:</p>
+<div class="highlight"><pre><span></span><code><span class="w">  </span><span class="nx">up</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">enable</span><span class="p">()</span>
+</code></pre></div>
+
+<p>We&#8217;ll see more <code>up</code> configuration directives later, however keep in mind that for a lot of <code>up-x</code> attributes it is possible to use the config to automatically add that attribute to multiple elements using a&nbsp;selector.</p>
+<h2 id="navigation-improvements">Navigation&nbsp;improvements</h2>
+<p>Using the <code>up-follow</code> directive you can start adding <code>up-follow</code> to all your links and you&#8217;ll get a much more responsive application. This is very simple and&nbsp;easy.</p>
+<p>One interesting thing is that we didn&#8217;t need to change <em>anything</em> on the backend. The whole response will be retrieved by unpoly and 
+will <em>replace</em> the <code>body</code> of the current page. Actually, it is possible to instruct unpoly to replace only a specific part of the page
+using a css selector (i.e replace only the <code>#content</code> div). To do this you can add the <code>up-target</code> attribute to the link, i.e <code>&lt;a up-target='#content' up-follow href='linkto'&gt;link&lt;/a&gt;</code>. When unpoly retrieves the response, it will make sure that it has an <code>#content</code> 
+element and put its contents to the original page <code>#content</code> element.</p>
+<p>This technique is called <code>linking to fragments</code> in the unpoly docs. To see this in action, try going to the tasks in the demo and add a couple of new task. Then try to edit a that task. You&#8217;ll notice that the edit form of the task will <em>replace</em> the task show card! To do that, unpoly loads the edit task form and matches the <code>.task</code> element there with the <em>current</em> <code>.task</code> element and does the replacement (see <a href="https://unpoly.com/fragment-placement#interaction-origin-is-considered">here</a> for rules on how this&nbsp;works). </p>
+<p>Beyond the <code>up-follow</code>, you can also use two more directives to further improve the&nbsp;navigation: </p>
+<ul>
+<li><code>up-instant</code> to follow the link on mousedown (without waiting for the user releasing the mouse&nbsp;button)</li>
+<li><code>up-preload</code> to follow the link when the mouse hovers over the&nbsp;link</li>
+</ul>
+<h3 id="using-the-up-main">Using the&nbsp;up-main</h3>
+<p>To make things simpler, you can declare an element to be the default replacement target. This is done by adding the <code>up-main</code> attribute to an element. This way, all <code>up-follow</code> links will replace that particular element by default unless they have an <code>up-target</code> element&nbsp;themselves.</p>
+<p>What I usually do is that I&#8217;ve got a <code>base.html</code> template looking something like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><code>    {% include &quot;partials/_nav.html&quot; %}
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">up-main</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;container&quot;</span><span class="p">&gt;</span>
+      {% include &quot;partials/_messages.html&quot; %}
+      {% block content %}
+      {% endblock %}
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+    {% include &quot;partials/_footer.html&quot; %}
+</code></pre></div>
+
+<p>See the <code>up-main</code> on the <code>.container</code>? This way, all my <code>up-follow</code> links will replace the contents of the <code>.container</code> element by default. If I wanted to replace a specific part of the page, I could add the <code>up-target</code> attribute to the&nbsp;link.</p>
+<p>If there&#8217;s no <code>up-main</code> element, unpoly will replace the whole <code>body</code> element.</p>
+<h3 id="make-all-links-followable">Make all links&nbsp;followable</h3>
+<p>It is possible to make all links (or links that follow a selector) <a href="https://unpoly.com/handling-everything#following-all-links">followable by default</a> by using the <code>up.link.config.followSelectors</code> option. 
+I would recommend to only do this on greenfield projects where you&#8217;ll test the functionality anyway. For existing projects I think it&#8217;s better to add the <code>up-follow</code> attribute explicitly to the links you want to make&nbsp;followable.</p>
+<p>This is recommend it because there are cases where using unpoly will break some pages, especially if you have some JavaScript code that relies on the page being loaded. We&#8217;ll talk about this in the up.compiler&nbsp;section.</p>
+<p>If you have made all the links followable but you want to skip some links and do a full page reload instead, add the <code>up-follow=false</code> attribute to the link or use the <code>up.link.config.noFollowSelectors</code> config to make multiple links&nbsp;non-followable.</p>
+<p>You can also make all links instant or preload for example by using <code>up.link.config.instantSelectors.push('a[href]')</code> to make all followable links load on mousedown. This should be safe because it will only work on links that are <a href="https://unpoly.com/handling-everything#following-all-links-on-mousedown">already followable</a>. </p>
+<h3 id="navigation-feedback">Navigation&nbsp;feedback</h3>
+<p>One very useful feature of unpoly is that it adds more or less <em>free</em> <a href="https://unpoly.com/up.feedback">navigation feedback</a>. This can be enabled by adding an <code>[up-nav]</code> element to the navigation section of your page. Unpoly then will add an <code>up-current</code> class to the links in that section that match the current <span class="caps">URL</span>. This works no matter if you are using <code>up-follow</code> or not. You can then style <code>.up-current</code> links as you&nbsp;want.</p>
+<p>If you are using Bootstrap along with the unpoly-bootstrap integrations you&#8217;ll get all that without any extra work! The unpoly-bootstrap has the following&nbsp;configuration:</p>
+<div class="highlight"><pre><span></span><code><span class="nx">up</span><span class="p">.</span><span class="nx">feedback</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">currentClasses</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s1">&#39;active&#39;</span><span class="p">);</span>
+<span class="nx">up</span><span class="p">.</span><span class="nx">feedback</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">navSelectors</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s1">&#39;.nav&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;.navbar&#39;</span><span class="p">);</span>
+</code></pre></div>
+
+<p>So it will automatically add the <code>up-nav</code> element on <code>.nav</code> and <code>.navbar</code> elements and will add the <code>active</code> class to the current link (in addition to the <code>.up-current</code> class). This is what happens in the demo, if you take a peek you&#8217;ll see that there are no <code>up-nav</code> elements (since these are marked by the unpoly-bootstrap integration) in the navigation bar and we style the <code>.active</code> nav&nbsp;links.</p>
+<h3 id="aliases-for-navigation-feedback">Aliases for navigation&nbsp;feedback</h3>
+<p>Unpoly also allows you to add aliases for the navigation feedback. For example, you may have <code>/companies/</code> and <code>/companies/new</code> and you want the <code>companies</code> nav link to be active on both of them. To allow that you need to use the <code>up-alias</code> attribute on the link&nbsp;like </p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">a</span> <span class="na">class</span><span class="o">=</span><span class="s">&#39;nav-item nav-link&#39;</span> <span class="na">up-follow</span> <span class="na">href</span><span class="o">=</span><span class="s">&#39;{% url &quot;company-list&quot; %}&#39;</span> <span class="na">up-alias</span><span class="o">=</span><span class="s">&#39;{% url &quot;company-list&quot; %}new/&#39;</span><span class="p">&gt;</span>Companies<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>(notice that in my case the url of <code>company-list</code> is <code>/companies/</code> that&#8217;s why I added <code>{% url "company-list" %}new/</code> on the alias so the resulting alias path would be <code>/companies/new/</code>), or even add multiple links to the&nbsp;alias</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">a</span> <span class="na">class</span><span class="o">=</span><span class="s">&#39;nav-item nav-link&#39;</span> <span class="na">up-follow</span> <span class="na">href</span><span class="o">=</span><span class="s">&#39;{% url &quot;company-list&quot; %}&#39;</span> <span class="na">up-alias</span><span class="o">=</span><span class="s">&#39;{% url &quot;company-list&quot; %}*&#39;</span><span class="p">&gt;</span>Companies<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>This will add the <code>up-current</code> class to the <code>a</code> element whenever the url starts with <code>/companies/</code> (i.e <code>/companies/</code>, <code>/companies/new</code>, <code>/companies/1/edit</code> etc).</p>
+<p>Please notice that it is recommended to have a proper url hierarchy for this to work better. For example, if you have <code>/companies_list/</code> and <code>/add_new_company/</code> you&#8217;ll need to add the aliases like <code>up-alias='/companies_list/ /add_new_company/'</code> (notice the space between the urls to add two aliases). Also, if you want to also handle <span class="caps">URLS</span> with query parameters i.e <code>/companies/?name=foo</code> then you&#8217;ll need to add <code>?*</code> i.e <code>/companies/?*</code>. These urls aren&#8217;t aliased by default so <code>/companies/</code> doesn&#8217;t match <code>/companies/?name=foo</code> unless you add an&nbsp;alias.</p>
+<p>One final remark is that it is possible to do some trickery to automatically add up-alias to all your nav links. This is useful in case you have many nav elements and you don&#8217;t want to add aliases to each one of them, for example, using this&nbsp;code:</p>
+<div class="highlight"><pre><span></span><code><span class="w">  </span><span class="nx">up</span><span class="p">.</span><span class="nx">compiler</span><span class="p">(</span><span class="s1">&#39;nav a[href]&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">link</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">link</span><span class="p">.</span><span class="nx">href</span><span class="p">.</span><span class="nx">endsWith</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">))</span><span class="w"> </span><span class="nx">link</span><span class="p">.</span><span class="nx">setAttribute</span><span class="p">(</span><span class="s1">&#39;up-alias&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">link</span><span class="p">.</span><span class="nx">href</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s1">&#39;*&#39;</span><span class="p">)</span>
+<span class="w">  </span><span class="p">})</span>
+</code></pre></div>
+
+<p>an <code>up-alias</code> attribute will be added to all links. The callback of the compiler will be called when the selector is matched and
+in this case add the <code>up-alias</code> attribute to the link. We&#8217;ll talk later about compilers&nbsp;more.</p>
+<h2 id="handling-forms">Handling&nbsp;forms</h2>
+<p>Unpoly can also be used to handle forms without page reloads, similar to following links. This is simple to do by adding an <code>up-submit</code> attribute to your form. Also similar to links you can make <a href="https://unpoly.com/handling-everything#handling-all-forms">all your forms handled by unpoly</a> but I recommend to be cautious before doing this on existing projects to make sure that stuff doesn&#8217;t&nbsp;break.</p>
+<p>When you add an <code>up-submit</code> to a form unpoly will do an <span class="caps">AJAX</span> post to submit the form and replace the contents of the <code>up-target</code> element with the response (if you don&#8217;t specify an <code>up-target</code> element, it will use the <code>up-main</code> element in a similar way as links). This works fine with the default Django behavior, i.e when the form is valid Django will do a redirect to the success url, unpoly will follow that link and render the response of the&nbsp;redirect.</p>
+<h3 id="integrating-with-messages">Integrating with&nbsp;messages</h3>
+<p>Django has the <a href="https://docs.djangoproject.com/en/stable/ref/contrib/messages/">messages framework</a> that can be used to add one-time flash messages
+after a form is successfully submitted. You need to make sure that these messages are actually rendered! For example, in the <code>base.htm</code> template I mentioned before, we&#8217;ve got the&nbsp;following:</p>
+<div class="highlight"><pre><span></span><code>    {% include &quot;partials/_nav.html&quot; %}
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">up-main</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;container&quot;</span><span class="p">&gt;</span>
+      {% include &quot;partials/_messages.html&quot; %}
+      {% block content %}
+      {% endblock %}
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+    {% include &quot;partials/_footer.html&quot; %}
+</code></pre></div>
+
+<p>please notice that we&#8217;ve got the <code>partials/_messages.html</code> template included in the <code>up-main</code> element (<em>inside</em> the container). This means that when unpoly replaces the contents of the <code>up-main</code> element with the response of the form submission, the messages will be rendered as well. So it will work fine in this&nbsp;case. </p>
+<p>However, if you are using <code>up-target</code> to render only particular parts of the page the flash messages will be actually lost! This happens because unpoly will load the page with the flash messages normally, so these messages will be consumed; then it will match the <code>.target</code> and display <em>only</em> that part of the&nbsp;response.</p>
+<p>To resolve that you can use the <code>up-hungry</code> attribute on your messages. For example, in the <code>partials/_messages.html</code> template we&#8217;ve got the&nbsp;following:</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">&#39;flash-messages&#39;</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;flash-messages&quot;</span> <span class="na">up-hungry</span><span class="p">&gt;</span>
+    {% for message in messages %}
+        <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;alert fade show {% if message.tags %} alert-{% if &#39;error&#39; in message.tags %}danger{% else %}{{ message.tags }}{% endif %}{% endif %}&quot;</span><span class="p">&gt;</span>
+            {{ message }}
+        <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+    {% endfor %}
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>The <code>up-hungry</code> attribute will make unpoly refresh that particular part of the page on every page load <a href="https://unpoly.com/up-hungry">even if it&#8217;s not on the target</a>. For example notice how the message is displayed when you edit or mark as done an existing task in the&nbsp;demo. </p>
+<p>However also notice that no messages are displayed if you create a new task! This happens because the actual response is &#8220;eaten&#8221; by the layer and the messages are discarded! We&#8217;ll see how to fix that&nbsp;later.</p>
+<h3 id="immediate-form-validation">Immediate form&nbsp;validation</h3>
+<p>Another area in which unpoly helps with our forms is that if we add the <code>up-validate</code> attribute to our form, unpoly will do an <span class="caps">AJAX</span> post to the server whenever the input focus changes and will display the errors in the form without reloading the page. For this we need a little modification to our views to check if the unpoly wants to validate the form. I&#8217;m using the following <code>form_valid</code> on a form&nbsp;mixin:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">form_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">up</span><span class="o">.</span><span class="n">validate</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;success_message&quot;</span><span class="p">):</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">success_message</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">form_valid</span><span class="p">(</span><span class="n">form</span><span class="p">)</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">render_to_response</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_context_data</span><span class="p">(</span><span class="n">form</span><span class="o">=</span><span class="n">form</span><span class="p">))</span>
+</code></pre></div>
+
+<p>So if the form is not valid or we get an unpoly validate request from unpoly we&#8217;ll render the response - this will render the form with or without errors. However if the form is actually valid and this is not an unpoly validate request we&#8217;ll do the usual form save and redirect to the success url. This is enough to handle all cases and is very simple and straightforward. It works fine without unpoly as well since the <code>up.validate</code> will be always <code>False</code> in this&nbsp;case.</p>
+<p>One thing to keep in mind is that this works fine in most cases but may result to problematic behavior if you use components that rely on javascript onload events. The <code>up-validate</code> will behave more or less the same as with <code>up-follow</code> links. </p>
+<h3 id="other-form-helpers">Other form&nbsp;helpers</h3>
+<p>Beyond these, unpoly offers a <a href="https://unpoly.com/up.form">bunch of form helpers</a> to run callbacks or auto-submit a form when a field is changed. Most of this functionality can be replicated by other js libraries (i.e jquery) or even by vanilla.js and is geared towards the front-end so I won&#8217;t cover it more&nbsp;here.</p>
+<h2 id="understanding-layers">Understanding&nbsp;layers</h2>
+<p>One of the most powerful features of unpoly is <a href="https://unpoly.com/up.layer">layers</a>. To understand the terminology, a layer is any page that is stacked on top of another. The initial page is called the root layer, all other layers are called overlays. Layers can be arbitrary opened and stacked, there&#8217;s no limit on the number of layers that can be&nbsp;opened. </p>
+<p>An overlay can be rendered like a modal / popup / drawer. The simplest way to use an overlay is to add an <code>up-layer='new'</code> attribute to a link. For example, in the demo app, the link to open a company is like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><code>  <span class="p">&lt;</span><span class="nt">a</span>
+    <span class="na">up-layer</span><span class="o">=</span><span class="s">&#39;new&#39;</span>
+    <span class="na">up-on-dismissed</span><span class="o">=</span><span class="s">&quot;up.reload(&#39;.table&#39;, { focus: &#39;:main&#39; })&quot;</span>
+    <span class="na">up-dismiss-event</span><span class="o">=</span><span class="s">&#39;company:destroyed&#39;</span>
+    <span class="na">href</span><span class="o">=</span><span class="s">&quot;{% url &#39;company-detail&#39; company.id %}&quot;</span><span class="p">&gt;</span>{{ company.name }}<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>(ignore the dismiss-related attributes for now). This opens a new modal dialog with the contents of the company detail. It will render the whole contents of the <code>up-main</code> element inside the modal since we don&#8217;t provide an <code>up-target</code>. If we added an <code>up-target='.projects'</code> attribute to this it would render <em>only</em> the <code>.projects</code> element inside the modal (but remember that it will retrieve the <em>whole</em> response since the /companies/detail/id is a normal django DetailView). So with <code>up-layer='new'</code> we open a page on a new overlay/modal. If we also add an <code>up-target</code> to it we&#8217;ll open only a particular part of that&nbsp;page.</p>
+<p>You can use <code>up-mode</code> attribute to <a href="https://unpoly.com/layer-terminology#available-modes">change the kind of overlay</a>; the default is a <code>modal</code>. Also if you want to configure the ways this modal closes you can use the 
+<code>up-dismissable</code> <a href="https://unpoly.com/closing-overlays#customizing-dismiss-controls">attribute</a>, for example add 
+<code>up-dismissable='button'</code> to allow closing only with the X button on the top right. Another useful thing is that there&#8217;s an 
+<code>up-size</code> attribute for changing the <a href="https://unpoly.com/customizing-overlays#overlay-sizes">size of the overlay</a>. I recommend playing a bit with these options to have a feel on how they are working and what you can do with&nbsp;them.</p>
+<h3 id="static-overlay-content">Static overlay&nbsp;content</h3>
+<p>An overlay can also contain &#8220;static&#8221; content (i.e not follow a link but display some html) by using the <code>up-content</code> <a href="https://unpoly.com/a-up-follow#up-content">attribute</a>. This is how the green dots are implemented, their html is similar to&nbsp;this:</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;#&quot;</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;tour-dot viewed&quot;</span> <span class="na">up-layer</span><span class="o">=</span><span class="s">&quot;new popup&quot;</span> <span class="na">up-content</span><span class="o">=</span><span class="s">&quot;&lt;p&gt;Navigation links have the &lt;code&gt;[up-follow]&lt;/code&gt; attribute. </span>
+<span class="s">    &lt;p&gt;</span>
+<span class="s">        &lt;a href=&amp;quot;#&amp;quot; up-dismiss class=&amp;quot;btn btn-success btn-sm&amp;quot;&gt;OK&lt;/a&gt;</span>
+<span class="s">    &lt;/p&gt;</span>
+<span class="s">    &quot;</span> <span class="na">up-position</span><span class="o">=</span><span class="s">&quot;right&quot;</span> <span class="na">up-align</span><span class="o">=</span><span class="s">&quot;top&quot;</span> <span class="na">up-class</span><span class="o">=</span><span class="s">&quot;tour-hint&quot;</span> <span class="na">up-size</span><span class="o">=</span><span class="s">&quot;medium&quot;</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>Notice that the <code>up-content</code> contains a whole html snippet. This is implemented in Django using the following template&nbsp;tag:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@register</span><span class="o">.</span><span class="n">tag</span><span class="p">(</span><span class="s2">&quot;tourdot&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">do_tourdot</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">token</span><span class="p">):</span>
+    <span class="n">nodelist</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">((</span><span class="s2">&quot;endtourdot&quot;</span><span class="p">,))</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">delete_first_token</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">TourDotNode</span><span class="p">(</span><span class="n">nodelist</span><span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">TourDotNode</span><span class="p">(</span><span class="n">template</span><span class="o">.</span><span class="n">Node</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nodelist</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodelist</span> <span class="o">=</span> <span class="n">nodelist</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="n">rendered</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodelist</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">context</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="s2">&quot;medium&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">strip_tags</span><span class="p">(</span><span class="n">rendered</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">400</span><span class="p">:</span>
+            <span class="n">size</span> <span class="o">=</span> <span class="s2">&quot;large&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">rendered</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;&lt;p&quot;</span><span class="p">):</span>
+            <span class="n">rendered</span> <span class="o">=</span> <span class="s2">&quot;&lt;p&gt;</span><span class="si">{}</span><span class="s2">&lt;/p&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">rendered</span><span class="p">)</span>
+
+        <span class="n">rendered</span> <span class="o">+=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        &lt;p&gt;</span>
+<span class="s2">            &lt;a href=&quot;#&quot; up-dismiss class=&quot;btn btn-success btn-sm&quot;&gt;OK&lt;/a&gt;</span>
+<span class="s2">        &lt;/p&gt;</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">escape</span>
+
+        <span class="n">output</span> <span class="o">=</span> <span class="n">escape</span><span class="p">(</span><span class="n">rendered</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        &lt;a </span>
+<span class="s2">            href=&quot;#&quot; class=&quot;tour-dot&quot; up-layer=&quot;new popup&quot; </span>
+<span class="s2">            up-position=&quot;right&quot; up-align=&quot;top&quot; up-class=&quot;tour-hint&quot;</span>
+<span class="s2">            up-content=&quot;</span><span class="si">{}</span><span class="s2">&quot;</span>
+<span class="s2">            up-size=&quot;</span><span class="si">{}</span><span class="s2">&quot;</span>
+<span class="s2">            &gt;</span>
+<span class="s2">        &lt;/a&gt;</span>
+<span class="s2">        &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">output</span><span class="p">,</span> <span class="n">size</span>
+        <span class="p">)</span>
+</code></pre></div>
+
+<p>So we can do something like this in our Django&nbsp;templates:</p>
+<div class="highlight"><pre><span></span><code>{% tourdot %}
+  <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>Navigation links have the <span class="p">&lt;</span><span class="nt">code</span><span class="p">&gt;</span>[up-follow]<span class="p">&lt;/</span><span class="nt">code</span><span class="p">&gt;</span> attribute. Clicking such links only updates a <span class="p">&lt;</span><span class="nt">b</span><span class="p">&gt;</span>page fragment<span class="p">&lt;/</span><span class="nt">b</span><span class="p">&gt;</span>. The remaining DOM is not changed.<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+{% endtourdot %}
+</code></pre></div>
+
+<h3 id="advanced-layersoverlays">Advanced&nbsp;layers/overlays</h3>
+<p>Opening overlays for popups or for modals to view links that don&#8217;t have interactivity is simple. However, when you open forms with overlays 
+and need to handle these (i.e close the modals only when the form is submitted succesfully) the situation unfortunately starts to get more complex. I recommend to start by reading the 
+<a href="https://unpoly.com/subinteractions">subinteractions</a> section of the unpoly documentation to understand how these things work. In the following subsections we&#8217;ll talk about specific cases and how to handle them with unpoly layers and&nbsp;Django.</p>
+<h3 id="opening-new-layers-over-existing-ones">Opening new layers <em>over</em> existing&nbsp;ones</h3>
+<p>How opening a new layer <em>over</em> an existing layer (i.e a modal inside a modal) would work? All links and forms that are handled in an existing layer will be handled in the same layer. So if we have opened a layer and there are <code>up-follow</code> links in the html of the layer, the user would be able to follow them normally inside that layer (of course if there are non <code>up-follow</code> links then a full page reload will be performed and the layer will disappear without a&nbsp;trace).</p>
+<p>If we want to open a new layer we need to use the <code>up-layer='new'</code> attribute on that link; it doesn&#8217;t matter if this is inside an already opened layer, it will work as expected and open a <em>layer-in-a-layer</em>. If the parent layer is an overlay then it will open an <em>overlay-in-an-overlay</em>. </p>
+<p>In the demo, if you click on an existing company to see its details you&#8217;ll get an overlay. If you try to edit that company the edit for will be opened <em>in the same layer</em> (notice that if you press the X button to close it you&#8217;ll go back to the company list without layers). Compare this with the behavior when adding a new project or viewing an existing one. You&#8217;ll get an overlay <em>inside</em> the parent overlay (both overlays should be visible). You need to close both overlays to go back to the company detail at the root&nbsp;layer. </p>
+<p>Even more impressive: Go to the company detail layer, click an existing project to get to the project detail layer, click <em>edit</em>; this will be opened on the <em>project detail</em> layer. You can edit the project or even delete it, when you click that overlay the company overlay will be updated with the new data and work fine! All this also works fine from the project detail list <em>without</em> any modifications on the Django&nbsp;code.</p>
+<p>The thing to remember here is that the layer behavior is very intuitive and is compatible with how a server side application works. Everything should work the same no matter if the link is opened in an overlay or in a new page or even an overlay over an&nbsp;overlay.</p>
+<h3 id="closing-overlays">Closing&nbsp;overlays</h3>
+<p>There are three main ways to <a href="https://unpoly.com/closing-overlays">close an overlay</a> (beyond of course using the (X) button or esc&nbsp;etc):</p>
+<ul>
+<li>Visiting a pre-defined&nbsp;link</li>
+<li>Explicitly closing the overlay from the&nbsp;server</li>
+<li>Emitting an unpoly&nbsp;event</li>
+</ul>
+<p>Also, when an overlay is closed we can decide if the overlay did something (i.e the user saved the form) or not (i.e the user clicked the X button). This is called <code>accepted</code> or <code>dismissed</code> respectively. We can use this to do different things. All the methods of closing an overlay have a version for accepting or dismissing the&nbsp;overlay.</p>
+<h4 id="closing-the-overlay-when-visiting-a-link">Closing the overlay when visiting a&nbsp;link</h4>
+<p>To close the overlay on visiting a link we&#8217;ll use the <code>up-accept-location</code> and <code>up-dismiss-location</code> respectively. For example, let&#8217;s take a peek on the new company&nbsp;link:</p>
+<div class="highlight"><pre><span></span><code>  <span class="p">&lt;</span><span class="nt">a</span>
+    <span class="na">class</span><span class="o">=</span><span class="s">&#39;btn btn-primary&#39;</span>
+    <span class="na">up-layer</span><span class="o">=</span><span class="s">&#39;new&#39;</span>
+    <span class="na">up-on-accepted</span><span class="o">=</span><span class="s">&quot;up.reload(&#39;.table&#39;, { focus: &#39;:main&#39; })&quot;</span>
+    <span class="na">up-accept-location</span><span class="o">=</span><span class="s">&#39;/core/companies/detail/$id/&#39;</span>
+    <span class="na">href</span><span class="o">=</span><span class="s">&#39;{% url &quot;company-create&quot; %}&#39;</span><span class="p">&gt;</span>New company<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>The important thing here is the <code>up-accept-location</code>. When Django creates a new object it redirects to the detail view of that object. In our case this detail view is <code>'/core/companies/detail/$id/'</code>; the <code>$id</code> is an unpoly thingie that will be replaced by the id of the new object and will be <a href="https://unpoly.com/closing-overlays#overlay-result-values">the result value of the overlay</a>. This value (the id) can then be used on the <code>up-on-accepted</code> callback if we&nbsp;want.</p>
+<p>Now, let&#8217;s suppose that we want to close the overlay when the user clicks on a <em>cancel</em> button that returns to the list of companies. We can do that by adding the <code>up-dismiss-location</code> attribute to that <code>&lt;a&gt;</code></p>
+<div class="highlight"><pre><span></span><code>up-dismiss-location=&#39;{% url &quot;company-list&quot; %}&#39;
+</code></pre></div>
+
+<p>The difference between these two is that the <code>up-on-accepted</code> event will only be called when the overlay is accepted and not on&nbsp;dismissed.</p>
+<h4 id="handling-hardcoded-urls">Handling hardcoded&nbsp;urls</h4>
+<p>One thing that Django developers may not like is that the url is hardcoded here. This is because using <code>{% url "company-detail" "$id" %}</code> will not work with our urls since we use have the following path for the company detail <code>"companies/detail/&lt;int:pk&gt;/"</code>. We can change it to <code>"companies/detail/&lt;str:pk&gt;/",</code> to make it work but then it will allow strings in the url and it will throw 500 error instead of 404 when the user uses a string there (to improve that we have to override the <code>get_object</code> of the <code>DetailView</code> to handle the string case). Another way to improve that is to create a <code>urlid</code> template tag like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">django.urls</span><span class="w"> </span><span class="kn">import</span> <span class="n">reverse</span>
+
+<span class="nd">@register</span><span class="o">.</span><span class="n">simple_tag</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">urlid</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">arg</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">arg</span> <span class="o">==</span> <span class="s2">&quot;$id&quot;</span><span class="p">:</span>
+        <span class="n">arg</span> <span class="o">=</span> <span class="mi">999</span>
+
+    <span class="n">url</span> <span class="o">=</span> <span class="n">reverse</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">arg</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">url</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;999&quot;</span><span class="p">,</span> <span class="s2">&quot;$id&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<p>And then using it like this on the&nbsp;up-accept-location:</p>
+<div class="highlight"><pre><span></span><code>up-accept-location=&#39;{% urlid &quot;company-detail&quot; &quot;$id&quot; %}&#39;
+</code></pre></div>
+
+<h4 id="explicitly-closing-the-layer">Explicitly closing the&nbsp;layer</h4>
+<p>To close the layer from the server you can you use the
+<a href="https://unpoly.com/X-Up-Accept-Layer"><code>X-Up-Accept-Layer</code></a>
+or <a href="https://unpoly.com/X-Up-Dismiss-Layer"><code>X-Up-Dismiss-Layer</code></a>
+response header. When unpoly sees this header in a response it will close the overlay by accepting/dismissing&nbsp;it.</p>
+<p>To do that from Django if you have integrated the unpoly middleware, call <code>request.up.layer.accept()</code> and <code>request.up.layer.dismiss()</code> respectively (passing an optional value if you&nbsp;want).</p>
+<p>The same feature can be used to close the overlay from the client side. For example, if you want to close the overlay when the user clicks on a <em>cancel</em> button that returns to the list of companies you can do that by adding the <code>up-accept</code> or <code>up-dismiss</code> attribute,&nbsp;like:</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&#39;{% urlid &quot;company-detail&quot; &quot;$id&quot; %}&#39;</span> <span class="na">up-dismiss</span><span class="p">&gt;</span>Return<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>Please notice that the <code>href</code> here could be like <code>href='#'</code> since this is javascript only to close the overlay, however we added the correct href to make sure the return button will also work when we open the link in a new page (without any&nbsp;overlays). </p>
+<p>Please notice that difference between this and <code>up-accept-location</code> or <code>up-dismiss-location</code> we mentioned before. In this case the <code>up-accept/dismiss</code> directive in placed in the a link that <em>closes</em> the overlay. In the former case the <code>up-accept/dismiss-location</code> directive is placed in the link that <em>opens</em> the&nbsp;overlay.</p>
+<h4 id="closing-the-layer-by-emitting-an-unpoly-event">Closing the layer by emitting an unpoly&nbsp;event</h4>
+<p>The final way to close an overlay is by emitting an event. Unpoly can emit events both from the server, using the <a href="https://unpoly.com/X-Up-Events"><code>X-Up-Event</code></a> response header or using <code>request.up.emit(event_type, data)</code> from the unpoly Django integration. Also events can be emitted from the client side using the <a href="https://unpoly.com/up.emit"><code>up-emit</code></a>&nbsp;attribute.</p>
+<p>To close the overlay from an event we need to use <code>up-accept-event</code> and <code>up-dismiss-event</code> on the link that opens the&nbsp;overlay.</p>
+<p>Let&#8217;s see what happens when we delete a company. We&#8217;ve got a form like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">form</span> <span class="na">up-submit</span> <span class="na">up-confirm</span><span class="o">=</span><span class="s">&#39;Really?&#39;</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;d-inline&quot;</span> <span class="na">method</span><span class="o">=</span><span class="s">&#39;POST&#39;</span> <span class="na">action</span><span class="o">=</span><span class="s">&#39;{% url &quot;company-delete&quot; company.id %}&#39;</span><span class="p">&gt;</span>
+  {% csrf_token %}
+  <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&#39;submit&#39;</span> <span class="na">value</span><span class="o">=</span><span class="s">&#39;Delete&#39;</span> <span class="na">class</span><span class="o">=</span><span class="s">&#39;btn btn-danger mr-3&#39;</span> <span class="p">/&gt;</span>
+<span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>This form asks the user for confirmation (using the <code>up-confirm</code> directive) and then submits the form on the company delete view. The <code>CompanyDeleteView</code> is like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">CompanyDeleteView</span><span class="p">(</span><span class="n">DeleteView</span><span class="p">):</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">Company</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_success_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">reverse</span><span class="p">(</span><span class="s2">&quot;company-list&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">form_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">up</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s2">&quot;company:destroyed&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">form_valid</span><span class="p">(</span><span class="n">form</span><span class="p">)</span>
+</code></pre></div>
+
+<p>So, it will emit the <code>company:destroyed</code> event and redirect to the list of companies (this is needed to make sure that delete works fine if we call it from a full page instead of an overlay). The company detail view overlay is opened from the following <code>a</code> link:</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">a</span>
+  <span class="na">up-layer</span><span class="o">=</span><span class="s">&#39;new&#39;</span>
+  <span class="na">up-on-dismissed</span><span class="o">=</span><span class="s">&quot;up.reload(&#39;.table&#39;, { focus: &#39;:main&#39; })&quot;</span>
+  <span class="na">up-dismiss-event</span><span class="o">=</span><span class="s">&#39;company:destroyed&#39;</span>
+  <span class="na">href</span><span class="o">=</span><span class="s">&quot;{% url &#39;company-detail&#39; company.id %}&quot;</span><span class="p">&gt;</span>{{ company.name }}<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>Notice that we have the <code>up-dismiss-event</code> here. If we didn&#8217;t have that then the overlay wouldn&#8217;t be closed when we deleted the company but we&#8217;d see the list of companies on the overlay because of the redirect on the Django side! Also, instead of the <code>up-dismiss-event</code> we could use the <code>up-dismiss-location='{% url "company-list" %}'</code> similar to how we discussed before. If we did it this way we wouldn&#8217;t even need to do anything unpoly related in our DeleteView, however using events for this is useful for educational reasons and we&#8217;ll see later how events will help us to dispaly a message when companies are&nbsp;deleted.</p>
+<h3 id="doing-stuff-when-a-layer-is-closed">Doing stuff when a layer is&nbsp;closed</h3>
+<p>After a layer is closed (and depending if it was accepted or dismissed) unpoly allows us to use callbacks to do stuff. The most obvious things are to reload the list of results if a result is added/edited/deleted or to choose a result in a form if we used the overlay as an object&nbsp;picker.</p>
+<p>The callbacks are <code>up-on-accepted</code> and <code>up-on-dismissed</code>.</p>
+<p>Let&#8217;s see some examples from the&nbsp;demo.</p>
+<p>On on the new company link we&#8217;ve got <code>up-on-accepted="up.reload('.table', { focus: ':main' })"</code>. However on the show details company link we&#8217;ve got <code>up-on-dismissed="up.reload('.table', { focus: ':main' })"</code>. This is a little strange (why <code>up-on-accepted</code> on the new vs <code>up-on-dismissed</code> on the detail) at first but we can explain&nbsp;it. </p>
+<p>First of all, the <a href="https://unpoly.com/up.reload">up.reload</a> method will do an <span class="caps">HTTP</span> request and reload that specific element from the server (in our case the <code>.table</code> element that contains the list of companies). The focus option that is passed instructs unopoly to move the focus to (that&nbsp;element)[https://unpoly.com/focus-option].</p>
+<p>For the &#8220;Add new&#8221; company we reload the companies when the form is accepted (when the user clicks on the &#8220;Save&#8221; button). However for the show details we&#8217;ll reload every time the overlay is dismissed because when the user edits a company the layer will not be closed but will display the edit company data. Also when we delete the company the layer will be&nbsp;dismissed. </p>
+<p>Notice that if the user clicks the company details and then presses the (X) button <em>we&#8217;ll still do a reload</em> even though it may not be needed because we can&#8217;t know if the user actually edited the company or not before closing the overlay. This is a little bit of a tradeoff but it&#8217;s not a big&nbsp;deal. </p>
+<p>Actually, it <em>is</em> possible to know if the overlay was dismissed because the user clicked the (X) button (or pressed escape) or if the overlay was dismissed because the object was deleted. This is useful if we wanted to display a message to the user when the company was deleted since we&#8217;d need to differentiate between these cases. We&#8217;ll see how the section about overlays and&nbsp;messages.</p>
+<p>On the company detail we&#8217;ve got <code>up-on-accepted='up.reload(".projects")'</code> for adding a new project but same as before we&#8217;ve got <code>up-on-dismissed='up.reload(".projects")'</code> for viewing the project detail. The <code>.projects</code> element is the projects holder inside the company detail. This is exactly the same behavior we explained&nbsp;before.</p>
+<p>On the project form we&#8217;ve got <code>up-on-accepted</code> both on the suggest name and on the new company button. In the first case, we are opening the name suggestion overlay like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">a</span>
+    <span class="na">up-layer</span><span class="o">=</span><span class="s">&#39;new popup&#39;</span>
+    <span class="na">up-align</span><span class="o">=</span><span class="s">&#39;left&#39;</span>
+    <span class="na">up-size</span><span class="o">=</span><span class="s">&#39;large&#39;</span>
+    <span class="na">up-accept-event</span><span class="o">=</span><span class="s">&#39;name:select&#39;</span>
+    <span class="na">up-on-accepted</span><span class="o">=</span><span class="s">&quot;up.fragment.get(&#39;#id_name&#39;).value = value.name&quot;</span>
+    <span class="na">href</span><span class="o">=</span><span class="s">&#39;{% url &quot;project-suggest-name&quot; %}&#39;</span><span class="p">&gt;</span>Suggest name<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>Notice that this overlay will be accepted when it receives the <code>name:select</code> event. This event passes it the selected name so it will  put it on the <code>#id_name</code> input. The <a href="https://unpoly.com/up.fragment.get"><code>up.fragment.get</code></a> is used to retrieve the input. To understand how this works we need to also see the name suggestion overlay. This is more or less similar&nbsp;to:</p>
+<div class="highlight"><pre><span></span><code>  {% for n in names %}
+    <span class="p">&lt;</span><span class="nt">a</span> <span class="na">up-emit</span><span class="o">=</span><span class="s">&quot;name:select&quot;</span>
+       <span class="na">up-emit-props</span><span class="o">=</span><span class="s">&#39;{&quot;name&quot;: &quot;{{ n }}&quot;}&#39;</span>
+       <span class="na">class</span><span class="o">=</span><span class="s">&quot;btn btn-info text-light mb-2 mr-1&quot;</span>
+       <span class="na">tabindex</span><span class="o">=</span><span class="s">&quot;0&quot;</span><span class="p">&gt;</span>
+      {{ n }}
+    <span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+  {% endfor %}
+</code></pre></div>
+
+<p>So we are using the <code>up-emit</code> directive here to emit the <code>name:select</code> event <em>and</em> we pass it some data which must be a json object. Then this data will be available as a javascript object named <code>value</code> on the <code>up-on-accepted</code> callback.</p>
+<p>So the flow&nbsp;is:</p>
+<ol>
+<li>When we click the suggest name link we open a new overlay and wait for the <code>name:select</code> event to be emitted. We don&#8217;t care if we are a full page or already inside an&nbsp;overlay</li>
+<li>The suggest name overlay displays a link of <code>&lt;a&gt;</code> elements that emit the <code>name:select</code> event when clicked and also pass the selected name as data on the&nbsp;event</li>
+<li>The overlay opener receives the <code>name:select</code> event and closes the overlay. It then uses the data to fill the <code>#id_name</code> input</li>
+</ol>
+<p>The second case is similar but instead of filling an input it opens a new overlay to create and select a new company. This is the create company link from inside the project&nbsp;form:</p>
+<div class="highlight"><pre><span></span><code>  <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&#39;{% url &quot;company-create&quot; %}&#39;</span>
+      <span class="na">up-layer</span><span class="o">=</span><span class="s">&#39;new&#39;</span>
+      <span class="na">up-accept-location</span><span class="o">=</span><span class="s">&#39;{% urlid &quot;company-detail&quot; &quot;$id&quot; %}&#39;</span>
+      <span class="na">up-on-accepted</span><span class="o">=</span><span class="s">&quot;up.validate(&#39;form&#39;, { params: { &#39;company&#39;: value.id } })&quot;</span>
+  <span class="p">&gt;</span>
+      New company
+  <span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>Nothing extra is needed from the company form side! We use the <code>up-accept-location</code> to accept the overlay when the company is created (so the user will be redirect to the company-detail view). Then we call <code>up.validate('form', { params: { 'company': value.id } })</code>  after the overlay is accepted. First of all, please remember that when we use the <code>up-accept-location</code> the overlay result 
+<a href="https://unpoly.com/a-up-layer-new#up-accept-location">will be an object with the captured parts of the url</a>. In this case we capture the new company id. Then, we call <code>up.validate</code> passing it the form and the company id we just retrieved (i.e the id of the newly created&nbsp;company).</p>
+<p>It is important to understand that we do <code>up.validate</code> here instead of simply setting the value of the select to the newly created id (similar to what we did before with the name) because the newly created value <em>is not</em> in the options that this select contains so it can&#8217;t be picked at this time;  when the validate returns though it <em>will</em> contain the newly created company to the options so it will be selected&nbsp;then.</p>
+<p>If we wanted to select the newly created company without doing the validate  instead we&#8217;d need to first add a new option to the select with the correct id and then set it to that value (which is a little bit more complex since we don&#8217;t know the name of the new company at this point). To properly implement that and to further understand how unpoly works, we&#8217;d need to emit a <code>company:create</code> event from our <code>CreateCompanyView</code> which would contain as data both the id and the name of the newly created company. Then we&#8217;d change our accept condition to <code>up-accept-event='company:create'</code>. Finally, our <code>up-on-accepted</code> would add a new option with the <code>value.name</code> and <code>value.id</code> it received from the event and select <em>that</em>&nbsp;option.</p>
+<h3 id="overlays-and-messages">Overlays and&nbsp;messages</h3>
+<p>This probably is the most complex part of integrating unpoly with Django. The problem is that when we do an action the messages will 
+be displayed on the page that our response redirects to. If we don&#8217;t display that page but we only use it as <code>on-accept-location</code> we&#8217;ll
+miss these messages. There are various solutions on how this can be fixed, and there also is a <a href="https://github.com/unpoly/unpoly/discussions/400">long discussion</a> in the unpoly repo discussions about&nbsp;that. </p>
+<p>We&#8217;ve already discussed about the <code>up-hungry</code> in your messages container element that will reread its contents from all responses. This will resolve all cases where the response is <em>not</em> discarded. For example, try to edit a project and you&#8217;ll see the edit message <em>on</em> the overlay (instead of the main page). This is because the overlay is contained in the <code>up-main</code> element so it will be rendered in the response in the&nbsp;overlay.</p>
+<p>The problematic behavior is when creating a new project or deleting one. In both these cases we discard the response so the messages are lost. The simplest way to actually fix this is to ignore the server side message and render again the message <em>from unpoly</em>. This avoids changing anything on your server-side code. So, in order to implement this, we&#8217;ll use this function which we add on <code>application.js</code> (after a suggestion on the afforementioned&nbsp;discussion):</p>
+<div class="highlight"><pre><span></span><code><span class="k">async</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">reloadWithFlash</span><span class="p">(</span><span class="nx">selector</span><span class="p">,</span><span class="w"> </span><span class="nx">flash</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">up</span><span class="p">.</span><span class="nx">reload</span><span class="p">(</span><span class="nx">selector</span><span class="p">)</span>
+<span class="w">  </span><span class="nx">up</span><span class="p">.</span><span class="nx">element</span><span class="p">.</span><span class="nx">affix</span><span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&#39;flash-messages&#39;</span><span class="p">),</span><span class="w"> </span><span class="s1">&#39;.alert.fade.show.alert-success&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">text</span><span class="o">:</span><span class="w"> </span><span class="nx">flash</span><span class="w"> </span><span class="p">})</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>This function will call <code>up.reload</code> with a selection we pass to it (f.e <code>up.reload('.table')</code>) and wait until this function finished.
+Then it will add a new element on the <code>flash-messages</code> container with the flash text we pass to it. In order to use it, we&#8217;ll change 
+the new company link&nbsp;to:</p>
+<div class="highlight"><pre><span></span><code>      <span class="p">&lt;</span><span class="nt">a</span>
+        <span class="na">class</span><span class="o">=</span><span class="s">&#39;btn btn-primary&#39;</span>
+        <span class="na">up-layer</span><span class="o">=</span><span class="s">&#39;new&#39;</span>
+        <span class="na">up-on-accepted</span><span class="o">=</span><span class="s">&quot;reloadWithFlash(&#39;.table&#39;, &#39;Company created!&#39;)&quot;</span>
+        <span class="na">up-accept-location</span><span class="o">=</span><span class="s">&#39;{% urlid &quot;company-detail&quot; &quot;$id&quot; %}&#39;</span>
+        <span class="na">href</span><span class="o">=</span><span class="s">&#39;{% url &quot;company-create&quot; %}&#39;</span><span class="p">&gt;</span>New company<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>(remember that <code>up-on-accepted</code> before was <code>up-on-accepted="up.reload('.table', { focus: ':main' })")</code>, let&#8217;s skip <code>focus</code> for now it&#8217;s not important). If we try it this way we&#8217;ll notice that we&#8217;ll get the <code>Company created</code> message after the overlay is closed! As I said before, the problem with this is that we ignore the server side message and  duplicate the message both on server and on client side. The Django side message will be used when we open the /companies/new link on a new page (not an overlay) so the overlay functionality won&#8217;t be used and the message will be rendered properly on the response. When we use an overlay the client side message will be rendered&nbsp;instead.</p>
+<p>Another solution would be to change our <code>CompanyCreateView</code> to redirect to the companies list page (instead of the newly created page). In this case, we can change the new company form&nbsp;like:</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">form</span> <span class="na">up-submit</span> <span class="na">up-validate</span> <span class="na">method</span><span class="o">=</span><span class="s">&quot;POST&quot;</span> <span class="na">up-layer</span><span class="o">=</span><span class="s">&#39;root&#39;</span><span class="p">&gt;</span>
+  ...
+<span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>Adding the <code>up-layer='root'</code> will render the response in the root layer which will close the overlay and render everything on the <code>up-main</code> element. Since we redirect to the companies list, we&#8217;ll get the list of companies along with the server-side message. This solution is actually simpler but modifies our server-side app (instead of the usual behavior of redirecting to the new company detail well&#8217;ll redirect to the companies&nbsp;list).</p>
+<p>Let&#8217;s now talk about delete. As we&#8217;ve already discussed above, the company detail overlay will be closed either when the user closes it explicitly by clicking the (X) button or because the company was deleted. In both cases we want to reload the companies but when the company is deleted we also want to display a message. So we need to know when the overlay was closed because the company was deleted vs when the overlay was closed explicitly by the&nbsp;user. </p>
+<p>Right now we&#8217;ve&nbsp;got </p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">a</span>
+  <span class="na">up-layer</span><span class="o">=</span><span class="s">&#39;new&#39;</span>
+  <span class="na">up-dismissable</span><span class="o">=</span><span class="s">&#39;button&#39;</span>
+  <span class="na">up-on-dismissed</span><span class="o">=</span><span class="s">&quot;up.reload(&#39;.table&#39;, { focus: &#39;:main&#39; })&quot;</span>
+  <span class="na">up-dismiss-event</span><span class="o">=</span><span class="s">&#39;company:destroyed&#39;</span>
+  <span class="na">href</span><span class="o">=</span><span class="s">&quot;{% url &#39;company-detail&#39; company.id %}&quot;</span><span class="p">&gt;</span>{{ company.name }}<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>For starters, we&#8217;ll add the following&nbsp;function:</p>
+<div class="highlight"><pre><span></span><code><span class="k">async</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">reloadWithFlashIfEvent</span><span class="p">(</span><span class="nx">selector</span><span class="p">,</span><span class="w"> </span><span class="nx">flash</span><span class="p">,</span><span class="w"> </span><span class="nx">value</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">up</span><span class="p">.</span><span class="nx">reload</span><span class="p">(</span><span class="nx">selector</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">focus</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;:main&#39;</span><span class="w"> </span><span class="p">})</span>
+<span class="w">  </span><span class="k">if</span><span class="p">(</span><span class="nx">value</span><span class="w"> </span><span class="ow">instanceof</span><span class="w"> </span><span class="nx">Event</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">up</span><span class="p">.</span><span class="nx">element</span><span class="p">.</span><span class="nx">affix</span><span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&#39;flash-messages&#39;</span><span class="p">),</span><span class="w"> </span><span class="s1">&#39;.alert.fade.show.alert-danger&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">text</span><span class="o">:</span><span class="w"> </span><span class="nx">flash</span><span class="w"> </span><span class="p">})</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>and change <code>up-on-dismissed</code> to <code>up-on-dismissed="reloadWithFlashIfEvent('.table', 'Company deleted!', value)"</code> on the open overlay&nbsp;link.</p>
+<p>The <code>up-on-dismissed</code> and <code>up-on-accepted</code> callbacks are passed <a href="https://unpoly.com/a-up-layer-new#up-on-dismissed">these paremeters</a> by unpoly:
+* <code>this</code> The link that originally opened the overlay
+* <code>layer</code> An up.Layer object for the dismissed overlay
+* <code>value</code> The overlay&#8217;s dismissal value
+* <code>event</code> An up:layer:dismissed&nbsp;event</p>
+<p>If the event was dismissed because the user clicked the (X) button, the <code>value</code> would have a similar to <code>:button</code> (there are same string values for pressing escape or clicking outside the modal). However if it was dismissed because of the <code>company:destroyed</code> event, the value would be an <code>Event</code> object. So we pass the <code>value</code> to our <code>reloadWithFlashIfEvent</code> callback and check if the value is an <code>Event</code> object. If it is, we know that the overlay was dismissed because the company was deleted and we can display the flash message. If it&#8217;s not, we know that the overlay was dismissed because the user clicked the (X) button and we won&#8217;t display the flash&nbsp;message.</p>
+<p>Another way we could implement this would be if we closed the company detail overlay when the company was deleted and returned the response (which is the company list view) to the root layer. Something like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">form</span> <span class="na">up-submit</span> <span class="na">up-confirm</span><span class="o">=</span><span class="s">&#39;Really?&#39;</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;d-inline&quot;</span> <span class="na">method</span><span class="o">=</span><span class="s">&#39;POST&#39;</span> <span class="na">action</span><span class="o">=</span><span class="s">&#39;{% url &quot;company-delete&quot; company.id %}&#39;</span> <span class="na">up-layer</span><span class="o">=</span><span class="s">&#39;root&#39;</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>(notice we added the <code>up-layer='root'</code> attribute). For this to work we need to <em>not</em>  <code>reload</code> in the <code>up-on-dismissed</code> function because if we reload the companies list the contents of the flash-messages will be re-read (because it has the <code>up-hungry</code> attr) and be immediately cleared out! However in this case we need to reload because a company may be&nbsp;edited!</p>
+<h4 id="improving-delete">Improving&nbsp;delete</h4>
+<p>Right now, the delete button is a form, similar to&nbsp;this:</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">form</span> <span class="na">up-submit</span> <span class="na">up-confirm</span><span class="o">=</span><span class="s">&#39;Really?&#39;</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;d-inline&quot;</span> <span class="na">method</span><span class="o">=</span><span class="s">&#39;POST&#39;</span> <span class="na">action</span><span class="o">=</span><span class="s">&#39;{% url &quot;company-delete&quot; company.id %}&#39;</span><span class="p">&gt;</span>
+  {% csrf_token %}
+  <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&#39;submit&#39;</span> <span class="na">value</span><span class="o">=</span><span class="s">&#39;Delete&#39;</span> <span class="na">class</span><span class="o">=</span><span class="s">&#39;btn btn-danger mr-3&#39;</span>  <span class="p">/&gt;</span>
+<span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>So this is an unpoly-handled form and will display a <code>Really?</code> javascript prompt to make sure the user really wants to delete the&nbsp;company. </p>
+<p>I have to confess that I don&#8217;t like javascript prompts because they can&#8217;t be styled and seem out of context from the app. However we can improve that behavior with unpoly. Here&#8217;s an improved version of the delete&nbsp;functionality:</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">a</span> <span class="na">class</span><span class="o">=</span><span class="s">&#39;btn btn-danger&#39;</span> <span class="na">up-layer</span><span class="o">=</span><span class="s">&quot;new&quot;</span> <span class="na">up-content</span><span class="o">=</span><span class="s">&#39;</span>
+<span class="s">      &lt;h3&gt;Delete company {{ company.name }}&lt;/h3&gt;</span>
+<span class="s">      Do you want to delete the company? </span>
+<span class="s">      &lt;form up-submit up-target=&quot;.table&quot; up-layer=&quot;root&quot; class=&quot;d-inline&quot; method=&quot;POST&quot; action=&quot;{% url &quot;company-delete&quot; company.id %}&quot;&gt;</span>
+<span class="s">        {% csrf_token %}</span>
+<span class="s">        &lt;input type=&quot;submit&quot; value=&quot;Yes&quot; class=&quot;btn btn-danger mr-3&quot;/&gt;</span>
+<span class="s">        &lt;a href=&quot;#&quot; class=&quot;btn btn-secondary&quot;  up-dismiss&gt;No&lt;/a&gt;</span>
+<span class="s">      &lt;/form&gt;</span>
+<span class="s">      &#39;</span><span class="p">&gt;</span>Delete<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>We changed the delete button to open a new layer. Instead of having a special view for the delete confirmation, we&#8217;re using the <code>up-content</code> attribute to directly pass the static <span class="caps">HTML</span> for the confirmation, which actually includes the delete form like before. Notice that we also include an <code>up-dismiss</code> button that clears the overlay when the user presses No. The up-layer of the form is <code>root</code> so when the form is submitted it will close both the confirmation overlay and the company detail overlay! Now, we&#8217;ll change the <code>reloadWithFlashIfEvent</code> like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><code><span class="k">async</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">reloadWithFlashIfEvent</span><span class="p">(</span><span class="nx">selector</span><span class="p">,</span><span class="w"> </span><span class="nx">flash</span><span class="p">,</span><span class="w"> </span><span class="nx">value</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">up</span><span class="p">.</span><span class="nx">reload</span><span class="p">(</span><span class="nx">selector</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">focus</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;:main&#39;</span><span class="w"> </span><span class="p">})</span>
+<span class="w">  </span><span class="k">if</span><span class="p">(</span><span class="nx">value</span><span class="w"> </span><span class="ow">instanceof</span><span class="w"> </span><span class="nx">Event</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nx">value</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s1">&#39;:peel&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">up</span><span class="p">.</span><span class="nx">element</span><span class="p">.</span><span class="nx">affix</span><span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&#39;flash-messages&#39;</span><span class="p">),</span><span class="w"> </span><span class="s1">&#39;.alert.fade.show.alert-danger&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">text</span><span class="o">:</span><span class="w"> </span><span class="nx">flash</span><span class="w"> </span><span class="p">})</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>This checks if the value is an event <em>or</em> <code>:peel</code>; this is the value that is passed when the overlay is dismissed because we use the <code>up-layer='root'</code> from the delete&nbsp;form.</p>
+<h2 id="improving-interaction-with-django-packages">Improving interaction with Django&nbsp;packages</h2>
+<p>There are two very important packages that I use on almost all my projects: <a href="https://django-tables2.readthedocs.io/en/latest/">django-tables2</a> and <a href="https://django-filter.readthedocs.io/en/stable/">django-filter</a>. You can see these in action at the <code>/core/tf/</code> path on the demo app. You&#8217;ll see&nbsp;that:</p>
+<ul>
+<li>Filtering is instant (when entering a character it will filter without the need to submit the form explicitly&nbsp;)</li>
+<li>The row detail links open in an&nbsp;overlay</li>
+<li>Sorting and pagination are handled by unpoly (so they don&#8217;t do full page&nbsp;reloads)</li>
+</ul>
+<p>To have the instant filtering we&#8217;ve changed our filter form like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">form</span> <span class="na">up-autosubmit</span> <span class="na">up-delay</span><span class="o">=</span><span class="s">&#39;250&#39;</span> <span class="na">class</span><span class="o">=</span><span class="s">&#39;form-inline&#39;</span> <span class="na">method</span><span class="o">=</span><span class="s">&#39;GET&#39;</span> <span class="na">action</span><span class="o">=</span><span class="s">&#39;&#39;</span> <span class="na">up-target</span><span class="o">=</span><span class="s">&#39;.form-data&#39;</span><span class="p">&gt;</span>
+    {{ filter.form|crispy }}
+    <span class="p">&lt;</span><span class="nt">input</span> <span class="na">class</span><span class="o">=</span><span class="s">&#39;btn btn-info&#39;</span> <span class="na">type</span><span class="o">=</span><span class="s">&#39;submit&#39;</span> <span class="na">value</span><span class="o">=</span><span class="s">&#39;Filter&#39;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">a</span> <span class="na">up-follow</span> <span class="na">href</span><span class="o">=</span><span class="s">&#39;{{ request.path }}&#39;</span> <span class="na">class</span><span class="o">=</span><span class="s">&#39;btn btn-secondary&#39;</span><span class="p">&gt;</span>Reset<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>Notice the <code>up-autosubmit</code>; this will submit the form when a field changes. Also  the <code>up-delay</code> adds a small
+delay before the form is submitted so when the user writes <code>foo</code> it will do 1 query instead of 3 (if he writes
+fast enough of course). The <code>up-target</code> attribute is used to specify the element that will be updated with the
+response. In this case we&#8217;re using a <code>form-data</code> element that includes the whole table (using django-tables2 of&nbsp;course):</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#39;form-data&#39;</span><span class="p">&gt;</span>
+  {% render_table table %}
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>To open the links in a layer we only need to pass the correct parameters to the table field, for example in our case the table is like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">CompanyTable</span><span class="p">(</span><span class="n">tables</span><span class="o">.</span><span class="n">Table</span><span class="p">):</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">tables</span><span class="o">.</span><span class="n">LinkColumn</span><span class="p">(</span>
+        <span class="s2">&quot;company-detail&quot;</span><span class="p">,</span>
+        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">A</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)],</span>
+        <span class="n">attrs</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;btn btn-primary btn-sm&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;up-on-dismissed&quot;</span><span class="p">:</span> <span class="s2">&quot;up.reload(&#39;.table&#39;, { focus: &#39;:main&#39; })&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;up-layer&quot;</span><span class="p">:</span> <span class="s2">&quot;new&quot;</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">Company</span>
+        <span class="n">template_name</span> <span class="o">=</span> <span class="s2">&quot;django_tables2/bootstrap4.html&quot;</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;address&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<p>So we a pass the attributes directly to the link&#8217;s <code>a</code> element. Nothing really fancy is&nbsp;needed.</p>
+<p>Furthermore, notice that we use the builtin bootstrap4 template. We don&#8217;t change the template at all. The original django-tables2 template does <em>not</em> have <code>unpoly</code> interation! So if we leave it like this the pagination
+and header links will start a full request/response. To fix that, we could override the template with our own however this is not the ideal solution for&nbsp;me. </p>
+<p>Instead, we can use <code>up.compiler</code>: </p>
+<div class="highlight"><pre><span></span><code><span class="nx">up</span><span class="p">.</span><span class="nx">compiler</span><span class="p">(</span><span class="s1">&#39;.pagination .page-item a.page-link&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">link</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">link</span><span class="p">.</span><span class="nx">setAttribute</span><span class="p">(</span><span class="s1">&#39;up-target&#39;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;.table-container&quot;</span><span class="p">)</span>
+<span class="p">})</span>
+
+<span class="nx">up</span><span class="p">.</span><span class="nx">compiler</span><span class="p">(</span><span class="s1">&#39;th.orderable a[href]&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">link</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">link</span><span class="p">.</span><span class="nx">setAttribute</span><span class="p">(</span><span class="s1">&#39;up-target&#39;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;.table-container&quot;</span><span class="p">)</span>
+<span class="p">})</span>
+</code></pre></div>
+
+<p>The <code>up.compiler</code> function takes a <span class="caps">CSS</span> selector and a callback function. The callback function is called
+when a snippet matching the selector is added to the <span class="caps">DOM</span>. In this case we&#8217;re adding the <code>up-target='.table-container'</code> unpoly attributes
+to both the pagination and the table header order links. The <code>.table-container</code> is the element that contains the table (it is added by&nbsp;django-tables2).</p>
+<p>This way, when unpoly sees these links it will add the <code>up-target</code> attribute (and functionality) to these without  the need to override any&nbsp;templates.</p>
+<h2 id="advanced-concepts">Advanced&nbsp;concepts</h2>
+<p>We&#8217;ll discuss some more advanced concepts of unpoly&nbsp;now.</p>
+<h3 id="more-about-upcompiler">More about&nbsp;up.compiler</h3>
+<p>The <code>up.compiler</code> function is <a href="https://unpoly.com/up.compiler">very powerful</a>. We already used it to add functionality to
+all our nav links (see the navigation aliases before) to avoid forgetting it and to add the <code>up-target</code> to our table links
+to avoid overriding the django-table2&nbsp;templates.</p>
+<p>Beyond these, the most important functionality of <code>up.compiler</code> is to replace the javascript on load (or jquery <code>$(function() {})</code>) event.
+Most common javascript libraries will be initialized when the document is ready. Unfortunately, when a page is loaded through unpoly
+this event will <em>not</em> be trigger, so the javascript elements will not be initialized! Let&#8217;s suppose that we&#8217;ve got a bunch traditional jquery ui datepicker elements and all these have the <code>.datepicker</code> css class. Normally we&#8217;d initialize it&nbsp;like</p>
+<div class="highlight"><pre><span></span><code><span class="nx">$</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;.datepicker&#39;</span><span class="p">).</span><span class="nx">datepicker</span><span class="p">()</span>
+<span class="p">})</span>
+</code></pre></div>
+
+<p>If we are to load a form with these elements through unpoly we won&#8217;t get the datepicker functionality. To fix this we can use <code>up.compiler</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="nx">up</span><span class="p">.</span><span class="nx">compiler</span><span class="p">(</span><span class="s1">&#39;.datepicker&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">element</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">$</span><span class="p">(</span><span class="nx">element</span><span class="p">).</span><span class="nx">datepicker</span><span class="p">()</span>
+<span class="p">})</span>
+</code></pre></div>
+
+<p>So when unpoly sees a <code>.datepicker</code> element it will call that callback function and initialize it! This will work properly if you follow links through <code>up-follow</code> or open new overlays with <code>up-layer='new'</code>.</p>
+<h3 id="passing-context-from-unpoly-to-server">Passing context from unpoly to&nbsp;server</h3>
+<p>Unpoly has an <code>up-context</code> attribute that can be used to pass context to the server. This must be a json object and can then be used to change the response based on that context. If we are using the unpoly python package then the context will be available in the <code>request.up.context</code> dictionary.</p>
+<p>Let&#8217;s see a particular example from the demo. When we create a new task we&#8217;ve got the following&nbsp;link:</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">a</span>
+    <span class="na">class</span><span class="o">=</span><span class="s">&#39;btn btn-primary&#39;</span>
+    <span class="na">up-layer</span><span class="o">=</span><span class="s">&#39;new&#39;</span>
+    <span class="na">up-context</span><span class="o">=</span><span class="s">&#39;{&quot;new_task&quot;: true}&#39;</span>
+    <span class="na">up-accept-location</span><span class="o">=</span><span class="s">&#39;/core/tasks/detail/$id/&#39;</span>
+    <span class="na">up-on-accepted</span><span class="o">=</span><span class="s">&quot;reloadWithFlash(&#39;.tasks&#39;, &#39;Task created!&#39;)&quot;</span>
+    <span class="na">href</span><span class="o">=</span><span class="s">&#39;{% url &quot;task-create&quot; %}&#39;</span><span class="p">&gt;</span>New task<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>Compare this with the edit&nbsp;link: </p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">a</span> <span class="na">up-target</span><span class="o">=</span><span class="s">&#39;.task&#39;</span> <span class="na">href</span><span class="o">=</span><span class="s">&#39;{% url &quot;task-update&quot; task.id %}&#39;</span> <span class="na">class</span><span class="o">=</span><span class="s">&#39;btn btn-sm btn-outline-secondary&#39;</span><span class="p">&gt;</span>Edit<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>Notice that the <code>up-context</code> is only included in the new link. Now, let&#8217;s see how the task form is&nbsp;implemented:</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">form</span> <span class="na">up-submit</span> <span class="err">{%</span> <span class="na">if</span> <span class="na">not</span> <span class="na">up</span><span class="err">.</span><span class="na">context</span><span class="err">.</span><span class="na">new_task</span> <span class="err">%}</span><span class="na">up-target</span><span class="o">=</span><span class="s">&#39;.task&#39;</span><span class="err">{%</span> <span class="na">endif</span> <span class="err">%}</span> <span class="na">class</span><span class="o">=</span><span class="s">&#39;task card&#39;</span> <span class="na">method</span><span class="o">=</span><span class="s">&quot;POST&quot;</span><span class="p">&gt;</span>
+    {% csrf_token %}
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;card-body d-flex flex-column&quot;</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;form-group flex-grow-1 mb-0&quot;</span><span class="p">&gt;</span>
+            {{ form|crispy }}
+        <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;flex-grow-0&quot;</span><span class="p">&gt;</span>
+            <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&#39;submit&#39;</span> <span class="na">class</span><span class="o">=</span><span class="s">&#39;btn btn-primary mt-2&#39;</span> <span class="na">value</span><span class="o">=</span><span class="s">&#39;Save&#39;</span><span class="p">&gt;</span>
+        <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>So, using Django we check to see if there&#8217;s <code>new_task</code> in the context and add an <code>up-target='.task'</code> if <em>not</em>. This way, we&#8217;ll get an <code>up-target='.task'</code> in the form <em>only</em> if we click the edit task button. Beyond this the form  is the same for both the new and edit&nbsp;links. </p>
+<p>This is needed because when we open the edit task it will be loaded in the same <code>.task</code> element we clicked the edit 
+link from (remember that unpoly is smart enough <a href="https://unpoly.com/fragment-placement#interaction-origin-is-considered">to match closer elements</a>). When the form is submitted we want the detail view of 
+the task to also be rendered on the same <code>.task</code> element so we use the <code>up-target='.task'</code>. This isn&#8217;t needed in
+the create new since it will be rendered in a new layer and we want to reload the the tasks with the flash message
+when the new task is&nbsp;created. </p>
+<p>Please notice that if we were to use <code>up-target='.task'</code> for both the new and edit form we&#8217;d get an error when
+the new task form was submitted because it wouldn&#8217;t be able to match the target <code>.task</code> element!</p>
+<h3 id="listening-to-unpoly-events">Listening to unpoly&nbsp;events</h3>
+<p>For most things happening in unpoly you&#8217;ll find out that there are events that you can listen to and add behavior. There are cases where handling these is&nbsp;useful. </p>
+<p>For example, I&#8217;ve observed that if you&#8217;re using bootstrap dropdowns and click a link while the dropdowns are <em>opened</em>, the dropdowns <em>will remain open</em> when the fragment has been loaded! This is very annoying. One simple way to resolve that is include the navigation inside your <code>up-main</code> element so the dropdowns will be reloaded. However there&#8217;s a better way by using unpoly events like in the following&nbsp;snippet:</p>
+<div class="highlight"><pre><span></span><code><span class="w">    </span><span class="nx">up</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;up:link:follow&#39;</span><span class="p">,</span><span class="w"> </span><span class="kd">function</span><span class="p">(</span><span class="nx">event</span><span class="p">,</span><span class="w"> </span><span class="nx">link</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="c1">// Hide visible dropdowns</span>
+<span class="w">      </span><span class="kd">const</span><span class="w"> </span><span class="nx">dropdownElementList</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">document</span><span class="p">.</span><span class="nx">querySelectorAll</span><span class="p">(</span><span class="s1">&#39;.dropdown-toggle.show&#39;</span><span class="p">)</span>
+<span class="w">      </span><span class="kd">const</span><span class="w"> </span><span class="nx">dropdownList</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[...</span><span class="nx">dropdownElementList</span><span class="p">].</span><span class="nx">map</span><span class="p">(</span><span class="nx">dropdownToggleEl</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">bootstrap</span><span class="p">.</span><span class="nx">Dropdown</span><span class="p">(</span><span class="nx">dropdownToggleEl</span><span class="p">))</span>
+<span class="w">      </span><span class="nx">dropdownList</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="nx">dropdown</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">dropdown</span><span class="p">.</span><span class="nx">hide</span><span class="p">())</span>
+<span class="w">    </span><span class="p">})</span>
+</code></pre></div>
+
+<p>Please notice that this code is for bootstrap 5 (not 4 as the remaining code in the demo since it&#8217;s from a different project). So what happens is that whenever a link is followed from unpoly we&#8217;ll clear the open dropdowns (the code isn&#8217;t very important&nbsp;here).</p>
+<h3 id="updating-history">Updating&nbsp;history</h3>
+<p>One thing to consider when using unpoly is <em>when</em> we actually need to update the browser history and url.
+<a href="https://unpoly.com/a-up-follow#up-history">By default</a>, unpoly will update the url only if the <code>up-target</code>
+matches <code>up-main</code> (so if there&#8217;s no <code>up-target</code> the url will always be&nbsp;upgraded).</p>
+<p>This can be configured through the <code>up-history</code> attribute. By default this has the value <code>'auto'</code> and we can
+set to <code>'true'</code> or <code>'false'</code> if we want to configure it so that unpoly updates the history or not for a particlar
+link or form&nbsp;submission. </p>
+<p>Let&#8217;s see a particular example from the demo. Because the <code>up-target</code> of the filter form on the is set to <code>.form-data</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">form</span> <span class="na">up-autosubmit</span> <span class="na">up-delay</span><span class="o">=</span><span class="s">&#39;250&#39;</span> <span class="na">class</span><span class="o">=</span><span class="s">&#39;form-inline&#39;</span> <span class="na">method</span><span class="o">=</span><span class="s">&#39;GET&#39;</span> <span class="na">action</span><span class="o">=</span><span class="s">&#39;&#39;</span> <span class="na">up-target</span><span class="o">=</span><span class="s">&#39;.form-data&#39;</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>the url will not be updated when the filter is changed. This is contrary to the usual way these kind of  filters work 
+(i.e update the url with the filter parameters). So we can add the  <code>up-history</code> attribute:</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">form</span> <span class="na">up-autosubmit</span> <span class="na">up-history</span><span class="o">=</span><span class="s">&#39;true&#39;</span> <span class="na">up-delay</span><span class="o">=</span><span class="s">&#39;250&#39;</span> <span class="na">class</span><span class="o">=</span><span class="s">&#39;form-inline&#39;</span> <span class="na">method</span><span class="o">=</span><span class="s">&#39;GET&#39;</span> <span class="na">action</span><span class="o">=</span><span class="s">&#39;&#39;</span> <span class="na">up-target</span><span class="o">=</span><span class="s">&#39;.form-data&#39;</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>The same applies for the pagination and header ordering links. They update the <code>.table-container</code> element so we&#8217;ll need
+to add <code>up-history=true</code> also to them. Thus we&#8217;ll change the <code>up.compiler</code> for these elements like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><code><span class="nx">up</span><span class="p">.</span><span class="nx">compiler</span><span class="p">(</span><span class="s1">&#39;.pagination .page-item a.page-link&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">link</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">link</span><span class="p">.</span><span class="nx">setAttribute</span><span class="p">(</span><span class="s1">&#39;up-follow&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">link</span><span class="p">.</span><span class="nx">href</span><span class="p">)</span>
+<span class="w">  </span><span class="nx">link</span><span class="p">.</span><span class="nx">setAttribute</span><span class="p">(</span><span class="s1">&#39;up-target&#39;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;.table-container&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="nx">link</span><span class="p">.</span><span class="nx">setAttribute</span><span class="p">(</span><span class="s1">&#39;up-history&#39;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;true&quot;</span><span class="p">)</span>
+<span class="p">})</span>
+
+<span class="nx">up</span><span class="p">.</span><span class="nx">compiler</span><span class="p">(</span><span class="s1">&#39;th.orderable a[href]&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">link</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">link</span><span class="p">.</span><span class="nx">setAttribute</span><span class="p">(</span><span class="s1">&#39;up-follow&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">link</span><span class="p">.</span><span class="nx">href</span><span class="p">)</span>
+<span class="w">  </span><span class="nx">link</span><span class="p">.</span><span class="nx">setAttribute</span><span class="p">(</span><span class="s1">&#39;up-target&#39;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;.table-container&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="nx">link</span><span class="p">.</span><span class="nx">setAttribute</span><span class="p">(</span><span class="s1">&#39;up-history&#39;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;true&quot;</span><span class="p">)</span>
+<span class="p">})</span>
+</code></pre></div>
+
+<p>This way, both the ordering links and the selected page will be reflected on the url&nbsp;history. </p>
+<p>The final result is that this filter/table page will have the usual functionality of updating the url when the filter
+is changed or the table sorting/pagination links are&nbsp;used.</p>
+<h3 id="troubleshooting">Troubleshooting</h3>
+<p>As I&#8217;ve already mentioned, the most common problem you are going to have with unpoly is when you use javascript on your page ready event. Unfortunately there&#8217;s a lot of functionality that relies on that event and pages will break when you use unpoly in these cases. That&#8217;s why I recommend to use <code>up-follow</code> and <code>up-submit</code> for your links and forms on a case-by-case basis on non greenfield projects so you&#8217;ve got more control on what works with unpoly and what is not working. Another thing that is very important to notice here is that I&#8217;ve stumbled upon libraries that not only rely on the load event but actually <em>there&#8217;s no other way to initialize them</em>! For example, there&#8217; are js libraries that have code&nbsp;like </p>
+<div class="highlight"><pre><span></span><code><span class="nx">$</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kd">let</span><span class="w"> </span><span class="nx">initElement</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">function</span><span class="p">(</span><span class="nx">el</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="p">...</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;.selected-elements&#39;</span><span class="p">).</span><span class="nx">each</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">initElement</span><span class="p">(</span><span class="k">this</span><span class="p">)</span>
+<span class="w">  </span><span class="p">})</span>
+<span class="p">})</span>
+</code></pre></div>
+
+<p>so the actual function that does the initialization (<code>initElement</code>) isn&#8217;t public and you can&#8217;t call it from the <code>up.compiler</code>. In these cases you&#8217;ll need to somehow make the <code>initElement</code> public so you can call it from the <code>up.compiler</code> or use a different&nbsp;library!</p>
+<p>The other major case for headaches in unpoly overlays. Although they are very powerful I recommend to <em>not</em> abuse them and use them only when you feel that are really needed and would improve the <span class="caps">UX</span> of the user. For example, I&#8217;d recommend using them to add new options on a select list (similar to how the project form works for companies and of course similar to how django admin does it). Also you could use overlays to have a functionality similar to django-inlines (see how the projects are added to the company) however I&#8217;d probably prefer to do that using normal django inlines especially when the standalone child edit functionality isn&#8217;t&nbsp;needed.</p>
+<p>Special care must be taken for the integration between layers and messages. I have tried to provide a solution in the previous sections by proposing flashing the message with javascript on the cases where the message will be &#8220;eaten&#8221; by a discarded response however I&#8217;m afraid that depending on how you&#8217;ve architectured your app you&#8217;ll may still get problems. The important thing is to understand how messages work (or not) and in which cases you may skip using messages at all since the feedback would be immediate and the users don&#8217;t really need&nbsp;messages.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>In conclusion, using unpoly with your Django apps can enhance the <span class="caps">UX</span> of your users by reducing page reloads and providing a more responsive and intuitive interface with little work from the developer. I recommend everybody to start integrating unpoly in their projects and see how it can improve the <span class="caps">UX</span> of your&nbsp;users!</p></div>
+    <footer>
+<p class="meta">
+  <span class="byline author vcard">
+    Posted by <span class="fn">
+        Serafeim Papastefanos
+    </span>
+  </span>
+<time datetime="2023-04-04T10:20:00+03:00" pubdate>Tue 04 April 2023</time>  <span class="categories">
+    <a class='category' href='https://spapas.github.io/category/django.html'>django</a>
+  </span>
+  <span class="categories">
+    <a class="category" href="https://spapas.github.io/tag/python.html">python</a>,    <a class="category" href="https://spapas.github.io/tag/django.html">django</a>,    <a class="category" href="https://spapas.github.io/tag/unpoly.html">unpoly</a>,    <a class="category" href="https://spapas.github.io/tag/javascript.html">javascript</a>  </span>
+</p><div class="sharing">
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="https://spapas.github.io/2023/04/04/using-unpoly-with-django/" data-via="" data-counturl="https://spapas.github.io/2023/04/04/using-unpoly-with-django/" >Tweet</a>
+</div>    </footer>
+  </article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript></div>
+  </section>
+</div>
+<aside class="sidebar">
+  
+  <section>
+    <br />
+    <a href='/feeds/all.atom.xml'>Atom</a>
+    |
+    <a href='/feeds/all.rss.xml'>RSS</a>
+  </section>
+
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <!-- Sidebar unit -->
+  <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7673322832689008" data-ad-slot="2720624730"
+    data-ad-format="auto" data-full-width-responsive="true"></ins>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+
+
+  <script async src="https://cse.google.com/cse.js?cx=612920e5ca9da850c"></script>
+  <div class="gcse-search"></div>
+
+  
+  <section>
+    <h1>Support me</h1>
+
+    You can show your appreciation for anything useful you've found here by 
+    buying me a coffee 
+    <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="spapas" data-color="#FFDD00" data-emoji=""  data-font="Lato" data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff" ></script>
+
+    or donating me some bitcoin to this address:
+    <small><pre>bc1qx42vp8napheaewhnx0rk0mttdrdrtvw6czvxhl</pre></small>
+    <svg shape-rendering="crispEdges" height="200" width="200" viewBox="0 0 29 29" class="qrcode">
+      <path fill="#FFFFFF" d="M0,0 h29v29H0z"></path><path fill="#000000" d="M0 0h7v1H0zM9 0h2v1H9zM12 0h1v1H12zM14 0h2v1H14zM18 0h2v1H18zM22,0 h7v1H22zM0 1h1v1H0zM6 1h1v1H6zM8 1h1v1H8zM11 1h1v1H11zM14 1h5v1H14zM22 1h1v1H22zM28,1 h1v1H28zM0 2h1v1H0zM2 2h3v1H2zM6 2h1v1H6zM8 2h4v1H8zM17 2h1v1H17zM22 2h1v1H22zM24 2h3v1H24zM28,2 h1v1H28zM0 3h1v1H0zM2 3h3v1H2zM6 3h1v1H6zM9 3h2v1H9zM14 3h3v1H14zM18 3h1v1H18zM22 3h1v1H22zM24 3h3v1H24zM28,3 h1v1H28zM0 4h1v1H0zM2 4h3v1H2zM6 4h1v1H6zM8 4h1v1H8zM11 4h1v1H11zM13 4h1v1H13zM15 4h2v1H15zM18 4h1v1H18zM22 4h1v1H22zM24 4h3v1H24zM28,4 h1v1H28zM0 5h1v1H0zM6 5h1v1H6zM8 5h2v1H8zM14 5h2v1H14zM19 5h2v1H19zM22 5h1v1H22zM28,5 h1v1H28zM0 6h7v1H0zM8 6h1v1H8zM10 6h1v1H10zM12 6h1v1H12zM14 6h1v1H14zM16 6h1v1H16zM18 6h1v1H18zM20 6h1v1H20zM22,6 h7v1H22zM8 7h2v1H8zM11 7h1v1H11zM15 7h1v1H15zM17 7h2v1H17zM0 8h2v1H0zM3 8h1v1H3zM6 8h2v1H6zM10 8h1v1H10zM12 8h3v1H12zM20 8h1v1H20zM22 8h3v1H22zM26 8h2v1H26zM1 9h1v1H1zM3 9h3v1H3zM8 9h1v1H8zM10 9h1v1H10zM12 9h2v1H12zM16 9h2v1H16zM20 9h1v1H20zM22 9h1v1H22zM25 9h1v1H25zM27,9 h2v1H27zM0 10h1v1H0zM3 10h2v1H3zM6 10h1v1H6zM8 10h3v1H8zM12 10h2v1H12zM16 10h1v1H16zM19 10h1v1H19zM22 10h3v1H22zM27 10h1v1H27zM0 11h1v1H0zM2 11h1v1H2zM4 11h2v1H4zM7 11h1v1H7zM13 11h4v1H13zM18 11h4v1H18zM26 11h2v1H26zM0 12h1v1H0zM2 12h3v1H2zM6 12h1v1H6zM11 12h1v1H11zM13 12h1v1H13zM15 12h3v1H15zM20 12h1v1H20zM22 12h2v1H22zM27,12 h2v1H27zM4 13h1v1H4zM8 13h3v1H8zM12 13h1v1H12zM14 13h1v1H14zM17 13h4v1H17zM25 13h2v1H25zM0 14h1v1H0zM4 14h3v1H4zM8 14h2v1H8zM11 14h3v1H11zM16 14h1v1H16zM21 14h2v1H21zM24,14 h5v1H24zM3 15h3v1H3zM7 15h2v1H7zM10 15h1v1H10zM12 15h2v1H12zM15 15h1v1H15zM17 15h2v1H17zM20 15h2v1H20zM23 15h1v1H23zM1 16h1v1H1zM4 16h1v1H4zM6 16h4v1H6zM16 16h2v1H16zM20 16h1v1H20zM23 16h1v1H23zM25 16h1v1H25zM28,16 h1v1H28zM2 17h1v1H2zM5 17h1v1H5zM7 17h2v1H7zM11 17h3v1H11zM17 17h1v1H17zM22 17h1v1H22zM25 17h1v1H25zM27,17 h2v1H27zM0 18h1v1H0zM3 18h1v1H3zM5 18h4v1H5zM10 18h1v1H10zM12 18h1v1H12zM18 18h1v1H18zM20 18h1v1H20zM22 18h2v1H22zM25,18 h4v1H25zM2 19h3v1H2zM8 19h1v1H8zM16 19h2v1H16zM21 19h1v1H21zM23 19h1v1H23zM25 19h1v1H25zM27 19h1v1H27zM0 20h1v1H0zM2 20h5v1H2zM8 20h2v1H8zM13 20h4v1H13zM19 20h6v1H19zM26 20h1v1H26zM28,20 h1v1H28zM8 21h2v1H8zM12 21h3v1H12zM16 21h1v1H16zM20 21h1v1H20zM24 21h1v1H24zM26,21 h3v1H26zM0 22h7v1H0zM8 22h3v1H8zM17 22h1v1H17zM20 22h1v1H20zM22 22h1v1H22zM24 22h2v1H24zM27 22h1v1H27zM0 23h1v1H0zM6 23h1v1H6zM10 23h2v1H10zM13 23h2v1H13zM19 23h2v1H19zM24,23 h5v1H24zM0 24h1v1H0zM2 24h3v1H2zM6 24h1v1H6zM9 24h2v1H9zM12 24h2v1H12zM17 24h1v1H17zM20 24h6v1H20zM28,24 h1v1H28zM0 25h1v1H0zM2 25h3v1H2zM6 25h1v1H6zM8 25h3v1H8zM12 25h1v1H12zM14 25h1v1H14zM18 25h1v1H18zM22 25h3v1H22zM26 25h1v1H26zM0 26h1v1H0zM2 26h3v1H2zM6 26h1v1H6zM10 26h5v1H10zM16 26h3v1H16zM21 26h1v1H21zM24 26h1v1H24zM26 26h1v1H26zM28,26 h1v1H28zM0 27h1v1H0zM6 27h1v1H6zM8 27h3v1H8zM12 27h4v1H12zM17 27h1v1H17zM20 27h1v1H20zM23 27h2v1H23zM27 27h1v1H27zM0 28h7v1H0zM8 28h3v1H8zM14 28h1v1H14zM16 28h3v1H16zM20 28h1v1H20zM22 28h1v1H22zM24 28h2v1H24zM27 28h1v1H27z"></path>
+    </svg>
+  </section>
+  
+
+  <section>
+    <h1>Subscribe</h1>
+    Do you want to get notified via email when I post new content?
+    <style>
+      .subscribe-button {
+        /* margin: 10px !important; */
+        padding: 10px !important;
+        background-color: black;
+        display: inline-block;
+        color: white !important;
+        text-decoration: none;
+
+        line-height: 36px !important;
+        height: 37px !important;
+        text-decoration: none !important;
+        display: inline-block !important;
+        color: #ffffff !important;
+        background-color: #000000 !important;
+        border-radius: 3px !important;
+        border: 1px solid transparent !important;
+        padding: 1px 9px !important;
+        font-size: 23px !important;
+        letter-spacing: 0.6px !important;
+        box-shadow: 0px 1px 2px rgba(190, 190, 190, 0.5) !important;
+        -webkit-box-shadow: 0px 1px 2px 2px rgba(190, 190, 190, 0.5) !important;
+        margin: 0 auto !important;
+        font-family: 'Cookie', cursive !important;
+        -webkit-box-sizing: border-box !important;
+        box-sizing: border-box !important;
+        -o-transition: 0.3s all linear !important;
+        -webkit-transition: 0.3s all linear !important;
+        -moz-transition: 0.3s all linear !important;
+        -ms-transition: 0.3s all linear !important;
+        transition: 0.3s all linear !important;
+
+      }
+    </style>
+    <a class='subscribe-button' target="_blank" href="http://eepurl.com/dxI3PP">Click here to subscribe!</a>
+  </section>
+
+
+  <section>
+    <h1>Recent Posts</h1>
+    <ul id="recent_posts">
+      <li class="post">
+        <a href="https://spapas.github.io/2024/08/22/multiple-erl-elixir-windows/">Multiple Erlang/Elixir versions in Windows</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/11/29/openid-connect-tutorial/">A simple OpenID connect tutorial</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/05/23/simple-django-datatables-integration/">Simple Django - DataTables integration</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/05/22/ai-auto-subtitling/">AI auto-subtitling</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/05/12/disable-your-forms/">HTML form disable after submit</a>
+      </li>
+    </ul>
+  </section>
+  <section>
+
+    <h1>Categories</h1>
+    <ul id="recent_posts">
+      <li><a href="https://spapas.github.io/category/ai.html">ai</a></li>
+      <li><a href="https://spapas.github.io/category/android.html">android</a></li>
+      <li><a href="https://spapas.github.io/category/clojure.html">clojure</a></li>
+      <li><a href="https://spapas.github.io/category/css.html">css</a></li>
+      <li><a href="https://spapas.github.io/category/django.html">django</a></li>
+      <li><a href="https://spapas.github.io/category/elixir.html">elixir</a></li>
+      <li><a href="https://spapas.github.io/category/flask.html">flask</a></li>
+      <li><a href="https://spapas.github.io/category/gaming.html">gaming</a></li>
+      <li><a href="https://spapas.github.io/category/git.html">git</a></li>
+      <li><a href="https://spapas.github.io/category/html.html">html</a></li>
+      <li><a href="https://spapas.github.io/category/javascript.html">javascript</a></li>
+      <li><a href="https://spapas.github.io/category/networking.html">networking</a></li>
+      <li><a href="https://spapas.github.io/category/pelican.html">pelican</a></li>
+      <li><a href="https://spapas.github.io/category/postgresql.html">postgresql</a></li>
+      <li><a href="https://spapas.github.io/category/python.html">python</a></li>
+      <li><a href="https://spapas.github.io/category/spring.html">spring</a></li>
+      <li><a href="https://spapas.github.io/category/unix.html">unix</a></li>
+      <li><a href="https://spapas.github.io/category/wagtail.html">wagtail</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Tags</h1>
+    <a href="https://spapas.github.io/tag/erlang.html">erlang</a>,    <a href="https://spapas.github.io/tag/elixir.html">elixir</a>,    <a href="https://spapas.github.io/tag/windows.html">windows</a>,    <a href="https://spapas.github.io/tag/openid.html">openid</a>,    <a href="https://spapas.github.io/tag/openid-connect.html">openid-connect</a>,    <a href="https://spapas.github.io/tag/oidc.html">oidc</a>,    <a href="https://spapas.github.io/tag/http.html">http</a>,    <a href="https://spapas.github.io/tag/keycloak.html">keycloak</a>,    <a href="https://spapas.github.io/tag/python.html">python</a>,    <a href="https://spapas.github.io/tag/django.html">django</a>,    <a href="https://spapas.github.io/tag/jquery.html">jquery</a>,    <a href="https://spapas.github.io/tag/datatables.html">datatables</a>,    <a href="https://spapas.github.io/tag/ai.html">ai</a>,    <a href="https://spapas.github.io/tag/whisper.html">whisper</a>,    <a href="https://spapas.github.io/tag/whispercpp.html">whisper.cpp</a>,    <a href="https://spapas.github.io/tag/subtitles.html">subtitles</a>,    <a href="https://spapas.github.io/tag/video.html">video</a>,    <a href="https://spapas.github.io/tag/auto-subtitling.html">auto-subtitling</a>,    <a href="https://spapas.github.io/tag/subtitiling.html">subtitiling</a>,    <a href="https://spapas.github.io/tag/transcribe.html">transcribe</a>,    <a href="https://spapas.github.io/tag/html.html">html</a>,    <a href="https://spapas.github.io/tag/javascript.html">javascript</a>,    <a href="https://spapas.github.io/tag/media.html">media</a>,    <a href="https://spapas.github.io/tag/storage.html">storage</a>,    <a href="https://spapas.github.io/tag/unpoly.html">unpoly</a>,    <a href="https://spapas.github.io/tag/access.html">access</a>,    <a href="https://spapas.github.io/tag/database.html">database</a>,    <a href="https://spapas.github.io/tag/accdb.html">accdb</a>,    <a href="https://spapas.github.io/tag/mdb.html">mdb</a>,    <a href="https://spapas.github.io/tag/postgresql.html">postgresql</a>,    <a href="https://spapas.github.io/tag/development.html">development</a>,    <a href="https://spapas.github.io/tag/inlines.html">inlines</a>,    <a href="https://spapas.github.io/tag/clojure.html">clojure</a>,    <a href="https://spapas.github.io/tag/cmd.html">cmd</a>,    <a href="https://spapas.github.io/tag/pdf.html">pdf</a>,    <a href="https://spapas.github.io/tag/wkhtmltopdf.html">wkhtmltopdf</a>,    <a href="https://spapas.github.io/tag/forward-proxy.html">forward-proxy</a>,    <a href="https://spapas.github.io/tag/reverse-proxy.html">reverse-proxy</a>,    <a href="https://spapas.github.io/tag/proxy.html">proxy</a>,    <a href="https://spapas.github.io/tag/networking.html">networking</a>,    <a href="https://spapas.github.io/tag/dj-rest-auth.html">dj-rest-auth</a>,    <a href="https://spapas.github.io/tag/rest.html">rest</a>,    <a href="https://spapas.github.io/tag/django-rest-framework.html">django-rest-framework</a>,    <a href="https://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="https://spapas.github.io/tag/tokens.html">tokens</a>,    <a href="https://spapas.github.io/tag/migrations.html">migrations</a>,    <a href="https://spapas.github.io/tag/foreignkey.html">foreignkey</a>,    <a href="https://spapas.github.io/tag/dark-souls.html">dark-souls</a>,    <a href="https://spapas.github.io/tag/dark-souls-2.html">dark-souls-2</a>,    <a href="https://spapas.github.io/tag/dark-souls-3.html">dark-souls-3</a>,    <a href="https://spapas.github.io/tag/autohotkey.html">autohotkey</a>,    <a href="https://spapas.github.io/tag/matplotlib.html">matplotlib</a>,    <a href="https://spapas.github.io/tag/hashids.html">hashids</a>,    <a href="https://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="https://spapas.github.io/tag/osmon.html">osmon</a>,    <a href="https://spapas.github.io/tag/phoenix.html">phoenix</a>,    <a href="https://spapas.github.io/tag/os-monitoring.html">os-monitoring</a>,    <a href="https://spapas.github.io/tag/forms.html">forms</a>,    <a href="https://spapas.github.io/tag/django-crispy-forms.html">django-crispy-forms</a>,    <a href="https://spapas.github.io/tag/django-widget-tweaks.html">django-widget-tweaks</a>,    <a href="https://spapas.github.io/tag/ecto.html">ecto</a>,    <a href="https://spapas.github.io/tag/queries.html">queries</a>,    <a href="https://spapas.github.io/tag/declarative.html">declarative</a>,    <a href="https://spapas.github.io/tag/form.html">form</a>,    <a href="https://spapas.github.io/tag/php.html">php</a>,    <a href="https://spapas.github.io/tag/select2.html">select2</a>,    <a href="https://spapas.github.io/tag/autocompelte.html">autocompelte</a>,    <a href="https://spapas.github.io/tag/ajax.html">ajax</a>,    <a href="https://spapas.github.io/tag/android.html">android</a>,    <a href="https://spapas.github.io/tag/kotlin.html">kotlin</a>,    <a href="https://spapas.github.io/tag/adapter.html">adapter</a>,    <a href="https://spapas.github.io/tag/filter.html">filter</a>,    <a href="https://spapas.github.io/tag/async.html">async</a>,    <a href="https://spapas.github.io/tag/tasks.html">tasks</a>,    <a href="https://spapas.github.io/tag/django-rq.html">django-rq</a>,    <a href="https://spapas.github.io/tag/rq.html">rq</a>,    <a href="https://spapas.github.io/tag/du.html">du</a>,    <a href="https://spapas.github.io/tag/unix.html">unix</a>,    <a href="https://spapas.github.io/tag/linux.html">linux</a>,    <a href="https://spapas.github.io/tag/disk-usage.html">disk-usage</a>,    <a href="https://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="https://spapas.github.io/tag/middleware.html">middleware</a>,    <a href="https://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="https://spapas.github.io/tag/react.html">react</a>,    <a href="https://spapas.github.io/tag/redux.html">redux</a>,    <a href="https://spapas.github.io/tag/hyperapp.html">hyperapp</a>,    <a href="https://spapas.github.io/tag/immutable.html">immutable</a>,    <a href="https://spapas.github.io/tag/es6.html">es6</a>,    <a href="https://spapas.github.io/tag/youtube.html">youtube</a>,    <a href="https://spapas.github.io/tag/youtube-dl.html">youtube-dl</a>,    <a href="https://spapas.github.io/tag/ffmpeg.html">ffmpeg</a>,    <a href="https://spapas.github.io/tag/django-rest-auth.html">django-rest-auth</a>,    <a href="https://spapas.github.io/tag/python-2.html">python-2</a>,    <a href="https://spapas.github.io/tag/python-3.html">python-3</a>,    <a href="https://spapas.github.io/tag/plpgsql.html">plpgsql</a>,    <a href="https://spapas.github.io/tag/component.html">component</a>,    <a href="https://spapas.github.io/tag/ag-grid.html">ag-grid</a>,    <a href="https://spapas.github.io/tag/grid.html">grid</a>,    <a href="https://spapas.github.io/tag/bash.html">bash</a>,    <a href="https://spapas.github.io/tag/cron.html">cron</a>,    <a href="https://spapas.github.io/tag/pandas.html">pandas</a>,    <a href="https://spapas.github.io/tag/scipy.html">scipy</a>,    <a href="https://spapas.github.io/tag/numpy.html">numpy</a>,    <a href="https://spapas.github.io/tag/pivot.html">pivot</a>,    <a href="https://spapas.github.io/tag/pivot_table.html">pivot_table</a>,    <a href="https://spapas.github.io/tag/ipython.html">ipython</a>,    <a href="https://spapas.github.io/tag/jupyter.html">jupyter</a>,    <a href="https://spapas.github.io/tag/notebook.html">notebook</a>,    <a href="https://spapas.github.io/tag/query.html">query</a>,    <a href="https://spapas.github.io/tag/q.html">q</a>,    <a href="https://spapas.github.io/tag/imgur.html">imgur</a>,    <a href="https://spapas.github.io/tag/console.html">console</a>,    <a href="https://spapas.github.io/tag/research.html">research</a>,    <a href="https://spapas.github.io/tag/debug.html">debug</a>,    <a href="https://spapas.github.io/tag/werkzeug.html">werkzeug</a>,    <a href="https://spapas.github.io/tag/django-extensions.html">django-extensions</a>,    <a href="https://spapas.github.io/tag/404.html">404</a>,    <a href="https://spapas.github.io/tag/error.html">error</a>,    <a href="https://spapas.github.io/tag/spring.html">spring</a>,    <a href="https://spapas.github.io/tag/spring-boot.html">spring-boot</a>,    <a href="https://spapas.github.io/tag/java.html">java</a>,    <a href="https://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="https://spapas.github.io/tag/profiles.html">profiles</a>,    <a href="https://spapas.github.io/tag/settings.html">settings</a>,    <a href="https://spapas.github.io/tag/properties.html">properties</a>,    <a href="https://spapas.github.io/tag/yaml.html">yaml</a>,    <a href="https://spapas.github.io/tag/configuration.html">configuration</a>,    <a href="https://spapas.github.io/tag/deploy.html">deploy</a>,    <a href="https://spapas.github.io/tag/initd.html">init.d</a>,    <a href="https://spapas.github.io/tag/react-redux.html">react-redux</a>,    <a href="https://spapas.github.io/tag/redux-thunk.html">redux-thunk</a>,    <a href="https://spapas.github.io/tag/redux-form.html">redux-form</a>,    <a href="https://spapas.github.io/tag/react-router.html">react-router</a>,    <a href="https://spapas.github.io/tag/react-router-redux.html">react-router-redux</a>,    <a href="https://spapas.github.io/tag/react-notification.html">react-notification</a>,    <a href="https://spapas.github.io/tag/history.html">history</a>,    <a href="https://spapas.github.io/tag/babel.html">babel</a>,    <a href="https://spapas.github.io/tag/babelify.html">babelify</a>,    <a href="https://spapas.github.io/tag/browserify.html">browserify</a>,    <a href="https://spapas.github.io/tag/watchify.html">watchify</a>,    <a href="https://spapas.github.io/tag/uglify.html">uglify</a>,    <a href="https://spapas.github.io/tag/boilerplate.html">boilerplate</a>,    <a href="https://spapas.github.io/tag/tutorial.html">tutorial</a>,    <a href="https://spapas.github.io/tag/introduction.html">introduction</a>,    <a href="https://spapas.github.io/tag/fixed-data-tables.html">fixed-data-tables</a>,    <a href="https://spapas.github.io/tag/fixeddatatable.html">FixedDataTable</a>,    <a href="https://spapas.github.io/tag/reportlab.html">reportlab</a>,    <a href="https://spapas.github.io/tag/xhtml2pdf.html">xhtml2pdf</a>,    <a href="https://spapas.github.io/tag/node.html">node</a>,    <a href="https://spapas.github.io/tag/npm.html">npm</a>,    <a href="https://spapas.github.io/tag/generic.html">generic</a>,    <a href="https://spapas.github.io/tag/tables.html">tables</a>,    <a href="https://spapas.github.io/tag/flux.html">flux</a>,    <a href="https://spapas.github.io/tag/jobs.html">jobs</a>,    <a href="https://spapas.github.io/tag/asynchronous.html">asynchronous</a>,    <a href="https://spapas.github.io/tag/scheduling.html">scheduling</a>,    <a href="https://spapas.github.io/tag/redis.html">redis</a>,    <a href="https://spapas.github.io/tag/pusher.html">pusher</a>,    <a href="https://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="https://spapas.github.io/tag/css.html">css</a>,    <a href="https://spapas.github.io/tag/design.html">design</a>,    <a href="https://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>,    <a href="https://spapas.github.io/tag/less.html">less</a>,    <a href="https://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="https://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="https://spapas.github.io/tag/security.html">security</a>,    <a href="https://spapas.github.io/tag/google.html">google</a>,    <a href="https://spapas.github.io/tag/flask.html">flask</a>,    <a href="https://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="https://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="https://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="https://spapas.github.io/tag/git.html">git</a>,    <a href="https://spapas.github.io/tag/github.html">github</a>,    <a href="https://spapas.github.io/tag/branching.html">branching</a>,    <a href="https://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="https://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="https://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="https://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="https://spapas.github.io/tag/rst.html">rst</a>  </section>
+
+  <section>
+    <h1>Yearly archives</h1>
+    <a href="https://spapas.github.io/posts/2013/">2013</a>,    <a href="https://spapas.github.io/posts/2014/">2014</a>,    <a href="https://spapas.github.io/posts/2015/">2015</a>,    <a href="https://spapas.github.io/posts/2016/">2016</a>,    <a href="https://spapas.github.io/posts/2017/">2017</a>,    <a href="https://spapas.github.io/posts/2018/">2018</a>,    <a href="https://spapas.github.io/posts/2019/">2019</a>,    <a href="https://spapas.github.io/posts/2020/">2020</a>,    <a href="https://spapas.github.io/posts/2021/">2021</a>,    <a href="https://spapas.github.io/posts/2022/">2022</a>,    <a href="https://spapas.github.io/posts/2023/">2023</a>,    <a href="https://spapas.github.io/posts/2024/">2024</a>  </section>
+
+
+
+  <section>
+    <h1>GitHub Repos</h1>
+    <ul id="gh_repos">
+      <li class="loading">Status updating...</li>
+    </ul>
+      <a href="https://github.com/spapas">@spapas</a> on GitHub
+    <script  src="//code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      $(function(){
+          if (!window.jXHR){
+              var jxhr = document.createElement('script');
+              jxhr.type = 'text/javascript';
+              jxhr.src = 'https://spapas.github.io/theme/js/jXHR.js';
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(jxhr, s);
+          }
+
+          github.showRepos({
+              user: 'spapas',
+              count: 5,
+              skip_forks: true,
+              target: '#gh_repos'
+          });
+      });
+    </script>
+    <script src="https://spapas.github.io/theme/js/github.js" type="text/javascript"> </script>
+  </section>
+
+
+  <section>
+    <a href="https://twitter.com/_serafeim_?ref_src=twsrc%5Etfw" class="twitter-follow-button"
+      data-show-count="false">Follow @_serafeim_</a>
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+  </section>
+
+</aside>    </div>
+  </div>
+  <footer role="contentinfo"><p>
+    Copyright &copy;  2013&ndash;2024  Serafeim Papastefanos &mdash;
+  <span class="credit">Powered by <a href="http://getpelican.com">Pelican</a></span>
+</p></footer>
+  <script src="https://spapas.github.io/theme/js/modernizr-2.0.js"></script>
+  <script src="https://spapas.github.io/theme/js/ender.js"></script>
+  <script src="https://spapas.github.io/theme/js/octopress.js" type="text/javascript"></script>
+  <script src="https://spapas.github.io/theme/js/ads.js"></script>
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-44750952-1', 'auto');
+
+    ga('send', 'pageview');
+    </script>
+
+<script defer data-domain="spapas.github.io" src="https://plausible.hcg.gr/js/script.js"></script>  <script type="text/javascript">
+    var disqus_shortname = 'spapas-github-io';
+    var disqus_identifier = '/2023/04/04/using-unpoly-with-django/';
+    var disqus_url = 'https://spapas.github.io/2023/04/04/using-unpoly-with-django/';
+    var disqus_title = 'Using Unpoly with&nbsp;Django';
+    (function() {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = "//" + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+     })();
+  </script>
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+</body>
+
+</html>

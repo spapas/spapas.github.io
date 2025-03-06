@@ -1,0 +1,831 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>/var/ - wagtail</title><link href="https://spapas.github.io/" rel="alternate"></link><link href="https://spapas.github.io/feeds/wagtail.atom.xml" rel="self"></link><id>https://spapas.github.io/</id><updated>2020-09-18T16:20:00+03:00</updated><subtitle>Various programming stuff</subtitle><entry><title>Adding a timeline of your wagtail Posts</title><link href="https://spapas.github.io/2020/09/18/wagtail-add-posts-timeline/" rel="alternate"></link><published>2020-09-18T16:20:00+03:00</published><updated>2020-09-18T16:20:00+03:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2020-09-18:/2020/09/18/wagtail-add-posts-timeline/</id><summary type="html">&lt;p class="first last"&gt;How to add a timeline wagtail&amp;nbsp;Posts&lt;/p&gt;
+</summary><content type="html">&lt;div class="section" id="intro"&gt;
+&lt;h2&gt;Intro&lt;/h2&gt;
+&lt;p&gt;In this small post I&amp;#8217;ll present a small tutorial on how to add a timelne of your &lt;a class="reference external" href="https://wagtail.io/"&gt;Wagtail&lt;/a&gt;
+posts using the &lt;a class="reference external" href="http://horizontal-timeline.ycodetech.co.uk/"&gt;Horizontal Timeline&lt;/a&gt; jquery&amp;nbsp;plugin.&lt;/p&gt;
+&lt;p&gt;This will be a step by step tutorial to help you understand the concepts. As a base
+we&amp;#8217;ll use the &lt;cite&gt;bakerydemo&lt;/cite&gt; wagtail demo. After you&amp;#8217;ve properly followed the instructions
+you&amp;#8217;ll see that this demo site has a &amp;#8220;Blog&amp;#8221; that contains articles about breads. Following
+we&amp;#8217;ll add a timeline of these articles grouped by their publish&amp;nbsp;month.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="decisions-decisions"&gt;
+&lt;h2&gt;Decisions,&amp;nbsp;decisions&lt;/h2&gt;
+&lt;p&gt;For this demo we&amp;#8217;ll include &lt;em&gt;all&lt;/em&gt; the &amp;#8220;blog&amp;#8221; pages in the timeline. However we may
+wanted to select which pages we want to include in the timeline. This could be done
+either by adding an extra field in our blog pages (class &lt;cite&gt;blog.models.BlogPage&lt;/cite&gt;) like
+&lt;cite&gt;include_in_timeline&lt;/cite&gt; or by using the Wagtail &lt;a class="reference external" href="https://docs.wagtail.io/en/latest/reference/contrib/modeladmin/"&gt;ModelAdmin&lt;/a&gt; functionality. For the ModelAdmin
+we&amp;#8217;d create an extra Django model (i.e &lt;cite&gt;BlogTimeLineEntry&lt;/cite&gt;) that would contain a link
+to the original page. We could enchance this field with extra fields that we may
+want to display in the timeline, for example a smaller description. Something like&amp;nbsp;this:&lt;/p&gt;
+&lt;!-- code
+
+class TimeLineEntry(models.Model):
+        description = RichTextField()
+        page = models.ForeignKey("blog.BlogPage", on_delete=models.PROTECT)
+        panels = [ FieldPanel("description"), PageChooserPanel("page")]
+
+        def pub_date(self):
+                return self.page.date_published
+
+        pub_date.admin_order_field = "page__date_published" --&gt;
+&lt;p&gt;The other decision is where to actually output the timeline. For the demo we&amp;#8217;ll just put it
+in the &lt;cite&gt;BlogIndexPage&lt;/cite&gt; page. If we wanted to add the timeline in a number of different
+page types then we&amp;#8217;d need to add a template tag that would include it. But since it will be
+available only to a single page type we&amp;#8217;ll just need to override the &lt;cite&gt;get_context&lt;/cite&gt; method and
+the template of that particular&amp;nbsp;type.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="overriding-the-get-context"&gt;
+&lt;h2&gt;Overriding the&amp;nbsp;get_context&lt;/h2&gt;
+&lt;p&gt;As we described above, we want to group the timeline entries based on their publish month. For
+this, we&amp;#8217;ll use the following code in the &lt;tt class="docutils literal"&gt;BlogIndexPage.get_context&lt;/tt&gt; method:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;def&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;get_context&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="n"&gt;context&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;super&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;BlogIndexPage&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get_context&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;context&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;posts&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;BlogPage&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;objects&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;descendant_of&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+        &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;live&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;order_by&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+        &lt;span class="s1"&gt;&amp;#39;-date_published&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+    &lt;span class="n"&gt;entries&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;context&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;posts&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+    &lt;span class="n"&gt;dentries&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{}&lt;/span&gt;
+    &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;e&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;entries&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="n"&gt;month&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;date_published&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;strftime&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;%m/%Y&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;month_entries&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;dentries&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;month&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;[])&lt;/span&gt;
+        &lt;span class="n"&gt;month_entries&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;append&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;dentries&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;month&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;month_entries&lt;/span&gt;
+
+    &lt;span class="n"&gt;lentries&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;sorted&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+        &lt;span class="p"&gt;[&lt;/span&gt;
+            &lt;span class="p"&gt;{&lt;/span&gt;
+                &lt;span class="s2"&gt;&amp;quot;date_small&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;k&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                &lt;span class="s2"&gt;&amp;quot;date_large&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;v&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;date_published&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;strftime&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;%B %Y&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+                &lt;span class="s2"&gt;&amp;quot;entries&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;v&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+            &lt;span class="p"&gt;}&lt;/span&gt;
+            &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;k&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;v&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;dentries&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;items&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+        &lt;span class="p"&gt;],&lt;/span&gt;
+        &lt;span class="n"&gt;key&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;lambda&lt;/span&gt; &lt;span class="n"&gt;z&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;z&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;entries&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;][&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;date_published&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="p"&gt;)&lt;/span&gt;
+
+    &lt;span class="n"&gt;context&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;update&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;timeline&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;lentries&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;context&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;So what&amp;#8217;s the purpose of the above? First of all we use &lt;cite&gt;super&lt;/cite&gt; to retrieve the context that
+any parent classes may have setup. After that we add a &lt;cite&gt;posts&lt;/cite&gt; attribute to the context
+that is a queryset of all the published children of the current page (which is the &lt;cite&gt;BlogIndexPage&lt;/cite&gt;),
+sorted by their published&amp;nbsp;date.&lt;/p&gt;
+&lt;p&gt;In the &lt;cite&gt;for&lt;/cite&gt; loop that follows, do some dict trickery to &amp;#8220;gather&amp;#8221; all entries for a particlular month/year
+in a list under that particular key in the &lt;cite&gt;dentries&lt;/cite&gt; dict.&lt;/p&gt;
+&lt;p&gt;Finally, we create the &lt;cite&gt;lentries&lt;/cite&gt; list which will be a list of the&amp;nbsp;form:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;[{&lt;/span&gt;
+        &lt;span class="s2"&gt;&amp;quot;date_small&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;09/2020&amp;quot;&lt;/span&gt;
+        &lt;span class="s2"&gt;&amp;quot;date_large&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;September 2020&amp;quot;&lt;/span&gt;
+        &lt;span class="s2"&gt;&amp;quot;entries: [BlogPage, BlogPage, BlogPage...]&lt;/span&gt;
+&lt;span class="p"&gt;},&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="o"&gt;...&lt;/span&gt;&lt;span class="p"&gt;},&lt;/span&gt; &lt;span class="o"&gt;...&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;This struct will help us in the next step when we implement the timeline&amp;nbsp;template.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="fixing-the-template"&gt;
+&lt;h2&gt;Fixing the&amp;nbsp;template&lt;/h2&gt;
+&lt;p&gt;To use the horizontal timeline we need to add a couple of css/js dependencies to our template. For this,
+we&amp;#8217;ll first go to the bakerydemotemplatesbase.html file and add the following snippet near the end of the file just before
+&lt;tt class="docutils literal"&gt;&amp;lt;/body&amp;gt;&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+{% block extra_script %}
+{% endblock %}
+&lt;/pre&gt;
+&lt;p&gt;The above is required to give us a placeholder for adding some needed js dependencies and&amp;nbsp;code.&lt;/p&gt;
+&lt;p&gt;After that we&amp;#8217;ll go to the &lt;tt class="docutils literal"&gt;bakerydemo\templates\blog\blog_index_page.html&lt;/tt&gt; file and add the following just before
+&lt;tt class="docutils literal"&gt;{% block content %}&lt;/tt&gt;&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+{% block head-extra %}
+        &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; type=&amp;quot;text/css&amp;quot; href=&amp;quot;//cdn.jsdelivr.net/gh/ycodetech/horizontal-timeline-2.0&amp;#64;2/css/horizontal_timeline.2.0.min.css&amp;quot;&amp;gt;
+        &amp;lt;style&amp;gt;
+
+                .timeline .selected {
+                        font-size: 24px;
+                        font-weight: bold;
+                }
+
+                #timeline ol {
+                        list-style: none;
+                }
+
+                .horizontal-timeline .events-content li {
+                        background: #f2f2f2;
+                        font-size: .8em;
+                }
+
+                #timeline img {
+                        width: 200px;
+                }
+        &amp;lt;/style&amp;gt;
+
+{% endblock head-extra %}
+&lt;/pre&gt;
+&lt;p&gt;And the following at the end of the&amp;nbsp;file&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+{% block extra_script %}
+
+        &amp;lt;script src=&amp;quot;//cdn.jsdelivr.net/gh/ycodetech/horizontal-timeline-2.0&amp;#64;2/JavaScript/horizontal_timeline.2.0.min.js&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
+
+        &amp;lt;script&amp;gt;
+
+        $(function() {
+                $('#timeline').horizontalTimeline({
+                dateIntervals: {
+                        &amp;quot;desktop&amp;quot;: 200,
+                        &amp;quot;tablet&amp;quot;: 150,
+                        &amp;quot;mobile&amp;quot;: 120,
+                        &amp;quot;minimal&amp;quot;: true
+                }
+                });
+        })
+
+        &amp;lt;/script&amp;gt;
+{% endblock %}
+&lt;/pre&gt;
+&lt;p&gt;Notice that the &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;head-extra&lt;/span&gt;&lt;/tt&gt; block is already there in the base.html file so we don&amp;#8217;t need to add it again. It just has some
+styling changes for the timeline to be displayed nice. Also the &lt;tt class="docutils literal"&gt;&amp;lt;script&amp;gt;&lt;/tt&gt; tags we added just include the needed dependency
+and initialize the timeline&amp;nbsp;component.&lt;/p&gt;
+&lt;p&gt;Of course we haven&amp;#8217;t yet added the actual timeline! To do that, we&amp;#8217;ll  need to add a file named &lt;tt class="docutils literal"&gt;timeline_partial.html&lt;/tt&gt; under the
+&lt;tt class="docutils literal"&gt;blog/templates/blog&lt;/tt&gt; folder (same folder that &lt;tt class="docutils literal"&gt;blog_index_page.html&lt;/tt&gt; is) with the&amp;nbsp;following:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+{% load wagtailcore_tags wagtailimages_tags %}
+&amp;lt;div class=&amp;quot;horizontal-timeline&amp;quot; id=&amp;quot;timeline&amp;quot;&amp;gt;
+  &amp;lt;div class=&amp;quot;events-content&amp;quot;&amp;gt;
+        &amp;lt;ol&amp;gt;
+
+          {% for month in timeline %}
+                &amp;lt;li class=&amp;quot;{% if forloop.last %}selected{% endif %}&amp;quot; data-horizontal-timeline='{&amp;quot;date&amp;quot;: &amp;quot;{{ month.date_small }}&amp;quot;}'&amp;gt;
+                  &amp;lt;h3&amp;gt;{{ month.date_large }}&amp;lt;/h3&amp;gt;
+
+                  {% for te in month.entries %}
+                        &amp;lt;div class='row'&amp;gt;
+
+                                &amp;lt;div class='col-md-6'&amp;gt;
+                                  &amp;lt;h4&amp;gt;&amp;lt;a href='{% pageurl te %}'&amp;gt;{{ te.title }}&amp;lt;/a&amp;gt;&amp;lt;/h4&amp;gt;
+                                  &amp;lt;span&amp;gt;{{ te.introduction }}&amp;lt;/span&amp;gt;
+                                &amp;lt;/div&amp;gt;
+                                &amp;lt;div class='col-md-6'&amp;gt;
+                                  {% with img=te.image %}
+                                        {% image img width-200 as img_thumb %}
+                                        &amp;lt;img class=&amp;quot;&amp;quot; src=&amp;quot;{{ img_thumb.url }}&amp;quot; alt=&amp;quot;{{ img.title }}&amp;quot;&amp;gt;
+                                  {% endwith %}
+                                &amp;lt;/div&amp;gt;
+
+                        &amp;lt;/div&amp;gt;
+                        &amp;lt;div class=&amp;quot;clear bottommargin-sm&amp;quot;&amp;gt;&amp;lt;/div&amp;gt;
+                  {% endfor %}
+                &amp;lt;/li&amp;gt;
+          {% endfor %}
+
+        &amp;lt;/ol&amp;gt;
+  &amp;lt;/div&amp;gt;
+&amp;lt;/div&amp;gt;
+&lt;/pre&gt;
+&lt;p&gt;The above will generate a &lt;tt class="docutils literal"&gt;&amp;lt;li &lt;span class="pre"&gt;data-horizontal-timeline='{&amp;quot;date&amp;quot;:&lt;/span&gt; &lt;span class="pre"&gt;&amp;quot;01/2020&amp;quot;}&amp;gt;&lt;/span&gt;&lt;/tt&gt; list element for all months and
+inside that it will add an &lt;tt class="docutils literal"&gt;&amp;lt;h3&amp;gt;&lt;/tt&gt; with the full name of the month and a bunch of bootstrap rows, one for the
+entries of that particular month (including its title, description and  their image at the side). It should be easy enough to&amp;nbsp;follow.&lt;/p&gt;
+&lt;p&gt;Finally, we need to incldue the above partial template. So add the line &lt;tt class="docutils literal"&gt;{% include &amp;quot;blog/timeline_partial.html&amp;quot; %}&lt;/tt&gt;
+immediately above the &lt;tt class="docutils literal"&gt;&amp;lt;div &lt;span class="pre"&gt;class=&amp;quot;row&lt;/span&gt; &lt;span class="pre"&gt;row-eq-height&lt;/span&gt; &lt;span class="pre"&gt;blog-list&amp;quot;&amp;gt;&lt;/span&gt;&lt;/tt&gt; line in the file &lt;tt class="docutils literal"&gt;blog_index_page.html&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;If you&amp;#8217;ve followed the instructions you should be able to see something like&amp;nbsp;this:&lt;/p&gt;
+&lt;img alt="The timeline" src="/images/tl-demo.gif" style="width: 640px;" /&gt;
+&lt;/div&gt;
+</content><category term="wagtail"></category><category term="django"></category><category term="wagtail"></category></entry><entry><title>Adding a latest-changes list to your Wagtail site</title><link href="https://spapas.github.io/2020/03/27/wagtail-add-latest-changes/" rel="alternate"></link><published>2020-03-27T14:20:00+02:00</published><updated>2020-03-27T14:20:00+02:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2020-03-27:/2020/03/27/wagtail-add-latest-changes/</id><summary type="html">&lt;p class="first last"&gt;How to add a list of the latest changes to your wagtail&amp;nbsp;site&lt;/p&gt;
+</summary><content type="html">&lt;p&gt;I think that a very important tool for a new production &lt;a class="reference external" href="https://wagtail.io"&gt;Wagtail&lt;/a&gt; site is to have a list
+where you&amp;#8217;ll be able to take a look at the latest changes. Most editors are not
+experienced enough when using a new tool so it&amp;#8217;s easy to make bad quality edits. A
+user could take a look at their changes and guide them if something&amp;#8217;s not up to good&amp;nbsp;standards.&lt;/p&gt;
+&lt;p&gt;In this article I&amp;#8217;ll present a simple way to add a latest-changes list in your Wagtail site.
+This is working excellent with Wagtail 2.9, I haven&amp;#8217;t tested it with other wagtail versions
+so your milage may vary. In the meantime, I&amp;#8217;ll also introduce a bunch of concepts of Wagtail
+I find&amp;nbsp;interesting.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Update 08/05/2020&lt;/strong&gt; Please notice that this article was originally written for Wagtail 2.8
+projects. However, Wagtail 2.8 didn&amp;#8217;t have an official &lt;span class="caps"&gt;API&lt;/span&gt; for adding reports thus I had to
+check the source code for some things. Those things since were not part of any &lt;span class="caps"&gt;API&lt;/span&gt; have
+been changed and are not working in Wagtail&amp;nbsp;2.9.&lt;/p&gt;
+&lt;p&gt;Thus I&amp;#8217;ve updated
+the project to use the proper APIs and work with Wagtail 2.9 (and hopefully the next versions).
+If you want to see what&amp;#8217;s changed between the two versions you can take a look at
+&lt;a class="reference external" href="https://github.com/spapas/wagtail-latest-changes/commit/d751cd7978fc99c3b2f10e84c2f9b72c555f0930"&gt;this commit&lt;/a&gt; from the companion project. You may also want to take a look at the
+&lt;a class="reference external" href="https://docs.wagtail.io/en/stable/advanced_topics/adding_reports.html"&gt;adding reports&lt;/a&gt; tutorial on the Wagtail&amp;nbsp;docs.&lt;/p&gt;
+&lt;div class="section" id="a-starter-project"&gt;
+&lt;h2&gt;A starter&amp;nbsp;project&lt;/h2&gt;
+&lt;p&gt;Let&amp;#8217;s create a simple wagtail-starter project (this is for windows you should be able to easily follow the same steps in Unix like&amp;nbsp;systems):&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+C:\progr\py3&amp;gt;mkdir wagtail-starter
+C:\progr\py3&amp;gt;cd wagtail-starter
+C:\progr\py3\wagtail-starter&amp;gt;py -3 -m venv venv
+C:\progr\py3\wagtail-starter&amp;gt;venv\Scripts\activate
+(venv) C:\progr\py3\wagtail-starter&amp;gt;pip install wagtail
+(venv) C:\progr\py3\wagtail-starter&amp;gt;wagtail.exe start wagtail_starter
+(venv) C:\progr\py3\wagtail-starter&amp;gt;cd wagtail_starter
+(venv) C:\progr\py3\wagtail-starter\wagtail_starter&amp;gt;python manage.py migrate
+(venv) C:\progr\py3\wagtail-starter\wagtail_starter&amp;gt;python manage.py createsuperuser
+(venv) C:\progr\py3\wagtail-starter\wagtail_starter&amp;gt;python manage.py runserver
+&lt;/pre&gt;
+&lt;p&gt;When you&amp;#8217;ve finished all the above you should be able to go to &lt;a class="reference external" href="http://127.0.0.1/"&gt;http://127.0.0.1/&lt;/a&gt; and see your homepage and then
+visit &lt;a class="reference external" href="http://127.0.0.1/admin/"&gt;http://127.0.0.1/admin/&lt;/a&gt; and login with your superuser. What we&amp;#8217;d like to do is add a &amp;#8220;Latest changes&amp;#8221;
+link in the &amp;#8220;Reports&amp;#8221; admin section like&amp;nbsp;this:&lt;/p&gt;
+&lt;img alt="New menu" src="/images/latest-changes-template.png" style="width: 580px;" /&gt;
+&lt;/div&gt;
+&lt;div class="section" id="implementing-the-latest-changes-menu"&gt;
+&lt;h2&gt;Implementing the latest-changes&amp;nbsp;menu&lt;/h2&gt;
+&lt;div class="section" id="start-with-a-new-app"&gt;
+&lt;h3&gt;Start with a new&amp;nbsp;app&lt;/h3&gt;
+&lt;p&gt;To start the menu implementation I recommend putting everything related to it in a separate django application
+so you can easily re-use it to multiple sites. For this, let&amp;#8217;s create a new django app&amp;nbsp;using:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+(venv) C:\progr\py3\wagtail-starter\wagtail_starter&amp;gt;python manage.py startapp latest_changes
+&lt;/pre&gt;
+&lt;p&gt;And add &lt;tt class="docutils literal"&gt;'latest_changes'&lt;/tt&gt; to the list of our &lt;tt class="docutils literal"&gt;INSTALLED_APPS&lt;/tt&gt; at the file &lt;tt class="docutils literal"&gt;wagtail_starter\settings\base.py&lt;/tt&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="add-the-view"&gt;
+&lt;h3&gt;Add the&amp;nbsp;view&lt;/h3&gt;
+&lt;p&gt;Let&amp;#8217;s add the code for the view that will display the latest changes page. Modify the latest_changes/views.py file like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+from django.shortcuts import render
+from wagtail.admin.views.reports import PageReportView
+from wagtail.core.models import UserPagePermissionsProxy
+from wagtail.core.models import Page
+
+
+class LatestChangesView(PageReportView):
+    template_name = &amp;quot;reports/latest_changes.html&amp;quot;
+    title = &amp;quot;Latest changes&amp;quot;
+    header_icon = &amp;quot;date&amp;quot;
+
+    def get_queryset(self):
+        self.queryset = Page.objects.order_by(&amp;quot;-last_published_at&amp;quot;)
+        return super().get_queryset()
+
+    def dispatch(self, request, *args, **kwargs):
+        if not UserPagePermissionsProxy(request.user).can_remove_locks():
+            return permission_denied(request)
+        return super().dispatch(request, *args, **kwargs)
+&lt;/pre&gt;
+&lt;p&gt;As you can see the above code adds a very small view that overrides &lt;tt class="docutils literal"&gt;PageReportView&lt;/tt&gt; which is used
+also by the locked pages view so most things are already implemented by that view. The only thing we do
+here is to override the &lt;tt class="docutils literal"&gt;get_queryset&lt;/tt&gt; method to denote which pages we want to display and
+the &lt;tt class="docutils literal"&gt;dispatch&lt;/tt&gt; to add some permission checks. Here we check that a user &lt;tt class="docutils literal"&gt;can_remove_locks&lt;/tt&gt; but we
+could do other checks if needed. Finally, notice that we have overriden the template name which we&amp;#8217;ll
+define in a&amp;nbsp;minute.&lt;/p&gt;
+&lt;p&gt;Beyond &lt;tt class="docutils literal"&gt;PageReportView&lt;/tt&gt; that should be used for generating &lt;tt class="docutils literal"&gt;Page&lt;/tt&gt; reports, you can override
+&lt;tt class="docutils literal"&gt;ReportView&lt;/tt&gt; which can be used to implement generic&amp;nbsp;reports.&lt;/p&gt;
+&lt;p&gt;To properly add that view in our urls.py we can use a wagtail hook named &lt;tt class="docutils literal"&gt;register_admin_py&lt;/tt&gt;. Wagtail hooks
+are a great way to excend the wagtail admin; to use them, you have to generate a file name &lt;tt class="docutils literal"&gt;wagtail_hooks.py&lt;/tt&gt;
+in one of your apps. This file will be auto-impoted by wagtail when your app is&amp;nbsp;started.&lt;/p&gt;
+&lt;p&gt;Thus, in our case we&amp;#8217;ll add a &lt;tt class="docutils literal"&gt;wagtail_hooks.py&lt;/tt&gt; file in the &lt;tt class="docutils literal"&gt;latest_changes&lt;/tt&gt; app with the following&amp;nbsp;code:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+from django.http import HttpResponse
+from django.conf.urls import url
+from wagtail.core import hooks
+from .views import LatestChangesView
+
+&amp;#64;hooks.register('register_admin_urls')
+def urlconf_time():
+  return [
+    url(r'^latest_changes/$', LatestChangesView.as_view(), name='latest_changes'),
+  ]
+&lt;/pre&gt;
+&lt;p&gt;The above just hooks up the &lt;tt class="docutils literal"&gt;LatestChangesView&lt;/tt&gt; we defined before to the &lt;tt class="docutils literal"&gt;/admin/latest_changes/&lt;/tt&gt; url.&lt;/p&gt;
+&lt;p&gt;If everything&amp;#8217;s ok till now you should be able to visit: &lt;a class="reference external" href="http://127.0.0.1:8000/admin/latest_changes/"&gt;http://127.0.0.1:8000/admin/latest_changes/&lt;/a&gt; and
+get an error for a missing template - remember that we haven&amp;#8217;t yet defined &lt;tt class="docutils literal"&gt;utils/reports/latest_changes.html&lt;/tt&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="add-the-template"&gt;
+&lt;h3&gt;Add the&amp;nbsp;template&lt;/h3&gt;
+&lt;p&gt;To add the template we&amp;#8217;ll need to create a folder named &lt;tt class="docutils literal"&gt;templates&lt;/tt&gt; under our &lt;tt class="docutils literal"&gt;latest_changes&lt;/tt&gt; app and then
+add a &lt;tt class="docutils literal"&gt;reports&lt;/tt&gt; folder to it. Finally in that folder add a &lt;tt class="docutils literal"&gt;latest_changes.html&lt;/tt&gt;. So the full path of
+the &lt;tt class="docutils literal"&gt;latest_changes.html&lt;/tt&gt; should be: &lt;tt class="docutils literal"&gt;wagtail_starter\latest_changes\templates\reports\latest_changes.html&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+{% extends 'wagtailadmin/reports/base_page_report.html' %}
+{% load i18n %}
+{% block listing %}
+    {% include &amp;quot;reports/_list_latest.html&amp;quot; %}
+{% endblock %}
+
+{% block no_results %}
+    &amp;lt;p&amp;gt;{% trans &amp;quot;No changes found.&amp;quot; %}&amp;lt;/p&amp;gt;
+{% endblock %}
+&lt;/pre&gt;
+&lt;p&gt;I&amp;#8217;ve selected the &lt;tt class="docutils literal"&gt;reports&lt;/tt&gt; subfolder just to be compatible with what wagtail does, you can just put &lt;tt class="docutils literal"&gt;latest_changes.html&lt;/tt&gt;  directly
+under &lt;tt class="docutils literal"&gt;templates&lt;/tt&gt;; don&amp;#8217;t forget to update the &lt;tt class="docutils literal"&gt;LatestChangesView&lt;/tt&gt; defined before though! This template extends the
+&lt;tt class="docutils literal"&gt;base_page_report.html&lt;/tt&gt; template that Wagtail provides for page reports. It also includes a
+snippet named &lt;tt class="docutils literal"&gt;reports/_list_latest.html&amp;quot; thus you also need to add a ``_list_latest.html&lt;/tt&gt; file in the same folder with the
+following&amp;nbsp;contents:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+{% extends &amp;quot;wagtailadmin/pages/listing/_list_explore.html&amp;quot; %}
+
+{% load i18n wagtailadmin_tags %}
+
+{% block post_parent_page_headers %}
+&amp;lt;tr&amp;gt;
+&amp;lt;th&amp;gt;Title&amp;lt;/th&amp;gt;
+&amp;lt;th&amp;gt;Last update&amp;lt;/th&amp;gt;
+&amp;lt;th&amp;gt;Kind&amp;lt;/th&amp;gt;
+&amp;lt;th&amp;gt;Status&amp;lt;/th&amp;gt;
+&amp;lt;th&amp;gt;Owner / last publish / last edit&amp;lt;/th&amp;gt;
+&amp;lt;/tr&amp;gt;
+{% endblock %}
+
+{% block page_navigation %}
+    &amp;lt;td&amp;gt;
+        {{ page.owner }} / {{ page.live_revision.user }} / {{ page.get_latest_revision.user }}
+    &amp;lt;/td&amp;gt;
+{% endblock %}
+&lt;/pre&gt;
+&lt;p&gt;Please notice that my &lt;tt class="docutils literal"&gt;_list_latest.html&lt;/tt&gt; snippet extends the Wagtail provided &lt;tt class="docutils literal"&gt;_list_explore.html&lt;/tt&gt; template and
+overrides some things that can be overriden from that file. If you want to do more changes you&amp;#8217;ll need to copy over
+everything and change things as you wish instead of&amp;nbsp;extending.&lt;/p&gt;
+&lt;p&gt;Also, keep in mind that because you added a &lt;tt class="docutils literal"&gt;templates&lt;/tt&gt; folder you&amp;#8217;ll need to restart your django development&amp;nbsp;server.&lt;/p&gt;
+&lt;p&gt;Finally, if everything is ok until now you should be able to visit &lt;a class="reference external" href="http://127.0.0.1:8000/admin/latest_changes/"&gt;http://127.0.0.1:8000/admin/latest_changes/&lt;/a&gt; and see
+your view! It will say &amp;#8220;No changes found&amp;#8221; if you&amp;#8217;ve followed the steps here; just go to Pages - Home from the wagtail
+menu and edit that page (just save it). Now visit &lt;a class="reference external" href="http://127.0.0.1:8000/admin/latest_changes/"&gt;http://127.0.0.1:8000/admin/latest_changes/&lt;/a&gt; again and behold! Your
+own latest changes&amp;nbsp;view:&lt;/p&gt;
+&lt;img alt="The view" src="/images/last_changes_view.png" style="width: 780px;" /&gt;
+&lt;/div&gt;
+&lt;div class="section" id="displaying-our-menu-item"&gt;
+&lt;h3&gt;Displaying our menu&amp;nbsp;item&lt;/h3&gt;
+&lt;p&gt;The last piece of the puzzle missing is to actually display a menu item under the Reports menu of wagtail admin. For this
+we are going to use our friends, the wagtail hooks. So, change the wagtail_hooks.py file like this (I&amp;#8217;m also including
+the code from adding the&amp;nbsp;url):&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+from django.http import HttpResponse
+from django.conf.urls import url
+from django.urls import reverse
+from wagtail.admin.menu import MenuItem
+from wagtail.core import hooks
+from wagtail.core.models import UserPagePermissionsProxy
+from .views import LatestChangesView
+
+&amp;#64;hooks.register('register_admin_urls')
+def urlconf_time():
+    return [
+      url(r'^latest_changes/$', LatestChangesView.as_view(), name='latest_changes'),
+    ]
+
+
+class LatestChangesPagesMenuItem(MenuItem):
+    def is_shown(self, request):
+        return UserPagePermissionsProxy(request.user).can_remove_locks()
+
+
+&amp;#64;hooks.register(&amp;quot;register_reports_menu_item&amp;quot;)
+def register_latest_changes_menu_item():
+    return LatestChangesPagesMenuItem(
+        &amp;quot;Latest changes&amp;quot;, reverse(&amp;quot;latest_changes&amp;quot;), classnames=&amp;quot;icon icon-date&amp;quot;, order=100,
+    )
+&lt;/pre&gt;
+&lt;p&gt;The above code uses the &lt;tt class="docutils literal"&gt;register_reports_menu_item&lt;/tt&gt; which is a hook that can be used to add a child
+specifically to the Reports menu item. Notice that it uses the &lt;tt class="docutils literal"&gt;LatestChangesPagesMenuItem&lt;/tt&gt; which
+is a class that inherits from &lt;tt class="docutils literal"&gt;MenuItem&lt;/tt&gt;; the only thing that is overriden there is the &lt;tt class="docutils literal"&gt;is_shown&lt;/tt&gt;
+method so it will have the same permissions as the &lt;tt class="docutils literal"&gt;LatestChangesView&lt;/tt&gt; we defined above so user
+that will see the menu item will also have permissions to display the view. Here&amp;#8217;s the final menu&amp;nbsp;item:&lt;/p&gt;
+&lt;img alt="The menu item" src="/images/latest_changes_menu.png" style="width: 380px;" /&gt;
+&lt;/div&gt;
+&lt;div class="section" id="conclusion"&gt;
+&lt;h3&gt;Conclusion&lt;/h3&gt;
+&lt;p&gt;We&amp;#8217;ve seen the steps required to add a latest pages view to your wagtail admin site. I have to admit that
+it is a little work however the nice thing is that this is all self-included in a single application. You can
+just get tha application and copy over it to your wagtail site; after you add that application to INSTALLED_APPS
+you should get the whole functionality without any more modifications to your project. To help you more
+with this I&amp;#8217;ve included the whole code of this project in the &lt;a class="reference external" href="https://github.com/spapas/wagtail-latest-changes"&gt;https://github.com/spapas/wagtail-latest-changes&lt;/a&gt;&amp;nbsp;repository.&lt;/p&gt;
+&lt;p&gt;You can either clone this repository to see the functionality or just copy over the &lt;tt class="docutils literal"&gt;latest_changes&lt;/tt&gt; folder to
+your wagtail project to include the functionality directly (don&amp;#8217;t forget to fix the &lt;tt class="docutils literal"&gt;INSTALLED_APPS&lt;/tt&gt; setting)!
+It should work with all Wagtail 2.9 and later&amp;nbsp;projects.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</content><category term="wagtail"></category><category term="django"></category><category term="wagtail"></category></entry><entry><title>A Wagtail tutorial</title><link href="https://spapas.github.io/2014/02/13/wagtail-tutorial/" rel="alternate"></link><published>2014-02-13T21:20:00+02:00</published><updated>2014-02-13T21:20:00+02:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2014-02-13:/2014/02/13/wagtail-tutorial/</id><summary type="html">&lt;p&gt;This is a from scratch tutorial for creating a wagtail based&amp;nbsp;Blog.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://wagtail.io"&gt;Wagtail&lt;/a&gt; is a new Open Source &lt;a href="https://www.djangoproject.com"&gt;Django&lt;/a&gt;-based &lt;span class="caps"&gt;CMS&lt;/span&gt;. In this 20 minute tutorial we will see how you can create a blog from scratch using Wagtail. If you want to see some more examples of usage please take a look at the &lt;a href="https://github.com/torchbox/wagtaildemo"&gt;wagtaildemo&lt;/a&gt; GitHub&amp;nbsp;project.&lt;/p&gt;
+&lt;p&gt;To follow this tutorial you will need to have &lt;a href="http://python.org/"&gt;Python&lt;/a&gt; 2.7 installed with a working version of &lt;a href="https://pypi.python.org/pypi/pip"&gt;pip&lt;/a&gt; and &lt;a href="https://pypi.python.org/pypi/virtualenv"&gt;virtualenv&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Update&lt;/strong&gt;: The result of this tutorial has been deployed to &lt;a href="https://www.heroku.com/"&gt;Heroku&lt;/a&gt;: &lt;a href="http://gentle-refuge-2590.herokuapp.com/"&gt;http://gentle-refuge-2590.herokuapp.com/&lt;/a&gt; - you may visit the &lt;a href="http://gentle-refuge-2590.herokuapp.com/admin/"&gt;admin site&lt;/a&gt; and login with root / 123 to play with Wagtail! Please don&amp;#8217;t do anything naughty !!! Also, notice that &lt;a href="https://devcenter.heroku.com/articles/dynos#isolation-and-security"&gt;because of how Heroku works&lt;/a&gt; you won&amp;#8217;t be able to upload&amp;nbsp;anything.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Update 08/09/2015: This tutorial has been written during the first days of Wagtail, when documentation and tutorials about it were sparce; right now it should be considered by all accounts obsolete and &lt;em&gt;not&lt;/em&gt; be followed! Instead, you should read the official (and very well written) tutorial @ http://docs.wagtail.io/en/latest/getting_started/tutorial.html in the official Wagtail&amp;nbsp;documentation!&lt;/strong&gt;&lt;/p&gt;
+&lt;h2 id="installing-the-wagtail-dependencies"&gt;Installing the wagtail&amp;nbsp;dependencies&lt;/h2&gt;
+&lt;p&gt;It is recomended to create a new virtual environment that will host the wagtail tutorial. After you have changed to the virtual environment you will need to installl the Wagtail requirements. Create a file named &lt;code&gt;requirements.txt&lt;/code&gt; containing the&amp;nbsp;following:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;Django==1.6.2
+South==1.0.0
+django-compressor==1.4
+django-modelcluster==0.3
+-e git://github.com/torchbox/wagtail.git#egg=wagtail
+django-taggit==0.11.2
+django-libsass==0.2
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;and run
+&lt;code&gt;pip install -r requirements.txt&lt;/code&gt;.  If you use Microsoft Windows you &lt;em&gt;will&lt;/em&gt; experience problems with Pillow and lxml. Please download the 
+installation executables from https://pypi.python.org/pypi/Pillow/2.3.0 and https://pypi.python.org/pypi/lxml/3.3.1, install 
+them using &lt;code&gt;easy_install Pillow-2.3.0.x-py2.7.exe&lt;/code&gt; and &lt;code&gt;easy_install lxml-3.3.1.x-py2.7.exe&lt;/code&gt; (from inside your virtual environment) 
+and then install the other requirements. Also please use the latest version of Wagtail (hosted on github) because it has some changes from 
+the pypi (so &lt;em&gt;don&amp;#8217;t&lt;/em&gt; do a &lt;code&gt;pip install wagtail&lt;/code&gt;).&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Warning:&lt;/strong&gt; Unfortuanately, no official binaries for libsass (which is a django-libsass requirement) are (yet) available for Windows. I
+have compiled a version for win32 and python 2.7 (which I use) using the &lt;a href="http://www.confusedbycode.com/articles/compiling-python-modules.html"&gt;instructions found here&lt;/a&gt;. You can download this version 
+&lt;a href="https://spapas.github.io/images/libsass-0.3.0-cp27-none-win32.whl"&gt;as a wheel package&lt;/a&gt;. Notice that because libsass was compiled with &lt;span class="caps"&gt;VC&lt;/span&gt; Express 2013
+you should also install the &lt;a href="http://www.microsoft.com/en-us/download/details.aspx?id=40784"&gt;Visual C++ 2013 redistributable&lt;/a&gt; package from&amp;nbsp;Microsoft.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Please use it at your own risk&amp;nbsp;!!!&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;To install &lt;a href="http://pythonwheels.com/"&gt;wheels&lt;/a&gt; you have to use a version of pip &amp;gt;= 1.4 (so do an &lt;code&gt;easy_install -U pip&lt;/code&gt; from your
+virtual environment if you have a previous version) and then you can just do a normal &lt;code&gt;pip install libsass-0.3.0-cp27-none-win32.whl&lt;/code&gt;. &lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Warning no2:&lt;/strong&gt; More unfortuanately, there seem to be &lt;a href="https://github.com/torchbox/wagtail/issues/133"&gt;a number of issues&lt;/a&gt; with how libsass handles &lt;code&gt;@import&lt;/code&gt; statements
+in Windows. Until this is fixed, Windows users are recommened to use the command line (Ruby) sass compiler. To use it, please
+install Ruby in your system and then install sass with &lt;code&gt;gem install sass -v "&amp;gt;=3.3.0alpha" --pre&lt;/code&gt;. After that, in the &lt;code&gt;COMPRESS_PRECOMPILERS&lt;/code&gt; 
+setting of your &lt;code&gt;settings.py&lt;/code&gt; (discussed in the next section), change the line &lt;code&gt;('text/x-scss', 'django_libsass.SassCompiler'),&lt;/code&gt; to 
+&lt;code&gt;('text/x-scss', 'sass --scss  {infile} {outfile}'),&lt;/code&gt;.&lt;/p&gt;
+&lt;h2 id="creating-and-configuring-your-project"&gt;Creating and configuring your&amp;nbsp;project&lt;/h2&gt;
+&lt;p&gt;Wagtail has to &amp;#8220;live&amp;#8221; inside a normal Django project so you now may create a new Django project by&amp;nbsp;issuing:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;python&lt;span class="w"&gt; &lt;/span&gt;&amp;lt;PATH_OF_YOUR_VIRTUAL_ENV&amp;gt;/scripts/django-admin.py&lt;span class="w"&gt; &lt;/span&gt;startproject&lt;span class="w"&gt; &lt;/span&gt;wagtailtutorial
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;If you use Unix you can just run &lt;code&gt;django-admin.py&lt;/code&gt; etc however if you try to do the same in windows you
+will find out that windows tries to run the .py file with the python executable that is assigned through
+explorer (which of course is your main python installation) and &lt;em&gt;not&lt;/em&gt; through your path! That&amp;#8217;s why
+all our commands will be in the form &lt;code&gt;python script.py&lt;/code&gt; to make sure that Windows picks the python
+executable from your path (which, if you&amp;#8217;re inside the virtual enviroment will be the correct&amp;nbsp;one).&lt;/p&gt;
+&lt;p&gt;Inside the &lt;code&gt;wagtailtutorial&lt;/code&gt; folder you will see a file named &lt;code&gt;manage.py&lt;/code&gt; and another folder named &lt;code&gt;wagtailtutorial&lt;/code&gt;. Inside this &lt;code&gt;wagtailtutorial&lt;/code&gt; folder you will find &lt;code&gt;settings.py&lt;/code&gt; and &lt;code&gt;urls.py&lt;/code&gt; which need to be&amp;nbsp;changed.&lt;/p&gt;
+&lt;p&gt;Starting with &lt;code&gt;urls.py&lt;/code&gt;, remove everything and change it like&amp;nbsp;this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kn"&gt;from&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;django.conf.urls&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;patterns&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;include&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;url&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;django.conf.urls.static&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;static&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;django.views.generic.base&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;RedirectView&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;django.contrib&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;admin&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;django.conf&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;settings&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;os.path&lt;/span&gt;
+
+&lt;span class="kn"&gt;from&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;wagtail.wagtailcore&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;urls&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;wagtail_urls&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;wagtail.wagtailadmin&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;urls&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;wagtailadmin_urls&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;wagtail.wagtailimages&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;urls&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;wagtailimages_urls&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;wagtail.wagtailembeds&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;urls&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;wagtailembeds_urls&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;wagtail.wagtaildocs&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;admin_urls&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;wagtaildocs_admin_urls&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;wagtail.wagtaildocs&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;urls&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;wagtaildocs_urls&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;wagtail.wagtailsnippets&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;urls&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;wagtailsnippets_urls&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;wagtail.wagtailsearch.urls&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;frontend&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;wagtailsearch_frontend_urls&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;admin&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;wagtailsearch_admin_urls&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;wagtail.wagtailusers&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;urls&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;wagtailusers_urls&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;wagtail.wagtailredirects&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;urls&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;wagtailredirects_urls&lt;/span&gt;
+
+&lt;span class="n"&gt;admin&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;autodiscover&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+
+
+&lt;span class="c1"&gt;# Signal handlers&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;wagtail.wagtailsearch&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;register_signal_handlers&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;wagtailsearch_register_signal_handlers&lt;/span&gt;
+&lt;span class="n"&gt;wagtailsearch_register_signal_handlers&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+
+
+&lt;span class="n"&gt;urlpatterns&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;patterns&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;r&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;^django-admin/&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;include&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;admin&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;site&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;urls&lt;/span&gt;&lt;span class="p"&gt;)),&lt;/span&gt;
+
+    &lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;r&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;^admin/images/&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;include&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;wagtailimages_urls&lt;/span&gt;&lt;span class="p"&gt;)),&lt;/span&gt;
+    &lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;r&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;^admin/embeds/&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;include&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;wagtailembeds_urls&lt;/span&gt;&lt;span class="p"&gt;)),&lt;/span&gt;
+    &lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;r&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;^admin/documents/&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;include&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;wagtaildocs_admin_urls&lt;/span&gt;&lt;span class="p"&gt;)),&lt;/span&gt;
+    &lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;r&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;^admin/snippets/&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;include&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;wagtailsnippets_urls&lt;/span&gt;&lt;span class="p"&gt;)),&lt;/span&gt;
+    &lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;r&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;^admin/search/&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;include&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;wagtailsearch_admin_urls&lt;/span&gt;&lt;span class="p"&gt;)),&lt;/span&gt;
+    &lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;r&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;^admin/users/&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;include&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;wagtailusers_urls&lt;/span&gt;&lt;span class="p"&gt;)),&lt;/span&gt;
+    &lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;r&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;^admin/redirects/&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;include&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;wagtailredirects_urls&lt;/span&gt;&lt;span class="p"&gt;)),&lt;/span&gt;
+    &lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;r&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;^admin/&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;include&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;wagtailadmin_urls&lt;/span&gt;&lt;span class="p"&gt;)),&lt;/span&gt;
+    &lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;r&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;^search/&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;include&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;wagtailsearch_frontend_urls&lt;/span&gt;&lt;span class="p"&gt;)),&lt;/span&gt;
+    &lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;r&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;^documents/&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;include&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;wagtaildocs_urls&lt;/span&gt;&lt;span class="p"&gt;)),&lt;/span&gt;
+
+    &lt;span class="c1"&gt;# For anything not caught by a more specific rule above, hand over to&lt;/span&gt;
+    &lt;span class="c1"&gt;# Wagtail&amp;#39;s serving mechanism&lt;/span&gt;
+    &lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;r&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;include&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;wagtail_urls&lt;/span&gt;&lt;span class="p"&gt;)),&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+
+
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;settings&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;DEBUG&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="kn"&gt;from&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;django.contrib.staticfiles.urls&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;staticfiles_urlpatterns&lt;/span&gt;
+
+    &lt;span class="n"&gt;urlpatterns&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;staticfiles_urlpatterns&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="c1"&gt;# tell gunicorn where static files are in dev mode&lt;/span&gt;
+    &lt;span class="n"&gt;urlpatterns&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;static&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;settings&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;MEDIA_URL&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;images/&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;document_root&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;os&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;join&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;settings&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;MEDIA_ROOT&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;images&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;You can se that there is a signal handler when a searchable thing is added or changed to handle indexing for search, normal django admin is mapped under /django-admin since /admin is use for Wagtail (of course you may map Wagtail wherever you&amp;#8217;d like), inclusion of various wagtail related urls and finally a Wagtail handling everything else. Finally there are some handlers for media and static&amp;nbsp;files.&lt;/p&gt;
+&lt;p&gt;After that please change your &lt;code&gt;settings.py&lt;/code&gt; like&amp;nbsp;this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# Django settings for wagtailtutorial project.&lt;/span&gt;
+
+&lt;span class="kn"&gt;import&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;os&lt;/span&gt;
+
+&lt;span class="n"&gt;PROJECT_ROOT&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;os&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;join&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;os&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;dirname&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="vm"&gt;__file__&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;..&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;..&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;DEBUG&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;True&lt;/span&gt;
+&lt;span class="n"&gt;TEMPLATE_DEBUG&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;DEBUG&lt;/span&gt;
+
+&lt;span class="n"&gt;ADMINS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;()&lt;/span&gt;
+&lt;span class="n"&gt;MANAGERS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;ADMINS&lt;/span&gt;
+
+&lt;span class="n"&gt;DATABASES&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;default&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="s1"&gt;&amp;#39;ENGINE&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;django.db.backends.sqlite3&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="s1"&gt;&amp;#39;NAME&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;PROJECT_ROOT&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;/wagtailtutorial.db&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="s1"&gt;&amp;#39;USER&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="s1"&gt;&amp;#39;PASSWORD&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="s1"&gt;&amp;#39;HOST&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;  &lt;span class="c1"&gt;# Set to empty string for localhost.&lt;/span&gt;
+        &lt;span class="s1"&gt;&amp;#39;PORT&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;  &lt;span class="c1"&gt;# Set to empty string for default.&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="n"&gt;CONN_MAX_AGE&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;600&lt;/span&gt;  &lt;span class="c1"&gt;# number of seconds database connections should persist for&lt;/span&gt;
+&lt;span class="n"&gt;ALLOWED_HOSTS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[]&lt;/span&gt;
+&lt;span class="n"&gt;TIME_ZONE&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;Europe/London&amp;#39;&lt;/span&gt;
+&lt;span class="n"&gt;LANGUAGE_CODE&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;en-gb&amp;#39;&lt;/span&gt;
+&lt;span class="n"&gt;SITE_ID&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;
+&lt;span class="n"&gt;USE_I18N&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;True&lt;/span&gt;
+&lt;span class="n"&gt;USE_L10N&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;False&lt;/span&gt;
+&lt;span class="n"&gt;USE_TZ&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;True&lt;/span&gt;
+&lt;span class="n"&gt;MEDIA_ROOT&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;os&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;join&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;PROJECT_ROOT&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;media&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;MEDIA_URL&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;/media/&amp;#39;&lt;/span&gt;
+&lt;span class="n"&gt;STATIC_ROOT&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;os&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;join&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;PROJECT_ROOT&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;static&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;STATIC_URL&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;/static/&amp;#39;&lt;/span&gt;
+&lt;span class="n"&gt;STATICFILES_DIRS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;()&lt;/span&gt;
+
+&lt;span class="n"&gt;STATICFILES_FINDERS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;django.contrib.staticfiles.finders.FileSystemFinder&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;django.contrib.staticfiles.finders.AppDirectoriesFinder&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;compressor.finders.CompressorFinder&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;SECRET_KEY&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;wq21wtjo3@d_qfjvd-#td!&lt;/span&gt;&lt;span class="si"&gt;%7g&lt;/span&gt;&lt;span class="s1"&gt;fy2updj2z+nev^k$iy%=m4_tr&amp;#39;&lt;/span&gt;
+
+&lt;span class="n"&gt;TEMPLATE_LOADERS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;django.template.loaders.filesystem.Loader&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;django.template.loaders.app_directories.Loader&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;MIDDLEWARE_CLASSES&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;django.middleware.common.CommonMiddleware&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;django.contrib.sessions.middleware.SessionMiddleware&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;django.middleware.csrf.CsrfViewMiddleware&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;django.contrib.auth.middleware.AuthenticationMiddleware&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;django.contrib.messages.middleware.MessageMiddleware&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;django.middleware.clickjacking.XFrameOptionsMiddleware&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;wagtail.wagtailcore.middleware.SiteMiddleware&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;wagtail.wagtailredirects.middleware.RedirectMiddleware&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="kn"&gt;from&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;django.conf&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;global_settings&lt;/span&gt;
+&lt;span class="n"&gt;TEMPLATE_CONTEXT_PROCESSORS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;global_settings&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;TEMPLATE_CONTEXT_PROCESSORS&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;django.core.context_processors.request&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;ROOT_URLCONF&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;wagtailtutorial.urls&amp;#39;&lt;/span&gt;
+&lt;span class="n"&gt;WSGI_APPLICATION&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;wagtailtutorial.wsgi.application&amp;#39;&lt;/span&gt;
+&lt;span class="n"&gt;TEMPLATE_DIRS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;()&lt;/span&gt;
+
+&lt;span class="n"&gt;INSTALLED_APPS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;django.contrib.auth&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;django.contrib.contenttypes&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;django.contrib.sessions&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="c1"&gt;# &amp;#39;django.contrib.sites&amp;#39;,  # Wagtail uses its own site management logic&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;django.contrib.messages&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;django.contrib.staticfiles&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+
+    &lt;span class="s1"&gt;&amp;#39;south&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;compressor&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;taggit&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;modelcluster&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;django.contrib.admin&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+
+    &lt;span class="s1"&gt;&amp;#39;wagtail.wagtailcore&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;wagtail.wagtailadmin&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;wagtail.wagtaildocs&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;wagtail.wagtailsnippets&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;wagtail.wagtailusers&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;wagtail.wagtailimages&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;wagtail.wagtailembeds&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;wagtail.wagtailsearch&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;wagtail.wagtailredirects&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+
+    &lt;span class="s1"&gt;&amp;#39;tutorial&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;EMAIL_SUBJECT_PREFIX&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;[wagtailtutorial] &amp;#39;&lt;/span&gt;
+
+&lt;span class="n"&gt;INTERNAL_IPS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;127.0.0.1&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;10.0.2.2&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;COMPRESS_PRECOMPILERS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;text/x-scss&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;django_libsass.SassCompiler&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Auth settings&lt;/span&gt;
+&lt;span class="n"&gt;LOGIN_URL&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;django.contrib.auth.views.login&amp;#39;&lt;/span&gt;
+&lt;span class="n"&gt;LOGIN_REDIRECT_URL&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;wagtailadmin_home&amp;#39;&lt;/span&gt;
+
+&lt;span class="n"&gt;LOGGING&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;version&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;disable_existing_loggers&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="kc"&gt;False&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;filters&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="s1"&gt;&amp;#39;require_debug_false&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+            &lt;span class="s1"&gt;&amp;#39;()&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;django.utils.log.RequireDebugFalse&amp;#39;&lt;/span&gt;
+        &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="p"&gt;},&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;handlers&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="s1"&gt;&amp;#39;mail_admins&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+            &lt;span class="s1"&gt;&amp;#39;level&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;ERROR&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+            &lt;span class="s1"&gt;&amp;#39;filters&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;require_debug_false&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt;
+            &lt;span class="s1"&gt;&amp;#39;class&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;django.utils.log.AdminEmailHandler&amp;#39;&lt;/span&gt;
+        &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="p"&gt;},&lt;/span&gt;
+    &lt;span class="s1"&gt;&amp;#39;loggers&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="s1"&gt;&amp;#39;django.request&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+            &lt;span class="s1"&gt;&amp;#39;handlers&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;mail_admins&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt;
+            &lt;span class="s1"&gt;&amp;#39;level&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;ERROR&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+            &lt;span class="s1"&gt;&amp;#39;propagate&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="kc"&gt;True&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="p"&gt;},&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+
+&lt;span class="c1"&gt;# WAGTAIL SETTINGS&lt;/span&gt;
+&lt;span class="n"&gt;WAGTAIL_SITE_NAME&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;wagtailtutorial&amp;#39;&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Override the search results template for wagtailsearch&lt;/span&gt;
+&lt;span class="n"&gt;WAGTAILSEARCH_RESULTS_TEMPLATE&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;tutorial/search_results.html&amp;#39;&lt;/span&gt;
+&lt;span class="n"&gt;WAGTAILSEARCH_RESULTS_TEMPLATE_AJAX&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;tutorial/includes/search_listing.html&amp;#39;&lt;/span&gt;
+
+&lt;span class="n"&gt;WAGTAILSEARCH_ES_INDEX&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;wagtailtutorial&amp;#39;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The most important thing to notice is that  the &lt;code&gt;INSTALLED_APPS&lt;/code&gt; contains the usual apps from django.*, &lt;a href="http://south.aeracode.org/"&gt;south&lt;/a&gt; for database migrations, &lt;a href="https://github.com/django-compressor/django-compressor"&gt;django-compressor&lt;/a&gt; to support compressing static files (and automatic translating from less to css), &lt;a href="https://github.com/alex/django-taggit"&gt;django-taggit&lt;/a&gt; to add support for tags, and &lt;a href="https://github.com/torchbox/django-modelcluster/"&gt;django-modelcluster&lt;/a&gt; which adds support from clusters (groups) of models. It also contains the wagtail.* applications and the tutorial application which is where we will create our blog. Also there are two Wagtail related middleware (one to add a site attribute to each request and one to hand redirects), configuring django-compressor to use &lt;code&gt;django_libsass&lt;/code&gt; to compile &lt;code&gt;less&lt;/code&gt; files, and some other, not so important Wagtail&amp;nbsp;settings.&lt;/p&gt;
+&lt;p&gt;So let&amp;#8217;s create the missing tutorial application by&amp;nbsp;issuing:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;python&lt;span class="w"&gt; &lt;/span&gt;manage.py&lt;span class="w"&gt; &lt;/span&gt;startapp&lt;span class="w"&gt; &lt;/span&gt;tutorial
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Now we&amp;#8217;ll have a &lt;code&gt;tutorial&lt;/code&gt; folder waiting to define our blog structure inside the &lt;code&gt;wagtailtutorial&lt;/code&gt; folder!&lt;/p&gt;
+&lt;h2 id="checking-to-see-if-everything-works"&gt;Checking to see if everything&amp;nbsp;works&lt;/h2&gt;
+&lt;p&gt;Before continuing with our blog creation let&amp;#8217;s make sure that everything works, first of all by generating the database&amp;nbsp;schema:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;python&lt;span class="w"&gt; &lt;/span&gt;manage.py&lt;span class="w"&gt; &lt;/span&gt;syncdb
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;In the superuser question answer yes and add a superuser. Then you can run the migrations - however because there are some problems with the way SQLite3 runs migrations it is recommended to run the migrations in two&amp;nbsp;steps:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;python&lt;span class="w"&gt; &lt;/span&gt;manage.py&lt;span class="w"&gt; &lt;/span&gt;migrate&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;0001&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;--all
+python&lt;span class="w"&gt; &lt;/span&gt;manage.py&lt;span class="w"&gt; &lt;/span&gt;migrate
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Finally, you now may try&amp;nbsp;a&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;python&lt;span class="w"&gt; &lt;/span&gt;manage.py&lt;span class="w"&gt; &lt;/span&gt;runserver
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;and visit &lt;code&gt;http://127.0.0.1:8000&lt;/code&gt;. If everything worked fine you will get&amp;nbsp;a&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Welcome to your new Wagtail&amp;nbsp;site!&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;page &amp;#8212; congratulations&amp;nbsp;!&lt;/p&gt;
+&lt;p&gt;The homepage is rather simple (for now!) but you may already navigate to http://127.0.0.1:8000/admin and from there, login to Wagtail admin with the superuser you created earlier. 
+Now you may start experiencing Wagtail&amp;nbsp;! &lt;/p&gt;
+&lt;p&gt;&lt;img alt="Wagtail admin index" src="https://spapas.github.io/images/wagtail-index.png"&gt;&lt;/p&gt;
+&lt;h2 id="exploring-wagtail-admin"&gt;Exploring Wagtail&amp;nbsp;admin&lt;/h2&gt;
+&lt;p&gt;When you login to Wagtail admin you will see a menu at the left with the&amp;nbsp;options:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Explorer is used to actually manage the content of your&amp;nbsp;site&lt;/li&gt;
+&lt;li&gt;Search is used for searching through your&amp;nbsp;content&lt;/li&gt;
+&lt;li&gt;Images is used to manage your&amp;nbsp;images&lt;/li&gt;
+&lt;li&gt;Documents is used to manage your&amp;nbsp;Documents&lt;/li&gt;
+&lt;li&gt;Snippets is used for side bars&amp;nbsp;etc&lt;/li&gt;
+&lt;li&gt;Users is used for User&amp;nbsp;management&lt;/li&gt;
+&lt;li&gt;Redirects is used to redirect to a specific&amp;nbsp;page&lt;/li&gt;
+&lt;li&gt;Editors picks is used to promote search&amp;nbsp;results&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Of the previous, the one needing more explanation is Explorer: Clicking it you will see that a label named &amp;#8220;Welcome to your Wagtail site!&amp;#8221; will open. This is the root Page of your site. If you click at it you will go to the actions of this page. The actions you can do here is:
+ - Add Child Page
+ - Edit
+ - View Live
+ - Move
+ - Delete
+ -&amp;nbsp;Unpublish&lt;/p&gt;
+&lt;p&gt;The Pages (and more generally the Content) of Wagtail are Django Models that are saved through a Tree hierarchy. However, if you click &amp;#8220;Add Child Page&amp;#8221; you won&amp;#8217;t be able to add anything because you must create your own Page types (we will see how it is done in the next&amp;nbsp;section). &lt;/p&gt;
+&lt;p&gt;When you click edit you will be able to edit the parts of the page (each part is a normal Field of the model). Also, you will see that the form is split into two tabs: Content and Promote. In the Content for instance you will see that the &amp;#8220;Welcome to your Wagtail site!&amp;#8221; has only a &amp;#8220;Title&amp;#8221; CharField. These are the fields that will be available to all Pages since &amp;#8220;Welcome to your Wagtail site!&amp;#8221; has a class of &lt;code&gt;Page&lt;/code&gt; from which every other page should inherit. After you finish editing a page you may save it as a draft, publish, sent it for moderation (if you don&amp;#8217;t have the rights to publish it)&amp;nbsp;etc.&lt;/p&gt;
+&lt;h2 id="creating-our-blog"&gt;Creating our&amp;nbsp;blog&lt;/h2&gt;
+&lt;p&gt;Each of our Page types is a normal Django Model which inherits from &lt;code&gt;Page&lt;/code&gt;. Let&amp;#8217;s suppose that our posts should contain a title, a body and a created date. Add the following to &lt;code&gt;tutorials/models.py&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kn"&gt;from&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;django.db&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;models&lt;/span&gt;
+
+&lt;span class="kn"&gt;from&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;wagtail.wagtailcore.models&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;Page&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;wagtail.wagtailcore.fields&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;RichTextField&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;wagtail.wagtailadmin.edit_handlers&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;FieldPanel&lt;/span&gt;    
+
+&lt;span class="k"&gt;class&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nc"&gt;BlogPage&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Page&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="n"&gt;body&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;RichTextField&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+    &lt;span class="n"&gt;date&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;models&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;DateField&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Post date&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;search_name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Blog Page&amp;quot;&lt;/span&gt;
+
+    &lt;span class="n"&gt;indexed_fields&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;body&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;BlogPage&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;content_panels&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;
+    &lt;span class="n"&gt;FieldPanel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;title&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;classname&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;full title&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+    &lt;span class="n"&gt;FieldPanel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;date&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+    &lt;span class="n"&gt;FieldPanel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;body&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;classname&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;full&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;and run &lt;code&gt;python manage.py syncdb&lt;/code&gt; to create the &lt;code&gt;tutorial_blogpage&lt;/code&gt; table. &lt;/p&gt;
+&lt;p&gt;Now, if you visit again the /admin and click on the &amp;#8220;Add Child Page&amp;#8221; action of &amp;#8220;Welcome to your new Wagtail Site!&amp;#8221; you will see the &amp;#8220;Blog Page&amp;#8221; page and after you click it you will be able to see a form with the Fields you defined &lt;em&gt;and&lt;/em&gt; title(title, body, date). The title is a field inherited from Page, along with the fields  in the Promote&amp;nbsp;tab. &lt;/p&gt;
+&lt;p&gt;In our declaration of BlogPage we added three &lt;code&gt;FieldPanel&lt;/code&gt;s on its content_panes. A &lt;code&gt;FieldPanel&lt;/code&gt; is a special edit handler for each Field. That is why when you try to edit the body you will see a rich text toolbar that enables you to not only format text but also embed images, documents and even oembed links. If you hadn&amp;#8217;t included the &lt;code&gt;FieldPanel('body', classname="full")&lt;/code&gt; then you wouldn&amp;#8217;t see the rich text&amp;nbsp;editor.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Editing pages in Wagtail" src="https://spapas.github.io/images/wagtail-edit-page.png"&gt;&lt;/p&gt;
+&lt;p&gt;So now we can add as many posts as we&amp;nbsp;like! &lt;/p&gt;
+&lt;p&gt;The time has come to take a look at our fine blog post: After we publish our page we click to the view live action&amp;nbsp;and&amp;#8230; &lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;TemplateDoesNotExist at&amp;nbsp;/hello-world/&lt;/p&gt;
+&lt;p&gt;tutorial/blog_page.html&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;:(&lt;/p&gt;
+&lt;p&gt;A template seems to be missing &amp;#8212; actually we have totally forgotten about the presentation of our blog &amp;#8212; we&amp;#8217;ll talk about this in the next section&amp;nbsp;!&lt;/p&gt;
+&lt;p&gt;However, before going there we should also create an Index page type collecting our&amp;nbsp;posts. &lt;/p&gt;
+&lt;p&gt;For this, we will change our &lt;code&gt;models.py&lt;/code&gt; to&amp;nbsp;this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kn"&gt;from&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;django.db&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;models&lt;/span&gt;
+
+&lt;span class="kn"&gt;from&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;wagtail.wagtailcore.models&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;Page&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Orderable&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;wagtail.wagtailcore.fields&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;RichTextField&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;wagtail.wagtailadmin.edit_handlers&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;FieldPanel&lt;/span&gt;  &lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;MultiFieldPanel&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;InlinePanel&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;PageChooserPanel&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;modelcluster.fields&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;ParentalKey&lt;/span&gt;
+
+&lt;span class="k"&gt;class&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nc"&gt;BlogPage&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Page&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="n"&gt;body&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;RichTextField&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+    &lt;span class="n"&gt;date&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;models&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;DateField&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Post date&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;indexed_fields&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;body&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;search_name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Blog Page&amp;quot;&lt;/span&gt;
+
+&lt;span class="n"&gt;BlogPage&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;content_panels&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;
+    &lt;span class="n"&gt;FieldPanel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;title&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;classname&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;full title&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+    &lt;span class="n"&gt;FieldPanel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;date&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+    &lt;span class="n"&gt;FieldPanel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;body&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;classname&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;full&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+&lt;span class="p"&gt;]&lt;/span&gt;
+
+
+&lt;span class="k"&gt;class&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nc"&gt;LinkFields&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;models&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Model&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="n"&gt;link_page&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;models&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;ForeignKey&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+        &lt;span class="s1"&gt;&amp;#39;wagtailcore.Page&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="n"&gt;null&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="kc"&gt;True&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="n"&gt;blank&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="kc"&gt;True&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="n"&gt;related_name&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;+&amp;#39;&lt;/span&gt;
+    &lt;span class="p"&gt;)&lt;/span&gt;
+
+    &lt;span class="n"&gt;panels&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;
+        &lt;span class="n"&gt;PageChooserPanel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;link_page&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+    &lt;span class="p"&gt;]&lt;/span&gt;
+
+    &lt;span class="k"&gt;class&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nc"&gt;Meta&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="n"&gt;abstract&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;True&lt;/span&gt;
+
+&lt;span class="k"&gt;class&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nc"&gt;RelatedLink&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;LinkFields&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="n"&gt;title&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;models&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;CharField&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;max_length&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;255&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;help_text&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Link title&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;panels&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;
+        &lt;span class="n"&gt;FieldPanel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;title&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+        &lt;span class="n"&gt;MultiFieldPanel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;LinkFields&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;panels&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Link&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+    &lt;span class="p"&gt;]&lt;/span&gt;
+
+    &lt;span class="k"&gt;class&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nc"&gt;Meta&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="n"&gt;abstract&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;True&lt;/span&gt;
+
+
+&lt;span class="k"&gt;class&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nc"&gt;BlogIndexPageRelatedLink&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Orderable&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;RelatedLink&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="n"&gt;page&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;ParentalKey&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;tutorial.BlogIndexPage&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;related_name&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;related_links&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="k"&gt;class&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nc"&gt;BlogIndexPage&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Page&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="n"&gt;intro&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;models&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;CharField&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;max_length&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;256&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;indexed_fields&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;body&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;search_name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Blog Index Page&amp;quot;&lt;/span&gt;
+
+&lt;span class="n"&gt;BlogIndexPage&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;content_panels&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;
+    &lt;span class="n"&gt;FieldPanel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;title&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;classname&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;full title&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+    &lt;span class="n"&gt;FieldPanel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;intro&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;classname&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;full&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+    &lt;span class="n"&gt;InlinePanel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;BlogIndexPage&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;related_links&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;label&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Related links&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+&lt;span class="p"&gt;]&lt;/span&gt;    
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The above adds a way to put &lt;code&gt;related_links&lt;/code&gt; to a &lt;code&gt;BlogIndexPage&lt;/code&gt; &amp;#8212; these related_links are the &lt;code&gt;BlogPage&lt;/code&gt;s that actually belong to the blog - so now, we can add a blog index page and add all our blog posts to&amp;nbsp;it!&lt;/p&gt;
+&lt;p&gt;Now that we&amp;#8217;ve created the BlogPage and BlogIndexPage pages it&amp;#8217;s time to take a look at how we will actually display our&amp;nbsp;blog&amp;#8230;&lt;/p&gt;
+&lt;h2 id="creating-templates-for-pages"&gt;Creating templates for &lt;em&gt;Page&lt;/em&gt;s&lt;/h2&gt;
+&lt;p&gt;A normal Django template can be used to display each page type. Wagtail either generates automatically (by seperating underscors with capital letters in camelcase for instance BlogIndexPage -&amp;gt; blog_index_page) or you can use the template class attribute. Let&amp;#8217;s add a &lt;code&gt;templates&lt;/code&gt; foler within the &lt;code&gt;tutorial&lt;/code&gt; foler and add another folder named &lt;code&gt;tutorial&lt;/code&gt; inside &lt;code&gt;templates&lt;/code&gt; and ten add a file named &lt;code&gt;blog_index_page.html&lt;/code&gt; to &lt;code&gt;templates&lt;/code&gt; with the following content (you must have the following hierarchy &lt;code&gt;wagtailtutorial/tutorial/templates/tutorial/blog_index_page.html&lt;/code&gt;):&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;html&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;body&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;h1&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;{{ self.title }}&lt;span class="p"&gt;&amp;lt;/&lt;/span&gt;&lt;span class="nt"&gt;h1&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+        Intro: {{ self.intro }}
+        &lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;hr&lt;/span&gt; &lt;span class="p"&gt;/&amp;gt;&lt;/span&gt;
+        {% for rl in self.related_links.all %}
+            &lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;p&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;{{ rl.title }}: &lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;a&lt;/span&gt; &lt;span class="na"&gt;href&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;{{ rl.link_page.url }}&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;{{ rl.link_page }}&lt;span class="p"&gt;&amp;lt;/&lt;/span&gt;&lt;span class="nt"&gt;a&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&amp;lt;/&lt;/span&gt;&lt;span class="nt"&gt;p&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+        {% endfor %}
+    &lt;span class="p"&gt;&amp;lt;/&lt;/span&gt;&lt;span class="nt"&gt;body&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="p"&gt;&amp;lt;/&lt;/span&gt;&lt;span class="nt"&gt;html&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;So self is the context name of the  BlogPageIndex instance that is used to render this page. Beyond that, it&amp;#8217;s normal&amp;nbsp;django.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Rendering the Blog Index" src="https://spapas.github.io/images/wagtail-index-template.png"&gt;&lt;/p&gt;
+&lt;p&gt;Now you can view your Blog Index &amp;#8212; however before clicking on a link to also view your posts add the template for your &lt;code&gt;BlogPost&lt;/code&gt; (&lt;code&gt;tutorial/blog_page.html&lt;/code&gt;):&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;{% load rich_text %}
+&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;html&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;body&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;h1&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;{{ self.title }}&lt;span class="p"&gt;&amp;lt;/&lt;/span&gt;&lt;span class="nt"&gt;h1&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+        Date: {{ self.date }}
+        {{ self.body | richtext }}
+    &lt;span class="p"&gt;&amp;lt;/&lt;/span&gt;&lt;span class="nt"&gt;body&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="p"&gt;&amp;lt;/&lt;/span&gt;&lt;span class="nt"&gt;html&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;    
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The extra thing here is the &lt;code&gt;richtext&lt;/code&gt; filter which renders a &lt;code&gt;RichTextField&lt;/code&gt; correctly. Of course the above templates are just examples - check &lt;code&gt;wagtaildemo&lt;/code&gt; for a much better template&amp;nbsp;design.&lt;/p&gt;
+&lt;p&gt;Woo-hoo &amp;#8212; now I can totally start blogging !!!&amp;nbsp;\o/&lt;/p&gt;
+&lt;p&gt;&amp;#8230;&lt;/p&gt;
+&lt;p&gt;&amp;#8230;&lt;/p&gt;
+&lt;p&gt;But &amp;#8230; when I go to 127.0.0.1:8000 it displays the ugly &amp;#8220;Welcome to your new Wagtail site!&amp;#8221;. I don&amp;#8217;t want to see that any more&amp;nbsp;!!!&lt;/p&gt;
+&lt;p&gt;No problemo - check the next section of the tutorial&amp;nbsp;:)&lt;/p&gt;
+&lt;h2 id="changing-your-home-page"&gt;Changing your home&amp;nbsp;page&lt;/h2&gt;
+&lt;p&gt;Wagtail uses the concept of &lt;em&gt;sites&lt;/em&gt; to define groups of pages hosted in the &lt;em&gt;same&lt;/em&gt; server. To make more clear what site is, you have to use the good old django admin which can be found at &lt;code&gt;http://127.0.0.1:8000/django-admin/&lt;/code&gt;. Check the localhost[default] site entry: You will see that each site has a name, a root page (currently the &amp;#8220;Welcome to your new Wagtail site!&amp;#8221;) and an is_default check. So,  change the root page of the localhost site to your BlogIndexPage and go to &lt;code&gt;http://127.0.0.1:8000/&lt;/code&gt; &amp;#8230; Yes ! The blog is alive&amp;nbsp;:)&lt;/p&gt;
+&lt;h2 id="where-to-go-from-here"&gt;Where to go from&amp;nbsp;here&lt;/h2&gt;
+&lt;p&gt;You are now ready to start adding more pages to your blog, adding functionality to it (don&amp;#8217;t forget that everything is just Django models and templates so you can
+change it at will), or even creating a completely different kind of site by adding other Page types. For a more complete site with lots of examples please check 
+&lt;a href="https://github.com/torchbox/wagtaildemo"&gt;wagtaildemo&lt;/a&gt;. There is
+no complete documentation yet however you&amp;nbsp;can &lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Use the source&amp;nbsp;Luke!&lt;/p&gt;
+&lt;/blockquote&gt;</content><category term="wagtail"></category><category term="wagtail"></category><category term="python"></category><category term="django"></category></entry></feed>

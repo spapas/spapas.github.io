@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="google-site-verification" content="5_8DTmIiEq4gFvNAfxAD6TsGOgrMAjp8lQFQvfA6zZc" />
+    <title>My essential guidelines for better Django development &mdash; /var/</title>
+    <meta name="author" content="Serafeim Papastefanos">
+
+
+    
+<style type="text/css">
+pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: var(--jp-cell-editor-active-background) }
+.highlight { background: var(--jp-cell-editor-background); color: var(--jp-mirror-editor-variable-color) }
+.highlight .c { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment */
+.highlight .err { color: var(--jp-mirror-editor-error-color) } /* Error */
+.highlight .k { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword */
+.highlight .o { color: var(--jp-mirror-editor-operator-color); font-weight: bold } /* Operator */
+.highlight .p { color: var(--jp-mirror-editor-punctuation-color) } /* Punctuation */
+.highlight .ch { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Preproc */
+.highlight .cpf { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Single */
+.highlight .cs { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Special */
+.highlight .kc { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Pseudo */
+.highlight .kr { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Type */
+.highlight .m { color: var(--jp-mirror-editor-number-color) } /* Literal.Number */
+.highlight .s { color: var(--jp-mirror-editor-string-color) } /* Literal.String */
+.highlight .ow { color: var(--jp-mirror-editor-operator-color); font-weight: bold } /* Operator.Word */
+.highlight .pm { color: var(--jp-mirror-editor-punctuation-color) } /* Punctuation.Marker */
+.highlight .w { color: var(--jp-mirror-editor-variable-color) } /* Text.Whitespace */
+.highlight .mb { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Bin */
+.highlight .mf { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Float */
+.highlight .mh { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Hex */
+.highlight .mi { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Integer */
+.highlight .mo { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Oct */
+.highlight .sa { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Affix */
+.highlight .sb { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Backtick */
+.highlight .sc { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Char */
+.highlight .dl { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Delimiter */
+.highlight .sd { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Doc */
+.highlight .s2 { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Double */
+.highlight .se { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Escape */
+.highlight .sh { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Heredoc */
+.highlight .si { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Interpol */
+.highlight .sx { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Other */
+.highlight .sr { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Regex */
+.highlight .s1 { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Single */
+.highlight .ss { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Symbol */
+.highlight .il { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Integer.Long */
+</style>
+
+<style type="text/css">
+/* Overrides of notebook CSS for static HTML export */
+div.entry-content {
+  overflow: visible;
+  padding: 8px;
+}
+.input_area {
+  padding: 0.2em;
+}
+
+a.heading-anchor {
+ white-space: normal;
+}
+
+.rendered_html
+code {
+ font-size: .8em;
+}
+
+pre.ipynb {
+  color: black;
+  background: #f7f7f7;
+  border: none;
+  box-shadow: none;
+  margin-bottom: 0;
+  padding: 0;
+  margin: 0px;
+  font-size: 13px;
+}
+
+/* remove the prompt div from text cells */
+div.text_cell .prompt {
+    display: none;
+}
+
+/* remove horizontal padding from text cells, */
+/* so it aligns with outer body text */
+div.text_cell_render {
+    padding: 0.5em 0em;
+}
+
+img.anim_icon{padding:0; border:0; vertical-align:middle; -webkit-box-shadow:none; -box-shadow:none}
+
+div.collapseheader {
+    width=100%;
+    background-color:#d3d3d3;
+    padding: 2px;
+    cursor: pointer;
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+</style>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true,
+        displayMath: [['$$','$$'], ["\\[","\\]"]]
+    }
+});
+</script>
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+    $("div.collapseheader").click(function () {
+    $header = $(this).children("span").first();
+    $codearea = $(this).children(".input_area");
+    console.log($(this).children());
+    $codearea.slideToggle(500, function () {
+        $header.text(function () {
+            return $codearea.is(":visible") ? "Collapse Code" : "Expand Code";
+        });
+    });
+});
+});
+</script>
+
+
+
+
+
+
+    <!-- http://t.co/dKP3o1e -->
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+    <link href="https://spapas.github.io/favicon.png" rel="icon">
+
+    <link href="https://spapas.github.io/theme/css/main.css" media="screen, projection" rel="stylesheet"
+      type="text/css">
+
+    <link href="https://spapas.github.io/theme/css/extra_style.css" media="screen, projection" rel="stylesheet"
+      type="text/css">
+
+    <link href="https://fonts.googleapis.com/css?family=Fira+Mono|Fira+Sans:400,700&amp;subset=greek" rel="stylesheet">
+
+<style>
+#gHPzseYvFrhZ123 {
+  padding: 5px !important;
+  display: block;
+  margin-bottom: 10px !important;
+  background: #900;
+  color: #fff;
+  border-radius: 5px;
+  font-size: 1.0rem !important;
+}
+</style>
+
+
+  <script>
+    
+      
+  </script>
+
+    <script data-ad-client="ca-pub-7673322832689008" async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
+      onerror="adBlockFunction();"></script>
+  </head>
+
+<body>
+  <header role="banner"><hgroup>
+  <h1><a href="https://spapas.github.io/">/var/</a></h1>
+    <h2>Various programming stuff</h2>
+</hgroup></header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+</ul>
+
+
+<ul class="main-navigation">
+      <li >
+        <a href="https://spapas.github.io/category/ai.html">Ai</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/android.html">Android</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/clojure.html">Clojure</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/css.html">Css</a>
+      </li>
+      <li class="active">
+        <a href="https://spapas.github.io/category/django.html">Django</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/elixir.html">Elixir</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/flask.html">Flask</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/gaming.html">Gaming</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/git.html">Git</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/html.html">Html</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/javascript.html">Javascript</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/networking.html">Networking</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/pelican.html">Pelican</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/postgresql.html">Postgresql</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/python.html">Python</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/spring.html">Spring</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/unix.html">Unix</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/wagtail.html">Wagtail</a>
+      </li>
+</ul></nav>
+  <div id="main">
+    <div id="content">
+    <div id="gHPzseYvFrhZ123">
+      Hello! If you are using an ad blocker but find something useful here 
+      and want to support me please consider disabling your ad blocker for this site. 
+      <br />
+      <br />
+      Thank you,<br />
+      Serafeim
+      
+    </div>
+<div>
+  <article class="hentry" role="article">
+<header>
+      <h1 class="entry-title">My essential guidelines for better Django development</h1>
+    <p class="meta">
+<time datetime="2022-09-28T11:10:00+03:00" pubdate>Wed 28 September 2022</time>    </p>
+</header>
+
+<div class="entry-content"><div class="contents topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#introduction" id="toc-entry-1">Introduction</a></li>
+<li><a class="reference internal" href="#model-design-guidelines" id="toc-entry-2">Model design guidelines</a><ul>
+<li><a class="reference internal" href="#avoid-using-choices" id="toc-entry-3">Avoid using&nbsp;choices</a></li>
+<li><a class="reference internal" href="#always-use-surrogate-keys" id="toc-entry-4">Always use surrogate&nbsp;keys</a></li>
+<li><a class="reference internal" href="#always-use-a-through-model-on-your-m2m-relations" id="toc-entry-5">Always use a through model on your m2m&nbsp;relations</a></li>
+<li><a class="reference internal" href="#use-a-custom-user-model" id="toc-entry-6">Use a custom user&nbsp;model</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#views-guidelines" id="toc-entry-7">Views guidelines</a><ul>
+<li><a class="reference internal" href="#use-class-based-views" id="toc-entry-8">Use class based&nbsp;views</a></li>
+<li><a class="reference internal" href="#view-method-overriding-guidelines" id="toc-entry-9">View method overriding&nbsp;guidelines</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#querying-guidelines" id="toc-entry-10">Querying guidelines</a><ul>
+<li><a class="reference internal" href="#guidelines-for-the-n-1-problem" id="toc-entry-11">Guidelines for the n+1&nbsp;problem</a></li>
+<li><a class="reference internal" href="#re-use-your-queries" id="toc-entry-12">Re-use your&nbsp;queries</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#forms-guidelines" id="toc-entry-13">Forms guidelines</a><ul>
+<li><a class="reference internal" href="#always-use-django-forms" id="toc-entry-14">Always use&nbsp;django-forms</a></li>
+<li><a class="reference internal" href="#overriding-form-methods-guidelines" id="toc-entry-15">Overriding Form methods&nbsp;guidelines</a></li>
+<li><a class="reference internal" href="#proper-cleaning" id="toc-entry-16">Proper&nbsp;cleaning</a></li>
+<li><a class="reference internal" href="#overriding-the-init" id="toc-entry-17">Overriding the&nbsp;__init__</a></li>
+<li><a class="reference internal" href="#laying-out-forms" id="toc-entry-18">Laying out&nbsp;forms</a></li>
+<li><a class="reference internal" href="#improve-the-formset-functionality" id="toc-entry-19">Improve the formset&nbsp;functionality</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#template-guidelines" id="toc-entry-20">Template guidelines</a><ul>
+<li><a class="reference internal" href="#stick-to-the-built-in-django-template-backend" id="toc-entry-21">Stick to the built-in Django template&nbsp;backend</a></li>
+<li><a class="reference internal" href="#don-t-add-template-tags-when-you-can-use-a-method" id="toc-entry-22">Don&#8217;t add template tags when you can use a&nbsp;method</a></li>
+<li><a class="reference internal" href="#re-use-templates-with-partials" id="toc-entry-23">Re-use templates with&nbsp;partials</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#settings-guidelines" id="toc-entry-24">Settings guidelines</a><ul>
+<li><a class="reference internal" href="#use-a-package-instead-of-module" id="toc-entry-25">Use a package instead of&nbsp;module</a></li>
+<li><a class="reference internal" href="#handle-secrets-properly" id="toc-entry-26">Handle secrets&nbsp;properly</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#static-and-media-guidelines" id="toc-entry-27">Static and media guidelines</a><ul>
+<li><a class="reference internal" href="#use-manifeststaticfilesstorage" id="toc-entry-28">Use&nbsp;ManifestStaticFilesStorage</a></li>
+<li><a class="reference internal" href="#organize-your-media-files" id="toc-entry-29">Organize your media&nbsp;files</a></li>
+<li><a class="reference internal" href="#do-not-serve-media-through-your-application-server" id="toc-entry-30">Do not serve media through your application&nbsp;server</a></li>
+<li><a class="reference internal" href="#secure-your-media-properly" id="toc-entry-31">Secure your media&nbsp;properly</a></li>
+<li><a class="reference internal" href="#handle-stale-media" id="toc-entry-32">Handle stale&nbsp;media</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#debugging-guidelines" id="toc-entry-33">Debugging guidelines</a><ul>
+<li><a class="reference internal" href="#be-careful-when-using-django-debug-toolbar" id="toc-entry-34">Be careful when using&nbsp;django-debug-toolbar</a></li>
+<li><a class="reference internal" href="#use-the-werkzeug-debugger" id="toc-entry-35">Use the Werkzeug&nbsp;debugger</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#general-guidelines" id="toc-entry-36">General guidelines</a><ul>
+<li><a class="reference internal" href="#consider-using-a-cookiecutter-project-template" id="toc-entry-37">Consider using a cookiecutter project&nbsp;template</a></li>
+<li><a class="reference internal" href="#be-careful-on-your-selection-of-packages-addons" id="toc-entry-38">Be careful on your selection of&nbsp;packages/addons</a></li>
+<li><a class="reference internal" href="#don-t-be-afraid-to-use-threadlocals" id="toc-entry-39">Don&#8217;t be afraid to use&nbsp;threadlocals</a></li>
+<li><a class="reference internal" href="#the-async-tasks-situation" id="toc-entry-40">The async tasks&nbsp;situation</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="introduction">
+<h2><a class="toc-backref" href="#toc-entry-1">Introduction</a></h2>
+<p>In this article I&#8217;d like to present a list of guidelines I follow when I develop
+Django projects, especially projects that are destined to be used in a production
+environment for many years. I am using django for more than 10 years as my day to
+day work tool to develop applications for the public sector organization I work&nbsp;for.</p>
+<p>My organization has got a number of different Django projects that cover its needs, with
+some of them running successfully for a lot of years, since Django 1.4. I have
+been involved in the development of all of them, and I have learned a lot in the process.
+I understand that some of these may be controversial but they have served me well over these&nbsp;years.</p>
+</div>
+<div class="section" id="model-design-guidelines">
+<h2><a class="toc-backref" href="#toc-entry-2">Model design&nbsp;guidelines</a></h2>
+<div class="section" id="avoid-using-choices">
+<h3><a class="toc-backref" href="#toc-entry-3">Avoid using&nbsp;choices</a></h3>
+<p>Django has the convenient feature of allowing you to define <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#choices">choices for a field</a> by defining
+a tuple of key-value pairs the field can take. So you&#8217;ll define a field like
+<tt class="docutils literal">choice_field = models.CharField(choices=<span class="caps">CHOICES</span>)</tt> with <tt class="docutils literal"><span class="caps">CHOICES</span></tt> being a tuple&nbsp;like</p>
+<div class="highlight"><pre><span></span><span class="n">CHOICES</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="p">(</span><span class="s1">&#39;CHOICE1&#39;</span><span class="p">,</span> <span class="s1">&#39;Choice 1 description&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;CHOICE2&#39;</span><span class="p">,</span> <span class="s1">&#39;Choice 2 description&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;CHOICE3&#39;</span><span class="p">,</span> <span class="s1">&#39;Choice 3 description&#39;</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+<p>and your database will contain <tt class="docutils literal"><span class="caps">CHOICE1</span></tt>, <tt class="docutils literal"><span class="caps">CHOICE2</span></tt> or <tt class="docutils literal"><span class="caps">CHOICE3</span></tt> as values for the field while your users will see
+the corresponding&nbsp;description.</p>
+<p>This is a great feature for prototyping however I
+suggest to use it only on toy-prototyping-<span class="caps">MVP</span> projects and use normal relations in production projects instead. So the choice field
+would be a Foreign Key and the choices would be tuples on the referenced table. The reasons for this&nbsp;are:</p>
+<ul class="simple">
+<li>The integrity of the choices is only on the application level. So people can go to the database and change a choice field with a random&nbsp;value.</li>
+<li>More general, the database design is not normalized; saving <tt class="docutils literal"><span class="caps">CHOICE1</span></tt> for every row is not&nbsp;ideal.</li>
+<li>Your users may want to edit the choices (add new ones) or change their descriptions. This is easy with a foreign key through the django-admin but needs a code change with&nbsp;choices.</li>
+<li>It is almost sure that you will need to add &#8220;properties&#8221; to your choices. No matter what your current requirements are, they are going to change. For example, you may want to make a choice &#8220;obsolete&#8221; so it can&#8217;t be picked by users. This is trivial when you use a foreign key but not very easy when you use&nbsp;choices.</li>
+<li>The values of the choices is saved only inside your app. The database has only the <tt class="docutils literal">'<span class="caps">CHOICE1</span>', '<span class="caps">CHOICE2</span>'</tt> etc values, so you&#8217;ll need to re-use the descriptions when your app is not used. For example, you may have reports that are generated directly from database queries so you&#8217;ll need to add the description of each key to your query using something like <tt class="docutils literal"><span class="caps">CASE</span></tt>.</li>
+<li>It easier to use the <span class="caps">ORM</span> to annotate your queries when you use relations instead of the&nbsp;choices.</li>
+</ul>
+<p>The disadvantage of relations is of course that you&#8217;ll need to follow the relation to display the values. So you must be
+careful to use <tt class="docutils literal">select_related</tt> to avoid the n+1 queries&nbsp;problem.</p>
+<p>So, in short, I suggest to use choices only for quick prototyping and covert them to normal relations in production projects.
+If you already are using choices in your project but want to convert them to normal relations, you can use take a look
+at my <a class="reference external" href="https://spapas.github.io/2015/09/01/django-rq-redux/">Django choices to ForeignKey article</a>.</p>
+</div>
+<div class="section" id="always-use-surrogate-keys">
+<h3><a class="toc-backref" href="#toc-entry-4">Always use surrogate&nbsp;keys</a></h3>
+<p>A <a class="reference external" href="https://en.wikipedia.org/wiki/Surrogate_key">surrogate key</a> is a unique identifier for a database tuple which is used as the primary key. By default Django always adds a
+surrogate key to your models. However, some people may be tempted to use a natural key as the primary key. Although this is possible
+and supported in Django, I&#8217;d recommend to stick to integer surrogate keys. Why&nbsp;?</p>
+<ul class="simple">
+<li>Django is more or less build upon having integer primary keys. Although non-integer primary keys are supported in core Django, you can&#8217;t be assured that this will be supported by the various addons/packages that you&#8217;ll want to&nbsp;use.</li>
+<li>I understand that your requirements say that &#8220;the field X will be unique and should be used to identify the row&#8221;. This is never true; this can easily be changed in the future and your primary key may stop being unique! It has happened to me and the solution was <em>not</em> something I&#8217;d like to discuss here. If there&#8217;s a field in the row that is guaranteed to be unique you can make it unique in the database level by adding <tt class="docutils literal"><span class="pre">unique==True</span></tt>; there&#8217;s no reason to also make it a primary&nbsp;key.</li>
+<li>Relying on all your models having an <tt class="docutils literal">id</tt> integer primary key makes it easier to write your code and other people reading&nbsp;it.</li>
+<li>Using an auto-increment primary key is the fastest way to insert a new row in the database (when compared to, for example using a random&nbsp;uuid)</li>
+</ul>
+<p>An even worse idea is to use composite keys (i.e define a primary key using two fields of your tuple). There&#8217;s actually
+a <a class="reference external" href="https://code.djangoproject.com/ticket/373">17-year an open issue</a> about that in Django! This should be enough for you to understand that you shouldn&#8217;t touch that
+with a 10-foot pole. Even if it is implemented somehow in core django, you&#8217;ll have something that can&#8217;t be used with all
+other packages that rely on primary key being a single&nbsp;field.</p>
+<p>Now, I understand that some public facing projects may not want to expose the auto-increment primary key since that discloses information
+about the number of rows in the database, the number of rows that are added between a user&#8217;s tuples etc. In this case, you may want to
+either add a unique uuid field, or a slug field, or even better use a library like hashid to convert your integer ids to hashes. I haven&#8217;t
+used uuids myself, but for a slug field I had used the <a class="reference external" href="https://github.com/justinmayer/django-autoslug">django-autoslug</a> library and was very happy with&nbsp;it.</p>
+<p>Concerning hashids, I&#8217;d recommend reading my <a class="reference external" href="https://spapas.github.io/2021/01/07/django-hashids/">Django hashids article</a>.</p>
+</div>
+<div class="section" id="always-use-a-through-model-on-your-m2m-relations">
+<h3><a class="toc-backref" href="#toc-entry-5">Always use a through model on your m2m&nbsp;relations</a></h3>
+<p>To add a many-to-many relation in Django, you&#8217;ll usually do something like <tt class="docutils literal">toppings = models.ManyToManyField(Topping)</tt>
+(for a pizza). This is a very convenient but, similar to the choices I mentioned above, it is not a good practice for
+production projects.
+This is because your requirements <em>will</em> change and you&#8217;ll need to add properties to your m2m relation. Although this <em>is possible</em>,
+it definitely is not pretty so it&#8217;s better to be safe than&nbsp;sorry.</p>
+<p>When you use the <tt class="docutils literal">ManyToManyField</tt> field, django will generate an intermediate table with a name similar to app_model1_model2, i.e
+for pizza and topping it will be <cite>pizzas_pizza_topping</cite>. This table will have 3 fields - the primary key, a foreign key to the pizza
+table and a foreign key to the topping table. This is the default behavior of Django and it is not&nbsp;configurable.</p>
+<p>What happens if you want to add a relation to the pizzas_pizza_topping table? For example, the amount of each topping on a pizza. Or
+the fact that some pizzas used to have that topping but it has been replaced now by another one? This is not possible unless you use
+a through table. As I said it is possible to fix that but it&#8217;s not something that you&#8217;ll want to&nbsp;do.</p>
+<p>So, my recommendation is to <em>always</em> add a through table when you use a m2m relation. Create a model that will represent the relation
+and has foreign keys to both tables along with any extra attributes the relation may&nbsp;have.</p>
+<div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">PizzaTopping</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">pizza</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Pizza</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">)</span>
+    <span class="n">topping</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Topping</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">)</span>
+    <span class="n">amount</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">()</span>
+</pre></div>
+<p>and define your pizza toppings relation like <tt class="docutils literal">toppings = models.ManyToManyField(Topping, through=PizzaTopping)</tt>.</p>
+<p>If the relation doesn&#8217;t have no extra attributes don&#8217;t worry: You&#8217;ll be prepared when these are&nbsp;requested!</p>
+<p>A bonus to that is that now you can query directly the PizzaTopping model and you can also add an admin interface for&nbsp;it.</p>
+<p>There are <em>no</em> disadvantages to adding the through model (except the 1 minute needed to add the through model minor) since
+Django will anyway create the intermediate table to represent the relation so you&#8217;ll still need to use <tt class="docutils literal">prefetch_related</tt>
+to get the toppings of a pizza and avoid the n+1 query&nbsp;problem.</p>
+</div>
+<div class="section" id="use-a-custom-user-model">
+<h3><a class="toc-backref" href="#toc-entry-6">Use a custom user&nbsp;model</a></h3>
+<p>Using a custom user model when starting a new project is already <a class="reference external" href="https://docs.djangoproject.com/en/stable/topics/auth/customizing/#using-a-custom-user-model-when-starting-a-project">advised in the Django documentation</a>. This will make it
+easier to add custom fields to your user model and have better control over it. Also, although you may be able to add
+a <tt class="docutils literal">Profile</tt> model with an one to one relation with the default <tt class="docutils literal">django.auth.User</tt> model you&#8217;ll still need to use
+a join to retrieve the profile for each user (something that won&#8217;t be necessary when the extra fields are on your custom user&nbsp;model).</p>
+<p>Another very important reason to use a custom user model is that you&#8217;ll be able to easily add custom methods to your user model.
+For example, there&#8217;s the <tt class="docutils literal">get_full_name</tt> method in builtin-Django that returns the first_name plus the last_name, with a space in between
+so you&#8217;re able to call it like <tt class="docutils literal">{{ user.get_full_name }}</tt> in your templates. If you don&#8217;t have a custom user model, you&#8217;ll need to
+add template tags for similar functionality; see the discussion about not adding template tags when you can use a&nbsp;method.</p>
+<p>There&#8217;s no real disadvantage to using a custom user model except the 5 minute it is needed to set it up. I actually recommend
+create a <tt class="docutils literal">users</tt> app that you&#8217;re going to use to keep user related information (see
+the <a class="reference external" href="https://github.com/spapas/cookiecutter-django-starter/tree/master/%7B%7Bcookiecutter.project_name%7D%7D/%7B%7Bcookiecutter.project_name%7D%7D/users">users app on my cookiecutter project</a>).</p>
+</div>
+</div>
+<div class="section" id="views-guidelines">
+<h2><a class="toc-backref" href="#toc-entry-7">Views&nbsp;guidelines</a></h2>
+<div class="section" id="use-class-based-views">
+<h3><a class="toc-backref" href="#toc-entry-8">Use class based&nbsp;views</a></h3>
+<p>I recommend to prefer using class-based views instead of function-based views. This is because class-based views are easier to
+reuse and extend. I&#8217;ve written an extensive <a class="reference external" href="https://spapas.github.io/2018/03/19/comprehensive-django-cbv-guide/">comprehensive Django <span class="caps">CBV</span> guide</a> that you can read to
+learn everything about class based&nbsp;views!</p>
+<p>Also, by properly using CBVs people reading your code will use sensible defaults and you be able to understand what you
+or others are doing much easier. Consider&nbsp;this</p>
+<div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">FooDetailView</span><span class="p">(</span><span class="n">DetailView</span><span class="p">):</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Foo</span>
+</pre></div>
+<p>vs</p>
+<div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">object_detail_view</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">pk</span><span class="p">):</span>
+    <span class="n">foo</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Foo</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">pk</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;foo/foo_detail.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;foo&#39;</span><span class="p">:</span> <span class="n">foo</span><span class="p">})</span>
+</pre></div>
+<p>These are more or less the same. However in the function-based view you need to actually write some logic for retrieving
+the Foo instance and then define the name of the template and the context object. Also notice that you use the <tt class="docutils literal">get_object_or_404</tt>
+function that helps you being <span class="caps">DRY</span>. Whereas in the class based view this is
+already done for you using well-known defaults. So, for example you&#8217;ll know which is the name of the template without the
+need to check the&nbsp;code.</p>
+</div>
+<div class="section" id="view-method-overriding-guidelines">
+<h3><a class="toc-backref" href="#toc-entry-9">View method overriding&nbsp;guidelines</a></h3>
+<p>It is important to know which method you need to override to add functionality to your class based views. You can
+use the excellent <a class="reference external" href="https://ccbv.co.uk/"><span class="caps">CBV</span> Inspector</a> app to understand how each <span class="caps">CBV</span> is working. Also, I&#8217;ve got
+many examples in my <a class="reference external" href="https://spapas.github.io/2018/03/19/comprehensive-django-cbv-guide/">comprehensive Django <span class="caps">CBV</span> guide</a>.</p>
+<p>Some quick guidelines&nbsp;follow:</p>
+<ul class="simple">
+<li>For <em>all</em> methods do not forget to call the parent&#8217;s method by <tt class="docutils literal">super()</tt>.</li>
+<li>Override <tt class="docutils literal">dispatch(self, request, *args, **kwargs)</tt> if you want to add functionality that is executed before any other method. For example to add permission checks or add some attribute (<tt class="docutils literal">self.foo</tt>) to your view instance. This method will <em>always</em> run on both <span class="caps">HTTP</span> <span class="caps">GET</span>/<span class="caps">POST</span> or whatever. Must return a Response object (i.e <tt class="docutils literal">HttpResponse</tt>, <tt class="docutils literal">HttpResponseRedirect</tt>, <tt class="docutils literal">HttpResponseForbidden</tt> etc)</li>
+<li>You should rarely need to override the <tt class="docutils literal">get</tt> or <tt class="docutils literal">post</tt> methods of your CBVs since they are called directly after <tt class="docutils literal">dispatch</tt> so any code should be&nbsp;there.</li>
+<li>To add extra data in your context (template) override <tt class="docutils literal">get_context_data(self, **kwargs)</tt>. This should return a dictionary with the context&nbsp;data.</li>
+<li>To pass extra data to your form (i.e the current request) override <tt class="docutils literal">get_form_kwargs(self)</tt>. This data will be passed on the <tt class="docutils literal">__init__</tt> of your form, you need to <em>remove it</em> by using something like <tt class="docutils literal">self.request = <span class="pre">kwargs.pop('request')</span></tt> before calling <tt class="docutils literal"><span class="pre">super().__init(*args,</span> **kwargs)</tt></li>
+<li>To override the initial data of your form override <tt class="docutils literal">get_form_initial(self)</tt>. This should return a dictionary with the initial&nbsp;data.</li>
+<li>You can override <tt class="docutils literal">get_form(self, form_class=None)</tt> to use a configurable form instance or <tt class="docutils literal">get_form_class(self)</tt> to use a configurable form class. The form instance will be generated by <tt class="docutils literal"><span class="pre">self.get_form_class()(**self.get_form_kwargs())</span></tt> (notice that the kwargs will contain an <tt class="docutils literal">initial=self.get_form_initial()</tt> value)</li>
+<li>To do stuff after a valid form is submitted you&#8217;ll override <tt class="docutils literal">form_valid(self, form)</tt>. This should return an <tt class="docutils literal">HttpResponse</tt> object and more specifically an <tt class="docutils literal">HttpResponseRedirect</tt> to avoid double form submission. This is the place where you can also add flash messages to your&nbsp;responses.</li>
+<li>You can also override <tt class="docutils literal">form_invalid(self, form)</tt> but this is rarely useful. This should return a normal response (not a&nbsp;redirect)</li>
+<li>Override <tt class="docutils literal">get_success_url(self)</tt> if you only want to set where you&#8217;ll be redirected after a valid form submission (notice this is used by <tt class="docutils literal">form_valid</tt>)</li>
+<li>You can use a different template based on some condition by overriding <tt class="docutils literal">get_template_names(self)</tt>. This is useful to return a partial response on an ajax request (for example the same detail view will return a full html view of an object when visited normally but will return a small partial html with the object&#8217;s info when called through an ajax&nbsp;call)</li>
+<li>For views that return 1 or multiple objects (<tt class="docutils literal">DetailView, ListView, UpdateView</tt> etc) you almost always need to override the <tt class="docutils literal">get_queryset(self)</tt> method, <em>not</em> the <tt class="docutils literal">get_object</tt>. I&#8217;ll talk about that a little more&nbsp;later.</li>
+<li>The <tt class="docutils literal">get_object(self, queryset=None)</tt> method will use the queryset returned by <tt class="docutils literal">get_queryset</tt> to get the object based on its pk, slug etc. I&#8217;ve observed that this rarely needs to be overridden since most of the time overriding <tt class="docutils literal">get_queryset</tt> will suffice. One possible use case for overriding <tt class="docutils literal">get_object</tt> is for views that don&#8217;t care at all about the queryset; for example you may implement a <tt class="docutils literal">/profile</tt> detail view that will pick the current user and display some stuff. This can be implemented by a <tt class="docutils literal">get_object</tt> similar to <tt class="docutils literal">return self.request.user</tt>.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="querying-guidelines">
+<h2><a class="toc-backref" href="#toc-entry-10">Querying&nbsp;guidelines</a></h2>
+<div class="section" id="guidelines-for-the-n-1-problem">
+<h3><a class="toc-backref" href="#toc-entry-11">Guidelines for the n+1&nbsp;problem</a></h3>
+<p>The most common Django newbie mistake is not considering the n+1 problem when writing your&nbsp;queries.</p>
+<p>Because Django automatically follows relations it is very easy to write code that will result in the n+1 queries
+problem. A simple example is having something&nbsp;like</p>
+<div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Category</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">)</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Product</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">)</span>
+    <span class="n">category</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Category</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2"> (</span><span class="si">{1}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">category</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+</pre></div>
+<p>and doing something&nbsp;like:</p>
+<div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">Product</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">product</span><span class="p">)</span>
+</pre></div>
+<p>or even having <tt class="docutils literal">products = Product.objects.all()</tt> as a context variabile in your&nbsp;template:</p>
+<div class="highlight"><pre><span></span>{% for product in products %}
+    {{ product }}
+{% endfor %}
+</pre></div>
+<p>If you&#8217;ve got 100 products, the above will run 101 queries to the database: The first one
+will get all the products and the other 100 will return each product&#8217;s category one by one!
+Consider what may happen if you had thousands of&nbsp;products&#8230;</p>
+<p>To avoid this problem you should add the <tt class="docutils literal">select_related</tt>, so <tt class="docutils literal">products = <span class="pre">Product.objects.all().select_related('category')</span></tt>.
+This will do an <span class="caps">SQL</span> <span class="caps">JOIN</span> between the products and categories table so each product will include its category instance. Now, when
+you&#8217;ve got a many to many relation the situation is a little different. Let&#8217;s suppose you&#8217;ve got a <tt class="docutils literal">tags = models.ManyToManyField(Tag)</tt>
+field in your <tt class="docutils literal">Product</tt> model. If you wanted to do something like <tt class="docutils literal">{{ <span class="pre">product.tags.all|join:&quot;,</span> &quot; }}</tt> to display the product tags you&#8217;d
+also get a n+1 situation because Django will do a query for each product to get its tags. To avoid this you cannot use
+<tt class="docutils literal">select_related</tt> but should use the <tt class="docutils literal">prefetch_related</tt>
+method so <tt class="docutils literal">products = <span class="pre">Product.objects.all().prefetch_related('tags')</span></tt>. This will result in 2 queries, one for
+products and one for their tags, the joining will be done in&nbsp;python.</p>
+<p>One final comment about the <tt class="docutils literal">prefetch_related</tt> is that you must be very careful to use what you prefetch. Let&#8217;s suppose that we
+had prefeched the tags but we wanted to display them ordered by name: Doing this <tt class="docutils literal">&quot;, <span class="pre">&quot;.join([tag</span> for tag in <span class="pre">product.tags.all().order_by('name')])</span></tt>
+will <em>not</em> use the prefetched tags but will do a new query for each product to get its tags resulting in the n+1 problem! Django has
+<tt class="docutils literal">tag.objects.all()</tt> for each product, <em>not</em> <tt class="docutils literal"><span class="pre">tag.objects.all().order_by('name')</span></tt>. To fix that you need to use <cite>Prefetch</cite> like&nbsp;this:</p>
+<div class="highlight"><pre><span></span>Product.objects.prefetch_related(Prefetch(&#39;tags&#39;, queryset=Tag.objects.order_by(&#39;name&#39;)))
+</pre></div>
+<p>The same is true if you wanted to filter your tags&nbsp;etc.</p>
+<p>Now, one thing to understand is that this behavior of Django is intentional. Instead of automatically following the relationships,
+Django could throw an exception when you tried to follow a relationship that wasn&#8217;t in a <tt class="docutils literal">select_related</tt>
+(this how it works in other frameworks). The disadvantage
+of this is that it would make Django <em>more difficult</em> to use for new users. Also, there are cases that the n+1 problem isn&#8217;t
+really a big deal, for example you may have a DetailView fetching a single object so in this case the n+1 problem will be 1+1
+and wouldn&#8217;t really matter. So, at least for Django, it&#8217;s a case of premature optimization: Write your queries as good as you
+can (but keep in mind the n+1 problem), if you miss some cases that actually make your views slow, you can easily optimize them&nbsp;later.</p>
+</div>
+<div class="section" id="re-use-your-queries">
+<h3><a class="toc-backref" href="#toc-entry-12">Re-use your&nbsp;queries</a></h3>
+<p>You should re-use your queries to avoid re-writing them. You can either put them inside your models
+(as instance methods) or in a mixin for the queries of your views or even add a new manager for
+your model. Let&#8217;s see some&nbsp;examples:</p>
+<p>Let&#8217;s suppose I wanted to get the tags of my product: I&#8217;d add this method to my <tt class="docutils literal">Product</tt> model:</p>
+<div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Product</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="c1"># ...</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+</pre></div>
+<p>Please notice that if you haven&#8217;t used a proper prefetch this will result in the n+1 queries problem. See the discussion above
+for more info. To get the products with their tags I could add a new manager&nbsp;like:</p>
+<div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">ProductWithTagManager</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Manager</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_queryset</span><span class="p">()</span><span class="o">.</span><span class="n">prefetch_related</span><span class="p">(</span><span class="n">Prefetch</span><span class="p">(</span><span class="s1">&#39;tags&#39;</span><span class="p">,</span> <span class="n">queryset</span><span class="o">=</span><span class="n">Tag</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)))</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Product</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="c1"># ...</span>
+
+    <span class="n">products_with_tags</span> <span class="o">=</span> <span class="n">ProductWithTagManager</span><span class="p">()</span>
+</pre></div>
+<p>Now I could do <tt class="docutils literal">[p.get_tags() for p in <span class="pre">Product.products_with_tags.all()]</span></tt> and not have a n+1&nbsp;problem.</p>
+<p>Actually, if I knew that I would <em>always</em> wanted to display the product&#8217;s tags I could override the default manager&nbsp;like</p>
+<div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Product</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="c1"># ...</span>
+
+    <span class="n">objects</span> <span class="o">=</span> <span class="n">ProductWithTagManager</span><span class="p">()</span>
+</pre></div>
+<p>However I would not recommend that since having a consistent behavior when you run Model.objects is very important. If you
+are to modify the default manager then you&#8217;ll need to always remember what your default manager does. This is very problematic
+in old projects and when you want to quickly query your database from a shell. Also, even more problematic is if you
+override your default manager to <em>filter</em> (hide) objects. Don&#8217;t do that or you&#8217;ll definitely regret&nbsp;it.</p>
+<p>The other query re-use option is through a mixin that would override the <tt class="docutils literal">get_queryset</tt> of your models.
+Let&#8217;s suppose that each user can only see his products: I could add a mixin&nbsp;like:</p>
+<div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">ProductPermissionMixin</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_queryset</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">created_by</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+</pre></div>
+<p>Then I could inherit my <tt class="docutils literal">ListView, DetailView, UpdateView</tt> and <tt class="docutils literal">DeleteView</tt>
+i.e <tt class="docutils literal">ProductListView(ProductPermissionMixin, ListView)</tt> from that mixin and I&#8217;d have a consistent behavior on
+which products each user can view. More on this can be found on my
+<a class="reference external" href="https://spapas.github.io/2018/03/19/comprehensive-django-cbv-guide/">comprehensive Django <span class="caps">CBV</span> guide</a>.</p>
+</div>
+</div>
+<div class="section" id="forms-guidelines">
+<h2><a class="toc-backref" href="#toc-entry-13">Forms&nbsp;guidelines</a></h2>
+<div class="section" id="always-use-django-forms">
+<h3><a class="toc-backref" href="#toc-entry-14">Always use&nbsp;django-forms</a></h3>
+<p>This is a no-brainer: The django-forms offers some great class-based functionality for your forms. I&#8217;ve
+seen people creating html forms &#8220;by hand&#8221; and missing all this. Don&#8217;t be that guy; use&nbsp;django-forms!</p>
+<p>I understand that sometimes the requirements of your forms may be difficult to be implemented with
+a django form and you prefer to use a custom form. This may seem fine at first but in the long run
+you&#8217;re gonna need (and probably re-implement) most of the django-forms&nbsp;capabilities.</p>
+</div>
+<div class="section" id="overriding-form-methods-guidelines">
+<h3><a class="toc-backref" href="#toc-entry-15">Overriding Form methods&nbsp;guidelines</a></h3>
+<p>Your <tt class="docutils literal">CustomForm</tt> inherits from a Django <tt class="docutils literal">Form</tt> so you can override some of its methods. Which ones
+should you&nbsp;override?</p>
+<ul class="simple">
+<li>The most usual method for overriding is <tt class="docutils literal">clean(self)</tt>. This is used to add your own server-side checks to the form. I&#8217;ll talk a bit more about overriding clean&nbsp;later.</li>
+<li>The second most usual to override is <tt class="docutils literal">__init__(self, *args, **kwargs)</tt>. You should override it to &#8220;pop&#8221;
+any extra kwargs from the <tt class="docutils literal">kwargs</tt> dict <em>before</em> calling <tt class="docutils literal"><span class="pre">super().__init__(*args,</span> **kwargs)</tt>. See the view method overriding guidelines for more info. Also you&#8217;ll use it to&nbsp;change.</li>
+<li>I usually <em>avoid</em> overriding the form&#8217;s <tt class="docutils literal">save()</tt> method. The <tt class="docutils literal">save()</tt> is almost always called from the view&#8217;s <tt class="docutils literal">form_valid</tt> method so I prefer to do any extra stuff from the view. This is mainly a personal preference in order to avoid having to hop between the form and view modules; by knowing that the form&#8217;s save is always the default the behavior will be consistent. This is personal preference&nbsp;though.</li>
+</ul>
+<p>There shouldn&#8217;t be a need to override any other method of a <tt class="docutils literal">Form</tt> or <tt class="docutils literal">ModelForm</tt>. However please notice that you can easily
+use mixins to add extra functionality to your forms. For example, if you had a particular check that would be called from <em>many</em> forms,
+you could add&nbsp;a</p>
+<div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">CustomFormMixin</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clean</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">clean</span><span class="p">()</span> <span class="c1"># Not really needed here but I recommend to add it to keep the inheritance chain</span>
+        <span class="c1"># The common checks that does the mixin</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">CustomForm</span><span class="p">(</span><span class="n">CustomFormMixin</span><span class="p">,</span> <span class="n">Form</span><span class="p">):</span>
+    <span class="c1"># Other stuff</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">clean</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">clean</span><span class="p">()</span> <span class="c1"># This will run the mixin&#39;s clean</span>
+        <span class="c1"># Any checks that only this form needs to do</span>
+</pre></div>
+</div>
+<div class="section" id="proper-cleaning">
+<h3><a class="toc-backref" href="#toc-entry-16">Proper&nbsp;cleaning</a></h3>
+<p>When you override the <tt class="docutils literal">clean(self)</tt> method of a <tt class="docutils literal">Form</tt> you should always use the <tt class="docutils literal">self.cleaned_data</tt> to check the
+data of the form. The common way to mark errors is to use the <tt class="docutils literal">self.add_error</tt> method, for example, if you have a
+<tt class="docutils literal">date_from</tt> and <tt class="docutils literal">date_to</tt> and date_from is after the <tt class="docutils literal">date_to</tt> you can do your clean something like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">clean</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+    <span class="n">date_from</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;date_from&quot;</span><span class="p">)</span>
+    <span class="n">date_to</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;date_to&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">date_from</span> <span class="ow">and</span> <span class="n">date_to</span> <span class="ow">and</span> <span class="n">date_from</span> <span class="o">&gt;</span> <span class="n">date_to</span><span class="p">:</span>
+        <span class="n">error_str</span> <span class="o">=</span> <span class="s2">&quot;Date from cannot be after date to&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_error</span><span class="p">(</span><span class="s2">&quot;date_from&quot;</span><span class="p">,</span> <span class="n">error_str</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_error</span><span class="p">(</span><span class="s2">&quot;date_from&quot;</span><span class="p">,</span> <span class="n">error_str</span><span class="p">)</span>
+</pre></div>
+<p>Please notice above that I am checking that both <tt class="docutils literal">date_from</tt> and <tt class="docutils literal">date_to</tt> are not null (or else it will try to compare
+null dates and will throw). Then I am adding the same error message to both fields. Django will see that the form has errors
+and run <tt class="docutils literal">form_invalid</tt> on the view and re-display the form with the&nbsp;errors.</p>
+<p>Beyond the <tt class="docutils literal">self.add_error</tt> method that adds the error to the field there&#8217;s a possibility to add an error to the &#8220;whole&#8221;
+form&nbsp;using:</p>
+<div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.core.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">ValidationError</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">clean</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">form_has_error</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;The form has an error!&quot;</span><span class="p">)</span>
+</pre></div>
+<p>This kind of error won&#8217;t be correlated with a field. You can use this approach when an error is correlated to multiple fields
+instead of adding the same error to multiple&nbsp;fields.</p>
+<p>You must be very careful because if you are using a non-standard
+form layout method (i.e you enumerate the fields) you also need to display the <tt class="docutils literal">{{ form.errors }}</tt> in your template or else
+you&#8217;ll get a rejected form without any errors! This is a very common&nbsp;mistake.</p>
+<p>Another thing to notice is that when your clean method raises it will display only the first such error. So if you&#8217;ve got multiple
+checks&nbsp;like:</p>
+<div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">clean</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">form_has_error</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;The form has an error!&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">form_has_another_error</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;The form has another error!&quot;</span><span class="p">)</span>
+</pre></div>
+<p>and your form has <em>both</em> errors only the 1st one will be displayed to the user. Then after he fixes it he&#8217;ll also see the 2nd one. When
+you use <tt class="docutils literal">self.add_error</tt> the user will get both at the same&nbsp;time.</p>
+</div>
+<div class="section" id="overriding-the-init">
+<h3><a class="toc-backref" href="#toc-entry-17">Overriding the&nbsp;__init__</a></h3>
+<p>You can override the <tt class="docutils literal">__init__</tt> method of your forms for three main&nbsp;reasons:</p>
+<p>1. Override some field attributes on a ModelForm. A Django ModelForm will automatically create a field for each model field.
+Some times you may want to override some of the attributes of the field. For example, you may want to change the label of the field
+or make a field required. To do that, you can do something&nbsp;like:</p>
+<div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;my_field&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="s2">&quot;My custom label&quot;</span> <span class="c1"># Change the label</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;my_field&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">help_text</span> <span class="o">=</span> <span class="s2">&quot;My custom label&quot;</span> <span class="c1"># Change the help text</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;my_field&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">required</span> <span class="o">=</span> <span class="kc">True</span> <span class="c1"># change the required attribute</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;my_field&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">queryset</span> <span class="o">=</span> <span class="n">Model</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">is_active</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="c1"># Only allow specific objects for the forein key</span>
+</pre></div>
+<p>Please notice that we need to use <tt class="docutils literal"><span class="pre">self.fields[&quot;my_field&quot;]</span></tt> <em>after</em> we call <tt class="docutils literal"><span class="pre">super().__init__(*args,</span> **kwargs)</tt>.</p>
+<p>2. Retrieve parameters (usually the request or user) from the view. A view (either a function-based or a <span class="caps">CBV</span> through <tt class="docutils literal">get_form_kwargs</tt>)
+can pass parameters to the form&#8217;s constructor. You need to override <tt class="docutils literal">__init__</tt> to handle these&nbsp;parameters:</p>
+<div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">request</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;request&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</pre></div>
+<p>Please notice that we must pop the <tt class="docutils literal">request</tt> from the <tt class="docutils literal">kwargs</tt> dict before calling <tt class="docutils literal"><span class="pre">super().__init__</span></tt> or else
+we&#8217;ll get an exception since the <tt class="docutils literal">Form.__init__</tt> method accepts only specific&nbsp;kwargs.</p>
+<p>3. Add functionality related to the current user/request. For example, you may want to add a field that is only editable if
+the user is&nbsp;superuser:</p>
+<div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">request</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;request&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_superuser</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;my_field&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;readonly&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+<p>or you may want to allow some custom validation logic only for non -&nbsp;superusers:</p>
+<div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">clean</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_superuser</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;my_field&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_error</span><span class="p">(</span><span class="s2">&quot;my_field&quot;</span><span class="p">,</span> <span class="s2">&quot;Please field this field&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="laying-out-forms">
+<h3><a class="toc-backref" href="#toc-entry-18">Laying out&nbsp;forms</a></h3>
+<p>To lay out the forms I recommend using a library like <a class="reference external" href="https://github.com/django-crispy-forms/django-crispy-forms">django-crispy-forms</a>. This integrates your forms properly with your
+front-end engine and helps you have proper styling. I&#8217;ve got some more info on
+<a class="reference external" href="https://spapas.github.io/2020/03/18/django-crispy-form-quick-easy-layout/">form layout post</a>.</p>
+<p>Please notice that the <a class="reference external" href="https://github.com/django-crispy-forms/django-crispy-forms">django-crispy-forms</a> supports specific front-end frameworks like bootstrap or tailwind (see its docs
+for all available options). If you&#8217;re using a non-supported front-end framework you can
+<a class="reference external" href="https://django-crispy-forms.readthedocs.io/en/latest/template_packs.html">create a custom template pack</a>. This seems like a lot of work but I recommend to do it. Also you don&#8217;t need to implement
+everything, only the functionality you&#8217;re going to need, when you need&nbsp;it.</p>
+</div>
+<div class="section" id="improve-the-formset-functionality">
+<h3><a class="toc-backref" href="#toc-entry-19">Improve the formset&nbsp;functionality</a></h3>
+<p>Beyond simple forms, Django allows you to use a functionality it calls <a class="reference external" href="https://docs.djangoproject.com/en/4.1/topics/forms/formsets/">formsets</a>. A formset is a collection of forms that
+can be used to edit multiple objects at the same time. This is usually used in combination with inlines which are a
+way to edit models on the same page as a parent model.
+For example you may have something like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Pizza</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
+    <span class="n">toppings</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ManyToManyField</span><span class="p">(</span><span class="s1">&#39;Topping&#39;</span><span class="p">,</span> <span class="n">through</span><span class="o">=</span><span class="s1">&#39;PizzaTopping&#39;</span><span class="p">)</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Topping</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">PizzaTopping</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">amount</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">PositiveIntegerField</span><span class="p">()</span>
+    <span class="n">pizza</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;Pizza&#39;</span><span class="p">)</span>
+    <span class="n">topping</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;Topping&#39;</span><span class="p">)</span>
+</pre></div>
+<p>Now we&#8217;d like to have a form that allows us to edit a pizza by both changing the pizza name <em>and</em> the toppings of the pizza
+along with their amounts. The pizza form will be the main form and the topping/amount will be the inline form. Notice that we
+won&#8217;t also create/edit the topping name, we&#8217;ll just select it from the existing toppings (we&#8217;re gonna have a completely different
+view for adding/editing individual&nbsp;toppings).</p>
+<p>First of all, to create a class based view that includes a formset we can use the <a class="reference external" href="https://github.com/AndrewIngram/django-extra-views">django-extra-views</a>
+package (this isn&#8217;t supported by built-in django CBVs unless we implement the functionality ourselves). Then we&#8217;d do something&nbsp;like:</p>
+<div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">extra_views</span><span class="w"> </span><span class="kn">import</span> <span class="n">CreateWithInlinesView</span><span class="p">,</span> <span class="n">InlineFormSetFactory</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ToppingInline</span><span class="p">(</span><span class="n">InlineFormSetFactory</span><span class="p">):</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Topping</span>
+    <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;topping&#39;</span><span class="p">,</span> <span class="s1">&#39;amount&#39;</span><span class="p">]</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">CreatePizzaView</span><span class="p">(</span><span class="n">CreateWithInlinesView</span><span class="p">):</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Pizza</span>
+    <span class="n">inlines</span> <span class="o">=</span> <span class="p">[</span><span class="n">ToppingInline</span><span class="p">]</span>
+    <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+</pre></div>
+<p>This will create a form that will allow us to create a pizza and add toppings to it. Now, to display the formset we&#8217;d
+modify our template to be similar&nbsp;to:</p>
+<div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">form</span> <span class="na">method</span><span class="o">=</span><span class="s">&quot;post&quot;</span><span class="p">&gt;</span>
+...
+{{ form }}
+
+{% for formset in inlines %}
+    {{ formset }}
+{% endfor %}
+...
+<span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;submit&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;Submit&quot;</span> <span class="p">/&gt;</span>
+<span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+</pre></div>
+<p>This works however it will be very ugly. The default behavior is to display the <tt class="docutils literal">Pizza</tt> form and three empty <tt class="docutils literal">Topping</tt> forms.
+If we want to add more toppings we&#8217;ll have to submit that form so it will be saved and then edit it. But once again we&#8217;ll get our
+existing toppings and three more. I am not fond of this&nbsp;behavior.</p>
+<p>That&#8217;s why my recommendation is to follow the instructions on my
+<a class="reference external" href="https://spapas.github.io/2022/06/28/better-django-inlines/">better django inlines</a> article that allows you to sprinkle some javascript on your
+template and get a much better, dynamic behavior. I.e you&#8217;ll get an &#8220;add more&#8221; button to add extra toppings without the need t
+submit the form every&nbsp;time.</p>
+</div>
+</div>
+<div class="section" id="template-guidelines">
+<h2><a class="toc-backref" href="#toc-entry-20">Template&nbsp;guidelines</a></h2>
+<div class="section" id="stick-to-the-built-in-django-template-backend">
+<h3><a class="toc-backref" href="#toc-entry-21">Stick to the built-in Django template&nbsp;backend</a></h3>
+<p>Django has its own built-in template engine but it also allows you to use the Jinja template engine or even
+use a completely different one! The django template backend is considered &#8220;too restrictive&#8221; by some people mainly
+because you can only call functions without parameters from&nbsp;it.</p>
+<p>My opinion is to just stick to the builtin Django template. Its restriction is actually a strength, enabling you
+to create re-usable custom template tags (or object methods) instead of calling business logic from the template.
+Also, using a completely custom backend means that you&#8217;ll add dependencies to your project; please see my the guideline
+about the selection of using external packages. Finally, don&#8217;t forget that any packages you&#8217;ll use that provide
+templates would be for the Django template backend, so you&#8217;ll need to convert/re-write these templates to be used with
+a different&nbsp;engine.</p>
+<p>I would consider the Jinja engine only if I already had a bunch of Jinja templates from a different project and
+wanted to quickly use them on my&nbsp;project.</p>
+</div>
+<div class="section" id="don-t-add-template-tags-when-you-can-use-a-method">
+<h3><a class="toc-backref" href="#toc-entry-22">Don&#8217;t add template tags when you can use a&nbsp;method</a></h3>
+<p>Continuing from the discussion on the previous guideline, I recommend you to add methods to your models instead of
+adding template tags. For example, let&#8217;s suppose that we want to get our pizza toppings order by their name. We could
+add a template tag that would do that&nbsp;like:</p>
+<div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">get_pizza_toppings</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">pizza</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">pizza</span><span class="o">.</span><span class="n">toppings</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+</pre></div>
+<p>and use it like <tt class="docutils literal">{% get_pizza_toppings pizza as pizza_toppings %}</tt> in our template. Notice that if you don&#8217;t care about
+the ordering you could instead do <tt class="docutils literal">{{ pizza.toppings.all }}</tt> but you need to use the order_by and pass a parameter so you
+can&#8217;t call the&nbsp;method.</p>
+<p>Instead of adding the template tag that I recommend  adding a method to your <tt class="docutils literal">pizza</tt> model&nbsp;like:</p>
+<div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">get_toppings</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">toppings</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+</pre></div>
+<p>and then call it like <tt class="docutils literal">{{ pizza.get_toppings }}</tt> in your template. This is much cleaner and easier to&nbsp;understand.</p>
+<p>Please notice that this guideline is not a proposal towards the &#8220;fat models&#8221; approach. You can add 1 line methods to
+your models that would only call the corresponding service methods if&nbsp;needed.</p>
+</div>
+<div class="section" id="re-use-templates-with-partials">
+<h3><a class="toc-backref" href="#toc-entry-23">Re-use templates with&nbsp;partials</a></h3>
+<p>When you have a part of a template that will be used in multiple places you can use partials to avoid repeating yourself.
+For example, let&#8217;s suppose you like to display your pizza details. These details would be displayed in the list of
+pizzas, in the cart page, in the receipt page etc. So can create an html page named <tt class="docutils literal">_pizza_details.html</tt> under a
+<tt class="docutils literal">partial</tt> folder (or whatever name you want but I recommend having a way to quickly check your partials) with contents
+similar&nbsp;to:</p>
+<div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#39;pizza-details&#39;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">h3</span><span class="p">&gt;</span>{{ pizza.name }}<span class="p">&lt;/</span><span class="nt">h3</span><span class="p">&gt;</span>
+    {% if show_photo %}
+        <span class="p">&lt;</span><span class="nt">img</span> <span class="na">src</span><span class="o">=</span><span class="s">&#39;{{ pizza.photo.url }}&#39;</span><span class="p">&gt;</span>
+    {% endif %}
+    <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>Toppings: {{ pizza.get_toppings|join:&quot;, &quot; }}<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</pre></div>
+<p>and then include it in your templates like <tt class="docutils literal">{% inlude &quot;pizzas/partials/_pizza_details.html&quot; %}</tt> to display the info without photo or
+<tt class="docutils literal">{% inlude &quot;pizzas/partials/_pizza_details.html&quot; with show_photo=True %}</tt> to display the photo. Also notice that you can override the
+{{ pizza }} context variable so, if you want to display two pizzas in a template you&#8217;ll write something&nbsp;like</p>
+<div class="highlight"><pre><span></span>{% inlude &quot;partials/_pizza_details.html&quot; with show_photo=True pizza=pizza1 %}
+{% inlude &quot;partials/_pizza_details.html&quot; with show_photo=True pizza=pizza2 %}
+</pre></div>
+</div>
+</div>
+<div class="section" id="settings-guidelines">
+<h2><a class="toc-backref" href="#toc-entry-24">Settings&nbsp;guidelines</a></h2>
+<div class="section" id="use-a-package-instead-of-module">
+<h3><a class="toc-backref" href="#toc-entry-25">Use a package instead of&nbsp;module</a></h3>
+<p>This is a well known guideline but I&#8217;d like to mention it here. When you create a new project, Django will
+create a <tt class="docutils literal">settings.py</tt> file. This file is a python module. I recommend to create a settings folder next to the
+<tt class="docutils literal">settings.py</tt> and put
+in it the <tt class="docutils literal">settings.py</tt> renamed as <tt class="docutils literal">base.py</tt> and an <tt class="docutils literal">__init__.py</tt> file so the <tt class="docutils literal">settings</tt> folder will be a
+python package. So instead of <tt class="docutils literal">project\settings.py</tt> you&#8217;ll have <tt class="docutils literal">project\settings\base.py</tt> and <tt class="docutils literal">project\settings\__init__.py</tt>.</p>
+<p>Now, you&#8217;ll add an extra module inside settings for each kind of environment you are gonna use your app on. For example, you&#8217;ll
+have something like
+* <tt class="docutils literal">project\settings\dev.py</tt> for your development environment
+* <tt class="docutils literal">project\settings\uat.py</tt> for the <span class="caps">UAT</span> environment
+* <tt class="docutils literal">project\settings\prod.py</tt> for the production&nbsp;environment</p>
+<p>Each of these files will import the <tt class="docutils literal">base.py</tt> file and override the settings that are different from the base settings, i.e
+these files will start&nbsp;like:</p>
+<div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">.base</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="c1"># And now all options that are different from the base settings</span>
+</pre></div>
+<p>All these files will be put in your version control. You won&#8217;t put any secrets in these files. We&#8217;ll see how to handle
+secrets&nbsp;later.</p>
+<p>When Django starts, it will by default look for the <tt class="docutils literal">project/settings.py</tt> module. So, if you try to run <tt class="docutils literal">python manage.py</tt>
+now it will complain. To fix that, you have to set the <tt class="docutils literal">DJANGO_SETTINGS_MODULE</tt> environment variable to point to
+the correct settings module you wanna use. For example, in the dev env you&#8217;ll do <tt class="docutils literal">DJANGO_SETTINGS_MODULE=project.settings.dev</tt>.</p>
+<p>To avoid doing that every time I recommend creating a script that will initiate the project&#8217;s virtual environment and set the
+settings module. For example, in my projects I have a file named dovenv.bat (I use windows) with the following&nbsp;contents:</p>
+<!-- code-block
+
+call ..\venv\scripts\activate
+set DJANGO_SETTINGS_MODULE=project.settings.dev -->
+</div>
+<div class="section" id="handle-secrets-properly">
+<h3><a class="toc-backref" href="#toc-entry-26">Handle secrets&nbsp;properly</a></h3>
+<p>You should never put secrets (i.e your database password or <span class="caps">API</span> <span class="caps">KEYS</span>) on your version control. There are two
+ways that can be used to handle secrets in&nbsp;Django:</p>
+<ul class="simple">
+<li>Use a <tt class="docutils literal">settings/local.py</tt> file that contains all your secrets for the current environment and is not under version&nbsp;control.</li>
+<li>Use environment&nbsp;variables.</li>
+</ul>
+<p>For the <tt class="docutils literal">settings/local.py</tt> solution, you&#8217;ll add the following code at the end of each one of your settings environment
+modules (i.e you should put it at the end of <tt class="docutils literal">dev.py</tt>, <tt class="docutils literal">uat.py</tt>, <tt class="docutils literal">prod.py</tt> etc):</p>
+<div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.local</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="k">pass</span>
+</pre></div>
+<p>The above will try to read a module named <tt class="docutils literal">local.py</tt> and if it exists it will import it. If it doesn&#8217;t exist it will
+just ignore it. Because this file is at the end of the corresponding settings module, it will override any settings that are already
+defined. The above file should be excluded from version control so you&#8217;ll add the line <tt class="docutils literal">local.py</tt> to your <tt class="docutils literal">.gitignore</tt>.</p>
+<p>Notice that the same solution to store secrets can be used if you don&#8217;tt use the settings package approach but you have a <tt class="docutils literal">settings.py</tt>
+module. Create a <tt class="docutils literal">settings_local.py</tt> module and import from that at the end of your settings module instead. However I strongly
+recommend to use the settings package&nbsp;approach.</p>
+<p>To catalogue my secrets, I will usually add a <tt class="docutils literal">local.py.template</tt> file that has all the settings that I need to override in my
+local.py with empty values. I.e it will may be similar&nbsp;to:</p>
+<div class="highlight"><pre><span></span><span class="n">API_TOKEN</span><span class="o">=</span><span class="s1">&#39;&#39;</span>
+<span class="n">ANOTHER_API_TOKEN</span><span class="o">=</span><span class="s1">&#39;&#39;</span>
+<span class="n">DATABASES_U</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;ENGINE&#39;</span><span class="p">:</span> <span class="s1">&#39;django.db.backends.postgresql_psycopg2&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;NAME&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;USER&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;PASSWORD&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;HOST&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;PORT&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+<p>Then I&#8217;ll copy over <tt class="docutils literal">local.py.template</tt> to <tt class="docutils literal">local.py</tt> when I initialize my project and fill in the&nbsp;values.</p>
+<p>Before continuing, it is important to understand the priority of the settings modules. So let&#8217;s suppose we are on
+production. We should have a <tt class="docutils literal">DJANGO_SETTINGS_MODULE=project.settings.prod</tt>. The players will be <tt class="docutils literal">base.py</tt>,
+<tt class="docutils literal">prod.py</tt> and <tt class="docutils literal">local.py</tt>. The priority will&nbsp;be</p>
+<ol class="arabic simple">
+<li><tt class="docutils literal">local.py</tt></li>
+<li><tt class="docutils literal">prod.py</tt></li>
+<li><tt class="docutils literal">base.py</tt></li>
+</ol>
+<p>So any settings defined in <tt class="docutils literal">prod.py</tt> will override the settings of <tt class="docutils literal">base.py</tt>. And any settings defined in <tt class="docutils literal">local.py</tt>
+will override any settings defined either in <tt class="docutils literal">prod.py</tt> or <tt class="docutils literal">base.py</tt>. Please notice that I mention <em>any</em> setting, not
+just&nbsp;secrets.</p>
+<p>To use the environment variables approach, you&#8217;ll have to read the values of the secrets from your environment.
+A simple way to do that is to use ths os.getenv function, for example in your <tt class="docutils literal">prod.py</tt> you may have something&nbsp;like:</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+<span class="n">API_TOKEN</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;API_TOKEN&#39;</span><span class="p">)</span>
+</pre></div>
+<p>This will set <tt class="docutils literal">API_TOKEN</tt> setting to <tt class="docutils literal">None</tt> if the <tt class="docutils literal">API_TOKEN</tt> env var is not found. You can do something like
+<tt class="docutils literal"><span class="pre">os.environ[&quot;API_TOKEN&quot;]</span></tt> instead to throw an exception. Also, there are libraries that will help you with this
+like <a class="reference external" href="https://github.com/theskumar/python-dotenv">python-dotenv</a>, However I can&#8217;t really recommend them because I haven&#8217;t used&nbsp;them.</p>
+<p>Now, which one to use? My recommendation (and what I always do) is to use the first approach (<tt class="docutils literal">local.py</tt>) <em>unless</em> you need to use
+environment variables to configure your project. For example, if you are using a PaaS like Heroku, you&#8217;ll have to use
+environment variables because of the way you deploy so you can&#8217;t really choose. However using the <tt class="docutils literal">local.py</tt> is much
+simpler, does not have any dependencies and you can quickly understand which settings are overriden. Also you can
+use it to override <em>any</em> setting by putting it in your local.py, not just&nbsp;secrets.</p>
+</div>
+</div>
+<div class="section" id="static-and-media-guidelines">
+<h2><a class="toc-backref" href="#toc-entry-27">Static and media&nbsp;guidelines</a></h2>
+<div class="section" id="use-manifeststaticfilesstorage">
+<h3><a class="toc-backref" href="#toc-entry-28">Use&nbsp;ManifestStaticFilesStorage</a></h3>
+<p>Django has a <tt class="docutils literal">STATICFILES_STORAGE</tt> setting that can be used to specify the storage engine that will be used to store
+the static files. By default, Django uses the <tt class="docutils literal">StaticFilesStorage</tt> engine which stores the files in the file system
+under the <tt class="docutils literal">STATIC_ROOT</tt> folder and with a <tt class="docutils literal">STATIC_URL</tt> url.</p>
+<p>For example  if you&#8217;ve got a <tt class="docutils literal"><span class="pre">STATIC_ROOT=/static_root</span></tt> and a <tt class="docutils literal"><span class="pre">STATIC_URL=/static_url/</span></tt> and you&#8217;ve got a file named <tt class="docutils literal">styles.css</tt>
+which you include with <tt class="docutils literal">{% static &quot;styles.css&quot; %}</tt>. When you run <tt class="docutils literal">python manage.py collectstatic</tt> the <tt class="docutils literal">styles.css</tt> will be copied
+to <tt class="docutils literal">/static_root/styles.css</tt> and you&#8217;ll be able to access it with <tt class="docutils literal">/static_url/styles.css</tt>.</p>
+<p>Please notice that the above should be configured in your web server (i.e nginx). Thus, you need to configure your
+web server so as to publish the files under <tt class="docutils literal">/static_root</tt> on the <tt class="docutils literal">/static_url</tt> url. This should work without Django,
+i.e if you have configured the web server properly you&#8217;ll be able to visit <tt class="docutils literal">example.com/static_url/styles.css</tt> even if
+your Django app isn&#8217;t running. For more info see <a class="reference external" href="https://docs.djangoproject.com/en/4.1/howto/static-files/deployment/">how to deploy static files</a>.</p>
+<p>Now, the problem with the <tt class="docutils literal">StaticFilesStorage</tt> is that if you change the <tt class="docutils literal">styles.css</tt> there won&#8217;t be any
+way for the user&#8217;s browser to understand that the file has been changed so it will keep using the cached&nbsp;version.</p>
+<p>This is why I recommend using the <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/contrib/staticfiles/#django.contrib.staticfiles.storage.ManifestStaticFilesStorage">ManifestStaticFilesStorage</a> instead. This storage will append the md5 has of each static
+file when copying it so the <tt class="docutils literal">styles.css</tt> will be copied to <tt class="docutils literal">/static_root/styles.fb2be32168f5.css</tt> and the url will be
+<tt class="docutils literal">/static_url/styles.fb2be32168f5.css</tt>. When the <tt class="docutils literal">styles.css</tt> is changed, its hash will also be changed so the users
+are guaranteed to pick the correct file each&nbsp;time.</p>
+</div>
+<div class="section" id="organize-your-media-files">
+<h3><a class="toc-backref" href="#toc-entry-29">Organize your media&nbsp;files</a></h3>
+<p>When you upload a file to your app, Django will store it in the <tt class="docutils literal">MEDIA_ROOT</tt> folder and serve it through <tt class="docutils literal">MEDIA_URL</tt>
+similar to the static files as I explained before. The problem with this approach is that you&#8217;ll end up with a lot of files
+in the same folder. This is why I recommend creating a folder structure for your media files. To create this structure
+you should set the <a class="reference external" href="https://docs.djangoproject.com/en/4.1/ref/models/fields/#django.db.models.FileField.upload_to">upload_to</a> attribute of <tt class="docutils literal">FileField</tt>.</p>
+<p>So instead of having <tt class="docutils literal">file = models.FileField</tt> or <tt class="docutils literal">image = models.ImageField</tt> you&#8217;d do something like
+<tt class="docutils literal">file = <span class="pre">models.FileField(upload_to='%Y/%m/files')</span></tt> or <tt class="docutils literal">image = <span class="pre">models.ImageField(upload_to='%Y/%m/images')</span></tt> to
+upload these files to their corresponding folder organized by&nbsp;year/month.</p>
+<p>Notice that instead of a string you can also pass a function to the <tt class="docutils literal">upload_to</tt> attribute. This function will need to
+return a string that will contain the path of the uploaded file <em>including</em> the filename. For example, an upload_to
+function can be similar to&nbsp;this:</p>
+<div class="highlight"><pre><span></span>def custom_upload_path(instance, filename):
+    dt_str = instance.created_on.strftime(&quot;%Y/%m/%d&quot;)
+    fname, ext = os.path.splitext(filename)
+    slug_fn = slugify(anyascii.anyascii(fname))
+    if ext:
+        slug_fn += &quot;&quot; + ext
+    return &quot;protected/{0}/{1}/{2}&quot;.format(dt_str, instance.id, slug_fn)
+</pre></div>
+<p>The above code will convert the filename to an ascii slug (i.e a file named <tt class="docutils literal">δοκιμή.pdf</tt> will be
+converted to <tt class="docutils literal">dokime.pdf</tt>) and will store it in a folder after the created date year/month/day and id of the
+object instance the file belongs to. So if for example the file <tt class="docutils literal">δοκιμή.pdf</tt> belongs to the object with id 3242
+and created date 2022-09-30 will be stored on the directory <tt class="docutils literal">protected/2022/09/30/3242/dokime.pdf</tt>.</p>
+<p>The above code is just an example. You can use it as a starting point and modify it to fit your needs. Having the
+media files in separate folders will enable you to easily navigate the folder structure and for example back up
+only a portion of the&nbsp;files.</p>
+</div>
+<div class="section" id="do-not-serve-media-through-your-application-server">
+<h3><a class="toc-backref" href="#toc-entry-30">Do not serve media through your application&nbsp;server</a></h3>
+<p>This is important. The media files of your app have to be served through your web server (i.e nginx) and <em>not</em> your
+application server (i.e gunicorn). This is because the application server has a limited number of workers and if you
+serve the media files through them, it will be a bottleneck for your app. Thus you need to configure your web server
+to serve the media files by publishing the <tt class="docutils literal">MEDIA_ROOT</tt> folder under the <tt class="docutils literal">MEDIA_URL</tt> url similar to the static files
+as described&nbsp;above.</p>
+<p>Notice that by default Django will only serve your media files for development by using the following at the end of your
+<tt class="docutils literal">urls.py</tt> file:</p>
+<div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+    <span class="n">urlpatterns</span> <span class="o">+=</span> <span class="n">static</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">MEDIA_URL</span><span class="p">,</span> <span class="n">document_root</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">MEDIA_ROOT</span><span class="p">)</span>
+</pre></div>
+<p>Under no circumstances you should use this when <tt class="docutils literal">settings.<span class="caps">DEBUG</span> = False</tt> (i.e on&nbsp;production).</p>
+</div>
+<div class="section" id="secure-your-media-properly">
+<h3><a class="toc-backref" href="#toc-entry-31">Secure your media&nbsp;properly</a></h3>
+<p>Continuing from the above, if you are not allowed to serve your media files through your application then how are
+you supposed to secure them? For example you may want to allow a user to upload files to your app but you want only
+that particular user to be able to download them and not anybody else. So you&#8217;ll need to check somehow that the
+user that tries to download the file is the same user that uploaded it. How can you do&nbsp;that?</p>
+<p>The answer is to use a functionality offered by most web servers called X SendFile. First of all I&#8217;d like to explain how this&nbsp;works:</p>
+<ol class="arabic simple">
+<li>A user wants to download a file with id <tt class="docutils literal">1234</tt> so he clicks the &#8220;download&#8221; button for that&nbsp;file</li>
+<li>The browser of the user will then visit a normal django view for example <tt class="docutils literal">/download/1234</tt></li>
+<li>This view will check if the user is allowed to download the file by doing any permissions checks it needs to do, all in Django&nbsp;code</li>
+<li>If the user is not allowed to download, it will return a 403 (forbidden) or 404 (not-found)&nbsp;response</li>
+<li>However if the user is <em>allowed</em> to download the Django view will return an http response that <em>will not</em> contain the file but will have a special header with the path of the file to download (which is the path that file 1234 is saved&nbsp;on)</li>
+<li>When the web server (i.e nginx) receives the http response it will check if the response has the special header and if it does it will serve the response it got <em>along</em> with the file, directly from the file system without going through the application server (i.e&nbsp;gunicorn)</li>
+</ol>
+<p>The above gives us the best of both worlds: We are allowed to do any checks we want in Django and the file is served through&nbsp;nginx.</p>
+<p>A library that implements this functionality is django-sendfile2 which is a fork of the non-maintained anymore django-sendfile.
+To use it you&#8217;ll need to follow the instructions provided and depend on your web server. However, let&#8217;s see a quick example for
+nginx from one production&nbsp;project:</p>
+<div class="highlight"><pre><span></span><span class="c1"># nginx conf</span>
+
+<span class="n">server</span> <span class="p">{</span>
+    <span class="c1"># other stuff</span>
+
+    <span class="n">location</span> <span class="o">/</span><span class="n">media_project</span><span class="o">/</span><span class="n">protected</span><span class="o">/</span> <span class="p">{</span>
+        <span class="n">internal</span><span class="p">;</span>
+        <span class="n">alias</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">files</span><span class="o">/</span><span class="n">project</span><span class="o">/</span><span class="n">media</span><span class="o">/</span><span class="n">protected</span><span class="o">/</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">location</span> <span class="o">/</span><span class="n">media_project</span><span class="o">/</span> <span class="p">{</span>
+        <span class="n">alias</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">files</span><span class="o">/</span><span class="n">project</span><span class="o">/</span><span class="n">media</span><span class="o">/</span><span class="p">;</span>
+    <span class="p">}</span>
+
+
+<span class="p">}</span>
+</pre></div>
+<p>For nginx we add a new location block that will serve the files under the <tt class="docutils literal">/media_project/protected/</tt> url. The <tt class="docutils literal">internal;</tt>
+directive will prevent the client from going directly to the <span class="caps">URI</span>, so visiting <tt class="docutils literal">example.com/media_project/protected/file.pdf</tt> directly
+will not work. We also have a <tt class="docutils literal">/media_project/</tt> location that serves the files under /media that are not protected. Please notice that
+nginx matches the most specific path first so all files under protected will be matched with the correct, internal&nbsp;location.</p>
+<div class="highlight"><pre><span></span><span class="c1"># django settings</span>
+<span class="n">MEDIA_ROOT</span> <span class="o">=</span> <span class="s2">&quot;/home/files/project/media&quot;</span>
+<span class="n">SENDFILE_ROOT</span> <span class="o">=</span> <span class="s2">&quot;/home/files/project/media/protected&quot;</span>
+
+<span class="n">MEDIA_URL</span> <span class="o">=</span> <span class="s2">&quot;/media_project/&quot;</span>
+<span class="n">SENDFILE_URL</span> <span class="o">=</span> <span class="s2">&quot;/media_project/protected&quot;</span>
+<span class="n">SENDFILE_BACKEND</span> <span class="o">=</span> <span class="s2">&quot;sendfile.backends.nginx&quot;</span>
+</pre></div>
+<p>Notice the difference between the <tt class="docutils literal">MEDIA_ROOT</tt> (that contains all our media files - some are not protected) and <tt class="docutils literal">SENDFILE_ROOT</tt>
+and same for <tt class="docutils literal">MEDIA_URL</tt> and <tt class="docutils literal">SENDFILE_URL</tt></p>
+<div class="highlight"><pre><span></span><span class="c1"># django view</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_document</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">doc_id</span><span class="p">):</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">django_sendfile</span><span class="w"> </span><span class="kn">import</span> <span class="n">sendfile</span>
+
+    <span class="n">doc</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Document</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">doc_id</span><span class="p">)</span>
+    <span class="n">rules_light</span><span class="o">.</span><span class="n">require</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="s2">&quot;apps.app.read_docs&quot;</span><span class="p">,</span> <span class="n">doc</span><span class="o">.</span><span class="n">app</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">sendfile</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">doc</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">attachment</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+<p>So this view first gets the <tt class="docutils literal">Document</tt> instance from its id and checks to see if the current user
+can read it. Finally, it returns the <tt class="docutils literal">sendfile</tt> response that will serve the file directly from the file system passing
+the <tt class="docutils literal">path</tt> of that file. This function view will have a url like <tt class="docutils literal"><span class="pre">path(&quot;get_doc/&lt;int:doc_id&gt;/&quot;,</span> login_required(views.get_document), <span class="pre">name=&quot;get_document&quot;,</span> ),</tt></p>
+<p>A final comment is that for your <tt class="docutils literal">dev</tt> environment you probably want to use the
+<tt class="docutils literal">SENDFILE_BACKEND = &quot;django_sendfile.backends.development&quot;</tt> (please see the settings package guideline on how to
+override settings per&nbsp;env).</p>
+</div>
+<div class="section" id="handle-stale-media">
+<h3><a class="toc-backref" href="#toc-entry-32">Handle stale&nbsp;media</a></h3>
+<p>Django does never delete your media files. For example if you have an object that has a file field and the object is deleted,
+the file that this file field refers to will not be deleted. The same is true if you upload a new file on that file field,
+the old file will also be kept&nbsp;there!</p>
+<p>This is very problematic in some cases, resulting to <span class="caps">GB</span> of unused files in your disk. To handle that, there are two&nbsp;solutions:</p>
+<ul class="simple">
+<li>Add a signal in your models that checks if they are deleted or a file field is updated and delete the non-used file. This is implemented by the <a class="reference external" href="https://github.com/un1t/django-cleanup">django-cleanup</a>&nbsp;package.</li>
+<li>Use a management command that will periodically check for stale files and delete them. This is implemented by the <a class="reference external" href="https://github.com/akolpakov/django-unused-media">django-unused-media</a>&nbsp;package.</li>
+</ul>
+<p>I&#8217;ve used both packages in various projects and they work great. I&#8217;d recommend the django-cleanup on greenfield projects so as to avoid stale files from the&nbsp;beginning.</p>
+</div>
+</div>
+<div class="section" id="debugging-guidelines">
+<h2><a class="toc-backref" href="#toc-entry-33">Debugging&nbsp;guidelines</a></h2>
+<div class="section" id="be-careful-when-using-django-debug-toolbar">
+<h3><a class="toc-backref" href="#toc-entry-34">Be careful when using&nbsp;django-debug-toolbar</a></h3>
+<p>The <a class="reference external" href="https://github.com/jazzband/django-debug-toolbar">django-debug-toolbar</a> is a great and very popular library that can help you debug your Django applications
+and identify slow views and n+1 query problems. However I have observed that it makes your development app <em>much slower</em>.
+For some views I am seeing like 10x decrease in speed i.e instead of 500 ms we&#8217;ll need more than 5 seconds to display
+that view! Since Django development (at least for me) is based on a very quick feedback loop, this is a huge&nbsp;problem.</p>
+<p>Thus, I recommend to keep it disabled when you are doing normal development and only enable it when you need it,
+for example to identify n+1 query&nbsp;problems.</p>
+</div>
+<div class="section" id="use-the-werkzeug-debugger">
+<h3><a class="toc-backref" href="#toc-entry-35">Use the Werkzeug&nbsp;debugger</a></h3>
+<p>Instead of using the traditional runserver to run your app in development
+I recommend installing the <a class="reference external" href="https://github.com/django-extensions/django-extensions">django-extensions</a> package so as to be able to
+use the Werkzeug debugger. This will enable you to get a python prompt
+whenever your code throws an exception or even to add your own breakpoints by throwing&nbsp;exceptions.</p>
+<p>In a nutshell, you&#8217;ll something like <tt class="docutils literal"><span class="pre">aa+=1</span></tt> (<tt class="docutils literal">aa</tt> should not be an integer) somewhere in your code (in a view, or a model method etc)
+and python will throw an exception. You&#8217;ll be able to get a python shell and inspect the state of your app inside that particular point,
+so you can see what variables are available and their values, run code etc. This is a superpower that after you start using it you&#8217;ll
+never want to go back to the traditional&nbsp;runserver.</p>
+<p>More info on my <a class="reference external" href="https://spapas.github.io/2016/06/07/django-werkzeug-debugger/">Django Werkzeug debugger article</a>.</p>
+</div>
+</div>
+<div class="section" id="general-guidelines">
+<h2><a class="toc-backref" href="#toc-entry-36">General&nbsp;guidelines</a></h2>
+<div class="section" id="consider-using-a-cookiecutter-project-template">
+<h3><a class="toc-backref" href="#toc-entry-37">Consider using a cookiecutter project&nbsp;template</a></h3>
+<p>If you are working on a Django shop so you need to create frequenctly new Django apps I&#8217;d recommend to
+consider creating (or use an existing) <a class="reference external" href="https://github.com/cookiecutter/cookiecutter">cookiecutter</a> project template. You can use <a class="reference external" href="https://github.com/spapas/cookiecutter-django-starter">my own cookiecutter</a>
+to create your projects or as an inspiration to create your own. It follows all the conventions I mention in
+this post and it is very simple to&nbsp;use.</p>
+</div>
+<div class="section" id="be-careful-on-your-selection-of-packages-addons">
+<h3><a class="toc-backref" href="#toc-entry-38">Be careful on your selection of&nbsp;packages/addons</a></h3>
+<p>Django, because of its popularity, has an <a class="reference external" href="https://djangopackages.org/">abundance of packages/addons</a> that can help you do almost anything.
+However, my experience has taught me that you should be very careful and do your research before adding a new
+package to your project. I&#8217;ve been left many times with projects that I was not able to upgrade because they
+heavily relied on functionality from an external package that was abandoned by its creator. I also have lost
+many hours trying to debug a problem that was caused by a package that was not compatible with the latest version
+of&nbsp;Django.</p>
+<p>So my guidelines before using an external Django addon&nbsp;are:</p>
+<ul class="simple">
+<li>Make sure that it has been upgraded recently. There are <em>no</em> finished Django addons. Django is constantly evolving by releasing new versions and that must be true for the addons. Even if the addons are compatible with the new Django version they need to denote that in their <span class="caps">README</span> so as to know that their maintainers&nbsp;care.</li>
+<li>Avoid using very new packages. I&#8217;ve seen many packages that are not yet mature and they are not yet ready for production. If you really need to use such a package make sure that you understand what it does and you can fix problems with the package if&nbsp;needed.</li>
+<li>Avoid using packages that rely heavily on Javascript; this is usually better to do on your&nbsp;own.</li>
+<li>Try to understand, at least at a high level, what the package does. If you don&#8217;t understand it, you will not be able to debug if it&nbsp;breaks.</li>
+<li>Make sure that the package is well documented and that it has a good test&nbsp;coverage.</li>
+<li>Don&#8217;t use very simple packages that you can easily implement yourself. Don&#8217;t be a left-pad&nbsp;developer.</li>
+</ul>
+<p>I already propose some packages in this article but I also like to point you out to my
+<a class="reference external" href="https://spapas.github.io/2017/10/11/essential-django-packages/">Django essential package list</a>. This list was compiled 5 years ago and
+I&#8217;m happy to still recommend <em>all</em> of these packages with the following minor&nbsp;changes:</p>
+<ul class="simple">
+<li>Nowadays I recommend using wkhtmltopdf for creating PDFs from Django instead of xhtml2pdf. Please see my <a class="reference external" href="https://spapas.github.io/2022/02/14/django-pdfs-2022/">PDFs in Django like it&#8217;s 2022</a> article for more info. Notice that there&#8217;s nothing wrong with the xhtml2pdf package, it still works great and is supported but my personal preference is to use the&nbsp;wwhtmltopdf.</li>
+<li>The django-sendfile is no longer supported so you need to use <a class="reference external" href="https://github.com/moggers87/django-sendfile2">django-sendfile2</a> instead. This is a drop-in replacement from django-sendfile2. See the point about media securing for more&nbsp;info.</li>
+<li><a class="reference external" href="https://github.com/django-auth-ldap/django-auth-ldap">django-auth-ldap</a> uses github now (nothing changed, it just uses github instead of&nbsp;bitbucket).</li>
+</ul>
+<p>The fact that from a list of ~30 packages only one (django-sendfile) is no longer supported
+(and the fact that even for that there&#8217;s a drop-in replacement) is
+a testament to the quality of the Django ecosystem (and to my choosing&nbsp;capabilities).</p>
+<p>In addition to the packages of my list, this article already contains a bunch of packages
+that I&#8217;ve used in my projects and I am happy with them so I&#8217;d also recommend them to&nbsp;you.</p>
+</div>
+<div class="section" id="don-t-be-afraid-to-use-threadlocals">
+<h3><a class="toc-backref" href="#toc-entry-39">Don&#8217;t be afraid to use&nbsp;threadlocals</a></h3>
+<p>One controversial aspect if Django is that it avoids using the threadlocals functionality. The <a class="reference external" href="https://docs.python.org/3/library/threading.html#thread-local-data">thread-local data</a> is a
+way to store data that is specific to the current running thread. This, combined with the fact that each one of the
+requests to your Django app <em>will be served by the same thread</em> (worker) gives you a super powerful way to store and then
+access data that is specific to the current request and would be very difficult (if at all possible) to do it&nbsp;otherwise.</p>
+<p>The usual way to work with thread locals in Django is to add a middleware that sets the current request in the thread local
+data. Then you can access this data from wherever you want in your code, like a global. You can either create that middleware
+yourself but I&#8217;d recommend using the <a class="reference external" href="https://github.com/jedie/django-tools/">django-tools</a> library for adding this functionality. You&#8217;ll add the
+<tt class="docutils literal">'django_tools.middlewares.ThreadLocal.ThreadLocalMiddleware'</tt> to your list of middleware (at the end of the listt
+unless you want to use the current user from another middleware) and then you&#8217;ll use it like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django_tools.middlewares</span><span class="w"> </span><span class="kn">import</span> <span class="n">ThreadLocal</span>
+
+<span class="c1"># Get the current request object:</span>
+<span class="n">request</span> <span class="o">=</span> <span class="n">ThreadLocal</span><span class="o">.</span><span class="n">get_current_request</span><span class="p">()</span>
+<span class="c1"># You can get the current user directly with:</span>
+<span class="n">user</span> <span class="o">=</span> <span class="n">ThreadLocal</span><span class="o">.</span><span class="n">get_current_user</span><span class="p">()</span>
+</pre></div>
+<p>Please notice that Django recommends avoiding this technique because it hides the request/user dependency and makes
+testing more difficult. However I&#8217;d like to respectfully disagree with their&nbsp;rationale.</p>
+<ul class="simple">
+<li>First of all, please notice that this is exactly how <a class="reference external" href="https://flask.palletsprojects.com/en/2.2.x/reqcontext/">Flask works</a> when you access the current request. It stores the request in the thread locals and then you can access it from anywhere in your&nbsp;code.</li>
+<li>Second, there are things that are very difficult (or even not possible) without using the threadlocals. I&#8217;ll give you an example in a&nbsp;little.</li>
+<li>Third, you can be careful to use the thread locals functionality properly. After all it is a very simple concept. The fact that you are using thread locals can be integrated to your&nbsp;tests.</li>
+</ul>
+<p>One example of why thread locals are so useful is this abstract class that I use in almost all my projects and&nbsp;models:</p>
+<div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">UserDateAbstractModel</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">created_on</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">auto_now_add</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="p">)</span>
+    <span class="n">modified_on</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">auto_now</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">created_by</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span>
+        <span class="n">settings</span><span class="o">.</span><span class="n">AUTH_USER_MODEL</span><span class="p">,</span>
+        <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">PROTECT</span><span class="p">,</span>
+        <span class="n">related_name</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%(class)s</span><span class="s2">_created&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">modified_by</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span>
+        <span class="n">settings</span><span class="o">.</span><span class="n">AUTH_USER_MODEL</span><span class="p">,</span>
+        <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">PROTECT</span><span class="p">,</span>
+        <span class="n">related_name</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%(class)s</span><span class="s2">_modified&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">abstract</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">ThreadLocal</span><span class="o">.</span><span class="n">get_current_user</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">user</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">pk</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">created_by</span> <span class="o">=</span> <span class="n">user</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">modified_by</span> <span class="o">=</span> <span class="n">user</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">UserDateAbstractModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</pre></div>
+<p>Models that override this abstract model will automatically set the <tt class="docutils literal">created_by</tt> and <tt class="docutils literal">modified_by</tt> fields to the current user. This works
+the same no matter if I edit the object from the admin, or from a view. To use that functionality all I need to do is to inherit from that model i.e
+<tt class="docutils literal">class MyModel(UserDateAbstractModel)</tt> and that&#8217;s&nbsp;it.</p>
+<p>What would I need to do if I didn&#8217;t use the thread locals? I&#8217;d need to create a mixin from which <em>all my views</em> (that modify an object)
+would inherit! This mixin would pick the current user from the request and set it up. Please consider the difference between these two approaches;
+using the model based approach with the thread locals I can be assured that no matter where I modify an object, the <tt class="docutils literal">created_by</tt> and <tt class="docutils literal">modified_by</tt>
+will be set properly (unless of course I modify it through the database or django shell &#8212; actually, I could make <tt class="docutils literal">save</tt> throw if
+the current use hasn&#8217;t been setup so it wouldn&#8217;t be possible to modify from the shell). If I use the mixin approach, I need to make sure that
+all my views inherit from that mixin and that I don&#8217;t forget to do it. Also other people that add code to my project will also need to
+remember that. This is a lot more error prone and difficult to&nbsp;maintain.</p>
+<p>The above is a <em>simple</em> example. I have seen many more cases where without the use of thread locals I&#8217;d need to replicate 3-4 classes
+from an external library (this library was django-allauth for anybody interested) in order to be able to pass through the current user
+to where I needed to use this. This is a lot of code duplication and a maintenance&nbsp;hell.</p>
+<p>One final comment: I&#8217;m not recommending to do it like Flask, i.e use thread locals anywhere. For example, in your views and forms it is
+easy to get the current request, there&#8217;s no need to use thread locals there. However, in places where there&#8217;s no simple path for
+accessing the current user then definitely use thread locals and don&#8217;t feel bad about&nbsp;it!</p>
+</div>
+<div class="section" id="the-async-tasks-situation">
+<h3><a class="toc-backref" href="#toc-entry-40">The async tasks&nbsp;situation</a></h3>
+<p>It is very common for new projects to add support for async tasks, either using celery, or django-rq or various other
+solutions. I&#8217;ve already written a
+<a class="reference external" href="https://spapas.github.io/2015/01/27/async-tasks-with-django-rq/">bunch</a>.
+<a class="reference external" href="https://spapas.github.io/2015/09/01/django-rq-redux/">of</a>.
+<a class="reference external" href="https://spapas.github.io/2019/02/25/django-fix-async-db/">posts</a>.
+about this&nbsp;topic.</p>
+<p>First of all let&#8217;s understand <em>why</em> we need async tasks: When you serve Djagno (or any Python web app) in production, you&#8217;ll
+start a number of worker processes that will be used to serve the users. These usually are normal <span class="caps">OS</span> processes. The guidelines
+are to start a finite amount of such processes, equal to 2-4 times the number of the <span class="caps">CPU</span> cores of your server. So with 2 cores
+you&#8217;ll have like 8 workers. This means your Django app can handle up to 8 concurrent requests at the same time. If we have a
+view that takes too long to response (e.g. because it runs a slow query), we&#8217;ll have many workers
+&#8220;stuck&#8221; on that view, resulting in delays for the other users since the number of workers always stays the&nbsp;same.</p>
+<p>To resolve that issue we can use async tasks to offload the work to the &#8220;background&#8221;. I.e instead of the view waiting
+for the slow query to finish, it will now add a task in a queue and return immediately. The tasks in the queue will then be run
+by the async worker one after another. The other way to resolve that is to increase the number of workers, but that is not
+a good idea since each worker takes a certain amount of memory and resources and we still can&#8217;t be positive that we&#8217;ll be able
+to handle all traffic peaks to our slow&nbsp;views.</p>
+<p>So, although I believe that async tasks are essential for <em>some</em> situations,
+my recommendation here is to be very careful and think twice before adding support for async tasks for your project.
+Because of how python works, the <em>only</em> way to have support for async tasks is to have <em>one or more extra</em> moving parts
+to your&nbsp;project.</p>
+<p>These moving parts will be always a task worker process (that would pick the async tasks from the queue
+and execute them asynchronously) and probably an external process that would store your queue. Actually the queue process may be redis
+if you already use it for caching or even the database but also there are projects that use a separate application for the queue
+like&nbsp;Rabbitmq.</p>
+<p>This may look like a small thing but in a production environment this means that instead of running 1 thing for
+your django app (a gunicorn or uwsgi app server) you need to add at least another thing (the worker). This results&nbsp;tp</p>
+<ul class="simple">
+<li>Make sure that the worker <em>sees</em> and handles your&nbsp;tasks</li>
+<li>Monitoring the worker (getting alerts when the worker stops, make sure it runs&nbsp;etc)</li>
+<li>Start the worker when your server starts (i.e when your server&nbsp;reboots)</li>
+<li>Re-start the worker when you deploy changes (this is critical and easily missed; your worker won&#8217;t pick any changes to your app when you deploy it, if you don&#8217;t re-start it it will run stale&nbsp;code)</li>
+<li>Handle exceptions to your async tasks&nbsp;properly</li>
+<li>Make sure you have some kind of logging and exception tracking for the&nbsp;worker</li>
+</ul>
+<p>All this adds up especially if you need to do for every new&nbsp;app.</p>
+<p>Taking this into account, I&#8217;d recommend to think twice before adding support for async tasks in you Django app. If you really need it, then
+of course, you&#8217;ll need to bite the bullet and add it. But lately my understanding is that people tend to add support for async tasks
+even though they don&#8217;t really need it. Let&#8217;s see some&nbsp;examples:</p>
+<ul class="simple">
+<li><em>I&#8217;ve got a view that sends mails and it is too slow</em>. If the view opens a connection to an <span class="caps">SMTP</span> server and sends the email then probably it will be slow. However, before using the async task situation, consider using a service like sendgrid or mailgun that will send your mails for you and will be much&nbsp;faster.</li>
+<li><em>I need to run slow queries</em>. Well&#8230; no you don&#8217;t. Your queries should <em>not</em> be slow. You should try to optimize your queries to run faster. If you have done all optimizations and still your queries are slow then you should consider de-normalizing your data to increase performance. This (at least in my book) is preferable over adding async&nbsp;tasks.</li>
+<li><em>I need to do bulk operations</em>. This probably is a reason to run async tasks. But before biting the bullet, consider: how many of your users are going to run such bulk operations at the same&nbsp;time?</li>
+</ul>
+</div>
+</div>
+</div>
+    <footer>
+<p class="meta">
+  <span class="byline author vcard">
+    Posted by <span class="fn">
+        Serafeim Papastefanos
+    </span>
+  </span>
+<time datetime="2022-09-28T11:10:00+03:00" pubdate>Wed 28 September 2022</time>  <span class="categories">
+    <a class='category' href='https://spapas.github.io/category/django.html'>django</a>
+  </span>
+  <span class="categories">
+    <a class="category" href="https://spapas.github.io/tag/python.html">python</a>,    <a class="category" href="https://spapas.github.io/tag/django.html">django</a>  </span>
+</p><div class="sharing">
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="https://spapas.github.io/2022/09/28/django-guidelines/" data-via="" data-counturl="https://spapas.github.io/2022/09/28/django-guidelines/" >Tweet</a>
+</div>    </footer>
+  </article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript></div>
+  </section>
+</div>
+<aside class="sidebar">
+  
+  <section>
+    <br />
+    <a href='/feeds/all.atom.xml'>Atom</a>
+    |
+    <a href='/feeds/all.rss.xml'>RSS</a>
+  </section>
+
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <!-- Sidebar unit -->
+  <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7673322832689008" data-ad-slot="2720624730"
+    data-ad-format="auto" data-full-width-responsive="true"></ins>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+
+
+  <script async src="https://cse.google.com/cse.js?cx=612920e5ca9da850c"></script>
+  <div class="gcse-search"></div>
+
+  
+  <section>
+    <h1>Support me</h1>
+
+    You can show your appreciation for anything useful you've found here by 
+    buying me a coffee 
+    <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="spapas" data-color="#FFDD00" data-emoji=""  data-font="Lato" data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff" ></script>
+
+    or donating me some bitcoin to this address:
+    <small><pre>bc1qx42vp8napheaewhnx0rk0mttdrdrtvw6czvxhl</pre></small>
+    <svg shape-rendering="crispEdges" height="200" width="200" viewBox="0 0 29 29" class="qrcode">
+      <path fill="#FFFFFF" d="M0,0 h29v29H0z"></path><path fill="#000000" d="M0 0h7v1H0zM9 0h2v1H9zM12 0h1v1H12zM14 0h2v1H14zM18 0h2v1H18zM22,0 h7v1H22zM0 1h1v1H0zM6 1h1v1H6zM8 1h1v1H8zM11 1h1v1H11zM14 1h5v1H14zM22 1h1v1H22zM28,1 h1v1H28zM0 2h1v1H0zM2 2h3v1H2zM6 2h1v1H6zM8 2h4v1H8zM17 2h1v1H17zM22 2h1v1H22zM24 2h3v1H24zM28,2 h1v1H28zM0 3h1v1H0zM2 3h3v1H2zM6 3h1v1H6zM9 3h2v1H9zM14 3h3v1H14zM18 3h1v1H18zM22 3h1v1H22zM24 3h3v1H24zM28,3 h1v1H28zM0 4h1v1H0zM2 4h3v1H2zM6 4h1v1H6zM8 4h1v1H8zM11 4h1v1H11zM13 4h1v1H13zM15 4h2v1H15zM18 4h1v1H18zM22 4h1v1H22zM24 4h3v1H24zM28,4 h1v1H28zM0 5h1v1H0zM6 5h1v1H6zM8 5h2v1H8zM14 5h2v1H14zM19 5h2v1H19zM22 5h1v1H22zM28,5 h1v1H28zM0 6h7v1H0zM8 6h1v1H8zM10 6h1v1H10zM12 6h1v1H12zM14 6h1v1H14zM16 6h1v1H16zM18 6h1v1H18zM20 6h1v1H20zM22,6 h7v1H22zM8 7h2v1H8zM11 7h1v1H11zM15 7h1v1H15zM17 7h2v1H17zM0 8h2v1H0zM3 8h1v1H3zM6 8h2v1H6zM10 8h1v1H10zM12 8h3v1H12zM20 8h1v1H20zM22 8h3v1H22zM26 8h2v1H26zM1 9h1v1H1zM3 9h3v1H3zM8 9h1v1H8zM10 9h1v1H10zM12 9h2v1H12zM16 9h2v1H16zM20 9h1v1H20zM22 9h1v1H22zM25 9h1v1H25zM27,9 h2v1H27zM0 10h1v1H0zM3 10h2v1H3zM6 10h1v1H6zM8 10h3v1H8zM12 10h2v1H12zM16 10h1v1H16zM19 10h1v1H19zM22 10h3v1H22zM27 10h1v1H27zM0 11h1v1H0zM2 11h1v1H2zM4 11h2v1H4zM7 11h1v1H7zM13 11h4v1H13zM18 11h4v1H18zM26 11h2v1H26zM0 12h1v1H0zM2 12h3v1H2zM6 12h1v1H6zM11 12h1v1H11zM13 12h1v1H13zM15 12h3v1H15zM20 12h1v1H20zM22 12h2v1H22zM27,12 h2v1H27zM4 13h1v1H4zM8 13h3v1H8zM12 13h1v1H12zM14 13h1v1H14zM17 13h4v1H17zM25 13h2v1H25zM0 14h1v1H0zM4 14h3v1H4zM8 14h2v1H8zM11 14h3v1H11zM16 14h1v1H16zM21 14h2v1H21zM24,14 h5v1H24zM3 15h3v1H3zM7 15h2v1H7zM10 15h1v1H10zM12 15h2v1H12zM15 15h1v1H15zM17 15h2v1H17zM20 15h2v1H20zM23 15h1v1H23zM1 16h1v1H1zM4 16h1v1H4zM6 16h4v1H6zM16 16h2v1H16zM20 16h1v1H20zM23 16h1v1H23zM25 16h1v1H25zM28,16 h1v1H28zM2 17h1v1H2zM5 17h1v1H5zM7 17h2v1H7zM11 17h3v1H11zM17 17h1v1H17zM22 17h1v1H22zM25 17h1v1H25zM27,17 h2v1H27zM0 18h1v1H0zM3 18h1v1H3zM5 18h4v1H5zM10 18h1v1H10zM12 18h1v1H12zM18 18h1v1H18zM20 18h1v1H20zM22 18h2v1H22zM25,18 h4v1H25zM2 19h3v1H2zM8 19h1v1H8zM16 19h2v1H16zM21 19h1v1H21zM23 19h1v1H23zM25 19h1v1H25zM27 19h1v1H27zM0 20h1v1H0zM2 20h5v1H2zM8 20h2v1H8zM13 20h4v1H13zM19 20h6v1H19zM26 20h1v1H26zM28,20 h1v1H28zM8 21h2v1H8zM12 21h3v1H12zM16 21h1v1H16zM20 21h1v1H20zM24 21h1v1H24zM26,21 h3v1H26zM0 22h7v1H0zM8 22h3v1H8zM17 22h1v1H17zM20 22h1v1H20zM22 22h1v1H22zM24 22h2v1H24zM27 22h1v1H27zM0 23h1v1H0zM6 23h1v1H6zM10 23h2v1H10zM13 23h2v1H13zM19 23h2v1H19zM24,23 h5v1H24zM0 24h1v1H0zM2 24h3v1H2zM6 24h1v1H6zM9 24h2v1H9zM12 24h2v1H12zM17 24h1v1H17zM20 24h6v1H20zM28,24 h1v1H28zM0 25h1v1H0zM2 25h3v1H2zM6 25h1v1H6zM8 25h3v1H8zM12 25h1v1H12zM14 25h1v1H14zM18 25h1v1H18zM22 25h3v1H22zM26 25h1v1H26zM0 26h1v1H0zM2 26h3v1H2zM6 26h1v1H6zM10 26h5v1H10zM16 26h3v1H16zM21 26h1v1H21zM24 26h1v1H24zM26 26h1v1H26zM28,26 h1v1H28zM0 27h1v1H0zM6 27h1v1H6zM8 27h3v1H8zM12 27h4v1H12zM17 27h1v1H17zM20 27h1v1H20zM23 27h2v1H23zM27 27h1v1H27zM0 28h7v1H0zM8 28h3v1H8zM14 28h1v1H14zM16 28h3v1H16zM20 28h1v1H20zM22 28h1v1H22zM24 28h2v1H24zM27 28h1v1H27z"></path>
+    </svg>
+  </section>
+  
+
+  <section>
+    <h1>Subscribe</h1>
+    Do you want to get notified via email when I post new content?
+    <style>
+      .subscribe-button {
+        /* margin: 10px !important; */
+        padding: 10px !important;
+        background-color: black;
+        display: inline-block;
+        color: white !important;
+        text-decoration: none;
+
+        line-height: 36px !important;
+        height: 37px !important;
+        text-decoration: none !important;
+        display: inline-block !important;
+        color: #ffffff !important;
+        background-color: #000000 !important;
+        border-radius: 3px !important;
+        border: 1px solid transparent !important;
+        padding: 1px 9px !important;
+        font-size: 23px !important;
+        letter-spacing: 0.6px !important;
+        box-shadow: 0px 1px 2px rgba(190, 190, 190, 0.5) !important;
+        -webkit-box-shadow: 0px 1px 2px 2px rgba(190, 190, 190, 0.5) !important;
+        margin: 0 auto !important;
+        font-family: 'Cookie', cursive !important;
+        -webkit-box-sizing: border-box !important;
+        box-sizing: border-box !important;
+        -o-transition: 0.3s all linear !important;
+        -webkit-transition: 0.3s all linear !important;
+        -moz-transition: 0.3s all linear !important;
+        -ms-transition: 0.3s all linear !important;
+        transition: 0.3s all linear !important;
+
+      }
+    </style>
+    <a class='subscribe-button' target="_blank" href="http://eepurl.com/dxI3PP">Click here to subscribe!</a>
+  </section>
+
+
+  <section>
+    <h1>Recent Posts</h1>
+    <ul id="recent_posts">
+      <li class="post">
+        <a href="https://spapas.github.io/2024/08/22/multiple-erl-elixir-windows/">Multiple Erlang/Elixir versions in Windows</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/11/29/openid-connect-tutorial/">A simple OpenID connect tutorial</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/05/23/simple-django-datatables-integration/">Simple Django - DataTables integration</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/05/22/ai-auto-subtitling/">AI auto-subtitling</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/05/12/disable-your-forms/">HTML form disable after submit</a>
+      </li>
+    </ul>
+  </section>
+  <section>
+
+    <h1>Categories</h1>
+    <ul id="recent_posts">
+      <li><a href="https://spapas.github.io/category/ai.html">ai</a></li>
+      <li><a href="https://spapas.github.io/category/android.html">android</a></li>
+      <li><a href="https://spapas.github.io/category/clojure.html">clojure</a></li>
+      <li><a href="https://spapas.github.io/category/css.html">css</a></li>
+      <li><a href="https://spapas.github.io/category/django.html">django</a></li>
+      <li><a href="https://spapas.github.io/category/elixir.html">elixir</a></li>
+      <li><a href="https://spapas.github.io/category/flask.html">flask</a></li>
+      <li><a href="https://spapas.github.io/category/gaming.html">gaming</a></li>
+      <li><a href="https://spapas.github.io/category/git.html">git</a></li>
+      <li><a href="https://spapas.github.io/category/html.html">html</a></li>
+      <li><a href="https://spapas.github.io/category/javascript.html">javascript</a></li>
+      <li><a href="https://spapas.github.io/category/networking.html">networking</a></li>
+      <li><a href="https://spapas.github.io/category/pelican.html">pelican</a></li>
+      <li><a href="https://spapas.github.io/category/postgresql.html">postgresql</a></li>
+      <li><a href="https://spapas.github.io/category/python.html">python</a></li>
+      <li><a href="https://spapas.github.io/category/spring.html">spring</a></li>
+      <li><a href="https://spapas.github.io/category/unix.html">unix</a></li>
+      <li><a href="https://spapas.github.io/category/wagtail.html">wagtail</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Tags</h1>
+    <a href="https://spapas.github.io/tag/erlang.html">erlang</a>,    <a href="https://spapas.github.io/tag/elixir.html">elixir</a>,    <a href="https://spapas.github.io/tag/windows.html">windows</a>,    <a href="https://spapas.github.io/tag/openid.html">openid</a>,    <a href="https://spapas.github.io/tag/openid-connect.html">openid-connect</a>,    <a href="https://spapas.github.io/tag/oidc.html">oidc</a>,    <a href="https://spapas.github.io/tag/http.html">http</a>,    <a href="https://spapas.github.io/tag/keycloak.html">keycloak</a>,    <a href="https://spapas.github.io/tag/python.html">python</a>,    <a href="https://spapas.github.io/tag/django.html">django</a>,    <a href="https://spapas.github.io/tag/jquery.html">jquery</a>,    <a href="https://spapas.github.io/tag/datatables.html">datatables</a>,    <a href="https://spapas.github.io/tag/ai.html">ai</a>,    <a href="https://spapas.github.io/tag/whisper.html">whisper</a>,    <a href="https://spapas.github.io/tag/whispercpp.html">whisper.cpp</a>,    <a href="https://spapas.github.io/tag/subtitles.html">subtitles</a>,    <a href="https://spapas.github.io/tag/video.html">video</a>,    <a href="https://spapas.github.io/tag/auto-subtitling.html">auto-subtitling</a>,    <a href="https://spapas.github.io/tag/subtitiling.html">subtitiling</a>,    <a href="https://spapas.github.io/tag/transcribe.html">transcribe</a>,    <a href="https://spapas.github.io/tag/html.html">html</a>,    <a href="https://spapas.github.io/tag/javascript.html">javascript</a>,    <a href="https://spapas.github.io/tag/media.html">media</a>,    <a href="https://spapas.github.io/tag/storage.html">storage</a>,    <a href="https://spapas.github.io/tag/unpoly.html">unpoly</a>,    <a href="https://spapas.github.io/tag/access.html">access</a>,    <a href="https://spapas.github.io/tag/database.html">database</a>,    <a href="https://spapas.github.io/tag/accdb.html">accdb</a>,    <a href="https://spapas.github.io/tag/mdb.html">mdb</a>,    <a href="https://spapas.github.io/tag/postgresql.html">postgresql</a>,    <a href="https://spapas.github.io/tag/development.html">development</a>,    <a href="https://spapas.github.io/tag/inlines.html">inlines</a>,    <a href="https://spapas.github.io/tag/clojure.html">clojure</a>,    <a href="https://spapas.github.io/tag/cmd.html">cmd</a>,    <a href="https://spapas.github.io/tag/pdf.html">pdf</a>,    <a href="https://spapas.github.io/tag/wkhtmltopdf.html">wkhtmltopdf</a>,    <a href="https://spapas.github.io/tag/forward-proxy.html">forward-proxy</a>,    <a href="https://spapas.github.io/tag/reverse-proxy.html">reverse-proxy</a>,    <a href="https://spapas.github.io/tag/proxy.html">proxy</a>,    <a href="https://spapas.github.io/tag/networking.html">networking</a>,    <a href="https://spapas.github.io/tag/dj-rest-auth.html">dj-rest-auth</a>,    <a href="https://spapas.github.io/tag/rest.html">rest</a>,    <a href="https://spapas.github.io/tag/django-rest-framework.html">django-rest-framework</a>,    <a href="https://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="https://spapas.github.io/tag/tokens.html">tokens</a>,    <a href="https://spapas.github.io/tag/migrations.html">migrations</a>,    <a href="https://spapas.github.io/tag/foreignkey.html">foreignkey</a>,    <a href="https://spapas.github.io/tag/dark-souls.html">dark-souls</a>,    <a href="https://spapas.github.io/tag/dark-souls-2.html">dark-souls-2</a>,    <a href="https://spapas.github.io/tag/dark-souls-3.html">dark-souls-3</a>,    <a href="https://spapas.github.io/tag/autohotkey.html">autohotkey</a>,    <a href="https://spapas.github.io/tag/matplotlib.html">matplotlib</a>,    <a href="https://spapas.github.io/tag/hashids.html">hashids</a>,    <a href="https://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="https://spapas.github.io/tag/osmon.html">osmon</a>,    <a href="https://spapas.github.io/tag/phoenix.html">phoenix</a>,    <a href="https://spapas.github.io/tag/os-monitoring.html">os-monitoring</a>,    <a href="https://spapas.github.io/tag/forms.html">forms</a>,    <a href="https://spapas.github.io/tag/django-crispy-forms.html">django-crispy-forms</a>,    <a href="https://spapas.github.io/tag/django-widget-tweaks.html">django-widget-tweaks</a>,    <a href="https://spapas.github.io/tag/ecto.html">ecto</a>,    <a href="https://spapas.github.io/tag/queries.html">queries</a>,    <a href="https://spapas.github.io/tag/declarative.html">declarative</a>,    <a href="https://spapas.github.io/tag/form.html">form</a>,    <a href="https://spapas.github.io/tag/php.html">php</a>,    <a href="https://spapas.github.io/tag/select2.html">select2</a>,    <a href="https://spapas.github.io/tag/autocompelte.html">autocompelte</a>,    <a href="https://spapas.github.io/tag/ajax.html">ajax</a>,    <a href="https://spapas.github.io/tag/android.html">android</a>,    <a href="https://spapas.github.io/tag/kotlin.html">kotlin</a>,    <a href="https://spapas.github.io/tag/adapter.html">adapter</a>,    <a href="https://spapas.github.io/tag/filter.html">filter</a>,    <a href="https://spapas.github.io/tag/async.html">async</a>,    <a href="https://spapas.github.io/tag/tasks.html">tasks</a>,    <a href="https://spapas.github.io/tag/django-rq.html">django-rq</a>,    <a href="https://spapas.github.io/tag/rq.html">rq</a>,    <a href="https://spapas.github.io/tag/du.html">du</a>,    <a href="https://spapas.github.io/tag/unix.html">unix</a>,    <a href="https://spapas.github.io/tag/linux.html">linux</a>,    <a href="https://spapas.github.io/tag/disk-usage.html">disk-usage</a>,    <a href="https://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="https://spapas.github.io/tag/middleware.html">middleware</a>,    <a href="https://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="https://spapas.github.io/tag/react.html">react</a>,    <a href="https://spapas.github.io/tag/redux.html">redux</a>,    <a href="https://spapas.github.io/tag/hyperapp.html">hyperapp</a>,    <a href="https://spapas.github.io/tag/immutable.html">immutable</a>,    <a href="https://spapas.github.io/tag/es6.html">es6</a>,    <a href="https://spapas.github.io/tag/youtube.html">youtube</a>,    <a href="https://spapas.github.io/tag/youtube-dl.html">youtube-dl</a>,    <a href="https://spapas.github.io/tag/ffmpeg.html">ffmpeg</a>,    <a href="https://spapas.github.io/tag/django-rest-auth.html">django-rest-auth</a>,    <a href="https://spapas.github.io/tag/python-2.html">python-2</a>,    <a href="https://spapas.github.io/tag/python-3.html">python-3</a>,    <a href="https://spapas.github.io/tag/plpgsql.html">plpgsql</a>,    <a href="https://spapas.github.io/tag/component.html">component</a>,    <a href="https://spapas.github.io/tag/ag-grid.html">ag-grid</a>,    <a href="https://spapas.github.io/tag/grid.html">grid</a>,    <a href="https://spapas.github.io/tag/bash.html">bash</a>,    <a href="https://spapas.github.io/tag/cron.html">cron</a>,    <a href="https://spapas.github.io/tag/pandas.html">pandas</a>,    <a href="https://spapas.github.io/tag/scipy.html">scipy</a>,    <a href="https://spapas.github.io/tag/numpy.html">numpy</a>,    <a href="https://spapas.github.io/tag/pivot.html">pivot</a>,    <a href="https://spapas.github.io/tag/pivot_table.html">pivot_table</a>,    <a href="https://spapas.github.io/tag/ipython.html">ipython</a>,    <a href="https://spapas.github.io/tag/jupyter.html">jupyter</a>,    <a href="https://spapas.github.io/tag/notebook.html">notebook</a>,    <a href="https://spapas.github.io/tag/query.html">query</a>,    <a href="https://spapas.github.io/tag/q.html">q</a>,    <a href="https://spapas.github.io/tag/imgur.html">imgur</a>,    <a href="https://spapas.github.io/tag/console.html">console</a>,    <a href="https://spapas.github.io/tag/research.html">research</a>,    <a href="https://spapas.github.io/tag/debug.html">debug</a>,    <a href="https://spapas.github.io/tag/werkzeug.html">werkzeug</a>,    <a href="https://spapas.github.io/tag/django-extensions.html">django-extensions</a>,    <a href="https://spapas.github.io/tag/404.html">404</a>,    <a href="https://spapas.github.io/tag/error.html">error</a>,    <a href="https://spapas.github.io/tag/spring.html">spring</a>,    <a href="https://spapas.github.io/tag/spring-boot.html">spring-boot</a>,    <a href="https://spapas.github.io/tag/java.html">java</a>,    <a href="https://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="https://spapas.github.io/tag/profiles.html">profiles</a>,    <a href="https://spapas.github.io/tag/settings.html">settings</a>,    <a href="https://spapas.github.io/tag/properties.html">properties</a>,    <a href="https://spapas.github.io/tag/yaml.html">yaml</a>,    <a href="https://spapas.github.io/tag/configuration.html">configuration</a>,    <a href="https://spapas.github.io/tag/deploy.html">deploy</a>,    <a href="https://spapas.github.io/tag/initd.html">init.d</a>,    <a href="https://spapas.github.io/tag/react-redux.html">react-redux</a>,    <a href="https://spapas.github.io/tag/redux-thunk.html">redux-thunk</a>,    <a href="https://spapas.github.io/tag/redux-form.html">redux-form</a>,    <a href="https://spapas.github.io/tag/react-router.html">react-router</a>,    <a href="https://spapas.github.io/tag/react-router-redux.html">react-router-redux</a>,    <a href="https://spapas.github.io/tag/react-notification.html">react-notification</a>,    <a href="https://spapas.github.io/tag/history.html">history</a>,    <a href="https://spapas.github.io/tag/babel.html">babel</a>,    <a href="https://spapas.github.io/tag/babelify.html">babelify</a>,    <a href="https://spapas.github.io/tag/browserify.html">browserify</a>,    <a href="https://spapas.github.io/tag/watchify.html">watchify</a>,    <a href="https://spapas.github.io/tag/uglify.html">uglify</a>,    <a href="https://spapas.github.io/tag/boilerplate.html">boilerplate</a>,    <a href="https://spapas.github.io/tag/tutorial.html">tutorial</a>,    <a href="https://spapas.github.io/tag/introduction.html">introduction</a>,    <a href="https://spapas.github.io/tag/fixed-data-tables.html">fixed-data-tables</a>,    <a href="https://spapas.github.io/tag/fixeddatatable.html">FixedDataTable</a>,    <a href="https://spapas.github.io/tag/reportlab.html">reportlab</a>,    <a href="https://spapas.github.io/tag/xhtml2pdf.html">xhtml2pdf</a>,    <a href="https://spapas.github.io/tag/node.html">node</a>,    <a href="https://spapas.github.io/tag/npm.html">npm</a>,    <a href="https://spapas.github.io/tag/generic.html">generic</a>,    <a href="https://spapas.github.io/tag/tables.html">tables</a>,    <a href="https://spapas.github.io/tag/flux.html">flux</a>,    <a href="https://spapas.github.io/tag/jobs.html">jobs</a>,    <a href="https://spapas.github.io/tag/asynchronous.html">asynchronous</a>,    <a href="https://spapas.github.io/tag/scheduling.html">scheduling</a>,    <a href="https://spapas.github.io/tag/redis.html">redis</a>,    <a href="https://spapas.github.io/tag/pusher.html">pusher</a>,    <a href="https://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="https://spapas.github.io/tag/css.html">css</a>,    <a href="https://spapas.github.io/tag/design.html">design</a>,    <a href="https://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>,    <a href="https://spapas.github.io/tag/less.html">less</a>,    <a href="https://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="https://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="https://spapas.github.io/tag/security.html">security</a>,    <a href="https://spapas.github.io/tag/google.html">google</a>,    <a href="https://spapas.github.io/tag/flask.html">flask</a>,    <a href="https://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="https://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="https://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="https://spapas.github.io/tag/git.html">git</a>,    <a href="https://spapas.github.io/tag/github.html">github</a>,    <a href="https://spapas.github.io/tag/branching.html">branching</a>,    <a href="https://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="https://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="https://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="https://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="https://spapas.github.io/tag/rst.html">rst</a>  </section>
+
+  <section>
+    <h1>Yearly archives</h1>
+    <a href="https://spapas.github.io/posts/2013/">2013</a>,    <a href="https://spapas.github.io/posts/2014/">2014</a>,    <a href="https://spapas.github.io/posts/2015/">2015</a>,    <a href="https://spapas.github.io/posts/2016/">2016</a>,    <a href="https://spapas.github.io/posts/2017/">2017</a>,    <a href="https://spapas.github.io/posts/2018/">2018</a>,    <a href="https://spapas.github.io/posts/2019/">2019</a>,    <a href="https://spapas.github.io/posts/2020/">2020</a>,    <a href="https://spapas.github.io/posts/2021/">2021</a>,    <a href="https://spapas.github.io/posts/2022/">2022</a>,    <a href="https://spapas.github.io/posts/2023/">2023</a>,    <a href="https://spapas.github.io/posts/2024/">2024</a>  </section>
+
+
+
+  <section>
+    <h1>GitHub Repos</h1>
+    <ul id="gh_repos">
+      <li class="loading">Status updating...</li>
+    </ul>
+      <a href="https://github.com/spapas">@spapas</a> on GitHub
+    <script  src="//code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      $(function(){
+          if (!window.jXHR){
+              var jxhr = document.createElement('script');
+              jxhr.type = 'text/javascript';
+              jxhr.src = 'https://spapas.github.io/theme/js/jXHR.js';
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(jxhr, s);
+          }
+
+          github.showRepos({
+              user: 'spapas',
+              count: 5,
+              skip_forks: true,
+              target: '#gh_repos'
+          });
+      });
+    </script>
+    <script src="https://spapas.github.io/theme/js/github.js" type="text/javascript"> </script>
+  </section>
+
+
+  <section>
+    <a href="https://twitter.com/_serafeim_?ref_src=twsrc%5Etfw" class="twitter-follow-button"
+      data-show-count="false">Follow @_serafeim_</a>
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+  </section>
+
+</aside>    </div>
+  </div>
+  <footer role="contentinfo"><p>
+    Copyright &copy;  2013&ndash;2024  Serafeim Papastefanos &mdash;
+  <span class="credit">Powered by <a href="http://getpelican.com">Pelican</a></span>
+</p></footer>
+  <script src="https://spapas.github.io/theme/js/modernizr-2.0.js"></script>
+  <script src="https://spapas.github.io/theme/js/ender.js"></script>
+  <script src="https://spapas.github.io/theme/js/octopress.js" type="text/javascript"></script>
+  <script src="https://spapas.github.io/theme/js/ads.js"></script>
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-44750952-1', 'auto');
+
+    ga('send', 'pageview');
+    </script>
+
+<script defer data-domain="spapas.github.io" src="https://plausible.hcg.gr/js/script.js"></script>  <script type="text/javascript">
+    var disqus_shortname = 'spapas-github-io';
+    var disqus_identifier = '/2022/09/28/django-guidelines/';
+    var disqus_url = 'https://spapas.github.io/2022/09/28/django-guidelines/';
+    var disqus_title = 'My essential guidelines for better Django&nbsp;development';
+    (function() {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = "//" + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+     })();
+  </script>
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+</body>
+
+</html>

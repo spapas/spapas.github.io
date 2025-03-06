@@ -1,0 +1,1530 @@
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="google-site-verification" content="5_8DTmIiEq4gFvNAfxAD6TsGOgrMAjp8lQFQvfA6zZc" />
+    <title>/var/</title>
+    <meta name="author" content="Serafeim Papastefanos">
+
+
+    
+<style type="text/css">
+pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: var(--jp-cell-editor-active-background) }
+.highlight { background: var(--jp-cell-editor-background); color: var(--jp-mirror-editor-variable-color) }
+.highlight .c { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment */
+.highlight .err { color: var(--jp-mirror-editor-error-color) } /* Error */
+.highlight .k { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword */
+.highlight .o { color: var(--jp-mirror-editor-operator-color); font-weight: bold } /* Operator */
+.highlight .p { color: var(--jp-mirror-editor-punctuation-color) } /* Punctuation */
+.highlight .ch { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Preproc */
+.highlight .cpf { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Single */
+.highlight .cs { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Special */
+.highlight .kc { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Pseudo */
+.highlight .kr { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Type */
+.highlight .m { color: var(--jp-mirror-editor-number-color) } /* Literal.Number */
+.highlight .s { color: var(--jp-mirror-editor-string-color) } /* Literal.String */
+.highlight .ow { color: var(--jp-mirror-editor-operator-color); font-weight: bold } /* Operator.Word */
+.highlight .pm { color: var(--jp-mirror-editor-punctuation-color) } /* Punctuation.Marker */
+.highlight .w { color: var(--jp-mirror-editor-variable-color) } /* Text.Whitespace */
+.highlight .mb { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Bin */
+.highlight .mf { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Float */
+.highlight .mh { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Hex */
+.highlight .mi { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Integer */
+.highlight .mo { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Oct */
+.highlight .sa { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Affix */
+.highlight .sb { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Backtick */
+.highlight .sc { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Char */
+.highlight .dl { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Delimiter */
+.highlight .sd { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Doc */
+.highlight .s2 { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Double */
+.highlight .se { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Escape */
+.highlight .sh { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Heredoc */
+.highlight .si { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Interpol */
+.highlight .sx { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Other */
+.highlight .sr { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Regex */
+.highlight .s1 { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Single */
+.highlight .ss { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Symbol */
+.highlight .il { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Integer.Long */
+</style>
+
+<style type="text/css">
+/* Overrides of notebook CSS for static HTML export */
+div.entry-content {
+  overflow: visible;
+  padding: 8px;
+}
+.input_area {
+  padding: 0.2em;
+}
+
+a.heading-anchor {
+ white-space: normal;
+}
+
+.rendered_html
+code {
+ font-size: .8em;
+}
+
+pre.ipynb {
+  color: black;
+  background: #f7f7f7;
+  border: none;
+  box-shadow: none;
+  margin-bottom: 0;
+  padding: 0;
+  margin: 0px;
+  font-size: 13px;
+}
+
+/* remove the prompt div from text cells */
+div.text_cell .prompt {
+    display: none;
+}
+
+/* remove horizontal padding from text cells, */
+/* so it aligns with outer body text */
+div.text_cell_render {
+    padding: 0.5em 0em;
+}
+
+img.anim_icon{padding:0; border:0; vertical-align:middle; -webkit-box-shadow:none; -box-shadow:none}
+
+div.collapseheader {
+    width=100%;
+    background-color:#d3d3d3;
+    padding: 2px;
+    cursor: pointer;
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+</style>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true,
+        displayMath: [['$$','$$'], ["\\[","\\]"]]
+    }
+});
+</script>
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+    $("div.collapseheader").click(function () {
+    $header = $(this).children("span").first();
+    $codearea = $(this).children(".input_area");
+    console.log($(this).children());
+    $codearea.slideToggle(500, function () {
+        $header.text(function () {
+            return $codearea.is(":visible") ? "Collapse Code" : "Expand Code";
+        });
+    });
+});
+});
+</script>
+
+
+
+
+    <!-- http://t.co/dKP3o1e -->
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+    <link href="https://spapas.github.io/favicon.png" rel="icon">
+
+    <link href="https://spapas.github.io/theme/css/main.css" media="screen, projection" rel="stylesheet"
+      type="text/css">
+
+    <link href="https://spapas.github.io/theme/css/extra_style.css" media="screen, projection" rel="stylesheet"
+      type="text/css">
+
+    <link href="https://fonts.googleapis.com/css?family=Fira+Mono|Fira+Sans:400,700&amp;subset=greek" rel="stylesheet">
+
+<style>
+#gHPzseYvFrhZ123 {
+  padding: 5px !important;
+  display: block;
+  margin-bottom: 10px !important;
+  background: #900;
+  color: #fff;
+  border-radius: 5px;
+  font-size: 1.0rem !important;
+}
+</style>
+
+
+  <script>
+    
+      
+  </script>
+
+    <script data-ad-client="ca-pub-7673322832689008" async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
+      onerror="adBlockFunction();"></script>
+  </head>
+
+<body>
+  <header role="banner"><hgroup>
+  <h1><a href="https://spapas.github.io/">/var/</a></h1>
+    <h2>Various programming stuff</h2>
+</hgroup></header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+</ul>
+
+
+<ul class="main-navigation">
+      <li >
+        <a href="https://spapas.github.io/category/ai.html">Ai</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/android.html">Android</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/clojure.html">Clojure</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/css.html">Css</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/django.html">Django</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/elixir.html">Elixir</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/flask.html">Flask</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/gaming.html">Gaming</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/git.html">Git</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/html.html">Html</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/javascript.html">Javascript</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/networking.html">Networking</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/pelican.html">Pelican</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/postgresql.html">Postgresql</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/python.html">Python</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/spring.html">Spring</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/unix.html">Unix</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/wagtail.html">Wagtail</a>
+      </li>
+</ul></nav>
+  <div id="main">
+    <div id="content">
+    <div id="gHPzseYvFrhZ123">
+      Hello! If you are using an ad blocker but find something useful here 
+      and want to support me please consider disabling your ad blocker for this site. 
+      <br />
+      <br />
+      Thank you,<br />
+      Serafeim
+      
+    </div>
+<div class="blog-index">
+  		<article>
+<header>
+      <h1 class="entry-title">
+        <a href="https://spapas.github.io/2019/07/25/declarative-ecto-query-filters/">Declarative Ecto query filters</a>
+      </h1>
+    <p class="meta">
+<time datetime="2019-07-25T14:20:00+03:00" pubdate>Thu 25 July 2019</time>    </p>
+</header>
+
+<div class="entry-content"><p>Continuing my Elixir <a class="reference external" href="https://spapas.github.io/2019/06/04/phoenix-form-select2-ajax/">journey</a> I&#8217;d like to discuss here a method to implement one of my
+<a class="reference external" href="https://spapas.github.io/2017/10/11/essential-django-packages/">favorite Django features</a>: Declarative query filters. This functionality is not a core Django
+feature but it is offered
+through the excellent <a class="reference external" href="https://github.com/carltongibson/django-filter/:">django-filter</a> package: Using this, you can create a <tt class="docutils literal">Filter</tt> class which defines
+which fields are to be used for filtering the queryset and how each field will be queried (i.e using
+things like exact, like, year of date&nbsp;etc).</p>
+<p>This is a functionality I am greatly missing in Elixir/phoenix
+so I&#8217;ve tried implementing it on my own. Of course, django-filter has various other capabilities that
+result from the implicit generation of things that Django offers like automatically creating the html
+for the declared fields, automatically declare the fields based on their types etc but such things are
+not supported by phoenix in any case so I won&#8217;t be trying in them&nbsp;here.</p>
+<p>During my research I&#8217;ve seen a bunch of blog posts or packages about this thing however they didn&#8217;t
+properly support joins (i.e you could only filter on fields on a specific schema) or needed too much
+work to filter on joins (i.e define different filters for each part of the join). In the solution
+I&#8217;ll present here you&#8217;ll just define a filter for the specific query you need to filter no matter how
+many joins it has (just like in&nbsp;django-filters).</p>
+<div class="section" id="what-will-it-do">
+<h2>What will it&nbsp;do</h2>
+<p>The solution is more or less a self contained Elixir module named <tt class="docutils literal">QueryFilterEx</tt> that can be used
+to declaratively filter your queries.
+To use that you&#8217;ll need to declare your filters using
+a simple array of maps. The filters should then be added in your form using a different input
+for each filter; then your queryset will be filtered with all the values you&#8217;ve added to the
+inputs using <tt class="docutils literal"><span class="caps">AND</span></tt>.</p>
+<p>The module has a very simple <span class="caps">API</span> consisting of three&nbsp;functions:</p>
+<ul class="simple">
+<li><tt class="docutils literal">get_changeset_from_params(params, filters)</tt>: Pass it the <tt class="docutils literal"><span class="caps">GET</span></tt> request parameters you got from your form and the declared filters array to return you a proper changeset (which you can then use to build your form in your&nbsp;html)</li>
+<li><tt class="docutils literal">make_filter_changeset(filters, params)</tt>: This function actually generates the changeset using the filters and a <tt class="docutils literal">Map</tt> of <tt class="docutils literal">filter_name: value</tt> pairs (it is actually used by <tt class="docutils literal">get_changeset_from_params</tt>)</li>
+<li><tt class="docutils literal">filter(query, changeset, filters)</tt>: Filter the <tt class="docutils literal">query</tt> using the previously created <tt class="docutils literal">changeset</tt> and the declared filters&nbsp;array</li>
+</ul>
+<p>You can find a sample of the technique presented in this article in my <span class="caps">PHXCRD</span> repository:
+<a class="reference external" href="https://github.com/spapas/phxcrd">https://github.com/spapas/phxcrd</a>  for example in the <tt class="docutils literal">user_controller</tt> or <tt class="docutils literal">authority_controller</tt>.</p>
+</div>
+<div class="section" id="preparing-the-query">
+<h2>Preparing the&nbsp;query</h2>
+<p>In order to use the <tt class="docutils literal">QueryFilterEx</tt> module you&#8217;ll need to properly &#8220;prepare&#8221; your Ecto query. By preparing
+I don&#8217;t mean a big deal just the fact that you&#8217;ll need to <em>name all your relations</em>  (or at least name all
+the relations you&#8217;re going to use for filtering). This is very simple to do, for example for the following&nbsp;query:</p>
+<div class="highlight"><pre><span></span><span class="n">from</span><span class="p">(</span><span class="n">a</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nc">Authority</span><span class="p">,</span>
+<span class="w">  </span><span class="ss">join</span><span class="p">:</span><span class="w"> </span><span class="n">ak</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nc">AuthorityKind</span><span class="p">,</span>
+<span class="w">  </span><span class="ss">on</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="ss">id</span><span class="p">:</span><span class="w"> </span><span class="n">a</span><span class="o">.</span><span class="n">authority_kind_id</span><span class="p">],</span>
+<span class="w">  </span><span class="ss">preload</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="ss">authority_kind</span><span class="p">:</span><span class="w"> </span><span class="n">ak</span><span class="p">]</span>
+<span class="p">)</span>
+</pre></div>
+<p>you can name the relations by adding two <tt class="docutils literal">as:</tt> atoms like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><span class="n">from</span><span class="p">(</span><span class="n">a</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nc">Authority</span><span class="p">,</span><span class="w"> </span><span class="ss">as</span><span class="p">:</span><span class="w"> </span><span class="ss">:authority</span><span class="p">,</span>
+<span class="w">  </span><span class="ss">join</span><span class="p">:</span><span class="w"> </span><span class="n">ak</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nc">AuthorityKind</span><span class="p">,</span><span class="w"> </span><span class="ss">as</span><span class="p">:</span><span class="w"> </span><span class="ss">:authority_kind</span><span class="p">,</span>
+<span class="w">  </span><span class="ss">on</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="ss">id</span><span class="p">:</span><span class="w"> </span><span class="n">a</span><span class="o">.</span><span class="n">authority_kind_id</span><span class="p">],</span>
+<span class="w">  </span><span class="ss">preload</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="ss">authority_kind</span><span class="p">:</span><span class="w"> </span><span class="n">ak</span><span class="p">]</span>
+<span class="p">)</span>
+</pre></div>
+<p>So after each <cite>join:</cite> you&#8217;ll add a name for your joined relation (and also add a name for your initial
+relation). Please notice that you can use any name you want for these (not related to the schema&nbsp;names).</p>
+</div>
+<div class="section" id="declaring-the-filters">
+<h2>Declaring the&nbsp;filters</h2>
+<p>To declare the filters you&#8217;ll just add an array of simple Elixir maps. Each map must have the following&nbsp;fields:</p>
+<ul class="simple">
+<li><tt class="docutils literal">:name</tt> This is the name of the specific filter; it is mainly used in conjunction with the queryset and the form fields to set initial values&nbsp;etc</li>
+<li><tt class="docutils literal">:type</tt> This is the type of the specific filter; it should be a proper Ecto type like <tt class="docutils literal">:string</tt>, <tt class="docutils literal">:date</tt>, <tt class="docutils literal">:integer</tt> etc. This is needed to properly cast the values and catch&nbsp;errors</li>
+<li><tt class="docutils literal">:binding</tt> This is the name of the relation this filter concerns which you defined in your query using <tt class="docutils literal">:as</tt> (discussed in previous&nbsp;section)</li>
+<li><tt class="docutils literal">:field_name</tt> This is the actual name of the field you want to filter&nbsp;on</li>
+<li><tt class="docutils literal">:method</tt> How to filter on this field; I&#8217;ve defined a couple of methods I needed but you can implement anything you&nbsp;want</li>
+</ul>
+<p>The methods I&#8217;ve implemented are the&nbsp;following:</p>
+<ul class="simple">
+<li><tt class="docutils literal">:eq</tt> Equality</li>
+<li><tt class="docutils literal">:ilike</tt> Field value starts with the input - ignore&nbsp;case</li>
+<li><tt class="docutils literal">:icontains</tt> Field value contains the input - ignore&nbsp;case</li>
+<li><tt class="docutils literal">:year</tt> Field is a date or datetime an its year is the same as the&nbsp;value</li>
+<li><tt class="docutils literal">:date</tt> Field is a datetime and its date part is equal to the&nbsp;value</li>
+</ul>
+<p>Anything else will just be compared using <tt class="docutils literal">=</tt> (same as <tt class="docutils literal">:eq</tt>).</p>
+</div>
+<div class="section" id="integrating-it-with-a-controller">
+<h2>Integrating it with a&nbsp;controller</h2>
+<p>As an example let&#8217;s see how <tt class="docutils literal">QueryFilterEx</tt> is integrated it with the phxcrd user_controller.
+The query I&#8217;d like to filter on is the following (see that everything I&#8217;ll need is named using <tt class="docutils literal">:as</tt>:</p>
+<div class="highlight"><pre><span></span><span class="n">from</span><span class="p">(</span><span class="n">u</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nc">User</span><span class="p">,</span><span class="w"> </span><span class="ss">as</span><span class="p">:</span><span class="w"> </span><span class="ss">:user</span><span class="p">,</span>
+<span class="w">  </span><span class="ss">left_join</span><span class="p">:</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nc">Authority</span><span class="p">,</span><span class="w"> </span><span class="ss">as</span><span class="p">:</span><span class="w"> </span><span class="ss">:authority</span><span class="p">,</span>
+<span class="w">  </span><span class="ss">on</span><span class="p">:</span><span class="w"> </span><span class="n">a</span><span class="o">.</span><span class="n">id</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">u</span><span class="o">.</span><span class="n">authority_id</span><span class="p">,</span>
+<span class="w">  </span><span class="ss">left_join</span><span class="p">:</span><span class="w"> </span><span class="n">up</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nc">UserPermission</span><span class="p">,</span>
+<span class="w">  </span><span class="ss">on</span><span class="p">:</span><span class="w"> </span><span class="n">up</span><span class="o">.</span><span class="n">user_id</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">u</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+<span class="w">  </span><span class="ss">left_join</span><span class="p">:</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nc">Permission</span><span class="p">,</span><span class="w"> </span><span class="ss">as</span><span class="p">:</span><span class="w"> </span><span class="ss">:permission</span><span class="p">,</span>
+<span class="w">  </span><span class="ss">on</span><span class="p">:</span><span class="w"> </span><span class="n">up</span><span class="o">.</span><span class="n">permission_id</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">p</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+<span class="w">  </span><span class="ss">preload</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="ss">authority</span><span class="p">:</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="ss">permissions</span><span class="p">:</span><span class="w"> </span><span class="n">p</span><span class="p">]</span>
+<span class="p">)</span>
+</pre></div>
+<p>To declare the filters I like to create a module attribute ending with <tt class="docutils literal">filters</tt>, something like
+<tt class="docutils literal">&#64;user_filters</tt> for example. Here&#8217;s the filters I&#8217;m going to use for&nbsp;user_controller:</p>
+<div class="highlight"><pre><span></span><span class="na">@user_filters</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="p">%{</span><span class="ss">name</span><span class="p">:</span><span class="w"> </span><span class="ss">:username</span><span class="p">,</span><span class="w"> </span><span class="ss">type</span><span class="p">:</span><span class="w"> </span><span class="ss">:string</span><span class="p">,</span><span class="w"> </span><span class="ss">binding</span><span class="p">:</span><span class="w"> </span><span class="ss">:user</span><span class="p">,</span><span class="w"> </span><span class="ss">field_name</span><span class="p">:</span><span class="w"> </span><span class="ss">:username</span><span class="p">,</span><span class="w"> </span><span class="ss">method</span><span class="p">:</span><span class="w"> </span><span class="ss">:ilike</span><span class="p">},</span>
+<span class="w">  </span><span class="p">%{</span><span class="ss">name</span><span class="p">:</span><span class="w"> </span><span class="ss">:authority_name</span><span class="p">,</span><span class="w"> </span><span class="ss">type</span><span class="p">:</span><span class="w"> </span><span class="ss">:string</span><span class="p">,</span><span class="w"> </span><span class="ss">binding</span><span class="p">:</span><span class="w"> </span><span class="ss">:authority</span><span class="p">,</span><span class="w"> </span><span class="ss">field_name</span><span class="p">:</span><span class="w"> </span><span class="ss">:name</span><span class="p">,</span><span class="w"> </span><span class="ss">method</span><span class="p">:</span><span class="w"> </span><span class="ss">:icontains</span><span class="p">},</span>
+<span class="w">  </span><span class="p">%{</span><span class="ss">name</span><span class="p">:</span><span class="w"> </span><span class="ss">:permission_name</span><span class="p">,</span><span class="w"> </span><span class="ss">type</span><span class="p">:</span><span class="w"> </span><span class="ss">:string</span><span class="p">,</span><span class="w"> </span><span class="ss">binding</span><span class="p">:</span><span class="w"> </span><span class="ss">:permission</span><span class="p">,</span><span class="w"> </span><span class="ss">field_name</span><span class="p">:</span><span class="w"> </span><span class="ss">:name</span><span class="p">,</span><span class="w"> </span><span class="ss">method</span><span class="p">:</span><span class="w"> </span><span class="ss">:ilike</span><span class="p">},</span>
+<span class="w">  </span><span class="p">%{</span><span class="ss">name</span><span class="p">:</span><span class="w"> </span><span class="ss">:last_login_date</span><span class="p">,</span><span class="w"> </span><span class="ss">type</span><span class="p">:</span><span class="w"> </span><span class="ss">:date</span><span class="p">,</span><span class="w"> </span><span class="ss">binding</span><span class="p">:</span><span class="w"> </span><span class="ss">:user</span><span class="p">,</span><span class="w"> </span><span class="ss">field_name</span><span class="p">:</span><span class="w"> </span><span class="ss">:last_login</span><span class="p">,</span><span class="w"> </span><span class="ss">method</span><span class="p">:</span><span class="w"> </span><span class="ss">:date</span><span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+<p>So it will check if the <tt class="docutils literal">user.username</tt> and <tt class="docutils literal">permission.name</tt> start with the passed value,
+<tt class="docutils literal">authority.name</tt> contains the passed value and if the <tt class="docutils literal">user.login_date</tt> (which is a datetime)
+is the same as the passed date&nbsp;value.</p>
+<p>Finally, here&#8217;s the full code of the index&nbsp;controller:</p>
+<div class="highlight"><pre><span></span><span class="kd">def</span><span class="w"> </span><span class="n">index</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span><span class="w"> </span><span class="n">params</span><span class="p">)</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span><span class="n">changeset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nc">QueryFilterEx</span><span class="o">.</span><span class="n">get_changeset_from_params</span><span class="p">(</span><span class="n">params</span><span class="p">,</span><span class="w"> </span><span class="na">@user_filters</span><span class="p">)</span>
+
+<span class="w">  </span><span class="n">users</span><span class="w"> </span><span class="o">=</span>
+<span class="w">    </span><span class="n">from</span><span class="p">(</span><span class="n">u</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nc">User</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">as</span><span class="p">:</span><span class="w"> </span><span class="ss">:user</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">left_join</span><span class="p">:</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nc">Authority</span><span class="p">,</span><span class="w"> </span><span class="ss">as</span><span class="p">:</span><span class="w"> </span><span class="ss">:authority</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">on</span><span class="p">:</span><span class="w"> </span><span class="n">a</span><span class="o">.</span><span class="n">id</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">u</span><span class="o">.</span><span class="n">authority_id</span><span class="p">,</span>
+
+<span class="w">      </span><span class="ss">left_join</span><span class="p">:</span><span class="w"> </span><span class="n">up</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nc">UserPermission</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">on</span><span class="p">:</span><span class="w"> </span><span class="n">up</span><span class="o">.</span><span class="n">user_id</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">u</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">left_join</span><span class="p">:</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nc">Permission</span><span class="p">,</span><span class="w"> </span><span class="ss">as</span><span class="p">:</span><span class="w"> </span><span class="ss">:permission</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">on</span><span class="p">:</span><span class="w"> </span><span class="n">up</span><span class="o">.</span><span class="n">permission_id</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">p</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">preload</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="ss">authority</span><span class="p">:</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="ss">permissions</span><span class="p">:</span><span class="w"> </span><span class="n">p</span><span class="p">]</span>
+<span class="w">    </span><span class="p">)</span>
+<span class="w">    </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">QueryFilterEx</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">changeset</span><span class="p">,</span><span class="w"> </span><span class="na">@user_filters</span><span class="p">)</span>
+<span class="w">    </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">Repo</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+<span class="w">  </span><span class="n">render</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;index.html&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">users</span><span class="p">:</span><span class="w"> </span><span class="n">users</span><span class="p">,</span><span class="w"> </span><span class="ss">changeset</span><span class="p">:</span><span class="w"> </span><span class="n">changeset</span><span class="p">)</span>
+<span class="k">end</span>
+</pre></div>
+<p>It is very simple, it just uses the <tt class="docutils literal">get_changeset_from_params</tt> method I discussed before to
+generate the changeset and then uses it to filter the query. Also please notice that it passes
+the changeset to the template to be properly rendered in the filter&nbsp;form.</p>
+</div>
+<div class="section" id="the-template">
+<h2>The&nbsp;template</h2>
+<p>The template for the user index action is the&nbsp;following:</p>
+<div class="highlight"><pre><span></span><span class="err">&lt;</span>%= form_for @changeset, AdminRoutes.user_path(@conn, :index), [method: :get, class: &quot;filter-form&quot;, as: :filter],  fn f -&gt; %&gt;
+  <span class="err">&lt;</span>%= label f, :username, gettext &quot;Username&quot; %&gt;
+  <span class="err">&lt;</span>%= text_input f, :username  %&gt;
+
+  <span class="err">&lt;</span>%= label f, :authority_name, gettext &quot;Authority name&quot; %&gt;
+  <span class="err">&lt;</span>%= text_input f, :authority_name  %&gt;
+
+  <span class="err">&lt;</span>%= label f, :permission_name, gettext &quot;Permission name&quot; %&gt;
+  <span class="err">&lt;</span>%= text_input f, :permission_name  %&gt;
+
+  <span class="err">&lt;</span>%= label f, :last_login_date, gettext &quot;Last login date&quot; %&gt;
+  <span class="err">&lt;</span>%= text_input f, :last_login_date  %&gt;
+  <span class="err">&lt;</span>%= error_tag f, :last_login_date %&gt;
+
+  <span class="err">&lt;</span>%= submit gettext(&quot;Filter&quot;), class: &quot;ml-5&quot; %&gt;
+  <span class="err">&lt;</span>%= link gettext(&quot;Reset&quot;), to: AdminRoutes.user_path(@conn, :index), class: &quot;button button-outline ml-2&quot; %&gt;
+<span class="err">&lt;</span>% end %&gt;
+<span class="err">&lt;</span>%= for user <span class="p">&lt;</span><span class="nt">-</span> <span class="err">@</span><span class="na">users</span> <span class="na">do</span> <span class="err">%</span><span class="p">&gt;</span>
+<span class="cm">&lt;!-- display the user info --&gt;</span>
+<span class="err">&lt;</span>% end %&gt;
+</pre></div>
+<p>Notice that it gets the <tt class="docutils literal">&#64;changeset</tt> and uses it to properly fill the initial values and display
+error messages. For this case I&#8217;ve only added an error_tag for the <tt class="docutils literal">:last_login_date</tt> field,
+the others since are strings do not really need it since they will accept all&nbsp;values.</p>
+<p>Also, the form method  form must be <tt class="docutils literal">:get</tt> since we only filter (not change anything) and I&#8217;ve passed
+the <tt class="docutils literal">as: :filter</tt> option to the <tt class="docutils literal">form_for</tt> to collect the parameters under the <tt class="docutils literal">filter</tt> server side
+parameter (this can be anything you want and can be optionally be
+passed to <tt class="docutils literal">QueryFilterEx.get_changeset_from_params</tt> to know which parameter the filters are collected&nbsp;on).</p>
+</div>
+<div class="section" id="how-does-this-work">
+<h2>How does this&nbsp;work?</h2>
+<p>In this section I&#8217;ll try to explain exactly how the <tt class="docutils literal">QueryFilterEx</tt> module works. Before continuing
+I want to thank the people at the <a class="reference external" href="https://elixirforum.com/">Elixir forum</a> and #elixir-lang Freenode <span class="caps">IRC</span> chat
+that helped me with understanding how to be able to <a class="reference external" href="https://elixirforum.com/t/create-dynamic-bindings-for-where-clause/23797/7">create dynamic bindings</a>.</p>
+<p>So I&#8217;ll split this explanation in two parts: Explain <tt class="docutils literal">QueryFilterEx.get_changeset_from_params</tt>
+and <tt class="docutils literal">make_filter_changeset</tt> (easy) and
+then explain <tt class="docutils literal">QueryFilterEx.filter</tt> (more&nbsp;difficult).</p>
+<div class="section" id="queryfilterex-get-changeset-from-params-and-make-filter-changeset">
+<h3><tt class="docutils literal">QueryFilterEx.get_changeset_from_params</tt> and <tt class="docutils literal">make_filter_changeset</tt></h3>
+<p>This function generates a changeset using the <span class="caps">GET</span> request parameters and the list of declared filters. The
+create changeset is a <a class="reference external" href="https://hexdocs.pm/ecto/Ecto.Changeset.html#module-schemaless-changesets">schemaless one</a> since it may contains fields of various schemas (or fields that
+are not even exist on a schema). To generate it it uses the <a class="reference external" href="https://hexdocs.pm/ecto/Ecto.Changeset.html#cast/4">cast/4</a> function passing it a <tt class="docutils literal">{data, types}</tt>
+first parameter to generate the schemaless changeset. It has two public methods: <tt class="docutils literal">get_changeset_from_params</tt>
+and <tt class="docutils literal">make_filter_changeset</tt>. The <tt class="docutils literal">get_changeset_from_params</tt> is the one we&#8217;ve used to integrate
+with the controller and is used to retrieve the filter parameters from the request
+parameters based on the collect parameter of the form we mentioned before (the <tt class="docutils literal">as: :filter</tt>). If such
+parameters are found they will be passed to <tt class="docutils literal">make_filter_changeset</tt> (or else it will pass an empty
+struct). Notice that the <tt class="docutils literal">filter_name</tt> by default is <tt class="docutils literal">&quot;filter&quot;</tt> but you can change it to anything
+you&nbsp;want.</p>
+<div class="highlight"><pre><span></span><span class="kd">def</span><span class="w"> </span><span class="n">get_changeset_from_params</span><span class="p">(</span><span class="n">params</span><span class="p">,</span><span class="w"> </span><span class="n">filters</span><span class="p">,</span><span class="w"> </span><span class="n">filter_name</span><span class="w"> </span><span class="p">\\</span><span class="w"> </span><span class="s2">&quot;filter&quot;</span><span class="p">)</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span><span class="k">case</span><span class="w"> </span><span class="n">params</span><span class="w"> </span><span class="k">do</span>
+<span class="w">    </span><span class="p">%{</span><span class="o">^</span><span class="n">filter_name</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">filter_params</span><span class="p">}</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">      </span><span class="n">filters</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="n">make_filter_changeset</span><span class="p">(</span><span class="n">filter_params</span><span class="p">)</span>
+
+<span class="w">    </span><span class="bp">_</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">      </span><span class="n">filters</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="n">make_filter_changeset</span><span class="p">(%{})</span>
+<span class="w">  </span><span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+<p>The <tt class="docutils literal">make_filter_changeset</tt> is the function that actually creates the schemaless changeset. To do that
+it uses two private functions that operate on the passed filters array: <tt class="docutils literal">make_filter_keys</tt>
+to extract the <tt class="docutils literal">:name</tt> field of each key filter and the <tt class="docutils literal">make_filter_types</tt> to generate a
+<tt class="docutils literal">Map</tt> of <tt class="docutils literal">%{name: :type}</tt> as needed by the <tt class="docutils literal">types</tt> of the <tt class="docutils literal">{data, types}</tt> tuple passed
+to <tt class="docutils literal">cast</tt> (the <tt class="docutils literal">data</tt> is just an empty <tt class="docutils literal">Map</tt>):</p>
+<div class="highlight"><pre><span></span><span class="kd">defp</span><span class="w"> </span><span class="n">make_filter_keys</span><span class="p">(</span><span class="n">filters</span><span class="p">)</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span><span class="n">filters</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">Enum</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="o">&amp;</span><span class="w"> </span><span class="ni">&amp;1</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="kd">defp</span><span class="w"> </span><span class="n">make_filter_types</span><span class="p">(</span><span class="n">filters</span><span class="p">)</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span><span class="n">filters</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">Enum</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="o">&amp;</span><span class="p">{</span><span class="ni">&amp;1</span><span class="o">.</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="ni">&amp;1</span><span class="o">.</span><span class="n">type</span><span class="p">})</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">Map</span><span class="o">.</span><span class="n">new</span><span class="p">()</span>
+<span class="k">end</span>
+
+<span class="kd">def</span><span class="w"> </span><span class="n">make_filter_changeset</span><span class="p">(</span><span class="n">filters</span><span class="p">,</span><span class="w"> </span><span class="n">params</span><span class="p">)</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">%{}</span>
+<span class="w">  </span><span class="n">types</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">filters</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="n">make_filter_types</span>
+
+<span class="w">  </span><span class="p">{</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">types</span><span class="p">}</span>
+<span class="w">  </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">Ecto.Changeset</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">params</span><span class="p">,</span><span class="w"> </span><span class="n">filters</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="n">make_filter_keys</span><span class="p">)</span>
+<span class="w">  </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">Map</span><span class="o">.</span><span class="n">merge</span><span class="p">(%{</span><span class="ss">action</span><span class="p">:</span><span class="w"> </span><span class="ss">:insert</span><span class="p">})</span>
+<span class="k">end</span>
+</pre></div>
+<p>One interesting thing here is the <tt class="docutils literal"><span class="pre">Map.merge(%{action:</span> :insert})</tt> that is piped to the
+generated changeset. This is needed to actually display the validation errors, if there&#8217;s
+no action to the changeset (and there won&#8217;t be since we aren&#8217;t going do any updates to the database
+with this changeset) then the casting errors won&#8217;t be&nbsp;displayed.</p>
+<p>Please notice that although I use the <tt class="docutils literal">get_changeset_from_params</tt> in my controller the important
+function here is the <tt class="docutils literal">make_filter_changeset</tt>. The <tt class="docutils literal">get_changeset_from_params</tt> is mainly used to
+retrieve the filter-related <span class="caps">GET</span> query parameter; however to use <tt class="docutils literal">QueryFilterEx</tt> you can just
+create (however you want) a <tt class="docutils literal">Map</tt> of <tt class="docutils literal">filter_name: value</tt> pairs  and pass it to
+<tt class="docutils literal">make_filter_changeset</tt> to get the&nbsp;changeset.</p>
+</div>
+<div class="section" id="queryfilterex-filter">
+<h3><tt class="docutils literal">QueryFilterEx.filter</tt></h3>
+<p>The <tt class="docutils literal">filter</tt> method gets three parameters. The <tt class="docutils literal">query</tt>, the <tt class="docutils literal">changeset</tt> (that was created with
+<tt class="docutils literal">make_filter_changeset</tt>) and the declared <tt class="docutils literal">filters</tt>. This function will then check all declared <tt class="docutils literal">filters</tt>
+one by one and see if the <tt class="docutils literal">changeset</tt> contains a change for this filter (i.e if the field has a value).
+If yes it will append a <a class="reference external" href="https://hexdocs.pm/ecto/Ecto.Query.html#where/3">where/3</a> to the query based on the passed value of the <tt class="docutils literal">changeset</tt> and the
+declared filter <tt class="docutils literal">:method</tt>.</p>
+<p>To do that it just uses <tt class="docutils literal">Enum.reduce</tt> starting with the initial query as an accumulator and
+reducing on all the declared <tt class="docutils literal">filters</tt>:</p>
+<div class="highlight"><pre><span></span><span class="kd">def</span><span class="w"> </span><span class="n">filter</span><span class="p">(</span><span class="n">query</span><span class="p">,</span><span class="w"> </span><span class="n">changeset</span><span class="p">,</span><span class="w"> </span><span class="n">filters</span><span class="p">)</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span><span class="n">changes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nc">Map</span><span class="o">.</span><span class="n">fetch!</span><span class="p">(</span><span class="n">changeset</span><span class="p">,</span><span class="w"> </span><span class="ss">:changes</span><span class="p">)</span>
+<span class="w">  </span><span class="n">filters</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">Enum</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">query</span><span class="p">,</span><span class="w"> </span><span class="n">creat_where_clauses_reducer</span><span class="p">(</span><span class="n">changes</span><span class="p">))</span>
+<span class="k">end</span>
+
+<span class="kd">defp</span><span class="w"> </span><span class="n">creat_where_clauses_reducer</span><span class="p">(</span><span class="n">changes</span><span class="p">)</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span><span class="k">fn</span><span class="w"> </span><span class="p">%{</span><span class="ss">name</span><span class="p">:</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="ss">field_name</span><span class="p">:</span><span class="w"> </span><span class="n">field_name</span><span class="p">,</span><span class="w"> </span><span class="ss">binding</span><span class="p">:</span><span class="w"> </span><span class="n">binding</span><span class="p">,</span><span class="w"> </span><span class="ss">method</span><span class="p">:</span><span class="w"> </span><span class="n">method</span><span class="p">},</span><span class="w"> </span><span class="n">acc</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nc">Map</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">changes</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">)</span><span class="w"> </span><span class="k">do</span>
+<span class="w">      </span><span class="p">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="p">}</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">        </span><span class="n">acc</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="n">creat_where_clause</span><span class="p">(</span><span class="n">field_name</span><span class="p">,</span><span class="w"> </span><span class="n">binding</span><span class="p">,</span><span class="w">  </span><span class="n">method</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="p">)</span>
+
+<span class="w">      </span><span class="bp">_</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">        </span><span class="n">acc</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">  </span><span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+<p>Notice that the <tt class="docutils literal">creat_where_clauses_reducer</tt> function returns a function (the reducer) that
+<tt class="docutils literal">reduce</tt> will use. This function checks to see if the current changes of the <tt class="docutils literal">changeset</tt> contain
+the <tt class="docutils literal">filter_name:</tt>. If yes it will pass the following values to the <tt class="docutils literal">creat_where_clause</tt> function:</p>
+<ul class="simple">
+<li>The accumulated query (<tt class="docutils literal">acc</tt>)</li>
+<li>The <tt class="docutils literal">field_name:</tt>, <tt class="docutils literal">:binding</tt> and <tt class="docutils literal">:method</tt> values of the current&nbsp;filter</li>
+<li>The value of the changes of the <tt class="docutils literal">changeset</tt></li>
+</ul>
+<p>If the current <tt class="docutils literal">filter_name</tt> is not contained in the changes then it just returns the accumulated query as it&nbsp;is.</p>
+<p>Let&#8217;s now take a look at the <tt class="docutils literal">creat_where_clause</tt> function:</p>
+<div class="highlight"><pre><span></span><span class="kd">defp</span><span class="w"> </span><span class="n">creat_where_clause</span><span class="p">(</span><span class="n">acc</span><span class="p">,</span><span class="w"> </span><span class="n">field_name</span><span class="p">,</span><span class="w"> </span><span class="n">binding</span><span class="p">,</span><span class="w">  </span><span class="n">method</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span><span class="k">case</span><span class="w"> </span><span class="n">method</span><span class="w"> </span><span class="k">do</span>
+<span class="w">    </span><span class="ss">:eq</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">acc</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="n">where</span><span class="p">(</span>
+<span class="w">      </span><span class="p">[{</span><span class="o">^</span><span class="n">binding</span><span class="p">,</span><span class="w"> </span><span class="n">t</span><span class="p">}],</span>
+<span class="w">      </span><span class="n">field</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="o">^</span><span class="n">field_name</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="o">^</span><span class="n">value</span>
+<span class="w">    </span><span class="p">)</span>
+<span class="w">    </span><span class="ss">:ilike</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">acc</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="n">where</span><span class="p">(</span>
+<span class="w">      </span><span class="p">[{</span><span class="o">^</span><span class="n">binding</span><span class="p">,</span><span class="w"> </span><span class="n">t</span><span class="p">}],</span>
+<span class="w">      </span><span class="n">ilike</span><span class="p">(</span><span class="n">field</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="o">^</span><span class="n">field_name</span><span class="p">),</span><span class="w"> </span><span class="o">^</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">#{</span><span class="n">value</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">)</span>
+<span class="w">    </span><span class="p">)</span>
+<span class="w">    </span><span class="ss">:icontains</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">acc</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="n">where</span><span class="p">(</span>
+<span class="w">      </span><span class="p">[{</span><span class="o">^</span><span class="n">binding</span><span class="p">,</span><span class="w"> </span><span class="n">t</span><span class="p">}],</span>
+<span class="w">      </span><span class="n">ilike</span><span class="p">(</span><span class="n">field</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="o">^</span><span class="n">field_name</span><span class="p">),</span><span class="w"> </span><span class="o">^</span><span class="p">(</span><span class="s2">&quot;%</span><span class="si">#{</span><span class="n">value</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">)</span>
+<span class="w">    </span><span class="p">)</span>
+<span class="w">    </span><span class="ss">:year</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">acc</span><span class="w">  </span><span class="o">|&gt;</span><span class="w"> </span><span class="n">where</span><span class="p">(</span>
+<span class="w">      </span><span class="p">[{</span><span class="o">^</span><span class="n">binding</span><span class="p">,</span><span class="w"> </span><span class="n">t</span><span class="p">}],</span>
+<span class="w">      </span><span class="n">fragment</span><span class="p">(</span><span class="s2">&quot;extract (year from ?) = ?&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">field</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="o">^</span><span class="n">field_name</span><span class="p">),</span><span class="w"> </span><span class="o">^</span><span class="n">value</span><span class="p">)</span>
+<span class="w">    </span><span class="p">)</span>
+<span class="w">    </span><span class="ss">:date</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">acc</span><span class="w">  </span><span class="o">|&gt;</span><span class="w"> </span><span class="n">where</span><span class="p">(</span>
+<span class="w">      </span><span class="p">[{</span><span class="o">^</span><span class="n">binding</span><span class="p">,</span><span class="w"> </span><span class="n">t</span><span class="p">}],</span>
+<span class="w">      </span><span class="n">fragment</span><span class="p">(</span><span class="s2">&quot;? &gt;= cast(? as date) and ? &lt; (cast(? as date) + &#39;1 day&#39;::interval&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">field</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="o">^</span><span class="n">field_name</span><span class="p">),</span><span class="w"> </span><span class="o">^</span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">field</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="o">^</span><span class="n">field_name</span><span class="p">),</span><span class="w"> </span><span class="o">^</span><span class="n">value</span><span class="p">)</span>
+<span class="w">    </span><span class="p">)</span>
+<span class="w">    </span><span class="bp">_</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">acc</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="n">where</span><span class="p">(</span>
+<span class="w">      </span><span class="p">[{</span><span class="o">^</span><span class="n">binding</span><span class="p">,</span><span class="w"> </span><span class="n">t</span><span class="p">}],</span>
+<span class="w">      </span><span class="n">field</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="o">^</span><span class="n">field_name</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="o">^</span><span class="n">value</span>
+<span class="w">    </span><span class="p">)</span>
+
+<span class="w">  </span><span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+<p>This function is just a simple <tt class="docutils literal">case</tt> that pipes the accumulated query to a different <tt class="docutils literal">where</tt> clause
+depending on the <tt class="docutils literal">method:</tt>. Let&#8217;s take a closer look at what happens when <tt class="docutils literal">:method == :eq</tt>:</p>
+<div class="highlight"><pre><span></span><span class="n">acc</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="n">where</span><span class="p">(</span>
+<span class="w">  </span><span class="p">[{</span><span class="o">^</span><span class="n">binding</span><span class="p">,</span><span class="w"> </span><span class="n">t</span><span class="p">}],</span>
+<span class="w">  </span><span class="n">field</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="o">^</span><span class="n">field_name</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="o">^</span><span class="n">value</span>
+<span class="p">)</span>
+</pre></div>
+<p>This may seem a little confusing so let&#8217;s take a look at a simple <tt class="docutils literal">where</tt> first:</p>
+<div class="highlight"><pre><span></span><span class="n">from</span><span class="p">(</span><span class="n">u</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nc">User</span><span class="p">)</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="n">where</span><span class="p">([</span><span class="n">u</span><span class="p">],</span><span class="w"> </span><span class="n">u</span><span class="o">.</span><span class="n">name</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;root&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">Repo</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+</pre></div>
+<p>Nothing fancy here, now let&#8217;s add a named&nbsp;query:</p>
+<div class="highlight"><pre><span></span><span class="n">from</span><span class="p">(</span><span class="n">u</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nc">User</span><span class="p">,</span><span class="w"> </span><span class="ss">as</span><span class="p">:</span><span class="w"> </span><span class="ss">:user</span><span class="p">)</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="n">where</span><span class="p">([</span><span class="ss">user</span><span class="p">:</span><span class="w"> </span><span class="n">u</span><span class="p">],</span><span class="w"> </span><span class="n">u</span><span class="o">.</span><span class="n">name</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;root&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">Repo</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+</pre></div>
+<p>Notice that now we can declare that <tt class="docutils literal">u</tt> is an alias for the <tt class="docutils literal">users</tt> named binding. What if
+we used the tuples syntax for the <tt class="docutils literal">user: u</tt> instead of the keyword&nbsp;one:</p>
+<div class="highlight"><pre><span></span><span class="n">from</span><span class="p">(</span><span class="n">u</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nc">User</span><span class="p">,</span><span class="w"> </span><span class="ss">as</span><span class="p">:</span><span class="w"> </span><span class="ss">:user</span><span class="p">)</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="n">where</span><span class="p">([{</span><span class="ss">:user</span><span class="p">,</span><span class="w"> </span><span class="n">u</span><span class="p">}],</span><span class="w"> </span><span class="n">u</span><span class="o">.</span><span class="n">name</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;root&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">Repo</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+</pre></div>
+<p>Yes this still works. What if we wanted to use a variable for the binding name in the&nbsp;where?</p>
+<div class="highlight"><pre><span></span><span class="n">binding</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ss">:user</span>
+<span class="n">from</span><span class="p">(</span><span class="n">u</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nc">User</span><span class="p">,</span><span class="w"> </span><span class="ss">as</span><span class="p">:</span><span class="w"> </span><span class="ss">:user</span><span class="p">)</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="n">where</span><span class="p">([{</span><span class="o">^</span><span class="n">binding</span><span class="p">,</span><span class="w"> </span><span class="n">u</span><span class="p">}],</span><span class="w"> </span><span class="n">u</span><span class="o">.</span><span class="n">name</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;root&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">Repo</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+</pre></div>
+<p>I think it starts to make sense now, let&#8217;s finally use a variable for the field name&nbsp;also:</p>
+<div class="highlight"><pre><span></span><span class="n">binding</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ss">:user</span>
+<span class="n">field_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ss">:name</span>
+<span class="n">from</span><span class="p">(</span><span class="n">u</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nc">User</span><span class="p">,</span><span class="w"> </span><span class="ss">as</span><span class="p">:</span><span class="w"> </span><span class="ss">:user</span><span class="p">)</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="n">where</span><span class="p">([{</span><span class="o">^</span><span class="n">binding</span><span class="p">,</span><span class="w"> </span><span class="n">u</span><span class="p">}],</span><span class="w"> </span><span class="n">field</span><span class="p">(</span><span class="n">u</span><span class="p">,</span><span class="w"> </span><span class="o">^</span><span class="n">field_name</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;root&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">Repo</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+</pre></div>
+<p>So this is exactly how this&nbsp;works!</p>
+<p>Beyond the <tt class="docutils literal">:eq</tt> I&#8217;ve got the definitions for the other methods I described there, the most
+complex one is probably the <tt class="docutils literal">:date</tt> which is something&nbsp;like:</p>
+<div class="highlight"><pre><span></span><span class="n">where</span><span class="p">(</span>
+<span class="w">  </span><span class="p">[{</span><span class="o">^</span><span class="n">binding</span><span class="p">,</span><span class="w"> </span><span class="n">t</span><span class="p">}],</span>
+<span class="w">  </span><span class="n">fragment</span><span class="p">(</span><span class="s2">&quot;? &gt;= cast(? as date) and ? &lt; (cast(? as date) + &#39;1 day&#39;::interval&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">field</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="o">^</span><span class="n">field_name</span><span class="p">),</span><span class="w"> </span><span class="o">^</span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">field</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="o">^</span><span class="n">field_name</span><span class="p">),</span><span class="w"> </span><span class="o">^</span><span class="n">value</span><span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+<p>What this does is that it generates the following <span class="caps">SQL</span>&nbsp;fragment:</p>
+<div class="highlight"><pre><span></span><span class="n">field_name</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="k">cast</span><span class="p">(</span><span class="n">value</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nb">date</span><span class="p">)</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">field_name</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="p">(</span><span class="k">cast</span><span class="p">(</span><span class="n">value</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nb">date</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s1">&#39;1 day&#39;</span><span class="p">::</span><span class="nb">interval</span><span class="p">)</span>
+</pre></div>
+<p>You can add your own methods by adding more clauses to the case of the <tt class="docutils literal">creat_where_clause</tt> function
+and following a similar&nbsp;pattern.</p>
+</div>
+</div>
+<div class="section" id="conclusion">
+<h2>Conclusion</h2>
+<p>By using the <tt class="docutils literal">QueryFilterEx</tt> module presented here you can very quickly declare the fields you want
+to filter on and the method you want to use for each field no matter if these fields are in the same
+schema or are accessed through joins. You can easily extend the functionality of the module by adding
+your own methods. The only extra thing you need to do is to just add names to your&nbsp;queries.</p>
+</div>
+</div>
+  		</article>
+  		<article>
+<header>
+      <h1 class="entry-title">
+        <a href="https://spapas.github.io/2019/06/04/phoenix-form-select2-ajax/">Phoenix forms integration with select2 and ajax</a>
+      </h1>
+    <p class="meta">
+<time datetime="2019-06-04T14:20:00+03:00" pubdate>Tue 04 June 2019</time>    </p>
+</header>
+
+<div class="entry-content"><p>During the past months I&#8217;ve tried to implement a project using <a class="reference external" href="https://elixir-lang.org/">Elixir</a> and the <a class="reference external" href="https://phoenixframework.org/">Phoenix framework</a>. Old
+visitors of my blog will probably remember that I mainly use Django for back-end development but I decided to
+also give Phoenix a&nbsp;try.</p>
+<p>My first impressions are positive but I don&#8217;t want to go into detail in this post; I&#8217;ll try to add a more
+extensive post comparing Elixir / Phoenix with Python / Django&nbsp;someday.</p>
+<p>The problem that this particular post will try to explain is how to properly integrate a jQuery <a class="reference external" href="https://select2.org/">select2</a>
+dropdown ajax with autocomplete search to your <a class="reference external" href="https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html">Phonix Forms</a>. This seems like a very common problem however I
+couldn&#8217;t find a proper solution anywhere in the internet. It seems that most people using Phoenix prefer to
+implement their autocompletes using <span class="caps">SPA</span> like functionality (react etc). Also I found <a class="reference external" href="https://github.com/nico-amsterdam/phoenix_form_awesomplete">this project</a> that
+seems to be working, however it does not use select2 and I really didn&#8217;t like to mess with a different
+<span class="caps">JS</span> library for reasons that should be too obvious to most&nbsp;people.</p>
+<p>So here we&#8217;ll implement a simple solution for allowing your foreign key value to be autocompleted through ajax
+using select2. The specific example is that you have a User that belongs to an Authority i.e user has a field
+named <cite>authority_id</cite> which is a foreign key to authority. We&#8217;ll add a functionality to the user edit form to
+select the authority using&nbsp;ajax-autocomplete.</p>
+<p>Please notice that you can find a working version of this tutorial in my Phoenix Crud template project:
+<a class="reference external" href="https://github.com/spapas/phxcrd">https://github.com/spapas/phxcrd</a>. This project contains various other functionality that I need but you should be
+able to test the user - authority integration by following the instructions&nbsp;there.</p>
+<div class="section" id="the-schemas">
+<h2>The&nbsp;schemas</h2>
+<p>For this tutorial, we&#8217;ll use two schemas: A <tt class="docutils literal">User</tt> and an <tt class="docutils literal">Authority</tt>. Each <tt class="docutils literal">User</tt> belongs to an <tt class="docutils literal">Authority</tt>
+(thus will have a foreign key to <tt class="docutils literal">Authority</tt>; that&#8217;s what we want to set using the ajax select2). Here are
+the ecto schemas for these&nbsp;entities:</p>
+<div class="highlight"><pre><span></span><span class="kd">defmodule</span><span class="w"> </span><span class="nc">Phxcrd.Auth.Authority</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span><span class="kn">use</span><span class="w"> </span><span class="nc">Ecto.Schema</span>
+
+<span class="w">  </span><span class="kn">import</span><span class="w"> </span><span class="nc">Ecto.Changeset</span>
+<span class="w">  </span><span class="kn">alias</span><span class="w"> </span><span class="nc">Phxcrd.Auth.User</span>
+
+<span class="w">  </span><span class="n">schema</span><span class="w"> </span><span class="s2">&quot;authorities&quot;</span><span class="w"> </span><span class="k">do</span>
+<span class="w">    </span><span class="n">field</span><span class="w"> </span><span class="ss">:name</span><span class="p">,</span><span class="w"> </span><span class="ss">:string</span>
+<span class="w">    </span><span class="n">has_many</span><span class="w"> </span><span class="ss">:users</span><span class="p">,</span><span class="w"> </span><span class="nc">User</span><span class="p">,</span><span class="w"> </span><span class="ss">on_replace</span><span class="p">:</span><span class="w"> </span><span class="ss">:nilify</span>
+<span class="w">    </span><span class="n">timestamps</span><span class="p">()</span>
+<span class="w">  </span><span class="k">end</span>
+
+<span class="w">  </span><span class="na">@doc</span><span class="w"> </span><span class="no">false</span>
+<span class="w">  </span><span class="kd">def</span><span class="w"> </span><span class="n">changeset</span><span class="p">(</span><span class="n">authority</span><span class="p">,</span><span class="w"> </span><span class="n">attrs</span><span class="p">)</span><span class="w"> </span><span class="k">do</span>
+<span class="w">    </span><span class="n">authority</span>
+<span class="w">    </span><span class="o">|&gt;</span><span class="w"> </span><span class="n">cast</span><span class="p">(</span><span class="n">attrs</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="ss">:name</span><span class="p">])</span>
+<span class="w">    </span><span class="o">|&gt;</span><span class="w"> </span><span class="n">validate_required</span><span class="p">([</span><span class="ss">:name</span><span class="p">],</span><span class="w"> </span><span class="ss">message</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;The field is required&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="o">|&gt;</span><span class="w"> </span><span class="n">unique_constraint</span><span class="p">(</span><span class="ss">:name</span><span class="p">,</span><span class="w"> </span><span class="ss">message</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;The name already exists!&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="k">end</span>
+
+<span class="w">  </span><span class="kn">use</span><span class="w"> </span><span class="nc">Accessible</span>
+<span class="k">end</span>
+</pre></div>
+<div class="highlight"><pre><span></span><span class="kd">defmodule</span><span class="w"> </span><span class="nc">Phxcrd.Auth.User</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span><span class="kn">use</span><span class="w"> </span><span class="nc">Ecto.Schema</span>
+
+<span class="w">  </span><span class="kn">import</span><span class="w"> </span><span class="nc">Ecto.Changeset</span>
+<span class="w">  </span><span class="kn">alias</span><span class="w"> </span><span class="nc">Phxcrd.Auth.Authority</span>
+
+<span class="w">  </span><span class="n">schema</span><span class="w"> </span><span class="s2">&quot;users&quot;</span><span class="w"> </span><span class="k">do</span>
+<span class="w">    </span><span class="n">field</span><span class="w"> </span><span class="ss">:email</span><span class="p">,</span><span class="w"> </span><span class="ss">:string</span>
+<span class="w">    </span><span class="n">field</span><span class="w"> </span><span class="ss">:username</span><span class="p">,</span><span class="w"> </span><span class="ss">:string</span>
+<span class="w">    </span><span class="n">field</span><span class="w"> </span><span class="ss">:password_hash</span><span class="p">,</span><span class="w"> </span><span class="ss">:string</span>
+<span class="w">    </span><span class="n">field</span><span class="w"> </span><span class="ss">:password</span><span class="p">,</span><span class="w"> </span><span class="ss">:string</span><span class="p">,</span><span class="w"> </span><span class="ss">virtual</span><span class="p">:</span><span class="w"> </span><span class="no">true</span>
+
+<span class="w">    </span><span class="n">belongs_to</span><span class="w"> </span><span class="ss">:authority</span><span class="p">,</span><span class="w"> </span><span class="nc">Authority</span>
+
+<span class="w">    </span><span class="n">timestamps</span><span class="p">()</span>
+<span class="w">  </span><span class="k">end</span>
+
+<span class="w">  </span><span class="na">@doc</span><span class="w"> </span><span class="no">false</span>
+<span class="w">  </span><span class="kd">def</span><span class="w"> </span><span class="n">changeset</span><span class="p">(</span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="n">attrs</span><span class="p">)</span><span class="w"> </span><span class="k">do</span>
+<span class="w">    </span><span class="n">user</span>
+<span class="w">    </span><span class="o">|&gt;</span><span class="w"> </span><span class="n">cast</span><span class="p">(</span><span class="n">attrs</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="ss">:username</span><span class="p">,</span><span class="w"> </span><span class="ss">:email</span><span class="p">,</span><span class="w"> </span><span class="ss">:authority_id</span><span class="p">])</span>
+<span class="w">    </span><span class="o">|&gt;</span><span class="w"> </span><span class="n">validate_required</span><span class="p">([</span><span class="ss">:username</span><span class="p">,</span><span class="w"> </span><span class="ss">:email</span><span class="w"> </span><span class="p">])</span>
+<span class="w">  </span><span class="k">end</span>
+
+<span class="w">  </span><span class="kn">use</span><span class="w"> </span><span class="nc">Accessible</span>
+<span class="k">end</span>
+</pre></div>
+<p>Notice that both these entities are contained in the <tt class="docutils literal">Auth</tt> context and were created using
+<tt class="docutils literal">mix phx.gen.html</tt>; I won&#8217;t include the migrations&nbsp;here.</p>
+</div>
+<div class="section" id="the-search-api">
+<h2>The search <span class="caps">API</span></h2>
+<p>Let&#8217;s now take a look at the search api for <tt class="docutils literal">Authority</tt>. I&#8217;ve added an <tt class="docutils literal">ApiController</tt>  which contains
+the following&nbsp;function:</p>
+<div class="highlight"><pre><span></span><span class="kd">def</span><span class="w"> </span><span class="n">search_authorities</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span><span class="w"> </span><span class="n">params</span><span class="p">)</span><span class="w"> </span><span class="k">do</span>
+<span class="w">    </span><span class="n">q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;q&quot;</span><span class="p">]</span>
+
+<span class="w">    </span><span class="n">authorities</span><span class="w"> </span><span class="o">=</span>
+<span class="w">      </span><span class="n">from</span><span class="p">(</span><span class="n">a</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nc">Authority</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">where</span><span class="p">:</span><span class="w"> </span><span class="n">ilike</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="o">^</span><span class="s2">&quot;%</span><span class="si">#{</span><span class="n">q</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+<span class="w">      </span><span class="p">)</span>
+<span class="w">      </span><span class="o">|&gt;</span><span class="w"> </span><span class="n">limit</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+<span class="w">      </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">Repo</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+<span class="w">    </span><span class="n">render</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;authorities.json&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">authorities</span><span class="p">:</span><span class="w"> </span><span class="n">authorities</span><span class="p">)</span>
+<span class="k">end</span>
+</pre></div>
+<p>Notice that this retrieves a <cite>q</cite> parameter and makes an <cite>ilike</cite> query to <cite>Authority.name</cite>. It then
+passes the results to the view for rendering. Here&#8217;s the corresponding function for <cite>ApiView</cite>:</p>
+<div class="highlight"><pre><span></span><span class="kd">def</span><span class="w"> </span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;authorities.json&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">%{</span><span class="ss">authorities</span><span class="p">:</span><span class="w"> </span><span class="n">authorities</span><span class="p">})</span><span class="w"> </span><span class="k">do</span>
+<span class="w">    </span><span class="p">%{</span><span class="ss">results</span><span class="p">:</span><span class="w"> </span><span class="nc">Enum</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">authorities</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">authority_json</span><span class="o">/</span><span class="mi">1</span><span class="p">)}</span>
+<span class="w">  </span><span class="k">end</span>
+
+<span class="w">  </span><span class="kd">def</span><span class="w"> </span><span class="n">authority_json</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="w"> </span><span class="k">do</span>
+<span class="w">    </span><span class="p">%{</span>
+<span class="w">      </span><span class="ss">id</span><span class="p">:</span><span class="w"> </span><span class="n">a</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">text</span><span class="p">:</span><span class="w"> </span><span class="n">a</span><span class="o">.</span><span class="n">name</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="k">end</span>
+</pre></div>
+<p>Notice that select2 wants its results in a <span class="caps">JSON</span> struct with the following form <tt class="docutils literal">{results: [{id: 1, name: &quot;Authority <span class="pre">1&quot;}]}</span></tt>.</p>
+<p>To add this controller action to my routes I&#8217;ve added this to <tt class="docutils literal">router.ex</tt>:</p>
+<div class="highlight"><pre><span></span><span class="n">scope</span><span class="w"> </span><span class="s2">&quot;/api&quot;</span><span class="p">,</span><span class="w"> </span><span class="nc">PhxcrdWeb</span><span class="w"> </span><span class="k">do</span>
+<span class="w">    </span><span class="n">pipe_through</span><span class="w"> </span><span class="ss">:api</span>
+
+<span class="w">    </span><span class="n">get</span><span class="w"> </span><span class="s2">&quot;/search_authorities&quot;</span><span class="p">,</span><span class="w"> </span><span class="nc">ApiController</span><span class="p">,</span><span class="w"> </span><span class="ss">:search_authorities</span>
+<span class="k">end</span>
+</pre></div>
+<p>Thus if you visit <tt class="docutils literal"><span class="pre">http://127.0.0.1/search_authorities?q=A</span></tt> you should retrieve authorities containing <tt class="docutils literal">A</tt> in their&nbsp;name.</p>
+</div>
+<div class="section" id="the-controller">
+<h2>The&nbsp;controller</h2>
+<p>Concenring the <tt class="docutils literal">UserController</tt> I&#8217;ve added the following methods to it for creating and updating&nbsp;users:</p>
+<div class="highlight"><pre><span></span><span class="kd">def</span><span class="w"> </span><span class="n">new</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span><span class="w"> </span><span class="n">_params</span><span class="p">)</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span><span class="n">changeset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nc">Auth</span><span class="o">.</span><span class="n">change_user</span><span class="p">(%</span><span class="nc">User</span><span class="p">{})</span>
+<span class="w">  </span><span class="n">render</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;new.html&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">changeset</span><span class="p">:</span><span class="w"> </span><span class="n">changeset</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="kd">def</span><span class="w"> </span><span class="n">create</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span><span class="w"> </span><span class="p">%{</span><span class="s2">&quot;user&quot;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">user_params</span><span class="p">})</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span><span class="k">case</span><span class="w"> </span><span class="nc">Auth</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span><span class="n">user_params</span><span class="p">)</span><span class="w"> </span><span class="k">do</span>
+<span class="w">    </span><span class="p">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w"> </span><span class="n">user</span><span class="p">}</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">      </span><span class="n">conn</span>
+<span class="w">      </span><span class="o">|&gt;</span><span class="w"> </span><span class="n">put_flash</span><span class="p">(</span><span class="ss">:info</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">#{</span><span class="n">user</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> created!&quot;</span><span class="p">)</span>
+<span class="w">      </span><span class="o">|&gt;</span><span class="w"> </span><span class="n">redirect</span><span class="p">(</span><span class="ss">to</span><span class="p">:</span><span class="w"> </span><span class="nc">Routes</span><span class="o">.</span><span class="n">user_path</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span><span class="w"> </span><span class="ss">:show</span><span class="p">,</span><span class="w"> </span><span class="n">user</span><span class="p">))</span>
+
+<span class="w">    </span><span class="p">{</span><span class="ss">:error</span><span class="p">,</span><span class="w"> </span><span class="n">changeset</span><span class="p">}</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">      </span><span class="n">render</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;new.html&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">changeset</span><span class="p">:</span><span class="w"> </span><span class="n">changeset</span><span class="p">)</span>
+<span class="w">  </span><span class="k">end</span>
+<span class="k">end</span>
+
+<span class="kd">def</span><span class="w"> </span><span class="n">edit</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span><span class="w"> </span><span class="p">%{</span><span class="s2">&quot;id&quot;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">id</span><span class="p">})</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span><span class="n">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nc">Auth</span><span class="o">.</span><span class="n">get_user!</span><span class="p">(</span><span class="n">id</span><span class="p">)</span>
+<span class="w">  </span><span class="n">changeset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nc">Auth</span><span class="o">.</span><span class="n">change_user</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+<span class="w">  </span><span class="n">render</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;edit.html&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">user</span><span class="p">:</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="ss">changeset</span><span class="p">:</span><span class="w"> </span><span class="n">changeset</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="kd">def</span><span class="w"> </span><span class="n">update</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span><span class="w"> </span><span class="p">%{</span><span class="s2">&quot;id&quot;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;user&quot;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">user_params</span><span class="p">})</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span><span class="n">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nc">Auth</span><span class="o">.</span><span class="n">get_user!</span><span class="p">(</span><span class="n">id</span><span class="p">)</span>
+
+<span class="w">  </span><span class="n">user_params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nc">Map</span><span class="o">.</span><span class="n">merge</span><span class="p">(%{</span><span class="s2">&quot;authority_id&quot;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="no">nil</span><span class="p">},</span><span class="w"> </span><span class="n">user_params</span><span class="p">)</span>
+
+<span class="w">  </span><span class="k">case</span><span class="w"> </span><span class="nc">Auth</span><span class="o">.</span><span class="n">update_user</span><span class="p">(</span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="n">user_params</span><span class="p">)</span><span class="w"> </span><span class="k">do</span>
+<span class="w">    </span><span class="p">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w"> </span><span class="n">user</span><span class="p">}</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">      </span><span class="n">conn</span>
+<span class="w">      </span><span class="o">|&gt;</span><span class="w"> </span><span class="n">put_flash</span><span class="p">(</span><span class="ss">:info</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;User updated successfully.&quot;</span><span class="p">)</span>
+<span class="w">      </span><span class="o">|&gt;</span><span class="w"> </span><span class="n">redirect</span><span class="p">(</span><span class="ss">to</span><span class="p">:</span><span class="w"> </span><span class="nc">Routes</span><span class="o">.</span><span class="n">user_path</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span><span class="w"> </span><span class="ss">:show</span><span class="p">,</span><span class="w"> </span><span class="n">user</span><span class="p">))</span>
+
+<span class="w">    </span><span class="p">{</span><span class="ss">:error</span><span class="p">,</span><span class="w"> </span><span class="p">%</span><span class="nc">Ecto.Changeset</span><span class="p">{}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">changeset</span><span class="p">}</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">      </span><span class="n">render</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;edit.html&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">user</span><span class="p">:</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="ss">changeset</span><span class="p">:</span><span class="w"> </span><span class="n">changeset</span><span class="p">)</span>
+<span class="w">  </span><span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+<p>Most of these are more or less the default things that <tt class="docutils literal">mix phx.gen.html</tt> creates.
+One thing that may seem a strange here is the <tt class="docutils literal">user_params = <span class="pre">Map.merge(%{&quot;authority_id&quot;</span> =&gt; nil}, user_params)</tt>
+line of <tt class="docutils literal">update</tt>. What happens here is that I want to be able to clear the authority of a user (I&#8217;ll
+explain how in the next sections). If I do
+that then the <tt class="docutils literal">user_params</tt> that is passed to <tt class="docutils literal">update</tt> will <em>not</em> contain an <tt class="docutils literal">authority_id</tt> key thus
+the <tt class="docutils literal">authority_id</tt> won&#8217;t be changed at all (so even though I cleared it, it will keep its previous value after
+I save it). To fix that I set a default value of <tt class="docutils literal">nil</tt> to <tt class="docutils literal">authority_id</tt>; if the user has actually selected
+an authority from the form this will be overriden when merging the two maps. So the resulting <tt class="docutils literal">user_params</tt> will
+<em>always</em> contain an <tt class="docutils literal">authority_id</tt> key, either set to nil or to the selected&nbsp;authority.</p>
+<p>Beyond that I wont&#8217; go into detail explaining the above functions,  but if something seems strange feel free to ask. I
+also won&#8217;t explain the <tt class="docutils literal">Auth.*</tt> functions; all these are created by phoenix in the context&nbsp;module.</p>
+</div>
+<div class="section" id="the-view">
+<h2>The&nbsp;view</h2>
+<p>The <tt class="docutils literal">UserView</tt> module contains a simple but very important&nbsp;function:</p>
+<div class="highlight"><pre><span></span><span class="kd">def</span><span class="w"> </span><span class="n">get_select_value</span><span class="p">(</span><span class="n">changeset</span><span class="p">,</span><span class="w"> </span><span class="n">attr</span><span class="p">)</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span><span class="k">case</span><span class="w"> </span><span class="n">changeset</span><span class="o">.</span><span class="n">changes</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span><span class="w"> </span><span class="k">do</span>
+<span class="w">    </span><span class="no">nil</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nc">Map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">changeset</span><span class="o">.</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">attr</span><span class="p">)</span>
+<span class="w">    </span><span class="n">z</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">z</span>
+<span class="w">  </span><span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+<p>This functions gets two parameters: The changeset and the name of the attribute (<tt class="docutils literal">:authority_id</tt> in our case). What
+it does is to first check if this attribute is contained in the changeset.changes; if yes it will return that value. If
+it isn&#8217;t contained in the changeset.changes then it will return the value of changeset.data for that&nbsp;attribute.</p>
+<p>This is a little complex but let&#8217;s try to understand its logic: When you start editing a <tt class="docutils literal">User</tt> you want to display
+the current authority of that instance. However, when you submit an edited user and retrieve an errored form (for example
+because you forgot to fill the username) you want to display the authority that <em>was submitted</em> in the form. So the
+<tt class="docutils literal">changeset.changes</tt> contains the changes that were submitted just before while the <tt class="docutils literal">changeset.data</tt> contain the
+initial value of the&nbsp;struct.</p>
+<p><strong>Update 02/07/2019:</strong> Please notice that instead of using the
+<tt class="docutils literal">get_select_value</tt> I presented before you can use the
+<tt class="docutils literal">Ecto.Changeset.get_field</tt> function that does exactly this! So
+<tt class="docutils literal">get_select_value</tt> could be defined like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><span class="kd">def</span><span class="w"> </span><span class="n">get_select_value</span><span class="p">(</span><span class="n">changeset</span><span class="p">,</span><span class="w"> </span><span class="n">attr</span><span class="p">)</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span><span class="n">changeset</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">Ecto.Changeset</span><span class="o">.</span><span class="n">get_field</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+<div class="section" id="the-form-template">
+<h2>The form&nbsp;template</h2>
+<p>Both the <tt class="docutils literal">:new</tt> and <tt class="docutils literal">:edit</tt> actions include a common form.html.eex&nbsp;template:</p>
+<div class="highlight"><pre><span></span><span class="err">&lt;</span>%= form_for @changeset, @action, fn f -&gt; %&gt;
+  <span class="err">&lt;</span>%= if @changeset.action do %&gt;
+  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;alert alert-danger&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span><span class="err">&lt;</span>%= gettext(&quot;Problems while saving&quot;) %&gt;<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+  <span class="err">&lt;</span>% end %&gt;
+  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#39;row&#39;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#39;column&#39;</span><span class="p">&gt;</span>
+      <span class="err">&lt;</span>%= label f, :username %&gt;
+      <span class="err">&lt;</span>%= text_input f, :username %&gt;
+      <span class="err">&lt;</span>%= error_tag f, :username %&gt;
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#39;column&#39;</span><span class="p">&gt;</span>
+      <span class="err">&lt;</span>%= label f, :email %&gt;
+      <span class="err">&lt;</span>%= text_input f, :email %&gt;
+      <span class="err">&lt;</span>%= error_tag f, :email %&gt;
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+
+  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#39;row&#39;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#39;column&#39;</span><span class="p">&gt;</span>
+      <span class="err">&lt;</span>%= label f, :authority %&gt;
+      <span class="err">&lt;</span>%= select(f,
+        :authority_id, [
+          (with sv when not is_nil(sv) <span class="p">&lt;</span><span class="nt">-</span> <span class="na">get_select_value</span><span class="err">(@</span><span class="na">changeset</span><span class="err">,</span> <span class="na">:authority_id</span><span class="err">),</span>
+                                     <span class="na">a</span> <span class="err">&lt;</span><span class="na">-</span> <span class="na">Phxcrd</span><span class="err">.</span><span class="na">Auth</span><span class="err">.</span><span class="na">get_authority</span><span class="err">!(</span><span class="na">sv</span><span class="err">),</span> <span class="na">do:</span> <span class="err">{</span><span class="na">a</span><span class="err">.</span><span class="na">name</span><span class="err">,</span> <span class="na">a</span><span class="err">.</span><span class="na">id</span><span class="err">})</span>
+        <span class="err">],</span>
+        <span class="na">style:</span> <span class="err">&quot;</span><span class="na">width:</span> <span class="na">100</span><span class="err">%&quot;)</span>
+        <span class="err">%</span><span class="p">&gt;</span>
+      <span class="err">&lt;</span>%= error_tag f, :authority_id %&gt;
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+
+  <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+
+  <span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>
+    <span class="err">&lt;</span>%= submit gettext(&quot;Save&quot;) %&gt;
+  <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="err">&lt;</span>% end %&gt;
+</pre></div>
+<p>This is a custom Phoenix form but it has the following addition which is more or less the meat of this article
+(along with the <tt class="docutils literal">get_select_value</tt> function I explained&nbsp;before):</p>
+<div class="highlight"><pre><span></span><span class="n">select</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="ss">:authority_id</span><span class="p">,</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">(</span><span class="n">with</span><span class="w"> </span><span class="n">sv</span><span class="w"> </span><span class="ow">when</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="n">is_nil</span><span class="p">(</span><span class="n">sv</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">get_select_value</span><span class="p">(</span><span class="na">@changeset</span><span class="p">,</span><span class="w"> </span><span class="ss">:authority_id</span><span class="p">),</span>
+<span class="w">                                   </span><span class="n">a</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nc">Phxcrd.Auth</span><span class="o">.</span><span class="n">get_authority!</span><span class="p">(</span><span class="n">sv</span><span class="p">),</span><span class="w"> </span><span class="ss">do</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="n">a</span><span class="o">.</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="o">.</span><span class="n">id</span><span class="p">})</span>
+<span class="w">      </span><span class="p">],</span>
+<span class="w">      </span><span class="ss">style</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;width: 100%&quot;</span><span class="p">)</span>
+</pre></div>
+<p>So this will create an html select element which will contain a single value (the array in the third
+parameter of <tt class="docutils literal">select</tt>): The authority of that object or the authority that the user had submitted
+in the form. For this it uses <tt class="docutils literal">get_select_value</tt> to retrieve the :authority_id and if it&#8217;s not nil
+it passes it to <tt class="docutils literal">get_authority!</tt> to retrieve the actual authority and return a tuple with its name and&nbsp;id.</p>
+<p>By default when you create a <tt class="docutils literal">select</tt> element you&#8217;ll pass an array of all options in the third
+parameter, for&nbsp;example:</p>
+<div class="highlight"><pre><span></span><span class="n">select</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="ss">:authority_id</span><span class="p">,</span><span class="w"> </span><span class="nc">Phxcrd.Auth</span><span class="o">.</span><span class="n">list_authorities</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">Enum</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="o">&amp;</span><span class="p">{</span><span class="ni">&amp;1</span><span class="o">.</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="ni">&amp;1</span><span class="o">.</span><span class="n">id</span><span class="p">}))</span>
+</pre></div>
+<p>Of course this beats the purpose of using ajax since all options will be&nbsp;rendered.</p>
+<p>The final step is to add the required custom javascript to convert that select to&nbsp;select2-with-ajax:</p>
+<div class="highlight"><pre><span></span><span class="nx">$</span><span class="p">(</span><span class="kd">function</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#user_authority_id&#39;</span><span class="p">).</span><span class="nx">select2</span><span class="p">({</span>
+<span class="w">      </span><span class="nx">allowClear</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">      </span><span class="nx">placeholder</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Select authority&#39;</span><span class="p">,</span>
+<span class="w">      </span><span class="nx">ajax</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">url</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;&lt;%= Routes.api_path(@conn, :search_authorities) %&gt;&#39;</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">dataType</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;json&#39;</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">delay</span><span class="o">:</span><span class="w"> </span><span class="mf">150</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">minimumInputLength</span><span class="o">:</span><span class="w"> </span><span class="mf">2</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">});</span>
+<span class="p">})</span>
+</pre></div>
+<p>The <span class="caps">JS</span> very rather simple; the <tt class="docutils literal">allowClear</tt> option will display an <tt class="docutils literal">x</tt> so that you can clear the
+selected authority while the ajax url will be that of the <tt class="docutils literal">:search_authorities</tt>.</p>
+</div>
+<div class="section" id="conclusion">
+<h2>Conclusion</h2>
+<p>Although this article may seem a little long, as I&#8217;ve already mentioned the most important thing
+to keep is how to properly set the value that should be displayed in your <tt class="docutils literal">select2</tt> widget. Beyond
+that everything is a walk in the park by following the&nbsp;docs.</p>
+</div>
+</div>
+  		</article>
+  		<article>
+<header>
+      <h1 class="entry-title">
+        <a href="https://spapas.github.io/2019/04/05/android-custom-filter-adapter/">How to create a custom filtered adapter in Android</a>
+      </h1>
+    <p class="meta">
+<time datetime="2019-04-05T12:20:00+03:00" pubdate>Fri 05 April 2019</time>    </p>
+</header>
+
+<div class="entry-content"><div class="section" id="introduction">
+<h2>Introduction</h2>
+<p>Android offers a nice component named <a class="reference external" href="https://developer.android.com/reference/android/widget/AutoCompleteTextView">AutoCompleteTextView</a> that can be used to auto-fill a text box from a list of values.
+In its simplest form, you just create an array adapter passing it a list of objects (that have a proper <tt class="docutils literal">toString()</tt> method).
+Then you type some characters to the textbox and by default it will filter the results searching
+in the <em>beginning of the backing object&#8217;s toString() result</em>.</p>
+<p>However there are times that you don&#8217;t want to look at the beginning of the string (because you want to look at the middle of the string) or
+you don&#8217;t want to just to search in toString() method of the object or you want to do some more fancy things in object output. For this
+you must override the <tt class="docutils literal">ArrayAdapter</tt> and add a custom <tt class="docutils literal">Filter</tt>.</p>
+<p>Unfurtunately this isn&#8217;t as straightforward as I&#8217;d like and I couldn&#8217;t find a quick and easy tutorial on how it can be&nbsp;done.</p>
+<p>So here goes nothing: In the following I&#8217;ll show you a very simple android application that will have <em>the minimum viable</em> custom filtered
+adapter implementation. You can find the whole project in github: <a class="reference external" href="https://github.com/spapas/CustomFilteredAdapeter">https://github.com/spapas/CustomFilteredAdapeter</a> but I am going to discuss
+everything here&nbsp;also.</p>
+</div>
+<div class="section" id="the-application">
+<h2>The&nbsp;application</h2>
+<p>Just create a new project with an empty activity from Android Studio. Use kotlin as the&nbsp;language.</p>
+</div>
+<div class="section" id="the-layout">
+<h2>The&nbsp;layout</h2>
+<p>I&#8217;ll keep it as simple as&nbsp;possible:</p>
+<div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span>
+<span class="nt">&lt;LinearLayout</span>
+<span class="w">        </span><span class="na">xmlns:android=</span><span class="s">&quot;http://schemas.android.com/apk/res/android&quot;</span>
+<span class="w">        </span><span class="na">xmlns:tools=</span><span class="s">&quot;http://schemas.android.com/tools&quot;</span>
+<span class="w">        </span><span class="na">android:orientation=</span><span class="s">&quot;vertical&quot;</span>
+<span class="w">        </span><span class="na">android:layout_width=</span><span class="s">&quot;match_parent&quot;</span><span class="w"> </span><span class="na">android:layout_height=</span><span class="s">&quot;match_parent&quot;</span>
+<span class="w">        </span><span class="na">tools:context=</span><span class="s">&quot;.MainActivity&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;TextView</span>
+<span class="w">            </span><span class="na">android:layout_width=</span><span class="s">&quot;match_parent&quot;</span><span class="w"> </span><span class="na">android:layout_height=</span><span class="s">&quot;wrap_content&quot;</span>
+<span class="w">            </span><span class="na">android:text=</span><span class="s">&quot;Hello World!&quot;</span>
+<span class="w">            </span><span class="na">android:textSize=</span><span class="s">&quot;32sp&quot;</span>
+<span class="w">            </span><span class="na">android:textAlignment=</span><span class="s">&quot;center&quot;</span><span class="nt">/&gt;</span>
+<span class="w">    </span><span class="nt">&lt;AutoCompleteTextView</span>
+<span class="w">            </span><span class="na">android:layout_marginTop=</span><span class="s">&quot;32dip&quot;</span>
+<span class="w">            </span><span class="na">android:layout_width=</span><span class="s">&quot;match_parent&quot;</span><span class="w"> </span><span class="na">android:layout_height=</span><span class="s">&quot;wrap_content&quot;</span>
+<span class="w">            </span><span class="na">android:id=</span><span class="s">&quot;@+id/autoCompleteTextView&quot;</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/LinearLayout&gt;</span>
+</pre></div>
+<p>You should just care about the <tt class="docutils literal">AutoCompleteTextView</tt> with an id of <tt class="docutils literal">autoCompleteTextView</tt>.</p>
+</div>
+<div class="section" id="the-backing-data-object">
+<h2>The backing data&nbsp;object</h2>
+<p>I&#8217;ll use a simple PoiDao Kotlin data class for&nbsp;this:</p>
+<div class="highlight"><pre><span></span><span class="kd">data</span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">PoiDao</span><span class="p">(</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">id</span><span class="p">:</span><span class="w"> </span><span class="kt">Int</span><span class="p">,</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">name</span><span class="p">:</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">city</span><span class="p">:</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">category_name</span><span class="p">:</span><span class="w"> </span><span class="kt">String</span>
+<span class="p">)</span>
+</pre></div>
+<p>I&#8217;d like to be able to search to both name, city and category_name of each object. To create a list of the pois to be used to the adapter I can do something&nbsp;like:</p>
+<div class="highlight"><pre><span></span><span class="kd">val</span><span class="w"> </span><span class="nv">poisArray</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">listOf</span><span class="p">(</span>
+<span class="w">    </span><span class="n">PoiDao</span><span class="p">(</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Taco Bell&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Athens&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Restaurant&quot;</span><span class="p">),</span>
+<span class="w">    </span><span class="n">PoiDao</span><span class="p">(</span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;McDonalds&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Athens&quot;</span><span class="p">,</span><span class="s">&quot;Restaurant&quot;</span><span class="p">),</span>
+<span class="w">    </span><span class="n">PoiDao</span><span class="p">(</span><span class="m">3</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;KFC&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Piraeus&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Restaurant&quot;</span><span class="p">),</span>
+<span class="w">    </span><span class="n">PoiDao</span><span class="p">(</span><span class="m">4</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Shell&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Lamia&quot;</span><span class="p">,</span><span class="s">&quot;Gas Station&quot;</span><span class="p">),</span>
+<span class="w">    </span><span class="n">PoiDao</span><span class="p">(</span><span class="m">5</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;BP&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Thessaloniki&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Gas Station&quot;</span><span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="the-custom-adapter">
+<h2>The custom&nbsp;adapter</h2>
+<p>This will be an <tt class="docutils literal">ArrayAdapter&lt;PoiDao&gt;</tt> implementing also the <tt class="docutils literal">Filterable</tt> interface:</p>
+<div class="highlight"><pre><span></span><span class="kd">inner</span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">PoiAdapter</span><span class="p">(</span><span class="n">context</span><span class="p">:</span><span class="w"> </span><span class="n">Context</span><span class="p">,</span><span class="w"> </span><span class="nd">@LayoutRes</span><span class="w"> </span><span class="kd">private</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">layoutResource</span><span class="p">:</span><span class="w"> </span><span class="kt">Int</span><span class="p">,</span><span class="w"> </span><span class="kd">private</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">allPois</span><span class="p">:</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">PoiDao</span><span class="o">&gt;</span><span class="p">):</span>
+<span class="w">    </span><span class="n">ArrayAdapter</span><span class="o">&lt;</span><span class="n">PoiDao</span><span class="o">&gt;</span><span class="p">(</span><span class="n">context</span><span class="p">,</span><span class="w"> </span><span class="n">layoutResource</span><span class="p">,</span><span class="w"> </span><span class="n">allPois</span><span class="p">),</span>
+<span class="w">    </span><span class="n">Filterable</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">var</span><span class="w"> </span><span class="nv">mPois</span><span class="p">:</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">PoiDao</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">allPois</span>
+
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">getCount</span><span class="p">():</span><span class="w"> </span><span class="kt">Int</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">mPois</span><span class="p">.</span><span class="na">size</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">getItem</span><span class="p">(</span><span class="n">p0</span><span class="p">:</span><span class="w"> </span><span class="kt">Int</span><span class="p">):</span><span class="w"> </span><span class="n">PoiDao? </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">mPois</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">p0</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">getItemId</span><span class="p">(</span><span class="n">p0</span><span class="p">:</span><span class="w"> </span><span class="kt">Int</span><span class="p">):</span><span class="w"> </span><span class="kt">Long</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// Or just return p0</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">mPois</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">p0</span><span class="p">).</span><span class="na">id</span><span class="p">.</span><span class="na">toLong</span><span class="p">()</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">getView</span><span class="p">(</span><span class="n">position</span><span class="p">:</span><span class="w"> </span><span class="kt">Int</span><span class="p">,</span><span class="w"> </span><span class="n">convertView</span><span class="p">:</span><span class="w"> </span><span class="n">View?,</span><span class="w"> </span><span class="n">parent</span><span class="p">:</span><span class="w"> </span><span class="n">ViewGroup?)</span><span class="p">:</span><span class="w"> </span><span class="n">View</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">val</span><span class="w"> </span><span class="nv">view</span><span class="p">:</span><span class="w"> </span><span class="n">TextView</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">convertView</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">TextView? </span><span class="o">?:</span><span class="w"> </span><span class="n">LayoutInflater</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="n">context</span><span class="p">).</span><span class="na">inflate</span><span class="p">(</span><span class="n">layoutResource</span><span class="p">,</span><span class="w"> </span><span class="n">parent</span><span class="p">,</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">TextView</span>
+<span class="w">        </span><span class="n">view</span><span class="p">.</span><span class="na">text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;</span><span class="si">${</span><span class="n">mPois</span><span class="o">[</span><span class="n">position</span><span class="o">]</span><span class="p">.</span><span class="na">name</span><span class="si">}</span><span class="s"> </span><span class="si">${</span><span class="n">mPois</span><span class="o">[</span><span class="n">position</span><span class="o">]</span><span class="p">.</span><span class="na">city</span><span class="si">}</span><span class="s"> (</span><span class="si">${</span><span class="n">mPois</span><span class="o">[</span><span class="n">position</span><span class="o">]</span><span class="p">.</span><span class="na">category_name</span><span class="si">}</span><span class="s">)&quot;</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">view</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">getFilter</span><span class="p">():</span><span class="w"> </span><span class="n">Filter</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// See next section</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+<p>You&#8217;ll see that we add an instance variable named <tt class="docutils literal">mPois</tt> that gets initialized in the start with <tt class="docutils literal">allPois</tt> (which is the initial list of all pois that is passed to the adapter). The mPois
+will contain the <em>filtered</em> results. Then,
+for <tt class="docutils literal">getCount</tt> and <tt class="docutils literal">getItem</tt> we return the corresponding valeus from <tt class="docutils literal">mPois</tt>; the <tt class="docutils literal">getItemId</tt> is used when you have an sqlite backed adapter but I&#8217;m including it here for&nbsp;completeness.</p>
+<p>The <tt class="docutils literal">getView</tt> will create the specific line for each item in the dropdown. As you&#8217;ll see the layout that is passed must have a <tt class="docutils literal">text</tt> child which is set based on some of the attributes of
+the corresponding poi for each position. Notice that we can use whatever view layout we want for our dropdown result line (this is the <tt class="docutils literal">layoutResource</tt> parameter) but we need to configure
+it (i.e bind it with the values of the backing object) here&nbsp;properly.</p>
+<p>Finally we create a custom instance of the <tt class="docutils literal">Filter</tt>, explained in the next&nbsp;section.</p>
+</div>
+<div class="section" id="the-custom-filter">
+<h2>The custom&nbsp;filter</h2>
+<p>The <tt class="docutils literal">getFilter</tt> creates an object instance of a Filter and returns&nbsp;it:</p>
+<div class="highlight"><pre><span></span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">getFilter</span><span class="p">():</span><span class="w"> </span><span class="n">Filter</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="k">object</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nc">Filter</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">publishResults</span><span class="p">(</span><span class="n">charSequence</span><span class="p">:</span><span class="w"> </span><span class="n">CharSequence?,</span><span class="w"> </span><span class="n">filterResults</span><span class="p">:</span><span class="w"> </span><span class="n">Filter</span><span class="p">.</span><span class="na">FilterResults</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">mPois</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">filterResults</span><span class="p">.</span><span class="na">values</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">PoiDao</span><span class="o">&gt;</span>
+<span class="w">            </span><span class="n">notifyDataSetChanged</span><span class="p">()</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">performFiltering</span><span class="p">(</span><span class="n">charSequence</span><span class="p">:</span><span class="w"> </span><span class="n">CharSequence?)</span><span class="p">:</span><span class="w"> </span><span class="n">Filter</span><span class="p">.</span><span class="na">FilterResults</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">queryString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">charSequence</span><span class="o">?.</span><span class="na">toString</span><span class="p">()</span><span class="o">?.</span><span class="na">toLowerCase</span><span class="p">()</span>
+
+<span class="w">            </span><span class="kd">val</span><span class="w"> </span><span class="nv">filterResults</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Filter</span><span class="p">.</span><span class="na">FilterResults</span><span class="p">()</span>
+<span class="w">            </span><span class="n">filterResults</span><span class="p">.</span><span class="na">values</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">queryString</span><span class="o">==</span><span class="kc">null</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">queryString</span><span class="p">.</span><span class="na">isEmpty</span><span class="p">())</span>
+<span class="w">                </span><span class="n">allPois</span>
+<span class="w">            </span><span class="k">else</span>
+<span class="w">                </span><span class="n">allPois</span><span class="p">.</span><span class="na">filter</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="nb">it</span><span class="p">.</span><span class="na">name</span><span class="p">.</span><span class="na">toLowerCase</span><span class="p">().</span><span class="na">contains</span><span class="p">(</span><span class="n">queryString</span><span class="p">)</span><span class="w"> </span><span class="o">||</span>
+<span class="w">                    </span><span class="nb">it</span><span class="p">.</span><span class="na">city</span><span class="p">.</span><span class="na">toLowerCase</span><span class="p">().</span><span class="na">contains</span><span class="p">(</span><span class="n">queryString</span><span class="p">)</span><span class="w"> </span><span class="o">||</span>
+<span class="w">                    </span><span class="nb">it</span><span class="p">.</span><span class="na">category_name</span><span class="p">.</span><span class="na">toLowerCase</span><span class="p">().</span><span class="na">contains</span><span class="p">(</span><span class="n">queryString</span><span class="p">)</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">filterResults</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+<p>This object instance overrides two methods of <tt class="docutils literal">Filter</tt>: <tt class="docutils literal">performFiltering</tt> and <tt class="docutils literal">publishResults</tt>. The <tt class="docutils literal">performFiltering</tt> is where the actual filtering is done;
+it should return a <tt class="docutils literal">FilterResults</tt> object containing a <tt class="docutils literal">values</tt> attribute with the filtered values. In this method
+we retrieve the <tt class="docutils literal">charSequence</tt> parameter and converit it to lowercase. Then, if this parameter is not empty we filter the corresponding elements of <tt class="docutils literal">allPois</tt>
+(i.e name, city and category_name in our case) using contains. If the query parameter is empty then we just return all pois. Warning java developers; here the if
+is used as an expression (i.e its result will be assigned to <tt class="docutils literal">filterResults.values</tt>).</p>
+<p>After the performFiltering has finished, the <tt class="docutils literal">publishResults</tt> method is called. This method retrieves the filtered results in its <tt class="docutils literal">filterResults</tt> parameter. Thus it sets
+<tt class="docutils literal">mPois</tt> of the custom adapter is set to the result of the filter operation and calls <tt class="docutils literal">notifyDataSetChanged</tt> to display the&nbsp;results.</p>
+</div>
+<div class="section" id="using-the-custom-adapter">
+<h2>Using the custom&nbsp;adapter</h2>
+<p>To use the custom adapter you can do something like this in your activity&#8217;s&nbsp;onCreate:</p>
+<div class="highlight"><pre><span></span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">onCreate</span><span class="p">(</span><span class="n">savedInstanceState</span><span class="p">:</span><span class="w"> </span><span class="n">Bundle?)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">super</span><span class="p">.</span><span class="na">onCreate</span><span class="p">(</span><span class="n">savedInstanceState</span><span class="p">)</span>
+<span class="w">    </span><span class="n">setContentView</span><span class="p">(</span><span class="n">R</span><span class="p">.</span><span class="na">layout</span><span class="p">.</span><span class="na">activity_main</span><span class="p">)</span>
+
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">poisArray</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">listOf</span><span class="p">(</span>
+<span class="w">        </span><span class="c1">// See previous sections</span>
+<span class="w">    </span><span class="p">)</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">adapter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PoiAdapter</span><span class="p">(</span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="n">android</span><span class="p">.</span><span class="na">R</span><span class="p">.</span><span class="na">layout</span><span class="p">.</span><span class="na">simple_list_item_1</span><span class="p">,</span><span class="w"> </span><span class="n">poisArray</span><span class="p">)</span>
+<span class="w">    </span><span class="n">autoCompleteTextView</span><span class="p">.</span><span class="na">setAdapter</span><span class="p">(</span><span class="n">adapter</span><span class="p">)</span>
+<span class="w">    </span><span class="n">autoCompleteTextView</span><span class="p">.</span><span class="na">threshold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">3</span>
+
+<span class="w">    </span><span class="n">autoCompleteTextView</span><span class="p">.</span><span class="na">setOnItemClickListener</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">parent</span><span class="p">,</span><span class="w"> </span><span class="n">_</span><span class="p">,</span><span class="w"> </span><span class="n">position</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">        </span><span class="kd">val</span><span class="w"> </span><span class="nv">selectedPoi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">parent</span><span class="p">.</span><span class="na">adapter</span><span class="p">.</span><span class="na">getItem</span><span class="p">(</span><span class="n">position</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">PoiDao?</span>
+<span class="w">        </span><span class="n">autoCompleteTextView</span><span class="p">.</span><span class="na">setText</span><span class="p">(</span><span class="n">selectedPoi</span><span class="o">?.</span><span class="na">name</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+<p>We create the PoiAdapter passing it the poisArray and <tt class="docutils literal">android.R.layout.simple_list_item_1</tt> as the layout. That layout just contains a textview named text. As we&#8217;ve already
+discussed you can pass something more complex here. The <tt class="docutils literal">thresold</tt> defined the number of characters that the user that needs to enter to do the filtering (default is&nbsp;2).</p>
+<p>Please notice that when the user clicks (selects) on an item of the dropdown we set the contents of the textview (or else it will just use the object&#8217;s toString() method to set&nbsp;it).</p>
+</div>
+</div>
+  		</article>
+  		<article>
+<header>
+      <h1 class="entry-title">
+        <a href="https://spapas.github.io/2019/02/25/django-fix-async-db/">Fixing your Django async job - database integration</a>
+      </h1>
+    <p class="meta">
+<time datetime="2019-02-25T15:20:00+02:00" pubdate>Mon 25 February 2019</time>    </p>
+</header>
+
+<div class="entry-content"><p>I&#8217;ve already written
+<a class="reference external" href="https://spapas.github.io/2015/01/27/async-tasks-with-django-rq/">two</a>
+<a class="reference external" href="https://spapas.github.io/2015/09/01/django-rq-redux/">articles</a>
+about django-rq and implementing asynchronous tasks in Django. However I&#8217;ve found out
+that there&#8217;s a very important thing missing from them: How to properly integrate
+your asynchronous tasks with your Django database. This is very important because
+if it is not done right you will start experiencing strange errors about missing
+database objects or duplicate keys. The most troublesome thing about these errors is
+that they are not consistent. Your app may work fine but for some reason you&#8217;ll see some
+of your asynchronous tasks fail with these errors. When you re-queue the async jobs everything will
+be&nbsp;ok.</p>
+<p>Of course this behavior (code that runs <em>sometimes</em>) smells of a race condition but its not easy to debug
+it if you don&#8217;t know the full&nbsp;story.</p>
+<p>In the following I will describe the cause of this error and how you can fix it. As a companion
+to this article I&#8217;ve implemented a small project that can be used to test the error and the
+fix: <a class="reference external" href="https://github.com/spapas/async-job-db-fix">https://github.com/spapas/async-job-db-fix</a>.</p>
+<p>Notice that although this article is written for django-rq it should also help people that have
+the same problems with other async job systems (like celery or&nbsp;django-q).</p>
+<div class="section" id="description-of-the-project">
+<h2>Description of the&nbsp;project</h2>
+<p>The project is very simple, you can just add a url and it will retrieve its content asynchronously and
+report its length. For the models, it just has a <tt class="docutils literal">Task</tt> model which is used to provide information about
+what we want to the asynchronous task to do and retrieve the&nbsp;result:</p>
+<div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">models</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Task</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">created_on</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">auto_now_add</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
+    <span class="n">url_length</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">PositiveIntegerField</span><span class="p">(</span><span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">job_id</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+<p>It also has a home view that can be used to start new asynchronous tasks by creating a <tt class="docutils literal">Task</tt> object
+with the url we got and passing it to the asynchronous&nbsp;task:</p>
+<div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.views.generic.edit</span><span class="w"> </span><span class="kn">import</span> <span class="n">FormView</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.forms</span><span class="w"> </span><span class="kn">import</span> <span class="n">TaskForm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.tasks</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_url_length</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Task</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">transaction</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">TasksHomeFormView</span><span class="p">(</span><span class="n">FormView</span><span class="p">):</span>
+    <span class="n">form_class</span> <span class="o">=</span> <span class="n">TaskForm</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s1">&#39;tasks_home.html&#39;</span>
+    <span class="n">success_url</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">form_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">):</span>
+        <span class="n">task</span> <span class="o">=</span> <span class="n">Task</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">])</span>
+        <span class="n">get_url_length</span><span class="o">.</span><span class="n">delay</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">TasksHomeFormView</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">form_valid</span><span class="p">(</span><span class="n">form</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_context_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">ctx</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TasksHomeFormView</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_context_data</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">ctx</span><span class="p">[</span><span class="s1">&#39;tasks&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Task</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;-created_on&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ctx</span>
+</pre></div>
+<p>And finally the asynchronous job itself that retrieves the task from the database,
+requests its url and saves its&nbsp;length:</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Task</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rq</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_current_job</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django_rq</span><span class="w"> </span><span class="kn">import</span> <span class="n">job</span>
+
+<span class="nd">@job</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_url_length</span><span class="p">(</span><span class="n">task_id</span><span class="p">):</span>
+    <span class="n">jb</span> <span class="o">=</span> <span class="n">get_current_job</span><span class="p">()</span>
+    <span class="n">task</span> <span class="o">=</span> <span class="n">Task</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+        <span class="nb">id</span><span class="o">=</span><span class="n">task_id</span>
+    <span class="p">)</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+    <span class="n">task</span><span class="o">.</span><span class="n">url_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+    <span class="n">task</span><span class="o">.</span><span class="n">job_id</span> <span class="o">=</span> <span class="n">jb</span><span class="o">.</span><span class="n">get_id</span><span class="p">()</span>
+    <span class="n">task</span><span class="o">.</span><span class="n">result</span> <span class="o">=</span> <span class="s1">&#39;OK&#39;</span>
+    <span class="n">task</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</pre></div>
+<p>The above should be fairly obvious: The user visits the homepage and enters a url at the input. When he presses submit
+the view will create a new <tt class="docutils literal">Task</tt> object with the url that the user entered and fire-off the <tt class="docutils literal">get_url_length</tt> asynchronous job passing the
+task id of the task that was just created. It will then return immediately without waiting for the asynchronous job to complete. The user will
+need to refresh to see the result of his job; this is the usual behavior with async&nbsp;jobs.</p>
+<p>The asynchronous job on the other hand will retrieve the task whose id got as a parameter from the database, do the work it needs to do
+and update the result when it is&nbsp;finished.</p>
+<p>Unfortunately, the above simple setup will <em>probably</em> behave erratically by randomly throwing database related&nbsp;errors!</p>
+</div>
+<div class="section" id="cause-of-the-problem">
+<h2>Cause of the&nbsp;problem</h2>
+<p>In the previous section I said <em>probably</em> because the erratic behavior is caused by a specific setting of your Django project; the <tt class="docutils literal">ATOMIC_REQUESTS</tt>.
+This setting can be set on your database connection and if it is <tt class="docutils literal"><span class="caps">TRUE</span></tt> then each request will be <em>atomic</em>. This means that each request will be tied with
+a database transaction i.e a transaction will be started when your request starts and commited only when your requests finishes; if for some reason your
+request throws an error then the transaction will be rolled back. An example of this setting&nbsp;is:</p>
+<div class="highlight"><pre><span></span><span class="n">DATABASES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;ENGINE&#39;</span><span class="p">:</span> <span class="s1">&#39;django.db.backends.sqlite3&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;NAME&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">BASE_DIR</span><span class="p">,</span> <span class="s1">&#39;db.sqlite3&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;ATOMIC_REQUESTS&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+<p>Now, in my opinion, <tt class="docutils literal">ATOMIC_REQUESTS</tt> is a great thing to have because it makes everything much easier. I always set it to <tt class="docutils literal">True</tt> to my projects because
+I don&#8217;t need to actually think about transactions and requests; I know that if there&#8217;s a problem in a request the whole transaction will be rolle back and no
+garbage will be left in the database. If on the other hand for some reason a request does not need to be tied to a transaction I just set it off
+for this specific transaction (using <cite>transaction.non_atomic_requests_</cite>). Please notice that by default the <tt class="docutils literal">ATOMIC_REQUESTS</tt> has a <tt class="docutils literal">False</tt> value which means that
+the database will be in autocommit mode meaning that every command will be executed&nbsp;immediately.</p>
+<p>So although the <tt class="docutils literal">ATOMIC_REQUESTS</tt> is great, it is actually the reason that there are problems with asynchronous tasks. Why? Let&#8217;s take a closer look at what the <tt class="docutils literal">form_valid</tt> of the view&nbsp;does:</p>
+<div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">form_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">):</span>
+    <span class="n">task</span> <span class="o">=</span> <span class="n">Task</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">])</span> <span class="c1">#1</span>
+    <span class="n">get_url_length</span><span class="o">.</span><span class="n">delay</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="c1">#2</span>
+    <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">TasksHomeFormView</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">form_valid</span><span class="p">(</span><span class="n">form</span><span class="p">)</span> <span class="c1">#3</span>
+</pre></div>
+<p>It creates the task in #1, fires off the asynchronous task in #2 and continues the execution of the view processing in #3. The important thing to understand
+here is that the transaction will be commited <em>only after #3</em> is finished. This means that there&#8217;s a possibility that the asynchronous task will be started
+before #3 is finished thus it won&#8217;t find the task because the task will <em>not</em> be created yet(!) This is a little counter-intuitive but you must remember
+that the async task is run by a worker which is a different process than your application server; the worker may be able to start before the transaction is&nbsp;commited.</p>
+<p>If you want to actually see the problem <em>every time</em> you can add a small delay between the start of the async task and the <tt class="docutils literal">form_valid</tt> something like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">form_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">):</span>
+    <span class="n">task</span> <span class="o">=</span> <span class="n">Task</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">])</span>
+    <span class="n">get_url_length</span><span class="o">.</span><span class="n">delay</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">TasksHomeFormView</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">form_valid</span><span class="p">(</span><span class="n">form</span><span class="p">)</span>
+</pre></div>
+<p>This will make the view more slow so the asynchronous worker will always have time to start executing the task (and get the not found error). Also notice
+that if you had <tt class="docutils literal">ATOMIC_REQUESTS: False</tt> the above code would work fine because the task would be created immediately (auto-commited) and the async job would be able to find&nbsp;it.</p>
+</div>
+<div class="section" id="the-solution">
+<h2>The&nbsp;solution</h2>
+<p>So how is this problem solved? Well it&#8217;s not that difficult now that you know what&#8217;s causing&nbsp;it!</p>
+<p>One solution would be to set <tt class="docutils literal">ATOMIC_REQUESTS</tt> to <tt class="docutils literal">False</tt> but that would make all database commands auto-commit so you&#8217;ll lose
+request-transaction-tieing. Another solution would be to set <tt class="docutils literal">ATOMIC_REQUESTS</tt> to <tt class="docutils literal">True</tt> and disable atomic requests for the specific view that starts the
+asynchronous job using <cite>transaction.non_atomic_requests_</cite>. This is a viable solution however I don&#8217;t like it because I&#8217;d lose the comfort of transaction per request
+for this specific request and I would need to add my own transaction&nbsp;handling.</p>
+<p>A third solution is to avoid messing with the database in your view and create the task object in the async job. Any parameters you want to pass to the async job would be
+passed directly to the async function. This may work fine in some cases but I find it more safe to create the task in the database before starting the async job so that
+I have better control and error handling. This way even if there&#8217;s an error in my worker and for some reason the async job never starts or it breaks before being able to
+handle the database, I will have the task object in the database because it will have been created in the&nbsp;view.</p>
+<p>Is there anything better? Isn&#8217;t there a way to start the executing the async job <em>after</em> the transaction of the
+view is commited? Actually yes, there is! For this, <a class="reference external" href="https://docs.djangoproject.com/en/2.1/topics/db/transactions/#django.db.transaction.on_commit">transaction.on_commit</a> comes to the rescue! This function
+receives a callback that will be called after the transaction is commited! Thus, to properly fix you project, you should
+change the <tt class="docutils literal">form_valid</tt> method like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">form_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">):</span>
+    <span class="n">task</span> <span class="o">=</span> <span class="n">Task</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">])</span>
+    <span class="n">transaction</span><span class="o">.</span><span class="n">on_commit</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">get_url_length</span><span class="o">.</span><span class="n">delay</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">TasksHomeFormView</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">form_valid</span><span class="p">(</span><span class="n">form</span><span class="p">)</span>
+</pre></div>
+<p>Notice that I need to use <tt class="docutils literal">lambda</tt> to create a callback function that will call <tt class="docutils literal">get_url_length.delay(task.id)</tt> when the transaction is commited. Now
+even though I have the delay there the async job will start after the transaction is commited, ie after the view handler is finished (after the 1 second&nbsp;delay).</p>
+</div>
+<div class="section" id="conclusion">
+<h2>Conclusion</h2>
+<p>From the above you should be able to understand why sometimes you have problems when your async jobs use the database. To fix it you have various
+options but at least for me, the best solution is to start your async jobs <em>after</em> the transaction is commited using <tt class="docutils literal">transaction.on_commit</tt>. Just
+change each <tt class="docutils literal">async.job.delay(parameters)</tt> call to <tt class="docutils literal">transaction.on_commit(lambda: async.job.delay(parameters))</tt> and you will be&nbsp;fine!</p>
+</div>
+</div>
+  		</article>
+  		<article>
+<header>
+      <h1 class="entry-title">
+        <a href="https://spapas.github.io/2018/11/12/du-disk-usage/">Use du to find out the disk usage of each directory in unix</a>
+      </h1>
+    <p class="meta">
+<time datetime="2018-11-12T14:20:00+02:00" pubdate>Mon 12 November 2018</time>    </p>
+</header>
+
+<div class="entry-content"><p>One usual problem I have when dealing with production servers is that their
+disks get filled.  This results in various warnings and errors and should be fixed
+immediately. The first step to resolve this issue is to actually find out where is that
+hard disk space is&nbsp;used!</p>
+<p>For this you can use the <cite>du</cite> unix tool with some parameters. The problem is that <cite>du</cite>
+has various parameters (not needed for the task at hand) and the various
+places I search for contain other info not related to this specific&nbsp;task.</p>
+<p>Thus I&#8217;ve decided to write this small blog post to help people struggling with
+this and also to help <em>me</em> avoid googling for it by searching in pages that
+also contain other <tt class="docutils literal">du</tt> recipies and also avoid the trial and error that this
+would&nbsp;require.</p>
+<p>So to print out the disk usage summary for a directory go to that directory
+and run <tt class="docutils literal">du <span class="pre">-h</span> <span class="pre">-s</span> *</tt>; you need to have access to the child subdirectories
+so probably it&#8217;s better to try this as root (unless you go to your home dir
+for&nbsp;example).</p>
+<p>Here&#8217;s a sample&nbsp;usage:</p>
+<pre class="code literal-block">
+[root&#64;server1 /]# cd /
+[root&#64;server1 /]# du -h -s *
+7.2M    bin
+55M     boot
+164K    dev
+35M     etc
+41G     home
+236M    lib
+25M     lib64
+20K     lost+found
+8.0K    media
+155G    mnt
+0       proc
+1.6G    root
+12M     sbin
+8.0K    srv
+427M    tmp
+3.2G    usr
+8.9G    var
+</pre>
+<p>The parameters are -h to print human readable sizes (G, M etc) and -s to
+print a summary usage of <em>each</em> parameter. Since this will output the
+summary for each parameter I finally pass <tt class="docutils literal">*</tt> to be changed to all files/dirs
+in that directory. If I used <tt class="docutils literal">du <span class="pre">-h</span> <span class="pre">-s</span> /tmp</tt> instead I&#8217;d get the total usage only for
+the <tt class="docutils literal">/tmp</tt> directory.</p>
+<p>Another trick that may help you quickly find out the offending directories is to
+append the <tt class="docutils literal">| grep G</tt> pipe command (i.e run <tt class="docutils literal">du <span class="pre">-h</span> <span class="pre">-s</span> * | grep G</tt>) which will
+filter out only the entries containing a <tt class="docutils literal">G</tt> (i.e only print the folders having
+more than 1 <span class="caps">GB</span> size). Yeh I know that this will also print entries that have
+also a G in their name but since there aren&#8217;t many directores that have
+G in their name you should be&nbsp;ok.</p>
+<p>If you run the above from <tt class="docutils literal">/</tt> so that <tt class="docutils literal">/proc</tt> is included you may
+get a bunch of <tt class="docutils literal">du: cannot access 'proc/nnn/task/nnn/fd/4': No such file or directory</tt>
+errors; just add the <tt class="docutils literal">2&gt; /dev/null</tt> pipe redirect to redirect the stderr output
+to <tt class="docutils literal">/dev/null</tt>, i.e run <tt class="docutils literal">du <span class="pre">-h</span> <span class="pre">-s</span> * 2&gt; /dev/null</tt>.</p>
+<p>Finally, please notice that if there are <em>lots</em> of files in your directory you&#8217;ll get
+a lot of output entries (since the <cite>*</cite> will match both files and directories).
+In this case you can use <tt class="docutils literal">echo */</tt> or <tt class="docutils literal">ls <span class="pre">-d</span> */</tt> to list only the directories;
+append that command inside a ` pair or <tt class="docutils literal">$()</tt> (to substitute for the command
+output) instead of the <tt class="docutils literal">*</tt> to only get the sizes of the
+directories, i.e run <tt class="docutils literal">du <span class="pre">-h</span> <span class="pre">-s</span> $(echo */)</tt> or <tt class="docutils literal">du <span class="pre">-h</span> <span class="pre">-s</span> `echo */`</tt>.</p>
+<p>One thing that you must be aware of is that this command may take <em>a long time</em>
+especially if you have lots of small files somewhere. Just let it run and it
+should finish after some time. If it takes too long time try to exclude any
+mounted network
+directories (either with <span class="caps">SMB</span> or <span class="caps">NFS</span>) since these will take extra long&nbsp;time.</p>
+<p>Also, if you awant a nice interactive output
+using ncurses you can download and compile the <a class="reference external" href="https://dev.yorhel.nl/ncdu">ncdu tool</a> (NCurses Disk&nbsp;Usage).</p>
+</div>
+  		</article>
+<div class="pagination">
+    <a class="prev" href="https://spapas.github.io/index7.html">&larr; Older</a>
+
+    <a class="next" href="https://spapas.github.io/index5.html">Newer &rarr;</a>
+  <br />
+</div></div>
+<aside class="sidebar">
+  
+  <section>
+    <br />
+    <a href='/feeds/all.atom.xml'>Atom</a>
+    |
+    <a href='/feeds/all.rss.xml'>RSS</a>
+  </section>
+
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <!-- Sidebar unit -->
+  <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7673322832689008" data-ad-slot="2720624730"
+    data-ad-format="auto" data-full-width-responsive="true"></ins>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+
+
+  <script async src="https://cse.google.com/cse.js?cx=612920e5ca9da850c"></script>
+  <div class="gcse-search"></div>
+
+  
+  <section>
+    <h1>Support me</h1>
+
+    You can show your appreciation for anything useful you've found here by 
+    buying me a coffee 
+    <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="spapas" data-color="#FFDD00" data-emoji=""  data-font="Lato" data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff" ></script>
+
+    or donating me some bitcoin to this address:
+    <small><pre>bc1qx42vp8napheaewhnx0rk0mttdrdrtvw6czvxhl</pre></small>
+    <svg shape-rendering="crispEdges" height="200" width="200" viewBox="0 0 29 29" class="qrcode">
+      <path fill="#FFFFFF" d="M0,0 h29v29H0z"></path><path fill="#000000" d="M0 0h7v1H0zM9 0h2v1H9zM12 0h1v1H12zM14 0h2v1H14zM18 0h2v1H18zM22,0 h7v1H22zM0 1h1v1H0zM6 1h1v1H6zM8 1h1v1H8zM11 1h1v1H11zM14 1h5v1H14zM22 1h1v1H22zM28,1 h1v1H28zM0 2h1v1H0zM2 2h3v1H2zM6 2h1v1H6zM8 2h4v1H8zM17 2h1v1H17zM22 2h1v1H22zM24 2h3v1H24zM28,2 h1v1H28zM0 3h1v1H0zM2 3h3v1H2zM6 3h1v1H6zM9 3h2v1H9zM14 3h3v1H14zM18 3h1v1H18zM22 3h1v1H22zM24 3h3v1H24zM28,3 h1v1H28zM0 4h1v1H0zM2 4h3v1H2zM6 4h1v1H6zM8 4h1v1H8zM11 4h1v1H11zM13 4h1v1H13zM15 4h2v1H15zM18 4h1v1H18zM22 4h1v1H22zM24 4h3v1H24zM28,4 h1v1H28zM0 5h1v1H0zM6 5h1v1H6zM8 5h2v1H8zM14 5h2v1H14zM19 5h2v1H19zM22 5h1v1H22zM28,5 h1v1H28zM0 6h7v1H0zM8 6h1v1H8zM10 6h1v1H10zM12 6h1v1H12zM14 6h1v1H14zM16 6h1v1H16zM18 6h1v1H18zM20 6h1v1H20zM22,6 h7v1H22zM8 7h2v1H8zM11 7h1v1H11zM15 7h1v1H15zM17 7h2v1H17zM0 8h2v1H0zM3 8h1v1H3zM6 8h2v1H6zM10 8h1v1H10zM12 8h3v1H12zM20 8h1v1H20zM22 8h3v1H22zM26 8h2v1H26zM1 9h1v1H1zM3 9h3v1H3zM8 9h1v1H8zM10 9h1v1H10zM12 9h2v1H12zM16 9h2v1H16zM20 9h1v1H20zM22 9h1v1H22zM25 9h1v1H25zM27,9 h2v1H27zM0 10h1v1H0zM3 10h2v1H3zM6 10h1v1H6zM8 10h3v1H8zM12 10h2v1H12zM16 10h1v1H16zM19 10h1v1H19zM22 10h3v1H22zM27 10h1v1H27zM0 11h1v1H0zM2 11h1v1H2zM4 11h2v1H4zM7 11h1v1H7zM13 11h4v1H13zM18 11h4v1H18zM26 11h2v1H26zM0 12h1v1H0zM2 12h3v1H2zM6 12h1v1H6zM11 12h1v1H11zM13 12h1v1H13zM15 12h3v1H15zM20 12h1v1H20zM22 12h2v1H22zM27,12 h2v1H27zM4 13h1v1H4zM8 13h3v1H8zM12 13h1v1H12zM14 13h1v1H14zM17 13h4v1H17zM25 13h2v1H25zM0 14h1v1H0zM4 14h3v1H4zM8 14h2v1H8zM11 14h3v1H11zM16 14h1v1H16zM21 14h2v1H21zM24,14 h5v1H24zM3 15h3v1H3zM7 15h2v1H7zM10 15h1v1H10zM12 15h2v1H12zM15 15h1v1H15zM17 15h2v1H17zM20 15h2v1H20zM23 15h1v1H23zM1 16h1v1H1zM4 16h1v1H4zM6 16h4v1H6zM16 16h2v1H16zM20 16h1v1H20zM23 16h1v1H23zM25 16h1v1H25zM28,16 h1v1H28zM2 17h1v1H2zM5 17h1v1H5zM7 17h2v1H7zM11 17h3v1H11zM17 17h1v1H17zM22 17h1v1H22zM25 17h1v1H25zM27,17 h2v1H27zM0 18h1v1H0zM3 18h1v1H3zM5 18h4v1H5zM10 18h1v1H10zM12 18h1v1H12zM18 18h1v1H18zM20 18h1v1H20zM22 18h2v1H22zM25,18 h4v1H25zM2 19h3v1H2zM8 19h1v1H8zM16 19h2v1H16zM21 19h1v1H21zM23 19h1v1H23zM25 19h1v1H25zM27 19h1v1H27zM0 20h1v1H0zM2 20h5v1H2zM8 20h2v1H8zM13 20h4v1H13zM19 20h6v1H19zM26 20h1v1H26zM28,20 h1v1H28zM8 21h2v1H8zM12 21h3v1H12zM16 21h1v1H16zM20 21h1v1H20zM24 21h1v1H24zM26,21 h3v1H26zM0 22h7v1H0zM8 22h3v1H8zM17 22h1v1H17zM20 22h1v1H20zM22 22h1v1H22zM24 22h2v1H24zM27 22h1v1H27zM0 23h1v1H0zM6 23h1v1H6zM10 23h2v1H10zM13 23h2v1H13zM19 23h2v1H19zM24,23 h5v1H24zM0 24h1v1H0zM2 24h3v1H2zM6 24h1v1H6zM9 24h2v1H9zM12 24h2v1H12zM17 24h1v1H17zM20 24h6v1H20zM28,24 h1v1H28zM0 25h1v1H0zM2 25h3v1H2zM6 25h1v1H6zM8 25h3v1H8zM12 25h1v1H12zM14 25h1v1H14zM18 25h1v1H18zM22 25h3v1H22zM26 25h1v1H26zM0 26h1v1H0zM2 26h3v1H2zM6 26h1v1H6zM10 26h5v1H10zM16 26h3v1H16zM21 26h1v1H21zM24 26h1v1H24zM26 26h1v1H26zM28,26 h1v1H28zM0 27h1v1H0zM6 27h1v1H6zM8 27h3v1H8zM12 27h4v1H12zM17 27h1v1H17zM20 27h1v1H20zM23 27h2v1H23zM27 27h1v1H27zM0 28h7v1H0zM8 28h3v1H8zM14 28h1v1H14zM16 28h3v1H16zM20 28h1v1H20zM22 28h1v1H22zM24 28h2v1H24zM27 28h1v1H27z"></path>
+    </svg>
+  </section>
+  
+
+  <section>
+    <h1>Subscribe</h1>
+    Do you want to get notified via email when I post new content?
+    <style>
+      .subscribe-button {
+        /* margin: 10px !important; */
+        padding: 10px !important;
+        background-color: black;
+        display: inline-block;
+        color: white !important;
+        text-decoration: none;
+
+        line-height: 36px !important;
+        height: 37px !important;
+        text-decoration: none !important;
+        display: inline-block !important;
+        color: #ffffff !important;
+        background-color: #000000 !important;
+        border-radius: 3px !important;
+        border: 1px solid transparent !important;
+        padding: 1px 9px !important;
+        font-size: 23px !important;
+        letter-spacing: 0.6px !important;
+        box-shadow: 0px 1px 2px rgba(190, 190, 190, 0.5) !important;
+        -webkit-box-shadow: 0px 1px 2px 2px rgba(190, 190, 190, 0.5) !important;
+        margin: 0 auto !important;
+        font-family: 'Cookie', cursive !important;
+        -webkit-box-sizing: border-box !important;
+        box-sizing: border-box !important;
+        -o-transition: 0.3s all linear !important;
+        -webkit-transition: 0.3s all linear !important;
+        -moz-transition: 0.3s all linear !important;
+        -ms-transition: 0.3s all linear !important;
+        transition: 0.3s all linear !important;
+
+      }
+    </style>
+    <a class='subscribe-button' target="_blank" href="http://eepurl.com/dxI3PP">Click here to subscribe!</a>
+  </section>
+
+
+  <section>
+    <h1>Recent Posts</h1>
+    <ul id="recent_posts">
+      <li class="post">
+        <a href="https://spapas.github.io/2024/08/22/multiple-erl-elixir-windows/">Multiple Erlang/Elixir versions in Windows</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/11/29/openid-connect-tutorial/">A simple OpenID connect tutorial</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/05/23/simple-django-datatables-integration/">Simple Django - DataTables integration</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/05/22/ai-auto-subtitling/">AI auto-subtitling</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/05/12/disable-your-forms/">HTML form disable after submit</a>
+      </li>
+    </ul>
+  </section>
+  <section>
+
+    <h1>Categories</h1>
+    <ul id="recent_posts">
+      <li><a href="https://spapas.github.io/category/ai.html">ai</a></li>
+      <li><a href="https://spapas.github.io/category/android.html">android</a></li>
+      <li><a href="https://spapas.github.io/category/clojure.html">clojure</a></li>
+      <li><a href="https://spapas.github.io/category/css.html">css</a></li>
+      <li><a href="https://spapas.github.io/category/django.html">django</a></li>
+      <li><a href="https://spapas.github.io/category/elixir.html">elixir</a></li>
+      <li><a href="https://spapas.github.io/category/flask.html">flask</a></li>
+      <li><a href="https://spapas.github.io/category/gaming.html">gaming</a></li>
+      <li><a href="https://spapas.github.io/category/git.html">git</a></li>
+      <li><a href="https://spapas.github.io/category/html.html">html</a></li>
+      <li><a href="https://spapas.github.io/category/javascript.html">javascript</a></li>
+      <li><a href="https://spapas.github.io/category/networking.html">networking</a></li>
+      <li><a href="https://spapas.github.io/category/pelican.html">pelican</a></li>
+      <li><a href="https://spapas.github.io/category/postgresql.html">postgresql</a></li>
+      <li><a href="https://spapas.github.io/category/python.html">python</a></li>
+      <li><a href="https://spapas.github.io/category/spring.html">spring</a></li>
+      <li><a href="https://spapas.github.io/category/unix.html">unix</a></li>
+      <li><a href="https://spapas.github.io/category/wagtail.html">wagtail</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Tags</h1>
+    <a href="https://spapas.github.io/tag/erlang.html">erlang</a>,    <a href="https://spapas.github.io/tag/elixir.html">elixir</a>,    <a href="https://spapas.github.io/tag/windows.html">windows</a>,    <a href="https://spapas.github.io/tag/openid.html">openid</a>,    <a href="https://spapas.github.io/tag/openid-connect.html">openid-connect</a>,    <a href="https://spapas.github.io/tag/oidc.html">oidc</a>,    <a href="https://spapas.github.io/tag/http.html">http</a>,    <a href="https://spapas.github.io/tag/keycloak.html">keycloak</a>,    <a href="https://spapas.github.io/tag/python.html">python</a>,    <a href="https://spapas.github.io/tag/django.html">django</a>,    <a href="https://spapas.github.io/tag/jquery.html">jquery</a>,    <a href="https://spapas.github.io/tag/datatables.html">datatables</a>,    <a href="https://spapas.github.io/tag/ai.html">ai</a>,    <a href="https://spapas.github.io/tag/whisper.html">whisper</a>,    <a href="https://spapas.github.io/tag/whispercpp.html">whisper.cpp</a>,    <a href="https://spapas.github.io/tag/subtitles.html">subtitles</a>,    <a href="https://spapas.github.io/tag/video.html">video</a>,    <a href="https://spapas.github.io/tag/auto-subtitling.html">auto-subtitling</a>,    <a href="https://spapas.github.io/tag/subtitiling.html">subtitiling</a>,    <a href="https://spapas.github.io/tag/transcribe.html">transcribe</a>,    <a href="https://spapas.github.io/tag/html.html">html</a>,    <a href="https://spapas.github.io/tag/javascript.html">javascript</a>,    <a href="https://spapas.github.io/tag/media.html">media</a>,    <a href="https://spapas.github.io/tag/storage.html">storage</a>,    <a href="https://spapas.github.io/tag/unpoly.html">unpoly</a>,    <a href="https://spapas.github.io/tag/access.html">access</a>,    <a href="https://spapas.github.io/tag/database.html">database</a>,    <a href="https://spapas.github.io/tag/accdb.html">accdb</a>,    <a href="https://spapas.github.io/tag/mdb.html">mdb</a>,    <a href="https://spapas.github.io/tag/postgresql.html">postgresql</a>,    <a href="https://spapas.github.io/tag/development.html">development</a>,    <a href="https://spapas.github.io/tag/inlines.html">inlines</a>,    <a href="https://spapas.github.io/tag/clojure.html">clojure</a>,    <a href="https://spapas.github.io/tag/cmd.html">cmd</a>,    <a href="https://spapas.github.io/tag/pdf.html">pdf</a>,    <a href="https://spapas.github.io/tag/wkhtmltopdf.html">wkhtmltopdf</a>,    <a href="https://spapas.github.io/tag/forward-proxy.html">forward-proxy</a>,    <a href="https://spapas.github.io/tag/reverse-proxy.html">reverse-proxy</a>,    <a href="https://spapas.github.io/tag/proxy.html">proxy</a>,    <a href="https://spapas.github.io/tag/networking.html">networking</a>,    <a href="https://spapas.github.io/tag/dj-rest-auth.html">dj-rest-auth</a>,    <a href="https://spapas.github.io/tag/rest.html">rest</a>,    <a href="https://spapas.github.io/tag/django-rest-framework.html">django-rest-framework</a>,    <a href="https://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="https://spapas.github.io/tag/tokens.html">tokens</a>,    <a href="https://spapas.github.io/tag/migrations.html">migrations</a>,    <a href="https://spapas.github.io/tag/foreignkey.html">foreignkey</a>,    <a href="https://spapas.github.io/tag/dark-souls.html">dark-souls</a>,    <a href="https://spapas.github.io/tag/dark-souls-2.html">dark-souls-2</a>,    <a href="https://spapas.github.io/tag/dark-souls-3.html">dark-souls-3</a>,    <a href="https://spapas.github.io/tag/autohotkey.html">autohotkey</a>,    <a href="https://spapas.github.io/tag/matplotlib.html">matplotlib</a>,    <a href="https://spapas.github.io/tag/hashids.html">hashids</a>,    <a href="https://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="https://spapas.github.io/tag/osmon.html">osmon</a>,    <a href="https://spapas.github.io/tag/phoenix.html">phoenix</a>,    <a href="https://spapas.github.io/tag/os-monitoring.html">os-monitoring</a>,    <a href="https://spapas.github.io/tag/forms.html">forms</a>,    <a href="https://spapas.github.io/tag/django-crispy-forms.html">django-crispy-forms</a>,    <a href="https://spapas.github.io/tag/django-widget-tweaks.html">django-widget-tweaks</a>,    <a href="https://spapas.github.io/tag/ecto.html">ecto</a>,    <a href="https://spapas.github.io/tag/queries.html">queries</a>,    <a href="https://spapas.github.io/tag/declarative.html">declarative</a>,    <a href="https://spapas.github.io/tag/form.html">form</a>,    <a href="https://spapas.github.io/tag/php.html">php</a>,    <a href="https://spapas.github.io/tag/select2.html">select2</a>,    <a href="https://spapas.github.io/tag/autocompelte.html">autocompelte</a>,    <a href="https://spapas.github.io/tag/ajax.html">ajax</a>,    <a href="https://spapas.github.io/tag/android.html">android</a>,    <a href="https://spapas.github.io/tag/kotlin.html">kotlin</a>,    <a href="https://spapas.github.io/tag/adapter.html">adapter</a>,    <a href="https://spapas.github.io/tag/filter.html">filter</a>,    <a href="https://spapas.github.io/tag/async.html">async</a>,    <a href="https://spapas.github.io/tag/tasks.html">tasks</a>,    <a href="https://spapas.github.io/tag/django-rq.html">django-rq</a>,    <a href="https://spapas.github.io/tag/rq.html">rq</a>,    <a href="https://spapas.github.io/tag/du.html">du</a>,    <a href="https://spapas.github.io/tag/unix.html">unix</a>,    <a href="https://spapas.github.io/tag/linux.html">linux</a>,    <a href="https://spapas.github.io/tag/disk-usage.html">disk-usage</a>,    <a href="https://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="https://spapas.github.io/tag/middleware.html">middleware</a>,    <a href="https://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="https://spapas.github.io/tag/react.html">react</a>,    <a href="https://spapas.github.io/tag/redux.html">redux</a>,    <a href="https://spapas.github.io/tag/hyperapp.html">hyperapp</a>,    <a href="https://spapas.github.io/tag/immutable.html">immutable</a>,    <a href="https://spapas.github.io/tag/es6.html">es6</a>,    <a href="https://spapas.github.io/tag/youtube.html">youtube</a>,    <a href="https://spapas.github.io/tag/youtube-dl.html">youtube-dl</a>,    <a href="https://spapas.github.io/tag/ffmpeg.html">ffmpeg</a>,    <a href="https://spapas.github.io/tag/django-rest-auth.html">django-rest-auth</a>,    <a href="https://spapas.github.io/tag/python-2.html">python-2</a>,    <a href="https://spapas.github.io/tag/python-3.html">python-3</a>,    <a href="https://spapas.github.io/tag/plpgsql.html">plpgsql</a>,    <a href="https://spapas.github.io/tag/component.html">component</a>,    <a href="https://spapas.github.io/tag/ag-grid.html">ag-grid</a>,    <a href="https://spapas.github.io/tag/grid.html">grid</a>,    <a href="https://spapas.github.io/tag/bash.html">bash</a>,    <a href="https://spapas.github.io/tag/cron.html">cron</a>,    <a href="https://spapas.github.io/tag/pandas.html">pandas</a>,    <a href="https://spapas.github.io/tag/scipy.html">scipy</a>,    <a href="https://spapas.github.io/tag/numpy.html">numpy</a>,    <a href="https://spapas.github.io/tag/pivot.html">pivot</a>,    <a href="https://spapas.github.io/tag/pivot_table.html">pivot_table</a>,    <a href="https://spapas.github.io/tag/ipython.html">ipython</a>,    <a href="https://spapas.github.io/tag/jupyter.html">jupyter</a>,    <a href="https://spapas.github.io/tag/notebook.html">notebook</a>,    <a href="https://spapas.github.io/tag/query.html">query</a>,    <a href="https://spapas.github.io/tag/q.html">q</a>,    <a href="https://spapas.github.io/tag/imgur.html">imgur</a>,    <a href="https://spapas.github.io/tag/console.html">console</a>,    <a href="https://spapas.github.io/tag/research.html">research</a>,    <a href="https://spapas.github.io/tag/debug.html">debug</a>,    <a href="https://spapas.github.io/tag/werkzeug.html">werkzeug</a>,    <a href="https://spapas.github.io/tag/django-extensions.html">django-extensions</a>,    <a href="https://spapas.github.io/tag/404.html">404</a>,    <a href="https://spapas.github.io/tag/error.html">error</a>,    <a href="https://spapas.github.io/tag/spring.html">spring</a>,    <a href="https://spapas.github.io/tag/spring-boot.html">spring-boot</a>,    <a href="https://spapas.github.io/tag/java.html">java</a>,    <a href="https://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="https://spapas.github.io/tag/profiles.html">profiles</a>,    <a href="https://spapas.github.io/tag/settings.html">settings</a>,    <a href="https://spapas.github.io/tag/properties.html">properties</a>,    <a href="https://spapas.github.io/tag/yaml.html">yaml</a>,    <a href="https://spapas.github.io/tag/configuration.html">configuration</a>,    <a href="https://spapas.github.io/tag/deploy.html">deploy</a>,    <a href="https://spapas.github.io/tag/initd.html">init.d</a>,    <a href="https://spapas.github.io/tag/react-redux.html">react-redux</a>,    <a href="https://spapas.github.io/tag/redux-thunk.html">redux-thunk</a>,    <a href="https://spapas.github.io/tag/redux-form.html">redux-form</a>,    <a href="https://spapas.github.io/tag/react-router.html">react-router</a>,    <a href="https://spapas.github.io/tag/react-router-redux.html">react-router-redux</a>,    <a href="https://spapas.github.io/tag/react-notification.html">react-notification</a>,    <a href="https://spapas.github.io/tag/history.html">history</a>,    <a href="https://spapas.github.io/tag/babel.html">babel</a>,    <a href="https://spapas.github.io/tag/babelify.html">babelify</a>,    <a href="https://spapas.github.io/tag/browserify.html">browserify</a>,    <a href="https://spapas.github.io/tag/watchify.html">watchify</a>,    <a href="https://spapas.github.io/tag/uglify.html">uglify</a>,    <a href="https://spapas.github.io/tag/boilerplate.html">boilerplate</a>,    <a href="https://spapas.github.io/tag/tutorial.html">tutorial</a>,    <a href="https://spapas.github.io/tag/introduction.html">introduction</a>,    <a href="https://spapas.github.io/tag/fixed-data-tables.html">fixed-data-tables</a>,    <a href="https://spapas.github.io/tag/fixeddatatable.html">FixedDataTable</a>,    <a href="https://spapas.github.io/tag/reportlab.html">reportlab</a>,    <a href="https://spapas.github.io/tag/xhtml2pdf.html">xhtml2pdf</a>,    <a href="https://spapas.github.io/tag/node.html">node</a>,    <a href="https://spapas.github.io/tag/npm.html">npm</a>,    <a href="https://spapas.github.io/tag/generic.html">generic</a>,    <a href="https://spapas.github.io/tag/tables.html">tables</a>,    <a href="https://spapas.github.io/tag/flux.html">flux</a>,    <a href="https://spapas.github.io/tag/jobs.html">jobs</a>,    <a href="https://spapas.github.io/tag/asynchronous.html">asynchronous</a>,    <a href="https://spapas.github.io/tag/scheduling.html">scheduling</a>,    <a href="https://spapas.github.io/tag/redis.html">redis</a>,    <a href="https://spapas.github.io/tag/pusher.html">pusher</a>,    <a href="https://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="https://spapas.github.io/tag/css.html">css</a>,    <a href="https://spapas.github.io/tag/design.html">design</a>,    <a href="https://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>,    <a href="https://spapas.github.io/tag/less.html">less</a>,    <a href="https://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="https://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="https://spapas.github.io/tag/security.html">security</a>,    <a href="https://spapas.github.io/tag/google.html">google</a>,    <a href="https://spapas.github.io/tag/flask.html">flask</a>,    <a href="https://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="https://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="https://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="https://spapas.github.io/tag/git.html">git</a>,    <a href="https://spapas.github.io/tag/github.html">github</a>,    <a href="https://spapas.github.io/tag/branching.html">branching</a>,    <a href="https://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="https://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="https://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="https://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="https://spapas.github.io/tag/rst.html">rst</a>  </section>
+
+  <section>
+    <h1>Yearly archives</h1>
+    <a href="https://spapas.github.io/posts/2013/">2013</a>,    <a href="https://spapas.github.io/posts/2014/">2014</a>,    <a href="https://spapas.github.io/posts/2015/">2015</a>,    <a href="https://spapas.github.io/posts/2016/">2016</a>,    <a href="https://spapas.github.io/posts/2017/">2017</a>,    <a href="https://spapas.github.io/posts/2018/">2018</a>,    <a href="https://spapas.github.io/posts/2019/">2019</a>,    <a href="https://spapas.github.io/posts/2020/">2020</a>,    <a href="https://spapas.github.io/posts/2021/">2021</a>,    <a href="https://spapas.github.io/posts/2022/">2022</a>,    <a href="https://spapas.github.io/posts/2023/">2023</a>,    <a href="https://spapas.github.io/posts/2024/">2024</a>  </section>
+
+
+
+  <section>
+    <h1>GitHub Repos</h1>
+    <ul id="gh_repos">
+      <li class="loading">Status updating...</li>
+    </ul>
+      <a href="https://github.com/spapas">@spapas</a> on GitHub
+    <script  src="//code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      $(function(){
+          if (!window.jXHR){
+              var jxhr = document.createElement('script');
+              jxhr.type = 'text/javascript';
+              jxhr.src = 'https://spapas.github.io/theme/js/jXHR.js';
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(jxhr, s);
+          }
+
+          github.showRepos({
+              user: 'spapas',
+              count: 5,
+              skip_forks: true,
+              target: '#gh_repos'
+          });
+      });
+    </script>
+    <script src="https://spapas.github.io/theme/js/github.js" type="text/javascript"> </script>
+  </section>
+
+
+  <section>
+    <a href="https://twitter.com/_serafeim_?ref_src=twsrc%5Etfw" class="twitter-follow-button"
+      data-show-count="false">Follow @_serafeim_</a>
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+  </section>
+
+</aside>    </div>
+  </div>
+  <footer role="contentinfo"><p>
+    Copyright &copy;  2013&ndash;2024  Serafeim Papastefanos &mdash;
+  <span class="credit">Powered by <a href="http://getpelican.com">Pelican</a></span>
+</p></footer>
+  <script src="https://spapas.github.io/theme/js/modernizr-2.0.js"></script>
+  <script src="https://spapas.github.io/theme/js/ender.js"></script>
+  <script src="https://spapas.github.io/theme/js/octopress.js" type="text/javascript"></script>
+  <script src="https://spapas.github.io/theme/js/ads.js"></script>
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-44750952-1', 'auto');
+
+    ga('send', 'pageview');
+    </script>
+
+<script defer data-domain="spapas.github.io" src="https://plausible.hcg.gr/js/script.js"></script>  <script type="text/javascript">
+    var disqus_shortname = 'spapas-github-io';
+    (function() {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = "//" + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+     })();
+  </script>
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+</body>
+
+</html>

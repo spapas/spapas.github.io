@@ -1,0 +1,40 @@
+
+div.cell {
+    padding: 0 !important;
+    padding-left: 0  !important;
+}
+
+.cell .prompt {
+    min-width: 0;
+    padding: 0;
+}
+
+.cell div.text_cell_render {
+    padding: 0;
+    margin: 0;   
+}
+
+body {
+    font-family: 'Fira Sans', sans-serif;
+}
+
+@media only screen and (min-width: 150px) {
+    body>nav ul {
+        margin: 0;
+        padding: 0;
+        border: 0;
+        overflow: hidden;
+        float: left;
+        display: block;
+        padding-top: .15em;
+    }
+    
+}
+
+.jp-RenderedText.jp-OutputArea-output pre {
+    color: #93a1a1
+}
+
+body.jp-Notebook {
+    padding: 0px !important;
+}

@@ -1,0 +1,584 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>/var/ - postgresql</title><link href="https://spapas.github.io/" rel="alternate"></link><link href="https://spapas.github.io/feeds/postgresql.atom.xml" rel="self"></link><id>https://spapas.github.io/</id><updated>2022-09-20T11:10:00+03:00</updated><subtitle>Various programming stuff</subtitle><entry><title>Setting up Postgres on Windows for development</title><link href="https://spapas.github.io/2022/09/20/postgresql-windows-dev/" rel="alternate"></link><published>2022-09-20T11:10:00+03:00</published><updated>2022-09-20T11:10:00+03:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2022-09-20:/2022/09/20/postgresql-windows-dev/</id><summary type="html">&lt;p class="first last"&gt;How to setup Postgres for development on&amp;nbsp;Windows&lt;/p&gt;
+</summary><content type="html">&lt;div class="section" id="introduction"&gt;
+&lt;h2&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;To install Postgresql for a production server on Windows you&amp;#8217;d usually go to the
+&lt;a class="reference external" href="https://www.postgresql.org/download/windows/"&gt;official website&lt;/a&gt; and use the download link. This will give you an executable
+installer that would install Postgresql on your server and help you configure&amp;nbsp;it.&lt;/p&gt;
+&lt;p&gt;However, since I only use Windows for development (and never running any in
+production on Windows) I&amp;#8217;ve found out that there&amp;#8217;s a much better and easier way to install
+postgresql for development and windows which I&amp;#8217;ll describe in this&amp;nbsp;post.&lt;/p&gt;
+&lt;p&gt;If you want to avoid reading the whole post, you can just follow the steps described on the
+&lt;a class="reference internal" href="#tl-dr-below"&gt;&lt;span class="caps"&gt;TL&lt;/span&gt;;&lt;span class="caps"&gt;DR&lt;/span&gt; below&lt;/a&gt; however I&amp;#8217;d recommend reading to understand&amp;nbsp;everything.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="downloading-the-server"&gt;
+&lt;h2&gt;Downloading the&amp;nbsp;server&lt;/h2&gt;
+&lt;p&gt;First, you&amp;#8217;ll
+click the &lt;a class="reference external" href="https://www.enterprisedb.com/download-postgresql-binaries"&gt;zip archives&lt;/a&gt; link on the . &lt;a class="reference external" href="https://www.postgresql.org/download/windows/"&gt;official website&lt;/a&gt; and then
+download the zip archive of the Postgres version you&amp;#8217;ll want to install. Right now there are
+archives for every current version like 14.5, 13.8, 12.12 etc. Let&amp;#8217;s get the latest one,&amp;nbsp;14.5.&lt;/p&gt;
+&lt;p&gt;This will give me a zip file named &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;postgresql-14.5-1-windows-x64-binaries.zip&lt;/span&gt;&lt;/tt&gt; which contains a
+single folder named &lt;tt class="docutils literal"&gt;pgsql&lt;/tt&gt;. I&amp;#8217;ll extract that folder, rename it to &lt;tt class="docutils literal"&gt;pgsql145&lt;/tt&gt; and move it to &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;c:\progr&lt;/span&gt;&lt;/tt&gt;
+(I keep stuff there to avoid putting everything on C:). Now you should have a folder named
+&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;c:\progr\pgsql145&lt;/span&gt;&lt;/tt&gt; that contains a bunch of folder named &lt;tt class="docutils literal"&gt;bin&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;doc&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;include&lt;/tt&gt; etc.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="setting-up-the-server"&gt;
+&lt;h2&gt;Setting up the&amp;nbsp;server&lt;/h2&gt;
+&lt;p&gt;Now we are ready to setup Postgresql. Open a command line and move to the &lt;tt class="docutils literal"&gt;pgsql145\bin&lt;/tt&gt; folder:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+cd c:\progr\pgsql145\bin
+&lt;/pre&gt;
+&lt;p&gt;The bin folder contains &lt;em&gt;all&lt;/em&gt; executables of your server and client, like &lt;tt class="docutils literal"&gt;psql.exe&lt;/tt&gt; (the &lt;span class="caps"&gt;CUI&lt;/span&gt; client),
+&lt;tt class="docutils literal"&gt;pg_dump.exe&lt;/tt&gt; (backup), &lt;tt class="docutils literal"&gt;initdb.exe&lt;/tt&gt; (create a new &lt;span class="caps"&gt;DB&lt;/span&gt; cluster), &lt;tt class="docutils literal"&gt;createdb/dropdb/createuser/dropuser.exe ``
+(create/drop database/user - these can also be run from &lt;span class="caps"&gt;SQL&lt;/span&gt;)
+and ``postgres.exe&lt;/tt&gt; which is the actual server&amp;nbsp;executable.&lt;/p&gt;
+&lt;p&gt;Our first step is to create a database cluster using initdb. We need to pass it a folder that will
+contain the data of our cluster. So we&amp;#8217;ll run it&amp;nbsp;like:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+initdb.exe -D c:\progr\pgsql145\data
+&lt;/pre&gt;
+&lt;p&gt;(also you could run &lt;tt class="docutils literal"&gt;initdb.exe &lt;span class="pre"&gt;-D&lt;/span&gt; &lt;span class="pre"&gt;..\data&lt;/span&gt;&lt;/tt&gt;, since we are on the bin folder). We&amp;#8217;ll get output similar&amp;nbsp;to:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+The files belonging to this database system will be owned by user &amp;quot;serafeim&amp;quot;.
+This user must also own the server process.
+
+The database cluster will be initialized with locale &amp;quot;Greek_Greece.1252&amp;quot;.
+The default database encoding has accordingly been set to &amp;quot;WIN1252&amp;quot;.
+The default text search configuration will be set to &amp;quot;greek&amp;quot;.
+
+Data page checksums are disabled.
+
+fixing permissions on existing directory c:/progr/pgsql145/data ... ok
+creating subdirectories ... ok
+selecting dynamic shared memory implementation ... windows
+selecting default max_connections ... 100
+selecting default shared_buffers ... 128MB
+selecting default time zone ... Europe/Bucharest
+creating configuration files ... ok
+running bootstrap script ... ok
+performing post-bootstrap initialization ... ok
+syncing data to disk ... ok
+
+initdb: warning: enabling &amp;quot;trust&amp;quot; authentication for local connections
+You can change this by editing pg_hba.conf or using the option -A, or
+--auth-local and --auth-host, the next time you run initdb.
+
+Success. You can now start the database server using:
+
+    pg_ctl -D ^&amp;quot;c^:^\progr^\pgsql145^\data^&amp;quot; -l logfile start
+&lt;/pre&gt;
+&lt;p&gt;And now we&amp;#8217;ll have a folder named &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;c:\progr\pgsql145\data&lt;/span&gt;&lt;/tt&gt; that contains files like
+&lt;tt class="docutils literal"&gt;pg_hba.conf&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;pg_ident.conf&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;postgresql.conf&lt;/tt&gt; and various folders that will keep our
+database server data. All these can be configured but we&amp;#8217;re going to keep using the default config
+since it fits our&amp;nbsp;needs!&lt;/p&gt;
+&lt;p&gt;Notice&amp;nbsp;that:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;The files of our database belong to the &amp;#8220;serafeim&amp;#8221; role. This role is automatically created by initdb. This is the same username that I&amp;#8217;m using to log in to windows (i.e my home folder is &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;c:\users\serafeim\&lt;/span&gt;&lt;/tt&gt; folder) so this will be different for you. If you wanted to use a different user name or the classic &lt;tt class="docutils literal"&gt;postgres&lt;/tt&gt; you could pass it to &lt;tt class="docutils literal"&gt;initdb&lt;/tt&gt; with the -U parameter, for example: &lt;tt class="docutils literal"&gt;initdb.exe &lt;span class="pre"&gt;-D&lt;/span&gt; &lt;span class="pre"&gt;c:\progr\pgsql145\data_postgres&lt;/span&gt; &lt;span class="pre"&gt;-U&lt;/span&gt; postgres&lt;/tt&gt;.&lt;/li&gt;
+&lt;li&gt;By default &amp;#8220;trust&amp;#8221; authentication has been configured. This means, copying from &lt;a class="reference external" href="https://www.postgresql.org/docs/current/auth-trust.html"&gt;postgres trust authentication page&lt;/a&gt; that &amp;#8220;[&amp;#8230;] PostgreSQL assumes that anyone who can connect to the server is authorized to access the database with whatever database user name they specify (even superuser names)&amp;#8221;. So local connections will always be accepted with the username we are passing. We&amp;#8217;ll see how this works in a&amp;nbsp;minute.&lt;/li&gt;
+&lt;li&gt;The default database encoding will be &lt;span class="caps"&gt;WIN1252&lt;/span&gt; (on my system). We&amp;#8217;ll talk about that a little more later (hint: it&amp;#8217;s better to pass -E utf-8 to set your cluster encodign to&amp;nbsp;utf-8)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="starting-the-server"&gt;
+&lt;h2&gt;Starting the&amp;nbsp;server&lt;/h2&gt;
+&lt;p&gt;We could use the &lt;tt class="docutils literal"&gt;pg_ctl.exe&lt;/tt&gt; executable as proposed by the initdb to start the server as a a background process.
+However, for our purposes it&amp;#8217;s better to start the server as a foreground process on a dedicated window. So we&amp;#8217;ll run the &lt;tt class="docutils literal"&gt;postgres.exe&lt;/tt&gt; directly&amp;nbsp;like:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+postgres.exe -D c:\progr\pgsql145\data
+&lt;/pre&gt;
+&lt;p&gt;or, from the &lt;tt class="docutils literal"&gt;bin&lt;/tt&gt; directory we could run &lt;tt class="docutils literal"&gt;postgres.exe &lt;span class="pre"&gt;-D&lt;/span&gt; &lt;span class="pre"&gt;..\data&lt;/span&gt;&lt;/tt&gt;. The output will&amp;nbsp;be&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+2022-09-20 09:34:10.184 EEST [10648] LOG:  starting PostgreSQL 14.5, compiled by Visual C++ build 1914, 64-bit
+2022-09-20 09:34:10.189 EEST [10648] LOG:  listening on IPv6 address &amp;quot;::1&amp;quot;, port 5432
+2022-09-20 09:34:10.189 EEST [10648] LOG:  listening on IPv4 address &amp;quot;127.0.0.1&amp;quot;, port 5432
+2022-09-20 09:34:10.330 EEST [3084] LOG:  database system was shut down at 2022-09-20 09:34:08 EEST
+2022-09-20 09:34:10.369 EEST [10648] LOG:  database system is ready to accept connections
+&lt;/pre&gt;
+&lt;p&gt;Success! Our server is running and listening on 127.0.0.1 port 5432. This means that it accepts connection &lt;em&gt;only&lt;/em&gt; from our local machine
+(which is what we want for our purposes). We can now connect to it using the &lt;tt class="docutils literal"&gt;psql.exe&lt;/tt&gt; client. Open another cmd, go to &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;C:\progr\pgsql145\bin&lt;/span&gt;&lt;/tt&gt;
+and run &lt;tt class="docutils literal"&gt;psql.exe&lt;/tt&gt;: You&amp;#8217;ll probably get an error similar to &lt;tt class="docutils literal"&gt;psql: error: connection to server at &amp;quot;localhost&amp;quot; &lt;span class="pre"&gt;(::1),&lt;/span&gt; port 5432 failed: &lt;span class="caps"&gt;FATAL&lt;/span&gt;:&amp;nbsp; database &amp;quot;serafeim&amp;quot; does not exist&lt;/tt&gt;
+(unless your windows username is &lt;tt class="docutils literal"&gt;postgres&lt;/tt&gt;).&lt;/p&gt;
+&lt;p&gt;By default psql.exe tries to connect with a role with the username of your Windows user and to a database named after the user you are
+connecting with. Our database server &lt;em&gt;has&lt;/em&gt; a role named &lt;tt class="docutils literal"&gt;serafeim&lt;/tt&gt; (it is created by default by the initdb as described before) but it doesn&amp;#8217;t have a database named &lt;tt class="docutils literal"&gt;serafeim&lt;/tt&gt;! Let&amp;#8217;s connect
+to the &lt;tt class="docutils literal"&gt;postgres&lt;/tt&gt; database instead by passing it as a parameter &lt;tt class="docutils literal"&gt;psql postgres&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+C:\progr\pgsql145\bin&amp;gt;psql postgres
+psql (14.5)
+WARNING: Console code page (437) differs from Windows code page (1252)
+        8-bit characters might not work correctly. See psql reference
+        page &amp;quot;Notes for Windows users&amp;quot; for details.
+Type &amp;quot;help&amp;quot; for help.
+
+postgres=# select version();
+                          version
+------------------------------------------------------------
+PostgreSQL 14.5, compiled by Visual C++ build 1914, 64-bit
+(1 row)
+&lt;/pre&gt;
+&lt;p&gt;Success!&lt;/p&gt;
+&lt;p&gt;Let&amp;#8217;s cerate a sample user and database to make user that everything&amp;#8217;s working fine &lt;tt class="docutils literal"&gt;createuser.exe koko&lt;/tt&gt;,
+&lt;tt class="docutils literal"&gt;createdb kokodb&lt;/tt&gt; and connect to the &lt;tt class="docutils literal"&gt;kokodb&lt;/tt&gt; as &lt;tt class="docutils literal"&gt;koko&lt;/tt&gt;: &lt;tt class="docutils literal"&gt;psql &lt;span class="pre"&gt;-U&lt;/span&gt; koko kokodb&lt;/tt&gt;.&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+kokodb=&amp;gt; create table kokotable(foo varchar);
+CREATE TABLE
+kokodb=&amp;gt; insert into kokotable values('kokoko');
+INSERT 0 1
+kokodb=&amp;gt; select * from kokotable;
+  foo
+--------
+kokoko
+(1 row)
+&lt;/pre&gt;
+&lt;p&gt;Everything&amp;#8217;s working fine! In the meantime, we should get useful output on our postgres dedicated windows, like
+&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;2022-09-20&lt;/span&gt; 09:36:01.899 &lt;span class="caps"&gt;EEST&lt;/span&gt; [9704] &lt;span class="caps"&gt;FATAL&lt;/span&gt;:&amp;nbsp; database &amp;quot;serafeim&amp;quot; does not exist&lt;/tt&gt;. To stop it, just press &lt;tt class="docutils literal"&gt;Ctrl+C&lt;/tt&gt;
+on that window and you should get output similar&amp;nbsp;to:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+2022-09-20 09:46:45.178 EEST [10648] LOG:  background worker &amp;quot;logical replication launcher&amp;quot; (PID 7860) exited with exit code 1
+2022-09-20 09:46:45.185 EEST [10048] LOG:  shutting down
+2022-09-20 09:46:45.278 EEST [10648] LOG:  database system is shut down
+&lt;/pre&gt;
+&lt;p&gt;I usually add a &lt;tt class="docutils literal"&gt;pg.bat&lt;/tt&gt; file on my &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;c:\progr\pgsql145\&lt;/span&gt;&lt;/tt&gt; that will start the database with its data folder. It&amp;#8217;s contents are only
+&lt;tt class="docutils literal"&gt;bin\postgres.exe &lt;span class="pre"&gt;-D&lt;/span&gt; data&lt;/tt&gt;&lt;/p&gt;
+&lt;p&gt;So let&amp;#8217;s create the pg.bat like&amp;nbsp;this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+c:\&amp;gt;cd c:\progr\pgsql145
+
+c:\progr\pgsql145&amp;gt;copy con pg.bat
+bin\postgres.exe -D data
+^Z
+        1 file(s) copied.
+
+c:\progr\pgsql145&amp;gt;pg.bat
+2022-09-20 09:49:53.642 EEST [11660] LOG:  starting PostgreSQL 14.5, compiled by Visual C++ build 1914, 64-bit
+...
+&lt;/pre&gt;
+&lt;p&gt;One final thing to notice is that, since we use the trust authentication there&amp;#8217;s no check for the password, so if we
+tried to pass a password like &lt;tt class="docutils literal"&gt;psql &lt;span class="pre"&gt;-U&lt;/span&gt; koko &lt;span class="pre"&gt;-W&lt;/span&gt; kokodb&lt;/tt&gt; it will work no matter what password we&amp;nbsp;type.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="encoding-stuff"&gt;
+&lt;h2&gt;Encoding&amp;nbsp;stuff&lt;/h2&gt;
+&lt;div class="section" id="the-default-encoding-situation"&gt;
+&lt;h3&gt;The default encoding&amp;nbsp;situation&lt;/h3&gt;
+&lt;p&gt;You may have noticed before that the default encoding for databases will be &lt;tt class="docutils literal"&gt;&lt;span class="caps"&gt;WIN1252&lt;/span&gt;&lt;/tt&gt; (or some other
+similar 8-bit character set). You never want that (I guess this default is there for compatibility reasons),
+you want to have utf-8 encoding. So you should either
+pass the proper encoding to initdb,&amp;nbsp;like:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+initdb -D ..\datautf8 -E utf-8
+&lt;/pre&gt;
+&lt;p&gt;This will create a new cluster with utf-8 encoding. All databases created on that cluster will be utf-8 by&amp;nbsp;default.&lt;/p&gt;
+&lt;p&gt;If you&amp;#8217;ve already got a non-utf-8  cluster, you should force utf-8 for your new database&amp;nbsp;instead:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+createdb -E utf-8 -T template0 dbutf8
+&lt;/pre&gt;
+&lt;p&gt;Notice that I also passed the &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;-T&lt;/span&gt; template0&lt;/tt&gt; parameter to use the &lt;tt class="docutils literal"&gt;template0&lt;/tt&gt; &lt;a class="reference external" href="https://www.postgresql.org/docs/current/manage-ag-templatedbs.html"&gt;template database&lt;/a&gt;. If I
+tried to run &lt;tt class="docutils literal"&gt;createdb &lt;span class="pre"&gt;-E&lt;/span&gt; &lt;span class="pre"&gt;utf-8&lt;/span&gt; dbutf8&lt;/tt&gt; (so it would use the &lt;tt class="docutils literal"&gt;template1&lt;/tt&gt;) I&amp;#8217;d get an error similar&amp;nbsp;to:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+createdb: error: database creation failed: ERROR:  new encoding (UTF8) is incompatible with the encoding of the template database (WIN1252)
+HINT:  Use the same encoding as in the template database, or use template0 as template.
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="about-the-psql-codepage-warning"&gt;
+&lt;h3&gt;About the psql codepage&amp;nbsp;warning&lt;/h3&gt;
+&lt;p&gt;You may (or may not) have noticed a warning similar to this when starting the&amp;nbsp;server:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+WARNING: Console code page (437) differs from Windows code page (1252)
+      8-bit characters might not work correctly. See psql reference
+      page &amp;quot;Notes for Windows users&amp;quot; for details.
+&lt;/pre&gt;
+&lt;p&gt;Some more info about this can be found in the &lt;a class="reference external" href="https://www.postgresql.org/docs/14/app-psql.html`"&gt;psql reference page&lt;/a&gt; and
+&lt;a class="reference external" href="https://stackoverflow.com/questions/20794035/postgresql-warning-console-code-page-437-differs-from-windows-code-page-125"&gt;this &lt;span class="caps"&gt;SO&lt;/span&gt; issue&lt;/a&gt;. To avoid this warning you&amp;#8217;ll use &lt;tt class="docutils literal"&gt;chcp 1252&lt;/tt&gt; to set the console code page to 1252
+before running&amp;nbsp;psql.&lt;/p&gt;
+&lt;p&gt;I have to warn you though that using psql.exe from the windows console &lt;strong&gt;will be problematic&lt;/strong&gt; anyway
+because of not good unicode support. You can use it fine as long as you write only ascii characters but
+I&amp;#8217;d avoid anything&amp;nbsp;else.&lt;/p&gt;
+&lt;p&gt;That&amp;#8217;s why I&amp;#8217;d recommend using a graphical database client like for example &lt;a class="reference external" href="https://dbeaver.io/"&gt;dbeaver&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="a-tl-dr-walkthrough"&gt;
+&lt;span id="tl-dr-below"&gt;&lt;/span&gt;&lt;h2&gt;A &lt;span class="caps"&gt;TL&lt;/span&gt;;&lt;span class="caps"&gt;DR&lt;/span&gt;&amp;nbsp;walkthrough&lt;/h2&gt;
+&lt;p&gt;Here are the steps to follow to get a working postgresql server on&amp;nbsp;windows:&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;Download the postgresql windows binaries of the version you want from the &lt;a class="reference external" href="https://www.enterprisedb.com/download-postgresql-binaries"&gt;zip archives&lt;/a&gt; page and extract it to a folder, let&amp;#8217;s name it &lt;tt class="docutils literal"&gt;pgsql&lt;/tt&gt;.&lt;/li&gt;
+&lt;li&gt;Go to &lt;tt class="docutils literal"&gt;pgsql\bin&lt;/tt&gt; folder on a command&amp;nbsp;line&lt;/li&gt;
+&lt;li&gt;Run &lt;tt class="docutils literal"&gt;initdb.exe &lt;span class="pre"&gt;-D&lt;/span&gt; &lt;span class="pre"&gt;..\data&lt;/span&gt; &lt;span class="pre"&gt;-E&lt;/span&gt; &lt;span class="pre"&gt;utf-8&lt;/span&gt;&lt;/tt&gt; from inside the &lt;tt class="docutils literal"&gt;pgsql\bin&lt;/tt&gt; folder of the  to create a new database cluster with utf-8 encoding on the &lt;tt class="docutils literal"&gt;data&lt;/tt&gt; directory&lt;/li&gt;
+&lt;li&gt;Run &lt;tt class="docutils literal"&gt;postgresql.exe &lt;span class="pre"&gt;-D&lt;/span&gt; &lt;span class="pre"&gt;..\data&lt;/span&gt;&lt;/tt&gt; to start the database&amp;nbsp;server&lt;/li&gt;
+&lt;li&gt;Go to &lt;tt class="docutils literal"&gt;pgsql\bin&lt;/tt&gt; folder on another command&amp;nbsp;line&lt;/li&gt;
+&lt;li&gt;Run &lt;tt class="docutils literal"&gt;psql postgres&lt;/tt&gt; to connect to the &lt;tt class="docutils literal"&gt;postgres&lt;/tt&gt; database with a role similar to your windows&amp;nbsp;username&lt;/li&gt;
+&lt;li&gt;Profit!&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+&lt;div class="section" id="conclusion"&gt;
+&lt;h2&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;Using the above steps you can easily setup a postgres database server on windows for development. Some advantages of the method
+proposed here&amp;nbsp;are:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Since you configure the data directory you can have as many clusters as you want (run initdb with different data directories and pass them to&amp;nbsp;postgres)&lt;/li&gt;
+&lt;li&gt;Since nothing is installed globally, you can have as many postgresql versions as you want, each one having its own data directory. Then you&amp;#8217;ll start the one you want each time! For example I&amp;#8217;ve got Postgresql 12,13 and&amp;nbsp;14.5.&lt;/li&gt;
+&lt;li&gt;Using the trust authentication makes it easy to connect with whatever&amp;nbsp;user&lt;/li&gt;
+&lt;li&gt;Running the database from postgresql.exe so it has a dedicated window makes it easy to know what the database is doing, peeking at the logs and stopping it (using&amp;nbsp;ctrl+c)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+</content><category term="postgresql"></category><category term="windows"></category><category term="postgresql"></category><category term="development"></category></entry><entry><title>Automatically create a category table in Postgresql by extracting unique table values</title><link href="https://spapas.github.io/2017/07/04/postgresql-auto-create-category-column/" rel="alternate"></link><published>2017-07-04T09:05:00+03:00</published><updated>2017-07-04T09:05:00+03:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2017-07-04:/2017/07/04/postgresql-auto-create-category-column/</id><summary type="html">&lt;p class="first last"&gt;A postgresql script to help you automatically create a new category table by extracting its values from a table and generate the&amp;nbsp;relations&lt;/p&gt;
+</summary><content type="html">&lt;p&gt;Recently I was given an &lt;span class="caps"&gt;SQL&lt;/span&gt; table containing some useful data. The problem with that table was that it was was non-properly normalized but was completely flat,
+i.e all its columns contained varchar values while, some of them should have instead contained foreign keys to other tables. Here&amp;#8217;s an example of how this
+table looked&amp;nbsp;like:&lt;/p&gt;
+&lt;table border="1" class="docutils"&gt;
+&lt;colgroup&gt;
+&lt;col width="14%" /&gt;
+&lt;col width="25%" /&gt;
+&lt;col width="28%" /&gt;
+&lt;col width="33%" /&gt;
+&lt;/colgroup&gt;
+&lt;thead valign="bottom"&gt;
+&lt;tr&gt;&lt;th class="head" colspan="4"&gt;Parts&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;th class="head"&gt;&lt;span class="caps"&gt;ID&lt;/span&gt;&lt;/th&gt;
+&lt;th class="head"&gt;Serial&lt;/th&gt;
+&lt;th class="head"&gt;Category&lt;/th&gt;
+&lt;th class="head"&gt;Manufacturer&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td&gt;1&lt;/td&gt;
+&lt;td&gt;423431&lt;/td&gt;
+&lt;td&gt;Monitor&lt;/td&gt;
+&lt;td&gt;&lt;span class="caps"&gt;LG&lt;/span&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;2&lt;/td&gt;
+&lt;td&gt;534552&lt;/td&gt;
+&lt;td&gt;Monitor&lt;/td&gt;
+&lt;td&gt;&lt;span class="caps"&gt;LG&lt;/span&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;3&lt;/td&gt;
+&lt;td&gt;435634&lt;/td&gt;
+&lt;td&gt;Printer&lt;/td&gt;
+&lt;td&gt;&lt;span class="caps"&gt;HP&lt;/span&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;4&lt;/td&gt;
+&lt;td&gt;534234&lt;/td&gt;
+&lt;td&gt;Printer&lt;/td&gt;
+&lt;td&gt;Samsung&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;5&lt;/td&gt;
+&lt;td&gt;234212&lt;/td&gt;
+&lt;td&gt;Monitor&lt;/td&gt;
+&lt;td&gt;Samsung&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;6&lt;/td&gt;
+&lt;td&gt;123123&lt;/td&gt;
+&lt;td&gt;Monitor&lt;/td&gt;
+&lt;td&gt;&lt;span class="caps"&gt;LG&lt;/span&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;The normalized version of this table should have been instead like&amp;nbsp;this:&lt;/p&gt;
+&lt;table border="1" class="docutils"&gt;
+&lt;colgroup&gt;
+&lt;col width="13%" /&gt;
+&lt;col width="23%" /&gt;
+&lt;col width="28%" /&gt;
+&lt;col width="38%" /&gt;
+&lt;/colgroup&gt;
+&lt;thead valign="bottom"&gt;
+&lt;tr&gt;&lt;th class="head" colspan="4"&gt;Parts&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;th class="head"&gt;&lt;span class="caps"&gt;ID&lt;/span&gt;&lt;/th&gt;
+&lt;th class="head"&gt;Serial&lt;/th&gt;
+&lt;th class="head"&gt;Category_id&lt;/th&gt;
+&lt;th class="head"&gt;Manufacturer_id&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td&gt;1&lt;/td&gt;
+&lt;td&gt;423431&lt;/td&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;2&lt;/td&gt;
+&lt;td&gt;534552&lt;/td&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;3&lt;/td&gt;
+&lt;td&gt;435634&lt;/td&gt;
+&lt;td&gt;2&lt;/td&gt;
+&lt;td&gt;2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;4&lt;/td&gt;
+&lt;td&gt;534234&lt;/td&gt;
+&lt;td&gt;2&lt;/td&gt;
+&lt;td&gt;3&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;5&lt;/td&gt;
+&lt;td&gt;234212&lt;/td&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;td&gt;3&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;6&lt;/td&gt;
+&lt;td&gt;123123&lt;/td&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;td&gt;2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;with the following extra tables that contain the category values with proper foreign&amp;nbsp;keys:&lt;/p&gt;
+&lt;table border="1" class="docutils"&gt;
+&lt;colgroup&gt;
+&lt;col width="22%" /&gt;
+&lt;col width="78%" /&gt;
+&lt;/colgroup&gt;
+&lt;thead valign="bottom"&gt;
+&lt;tr&gt;&lt;th class="head" colspan="2"&gt;Category&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;th class="head"&gt;&lt;span class="caps"&gt;ID&lt;/span&gt;&lt;/th&gt;
+&lt;th class="head"&gt;Name&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td&gt;1&lt;/td&gt;
+&lt;td&gt;Monitor&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;2&lt;/td&gt;
+&lt;td&gt;Printer&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;table border="1" class="docutils"&gt;
+&lt;colgroup&gt;
+&lt;col width="17%" /&gt;
+&lt;col width="83%" /&gt;
+&lt;/colgroup&gt;
+&lt;thead valign="bottom"&gt;
+&lt;tr&gt;&lt;th class="head" colspan="2"&gt;Manufacturer&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;th class="head"&gt;&lt;span class="caps"&gt;ID&lt;/span&gt;&lt;/th&gt;
+&lt;th class="head"&gt;Name&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td&gt;1&lt;/td&gt;
+&lt;td&gt;Monitor&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;2&lt;/td&gt;
+&lt;td&gt;Printer&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;The normalized version should be used instead of the flat one &lt;a class="reference external" href="http://www.imdb.com/title/tt0057012/quotes?item=qt0454452"&gt;for reasons which at this moment must be all too obvious&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Having such non-normalized tables is also a common problem I experience with Django: When creating a model
+I usually define some &lt;tt class="docutils literal"&gt;CharField&lt;/tt&gt;  with pre-defined &lt;tt class="docutils literal"&gt;choices&lt;/tt&gt; which &amp;#8220;will never change&amp;#8221;. Sometime during the
+development (if I am lucky) or when the project is live for years I will be informed that the choices need not
+only to be changed but must be changed by the users of the site without the need to change the source code! Or
+that the choices/categories have properties (beyond their name) that need to be defined and used in the project. Both
+of these cases mean that these categories need to be extracted from simple strings to full Django models (i.e get
+normalized in their own&amp;nbsp;table)!&lt;/p&gt;
+&lt;p&gt;In this post I will present a function written in &lt;span class="caps"&gt;PL&lt;/span&gt;/pgsql that will automatically normalize a column from a
+flat table like the previous. Specifically, using the previous example,
+if you have a table named &lt;tt class="docutils literal"&gt;part&lt;/tt&gt; that has a non-normalized
+column named &lt;tt class="docutils literal"&gt;category&lt;/tt&gt; then when you call &lt;tt class="docutils literal"&gt;select &lt;span class="pre"&gt;export_relation('part',&lt;/span&gt; 'category')&lt;/tt&gt; the following
+will&amp;nbsp;happen:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;A new table named &lt;tt class="docutils literal"&gt;part_category&lt;/tt&gt; will be created. This table will contain two columns &lt;tt class="docutils literal"&gt;id&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;name&lt;/tt&gt;, with &lt;tt class="docutils literal"&gt;id&lt;/tt&gt; being the primary key and &lt;tt class="docutils literal"&gt;name&lt;/tt&gt; having a unique constraint. If the table exists it will be dropped and&amp;nbsp;re-ccreated&lt;/li&gt;
+&lt;li&gt;A new column named &lt;tt class="docutils literal"&gt;category_id&lt;/tt&gt; will be added to &lt;tt class="docutils literal"&gt;part&lt;/tt&gt;. This column will be a foreign key to the new table &lt;tt class="docutils literal"&gt;part_category&lt;/tt&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;dl class="first docutils"&gt;
+&lt;dt&gt;For each unique value &lt;tt class="docutils literal"&gt;v&lt;/tt&gt; of &lt;tt class="docutils literal"&gt;category&lt;/tt&gt;:&lt;/dt&gt;
+&lt;dd&gt;&lt;ul class="first last"&gt;
+&lt;li&gt;Insert a new record in &lt;tt class="docutils literal"&gt;part_category&lt;/tt&gt; with &lt;tt class="docutils literal"&gt;v&lt;/tt&gt; in the &lt;tt class="docutils literal"&gt;name&lt;/tt&gt; field of the table and save the inserted id to &lt;tt class="docutils literal"&gt;current_id&lt;/tt&gt;&lt;/li&gt;
+&lt;li&gt;Set &lt;tt class="docutils literal"&gt;current_id&lt;/tt&gt; to &lt;tt class="docutils literal"&gt;category_id&lt;/tt&gt;  to all rows of &lt;tt class="docutils literal"&gt;part&lt;/tt&gt; where &lt;tt class="docutils literal"&gt;category&lt;/tt&gt; has the value of &lt;tt class="docutils literal"&gt;v&lt;/tt&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Before diving in to the &lt;span class="caps"&gt;PL&lt;/span&gt;/pgSQL script that does the above changes to the table I&amp;#8217;d like to notice that I am
+not very experienced with &lt;span class="caps"&gt;PL&lt;/span&gt;/pgSQL since I rarerly use it
+(I actually avoid writing code in the database) however, because the case I described is ideal for using a database script
+I&amp;#8217;ve bitten the bullet and implemented&amp;nbsp;it.&lt;/p&gt;
+&lt;p&gt;Beyond it&amp;#8217;s actual functionality, this script can be used as a reference/cookbook for common &lt;span class="caps"&gt;PL&lt;/span&gt;/pgSQL&amp;nbsp;tasks:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Create/define a &lt;span class="caps"&gt;PL&lt;/span&gt;/pgSQL function (stored&amp;nbsp;procedure)&lt;/li&gt;
+&lt;li&gt;Declare&amp;nbsp;variables&lt;/li&gt;
+&lt;li&gt;Assign values to&amp;nbsp;variables&lt;/li&gt;
+&lt;li&gt;Execute &lt;span class="caps"&gt;SQL&lt;/span&gt; commands with variable defined table / column&amp;nbsp;names&lt;/li&gt;
+&lt;li&gt;Log process in &lt;span class="caps"&gt;PL&lt;/span&gt;/pgSQL&lt;/li&gt;
+&lt;li&gt;Executing code&amp;nbsp;conditionally&lt;/li&gt;
+&lt;li&gt;Loop through the rows of a&amp;nbsp;query&lt;/li&gt;
+&lt;li&gt;Save the primary key of an inserted&amp;nbsp;row&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The script works however I feel that more experienced &lt;span class="caps"&gt;PL&lt;/span&gt;/pgSQL developers would write things different - if you have any
+proposals please comment out and I&amp;#8217;ll be happy to incorporate them to the&amp;nbsp;script.&lt;/p&gt;
+&lt;p&gt;Now, let&amp;#8217;s now take a look at the actual&amp;nbsp;script:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;CREATE&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;OR&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;REPLACE&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;FUNCTION&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;export_relation&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;table_name&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;varchar&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;column_name&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;varchar&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="k"&gt;RETURNS&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;void&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;AS&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;$$&lt;/span&gt;
+&lt;span class="k"&gt;DECLARE&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;val&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;varchar&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;res&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;boolean&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;new_table_name&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;varchar&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;new_column_name&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;varchar&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;current_id&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;int&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;BEGIN&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;new_table_name&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;:=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;table_name&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;||&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;_&amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;||&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;column_name&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;new_column_name&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;:=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;column_name&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;||&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;_id&amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;execute&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;drop table if exists %s cascade&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;new_table_name&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;execute&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;CREATE TABLE %s (id serial NOT NULL, name character varying(255) NOT NULL, CONSTRAINT %s_pkey PRIMARY KEY (id), CONSTRAINT %s_unique UNIQUE (name))WITH ( OIDS=FALSE)&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;new_table_name&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;new_table_name&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;new_table_name&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;execute&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;select exists(SELECT column_name  FROM information_schema.columns WHERE table_name=&amp;#39;&amp;#39;%s&amp;#39;&amp;#39; and column_name=&amp;#39;&amp;#39;%s&amp;#39;&amp;#39;) as x&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;table_name&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;new_column_name&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;into&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;res&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;res&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;is&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;false&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="k"&gt;raise&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;notice&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Creating colum&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="k"&gt;execute&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;ALTER TABLE %s ADD COLUMN %s integer null&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;table_name&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;new_column_name&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="k"&gt;execute&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;ALTER TABLE %s ADD CONSTRAINT fk_%s FOREIGN KEY (%s) REFERENCES %s(id)&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;table_name&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;new_column_name&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;new_column_name&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;new_table_name&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;end&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;val&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;IN&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;execute&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;select %s from %s group by(%s)&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;column_name&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;table_name&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;column_name&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;LOOP&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="k"&gt;RAISE&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;NOTICE&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Inserting new value %s ...&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;val&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="k"&gt;execute&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;insert into  %s(name) values (&amp;#39;&amp;#39;%s&amp;#39;&amp;#39;) returning id&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;new_table_name&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;val&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;into&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;current_id&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="k"&gt;raise&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;notice&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Created ID %&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;current_id&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="k"&gt;execute&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;update %s set %s = %s where %s = &amp;#39;&amp;#39;%s&amp;#39;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;table_name&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;new_column_name&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;current_id&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;column_name&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;val&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;END&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;LOOP&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="cm"&gt;/* Uncomment this if you want to drop the flat column&lt;/span&gt;
+&lt;span class="cm"&gt;    raise notice &amp;#39;Dropping colmn&amp;#39;;&lt;/span&gt;
+&lt;span class="cm"&gt;    execute format (&amp;#39;alter table %s drop column %s&amp;#39;, table_name, column_name);&lt;/span&gt;
+&lt;span class="cm"&gt;    */&lt;/span&gt;
+
+&lt;span class="k"&gt;END&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="s"&gt;$$&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;LANGUAGE&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;plpgsql&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;The first line creates or updates the script. You can just copy over this script to an &lt;span class="caps"&gt;SQL&lt;/span&gt; window and run it as many times as you like (making changes
+between runs) and the script will be always updated. The function that is created is actually a procedure since it returns &lt;tt class="docutils literal"&gt;void&lt;/tt&gt; and takes two parameters.
+The &lt;tt class="docutils literal"&gt;&lt;span class="caps"&gt;DECLARE&lt;/span&gt;&lt;/tt&gt; section that follows contains all the variables that are used in the&amp;nbsp;script:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;val&lt;/tt&gt; is the current value of the category when looping through their&amp;nbsp;values&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;res&lt;/tt&gt; is a boolean variable used for a&amp;nbsp;conditional&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;new_table_name&lt;/tt&gt; is the name of the table that will be&amp;nbsp;created&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;new_column_name&lt;/tt&gt; is the name of the column that will be added to the old&amp;nbsp;table&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;current_id&lt;/tt&gt; is the id of the last inserted value in the new&amp;nbsp;table&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;After the &lt;tt class="docutils literal"&gt;&lt;span class="caps"&gt;BEGIN&lt;/span&gt;&lt;/tt&gt; the actual procedure starts: First the values of &lt;tt class="docutils literal"&gt;new_table_name&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;new_column_name&lt;/tt&gt; are initialized to be used throughout the code and
+then the new table is dropped (if exists) and re-created. Noticce the &lt;tt class="docutils literal"&gt;execute format (parameter)&lt;/tt&gt; function that executes the &lt;span class="caps"&gt;SQL&lt;/span&gt; contained in the parameter which
+is a string and is constructed using the variables we&amp;#8217;ve defined. The next line checks if the old table has the new column (i.e category_id) and saves
+the result in the &lt;tt class="docutils literal"&gt;res&lt;/tt&gt; variable to check if the new column exists and if not add it to the old&amp;nbsp;table.&lt;/p&gt;
+&lt;p&gt;A loop enumerating all unique values of the category column of the old table is then executed. Notice that &lt;tt class="docutils literal"&gt;val&lt;/tt&gt; will contain a single value since the &lt;span class="caps"&gt;SQL&lt;/span&gt; that is executed
+will return a single column (that&amp;#8217;s why it is declared as varchar). If we returned more than one column from the select the val could be declared as &lt;tt class="docutils literal"&gt;record&lt;/tt&gt; and access its
+properties through dot notation (&lt;tt class="docutils literal"&gt;val.prop1&lt;/tt&gt; etc). The value is inserted to the newly created table using a &lt;tt class="docutils literal"&gt;insert into table values () returning id&lt;/tt&gt; &lt;span class="caps"&gt;SQL&lt;/span&gt; syntax
+(so that the new id will be returned - this is an insert/select hybrid command) and saved to the &lt;tt class="docutils literal"&gt;current_id&lt;/tt&gt; variable. The &lt;tt class="docutils literal"&gt;current_id&lt;/tt&gt; variable then is used to update
+the new column that was added to the old table with the proper foreign key&amp;nbsp;value.&lt;/p&gt;
+&lt;p&gt;Notice that I&amp;#8217;ve a commented out code in the end - if you want you can uncomment it and the old (flat) column will be dropped - so in my examply the &lt;tt class="docutils literal"&gt;category&lt;/tt&gt; column will be
+removed since I will have &lt;tt class="docutils literal"&gt;category_id&lt;/tt&gt; to find out the name of each category. I recommend to uncomment this and actually drop the column since when you have both &lt;tt class="docutils literal"&gt;category&lt;/tt&gt;
+and &lt;tt class="docutils literal"&gt;category_id&lt;/tt&gt; the values of these two columns are going to get out of sync and since you&amp;#8217;ll have duplicate information your table will be even more non-normalized. You can
+of course keep the column to make sure that the script works as you want since if the column is not dropped you can easily return to the previous state of the database by
+removeing the new table and&amp;nbsp;column.&lt;/p&gt;
+&lt;p&gt;To call it just run &lt;tt class="docutils literal"&gt;select &lt;span class="pre"&gt;export_relation('part',&lt;/span&gt; 'category')&lt;/tt&gt; and you should see some debug info in the messages tab. When the script is finished you&amp;#8217;ll have the
+&lt;tt class="docutils literal"&gt;part_category&lt;/tt&gt; table and &lt;tt class="docutils literal"&gt;category_id&lt;/tt&gt; column in the &lt;tt class="docutils literal"&gt;part&lt;/tt&gt; table.&lt;/p&gt;
+</content><category term="postgresql"></category><category term="postgresql"></category><category term="plpgsql"></category></entry><entry><title>Getting a logical backup of all databases of your Postgresql server</title><link href="https://spapas.github.io/2016/11/02/postgresql-backup/" rel="alternate"></link><published>2016-11-02T15:10:00+02:00</published><updated>2016-11-02T15:10:00+02:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2016-11-02:/2016/11/02/postgresql-backup/</id><summary type="html">&lt;p class="first last"&gt;A script to help you backup your postgresql&amp;nbsp;databases&lt;/p&gt;
+</summary><content type="html">&lt;p&gt;In this small post I will present a small bash script that could be used to create logical backups of all the databases in a Postgresql server along
+with some other goodies. More specifically, the script&amp;nbsp;will:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Create two files at /tmp to output information (one for debugging and one with info for sending it through email at the&amp;nbsp;end)&lt;/li&gt;
+&lt;li&gt;Create a backup directory with the current&amp;nbsp;date&lt;/li&gt;
+&lt;li&gt;Create a list of all databases found on the&amp;nbsp;server&lt;/li&gt;
+&lt;li&gt;For each database, vacuum and analyze it, backup it, gzip it and put it in the backup&amp;nbsp;directory&lt;/li&gt;
+&lt;li&gt;Write info about the backup in the info log&amp;nbsp;file&lt;/li&gt;
+&lt;li&gt;Do the same for global&amp;nbsp;objects&lt;/li&gt;
+&lt;li&gt;Send an email when the backup is finished with the info&amp;nbsp;log&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Now, in my system I&amp;#8217;m using an external folder at &lt;tt class="docutils literal"&gt;/mnt/backupdb&lt;/tt&gt; to put my backups. You may either use the same technique or connect remotely to a
+postgresql database (so you need to change the parameters of &lt;tt class="docutils literal"&gt;vacuumdb&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;pg_dump&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;pg_dumpall&lt;/tt&gt; to define the server and credentials to connect to)
+and put the backups to a local&amp;nbsp;disc.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/bin/sh&lt;/span&gt;
+&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;/tmp/db_backup.log
+&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;/tmp/db_backup_info.log
+&lt;span class="nv"&gt;date_str&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;date&lt;span class="w"&gt; &lt;/span&gt;+&lt;span class="s2"&gt;&amp;quot;%Y%m%d_%H%M%S&amp;quot;&lt;/span&gt;&lt;span class="k"&gt;)&lt;/span&gt;
+&lt;span class="nv"&gt;backup_dir&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/mnt/backupdb/pg_backup.&lt;span class="nv"&gt;$date_str&lt;/span&gt;
+
+mkdir&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$backup_dir&lt;/span&gt;
+&lt;span class="nb"&gt;pushd&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$backup_dir&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;/dev/null
+
+&lt;span class="nv"&gt;dbs&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;-u&lt;span class="w"&gt; &lt;/span&gt;postgres&lt;span class="w"&gt; &lt;/span&gt;psql&lt;span class="w"&gt; &lt;/span&gt;-Upostgres&lt;span class="w"&gt; &lt;/span&gt;-lt&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;|&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;grep&lt;span class="w"&gt; &lt;/span&gt;-v&lt;span class="w"&gt; &lt;/span&gt;:&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;|&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;cut&lt;span class="w"&gt; &lt;/span&gt;-d&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="se"&gt;\|&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-f&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;|&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;grep&lt;span class="w"&gt; &lt;/span&gt;-v&lt;span class="w"&gt; &lt;/span&gt;template&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;|&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;grep&lt;span class="w"&gt; &lt;/span&gt;-v&lt;span class="w"&gt; &lt;/span&gt;-e&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;^\s*$&amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;|&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;sed&lt;span class="w"&gt; &lt;/span&gt;-e&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;s/  *$//&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;|&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;tr&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;\n&amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39; &amp;#39;&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;
+&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Will backup: &lt;/span&gt;&lt;span class="nv"&gt;$dbs&lt;/span&gt;&lt;span class="s2"&gt; to &lt;/span&gt;&lt;span class="nv"&gt;$backup_dir&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;/tmp/db_backup_info.log
+&lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;db&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;in&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$dbs&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;do&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Starting backup for &lt;/span&gt;&lt;span class="nv"&gt;$db&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;/tmp/db_backup_info.log
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nv"&gt;filename&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$db&lt;/span&gt;.&lt;span class="nv"&gt;$date_str&lt;/span&gt;.sql.gz
+&lt;span class="w"&gt;  &lt;/span&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;-u&lt;span class="w"&gt; &lt;/span&gt;postgres&lt;span class="w"&gt; &lt;/span&gt;vacuumdb&lt;span class="w"&gt; &lt;/span&gt;--analyze&lt;span class="w"&gt; &lt;/span&gt;-Upostgres&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$db&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;/tmp/db_backup.log
+&lt;span class="w"&gt;  &lt;/span&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;-u&lt;span class="w"&gt; &lt;/span&gt;postgres&lt;span class="w"&gt; &lt;/span&gt;pg_dump&lt;span class="w"&gt; &lt;/span&gt;-Upostgres&lt;span class="w"&gt; &lt;/span&gt;-v&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$db&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-F&lt;span class="w"&gt; &lt;/span&gt;p&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&amp;gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;/tmp/db_backup.log&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;|&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;gzip&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$filename&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nv"&gt;size&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;stat&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$filename&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;--printf&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;%s&amp;quot;&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nv"&gt;kb_size&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;scale=2; &lt;/span&gt;&lt;span class="nv"&gt;$size&lt;/span&gt;&lt;span class="s2"&gt; / 1024.0&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;|&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;bc&lt;span class="sb"&gt;`&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Finished backup for &lt;/span&gt;&lt;span class="nv"&gt;$db&lt;/span&gt;&lt;span class="s2"&gt; - size is &lt;/span&gt;&lt;span class="nv"&gt;$kb_size&lt;/span&gt;&lt;span class="s2"&gt; KB&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;/tmp/db_backup_info.log
+&lt;span class="k"&gt;done&lt;/span&gt;
+
+&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Backing up global objects&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;/tmp/db_backup_info.log
+&lt;span class="nv"&gt;filename&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;global.&lt;span class="nv"&gt;$date_str&lt;/span&gt;.sql.gz
+sudo&lt;span class="w"&gt; &lt;/span&gt;-u&lt;span class="w"&gt; &lt;/span&gt;postgres&lt;span class="w"&gt; &lt;/span&gt;pg_dumpall&lt;span class="w"&gt; &lt;/span&gt;-Upostgres&lt;span class="w"&gt; &lt;/span&gt;-v&lt;span class="w"&gt; &lt;/span&gt;-g&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&amp;gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;/tmp/db_backup.log&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;|&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;gzip&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$filename&lt;/span&gt;
+&lt;span class="nv"&gt;size&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;stat&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$filename&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;--printf&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;%s&amp;quot;&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;
+&lt;span class="nv"&gt;kb_size&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;scale=2; &lt;/span&gt;&lt;span class="nv"&gt;$size&lt;/span&gt;&lt;span class="s2"&gt; / 1024.0&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;|&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;bc&lt;span class="sb"&gt;`&lt;/span&gt;
+&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Finished backup for global - size is &lt;/span&gt;&lt;span class="nv"&gt;$kb_size&lt;/span&gt;&lt;span class="s2"&gt; KB&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;/tmp/db_backup_info.log
+
+&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Ok!&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;/tmp/db_backup_info.log
+mail&lt;span class="w"&gt; &lt;/span&gt;-s&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Backup results&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;spapas@mymail.foo.bar&lt;span class="w"&gt;  &lt;/span&gt;&amp;lt;&lt;span class="w"&gt; &lt;/span&gt;/tmp/db_backup_info.log
+&lt;span class="nb"&gt;popd&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;/dev/null
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Let&amp;#8217;s explain a bit the above script: The two first lines (echo &amp;#8230;)  will just clear out the two files &lt;tt class="docutils literal"&gt;/tmp/db_backup.log&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;/tmp/db_backup_info.log&lt;/tt&gt;. The first
+will contain debug info from the commands and the second one will contain our info that will be sent through an email at the end of the backup. After that, we initialize
+&lt;tt class="docutils literal"&gt;date_str&lt;/tt&gt; with the current date in the form &lt;tt class="docutils literal"&gt;20161102_145011&lt;/tt&gt; and the backup_dir with the correct directory to save the backups to. We then create the backup directory
+and switch to it with &lt;tt class="docutils literal"&gt;pushd&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;The following, rather long command will assign the names of the databases to the &lt;tt class="docutils literal"&gt;dbs&lt;/tt&gt; variable. So how is it working? &lt;tt class="docutils literal"&gt;psql &lt;span class="pre"&gt;-lt&lt;/span&gt;&lt;/tt&gt; lists the names of the databases, but lists
+also more non-needed information which we remove with the following commands (grep, cut etc). The sed removes whitespace and the tr concatenates individual lines to a single line
+so dbs will have a value like &amp;#8216;db1 db2 &amp;#8230;&amp;#8217;. For each one of these files then we assign its name and date to a filename and then, after we execute vacuumdb we use pg_dump with gzip to actually
+create the backup and output it to the file. The other two lines (size and kb_size) are used to calculate the size of the backup file (to be sure that something is actually created) - you&amp;#8217;ll
+need to install bc for that. The same process is followed the to backup global objects (usernames etc) using &lt;tt class="docutils literal"&gt;pg_dumpall &lt;span class="pre"&gt;-g&lt;/span&gt;&lt;/tt&gt;. Finally, we send a mail with a subject of &amp;#8220;Backup results&amp;#8221;
+and body the contents of &lt;tt class="docutils literal"&gt;/tmp/db_backup_info.log&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ve saved this file to &lt;tt class="docutils literal"&gt;/var/lib/pgsql/db_backup_all.sh&lt;/tt&gt;. To run I propose using cron &amp;#8212; just edit your crontab (through &lt;tt class="docutils literal"&gt;vi /etc/crontab&lt;/tt&gt;) and add the&amp;nbsp;line&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+15 2  *  *  * root       /usr/bin/bash /var/lib/pgsql/db_backup_all.sh
+&lt;/pre&gt;
+&lt;p&gt;This will run the backup every night at 2.15. Uses the root user to have access rights to the backup folder. One thing to be careful about is that on Redhat/Centos distributions,
+the above won&amp;#8217;t work because sudo requires a tty to work and cron doesn&amp;#8217;t have one. To fix this, comment out the&amp;nbsp;line&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+Defaults    requiretty
+&lt;/pre&gt;
+&lt;p&gt;of your /etc/sudoers&amp;nbsp;file.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Update 02/12/2016:&lt;/strong&gt; Here&amp;#8217;s a little better version of the above script&amp;nbsp;that&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;Create two files for each database, one with &lt;span class="caps"&gt;SQL&lt;/span&gt; script backup, one with binary backup. Although with &lt;span class="caps"&gt;SQL&lt;/span&gt; backup you can check out the backup and maybe do changes before applying it, the binary backup is a more foolproof method of restoring everything to your database! Also, instead of restoring the database through &lt;tt class="docutils literal"&gt;psql&lt;/tt&gt; (as required by the &lt;span class="caps"&gt;SQL&lt;/span&gt; script backup), using the binary backup you can restore through the &lt;tt class="docutils literal"&gt;pg_restore&lt;/tt&gt; tool.&lt;/li&gt;
+&lt;li&gt;Adds a function to output the file size (so the script is more &lt;span class="caps"&gt;DRY&lt;/span&gt;)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/bin/sh&lt;/span&gt;
+
+&lt;span class="k"&gt;function&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;output_file_size&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nv"&gt;size&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;stat&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;--printf&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;%s&amp;quot;&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nv"&gt;kb_size&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;scale=2; &lt;/span&gt;&lt;span class="nv"&gt;$size&lt;/span&gt;&lt;span class="s2"&gt; / 1024.0&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;|&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;bc&lt;span class="sb"&gt;`&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Finished backup for &lt;/span&gt;&lt;span class="nv"&gt;$2&lt;/span&gt;&lt;span class="s2"&gt; - size is &lt;/span&gt;&lt;span class="nv"&gt;$kb_size&lt;/span&gt;&lt;span class="s2"&gt; KB&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;/tmp/db_backup_info.log
+&lt;span class="o"&gt;}&lt;/span&gt;
+
+&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;/tmp/db_backup.log
+&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;/tmp/db_backup_info.log
+&lt;span class="nv"&gt;date_str&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;date&lt;span class="w"&gt; &lt;/span&gt;+&lt;span class="s2"&gt;&amp;quot;%Y%m%d_%H%M%S&amp;quot;&lt;/span&gt;&lt;span class="k"&gt;)&lt;/span&gt;
+&lt;span class="nv"&gt;backup_dir&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/mnt/backupdb/dbpg/pg_backup.&lt;span class="nv"&gt;$date_str&lt;/span&gt;
+
+mkdir&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$backup_dir&lt;/span&gt;
+&lt;span class="nb"&gt;pushd&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$backup_dir&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;/dev/null
+&lt;span class="nv"&gt;dbs&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;-u&lt;span class="w"&gt; &lt;/span&gt;postgres&lt;span class="w"&gt; &lt;/span&gt;psql&lt;span class="w"&gt; &lt;/span&gt;-Upostgres&lt;span class="w"&gt; &lt;/span&gt;-lt&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;|&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;cut&lt;span class="w"&gt; &lt;/span&gt;-d&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="se"&gt;\|&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-f&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;|&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;grep&lt;span class="w"&gt; &lt;/span&gt;-v&lt;span class="w"&gt; &lt;/span&gt;template&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;|&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;grep&lt;span class="w"&gt; &lt;/span&gt;-v&lt;span class="w"&gt; &lt;/span&gt;-e&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;^\s*$&amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;|&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;sed&lt;span class="w"&gt; &lt;/span&gt;-e&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;s/  *$//&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;|&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;tr&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;\n&amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39; &amp;#39;&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;
+&lt;span class="c1"&gt;#dbs=&amp;#39;dgul  hrms  mailer_server  missions  postgres&amp;#39;&lt;/span&gt;
+&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Will backup: &lt;/span&gt;&lt;span class="nv"&gt;$dbs&lt;/span&gt;&lt;span class="s2"&gt; to &lt;/span&gt;&lt;span class="nv"&gt;$backup_dir&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;/tmp/db_backup_info.log
+&lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;db&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;in&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$dbs&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;do&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Starting backup for &lt;/span&gt;&lt;span class="nv"&gt;$db&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;/tmp/db_backup_info.log
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nv"&gt;filename&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$db&lt;/span&gt;.&lt;span class="nv"&gt;$date_str&lt;/span&gt;.sql.gz
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nv"&gt;filename_binary&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$db&lt;/span&gt;.&lt;span class="nv"&gt;$date_str&lt;/span&gt;.bak.gz
+&lt;span class="w"&gt;  &lt;/span&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;-u&lt;span class="w"&gt; &lt;/span&gt;postgres&lt;span class="w"&gt; &lt;/span&gt;vacuumdb&lt;span class="w"&gt; &lt;/span&gt;--analyze&lt;span class="w"&gt; &lt;/span&gt;-Upostgres&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$db&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;/tmp/db_backup.log
+&lt;span class="w"&gt;  &lt;/span&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;-u&lt;span class="w"&gt; &lt;/span&gt;postgres&lt;span class="w"&gt; &lt;/span&gt;pg_dump&lt;span class="w"&gt; &lt;/span&gt;-Upostgres&lt;span class="w"&gt; &lt;/span&gt;-v&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$db&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-F&lt;span class="w"&gt; &lt;/span&gt;p&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&amp;gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;/tmp/db_backup.log&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;|&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;gzip&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$filename&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;-u&lt;span class="w"&gt; &lt;/span&gt;postgres&lt;span class="w"&gt; &lt;/span&gt;pg_dump&lt;span class="w"&gt; &lt;/span&gt;-Upostgres&lt;span class="w"&gt; &lt;/span&gt;-v&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$db&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-F&lt;span class="w"&gt; &lt;/span&gt;c&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&amp;gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;/tmp/db_backup.log&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;|&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;gzip&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$filename_binary&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;output_file_size&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$filename&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$db&lt;/span&gt;&lt;span class="s2"&gt; sql&amp;quot;&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;output_file_size&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$filename_binary&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$db&lt;/span&gt;&lt;span class="s2"&gt; bin&amp;quot;&lt;/span&gt;
+&lt;span class="k"&gt;done&lt;/span&gt;
+&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Backing up global objects&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;/tmp/db_backup_info.log
+&lt;span class="nv"&gt;filename&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;global.&lt;span class="nv"&gt;$date_str&lt;/span&gt;.sql.gz
+sudo&lt;span class="w"&gt; &lt;/span&gt;-u&lt;span class="w"&gt; &lt;/span&gt;postgres&lt;span class="w"&gt; &lt;/span&gt;pg_dumpall&lt;span class="w"&gt; &lt;/span&gt;-Upostgres&lt;span class="w"&gt; &lt;/span&gt;-v&lt;span class="w"&gt; &lt;/span&gt;-g&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&amp;gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;/tmp/db_backup.log&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;|&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;gzip&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$filename&lt;/span&gt;
+output_file_size&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$filename&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;global
+&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Ok!&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;/tmp/db_backup_info.log
+mail&lt;span class="w"&gt; &lt;/span&gt;-s&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Backup results&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;spapas@hcg.gr&lt;span class="w"&gt;  &lt;/span&gt;&amp;lt;&lt;span class="w"&gt; &lt;/span&gt;/tmp/db_backup_info.log
+&lt;span class="nb"&gt;popd&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;/dev/null
+&lt;/pre&gt;&lt;/div&gt;
+</content><category term="postgresql"></category><category term="bash"></category><category term="cron"></category><category term="postgresql"></category></entry></feed>

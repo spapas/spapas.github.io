@@ -1,0 +1,1764 @@
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="google-site-verification" content="5_8DTmIiEq4gFvNAfxAD6TsGOgrMAjp8lQFQvfA6zZc" />
+    <title>AI auto-subtitling &mdash; /var/</title>
+    <meta name="author" content="Serafeim Papastefanos">
+
+
+    
+<style type="text/css">
+pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: var(--jp-cell-editor-active-background) }
+.highlight { background: var(--jp-cell-editor-background); color: var(--jp-mirror-editor-variable-color) }
+.highlight .c { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment */
+.highlight .err { color: var(--jp-mirror-editor-error-color) } /* Error */
+.highlight .k { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword */
+.highlight .o { color: var(--jp-mirror-editor-operator-color); font-weight: bold } /* Operator */
+.highlight .p { color: var(--jp-mirror-editor-punctuation-color) } /* Punctuation */
+.highlight .ch { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Preproc */
+.highlight .cpf { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Single */
+.highlight .cs { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Special */
+.highlight .kc { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Pseudo */
+.highlight .kr { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Type */
+.highlight .m { color: var(--jp-mirror-editor-number-color) } /* Literal.Number */
+.highlight .s { color: var(--jp-mirror-editor-string-color) } /* Literal.String */
+.highlight .ow { color: var(--jp-mirror-editor-operator-color); font-weight: bold } /* Operator.Word */
+.highlight .pm { color: var(--jp-mirror-editor-punctuation-color) } /* Punctuation.Marker */
+.highlight .w { color: var(--jp-mirror-editor-variable-color) } /* Text.Whitespace */
+.highlight .mb { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Bin */
+.highlight .mf { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Float */
+.highlight .mh { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Hex */
+.highlight .mi { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Integer */
+.highlight .mo { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Oct */
+.highlight .sa { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Affix */
+.highlight .sb { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Backtick */
+.highlight .sc { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Char */
+.highlight .dl { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Delimiter */
+.highlight .sd { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Doc */
+.highlight .s2 { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Double */
+.highlight .se { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Escape */
+.highlight .sh { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Heredoc */
+.highlight .si { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Interpol */
+.highlight .sx { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Other */
+.highlight .sr { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Regex */
+.highlight .s1 { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Single */
+.highlight .ss { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Symbol */
+.highlight .il { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Integer.Long */
+</style>
+
+<style type="text/css">
+/* Overrides of notebook CSS for static HTML export */
+div.entry-content {
+  overflow: visible;
+  padding: 8px;
+}
+.input_area {
+  padding: 0.2em;
+}
+
+a.heading-anchor {
+ white-space: normal;
+}
+
+.rendered_html
+code {
+ font-size: .8em;
+}
+
+pre.ipynb {
+  color: black;
+  background: #f7f7f7;
+  border: none;
+  box-shadow: none;
+  margin-bottom: 0;
+  padding: 0;
+  margin: 0px;
+  font-size: 13px;
+}
+
+/* remove the prompt div from text cells */
+div.text_cell .prompt {
+    display: none;
+}
+
+/* remove horizontal padding from text cells, */
+/* so it aligns with outer body text */
+div.text_cell_render {
+    padding: 0.5em 0em;
+}
+
+img.anim_icon{padding:0; border:0; vertical-align:middle; -webkit-box-shadow:none; -box-shadow:none}
+
+div.collapseheader {
+    width=100%;
+    background-color:#d3d3d3;
+    padding: 2px;
+    cursor: pointer;
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+</style>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true,
+        displayMath: [['$$','$$'], ["\\[","\\]"]]
+    }
+});
+</script>
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+    $("div.collapseheader").click(function () {
+    $header = $(this).children("span").first();
+    $codearea = $(this).children(".input_area");
+    console.log($(this).children());
+    $codearea.slideToggle(500, function () {
+        $header.text(function () {
+            return $codearea.is(":visible") ? "Collapse Code" : "Expand Code";
+        });
+    });
+});
+});
+</script>
+
+
+
+
+
+
+    <!-- http://t.co/dKP3o1e -->
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+    <link href="https://spapas.github.io/favicon.png" rel="icon">
+
+    <link href="https://spapas.github.io/theme/css/main.css" media="screen, projection" rel="stylesheet"
+      type="text/css">
+
+    <link href="https://spapas.github.io/theme/css/extra_style.css" media="screen, projection" rel="stylesheet"
+      type="text/css">
+
+    <link href="https://fonts.googleapis.com/css?family=Fira+Mono|Fira+Sans:400,700&amp;subset=greek" rel="stylesheet">
+
+<style>
+#gHPzseYvFrhZ123 {
+  padding: 5px !important;
+  display: block;
+  margin-bottom: 10px !important;
+  background: #900;
+  color: #fff;
+  border-radius: 5px;
+  font-size: 1.0rem !important;
+}
+</style>
+
+
+  <script>
+    
+      
+  </script>
+
+    <script data-ad-client="ca-pub-7673322832689008" async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
+      onerror="adBlockFunction();"></script>
+  </head>
+
+<body>
+  <header role="banner"><hgroup>
+  <h1><a href="https://spapas.github.io/">/var/</a></h1>
+    <h2>Various programming stuff</h2>
+</hgroup></header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+</ul>
+
+
+<ul class="main-navigation">
+      <li class="active">
+        <a href="https://spapas.github.io/category/ai.html">Ai</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/android.html">Android</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/clojure.html">Clojure</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/css.html">Css</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/django.html">Django</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/elixir.html">Elixir</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/flask.html">Flask</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/gaming.html">Gaming</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/git.html">Git</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/html.html">Html</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/javascript.html">Javascript</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/networking.html">Networking</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/pelican.html">Pelican</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/postgresql.html">Postgresql</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/python.html">Python</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/spring.html">Spring</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/unix.html">Unix</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/wagtail.html">Wagtail</a>
+      </li>
+</ul></nav>
+  <div id="main">
+    <div id="content">
+    <div id="gHPzseYvFrhZ123">
+      Hello! If you are using an ad blocker but find something useful here 
+      and want to support me please consider disabling your ad blocker for this site. 
+      <br />
+      <br />
+      Thank you,<br />
+      Serafeim
+      
+    </div>
+<div>
+  <article class="hentry" role="article">
+<header>
+      <h1 class="entry-title">AI auto-subtitling</h1>
+    <p class="meta">
+<time datetime="2023-05-22T13:20:00+03:00" pubdate>Mon 22 May 2023</time>    </p>
+</header>
+
+<div class="entry-content"><h2 id="introduction">Introduction</h2>
+<p>As English is not my native language, I rely on subtitles to fully enjoy and comprehend most movies.
+Unfortunately there are a lot of movies that don&#8217;t include subtitles or the subtitles that I am able
+to find are not synchronized with the&nbsp;movie.</p>
+<p>In this small post I&#8217;ll give you some instructions on how to use the newest &#8220;<span class="caps">AI</span>&#8221; trends to automatically 
+generate subtitles for a movie. The process does not achive 100% accuracy but it is very good and should definitely allow you to understand what&#8217;s being&nbsp;said. </p>
+<p>Also, the described process will be very useful to people that do the actual subtitling for new movies since it 
+should save them a lot of manual labour. Instead of adding subtitles and timings manually they can use this to generate an automatic subtitle draft and then edit it by hand and&nbsp;ear.</p>
+<p>Finally, please notice that all tools described here are free and open source and you should be able to run everything on your <span class="caps">PC</span> even if it is very slow and doesn&#8217;t have a <span class="caps">GPU</span>.</p>
+<p><em>Everything described here is for educational purposes only. Please don&#8217;t use it to generate subtitles for movies that you don&#8217;t own or have the rights to do&nbsp;so.</em></p>
+<h2 id="whispercpp">Whisper.cpp</h2>
+<p>For the auto-subtitling we&#8217;ll use the <a href="https://github.com/ggerganov/whisper.cpp">whisper.cpp</a> library. This
+library can be used to auto-transcribe audio files i.e it gets
+audio as input and outputs the text that is being said in the&nbsp;audio.</p>
+<p>This library can be compiled on your <span class="caps">PC</span> however to avoid complex workflows you can 
+<a href="https://github.com/ggerganov/whisper.cpp/releases/tag/v1.4.0">download the binaries for your system</a>. I&#8217;d also
+recommend to download the <span class="caps">BLAS</span> binaries since they should work faster if your system supports&nbsp;them.</p>
+<p>After you download the whisper.cpp extract it in a folder of your&nbsp;choice.</p>
+<p>Beyond whisper.cpp, you need to download a model that will be used for the transcription.
+The simplest way is to go to the hugging face whisper.cpp <a href="https://huggingface.co/ggerganov/whisper.cpp/tree/main">model repository</a>
+and download the model from there. You only need 1 model file. The largest models will give you better results but will be slower and require more resources. I think that the base or small models should be good and fast&nbsp;enough.</p>
+<p>I&#8217;ll give you some test results later to see the&nbsp;differences.</p>
+<p>Notice that if your movie is in english you should download the .en&nbsp;models. </p>
+<p>To continue copy the downloaded models in the whisper.cpp&nbsp;folder.</p>
+<h2 id="extract-audio-from-the-movie">Extract audio from the&nbsp;movie</h2>
+<p>The whisper.cpp library requires uncompressed audio (a .wav file) with specific characteristics (a sample rate of 16khz) to&nbsp;work.</p>
+<p>To be able to extract that audio from our movie will use <a href="https://ffmpeg.org/">ffmpeg</a>. Download the win64 binaries 
+<a href="https://github.com/BtbN/FFmpeg-Builds/releases">from here</a> (get the <code>ffmpeg-master-latest-win64-gpl.zip</code> file) and copy over ffmpeg.exe to the whisper.cpp&nbsp;folder.</p>
+<p>Then, to extract the audio from the movie you can use the following&nbsp;command:</p>
+<div class="highlight"><pre><span></span><code>ffmpeg.exe<span class="w"> </span>-i<span class="w"> </span><span class="s2">&quot;movie.mp4&quot;</span><span class="w"> </span>-f<span class="w"> </span>wav<span class="w"> </span>-vn<span class="w"> </span>-acodec<span class="w"> </span>pcm_s16le<span class="w"> </span>-ar<span class="w"> </span><span class="m">16000</span><span class="w"> </span>-ac<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="s2">&quot;movie.wav&quot;</span>
+</code></pre></div>
+
+<p>(please change movie.mp4 and movie.wav with the correct names for your movie&nbsp;file).</p>
+<p>To understand the&nbsp;command:</p>
+<ul>
+<li><code>-i "movie.mp4"</code>: the input&nbsp;file</li>
+<li><code>-f wav</code>: the output format (a .wav&nbsp;file)</li>
+<li><code>-vn</code>: no&nbsp;video</li>
+<li><code>-acodec pcm_s16le</code>: the audio codec (the correct one for .wav&nbsp;file)</li>
+<li><code>-ar 16000</code>: the sample rate&nbsp;(16khz)</li>
+<li><code>-ac 1</code>: the number of channels (1 for mono, 2 for&nbsp;stereo)</li>
+<li><code>"movie.wav"</code>: the output&nbsp;file</li>
+</ul>
+<p>The process should be very fast and will give you a .wav file with the same length as the&nbsp;movie.</p>
+<h2 id="transcribing-the-audio">Transcribing the&nbsp;audio</h2>
+<p>The last step is to do the actual audio transcribing using whisper.cpp. The great thing about whisper.cpp
+is that it can directly create .srt (subtitle) files. The command to use&nbsp;is:</p>
+<div class="highlight"><pre><span></span><code>main.exe<span class="w"> </span>-osrt<span class="w"> </span>-m<span class="w"> </span>ggml-base.en.bin<span class="w"> </span>-f<span class="w"> </span>movie.wav
+</code></pre></div>
+
+<p>Notice&nbsp;that</p>
+<ul>
+<li>The whisper.cpp bundle you downloaded should have a main.exe&nbsp;file</li>
+<li><code>-osrt</code>: Generate a .srt file as&nbsp;output</li>
+<li><code>-m ggml-base.en.bin</code>: The model to use for the&nbsp;transcription</li>
+<li><code>-f movie.wav</code>: The input&nbsp;file</li>
+</ul>
+<p>The above command will start outputing the text it detects and when it finishes it will generate a <code>movie.wav.srt</code>.  You can then use that .srt file to add subtitles for your&nbsp;movie!</p>
+<h2 id="results">Results</h2>
+<p>To test the process I used the first 14 minutes of the movie Kill Bill 2 as input. To generate the .wav file I used the following&nbsp;command:</p>
+<div class="highlight"><pre><span></span><code>ffmpeg.exe<span class="w"> </span>-i<span class="w"> </span><span class="s2">&quot;kb2.mp4&quot;</span><span class="w"> </span>-f<span class="w"> </span>wav<span class="w"> </span>-vn<span class="w"> </span>-acodec<span class="w"> </span>pcm_s16le<span class="w"> </span>-ar<span class="w"> </span><span class="m">16000</span><span class="w"> </span>-ac<span class="w"> </span><span class="m">1</span><span class="w">  </span>-ss<span class="w"> </span><span class="m">00</span>:00:00<span class="w"> </span>-to<span class="w"> </span><span class="m">00</span>:14:00<span class="w"> </span><span class="s2">&quot;kb2.wav&quot;</span>
+</code></pre></div>
+
+<p>(please notice the <code>-ss</code> and <code>-to</code> to select the first 14 minutes of the&nbsp;movie).</p>
+<p>This generated a 26 <span class="caps">MB</span> wav file. Then I tried the results using
+three different&nbsp;models:</p>
+<ul>
+<li>ggml-tiny.en.bin with a size of 77 <span class="caps">MB</span></li>
+<li>ggml-base.en.bin with a size of 147 <span class="caps">MB</span></li>
+<li>ggml-small.en.bin with a size of 488 <span class="caps">MB</span></li>
+<li>ggml-medium.bin with a size of 1533 <span class="caps">MB</span></li>
+</ul>
+<h3 id="ggml-tinyenbin">ggml-tiny.en.bin</h3>
+<p>Some&nbsp;stats:</p>
+<div class="highlight"><pre><span></span><code><span class="n">whisper_model_load</span><span class="p">:</span><span class="w"> </span><span class="n">mem</span><span class="w"> </span><span class="n">required</span><span class="w">  </span><span class="o">=</span><span class="w">  </span><span class="mf">201.00</span><span class="w"> </span><span class="n">MB</span><span class="w"> </span><span class="p">(</span><span class="o">+</span><span class="w">    </span><span class="mf">3.00</span><span class="w"> </span><span class="n">MB</span><span class="w"> </span><span class="n">per</span><span class="w"> </span><span class="n">decoder</span><span class="p">)</span>
+<span class="n">whisper_model_load</span><span class="p">:</span><span class="w"> </span><span class="n">model</span><span class="w"> </span><span class="n">size</span><span class="w">    </span><span class="o">=</span><span class="w">   </span><span class="mf">73.54</span><span class="w"> </span><span class="n">MB</span>
+
+<span class="n">whisper_print_timings</span><span class="p">:</span><span class="w">    </span><span class="n">total</span><span class="w"> </span><span class="n">time</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">166330.89</span><span class="w"> </span><span class="n">ms</span>
+</code></pre></div>
+
+<p><strong>So time needed was ~ 160&nbsp;seconds</strong></p>
+<p>And the actual&nbsp;transcription:</p>
+<div class="highlight"><pre><span></span><code><span class="k">[00:00:00.000 --&gt; 00:00:03.000]   [MUSIC PLAYING]</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:03.000 --&gt; 00:00:16.480]   Do you finally sit just now?</span>
+<span class="k">[00:00:16.480 --&gt; 00:00:19.120]   [MUSIC PLAYING]</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:19.120 --&gt; 00:00:21.480]   No, I can&#39;t do.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:21.480 --&gt; 00:00:27.600]   I&#39;d like to believe you&#39;re aware enough even now.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:27.600 --&gt; 00:00:35.080]   No, that there is nothing suggesting in my actions.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:35.080 --&gt; 00:00:44.000]   This moment, this is me and my most nice against them.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:44.000 --&gt; 00:00:47.440]   Well, it&#39;s your name.</span>
+<span class="k">[00:00:47.440 --&gt; 00:00:52.920]   [MUSIC PLAYING]</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:52.920 --&gt; 00:00:55.120]   But Dad didn&#39;t I?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:55.120 --&gt; 00:00:56.640]   Well, I wasn&#39;t.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:56.640 --&gt; 00:00:58.040]   But it wasn&#39;t from lack of trying.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:58.040 --&gt; 00:01:00.360]   I can tell you that.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:00.360 --&gt; 00:01:03.600]   Actually, Bill&#39;s last bullet put me in a coma.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:03.600 --&gt; 00:01:07.600]   A coma, I was to lie in for four years.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:07.600 --&gt; 00:01:09.360]   And I woke up.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:09.360 --&gt; 00:01:11.280]   I went on with a movie advertisements</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:11.280 --&gt; 00:01:15.720]   for two as a roaring rampage of revenge.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:15.720 --&gt; 00:01:17.120]   I roared.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:17.120 --&gt; 00:01:18.800]   And I relanged.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:18.800 --&gt; 00:01:22.480]   And I got bloody satisfaction.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:22.480 --&gt; 00:01:26.360]   I&#39;ve killed a hell of a lot of people to get to this point.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:26.360 --&gt; 00:01:29.720]   But I have only one more.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:29.720 --&gt; 00:01:31.760]   The last one.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:31.760 --&gt; 00:01:35.360]   The one I&#39;m driving to right now.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:35.360 --&gt; 00:01:38.280]   The only one left.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:38.280 --&gt; 00:01:42.040]   And when I arrive at my destination,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:42.040 --&gt; 00:01:44.200]   I have going to kill Bill.</span>
+<span class="k">[00:01:44.200 --&gt; 00:01:47.200]   [MUSIC PLAYING]</span>
+<span class="k">[00:01:47.200 --&gt; 00:02:10.880]   [MUSIC PLAYING]</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:10.880 --&gt; 00:02:13.480]   Now the incident that happened at the two pines wedding</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:13.480 --&gt; 00:02:17.360]   chapel that put this whole gory story into motion</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:17.360 --&gt; 00:02:20.120]   has since become legend.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:20.120 --&gt; 00:02:22.800]   Massacre at two pines.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:22.800 --&gt; 00:02:24.800]   That&#39;s what the newspapers called it.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:24.800 --&gt; 00:02:28.760]   The local TV news called it the El Paso, Texas wedding</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:28.760 --&gt; 00:02:30.920]   chapel massacre.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:30.920 --&gt; 00:02:32.280]   How it happened?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:32.280 --&gt; 00:02:33.680]   Who was there?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:33.680 --&gt; 00:02:36.600]   How many got killed and who killed them?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:36.600 --&gt; 00:02:40.320]   Changes depending on who&#39;s telling the story.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:40.320 --&gt; 00:02:43.080]   In actual fact, the massacre didn&#39;t happen</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:43.080 --&gt; 00:02:45.720]   during a wedding at all.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:45.720 --&gt; 00:02:48.360]   It was a wedding rehearsal.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:48.360 --&gt; 00:02:51.800]   Now when we come to the park where I say you make kiss,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:51.800 --&gt; 00:02:55.120]   the bride, you make kiss, the bride.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:55.120 --&gt; 00:02:56.960]   But don&#39;t stick your tongue in her mouth.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:56.960 --&gt; 00:03:01.840]   This might be funny to your friends,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:01.840 --&gt; 00:03:06.440]   but it would be embarrassing to your parents.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:06.440 --&gt; 00:03:08.200]   We&#39;ll try to do strange things.</span>
+<span class="k">[00:03:08.200 --&gt; 00:03:11.080]   [LAUGHTER]</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:11.080 --&gt; 00:03:12.040]   Y&#39;all got a song?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:12.040 --&gt; 00:03:18.000]   How about love me, tender?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:18.000 --&gt; 00:03:18.840]   I&#39;d play that.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:18.840 --&gt; 00:03:24.360]   Let me tender be great.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:24.360 --&gt; 00:03:27.520]   Rufus, he&#39;s the man.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:27.520 --&gt; 00:03:30.640]   Rufus, who was that he used to play for?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:30.640 --&gt; 00:03:32.640]   Rufus Thomas.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:32.640 --&gt; 00:03:34.760]   Rufus Thomas.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:34.760 --&gt; 00:03:35.680]   Rufus Thomas.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:35.680 --&gt; 00:03:37.080]   I was a dreel.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:37.080 --&gt; 00:03:38.600]   I was a drifter.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:38.600 --&gt; 00:03:40.080]   I was a colister.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:40.080 --&gt; 00:03:41.920]   I was a part of the game.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:41.920 --&gt; 00:03:43.760]   I was a bar kid.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:43.760 --&gt; 00:03:48.200]   If they come through Texas, I can play with him.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:48.200 --&gt; 00:03:50.720]   Rufus, he&#39;s the man.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:50.720 --&gt; 00:03:56.840]   I never forgot anything.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:56.840 --&gt; 00:04:00.440]   Oh, yes, you forgot the seating arrangements.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:00.440 --&gt; 00:04:03.200]   Thank you, Mother.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:03.200 --&gt; 00:04:07.840]   Now the way we normally do this, we have the bride&#39;s side,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:07.840 --&gt; 00:04:09.560]   and then we have the groom&#39;s side.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:09.560 --&gt; 00:04:12.880]   But since the bride ain&#39;t got nobody coming,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:12.880 --&gt; 00:04:16.960]   and the groom&#39;s got far too many people coming--</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:16.960 --&gt; 00:04:18.920]   Well, yeah, they&#39;re coming all the way from Oklahoma.</span>
+<span class="k">[00:04:18.920 --&gt; 00:04:21.600]   [LAUGHTER]</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:21.600 --&gt; 00:04:23.160]   Right.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:23.160 --&gt; 00:04:27.880]   Well, I don&#39;t see no problem with the groom&#39;s side</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:27.880 --&gt; 00:04:29.840]   sharing the bride&#39;s side.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:29.840 --&gt; 00:04:30.760]   Do you, Mother?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:30.760 --&gt; 00:04:32.720]   Not a problem with that.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:32.720 --&gt; 00:04:38.880]   But honey, you know, it would be good if you had somebody come.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:38.880 --&gt; 00:04:42.840]   You know, it was a sign of good faith.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:42.840 --&gt; 00:04:49.400]   Well, I don&#39;t have anybody except for Tommy and my friends.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:49.400 --&gt; 00:04:52.000]   You have no family?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:52.000 --&gt; 00:04:53.600]   Well, I&#39;m working on changing that.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:53.600 --&gt; 00:04:55.360]   Mrs. Harmony, we&#39;re all the family.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:55.360 --&gt; 00:04:56.760]   This is Langel&#39;s ever going to need.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:56.760 --&gt; 00:05:01.760]   I don&#39;t feel very well in this bitch.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">05:01.760 --&gt; 00:05:03.680]   This started to piss me off.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">05:03.680 --&gt; 00:05:08.280]   So while you all blather on, I&#39;m going to go outside and get some air.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">05:08.280 --&gt; 00:05:10.320]   I&#39;m a Reverend, sorry.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">05:10.320 --&gt; 00:05:11.840]   She&#39;s going to go out and get some air.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">05:11.840 --&gt; 00:05:12.440]   Yeah.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">05:12.440 --&gt; 00:05:15.320]   Given her delicate condition, she just needs a few minutes</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">05:15.320 --&gt; 00:05:15.920]   to get it together.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">05:15.920 --&gt; 00:05:16.920]   She&#39;ll be OK.</span>
+<span class="k">[00:05:16.920 --&gt; 00:05:19.880]   [MUSIC PLAYING]</span>
+<span class="k">[00:05:19.880 --&gt; 00:05:23.880]   [MUSIC PLAYING]</span>
+<span class="k">[00:05:23.880 --&gt; 00:05:27.880]   [MUSIC PLAYING]</span>
+<span class="k">[00:05:27.880 --&gt; 00:05:31.880]   [MUSIC PLAYING]</span>
+<span class="k">[00:05:31.880 --&gt; 00:05:35.880]   [MUSIC PLAYING]</span>
+<span class="k">[00:05:35.880 --&gt; 00:05:39.880]   [MUSIC PLAYING]</span>
+<span class="k">[00:05:39.880 --&gt; 00:05:43.880]   [MUSIC PLAYING]</span>
+<span class="k">[00:05:43.880 --&gt; 00:05:47.880]   [MUSIC PLAYING]</span>
+<span class="k">[00:05:47.880 --&gt; 00:05:51.880]   [MUSIC PLAYING]</span>
+<span class="k">[00:05:51.880 --&gt; 00:05:55.880]   [MUSIC PLAYING]</span>
+<span class="k">[00:05:55.880 --&gt; 00:05:59.880]   [MUSIC PLAYING]</span>
+<span class="k">[00:05:59.880 --&gt; 00:06:01.880]   [MUSIC PLAYING]</span>
+<span class="k">[00:06:01.880 --&gt; 00:06:03.880]   [MUSIC PLAYING]</span>
+<span class="k">[00:06:03.880 --&gt; 00:06:05.880]   [MUSIC PLAYING]</span>
+<span class="k">[00:06:05.880 --&gt; 00:06:07.880]   [MUSIC PLAYING]</span>
+<span class="k">[00:06:07.880 --&gt; 00:06:09.880]   [MUSIC PLAYING]</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">06:35.880 --&gt; 00:06:37.880]   Hello, kiddo.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">06:37.880 --&gt; 00:06:45.880]   How did you find me?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">06:45.880 --&gt; 00:06:46.880]   I&#39;m the man.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">06:46.880 --&gt; 00:06:54.880]   What are you doing here?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">06:54.880 --&gt; 00:06:57.880]   Am I doing?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">06:57.880 --&gt; 00:07:02.880]   Well, I&#39;m only going to play my flute.</span>
+<span class="k">[00:07:02.880 --&gt; 00:07:05.880]   [MUSIC PLAYING]</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:05.880 --&gt; 00:07:14.880]   This moment, I&#39;m looking at the most beautiful</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:14.880 --&gt; 00:07:18.880]   bright and these old eyes of every scene.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:18.880 --&gt; 00:07:20.880]   Where are you here?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:20.880 --&gt; 00:07:21.880]   Nice look.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:21.880 --&gt; 00:07:26.880]   Are you going to be nice?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:26.880 --&gt; 00:07:30.880]   I&#39;ve never been nice my whole life.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:30.880 --&gt; 00:07:33.880]   But I&#39;ll do my best to be sweet.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:33.880 --&gt; 00:07:42.880]   I was told you, your sweet side is your best side.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:42.880 --&gt; 00:07:45.880]   I guess that&#39;s why you&#39;re the only one who&#39;s ever seen it.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:45.880 --&gt; 00:07:51.880]   See, you got a bun in the oven.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:51.880 --&gt; 00:07:54.880]   Hmm.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:54.880 --&gt; 00:07:57.880]   I&#39;m knocked out.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:57.880 --&gt; 00:07:59.880]   I&#39;m not sure what you&#39;re doing.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:59.880 --&gt; 00:08:01.880]   I&#39;m not sure what you&#39;re doing.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:01.880 --&gt; 00:08:03.880]   I&#39;m not sure what you&#39;re doing.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:03.880 --&gt; 00:08:05.880]   I&#39;m not sure what you&#39;re doing.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:05.880 --&gt; 00:08:07.880]   I&#39;m not sure what you&#39;re doing.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:07.880 --&gt; 00:08:09.880]   I&#39;m not sure what you&#39;re doing.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:09.880 --&gt; 00:08:11.880]   I&#39;m not sure what you&#39;re doing.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:11.880 --&gt; 00:08:13.880]   I&#39;m not sure what you&#39;re doing.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:13.880 --&gt; 00:08:15.880]   I&#39;m not sure what you&#39;re doing.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:15.880 --&gt; 00:08:17.880]   I&#39;m not sure what you&#39;re doing.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:17.880 --&gt; 00:08:19.880]   I&#39;m not sure what you&#39;re doing.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:19.880 --&gt; 00:08:21.880]   I&#39;m not sure what you&#39;re doing.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:21.880 --&gt; 00:08:23.880]   I&#39;m not sure what you&#39;re doing.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:23.880 --&gt; 00:08:25.880]   I&#39;m not sure what you&#39;re doing.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:25.880 --&gt; 00:08:28.880]   That&#39;s hardly a prompt.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:28.880 --&gt; 00:08:30.880]   But you&#39;re right.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:30.880 --&gt; 00:08:35.880]   What is your young man do for a living?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:35.880 --&gt; 00:08:39.880]   He owns a used record store here in El Paso.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:39.880 --&gt; 00:08:41.880]   Music lover, right?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:41.880 --&gt; 00:08:44.880]   He&#39;s fond of music.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:44.880 --&gt; 00:08:46.880]   Not me all.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:46.880 --&gt; 00:08:54.880]   And what are you doing for a J.O.B. these days?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:55.880 --&gt; 00:08:58.880]   I work in the record store.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:58.880 --&gt; 00:09:06.880]   Oh, so it all suddenly seems so clear.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:06.880 --&gt; 00:09:09.880]   Do you like it?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:09.880 --&gt; 00:09:13.880]   Yeah, I like it a lot, smartass.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:13.880 --&gt; 00:09:15.880]   I get to listen to music all day.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:15.880 --&gt; 00:09:17.880]   Talk about music all day.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:17.880 --&gt; 00:09:20.880]   It&#39;s really cool.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:20.880 --&gt; 00:09:22.880]   It&#39;s going to be a great environment</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:22.880 --&gt; 00:09:27.880]   for a little girl to grow up in.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:27.880 --&gt; 00:09:30.880]   As opposed to getting around the world,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:30.880 --&gt; 00:09:33.880]   killing human beings, and being paid best</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:33.880 --&gt; 00:09:36.880]   sums of money.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:36.880 --&gt; 00:09:38.880]   Precisely.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:38.880 --&gt; 00:09:41.880]   Well, my own friend.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:41.880 --&gt; 00:09:43.880]   Do we choose someone?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:43.880 --&gt; 00:09:48.880]   However, all cocklockery aside,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:48.880 --&gt; 00:09:51.880]   I am looking forward to meeting your young man.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:51.880 --&gt; 00:09:54.880]   I happen to be more or less particular.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:54.880 --&gt; 00:09:59.880]   Who might get married?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:59.880 --&gt; 00:10:01.880]   You want to come to the wedding?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:01.880 --&gt; 00:10:04.880]   Only if I can sit on the bright side.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:04.880 --&gt; 00:10:07.880]   You&#39;ll find it a bit lonely on my side.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:07.880 --&gt; 00:10:11.880]   Your side always was a bit lonely.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:11.880 --&gt; 00:10:15.880]   But I wouldn&#39;t sit anywhere else.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:15.880 --&gt; 00:10:20.880]   You know, I had a lovely stream of money.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:20.880 --&gt; 00:10:22.880]   Lovely stream about you.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:22.880 --&gt; 00:10:23.880]   Oh, here&#39;s Tommy.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:23.880 --&gt; 00:10:25.880]   Call me, Arlene.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:25.880 --&gt; 00:10:26.880]   You must be Tommy.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:26.880 --&gt; 00:10:27.880]   Uh-huh.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:27.880 --&gt; 00:10:29.880]   Arlene&#39;s told me so much about you.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:29.880 --&gt; 00:10:30.880]   Aren&#39;t you okay?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:30.880 --&gt; 00:10:31.880]   Oh, I&#39;m fine.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:31.880 --&gt; 00:10:34.880]   Tommy, I&#39;d like you to meet my father.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:34.880 --&gt; 00:10:37.880]   Oh, my God.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:37.880 --&gt; 00:10:39.880]   Oh, my God, this is great.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:39.880 --&gt; 00:10:41.880]   I&#39;m so glad to meet you, sir.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:41.880 --&gt; 00:10:42.880]   Oh, Dad.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:42.880 --&gt; 00:10:44.880]   The name is Bill.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:44.880 --&gt; 00:10:46.880]   Well, it&#39;s great to meet you.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:46.880 --&gt; 00:10:47.880]   Bill.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:47.880 --&gt; 00:10:49.880]   Arlene told me you could make it.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:49.880 --&gt; 00:10:50.880]   Surprise.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:50.880 --&gt; 00:10:52.880]   That&#39;s my pop for you.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:52.880 --&gt; 00:10:54.880]   Always full of surprises.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:54.880 --&gt; 00:11:00.880]   Well, in the surprise department, the apple doesn&#39;t fall far from the tree.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:00.880 --&gt; 00:11:02.880]   When did you get in?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:02.880 --&gt; 00:11:03.880]   Just now.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:03.880 --&gt; 00:11:05.880]   Did you come straight from Australia?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:05.880 --&gt; 00:11:06.880]   Of course.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:06.880 --&gt; 00:11:08.880]   Daddy, I told Tommy that you were in Perth,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:08.880 --&gt; 00:11:11.880]   lining for silver and no one could meet you.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:11.880 --&gt; 00:11:15.880]   Lucky for us all, that&#39;s not the case.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:15.880 --&gt; 00:11:19.880]   So, what&#39;s this all about?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:19.880 --&gt; 00:11:26.880]   I&#39;ve heard of wedding rehearsals, but I don&#39;t believe I&#39;ve ever heard of a wedding dress rehearsal before.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:26.880 --&gt; 00:11:33.880]   We thought, well, I paid so much money for a dress you only going to wear once, especially when Arlene looks so goddamn beautiful in it.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:33.880 --&gt; 00:11:38.880]   So, uh, we&#39;re going to try to get all the mileage we can out of it.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:38.880 --&gt; 00:11:43.880]   Isn&#39;t it supposed to be bad luck for the groom to see the bride and her wedding dress?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:43.880 --&gt; 00:11:45.880]   People with a ceremony?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:45.880 --&gt; 00:11:50.880]   Well, I guess I just believe I&#39;m having dangerous.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:50.880 --&gt; 00:11:53.880]   I know just what you mean.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:53.880 --&gt; 00:11:54.880]   Some.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:54.880 --&gt; 00:11:56.880]   Some of us are places to be.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:56.880 --&gt; 00:11:58.880]   Show them to do.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:58.880 --&gt; 00:12:01.880]   Look, we got to go through this one more time.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:01.880 --&gt; 00:12:03.880]   So, uh, why don&#39;t you have a--</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:03.880 --&gt; 00:12:05.880]   Oh, my God.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:05.880 --&gt; 00:12:06.880]   What am I thinking?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:06.880 --&gt; 00:12:07.880]   You should give her away.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:07.880 --&gt; 00:12:10.880]   Tommy, that&#39;s not exactly Daddy&#39;s cup of tea.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:10.880 --&gt; 00:12:15.880]   I&#39;m not even sure if you&#39;re much more comfortable sitting with the rest of the cats.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:15.880 --&gt; 00:12:17.880]   Really?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:17.880 --&gt; 00:12:20.880]   That&#39;s asking a lot.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:20.880 --&gt; 00:12:21.880]   No.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:21.880 --&gt; 00:12:22.880]   Okay.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:22.880 --&gt; 00:12:23.880]   Forget it.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:23.880 --&gt; 00:12:25.880]   But how about we go out to dinner tonight, celebrate?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:25.880 --&gt; 00:12:28.880]   Only on the condition that I pay for everything.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:28.880 --&gt; 00:12:29.880]   Deal.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:29.880 --&gt; 00:12:31.880]   We have to do this now.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:31.880 --&gt; 00:12:32.880]   Can I watch?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:32.880 --&gt; 00:12:33.880]   Absolutely.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:33.880 --&gt; 00:12:35.880]   Have a seat.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:35.880 --&gt; 00:12:37.880]   Which is the bride&#39;s side.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:37.880 --&gt; 00:12:39.880]   Right over here.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:39.880 --&gt; 00:12:44.880]   Mother, here we go.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:44.880 --&gt; 00:12:45.880]   Yes.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:45.880 --&gt; 00:12:48.880]   Now, son, pop them, bowels.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:48.880 --&gt; 00:12:49.880]   Yeah.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:49.880 --&gt; 00:12:51.880]   You can&#39;t hear me.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:51.880 --&gt; 00:12:53.880]   You should be.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:53.880 --&gt; 00:12:54.880]   No.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:54.880 --&gt; 00:12:58.880]   I just don&#39;t want to.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:58.880 --&gt; 00:13:00.880]   You don&#39;t want me to put them there.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">13:00.880 --&gt; 00:13:07.880]   If he&#39;s the man you want, then go stand by.</span>
+<span class="k">[00:13:07.880 --&gt; 00:13:31.880]   [MUSIC]</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">13:31.880 --&gt; 00:13:33.880]   Does it look pretty?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">13:33.880 --&gt; 00:13:35.880]   Oh, yeah.</span>
+<span class="k">[00:13:35.880 --&gt; 00:13:45.880]   [MUSIC]</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">13:45.880 --&gt; 00:13:47.880]   Thank you.</span>
+<span class="k">[00:13:47.880 --&gt; 00:13:52.880]   [MUSIC]</span>
+<span class="k">[00:13:52.880 --&gt; 00:13:59.880]   [MUSIC]</span>
+</code></pre></div>
+
+<h2 id="ggml-baseenbin">ggml-base.en.bin</h2>
+<p>Some&nbsp;stats:</p>
+<div class="highlight"><pre><span></span><code><span class="n">whisper_model_load</span><span class="p">:</span><span class="w"> </span><span class="n">mem</span><span class="w"> </span><span class="n">required</span><span class="w">  </span><span class="o">=</span><span class="w">  </span><span class="mf">310.00</span><span class="w"> </span><span class="n">MB</span><span class="w"> </span><span class="p">(</span><span class="o">+</span><span class="w">    </span><span class="mf">6.00</span><span class="w"> </span><span class="n">MB</span><span class="w"> </span><span class="n">per</span><span class="w"> </span><span class="n">decoder</span><span class="p">)</span>
+<span class="n">whisper_model_load</span><span class="p">:</span><span class="w"> </span><span class="n">model</span><span class="w"> </span><span class="n">size</span><span class="w">    </span><span class="o">=</span><span class="w">  </span><span class="mf">140.54</span><span class="w"> </span><span class="n">MB</span>
+
+<span class="n">whisper_print_timings</span><span class="p">:</span><span class="w">    </span><span class="n">total</span><span class="w"> </span><span class="n">time</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">433205.62</span><span class="w"> </span><span class="n">ms</span>
+</code></pre></div>
+
+<p><strong>So time needed was ~ 433&nbsp;seconds</strong></p>
+<p>Actual&nbsp;transcription:</p>
+<div class="highlight"><pre><span></span><code><span class="k">[00:00:00.000 --&gt; 00:00:15.000]   [Music]</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:15.000 --&gt; 00:00:17.000]   Do you find me sadistic?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:17.000 --&gt; 00:00:20.000]   No, Kato.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:20.000 --&gt; 00:00:23.000]   I&#39;d like to believe</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:23.000 --&gt; 00:00:27.000]   you&#39;re aware enough, even now.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:27.000 --&gt; 00:00:33.000]   I know that there is nothing sadistic in my actions.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:33.000 --&gt; 00:00:36.000]   This moment,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:36.000 --&gt; 00:00:40.000]   this is me,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:40.000 --&gt; 00:00:44.000]   and I most miss the case.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:44.000 --&gt; 00:00:45.000]   Well,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:45.000 --&gt; 00:00:48.000]   it&#39;s your baby.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:48.000 --&gt; 00:00:54.000]   The dead didn&#39;t I?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:55.000 --&gt; 00:00:57.000]   Well, I wasn&#39;t.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:57.000 --&gt; 00:01:00.000]   But it wasn&#39;t from lack of try and I can tell you that.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:00.000 --&gt; 00:01:03.000]   Actually, Bill&#39;s last bullet put me in a coma.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:03.000 --&gt; 00:01:07.000]   A coma I was to lie in for four years.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:07.000 --&gt; 00:01:09.000]   When I woke up,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:09.000 --&gt; 00:01:15.000]   I went on with the movie advertisements referred to as a roaring rampage of revenge.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:15.000 --&gt; 00:01:17.000]   I roared,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:17.000 --&gt; 00:01:19.000]   and I rampaged,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:19.000 --&gt; 00:01:22.000]   and I got bloody satisfaction.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:22.000 --&gt; 00:01:26.000]   I&#39;ve killed a hell of a lot of people who get to this point.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:26.000 --&gt; 00:01:29.000]   But I have only one more.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:29.000 --&gt; 00:01:31.000]   The last one.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:31.000 --&gt; 00:01:35.000]   The one I&#39;m driving to right now.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:35.000 --&gt; 00:01:38.000]   The only one left.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:38.000 --&gt; 00:01:41.000]   And when I arrive at my destination,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:41.000 --&gt; 00:01:45.000]   I am gonna kill Bill.</span>
+<span class="k">[00:01:45.000 --&gt; 00:02:02.000]   [Music]</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:02.000 --&gt; 00:02:14.000]   Now the incident that happened at the two pines wedding chapel</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:14.000 --&gt; 00:02:20.000]   that put this whole gory story into motion has since become legend.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:20.000 --&gt; 00:02:23.000]   Massacre at two pines.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:23.000 --&gt; 00:02:25.000]   That&#39;s what the newspapers called it.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:25.000 --&gt; 00:02:31.000]   The local TV news called it the El Paso Texas Wedding Chapel Massacre.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:31.000 --&gt; 00:02:32.000]   How it happened?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:32.000 --&gt; 00:02:33.000]   Who was there?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:33.000 --&gt; 00:02:36.000]   How many got killed and who killed them?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:36.000 --&gt; 00:02:40.000]   Changes depending on who&#39;s telling the story.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:40.000 --&gt; 00:02:42.000]   In actual fact,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:42.000 --&gt; 00:02:46.000]   the massacre didn&#39;t happen during a wedding at all.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:46.000 --&gt; 00:02:48.000]   It was a wedding rehearsal.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:48.000 --&gt; 00:02:53.000]   Now when we come to the park where I say you may kiss the bride,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:53.000 --&gt; 00:02:55.000]   you may kiss the bride.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:55.000 --&gt; 00:02:59.000]   But don&#39;t stick your tongue in her mouth.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:59.000 --&gt; 00:03:02.000]   This might be funny to your friends,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:02.000 --&gt; 00:03:06.000]   but it would be embarrassing to your parents.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:06.000 --&gt; 00:03:11.000]   We&#39;ll try to be strange.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:11.000 --&gt; 00:03:16.000]   Y&#39;all got a song?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:16.000 --&gt; 00:03:18.000]   How about &quot;Love Me Tender&quot;?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:18.000 --&gt; 00:03:22.000]   I can play that.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:22.000 --&gt; 00:03:24.000]   Let me tend to be great.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:24.000 --&gt; 00:03:27.000]   Rufus, he&#39;s the man.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:27.000 --&gt; 00:03:28.000]   Rufus?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:28.000 --&gt; 00:03:30.000]   Who was that to use to play for?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:30.000 --&gt; 00:03:32.000]   Rufus Thomas.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:32.000 --&gt; 00:03:34.000]   Rufus Thomas.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:34.000 --&gt; 00:03:36.000]   Rufus Thomas.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:36.000 --&gt; 00:03:37.000]   I was a drill.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:37.000 --&gt; 00:03:38.000]   I was a drifted.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:38.000 --&gt; 00:03:40.000]   I was a coaster.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:40.000 --&gt; 00:03:42.000]   I was part of the gang.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:42.000 --&gt; 00:03:44.000]   I was a bar-k.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:44.000 --&gt; 00:03:48.000]   If they come through Texas, I&#39;d play with him.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:48.000 --&gt; 00:03:50.000]   Rufus?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:50.000 --&gt; 00:03:54.000]   He&#39;s the man.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:54.000 --&gt; 00:03:57.000]   Have I forgot anything?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:57.000 --&gt; 00:04:00.000]   Oh yes, you forgot the seating arrangements.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:00.000 --&gt; 00:04:03.000]   Thank you, mother.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:03.000 --&gt; 00:04:05.000]   Now the way we normally do this,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:05.000 --&gt; 00:04:08.000]   we have the bride&#39;s side,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:08.000 --&gt; 00:04:12.000]   but since the bride ain&#39;t got nobody coming,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:12.000 --&gt; 00:04:16.000]   and the groom&#39;s got far too many people coming,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:16.000 --&gt; 00:04:20.000]   well yeah, they&#39;re coming all the way from Oklahoma.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:20.000 --&gt; 00:04:22.000]   Right.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:22.000 --&gt; 00:04:27.000]   Well, I don&#39;t see no problem with the groom&#39;s side</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:27.000 --&gt; 00:04:29.000]   sharing the bride&#39;s side.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:29.000 --&gt; 00:04:30.000]   Do you, mother?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:30.000 --&gt; 00:04:32.000]   Not a problem with that,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:32.000 --&gt; 00:04:37.000]   but honey, you know, it would be good if you had somebody come</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:37.000 --&gt; 00:04:41.000]   You know, is it sign of good faith?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:41.000 --&gt; 00:04:44.000]   Well, I don&#39;t have anybody,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:44.000 --&gt; 00:04:48.000]   except for Tommy and my friends.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:48.000 --&gt; 00:04:51.000]   You have no family?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:51.000 --&gt; 00:04:53.000]   Well, I&#39;m working on changing then.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:53.000 --&gt; 00:04:55.000]   Mrs. Harmony, we&#39;re all the family</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:55.000 --&gt; 00:04:58.000]   this Alangel&#39;s ever going to need.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:58.000 --&gt; 00:05:00.000]   I&#39;m not feeling very well,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">05:00.000 --&gt; 00:05:03.000]   and this bitch is starting to piss me off.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">05:03.000 --&gt; 00:05:05.000]   So while you all bother on,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">05:05.000 --&gt; 00:05:08.000]   I&#39;m going to go outside and get some air.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">05:08.000 --&gt; 00:05:10.000]   I&#39;m sorry.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">05:10.000 --&gt; 00:05:12.000]   She&#39;s going to go out and get some air.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">05:12.000 --&gt; 00:05:14.000]   Yeah, given her delicate condition,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">05:14.000 --&gt; 00:05:17.000]   she just needs a few minutes to give it to get us to be okay.</span>
+<span class="k">[00:05:18.000 --&gt; 00:05:21.000]   [music]</span>
+<span class="k">[00:05:22.000 --&gt; 00:05:25.000]   [music]</span>
+<span class="k">[00:05:26.000 --&gt; 00:05:29.000]   [music]</span>
+<span class="k">[00:05:30.000 --&gt; 00:05:33.000]   [music]</span>
+<span class="k">[00:05:34.000 --&gt; 00:05:37.000]   [music]</span>
+<span class="k">[00:05:38.000 --&gt; 00:05:41.000]   [music]</span>
+<span class="k">[00:05:42.000 --&gt; 00:05:45.000]   [music]</span>
+<span class="k">[00:05:46.000 --&gt; 00:05:49.000]   [music]</span>
+<span class="k">[00:05:50.000 --&gt; 00:05:53.000]   [music]</span>
+<span class="k">[00:05:53.000 --&gt; 00:05:57.000]   [music]</span>
+<span class="k">[00:05:57.000 --&gt; 00:06:01.000]   [music]</span>
+<span class="k">[00:06:01.000 --&gt; 00:06:05.000]   [music]</span>
+<span class="k">[00:06:05.000 --&gt; 00:06:09.000]   [music]</span>
+<span class="k">[00:06:09.000 --&gt; 00:06:13.000]   [music]</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">06:36.000 --&gt; 00:06:40.000]   Hello, kiddo.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">06:40.000 --&gt; 00:06:46.000]   How did you find me?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">06:46.000 --&gt; 00:06:50.000]   I&#39;m the man.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">06:50.000 --&gt; 00:06:54.000]   What are you doing here?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">06:54.000 --&gt; 00:06:58.000]   What am I doing?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">06:58.000 --&gt; 00:07:00.000]   Well,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:00.000 --&gt; 00:07:06.000]   I was playing my flute.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:06.000 --&gt; 00:07:12.000]   At this moment,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:12.000 --&gt; 00:07:15.000]   I&#39;m looking at the most beautiful bride</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:15.000 --&gt; 00:07:19.000]   in these old eyes of every scene.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:19.000 --&gt; 00:07:21.000]   Why are you here?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:21.000 --&gt; 00:07:25.000]   Last look.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:25.000 --&gt; 00:07:27.000]   Are you going to be nice?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:27.000 --&gt; 00:07:31.000]   I&#39;ve never been nice my whole life.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:31.000 --&gt; 00:07:36.000]   But I&#39;ll do my best to be sweet.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:36.000 --&gt; 00:07:39.000]   I always told you,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:39.000 --&gt; 00:07:42.000]   your sweet side is your best side.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:42.000 --&gt; 00:07:49.000]   I guess that&#39;s why you&#39;re the only one who&#39;s ever seen it.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:49.000 --&gt; 00:07:54.000]   See, you got a bun in the oven?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:54.000 --&gt; 00:07:58.000]   I&#39;m knocked up.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:58.000 --&gt; 00:08:00.000]   Chase Louise.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:00.000 --&gt; 00:08:02.000]   That young man here is sure</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:02.000 --&gt; 00:08:06.000]   it doesn&#39;t believe in wasting time, does he?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:06.000 --&gt; 00:08:10.000]   Have you seen Tommy?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:10.000 --&gt; 00:08:12.000]   A guy on the tux?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:12.000 --&gt; 00:08:13.000]   Yes.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:13.000 --&gt; 00:08:16.000]   And I saw him.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:16.000 --&gt; 00:08:20.000]   I like his hair.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:20.000 --&gt; 00:08:24.000]   You promised you&#39;d be nice.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:24.000 --&gt; 00:08:26.000]   I said I&#39;d do my best.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:26.000 --&gt; 00:08:29.000]   That&#39;s hardly a promise.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:29.000 --&gt; 00:08:31.000]   But you&#39;re right.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:31.000 --&gt; 00:08:36.000]   What does your young man do for a living?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:36.000 --&gt; 00:08:40.000]   He owns a used record store here in El Paso.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:40.000 --&gt; 00:08:42.000]   He&#39;s a lover, right?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:42.000 --&gt; 00:08:45.000]   He&#39;s fond of music.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:45.000 --&gt; 00:08:51.000]   Aren&#39;t we all?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:51.000 --&gt; 00:08:56.000]   And what are you doing for a J.O.B. these days?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:56.000 --&gt; 00:08:59.000]   I work in the record store.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:59.000 --&gt; 00:09:03.000]   Ah, so...</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:03.000 --&gt; 00:09:08.000]   it all suddenly seems so clear.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:08.000 --&gt; 00:09:10.000]   Do you like it?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:10.000 --&gt; 00:09:14.000]   Yeah, I like it a lot, smart ass.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:14.000 --&gt; 00:09:17.000]   I get to listen to music all day.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:17.000 --&gt; 00:09:21.000]   Talk about music all day. It&#39;s really cool.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:21.000 --&gt; 00:09:28.000]   It&#39;s going to be a great environment for my little girl to grow up in.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:28.000 --&gt; 00:09:33.000]   As opposed to jetting around the world, killing human beams,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:33.000 --&gt; 00:09:38.000]   and being paid best sums of money.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:38.000 --&gt; 00:09:40.000]   Precisely.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:40.000 --&gt; 00:09:44.000]   I have a friend.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:44.000 --&gt; 00:09:47.000]   Do each you own.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:47.000 --&gt; 00:09:51.000]   However, all clockwork re-assigned.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:51.000 --&gt; 00:09:55.000]   I am looking forward to meeting your young man.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:55.000 --&gt; 00:09:59.000]   I happen to be more or less particular.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:59.000 --&gt; 00:10:03.000]   Oh, my God, Mary.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:03.000 --&gt; 00:10:05.000]   You want to come to the wedding?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:05.000 --&gt; 00:10:08.000]   Only if I can sit on the bride&#39;s side.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:08.000 --&gt; 00:10:12.000]   Your side always was a bit lonely.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:12.000 --&gt; 00:10:17.000]   But I wouldn&#39;t sit anywhere else.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:17.000 --&gt; 00:10:22.000]   You know, I had a lovely stream about you.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:22.000 --&gt; 00:10:25.000]   Oh, here&#39;s Tommy. Call me Arlene.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:25.000 --&gt; 00:10:29.000]   You must be Tommy. Arlene&#39;s told me so much about you.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:29.000 --&gt; 00:10:31.000]   Are you okay?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:31.000 --&gt; 00:10:35.000]   Oh, I&#39;m fine. Tommy, I&#39;d like you to meet my father.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:35.000 --&gt; 00:10:38.000]   Oh, my God.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:38.000 --&gt; 00:10:40.000]   Oh, my God, this is great.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:40.000 --&gt; 00:10:42.000]   I&#39;m so glad to meet you, sir.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:42.000 --&gt; 00:10:45.000]   Oh, Dad, the name is Bill.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:45.000 --&gt; 00:10:48.000]   Well, it&#39;s great to meet you. Bill.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:48.000 --&gt; 00:10:50.000]   Arlene told me you could make it.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:50.000 --&gt; 00:10:51.000]   Surprise.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:51.000 --&gt; 00:10:54.000]   That&#39;s my pot for you. Always full of surprises.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:54.000 --&gt; 00:10:58.000]   Well, in a surprise department.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:58.000 --&gt; 00:11:01.000]   The Apple doesn&#39;t fall far from the tree.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:01.000 --&gt; 00:11:04.000]   When did you get in? Just now.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:04.000 --&gt; 00:11:06.000]   Did you come straight from Australia?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:06.000 --&gt; 00:11:07.000]   Of course.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:07.000 --&gt; 00:11:09.000]   Daddy, I told Tommy that you were in Perth,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:09.000 --&gt; 00:11:13.000]   finding for silver, and no one could reach you.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:13.000 --&gt; 00:11:16.000]   Lucky for us all, that&#39;s not the case.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:16.000 --&gt; 00:11:20.000]   So, what&#39;s this all about?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:20.000 --&gt; 00:11:27.000]   I&#39;ve heard of wedding rehearsals, but I don&#39;t believe I&#39;ve ever heard of a wedding dress rehearsal before.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:27.000 --&gt; 00:11:31.000]   We thought, &quot;Why pay so much money for a dress you only gonna wear once?&quot;</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:31.000 --&gt; 00:11:34.000]   Especially when Arlene looks so goddamn beautiful in it.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:34.000 --&gt; 00:11:39.000]   So, we&#39;re gonna try to get all the mileage we can out of it.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:39.000 --&gt; 00:11:44.000]   Isn&#39;t it supposed to be bad luck for the groom to see the bride in her wedding dress?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:44.000 --&gt; 00:11:46.000]   People with a ceremony?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:46.000 --&gt; 00:11:51.000]   Wow. I guess I just believe in them dangerously.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:51.000 --&gt; 00:11:54.000]   I know just what you mean.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:54.000 --&gt; 00:11:59.000]   &quot;San, Sama Lacha, places to be. It&#39;s your duty.&quot;</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:59.000 --&gt; 00:12:02.000]   But we gotta go through this one more time.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:02.000 --&gt; 00:12:05.000]   So, uh, why don&#39;t you have a... oh my god.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:05.000 --&gt; 00:12:08.000]   What am I thinking? You should give her away!</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:08.000 --&gt; 00:12:11.000]   Tommy, that&#39;s not exactly Daddy&#39;s cup of tea.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:11.000 --&gt; 00:12:16.000]   I think Father seemed much more comfortable sitting with the rest of the guests.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:16.000 --&gt; 00:12:18.000]   Really?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:18.000 --&gt; 00:12:21.000]   That&#39;s asking a lot.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:21.000 --&gt; 00:12:24.000]   Oh. Okay. We&#39;ll forget it.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:24.000 --&gt; 00:12:26.000]   But how about we go out to dinner tonight and celebrate?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:26.000 --&gt; 00:12:29.000]   Only on the condition that I pay for everything.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:29.000 --&gt; 00:12:32.000]   Deal. We have to do this now.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:32.000 --&gt; 00:12:33.000]   Can I watch?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:33.000 --&gt; 00:12:36.000]   Absolutely. You have a seat.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:36.000 --&gt; 00:12:38.000]   Which is the bride&#39;s side?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:38.000 --&gt; 00:12:40.000]   Right over here.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:40.000 --&gt; 00:12:45.000]   Father, here we go.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:45.000 --&gt; 00:12:50.000]   Yeah. Now, Sean, drop them bows.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:50.000 --&gt; 00:12:53.000]   Yeah.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:53.000 --&gt; 00:12:56.000]   Oh, Sean.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:56.000 --&gt; 00:12:59.000]   Oh. I just want...</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:59.000 --&gt; 00:13:03.000]   You don&#39;t want me a damn thing.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">13:03.000 --&gt; 00:13:08.000]   If he&#39;s the man you want, then go stand by.</span>
+<span class="k">[00:13:08.000 --&gt; 00:13:11.000]   [Sighs]</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">13:11.000 --&gt; 00:13:34.000]   Does it look pretty?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">13:34.000 --&gt; 00:13:37.000]   Oh, yes.</span>
+<span class="k">[00:13:37.000 --&gt; 00:13:40.000]   [Sighs]</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">13:40.000 --&gt; 00:13:49.000]   Thank you.</span>
+<span class="k">[00:13:49.000 --&gt; 00:13:56.000]   [Sighs]</span>
+<span class="k">[00:13:56.000 --&gt; 00:14:00.000]   [Music]</span>
+</code></pre></div>
+
+<h2 id="ggml-smallenbin">ggml-small.en.bin</h2>
+<p>Some&nbsp;stats:</p>
+<div class="highlight"><pre><span></span><code><span class="n">whisper_model_load</span><span class="p">:</span><span class="w"> </span><span class="n">mem</span><span class="w"> </span><span class="n">required</span><span class="w">  </span><span class="o">=</span><span class="w">  </span><span class="mf">743.00</span><span class="w"> </span><span class="n">MB</span><span class="w"> </span><span class="p">(</span><span class="o">+</span><span class="w">   </span><span class="mf">16.00</span><span class="w"> </span><span class="n">MB</span><span class="w"> </span><span class="n">per</span><span class="w"> </span><span class="n">decoder</span><span class="p">)</span>
+<span class="n">whisper_model_load</span><span class="p">:</span><span class="w"> </span><span class="n">model</span><span class="w"> </span><span class="n">size</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="mf">464.44</span><span class="w"> </span><span class="n">MB</span>
+
+<span class="n">whisper_print_timings</span><span class="p">:</span><span class="w">    </span><span class="n">total</span><span class="w"> </span><span class="n">time</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1713762.12</span><span class="w"> </span><span class="n">ms</span>
+</code></pre></div>
+
+<p><strong>So time needed was ~ 1713 seconds (almost half an&nbsp;hour)</strong></p>
+<p>And the actual&nbsp;transcription:</p>
+<div class="highlight"><pre><span></span><code><span class="k">[00:00:00.000 --&gt; 00:00:10.000]   [MUSIC]</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:10.000 --&gt; 00:00:17.000]   Do you find me sadistic?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:17.000 --&gt; 00:00:21.000]   No, kiddo.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:21.000 --&gt; 00:00:27.000]   I&#39;d like to believe you&#39;re aware enough, even now,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:27.000 --&gt; 00:00:33.000]   to know that there is nothing sadistic in my actions.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:33.000 --&gt; 00:00:44.000]   This moment, this is me and my most nicer kiss to be.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:44.000 --&gt; 00:00:48.000]   Well, it&#39;s your baby.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:48.000 --&gt; 00:00:55.000]   Look, Dad, didn&#39;t I?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:55.000 --&gt; 00:01:00.000]   Well, I wasn&#39;t. But it wasn&#39;t from lack of trying, I can tell you that.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:00.000 --&gt; 00:01:03.000]   Actually, Bill&#39;s last bullet put me in a coma.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:03.000 --&gt; 00:01:07.000]   A coma I was to lie in for four years.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:07.000 --&gt; 00:01:11.000]   When I woke up, I went on with the movie advertisements</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:11.000 --&gt; 00:01:15.000]   referred to as a roaring rampage of revenge.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:15.000 --&gt; 00:01:22.000]   I roared, and I rampaged, and I got bloody satisfaction.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:22.000 --&gt; 00:01:26.000]   I&#39;ve killed a hell of a lot of people to get to this point.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:26.000 --&gt; 00:01:29.000]   But I have only one more.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:29.000 --&gt; 00:01:31.000]   The last one.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:31.000 --&gt; 00:01:35.000]   The one I&#39;m driving to right now.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:35.000 --&gt; 00:01:38.000]   The only one left.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:38.000 --&gt; 00:01:45.000]   And when I arrive at my destination, I am gonna kill Bill.</span>
+<span class="k">[00:01:45.000 --&gt; 00:02:10.000]   [Music]</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:10.000 --&gt; 00:02:14.000]   Now, the incident that happened at the Two Pines Wedding Chapel</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:14.000 --&gt; 00:02:20.000]   that put this whole gory story into motion has since become legend.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:20.000 --&gt; 00:02:22.000]   Massacre at Two Pines.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:22.000 --&gt; 00:02:24.000]   That&#39;s what the newspapers called it.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:24.000 --&gt; 00:02:30.000]   The local TV news called it the El Paso, Texas Wedding Chapel Massacre.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:30.000 --&gt; 00:02:36.000]   How it happened, who was there, how many got killed, and who killed them.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:36.000 --&gt; 00:02:40.000]   Changes depending on who&#39;s telling the story.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:40.000 --&gt; 00:02:45.000]   In actual fact, the massacre didn&#39;t happen during a wedding at all.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:45.000 --&gt; 00:02:48.000]   It was a wedding rehearsal.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:48.000 --&gt; 00:02:53.000]   Now, when we come to the park where I say you may kiss the bride,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:53.000 --&gt; 00:02:55.000]   you may kiss the bride.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:55.000 --&gt; 00:02:59.000]   But don&#39;t stick your tongue in her mouth.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:59.000 --&gt; 00:03:06.000]   This might be funny to your friends, but it would be embarrassing to your parents.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:06.000 --&gt; 00:03:10.000]   We&#39;ll try and restrain ourselves from that.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:10.000 --&gt; 00:03:16.000]   Y&#39;all got a song?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:16.000 --&gt; 00:03:19.000]   How about &quot;Love Me, Tender&quot;? I can play that.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:19.000 --&gt; 00:03:21.000]   Sure.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:21.000 --&gt; 00:03:24.000]   &quot;Love Me, Tender&quot; would be great.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:24.000 --&gt; 00:03:27.000]   Rufus, he&#39;s the man.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:27.000 --&gt; 00:03:30.000]   Rufus, who was that you used to play for?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:30.000 --&gt; 00:03:32.000]   Rufus Thomas.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:32.000 --&gt; 00:03:34.000]   Rufus Thomas.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:34.000 --&gt; 00:03:35.000]   Rufus Thomas.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:35.000 --&gt; 00:03:39.000]   I was a drill, I was a drifter, I was a coaster,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:39.000 --&gt; 00:03:43.000]   I was part of the gang, I was a bar-k.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:43.000 --&gt; 00:03:47.000]   If they come through Texas, I haven&#39;t played with them.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:47.000 --&gt; 00:03:53.000]   Rufus, he&#39;s the man.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:53.000 --&gt; 00:03:56.000]   Have you forgotten anything?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:56.000 --&gt; 00:04:00.000]   Oh, yes, you forgot the seating arrangements.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:00.000 --&gt; 00:04:02.000]   Thank you, Mother.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:02.000 --&gt; 00:04:07.000]   Now, the way we normally do this, we have the bride&#39;s side,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:07.000 --&gt; 00:04:09.000]   and then we have the groom&#39;s side.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:09.000 --&gt; 00:04:12.000]   But since the bride ain&#39;t got nobody coming,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:12.000 --&gt; 00:04:16.000]   and the groom&#39;s got far too many people coming...</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:16.000 --&gt; 00:04:19.000]   Well, yeah, they&#39;re coming all the way from Oklahoma.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:19.000 --&gt; 00:04:22.000]   Right.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:22.000 --&gt; 00:04:29.000]   Well, I don&#39;t see no problem with the groom&#39;s side sharing the bride&#39;s side.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:29.000 --&gt; 00:04:30.000]   Do you, Mother?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:30.000 --&gt; 00:04:32.000]   I don&#39;t have a problem with that.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:32.000 --&gt; 00:04:38.000]   But, honey, you know, it would be good if you had somebody come.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:38.000 --&gt; 00:04:41.000]   You know, is that a sign of good faith?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:41.000 --&gt; 00:04:48.000]   Well, I don&#39;t have anybody, except for Tommy and my friends.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:48.000 --&gt; 00:04:51.000]   You have no family?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:51.000 --&gt; 00:04:53.000]   Well, I&#39;m working on changing that.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:53.000 --&gt; 00:04:57.000]   Mrs. Harmony, we&#39;re all the family this little angel&#39;s ever gonna need.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:57.000 --&gt; 00:05:03.000]   I&#39;m not feeling very well, and this bitch is starting to piss me off.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">05:03.000 --&gt; 00:05:07.000]   So while you all blather on, I&#39;m gonna go outside and get some air.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">05:07.000 --&gt; 00:05:09.000]   Um, uh, Reverend, sorry.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">05:09.000 --&gt; 00:05:11.000]   She&#39;s gonna go out and get some air.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">05:11.000 --&gt; 00:05:13.000]   Yeah, given her delicate condition.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">05:13.000 --&gt; 00:05:16.000]   She just needs a few minutes to get it together. She&#39;ll be okay.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">05:16.000 --&gt; 00:05:18.000]   Okay.</span>
+<span class="k">[00:05:19.000 --&gt; 00:05:22.000]   [♪♪♪]</span>
+<span class="k">[00:05:23.000 --&gt; 00:05:25.000]   [♪♪♪]</span>
+<span class="k">[00:05:26.000 --&gt; 00:05:28.000]   [♪♪♪]</span>
+<span class="k">[00:05:28.000 --&gt; 00:05:30.000]   [♪♪♪]</span>
+<span class="k">[00:05:30.000 --&gt; 00:05:32.000]   [♪♪♪]</span>
+<span class="k">[00:05:33.000 --&gt; 00:05:35.000]   [♪♪♪]</span>
+<span class="k">[00:05:36.000 --&gt; 00:05:38.000]   [♪♪♪]</span>
+<span class="k">[00:05:39.000 --&gt; 00:05:41.000]   [♪♪♪]</span>
+<span class="k">[00:05:41.000 --&gt; 00:05:43.000]   [♪♪♪]</span>
+<span class="k">[00:05:43.000 --&gt; 00:05:45.000]   [♪♪♪]</span>
+<span class="k">[00:05:45.000 --&gt; 00:05:47.000]   [♪♪♪]</span>
+<span class="k">[00:05:47.000 --&gt; 00:05:49.000]   [♪♪♪]</span>
+<span class="k">[00:05:49.000 --&gt; 00:05:51.000]   [♪♪♪]</span>
+<span class="k">[00:05:51.000 --&gt; 00:05:53.000]   [♪♪♪]</span>
+<span class="k">[00:05:53.000 --&gt; 00:05:55.000]   [♪♪♪]</span>
+<span class="k">[00:05:55.000 --&gt; 00:05:57.000]   [♪♪♪]</span>
+<span class="k">[00:05:57.000 --&gt; 00:05:59.000]   [♪♪♪]</span>
+<span class="k">[00:05:59.000 --&gt; 00:06:01.000]   [♪♪♪]</span>
+<span class="k">[00:06:01.000 --&gt; 00:06:03.000]   [♪♪♪]</span>
+<span class="k">[00:06:03.000 --&gt; 00:06:05.000]   [♪♪♪]</span>
+<span class="k">[00:06:05.000 --&gt; 00:06:07.000]   [♪♪♪]</span>
+<span class="k">[00:06:07.000 --&gt; 00:06:09.000]   [♪♪♪]</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">06:36.000 --&gt; 00:06:38.000]   Hello, kiddo.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">06:38.000 --&gt; 00:06:45.000]   How did you find me?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">06:45.000 --&gt; 00:06:48.000]   I&#39;m the man.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">06:48.000 --&gt; 00:06:53.000]   What are you doing here?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">06:53.000 --&gt; 00:06:57.000]   What am I doing?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">06:57.000 --&gt; 00:07:03.000]   Well, a moment ago I was playing my flute.</span>
+<span class="k">[00:07:04.000 --&gt; 00:07:06.000]   [♪♪♪]</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:06.000 --&gt; 00:07:15.000]   At this moment, I&#39;m looking at the most beautiful bride</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:15.000 --&gt; 00:07:18.000]   these old eyes have ever seen.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:18.000 --&gt; 00:07:22.000]   Why are you here?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:22.000 --&gt; 00:07:25.000]   Last look.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:25.000 --&gt; 00:07:28.000]   Are you gonna be nice?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:28.000 --&gt; 00:07:30.000]   I&#39;ve never been nice my whole life.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:32.000 --&gt; 00:07:34.000]   I&#39;m just a guest to be sweet.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:34.000 --&gt; 00:07:42.000]   I always told you, your sweet side is your best side.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:42.000 --&gt; 00:07:47.000]   I guess that&#39;s why you&#39;re the only one who&#39;s ever seen it.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:47.000 --&gt; 00:07:52.000]   See, you got a bun in the oven.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:52.000 --&gt; 00:07:57.000]   I&#39;m knocked up.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:58.000 --&gt; 00:08:01.000]   I&#39;m not a man of the way.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:01.000 --&gt; 00:08:04.000]   I&#39;m not a man of the way.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:04.000 --&gt; 00:08:07.000]   I&#39;m not a man of the way.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:07.000 --&gt; 00:08:10.000]   I&#39;m not a man of the way.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:10.000 --&gt; 00:08:13.000]   I&#39;m not a man of the way.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:13.000 --&gt; 00:08:16.000]   I&#39;m not a man of the way.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:16.000 --&gt; 00:08:19.000]   I&#39;m not a man of the way.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:19.000 --&gt; 00:08:22.000]   I&#39;m not a man of the way.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:22.000 --&gt; 00:08:25.000]   I&#39;m not a man of the way.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:26.000 --&gt; 00:08:28.000]   It&#39;s hardly a promise.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:28.000 --&gt; 00:08:31.000]   But you&#39;re right.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:31.000 --&gt; 00:08:34.000]   What does your young man do for a living?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:34.000 --&gt; 00:08:39.000]   He owns a used record store here in El Paso.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:39.000 --&gt; 00:08:42.000]   A music lover, right?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:42.000 --&gt; 00:08:44.000]   He&#39;s fond of music.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:44.000 --&gt; 00:08:47.000]   Aren&#39;t we all?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:47.000 --&gt; 00:08:55.000]   And what are you doing for a J-O-B these days?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:56.000 --&gt; 00:08:58.000]   I work in the record store.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:58.000 --&gt; 00:09:01.000]   Ah, so...</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:01.000 --&gt; 00:09:06.000]   it all suddenly seems so clear.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:06.000 --&gt; 00:09:10.000]   Do you like it?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:10.000 --&gt; 00:09:13.000]   Yeah, I like it a lot, smartass.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:13.000 --&gt; 00:09:16.000]   I get to listen to music all day,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:16.000 --&gt; 00:09:19.000]   talk about music all day. It&#39;s really cool.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:19.000 --&gt; 00:09:24.000]   It&#39;s gonna be a great environment for my little girl to grow up in.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:24.000 --&gt; 00:09:30.000]   As opposed to jetting around the world,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:30.000 --&gt; 00:09:32.000]   killing human beings,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:32.000 --&gt; 00:09:35.000]   and being paid vast sums of money.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:35.000 --&gt; 00:09:39.000]   Precisely.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:39.000 --&gt; 00:09:41.000]   Well, my old friend,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:41.000 --&gt; 00:09:43.000]   to each his own.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:43.000 --&gt; 00:09:45.000]   However,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:45.000 --&gt; 00:09:49.000]   all cock-blockery aside,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:49.000 --&gt; 00:09:52.000]   I am looking forward to meeting your young man.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:52.000 --&gt; 00:09:55.000]   I happen to be more or less particular</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:55.000 --&gt; 00:09:58.000]   who my gal marries.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:58.000 --&gt; 00:10:02.000]   You wanna come to the wedding?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:02.000 --&gt; 00:10:04.000]   Only if I can sit on the bride&#39;s side.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:04.000 --&gt; 00:10:08.000]   You&#39;ll find it a bit lonely on my side.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:08.000 --&gt; 00:10:12.000]   Your side always was a bit lonely,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:12.000 --&gt; 00:10:15.000]   but I wouldn&#39;t sit anywhere else.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:15.000 --&gt; 00:10:19.000]   You know,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:19.000 --&gt; 00:10:22.000]   I had the loveliest dream about you.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:22.000 --&gt; 00:10:24.000]   Oh, here&#39;s Tommy. Call me Arlene.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:24.000 --&gt; 00:10:27.000]   You must be Tommy.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:27.000 --&gt; 00:10:29.000]   Arlene&#39;s told me so much about you.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:29.000 --&gt; 00:10:31.000]   Honey, you okay?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:31.000 --&gt; 00:10:32.000]   Oh, I&#39;m fine.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:32.000 --&gt; 00:10:35.000]   Tommy, I&#39;d like you to meet my father.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:35.000 --&gt; 00:10:38.000]   Oh, my God.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:38.000 --&gt; 00:10:40.000]   Oh, my God, this is great.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:40.000 --&gt; 00:10:42.000]   I&#39;m so glad to meet you, sir.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:42.000 --&gt; 00:10:43.000]   Oh, Dad.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:43.000 --&gt; 00:10:45.000]   The name&#39;s Bill.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:45.000 --&gt; 00:10:47.000]   Well, it&#39;s great to meet you.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:47.000 --&gt; 00:10:50.000]   So, Arlene told me you couldn&#39;t make it.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:50.000 --&gt; 00:10:51.000]   Surprise.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:51.000 --&gt; 00:10:53.000]   That&#39;s my pot for you.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:53.000 --&gt; 00:10:55.000]   Always full of surprises.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:55.000 --&gt; 00:10:58.000]   Well, in the surprise department,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:58.000 --&gt; 00:11:01.000]   the apple doesn&#39;t fall far from the tree.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:01.000 --&gt; 00:11:03.000]   When did you get in?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:03.000 --&gt; 00:11:04.000]   Just now.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:04.000 --&gt; 00:11:06.000]   Did you come straight from Australia?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:06.000 --&gt; 00:11:07.000]   Of course.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:07.000 --&gt; 00:11:09.000]   Daddy, I told Tommy that you were in Perth</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:09.000 --&gt; 00:11:12.000]   lining for Silver and no one could reach you.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:12.000 --&gt; 00:11:16.000]   Lucky for us all, that&#39;s not the case.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:16.000 --&gt; 00:11:20.000]   So, what&#39;s this all about?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:20.000 --&gt; 00:11:22.000]   I&#39;ve heard of wedding rehearsals,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:22.000 --&gt; 00:11:24.000]   but I don&#39;t believe I&#39;ve ever heard</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:24.000 --&gt; 00:11:26.000]   of a wedding dress rehearsal before.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:26.000 --&gt; 00:11:29.000]   We thought, why pay so much money for a dress</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:29.000 --&gt; 00:11:31.000]   you&#39;re only gonna wear once?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:31.000 --&gt; 00:11:34.000]   Especially when Arlene looks so goddamn beautiful in it.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:34.000 --&gt; 00:11:38.000]   So, I think we&#39;re gonna try to get all the mileage we can out of it.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:38.000 --&gt; 00:11:41.000]   Isn&#39;t it supposed to be bad luck</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:41.000 --&gt; 00:11:44.000]   for the groom to see the bride in her wedding dress?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:44.000 --&gt; 00:11:46.000]   People of the ceremony?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:46.000 --&gt; 00:11:50.000]   I guess I just believe in living dangerously.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:50.000 --&gt; 00:11:54.000]   I know just what you mean.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:54.000 --&gt; 00:11:57.000]   Some...some of us are places to be.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:57.000 --&gt; 00:11:59.000]   It&#39;s your duty.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:59.000 --&gt; 00:12:01.000]   Look, we gotta go through this one more time.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:01.000 --&gt; 00:12:03.000]   So, why don&#39;t you have a s...</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:03.000 --&gt; 00:12:05.000]   Oh, my God.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:05.000 --&gt; 00:12:07.000]   What am I thinking? You should give her away.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:07.000 --&gt; 00:12:11.000]   Tommy, that&#39;s not exactly Daddy&#39;s cup of tea.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:11.000 --&gt; 00:12:14.000]   I think Father would be much more comfortable</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:14.000 --&gt; 00:12:16.000]   sitting with the rest of the guests.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:16.000 --&gt; 00:12:18.000]   Really?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:18.000 --&gt; 00:12:20.000]   That&#39;s asking a lot.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:20.000 --&gt; 00:12:24.000]   Oh. Okay. We&#39;ll forget it.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:24.000 --&gt; 00:12:26.000]   But how about we go out to dinner tonight and celebrate?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:26.000 --&gt; 00:12:29.000]   Only on the condition that I pay for everything.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:29.000 --&gt; 00:12:32.000]   Deal. We gotta do this now.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:32.000 --&gt; 00:12:33.000]   Can I watch?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:33.000 --&gt; 00:12:35.000]   Absolutely. Have a seat.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:35.000 --&gt; 00:12:38.000]   Which is the bride&#39;s side?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:38.000 --&gt; 00:12:40.000]   Right over here.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:41.000 --&gt; 00:12:44.000]   Father, here we go.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:44.000 --&gt; 00:12:45.000]   Yes.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:45.000 --&gt; 00:12:48.000]   Now, son, about them vows.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:48.000 --&gt; 00:12:57.000]   Belle.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:57.000 --&gt; 00:12:58.000]   I just don&#39;t want...</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:58.000 --&gt; 00:13:01.000]   You know only a damn thing.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">13:01.000 --&gt; 00:13:04.000]   If he&#39;s the man you want,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">13:04.000 --&gt; 00:13:07.000]   then go stand by.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">13:07.000 --&gt; 00:13:09.000]   Stand by.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">13:09.000 --&gt; 00:13:33.000]   Do I look pretty?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">13:33.000 --&gt; 00:13:35.000]   Oh, yes.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">13:35.000 --&gt; 00:13:37.000]   Thank you.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">13:38.000 --&gt; 00:13:40.000]   Thank you.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">13:41.000 --&gt; 00:13:43.000]   Thank you.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">13:44.000 --&gt; 00:13:46.000]   Thank you.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">13:47.000 --&gt; 00:13:49.000]   Thank you.</span>
+<span class="k">[00:13:49.000 --&gt; 00:13:52.000]   [♪♪♪]</span>
+<span class="k">[00:13:53.000 --&gt; 00:13:55.000]   [♪♪♪]</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">13:55.000 --&gt; 00:13:57.420]   (soft music)</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">13:57.420 --&gt; 00:13:59.320]   (slow, dramatic music)</span>
+</code></pre></div>
+
+<h2 id="ggml-mediumenbin">ggml-medium.en.bin</h2>
+<p>Some&nbsp;stats:</p>
+<div class="highlight"><pre><span></span><code><span class="n">whisper_model_load</span><span class="p">:</span><span class="w"> </span><span class="n">mem</span><span class="w"> </span><span class="n">required</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="mf">1899.00</span><span class="w"> </span><span class="n">MB</span><span class="w"> </span><span class="p">(</span><span class="o">+</span><span class="w">   </span><span class="mf">43.00</span><span class="w"> </span><span class="n">MB</span><span class="w"> </span><span class="n">per</span><span class="w"> </span><span class="n">decoder</span><span class="p">)</span>
+<span class="n">whisper_model_load</span><span class="p">:</span><span class="w"> </span><span class="n">model</span><span class="w"> </span><span class="n">size</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="mf">1462.12</span><span class="w"> </span><span class="n">MB</span>
+
+<span class="n">whisper_print_timings</span><span class="p">:</span><span class="w">    </span><span class="n">total</span><span class="w"> </span><span class="n">time</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">3563774.75</span><span class="w"> </span><span class="n">ms</span>
+</code></pre></div>
+
+<p><strong>So time needed was ~ 3563 seconds (almost 1&nbsp;hour)</strong></p>
+<p>And the actual&nbsp;transcription:</p>
+<div class="highlight"><pre><span></span><code><span class="k">[00:00:00.000 --&gt; 00:00:15.000]   [Music]</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:15.000 --&gt; 00:00:19.000]   Do you find me sadistic?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:19.000 --&gt; 00:00:21.000]   No, kiddo.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:21.000 --&gt; 00:00:24.000]   I&#39;d like to believe</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:24.000 --&gt; 00:00:27.000]   you&#39;re aware enough, even now,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:27.000 --&gt; 00:00:31.000]   to know that there&#39;s nothing sadistic</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:31.000 --&gt; 00:00:34.000]   in my actions.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:34.000 --&gt; 00:00:38.000]   This moment,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:38.000 --&gt; 00:00:41.000]   this is me</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:41.000 --&gt; 00:00:44.000]   and my most masochistic.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:44.000 --&gt; 00:00:46.000]   Well,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:46.000 --&gt; 00:00:48.000]   it&#39;s your baby.</span>
+<span class="k">[00:00:48.000 --&gt; 00:00:50.000]   [Gunshot]</span>
+<span class="k">[00:00:50.000 --&gt; 00:00:53.000]   [Music]</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:53.000 --&gt; 00:00:55.000]   You looked dead, didn&#39;t I?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:55.000 --&gt; 00:00:57.000]   Well, I wasn&#39;t.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">00:57.000 --&gt; 00:01:00.000]   But it wasn&#39;t from lack of trying, I can tell you that.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:00.000 --&gt; 00:01:03.000]   Actually, Bill&#39;s last bullet put me in a coma.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:03.000 --&gt; 00:01:07.000]   A coma I was to lie in for four years.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:07.000 --&gt; 00:01:09.000]   When I woke up,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:09.000 --&gt; 00:01:15.000]   I went on what the movie advertisements refer to as a &quot;roaring rampage of revenge.&quot;</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:15.000 --&gt; 00:01:18.000]   I roared, and I rampaged,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:18.000 --&gt; 00:01:22.000]   and I got bloody satisfaction.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:22.000 --&gt; 00:01:26.000]   I&#39;ve killed a hell of a lot of people to get to this point.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:26.000 --&gt; 00:01:29.000]   But I have only one more.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:29.000 --&gt; 00:01:31.000]   The last one.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:31.000 --&gt; 00:01:35.000]   The one I&#39;m driving to right now.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:35.000 --&gt; 00:01:38.000]   The only one left.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:38.000 --&gt; 00:01:42.000]   And when I arrive at my destination,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">01:42.000 --&gt; 00:01:45.000]   I am gonna kill Bill.</span>
+<span class="k">[00:01:45.000 --&gt; 00:02:10.000]   [Music]</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:10.000 --&gt; 00:02:17.000]   Now, the incident that happened at the Two Pines wedding chapel that put this whole gory story into motion</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:17.000 --&gt; 00:02:20.000]   has since become legend.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:20.000 --&gt; 00:02:22.000]   &quot;Massacre at Two Pines.&quot;</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:22.000 --&gt; 00:02:24.000]   That&#39;s what the newspapers called it.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:24.000 --&gt; 00:02:30.000]   The local TV news called it the &quot;El Paso, Texas Wedding Chapel Massacre.&quot;</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:30.000 --&gt; 00:02:32.000]   How it happened.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:32.000 --&gt; 00:02:33.000]   Who was there.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:33.000 --&gt; 00:02:36.000]   How many got killed and who killed them.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:36.000 --&gt; 00:02:40.000]   Changes depending on who&#39;s telling the story.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:40.000 --&gt; 00:02:45.000]   In actual fact, the massacre didn&#39;t happen during a wedding at all.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:45.000 --&gt; 00:02:48.000]   It was a wedding rehearsal.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:48.000 --&gt; 00:02:55.000]   Now, when we come to the part where I say, &quot;You may kiss the bride, you may kiss the bride,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:55.000 --&gt; 00:02:59.000]   but don&#39;t stick your tongue in her mouth.&quot;</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">02:59.000 --&gt; 00:03:06.000]   This might be funny to your friends, but it would be embarrassing to your parents.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:06.000 --&gt; 00:03:11.000]   We&#39;ll try to restrain ourselves from it.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:11.000 --&gt; 00:03:16.000]   Y&#39;all got a song?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:16.000 --&gt; 00:03:20.000]   How about &quot;Love Me Tender.&quot; I can play that.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:20.000 --&gt; 00:03:22.000]   Sure.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:22.000 --&gt; 00:03:24.000]   &quot;Love Me Tender&quot; would be great.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:24.000 --&gt; 00:03:27.000]   Rufus, he&#39;s the man.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:27.000 --&gt; 00:03:30.000]   Rufus, who was that you used to play for?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:30.000 --&gt; 00:03:32.000]   Rufus Thomas.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:32.000 --&gt; 00:03:35.000]   Rufus Thomas. Rufus Thomas.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:35.000 --&gt; 00:03:43.000]   I was a drill, I was a drifter, I was a coaster, I was part of the gang, I was a bar-quet.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:43.000 --&gt; 00:03:47.000]   If they come through Texas, I done played with them.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:47.000 --&gt; 00:03:51.000]   Rufus, he&#39;s the man.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:54.000 --&gt; 00:03:57.000]   Have you ever forgotten anything?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">03:57.000 --&gt; 00:04:00.000]   Oh yes, you forgot the seating arrangements.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:00.000 --&gt; 00:04:03.000]   Thank you, Mother.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:03.000 --&gt; 00:04:10.000]   Now, the way we normally do this, we have the bride&#39;s side and then we have the groom&#39;s side.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:10.000 --&gt; 00:04:17.000]   But since the bride ain&#39;t got nobody coming, and the groom&#39;s got far too many people coming.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:17.000 --&gt; 00:04:21.000]   Well yeah, they&#39;re coming all the way from Oklahoma.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:21.000 --&gt; 00:04:30.000]   Right. Well I don&#39;t see no problem with the groom&#39;s side sharing the bride&#39;s side. Do you, Mother?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:30.000 --&gt; 00:04:32.000]   No, I don&#39;t have a problem with that.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:32.000 --&gt; 00:04:38.000]   But, honey, you know it would be good if you had somebody come.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:38.000 --&gt; 00:04:42.000]   You know, is it a sign of good faith?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:42.000 --&gt; 00:04:49.000]   Well, I don&#39;t have anybody. Except for Tommy and my friends.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:49.000 --&gt; 00:04:52.000]   You have no family?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:52.000 --&gt; 00:04:54.000]   Well, I&#39;m working on changing that.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:54.000 --&gt; 00:04:58.000]   Mrs. Harmony, we&#39;re all the family this little angel&#39;s ever gonna need.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">04:58.000 --&gt; 00:05:04.000]   I&#39;m not feeling very well, and this bitch is starting to piss me off.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">05:04.000 --&gt; 00:05:08.000]   So while you all blather on, I&#39;m gonna go outside and get some air.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">05:08.000 --&gt; 00:05:10.000]   Um, uh, Reverend, sorry.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">05:10.000 --&gt; 00:05:12.000]   She&#39;s gonna go out and get some air?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">05:12.000 --&gt; 00:05:14.000]   Yeah, given her delicate condition.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">05:14.000 --&gt; 00:05:19.000]   She just needs a few minutes to get it together. She&#39;ll be okay.</span>
+<span class="k">[00:05:20.000 --&gt; 00:05:25.000]   [Music]</span>
+<span class="k">[00:05:26.000 --&gt; 00:05:31.000]   [Music]</span>
+<span class="k">[00:05:31.000 --&gt; 00:05:36.000]   [Music]</span>
+<span class="k">[00:05:36.000 --&gt; 00:05:41.000]   [Music]</span>
+<span class="k">[00:05:41.000 --&gt; 00:05:46.000]   [Music]</span>
+<span class="k">[00:05:46.000 --&gt; 00:05:51.000]   [Music]</span>
+<span class="k">[00:05:51.000 --&gt; 00:05:56.000]   [Music]</span>
+<span class="k">[00:05:56.000 --&gt; 00:06:01.000]   [Music]</span>
+<span class="k">[00:06:01.000 --&gt; 00:06:06.000]   [Music]</span>
+<span class="k">[00:06:06.000 --&gt; 00:06:11.000]   [Music]</span>
+<span class="k">[00:06:11.000 --&gt; 00:06:16.000]   [Music]</span>
+<span class="k">[00:06:16.000 --&gt; 00:06:21.000]   [Music]</span>
+<span class="k">[00:06:21.000 --&gt; 00:06:26.000]   [Music]</span>
+<span class="k">[00:06:26.000 --&gt; 00:06:31.000]   [Music]</span>
+<span class="k">[00:06:31.000 --&gt; 00:06:36.000]   [Music]</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">06:36.000 --&gt; 00:06:38.000]   Hello, kiddo.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">06:38.000 --&gt; 00:06:45.000]   How did you find me?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">06:45.000 --&gt; 00:06:48.000]   I&#39;m the man.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">06:48.000 --&gt; 00:06:53.000]   What are you doing here?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">06:55.000 --&gt; 00:06:57.000]   What am I doing?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">06:57.000 --&gt; 00:07:03.000]   Well, a moment ago I was playing my flute.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:03.000 --&gt; 00:07:17.000]   This moment, I&#39;m looking at the most beautiful bride these whole eyes have ever seen.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:17.000 --&gt; 00:07:21.000]   Why are you here?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:21.000 --&gt; 00:07:23.000]   Last look.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:24.000 --&gt; 00:07:26.000]   Are you gonna be nice?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:26.000 --&gt; 00:07:29.000]   I&#39;ve never been nice my whole life.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:29.000 --&gt; 00:07:34.000]   But I&#39;ll do my best to be sweet.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:34.000 --&gt; 00:07:41.000]   I always told you, your sweet side is your best side.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:41.000 --&gt; 00:07:46.000]   I guess that&#39;s why you&#39;re the only one who&#39;s ever seen it.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:46.000 --&gt; 00:07:51.000]   See, you got a bun in the oven.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:52.000 --&gt; 00:07:53.000]   Hmm.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:53.000 --&gt; 00:07:56.000]   I&#39;m knocked up.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:56.000 --&gt; 00:07:59.000]   Jeez, Louise.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">07:59.000 --&gt; 00:08:04.000]   That young man of yours sure doesn&#39;t believe in wasting time, does he?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:04.000 --&gt; 00:08:07.000]   Have you seen Tommy?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:07.000 --&gt; 00:08:11.000]   Big guy in the tux?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:11.000 --&gt; 00:08:12.000]   Yes.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:12.000 --&gt; 00:08:14.000]   Then I saw him.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:14.000 --&gt; 00:08:18.000]   I like his hair.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:20.000 --&gt; 00:08:22.000]   You promised you&#39;d be nice.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:22.000 --&gt; 00:08:28.000]   I said I&#39;d do my best. That&#39;s hardly a promise.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:28.000 --&gt; 00:08:30.000]   But you&#39;re right.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:30.000 --&gt; 00:08:34.000]   What does your young man do for a living?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:34.000 --&gt; 00:08:39.000]   He owns a used record store here in El Paso.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:39.000 --&gt; 00:08:41.000]   Ah. Music lover, eh?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:41.000 --&gt; 00:08:44.000]   He&#39;s fond of music.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:44.000 --&gt; 00:08:47.000]   Aren&#39;t we all?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:48.000 --&gt; 00:08:52.000]   And what are you doing for a J.O.B. these days?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:52.000 --&gt; 00:08:55.000]   I work in the record store.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:55.000 --&gt; 00:08:59.000]   Ah, so...</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">08:59.000 --&gt; 00:09:03.000]   it all suddenly seems so clear.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:03.000 --&gt; 00:09:07.000]   Do you like it?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:07.000 --&gt; 00:09:10.000]   Yeah, I like it a lot, smartass.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:10.000 --&gt; 00:09:13.000]   I get to listen to music all day.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:14.000 --&gt; 00:09:17.000]   Talk about music all day. It&#39;s really cool.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:17.000 --&gt; 00:09:22.000]   It&#39;s gonna be a great environment for my little girl to grow up in.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:22.000 --&gt; 00:09:30.000]   As opposed to jetting around the world, killing human beings,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:30.000 --&gt; 00:09:33.000]   and being paid vast sums of money?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:33.000 --&gt; 00:09:36.000]   Precisely.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:36.000 --&gt; 00:09:39.000]   Well, my old friend,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:39.000 --&gt; 00:09:41.000]   to each his own,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:42.000 --&gt; 00:09:44.000]   to each his own.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:44.000 --&gt; 00:09:49.000]   However, all cock-luckery aside,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:49.000 --&gt; 00:09:52.000]   I am looking forward to meeting your young man.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:52.000 --&gt; 00:09:56.000]   I happen to be more or less particular,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:56.000 --&gt; 00:09:58.000]   whom my gout marries.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">09:58.000 --&gt; 00:10:02.000]   You wanna come to the wedding?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:02.000 --&gt; 00:10:05.000]   Only if I can sit on the bride&#39;s side.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:05.000 --&gt; 00:10:09.000]   You&#39;ll find it a bit lonely on my side.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:09.000 --&gt; 00:10:12.000]   Your side always was a bit lonely.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:12.000 --&gt; 00:10:15.000]   But I wouldn&#39;t sit anywhere else.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:15.000 --&gt; 00:10:19.000]   You know,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:19.000 --&gt; 00:10:22.000]   I had the loveliest dream about you.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:22.000 --&gt; 00:10:25.000]   Oh, here&#39;s Tommy. Call me Arlene.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:25.000 --&gt; 00:10:27.000]   You must be Tommy.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:27.000 --&gt; 00:10:29.000]   Arlene&#39;s told me so much about you.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:29.000 --&gt; 00:10:31.000]   Arlene, you okay?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:31.000 --&gt; 00:10:32.000]   Oh, I&#39;m fine.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:32.000 --&gt; 00:10:35.000]   Tommy, I&#39;d like you to meet my father.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:35.000 --&gt; 00:10:38.000]   Oh, my God!</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:38.000 --&gt; 00:10:40.000]   Oh, my God! This is great!</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:40.000 --&gt; 00:10:42.000]   I&#39;m so glad to meet you, sir.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:42.000 --&gt; 00:10:43.000]   Oh, Dad.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:43.000 --&gt; 00:10:45.000]   The name&#39;s Bill.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:45.000 --&gt; 00:10:47.000]   Well, it&#39;s great to meet you, Bill.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:47.000 --&gt; 00:10:49.000]   Arlene told me you couldn&#39;t make it.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:49.000 --&gt; 00:10:51.000]   Surprise.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:51.000 --&gt; 00:10:52.000]   That&#39;s my pop for you.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:52.000 --&gt; 00:10:54.000]   Always full of surprises.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:54.000 --&gt; 00:10:57.000]   Well, in the surprise department,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">10:57.000 --&gt; 00:11:00.000]   the apple doesn&#39;t fall far from the tree.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:00.000 --&gt; 00:11:02.000]   When did you get in?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:02.000 --&gt; 00:11:03.000]   Just now.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:03.000 --&gt; 00:11:05.000]   Did you come straight from Australia?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:05.000 --&gt; 00:11:07.000]   Of course.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:07.000 --&gt; 00:11:09.000]   Daddy, I told Tommy that you were in Perth</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:09.000 --&gt; 00:11:12.000]   mining for silver, and no one could reach you.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:12.000 --&gt; 00:11:16.000]   Lucky for us all, that&#39;s not the case.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:16.000 --&gt; 00:11:20.000]   So, what&#39;s this all about?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:20.000 --&gt; 00:11:22.000]   I&#39;ve heard of wedding rehearsals,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:22.000 --&gt; 00:11:24.000]   but I don&#39;t believe I&#39;ve ever heard</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:24.000 --&gt; 00:11:27.000]   of a wedding dress rehearsal before.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:27.000 --&gt; 00:11:28.000]   We thought,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:28.000 --&gt; 00:11:29.000]   &quot;Why pay so much money for a dress</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:29.000 --&gt; 00:11:31.000]   you&#39;re only gonna wear once?&quot;</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:31.000 --&gt; 00:11:34.000]   Especially when Arlene looks so goddamn beautiful in it.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:34.000 --&gt; 00:11:36.000]   So, uh, I think we&#39;re gonna try to get all the mileage</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:36.000 --&gt; 00:11:37.000]   we can out of it.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:37.000 --&gt; 00:11:41.000]   Isn&#39;t it supposed to be bad luck</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:41.000 --&gt; 00:11:44.000]   for the groom to see the bride in her wedding dress</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:44.000 --&gt; 00:11:46.000]   before the ceremony?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:46.000 --&gt; 00:11:50.000]   Well, I guess I just believe I live in danger, so...</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:50.000 --&gt; 00:11:54.000]   I know just what you mean.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:54.000 --&gt; 00:11:57.000]   Son, some of us have places to be.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:57.000 --&gt; 00:11:59.000]   It&#39;s your old dude.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">11:59.000 --&gt; 00:12:01.000]   Look, we gotta go through this one more time.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:01.000 --&gt; 00:12:03.000]   So, uh, why don&#39;t you have a s--</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:03.000 --&gt; 00:12:05.000]   Oh, my God.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:05.000 --&gt; 00:12:07.000]   What am I thinking? You should give her away.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:07.000 --&gt; 00:12:11.000]   Tommy, that&#39;s not exactly Daddy&#39;s cup of tea.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:11.000 --&gt; 00:12:14.000]   I think Father would be much more comfortable</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:14.000 --&gt; 00:12:16.000]   sitting with the rest of the guests.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:16.000 --&gt; 00:12:17.000]   Really?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:17.000 --&gt; 00:12:19.000]   That&#39;s asking a lot.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:19.000 --&gt; 00:12:21.000]   Oh.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:21.000 --&gt; 00:12:23.000]   Okay. Well, forget it.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:23.000 --&gt; 00:12:26.000]   But how about we go out to dinner tonight and celebrate?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:26.000 --&gt; 00:12:29.000]   Only on the condition that I pay for everything.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:29.000 --&gt; 00:12:31.000]   Deal. We gotta do this now.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:31.000 --&gt; 00:12:33.000]   Can I watch?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:33.000 --&gt; 00:12:35.000]   Absolutely. Have a seat.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:35.000 --&gt; 00:12:37.000]   Which is the bride&#39;s side?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:37.000 --&gt; 00:12:39.000]   Right over here.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:39.000 --&gt; 00:12:44.000]   Mother, here we go.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:44.000 --&gt; 00:12:49.000]   Now, son, about them vows.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:49.000 --&gt; 00:12:57.000]   No.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:57.000 --&gt; 00:12:59.000]   I just don&#39;t want...</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">12:59.000 --&gt; 00:13:02.000]   You don&#39;t owe me a damn thing.</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">13:03.000 --&gt; 00:13:05.000]   If he&#39;s the man you want,</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">13:05.000 --&gt; 00:13:08.000]   then go stand by.</span>
+<span class="k">[00:13:08.000 --&gt; 00:13:10.000]   [chuckles]</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">13:10.000 --&gt; 00:13:34.000]   Do I look pretty?</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">13:34.000 --&gt; 00:13:36.000]   Oh, yeah.</span>
+<span class="k">[00:13:36.000 --&gt; 00:13:39.000]   [♪♪♪]</span>
+<span class="na">[00</span><span class="o">:</span><span class="s">13:39.000 --&gt; 00:13:48.000]   Thank you.</span>
+<span class="k">[00:13:48.000 --&gt; 00:13:51.000]   [♪♪♪]</span>
+<span class="k">[00:13:51.000 --&gt; 00:13:54.000]   [♪♪♪]</span>
+<span class="k">[00:13:54.000 --&gt; 00:13:57.000]   [♪♪♪]</span>
+<span class="k">[00:13:57.000 --&gt; 00:13:59.920]   [MUSIC]</span>
+</code></pre></div>
+
+<h2 id="comparison-of-results">Comparison of&nbsp;results</h2>
+<table>
+<thead>
+<tr>
+<th>tiny 160 s</th>
+<th>base 433 s</th>
+<th>small 1713 s</th>
+<th>medium  3563 s</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Do you finally sit just now?</td>
+<td>Do you find me sadistic?</td>
+<td>Do you find me sadistic?</td>
+<td>Do you find me sadistic?</td>
+</tr>
+<tr>
+<td>[<span class="caps">MUSIC</span> <span class="caps">PLAYING</span>]</td>
+<td>No, Kato.</td>
+<td>No, kiddo.</td>
+<td>No, kiddo.</td>
+</tr>
+<tr>
+<td>No, I can&#8217;t do.</td>
+<td>I&#8217;d like to believe</td>
+<td>I&#8217;d like to believe you&#8217;re aware enough, even now,</td>
+<td>I&#8217;d like to believe</td>
+</tr>
+<tr>
+<td>I&#8217;d like to believe you&#8217;re aware enough even now.</td>
+<td>you&#8217;re aware enough, even now.</td>
+<td>to know that there is nothing sadistic in my actions.</td>
+<td>you&#8217;re aware enough, even now,</td>
+</tr>
+<tr>
+<td>No, that there is nothing suggesting in my actions.</td>
+<td>I know that there is nothing sadistic in my actions.</td>
+<td>This moment, this is me and my most nicer kiss to be.</td>
+<td>to know that there&#8217;s nothing sadistic</td>
+</tr>
+<tr>
+<td>This moment, this is me and my most nice against them.</td>
+<td>This moment,</td>
+<td>Well, it&#8217;s your baby.</td>
+<td>in my actions.</td>
+</tr>
+<tr>
+<td>Well, it&#8217;s your name.</td>
+<td>this is me,</td>
+<td>Look, Dad, didn&#8217;t I?</td>
+<td>This moment,</td>
+</tr>
+<tr>
+<td>[<span class="caps">MUSIC</span> <span class="caps">PLAYING</span>]</td>
+<td>and I most miss the case.</td>
+<td>Well, I wasn&#8217;t. But it wasn&#8217;t from lack of trying, I can tell you that.</td>
+<td>this is me</td>
+</tr>
+<tr>
+<td>But Dad didn&#8217;t I?</td>
+<td>Well,</td>
+<td>Actually, Bill&#8217;s last bullet put me in a coma.</td>
+<td>and my most masochistic.</td>
+</tr>
+<tr>
+<td>Well, I wasn&#8217;t.</td>
+<td>it&#8217;s your baby.</td>
+<td>A coma I was to lie in for four years.</td>
+<td>Well,</td>
+</tr>
+<tr>
+<td>But it wasn&#8217;t from lack of trying.</td>
+<td>The dead didn&#8217;t I?</td>
+<td>When I woke up, I went on with the movie advertisements</td>
+<td>it&#8217;s your baby.</td>
+</tr>
+<tr>
+<td>I can tell you that.</td>
+<td>Well, I wasn&#8217;t.</td>
+<td>referred to as a roaring rampage of revenge.</td>
+<td>[Gunshot]</td>
+</tr>
+<tr>
+<td>Actually, Bill&#8217;s last bullet put me in a coma.</td>
+<td>But it wasn&#8217;t from lack of try and I can tell you that.</td>
+<td>I roared, and I rampaged, and I got bloody satisfaction.</td>
+<td>[Music]</td>
+</tr>
+<tr>
+<td>A coma, I was to lie in for four years.</td>
+<td>Actually, Bill&#8217;s last bullet put me in a coma.</td>
+<td>I&#8217;ve killed a hell of a lot of people to get to this point.</td>
+<td>You looked dead, didn&#8217;t I?</td>
+</tr>
+<tr>
+<td>And I woke up.</td>
+<td>A coma I was to lie in for four years.</td>
+<td>But I have only one more.</td>
+<td>Well, I wasn&#8217;t.</td>
+</tr>
+<tr>
+<td>I went on with a movie advertisements</td>
+<td>When I woke up,</td>
+<td>The last one.</td>
+<td>But it wasn&#8217;t from lack of trying, I can tell you that.</td>
+</tr>
+<tr>
+<td>for two as a roaring rampage of revenge.</td>
+<td>I went on with the movie advertisements referred to as a roaring rampage of</td>
+<td>The one I&#8217;m driving to right now.</td>
+<td>Actually, Bill&#8217;s last bullet put me in a coma.</td>
+</tr>
+<tr>
+<td>I roared.</td>
+<td>I roared,</td>
+<td>The only one left.</td>
+<td>A coma I was to lie in for four years.</td>
+</tr>
+<tr>
+<td>And I relanged.</td>
+<td>and I rampaged,</td>
+<td>And when I arrive at my destination, I am gonna kill Bill.</td>
+<td>When I woke up,</td>
+</tr>
+<tr>
+<td>And I got bloody satisfaction.</td>
+<td>and I got bloody satisfaction.</td>
+<td></td>
+<td>I went on what the movie advertisements refer to as a &#8220;roaring rampage of revenege.&#8221;</td>
+</tr>
+<tr>
+<td>I&#8217;ve killed a hell of a lot of people to get to this point.</td>
+<td>I&#8217;ve killed a hell of a lot of people who get to this point.</td>
+<td></td>
+<td>I roared, and I rampaged,</td>
+</tr>
+<tr>
+<td>But I have only one more.</td>
+<td>But I have only one more.</td>
+<td></td>
+<td>and I got bloody satisfaction.</td>
+</tr>
+<tr>
+<td>The last one.</td>
+<td>The last one.</td>
+<td></td>
+<td>I&#8217;ve killed a hell of a lot of people to get to this point.</td>
+</tr>
+<tr>
+<td>The one I&#8217;m driving to right now.</td>
+<td>The one I&#8217;m driving to right now.</td>
+<td></td>
+<td>But I have only one more.</td>
+</tr>
+<tr>
+<td>The only one left.</td>
+<td>The only one left.</td>
+<td></td>
+<td>The last one.</td>
+</tr>
+<tr>
+<td>And when I arrive at my destination,</td>
+<td>And when I arrive at my destination,</td>
+<td></td>
+<td>The one I&#8217;m driving to right now.</td>
+</tr>
+<tr>
+<td>I have going to kill Bill.</td>
+<td>I am gonna kill Bill.</td>
+<td></td>
+<td>The only one left.</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td>And when I arrive at my destination,</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td>I am gonna kill Bill.</td>
+</tr>
+</tbody>
+</table>
+<h1 id="conclusion">Conclusion</h1>
+<p>If you take a peek at the above results (and you remember the movie or download an .srt of the actual subtitles) you&#8217;ll see that the results for the small and medium model were almost perfect! The base model was also good enough considering that it took much less time than these&nbsp;two. </p>
+<p>The tiny model wasn&#8217;t so good however even that model is good enough to understand everything that is being said in the movie from the subtitles and context. Finally, consider that both the tiny and base models were faster than real-time even on my (very slow)&nbsp;computer.</p></div>
+    <footer>
+<p class="meta">
+  <span class="byline author vcard">
+    Posted by <span class="fn">
+        Serafeim Papastefanos
+    </span>
+  </span>
+<time datetime="2023-05-22T13:20:00+03:00" pubdate>Mon 22 May 2023</time>  <span class="categories">
+    <a class='category' href='https://spapas.github.io/category/ai.html'>ai</a>
+  </span>
+  <span class="categories">
+    <a class="category" href="https://spapas.github.io/tag/ai.html">ai</a>,    <a class="category" href="https://spapas.github.io/tag/whisper.html">whisper</a>,    <a class="category" href="https://spapas.github.io/tag/whispercpp.html">whisper.cpp</a>,    <a class="category" href="https://spapas.github.io/tag/subtitles.html">subtitles</a>,    <a class="category" href="https://spapas.github.io/tag/video.html">video</a>,    <a class="category" href="https://spapas.github.io/tag/auto-subtitling.html">auto-subtitling</a>,    <a class="category" href="https://spapas.github.io/tag/subtitiling.html">subtitiling</a>,    <a class="category" href="https://spapas.github.io/tag/transcribe.html">transcribe</a>  </span>
+</p><div class="sharing">
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="https://spapas.github.io/2023/05/22/ai-auto-subtitling/" data-via="" data-counturl="https://spapas.github.io/2023/05/22/ai-auto-subtitling/" >Tweet</a>
+</div>    </footer>
+  </article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript></div>
+  </section>
+</div>
+<aside class="sidebar">
+  
+  <section>
+    <br />
+    <a href='/feeds/all.atom.xml'>Atom</a>
+    |
+    <a href='/feeds/all.rss.xml'>RSS</a>
+  </section>
+
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <!-- Sidebar unit -->
+  <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7673322832689008" data-ad-slot="2720624730"
+    data-ad-format="auto" data-full-width-responsive="true"></ins>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+
+
+  <script async src="https://cse.google.com/cse.js?cx=612920e5ca9da850c"></script>
+  <div class="gcse-search"></div>
+
+  
+  <section>
+    <h1>Support me</h1>
+
+    You can show your appreciation for anything useful you've found here by 
+    buying me a coffee 
+    <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="spapas" data-color="#FFDD00" data-emoji=""  data-font="Lato" data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff" ></script>
+
+    or donating me some bitcoin to this address:
+    <small><pre>bc1qx42vp8napheaewhnx0rk0mttdrdrtvw6czvxhl</pre></small>
+    <svg shape-rendering="crispEdges" height="200" width="200" viewBox="0 0 29 29" class="qrcode">
+      <path fill="#FFFFFF" d="M0,0 h29v29H0z"></path><path fill="#000000" d="M0 0h7v1H0zM9 0h2v1H9zM12 0h1v1H12zM14 0h2v1H14zM18 0h2v1H18zM22,0 h7v1H22zM0 1h1v1H0zM6 1h1v1H6zM8 1h1v1H8zM11 1h1v1H11zM14 1h5v1H14zM22 1h1v1H22zM28,1 h1v1H28zM0 2h1v1H0zM2 2h3v1H2zM6 2h1v1H6zM8 2h4v1H8zM17 2h1v1H17zM22 2h1v1H22zM24 2h3v1H24zM28,2 h1v1H28zM0 3h1v1H0zM2 3h3v1H2zM6 3h1v1H6zM9 3h2v1H9zM14 3h3v1H14zM18 3h1v1H18zM22 3h1v1H22zM24 3h3v1H24zM28,3 h1v1H28zM0 4h1v1H0zM2 4h3v1H2zM6 4h1v1H6zM8 4h1v1H8zM11 4h1v1H11zM13 4h1v1H13zM15 4h2v1H15zM18 4h1v1H18zM22 4h1v1H22zM24 4h3v1H24zM28,4 h1v1H28zM0 5h1v1H0zM6 5h1v1H6zM8 5h2v1H8zM14 5h2v1H14zM19 5h2v1H19zM22 5h1v1H22zM28,5 h1v1H28zM0 6h7v1H0zM8 6h1v1H8zM10 6h1v1H10zM12 6h1v1H12zM14 6h1v1H14zM16 6h1v1H16zM18 6h1v1H18zM20 6h1v1H20zM22,6 h7v1H22zM8 7h2v1H8zM11 7h1v1H11zM15 7h1v1H15zM17 7h2v1H17zM0 8h2v1H0zM3 8h1v1H3zM6 8h2v1H6zM10 8h1v1H10zM12 8h3v1H12zM20 8h1v1H20zM22 8h3v1H22zM26 8h2v1H26zM1 9h1v1H1zM3 9h3v1H3zM8 9h1v1H8zM10 9h1v1H10zM12 9h2v1H12zM16 9h2v1H16zM20 9h1v1H20zM22 9h1v1H22zM25 9h1v1H25zM27,9 h2v1H27zM0 10h1v1H0zM3 10h2v1H3zM6 10h1v1H6zM8 10h3v1H8zM12 10h2v1H12zM16 10h1v1H16zM19 10h1v1H19zM22 10h3v1H22zM27 10h1v1H27zM0 11h1v1H0zM2 11h1v1H2zM4 11h2v1H4zM7 11h1v1H7zM13 11h4v1H13zM18 11h4v1H18zM26 11h2v1H26zM0 12h1v1H0zM2 12h3v1H2zM6 12h1v1H6zM11 12h1v1H11zM13 12h1v1H13zM15 12h3v1H15zM20 12h1v1H20zM22 12h2v1H22zM27,12 h2v1H27zM4 13h1v1H4zM8 13h3v1H8zM12 13h1v1H12zM14 13h1v1H14zM17 13h4v1H17zM25 13h2v1H25zM0 14h1v1H0zM4 14h3v1H4zM8 14h2v1H8zM11 14h3v1H11zM16 14h1v1H16zM21 14h2v1H21zM24,14 h5v1H24zM3 15h3v1H3zM7 15h2v1H7zM10 15h1v1H10zM12 15h2v1H12zM15 15h1v1H15zM17 15h2v1H17zM20 15h2v1H20zM23 15h1v1H23zM1 16h1v1H1zM4 16h1v1H4zM6 16h4v1H6zM16 16h2v1H16zM20 16h1v1H20zM23 16h1v1H23zM25 16h1v1H25zM28,16 h1v1H28zM2 17h1v1H2zM5 17h1v1H5zM7 17h2v1H7zM11 17h3v1H11zM17 17h1v1H17zM22 17h1v1H22zM25 17h1v1H25zM27,17 h2v1H27zM0 18h1v1H0zM3 18h1v1H3zM5 18h4v1H5zM10 18h1v1H10zM12 18h1v1H12zM18 18h1v1H18zM20 18h1v1H20zM22 18h2v1H22zM25,18 h4v1H25zM2 19h3v1H2zM8 19h1v1H8zM16 19h2v1H16zM21 19h1v1H21zM23 19h1v1H23zM25 19h1v1H25zM27 19h1v1H27zM0 20h1v1H0zM2 20h5v1H2zM8 20h2v1H8zM13 20h4v1H13zM19 20h6v1H19zM26 20h1v1H26zM28,20 h1v1H28zM8 21h2v1H8zM12 21h3v1H12zM16 21h1v1H16zM20 21h1v1H20zM24 21h1v1H24zM26,21 h3v1H26zM0 22h7v1H0zM8 22h3v1H8zM17 22h1v1H17zM20 22h1v1H20zM22 22h1v1H22zM24 22h2v1H24zM27 22h1v1H27zM0 23h1v1H0zM6 23h1v1H6zM10 23h2v1H10zM13 23h2v1H13zM19 23h2v1H19zM24,23 h5v1H24zM0 24h1v1H0zM2 24h3v1H2zM6 24h1v1H6zM9 24h2v1H9zM12 24h2v1H12zM17 24h1v1H17zM20 24h6v1H20zM28,24 h1v1H28zM0 25h1v1H0zM2 25h3v1H2zM6 25h1v1H6zM8 25h3v1H8zM12 25h1v1H12zM14 25h1v1H14zM18 25h1v1H18zM22 25h3v1H22zM26 25h1v1H26zM0 26h1v1H0zM2 26h3v1H2zM6 26h1v1H6zM10 26h5v1H10zM16 26h3v1H16zM21 26h1v1H21zM24 26h1v1H24zM26 26h1v1H26zM28,26 h1v1H28zM0 27h1v1H0zM6 27h1v1H6zM8 27h3v1H8zM12 27h4v1H12zM17 27h1v1H17zM20 27h1v1H20zM23 27h2v1H23zM27 27h1v1H27zM0 28h7v1H0zM8 28h3v1H8zM14 28h1v1H14zM16 28h3v1H16zM20 28h1v1H20zM22 28h1v1H22zM24 28h2v1H24zM27 28h1v1H27z"></path>
+    </svg>
+  </section>
+  
+
+  <section>
+    <h1>Subscribe</h1>
+    Do you want to get notified via email when I post new content?
+    <style>
+      .subscribe-button {
+        /* margin: 10px !important; */
+        padding: 10px !important;
+        background-color: black;
+        display: inline-block;
+        color: white !important;
+        text-decoration: none;
+
+        line-height: 36px !important;
+        height: 37px !important;
+        text-decoration: none !important;
+        display: inline-block !important;
+        color: #ffffff !important;
+        background-color: #000000 !important;
+        border-radius: 3px !important;
+        border: 1px solid transparent !important;
+        padding: 1px 9px !important;
+        font-size: 23px !important;
+        letter-spacing: 0.6px !important;
+        box-shadow: 0px 1px 2px rgba(190, 190, 190, 0.5) !important;
+        -webkit-box-shadow: 0px 1px 2px 2px rgba(190, 190, 190, 0.5) !important;
+        margin: 0 auto !important;
+        font-family: 'Cookie', cursive !important;
+        -webkit-box-sizing: border-box !important;
+        box-sizing: border-box !important;
+        -o-transition: 0.3s all linear !important;
+        -webkit-transition: 0.3s all linear !important;
+        -moz-transition: 0.3s all linear !important;
+        -ms-transition: 0.3s all linear !important;
+        transition: 0.3s all linear !important;
+
+      }
+    </style>
+    <a class='subscribe-button' target="_blank" href="http://eepurl.com/dxI3PP">Click here to subscribe!</a>
+  </section>
+
+
+  <section>
+    <h1>Recent Posts</h1>
+    <ul id="recent_posts">
+      <li class="post">
+        <a href="https://spapas.github.io/2024/08/22/multiple-erl-elixir-windows/">Multiple Erlang/Elixir versions in Windows</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/11/29/openid-connect-tutorial/">A simple OpenID connect tutorial</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/05/23/simple-django-datatables-integration/">Simple Django - DataTables integration</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/05/22/ai-auto-subtitling/">AI auto-subtitling</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/05/12/disable-your-forms/">HTML form disable after submit</a>
+      </li>
+    </ul>
+  </section>
+  <section>
+
+    <h1>Categories</h1>
+    <ul id="recent_posts">
+      <li><a href="https://spapas.github.io/category/ai.html">ai</a></li>
+      <li><a href="https://spapas.github.io/category/android.html">android</a></li>
+      <li><a href="https://spapas.github.io/category/clojure.html">clojure</a></li>
+      <li><a href="https://spapas.github.io/category/css.html">css</a></li>
+      <li><a href="https://spapas.github.io/category/django.html">django</a></li>
+      <li><a href="https://spapas.github.io/category/elixir.html">elixir</a></li>
+      <li><a href="https://spapas.github.io/category/flask.html">flask</a></li>
+      <li><a href="https://spapas.github.io/category/gaming.html">gaming</a></li>
+      <li><a href="https://spapas.github.io/category/git.html">git</a></li>
+      <li><a href="https://spapas.github.io/category/html.html">html</a></li>
+      <li><a href="https://spapas.github.io/category/javascript.html">javascript</a></li>
+      <li><a href="https://spapas.github.io/category/networking.html">networking</a></li>
+      <li><a href="https://spapas.github.io/category/pelican.html">pelican</a></li>
+      <li><a href="https://spapas.github.io/category/postgresql.html">postgresql</a></li>
+      <li><a href="https://spapas.github.io/category/python.html">python</a></li>
+      <li><a href="https://spapas.github.io/category/spring.html">spring</a></li>
+      <li><a href="https://spapas.github.io/category/unix.html">unix</a></li>
+      <li><a href="https://spapas.github.io/category/wagtail.html">wagtail</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Tags</h1>
+    <a href="https://spapas.github.io/tag/erlang.html">erlang</a>,    <a href="https://spapas.github.io/tag/elixir.html">elixir</a>,    <a href="https://spapas.github.io/tag/windows.html">windows</a>,    <a href="https://spapas.github.io/tag/openid.html">openid</a>,    <a href="https://spapas.github.io/tag/openid-connect.html">openid-connect</a>,    <a href="https://spapas.github.io/tag/oidc.html">oidc</a>,    <a href="https://spapas.github.io/tag/http.html">http</a>,    <a href="https://spapas.github.io/tag/keycloak.html">keycloak</a>,    <a href="https://spapas.github.io/tag/python.html">python</a>,    <a href="https://spapas.github.io/tag/django.html">django</a>,    <a href="https://spapas.github.io/tag/jquery.html">jquery</a>,    <a href="https://spapas.github.io/tag/datatables.html">datatables</a>,    <a href="https://spapas.github.io/tag/ai.html">ai</a>,    <a href="https://spapas.github.io/tag/whisper.html">whisper</a>,    <a href="https://spapas.github.io/tag/whispercpp.html">whisper.cpp</a>,    <a href="https://spapas.github.io/tag/subtitles.html">subtitles</a>,    <a href="https://spapas.github.io/tag/video.html">video</a>,    <a href="https://spapas.github.io/tag/auto-subtitling.html">auto-subtitling</a>,    <a href="https://spapas.github.io/tag/subtitiling.html">subtitiling</a>,    <a href="https://spapas.github.io/tag/transcribe.html">transcribe</a>,    <a href="https://spapas.github.io/tag/html.html">html</a>,    <a href="https://spapas.github.io/tag/javascript.html">javascript</a>,    <a href="https://spapas.github.io/tag/media.html">media</a>,    <a href="https://spapas.github.io/tag/storage.html">storage</a>,    <a href="https://spapas.github.io/tag/unpoly.html">unpoly</a>,    <a href="https://spapas.github.io/tag/access.html">access</a>,    <a href="https://spapas.github.io/tag/database.html">database</a>,    <a href="https://spapas.github.io/tag/accdb.html">accdb</a>,    <a href="https://spapas.github.io/tag/mdb.html">mdb</a>,    <a href="https://spapas.github.io/tag/postgresql.html">postgresql</a>,    <a href="https://spapas.github.io/tag/development.html">development</a>,    <a href="https://spapas.github.io/tag/inlines.html">inlines</a>,    <a href="https://spapas.github.io/tag/clojure.html">clojure</a>,    <a href="https://spapas.github.io/tag/cmd.html">cmd</a>,    <a href="https://spapas.github.io/tag/pdf.html">pdf</a>,    <a href="https://spapas.github.io/tag/wkhtmltopdf.html">wkhtmltopdf</a>,    <a href="https://spapas.github.io/tag/forward-proxy.html">forward-proxy</a>,    <a href="https://spapas.github.io/tag/reverse-proxy.html">reverse-proxy</a>,    <a href="https://spapas.github.io/tag/proxy.html">proxy</a>,    <a href="https://spapas.github.io/tag/networking.html">networking</a>,    <a href="https://spapas.github.io/tag/dj-rest-auth.html">dj-rest-auth</a>,    <a href="https://spapas.github.io/tag/rest.html">rest</a>,    <a href="https://spapas.github.io/tag/django-rest-framework.html">django-rest-framework</a>,    <a href="https://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="https://spapas.github.io/tag/tokens.html">tokens</a>,    <a href="https://spapas.github.io/tag/migrations.html">migrations</a>,    <a href="https://spapas.github.io/tag/foreignkey.html">foreignkey</a>,    <a href="https://spapas.github.io/tag/dark-souls.html">dark-souls</a>,    <a href="https://spapas.github.io/tag/dark-souls-2.html">dark-souls-2</a>,    <a href="https://spapas.github.io/tag/dark-souls-3.html">dark-souls-3</a>,    <a href="https://spapas.github.io/tag/autohotkey.html">autohotkey</a>,    <a href="https://spapas.github.io/tag/matplotlib.html">matplotlib</a>,    <a href="https://spapas.github.io/tag/hashids.html">hashids</a>,    <a href="https://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="https://spapas.github.io/tag/osmon.html">osmon</a>,    <a href="https://spapas.github.io/tag/phoenix.html">phoenix</a>,    <a href="https://spapas.github.io/tag/os-monitoring.html">os-monitoring</a>,    <a href="https://spapas.github.io/tag/forms.html">forms</a>,    <a href="https://spapas.github.io/tag/django-crispy-forms.html">django-crispy-forms</a>,    <a href="https://spapas.github.io/tag/django-widget-tweaks.html">django-widget-tweaks</a>,    <a href="https://spapas.github.io/tag/ecto.html">ecto</a>,    <a href="https://spapas.github.io/tag/queries.html">queries</a>,    <a href="https://spapas.github.io/tag/declarative.html">declarative</a>,    <a href="https://spapas.github.io/tag/form.html">form</a>,    <a href="https://spapas.github.io/tag/php.html">php</a>,    <a href="https://spapas.github.io/tag/select2.html">select2</a>,    <a href="https://spapas.github.io/tag/autocompelte.html">autocompelte</a>,    <a href="https://spapas.github.io/tag/ajax.html">ajax</a>,    <a href="https://spapas.github.io/tag/android.html">android</a>,    <a href="https://spapas.github.io/tag/kotlin.html">kotlin</a>,    <a href="https://spapas.github.io/tag/adapter.html">adapter</a>,    <a href="https://spapas.github.io/tag/filter.html">filter</a>,    <a href="https://spapas.github.io/tag/async.html">async</a>,    <a href="https://spapas.github.io/tag/tasks.html">tasks</a>,    <a href="https://spapas.github.io/tag/django-rq.html">django-rq</a>,    <a href="https://spapas.github.io/tag/rq.html">rq</a>,    <a href="https://spapas.github.io/tag/du.html">du</a>,    <a href="https://spapas.github.io/tag/unix.html">unix</a>,    <a href="https://spapas.github.io/tag/linux.html">linux</a>,    <a href="https://spapas.github.io/tag/disk-usage.html">disk-usage</a>,    <a href="https://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="https://spapas.github.io/tag/middleware.html">middleware</a>,    <a href="https://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="https://spapas.github.io/tag/react.html">react</a>,    <a href="https://spapas.github.io/tag/redux.html">redux</a>,    <a href="https://spapas.github.io/tag/hyperapp.html">hyperapp</a>,    <a href="https://spapas.github.io/tag/immutable.html">immutable</a>,    <a href="https://spapas.github.io/tag/es6.html">es6</a>,    <a href="https://spapas.github.io/tag/youtube.html">youtube</a>,    <a href="https://spapas.github.io/tag/youtube-dl.html">youtube-dl</a>,    <a href="https://spapas.github.io/tag/ffmpeg.html">ffmpeg</a>,    <a href="https://spapas.github.io/tag/django-rest-auth.html">django-rest-auth</a>,    <a href="https://spapas.github.io/tag/python-2.html">python-2</a>,    <a href="https://spapas.github.io/tag/python-3.html">python-3</a>,    <a href="https://spapas.github.io/tag/plpgsql.html">plpgsql</a>,    <a href="https://spapas.github.io/tag/component.html">component</a>,    <a href="https://spapas.github.io/tag/ag-grid.html">ag-grid</a>,    <a href="https://spapas.github.io/tag/grid.html">grid</a>,    <a href="https://spapas.github.io/tag/bash.html">bash</a>,    <a href="https://spapas.github.io/tag/cron.html">cron</a>,    <a href="https://spapas.github.io/tag/pandas.html">pandas</a>,    <a href="https://spapas.github.io/tag/scipy.html">scipy</a>,    <a href="https://spapas.github.io/tag/numpy.html">numpy</a>,    <a href="https://spapas.github.io/tag/pivot.html">pivot</a>,    <a href="https://spapas.github.io/tag/pivot_table.html">pivot_table</a>,    <a href="https://spapas.github.io/tag/ipython.html">ipython</a>,    <a href="https://spapas.github.io/tag/jupyter.html">jupyter</a>,    <a href="https://spapas.github.io/tag/notebook.html">notebook</a>,    <a href="https://spapas.github.io/tag/query.html">query</a>,    <a href="https://spapas.github.io/tag/q.html">q</a>,    <a href="https://spapas.github.io/tag/imgur.html">imgur</a>,    <a href="https://spapas.github.io/tag/console.html">console</a>,    <a href="https://spapas.github.io/tag/research.html">research</a>,    <a href="https://spapas.github.io/tag/debug.html">debug</a>,    <a href="https://spapas.github.io/tag/werkzeug.html">werkzeug</a>,    <a href="https://spapas.github.io/tag/django-extensions.html">django-extensions</a>,    <a href="https://spapas.github.io/tag/404.html">404</a>,    <a href="https://spapas.github.io/tag/error.html">error</a>,    <a href="https://spapas.github.io/tag/spring.html">spring</a>,    <a href="https://spapas.github.io/tag/spring-boot.html">spring-boot</a>,    <a href="https://spapas.github.io/tag/java.html">java</a>,    <a href="https://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="https://spapas.github.io/tag/profiles.html">profiles</a>,    <a href="https://spapas.github.io/tag/settings.html">settings</a>,    <a href="https://spapas.github.io/tag/properties.html">properties</a>,    <a href="https://spapas.github.io/tag/yaml.html">yaml</a>,    <a href="https://spapas.github.io/tag/configuration.html">configuration</a>,    <a href="https://spapas.github.io/tag/deploy.html">deploy</a>,    <a href="https://spapas.github.io/tag/initd.html">init.d</a>,    <a href="https://spapas.github.io/tag/react-redux.html">react-redux</a>,    <a href="https://spapas.github.io/tag/redux-thunk.html">redux-thunk</a>,    <a href="https://spapas.github.io/tag/redux-form.html">redux-form</a>,    <a href="https://spapas.github.io/tag/react-router.html">react-router</a>,    <a href="https://spapas.github.io/tag/react-router-redux.html">react-router-redux</a>,    <a href="https://spapas.github.io/tag/react-notification.html">react-notification</a>,    <a href="https://spapas.github.io/tag/history.html">history</a>,    <a href="https://spapas.github.io/tag/babel.html">babel</a>,    <a href="https://spapas.github.io/tag/babelify.html">babelify</a>,    <a href="https://spapas.github.io/tag/browserify.html">browserify</a>,    <a href="https://spapas.github.io/tag/watchify.html">watchify</a>,    <a href="https://spapas.github.io/tag/uglify.html">uglify</a>,    <a href="https://spapas.github.io/tag/boilerplate.html">boilerplate</a>,    <a href="https://spapas.github.io/tag/tutorial.html">tutorial</a>,    <a href="https://spapas.github.io/tag/introduction.html">introduction</a>,    <a href="https://spapas.github.io/tag/fixed-data-tables.html">fixed-data-tables</a>,    <a href="https://spapas.github.io/tag/fixeddatatable.html">FixedDataTable</a>,    <a href="https://spapas.github.io/tag/reportlab.html">reportlab</a>,    <a href="https://spapas.github.io/tag/xhtml2pdf.html">xhtml2pdf</a>,    <a href="https://spapas.github.io/tag/node.html">node</a>,    <a href="https://spapas.github.io/tag/npm.html">npm</a>,    <a href="https://spapas.github.io/tag/generic.html">generic</a>,    <a href="https://spapas.github.io/tag/tables.html">tables</a>,    <a href="https://spapas.github.io/tag/flux.html">flux</a>,    <a href="https://spapas.github.io/tag/jobs.html">jobs</a>,    <a href="https://spapas.github.io/tag/asynchronous.html">asynchronous</a>,    <a href="https://spapas.github.io/tag/scheduling.html">scheduling</a>,    <a href="https://spapas.github.io/tag/redis.html">redis</a>,    <a href="https://spapas.github.io/tag/pusher.html">pusher</a>,    <a href="https://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="https://spapas.github.io/tag/css.html">css</a>,    <a href="https://spapas.github.io/tag/design.html">design</a>,    <a href="https://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>,    <a href="https://spapas.github.io/tag/less.html">less</a>,    <a href="https://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="https://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="https://spapas.github.io/tag/security.html">security</a>,    <a href="https://spapas.github.io/tag/google.html">google</a>,    <a href="https://spapas.github.io/tag/flask.html">flask</a>,    <a href="https://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="https://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="https://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="https://spapas.github.io/tag/git.html">git</a>,    <a href="https://spapas.github.io/tag/github.html">github</a>,    <a href="https://spapas.github.io/tag/branching.html">branching</a>,    <a href="https://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="https://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="https://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="https://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="https://spapas.github.io/tag/rst.html">rst</a>  </section>
+
+  <section>
+    <h1>Yearly archives</h1>
+    <a href="https://spapas.github.io/posts/2013/">2013</a>,    <a href="https://spapas.github.io/posts/2014/">2014</a>,    <a href="https://spapas.github.io/posts/2015/">2015</a>,    <a href="https://spapas.github.io/posts/2016/">2016</a>,    <a href="https://spapas.github.io/posts/2017/">2017</a>,    <a href="https://spapas.github.io/posts/2018/">2018</a>,    <a href="https://spapas.github.io/posts/2019/">2019</a>,    <a href="https://spapas.github.io/posts/2020/">2020</a>,    <a href="https://spapas.github.io/posts/2021/">2021</a>,    <a href="https://spapas.github.io/posts/2022/">2022</a>,    <a href="https://spapas.github.io/posts/2023/">2023</a>,    <a href="https://spapas.github.io/posts/2024/">2024</a>  </section>
+
+
+
+  <section>
+    <h1>GitHub Repos</h1>
+    <ul id="gh_repos">
+      <li class="loading">Status updating...</li>
+    </ul>
+      <a href="https://github.com/spapas">@spapas</a> on GitHub
+    <script  src="//code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      $(function(){
+          if (!window.jXHR){
+              var jxhr = document.createElement('script');
+              jxhr.type = 'text/javascript';
+              jxhr.src = 'https://spapas.github.io/theme/js/jXHR.js';
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(jxhr, s);
+          }
+
+          github.showRepos({
+              user: 'spapas',
+              count: 5,
+              skip_forks: true,
+              target: '#gh_repos'
+          });
+      });
+    </script>
+    <script src="https://spapas.github.io/theme/js/github.js" type="text/javascript"> </script>
+  </section>
+
+
+  <section>
+    <a href="https://twitter.com/_serafeim_?ref_src=twsrc%5Etfw" class="twitter-follow-button"
+      data-show-count="false">Follow @_serafeim_</a>
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+  </section>
+
+</aside>    </div>
+  </div>
+  <footer role="contentinfo"><p>
+    Copyright &copy;  2013&ndash;2024  Serafeim Papastefanos &mdash;
+  <span class="credit">Powered by <a href="http://getpelican.com">Pelican</a></span>
+</p></footer>
+  <script src="https://spapas.github.io/theme/js/modernizr-2.0.js"></script>
+  <script src="https://spapas.github.io/theme/js/ender.js"></script>
+  <script src="https://spapas.github.io/theme/js/octopress.js" type="text/javascript"></script>
+  <script src="https://spapas.github.io/theme/js/ads.js"></script>
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-44750952-1', 'auto');
+
+    ga('send', 'pageview');
+    </script>
+
+<script defer data-domain="spapas.github.io" src="https://plausible.hcg.gr/js/script.js"></script>  <script type="text/javascript">
+    var disqus_shortname = 'spapas-github-io';
+    var disqus_identifier = '/2023/05/22/ai-auto-subtitling/';
+    var disqus_url = 'https://spapas.github.io/2023/05/22/ai-auto-subtitling/';
+    var disqus_title = '<span class="caps">AI</span>&nbsp;auto-subtitling';
+    (function() {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = "//" + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+     })();
+  </script>
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+</body>
+
+</html>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>/var/ - unix</title><link href="https://spapas.github.io/" rel="alternate"></link><link href="https://spapas.github.io/feeds/unix.atom.xml" rel="self"></link><id>https://spapas.github.io/</id><updated>2018-11-12T14:20:00+02:00</updated><subtitle>Various programming stuff</subtitle><entry><title>Use du to find out the disk usage of each directory in unix</title><link href="https://spapas.github.io/2018/11/12/du-disk-usage/" rel="alternate"></link><published>2018-11-12T14:20:00+02:00</published><updated>2018-11-12T14:20:00+02:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:spapas.github.io,2018-11-12:/2018/11/12/du-disk-usage/</id><summary type="html">&lt;p class="first last"&gt;How to use the du utility to find out the disk usage of each directory in&amp;nbsp;unix&lt;/p&gt;
+</summary><content type="html">&lt;p&gt;One usual problem I have when dealing with production servers is that their
+disks get filled.  This results in various warnings and errors and should be fixed
+immediately. The first step to resolve this issue is to actually find out where is that
+hard disk space is&amp;nbsp;used!&lt;/p&gt;
+&lt;p&gt;For this you can use the &lt;cite&gt;du&lt;/cite&gt; unix tool with some parameters. The problem is that &lt;cite&gt;du&lt;/cite&gt;
+has various parameters (not needed for the task at hand) and the various
+places I search for contain other info not related to this specific&amp;nbsp;task.&lt;/p&gt;
+&lt;p&gt;Thus I&amp;#8217;ve decided to write this small blog post to help people struggling with
+this and also to help &lt;em&gt;me&lt;/em&gt; avoid googling for it by searching in pages that
+also contain other &lt;tt class="docutils literal"&gt;du&lt;/tt&gt; recipies and also avoid the trial and error that this
+would&amp;nbsp;require.&lt;/p&gt;
+&lt;p&gt;So to print out the disk usage summary for a directory go to that directory
+and run &lt;tt class="docutils literal"&gt;du &lt;span class="pre"&gt;-h&lt;/span&gt; &lt;span class="pre"&gt;-s&lt;/span&gt; *&lt;/tt&gt;; you need to have access to the child subdirectories
+so probably it&amp;#8217;s better to try this as root (unless you go to your home dir
+for&amp;nbsp;example).&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s a sample&amp;nbsp;usage:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+[root&amp;#64;server1 /]# cd /
+[root&amp;#64;server1 /]# du -h -s *
+7.2M    bin
+55M     boot
+164K    dev
+35M     etc
+41G     home
+236M    lib
+25M     lib64
+20K     lost+found
+8.0K    media
+155G    mnt
+0       proc
+1.6G    root
+12M     sbin
+8.0K    srv
+427M    tmp
+3.2G    usr
+8.9G    var
+&lt;/pre&gt;
+&lt;p&gt;The parameters are -h to print human readable sizes (G, M etc) and -s to
+print a summary usage of &lt;em&gt;each&lt;/em&gt; parameter. Since this will output the
+summary for each parameter I finally pass &lt;tt class="docutils literal"&gt;*&lt;/tt&gt; to be changed to all files/dirs
+in that directory. If I used &lt;tt class="docutils literal"&gt;du &lt;span class="pre"&gt;-h&lt;/span&gt; &lt;span class="pre"&gt;-s&lt;/span&gt; /tmp&lt;/tt&gt; instead I&amp;#8217;d get the total usage only for
+the &lt;tt class="docutils literal"&gt;/tmp&lt;/tt&gt; directory.&lt;/p&gt;
+&lt;p&gt;Another trick that may help you quickly find out the offending directories is to
+append the &lt;tt class="docutils literal"&gt;| grep G&lt;/tt&gt; pipe command (i.e run &lt;tt class="docutils literal"&gt;du &lt;span class="pre"&gt;-h&lt;/span&gt; &lt;span class="pre"&gt;-s&lt;/span&gt; * | grep G&lt;/tt&gt;) which will
+filter out only the entries containing a &lt;tt class="docutils literal"&gt;G&lt;/tt&gt; (i.e only print the folders having
+more than 1 &lt;span class="caps"&gt;GB&lt;/span&gt; size). Yeh I know that this will also print entries that have
+also a G in their name but since there aren&amp;#8217;t many directores that have
+G in their name you should be&amp;nbsp;ok.&lt;/p&gt;
+&lt;p&gt;If you run the above from &lt;tt class="docutils literal"&gt;/&lt;/tt&gt; so that &lt;tt class="docutils literal"&gt;/proc&lt;/tt&gt; is included you may
+get a bunch of &lt;tt class="docutils literal"&gt;du: cannot access 'proc/nnn/task/nnn/fd/4': No such file or directory&lt;/tt&gt;
+errors; just add the &lt;tt class="docutils literal"&gt;2&amp;gt; /dev/null&lt;/tt&gt; pipe redirect to redirect the stderr output
+to &lt;tt class="docutils literal"&gt;/dev/null&lt;/tt&gt;, i.e run &lt;tt class="docutils literal"&gt;du &lt;span class="pre"&gt;-h&lt;/span&gt; &lt;span class="pre"&gt;-s&lt;/span&gt; * 2&amp;gt; /dev/null&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;Finally, please notice that if there are &lt;em&gt;lots&lt;/em&gt; of files in your directory you&amp;#8217;ll get
+a lot of output entries (since the &lt;cite&gt;*&lt;/cite&gt; will match both files and directories).
+In this case you can use &lt;tt class="docutils literal"&gt;echo */&lt;/tt&gt; or &lt;tt class="docutils literal"&gt;ls &lt;span class="pre"&gt;-d&lt;/span&gt; */&lt;/tt&gt; to list only the directories;
+append that command inside a ` pair or &lt;tt class="docutils literal"&gt;$()&lt;/tt&gt; (to substitute for the command
+output) instead of the &lt;tt class="docutils literal"&gt;*&lt;/tt&gt; to only get the sizes of the
+directories, i.e run &lt;tt class="docutils literal"&gt;du &lt;span class="pre"&gt;-h&lt;/span&gt; &lt;span class="pre"&gt;-s&lt;/span&gt; $(echo */)&lt;/tt&gt; or &lt;tt class="docutils literal"&gt;du &lt;span class="pre"&gt;-h&lt;/span&gt; &lt;span class="pre"&gt;-s&lt;/span&gt; `echo */`&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;One thing that you must be aware of is that this command may take &lt;em&gt;a long time&lt;/em&gt;
+especially if you have lots of small files somewhere. Just let it run and it
+should finish after some time. If it takes too long time try to exclude any
+mounted network
+directories (either with &lt;span class="caps"&gt;SMB&lt;/span&gt; or &lt;span class="caps"&gt;NFS&lt;/span&gt;) since these will take extra long&amp;nbsp;time.&lt;/p&gt;
+&lt;p&gt;Also, if you awant a nice interactive output
+using ncurses you can download and compile the &lt;a class="reference external" href="https://dev.yorhel.nl/ncdu"&gt;ncdu tool&lt;/a&gt; (NCurses Disk&amp;nbsp;Usage).&lt;/p&gt;
+</content><category term="unix"></category><category term="du"></category><category term="unix"></category><category term="linux"></category><category term="disk-usage"></category></entry></feed>

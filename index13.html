@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="google-site-verification" content="5_8DTmIiEq4gFvNAfxAD6TsGOgrMAjp8lQFQvfA6zZc" />
+    <title>/var/</title>
+    <meta name="author" content="Serafeim Papastefanos">
+
+
+    
+<style type="text/css">
+pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: var(--jp-cell-editor-active-background) }
+.highlight { background: var(--jp-cell-editor-background); color: var(--jp-mirror-editor-variable-color) }
+.highlight .c { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment */
+.highlight .err { color: var(--jp-mirror-editor-error-color) } /* Error */
+.highlight .k { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword */
+.highlight .o { color: var(--jp-mirror-editor-operator-color); font-weight: bold } /* Operator */
+.highlight .p { color: var(--jp-mirror-editor-punctuation-color) } /* Punctuation */
+.highlight .ch { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Preproc */
+.highlight .cpf { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Single */
+.highlight .cs { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Special */
+.highlight .kc { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Pseudo */
+.highlight .kr { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Type */
+.highlight .m { color: var(--jp-mirror-editor-number-color) } /* Literal.Number */
+.highlight .s { color: var(--jp-mirror-editor-string-color) } /* Literal.String */
+.highlight .ow { color: var(--jp-mirror-editor-operator-color); font-weight: bold } /* Operator.Word */
+.highlight .pm { color: var(--jp-mirror-editor-punctuation-color) } /* Punctuation.Marker */
+.highlight .w { color: var(--jp-mirror-editor-variable-color) } /* Text.Whitespace */
+.highlight .mb { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Bin */
+.highlight .mf { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Float */
+.highlight .mh { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Hex */
+.highlight .mi { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Integer */
+.highlight .mo { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Oct */
+.highlight .sa { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Affix */
+.highlight .sb { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Backtick */
+.highlight .sc { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Char */
+.highlight .dl { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Delimiter */
+.highlight .sd { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Doc */
+.highlight .s2 { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Double */
+.highlight .se { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Escape */
+.highlight .sh { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Heredoc */
+.highlight .si { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Interpol */
+.highlight .sx { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Other */
+.highlight .sr { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Regex */
+.highlight .s1 { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Single */
+.highlight .ss { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Symbol */
+.highlight .il { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Integer.Long */
+</style>
+
+<style type="text/css">
+/* Overrides of notebook CSS for static HTML export */
+div.entry-content {
+  overflow: visible;
+  padding: 8px;
+}
+.input_area {
+  padding: 0.2em;
+}
+
+a.heading-anchor {
+ white-space: normal;
+}
+
+.rendered_html
+code {
+ font-size: .8em;
+}
+
+pre.ipynb {
+  color: black;
+  background: #f7f7f7;
+  border: none;
+  box-shadow: none;
+  margin-bottom: 0;
+  padding: 0;
+  margin: 0px;
+  font-size: 13px;
+}
+
+/* remove the prompt div from text cells */
+div.text_cell .prompt {
+    display: none;
+}
+
+/* remove horizontal padding from text cells, */
+/* so it aligns with outer body text */
+div.text_cell_render {
+    padding: 0.5em 0em;
+}
+
+img.anim_icon{padding:0; border:0; vertical-align:middle; -webkit-box-shadow:none; -box-shadow:none}
+
+div.collapseheader {
+    width=100%;
+    background-color:#d3d3d3;
+    padding: 2px;
+    cursor: pointer;
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+</style>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true,
+        displayMath: [['$$','$$'], ["\\[","\\]"]]
+    }
+});
+</script>
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+    $("div.collapseheader").click(function () {
+    $header = $(this).children("span").first();
+    $codearea = $(this).children(".input_area");
+    console.log($(this).children());
+    $codearea.slideToggle(500, function () {
+        $header.text(function () {
+            return $codearea.is(":visible") ? "Collapse Code" : "Expand Code";
+        });
+    });
+});
+});
+</script>
+
+
+
+
+    <!-- http://t.co/dKP3o1e -->
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+    <link href="https://spapas.github.io/favicon.png" rel="icon">
+
+    <link href="https://spapas.github.io/theme/css/main.css" media="screen, projection" rel="stylesheet"
+      type="text/css">
+
+    <link href="https://spapas.github.io/theme/css/extra_style.css" media="screen, projection" rel="stylesheet"
+      type="text/css">
+
+    <link href="https://fonts.googleapis.com/css?family=Fira+Mono|Fira+Sans:400,700&amp;subset=greek" rel="stylesheet">
+
+<style>
+#gHPzseYvFrhZ123 {
+  padding: 5px !important;
+  display: block;
+  margin-bottom: 10px !important;
+  background: #900;
+  color: #fff;
+  border-radius: 5px;
+  font-size: 1.0rem !important;
+}
+</style>
+
+
+  <script>
+    
+      
+  </script>
+
+    <script data-ad-client="ca-pub-7673322832689008" async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
+      onerror="adBlockFunction();"></script>
+  </head>
+
+<body>
+  <header role="banner"><hgroup>
+  <h1><a href="https://spapas.github.io/">/var/</a></h1>
+    <h2>Various programming stuff</h2>
+</hgroup></header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+</ul>
+
+
+<ul class="main-navigation">
+      <li >
+        <a href="https://spapas.github.io/category/ai.html">Ai</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/android.html">Android</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/clojure.html">Clojure</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/css.html">Css</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/django.html">Django</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/elixir.html">Elixir</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/flask.html">Flask</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/gaming.html">Gaming</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/git.html">Git</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/html.html">Html</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/javascript.html">Javascript</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/networking.html">Networking</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/pelican.html">Pelican</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/postgresql.html">Postgresql</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/python.html">Python</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/spring.html">Spring</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/unix.html">Unix</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/wagtail.html">Wagtail</a>
+      </li>
+</ul></nav>
+  <div id="main">
+    <div id="content">
+    <div id="gHPzseYvFrhZ123">
+      Hello! If you are using an ad blocker but find something useful here 
+      and want to support me please consider disabling your ad blocker for this site. 
+      <br />
+      <br />
+      Thank you,<br />
+      Serafeim
+      
+    </div>
+<div class="blog-index">
+  		<article>
+<header>
+      <h1 class="entry-title">
+        <a href="https://spapas.github.io/2014/12/16/change-bootstrap-material-primary-color/">Change the primary color of bootstrap material design</a>
+      </h1>
+    <p class="meta">
+<time datetime="2014-12-16T16:20:00+02:00" pubdate>Tue 16 December 2014</time>    </p>
+</header>
+
+<div class="entry-content"><div class="section" id="introduction">
+<h2>Introduction</h2>
+<p><a class="reference external" href="https://github.com/FezVrasta/bootstrap-material-design">Bootstrap Material Design</a> is a great theme that sits on top of <a class="reference external" href="http://getbootstrap.com/">Bootstrap</a> and transforms it to
+<a class="reference external" href="http://www.google.com/design/spec/material-design/introduction.html">Material Design</a>! The great thing about Bootstrap Material Design is that you just need to include
+its css and js files after your Bootstrap files and&nbsp;&#8230;</p>
+<p>boom! Your page is Material Design&nbsp;compatible!</p>
+<object data="https://google.github.io/material-design-icons/action/svg/ic_thumb_up_24px.svg" type="image/svg+xml"></object>
+<p>A nice feature of Bootstrap Material Design is that you can change its default color to a new one (I
+don&#8217;t really like the current - greenish one). This is easy for people with less skills however I
+found it rather challenging when I tried it. That&#8217;s why I will present a step by step tutorial on
+changing the default primary color of the Bootstrap Material Design&nbsp;theme:</p>
+</div>
+<div class="section" id="step-1-get-the-code">
+<h2>Step 1: Get the&nbsp;code</h2>
+<p>Use git to make a local clone of the project with <tt class="docutils literal">git clone <span class="pre">https://github.com/FezVrasta/bootstrap-material-design.git</span></tt>. This will create a directory
+named <tt class="docutils literal"><span class="pre">bootstrap-material-design</span></tt>. Or you can download the latest version of the code using (<a class="reference external" href="https://github.com/FezVrasta/bootstrap-material-design/archive/master.zip">https://github.com/FezVrasta/bootstrap-material-design/archive/master.zip</a>)
+and unzip it to the <tt class="docutils literal"><span class="pre">bootstrap-material-design</span></tt> directory.</p>
+</div>
+<div class="section" id="step-2-install-node-js-and-npm">
+<h2>Step 2: Install node.js and&nbsp;npm</h2>
+<p>You need to have <a class="reference external" href="http://nodejs.org/">node.js</a> and npm installed in your system - this is something very easy so I won&#8217;t go into any details about this. After you have installed
+both node.js and npm you need to put them in your path so that you&#8217;ll be able to run <tt class="docutils literal">npm <span class="pre">-v</span></tt> without errors and receive something like <tt class="docutils literal">1.4.14</tt>.</p>
+</div>
+<div class="section" id="step-3-install-less">
+<h2>Step 3: Install&nbsp;less</h2>
+<p><a class="reference external" href="http://lesscss.org/">less</a> is a <span class="caps">CSS</span> preprocessor in which Bootstrap Material Design has been written. To install it, just enter the command <tt class="docutils literal">npm install <span class="pre">-g</span> less</tt>. After that
+you should have a command named <tt class="docutils literal">lessc</tt> which, when run would output something like: <tt class="docutils literal">lessc 2.1.1 (Less Compiler) [JavaScript]</tt>.</p>
+</div>
+<div class="section" id="step-4-create-the-customizations-files">
+<h2>Step 4: Create the customizations&nbsp;files</h2>
+<p>Go to the directory where you cloned (or unzipped) the Bootstrap Material Design code and create a file named <tt class="docutils literal">custom.less</tt> (so, that file should be
+in the same folder as with <tt class="docutils literal">bower.json</tt>, <tt class="docutils literal">Gruntfile.js</tt> etc) with the following&nbsp;contents:</p>
+<pre class="code literal-block">
+&#64;import &quot;less/material.less&quot;;
+
+// Override &#64;primary color with one took from _colors.less
+&#64;primary: &#64;indigo;
+</pre>
+<p>(I wanted to use the indigo color as my primary one - you may of course use whichever color from the ones defined in <tt class="docutils literal">less/_variables.less</tt> you&nbsp;like)</p>
+<p>This file may contain other default values for variables - if I find anything useful I will add it to this post (also please reply with any&nbsp;recommendations).</p>
+<p><strong>Update 13/10/2015</strong> After a request from commenter Jofferson Ramirez Tiquez, here&#8217;s a custom.less that overrides more colors from <tt class="docutils literal">_variables.css</tt>
+(beyond the primary color, it changes the success color to teal and info and warning to the corresponding hex color&nbsp;values):</p>
+<pre class="code literal-block">
+&#64;import &quot;less/material.less&quot;;
+
+&#64;primary: &#64;indigo;
+&#64;success: &#64;teal;
+&#64;info: #CFD8DC;
+&#64;warning:#455A64;
+</pre>
+<p><strong>Update 08/02/2017</strong> Commenter Enrique SIlva informed me that the names of these color variables have been changed to
+<tt class="docutils literal"><span class="pre">&#64;brand-primary</span></tt>, <tt class="docutils literal"><span class="pre">&#64;brand-success</span></tt> etc (as can be seen on <tt class="docutils literal">less/_variables.less</tt>) so you must change them accordingly when overriding&nbsp;them!</p>
+</div>
+<div class="section" id="step-5-create-your-custom-material-css-file">
+<h2>Step 5: Create your custom material css&nbsp;file</h2>
+<p>Finally, run the following command: <tt class="docutils literal">lessc custom.less&nbsp; &gt; <span class="pre">material-custom.css</span></tt>. This will create a file named <tt class="docutils literal"><span class="pre">material-custom.css</span></tt> that contains your
+custom version of Bootstrap Material Design! If you want your <tt class="docutils literal"><span class="pre">material-custom.css</span></tt> to be compressed, add the <tt class="docutils literal"><span class="pre">-x</span></tt> option like this:  <tt class="docutils literal">lessc <span class="pre">-x</span> custom.less&nbsp; &gt; <span class="pre">material-custom.css</span></tt>.</p>
+<p>You may now include <tt class="docutils literal"><span class="pre">material-custom.css</span></tt> instead of <tt class="docutils literal">material.css</tt> (or the minified version of it) to your projects and you&#8217;ll have your own primary&nbsp;color!</p>
+<p><strong>Update 09/06/2016</strong>: After some comments I returned to this blog post and tried to re-create the custom
+css file. Unfortunately, for the latest versions of the bootstrap-material-design, the above step by step instructions need to be changed in two&nbsp;places:</p>
+<ul class="simple">
+<li>Step 1: Instead of only the bootstrap-material-design code, you also need to retrieve the code of the original bootstrap. To do that you can do a <tt class="docutils literal">git clone <span class="pre">https://github.com/twbs/bootstrap.git</span></tt> so that you&#8217;ll have the bootstrap directory next to the bootstrap-material-design directory. Be careful on that, you should have two directories side by side, one containing the bootstrap code and another containing the bootstrap-material-design code. This is required because bootstrap-material-design references some bootstrap variables (from <tt class="docutils literal"><span class="pre">less/_import-bs-less.less</span></tt>).</li>
+<li>Step 4: For the customizations file (<tt class="docutils literal">custom.less</tt>), you should change the line <tt class="docutils literal">&#64;import &quot;less/material.less&quot;;</tt> to <tt class="docutils literal">&#64;import <span class="pre">&quot;less/bootstrap-material-design.less&quot;;</span></tt> because the name of that file has been&nbsp;changed.</li>
+</ul>
+<p>After these two changes you should once again be able to create your custom css&nbsp;file!</p>
+<p><strong>Update 03/07/2017</strong> Commenter Nuraan Bader informed of an <cite>NameError: variable &#64;line-height-base is undefined</cite> error when
+creating the custom css file. This is because bootstrap has changed the default branch from <cite>master</cite> to <cite>v4-dev</cite>
+so when you clone you&#8217;ll get the <cite>v4-dev</cite> branch instead of the <cite>master</cite> one! To fix this, after you clone (check out
+my 09/06/2016 update) do the&nbsp;following:</p>
+<pre class="code literal-block">
+cd bootstrap
+git checkout master
+</pre>
+<p>This should change the current branch to master and you should see the <cite>less</cite> folder inside the <cite>bootstrap</cite> folder. After that everything should work as&nbsp;expected.</p>
+</div>
+</div>
+  		</article>
+  		<article>
+<header>
+      <h1 class="entry-title">
+        <a href="https://spapas.github.io/2014/10/23/retrieve-gmail-blocked-attachments/">Retrieving Gmail blocked attachments</a>
+      </h1>
+    <p class="meta">
+<time datetime="2014-10-23T14:20:00+03:00" pubdate>Thu 23 October 2014</time>    </p>
+</header>
+
+<div class="entry-content"><p>Before services like Dropbox were widely available, some people (including me) were using
+their Gmail account as a primitive backup solution: Compress your directory and send it to
+your gmail. There. Backup&nbsp;complete.</p>
+<p>However, nothing is so&nbsp;easy&#8230;</p>
+<p>Recently, I wanted to retrieve one of these backups, a .rar containing the complete
+source code (since it was written in TeX) of my PhD thesis. The problem was that Gmail blocked the access to these attachments&nbsp;saying</p>
+<blockquote>
+Anti-virus warning - 1 attachment contains a virus or blocked file. Downloading this attachment is disabled.</blockquote>
+<p>probably because I had a number of .bat files inside that .rar archive to automate my work&nbsp;:(</p>
+<p>Now what&nbsp;?</p>
+<p>After searching the internet and not founding any solutions, I tried the options that gmail gives for each email. One
+particular one cought my interest: <em>Show&nbsp;original</em></p>
+<img alt="Here it is!" src="/images/show_original.png" style="width: 780px;" />
+<p>Clicking this option opened a text file with the original, <span class="caps">MIME</span> encoded message. The interesting thing of course&nbsp;was</p>
+<pre class="code literal-block">
+------=_NextPart_000_004F_01CA0AED.E63C2A30
+Content-Type: application/octet-stream;
+      name=&quot;phdstuff.rar&quot;
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+      filename=&quot;phdstuff.rar&quot;
+
+UmFyIRoHAM+QcwAADQAAAAAAAAB0f3TAgCwANAMAAFQEAAACRbXCx8lr9TodMwwAIAAAAG5ld2Zp
+bmFsLnR4dA3dEQzM082BF7sB+D3q6QPUNEfwG7vHQgNkiQDTkGvfhOE4mNltIJJlBFMOCQPzPeKD
+...
+</pre>
+<p>So the whole attachment was contained in that text file, encoded in base64! Now I just
+needed to extract it from the email and convert it back to&nbsp;binary.</p>
+<blockquote>
+<strong>Important: Before going the python way, please check the 2 June 2015 update at the end of the article for an easier solution!</strong></blockquote>
+<p>This was very easy to do using Python - some people <a class="reference external" href="http://stackoverflow.com/questions/4067937/getting-mail-attachment-to-python-file-object">had already asked the same thing on <span class="caps">SO</span></a>.
+So here&#8217;s a simple program that gets an email in text/mime format as input and dumps all&nbsp;attachments:</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">email</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span><span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span><span class="o">&lt;</span><span class="mi">2</span><span class="p">:</span>
+        <span class="nb">print</span> <span class="s2">&quot;Please enter a file to extract attachments from&quot;</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">msg</span> <span class="o">=</span> <span class="n">email</span><span class="o">.</span><span class="n">message_from_file</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="k">for</span> <span class="n">pl</span> <span class="ow">in</span> <span class="n">msg</span><span class="o">.</span><span class="n">get_payload</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">pl</span><span class="o">.</span><span class="n">get_filename</span><span class="p">():</span> <span class="c1"># if it is an attachment</span>
+            <span class="nb">open</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">get_filename</span><span class="p">(),</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">get_payload</span><span class="p">(</span><span class="n">decode</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+</pre></div>
+<p>Save this to a file named <tt class="docutils literal">get_attachments.py</tt> and, after saving the original message to a file
+named <tt class="docutils literal">0.txt</tt> run <tt class="docutils literal">python get_attachments.py 0.txt</tt> and you&#8217;ll see the attachments of your email in the same&nbsp;folder!</p>
+<blockquote>
+Disclaimer: I have to warn you that since Gmail claims that an attachment is <em>not safe</em> it may be <strong>actually not safe</strong>. So
+you must be 100% sure that you know what you are doing before retrievening your email attachments like this.</blockquote>
+<p><strong>Update</strong>: Stefan <a class="reference external" href="https://gist.github.com/stefansundin/a99bbfb6cda873d14fd2">created an improved version</a> of the attachment extractor which is also compatible with Python&nbsp;3.4!</p>
+<p><strong>Update, 12 January 2015</strong>: Ivana (at the comments section) proposed a different solution that may work
+for some files: <em>Use a mobile Gmail client (I tested it with Android) and &#8220;Save to Drive&#8221; your attachment.
+You&#8217;ll then be able to download it from the Google Drive!</em> I am not sure if this works for all attachments,
+however it worked for the source of my PhD thesis! I&#8217;m writing it may not work for all attachments because
+when you download something from Google Drive it does a virus check so it may not allow you to download the
+attachment and then  you&#8217;ll still need to do it manually using the method below (however <strong>in that case you
+must be even more cautious for the case the attachment actualyl contains a malicious file</strong>).</p>
+<p><strong>Update, 2 June 2015</strong>: Commenter Sumit Chauhan (and Yuri Marx) proposed to change the extension
+of the downloaded <span class="caps">MIME</span> text file (original message) to eml and open it with Outlook. I don&#8217;t have
+Outlook in my system, however I tried opening it with <a class="reference external" href="https://www.mozilla.org/el/thunderbird/">Thunderbird</a> and it worked!!! So please
+try this solution before trying the pythonic way (especially if you&#8217;re not familiar with&nbsp;python).</p>
+<p><strong>Update, 6 March 2016</strong>: Commenter Alex (Alexandre Barfuhok) proposed another clever trick (involving making visible
+the initially invisible &#8220;Download to drive&#8221; button) for retrieving gmail blocked attachments!
+Read more about it <a class="reference external" href="http://www.barfuhok.com/how-to-download-a-file-with-anti-virus-warning-on-gmail/">at his article</a>!</p>
+</div>
+  		</article>
+  		<article>
+<header>
+      <h1 class="entry-title">
+        <a href="https://spapas.github.io/2014/09/15/django-non-html-responses/">Django non-HTML responses</a>
+      </h1>
+    <p class="meta">
+<time datetime="2014-09-15T14:20:00+03:00" pubdate>Mon 15 September 2014</time>    </p>
+</header>
+
+<div class="entry-content"><div class="contents topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#introduction" id="toc-entry-1">Introduction</a></li>
+<li><a class="reference internal" href="#how-are-cbvs-rendered" id="toc-entry-2">How are CBVs&nbsp;rendered</a></li>
+<li><a class="reference internal" href="#rendering-to-non-html" id="toc-entry-3">Rendering to non-<span class="caps">HTML</span></a></li>
+<li><a class="reference internal" href="#a-non-html-mixin" id="toc-entry-4">A non-<span class="caps">HTML</span>&nbsp;mixin</a></li>
+<li><a class="reference internal" href="#a-more-complex-example" id="toc-entry-5">A more complex&nbsp;example</a></li>
+<li><a class="reference internal" href="#conclusion" id="toc-entry-6">Conclusion</a></li>
+</ul>
+</div>
+<div class="section" id="introduction">
+<h2><a class="toc-backref" href="#toc-entry-1">Introduction</a></h2>
+<p>I have already written about the many advantages (<span class="caps">DRY</span>!) of using <a class="reference external" href="https://spapas.github.io/2014/04/11/django-generic-formviews-for-objects/">CBVs in a previous article.</a>
+In this article I will present the correct (pythonic) way to allow a normal <span class="caps">CBV</span> to return non-<span class="caps">HTML</span> responses, like <span class="caps">PDF</span>, <span class="caps">CSV</span>, <span class="caps">XSL</span>&nbsp;etc.</p>
+</div>
+<div class="section" id="how-are-cbvs-rendered">
+<h2><a class="toc-backref" href="#toc-entry-2">How are CBVs&nbsp;rendered</a></h2>
+<p>Before proceeding, we need to understand how CBVs are rendered. By walking through the
+class hierarchy in the <a class="reference external" href="http://ccbv.co.uk/"><span class="caps">CBV</span> inspector</a>, we can see that
+all the normal Django CBVs (DetailView, CreateView, TemplateView etc) are using a mixin
+named <a class="reference external" href="http://ccbv.co.uk/projects/Django/1.7/django.views.generic.base/TemplateResponseMixin/">TemplateResponseMixin</a> which defines a method named <tt class="docutils literal">render_to_response</tt>. This
+is the method that is used for rendering the output of the Views. Let&#8217;s take a look at
+<a class="reference external" href="http://ccbv.co.uk/projects/Django/1.7/django.views.generic.base/TemplateResponseMixin/">how it is defined</a> (I&#8217;ll remove the&nbsp;comments):</p>
+<div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">TemplateResponseMixin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+  <span class="n">template_name</span> <span class="o">=</span> <span class="kc">None</span>
+  <span class="n">response_class</span> <span class="o">=</span> <span class="n">TemplateResponse</span>
+  <span class="n">content_type</span> <span class="o">=</span> <span class="kc">None</span>
+
+  <span class="k">def</span><span class="w"> </span><span class="nf">render_to_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="o">**</span><span class="n">response_kwargs</span><span class="p">):</span>
+      <span class="n">response_kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;content_type&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">content_type</span><span class="p">)</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">response_class</span><span class="p">(</span>
+          <span class="n">request</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">,</span>
+          <span class="n">template</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_template_names</span><span class="p">(),</span>
+          <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">,</span>
+          <span class="o">**</span><span class="n">response_kwargs</span>
+      <span class="p">)</span>
+
+  <span class="k">def</span><span class="w"> </span><span class="nf">get_template_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+          <span class="k">raise</span> <span class="n">ImproperlyConfigured</span><span class="p">(</span>
+              <span class="s2">&quot;TemplateResponseMixin requires either a definition of &quot;</span>
+              <span class="s2">&quot;&#39;template_name&#39; or an implementation of &#39;get_template_names()&#39;&quot;</span><span class="p">)</span>
+      <span class="k">else</span><span class="p">:</span>
+          <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">template_name</span><span class="p">]</span>
+</pre></div>
+<p>This method will try to find out which html template should be used to render the View
+(using the  <tt class="docutils literal">get_template_names</tt> method and template_name attribute of the mixin) and
+then render this view by instantiating an instance of the <tt class="docutils literal">TemplateResponse</tt> class
+(as defined in the <tt class="docutils literal">response_class</tt> attribute)
+and passing the request, template, context and other response_args to&nbsp;it.</p>
+<p>The <a class="reference external" href="https://github.com/django/django/blob/master/django/template/response.py">TemplateResponse</a> class which is instantiated in the <tt class="docutils literal">render_to_response</tt> method
+inherits from a normal <tt class="docutils literal">HttpResponse</tt> and is used to render
+the template passed to it as a&nbsp;parameter.</p>
+</div>
+<div class="section" id="rendering-to-non-html">
+<h2><a class="toc-backref" href="#toc-entry-3">Rendering to non-<span class="caps">HTML</span></a></h2>
+<p>From the previous discussion we can conclude that if your non-<span class="caps">HTML</span> response <em>needs</em>
+a template then you just need to create a subclass of <tt class="docutils literal">TemplateResponse</tt> and
+assign it to the <tt class="docutils literal">response_class</tt> attribute (and also change the <tt class="docutils literal">content_type</tt>
+attribute). On the other hand, if your non-<span class="caps">HTML</span> respond does not need a template
+to be rendered then you have to override <tt class="docutils literal">render_to_response</tt> completely
+(since the template parameter does not need to be passed now) and either define
+a subclass of HttpResponse or do the rendering in the&nbsp;render_to_response.</p>
+<p>Since almost always you won&#8217;t need a template to create a non-<span class="caps">HTML</span> view and because
+I believe that the solution is <span class="caps">DRY</span>-enough by implementing the rendering code to
+the <tt class="docutils literal">render_to_response</tt> method (<em>without</em> subclassing <tt class="docutils literal">HttpResponse</tt>) I will
+implement a mixin that does exactly&nbsp;that.</p>
+<p>Subclassing <tt class="docutils literal">HttpResponse</tt> will not make our design more <span class="caps">DRY</span> because for every
+subclass of <tt class="docutils literal">HttpResponse</tt> the <tt class="docutils literal">render_to_response</tt> method would also need to
+be modified (by subclassing <tt class="docutils literal">TemplateResponseMixin) to instantiate the subclass of ``HttpResponse</tt> with the correct parameters.
+For instance, the existing <tt class="docutils literal">TemplateResponseMixin</tt> cannot be used if the subclass
+of <tt class="docutils literal">HttpResponse</tt> does not take a template as a parameter (solutions like
+passing None to the template parameter are signals of bad&nbsp;design).</p>
+<p>In any case, changing just the <tt class="docutils literal">render_to_response</tt> method using a Mixin is in my opinion the best solution
+to the above problem.
+A <a class="reference external" href="http://stackoverflow.com/questions/533631/what-is-a-mixin-and-why-are-they-useful">Mixin</a> is a simple class that can be used to extend other classes either by overriding functionality of the base class or
+by adding extra features. Django CBVs use various <a class="reference external" href="https://docs.djangoproject.com/en/dev/topics/class-based-views/mixins/">mixins</a> to extend the base Views and add&nbsp;functionality.</p>
+</div>
+<div class="section" id="a-non-html-mixin">
+<h2><a class="toc-backref" href="#toc-entry-4">A non-<span class="caps">HTML</span>&nbsp;mixin</a></h2>
+<p>So, a basic skeleton for our mixin would be something like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">NonHtmlResponseMixin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">render_to_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="o">**</span><span class="n">response_kwargs</span><span class="p">):</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">content_type</span><span class="o">=</span><span class="s1">&#39;text/plain&#39;</span><span class="p">)</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="s2">&quot;Hello, world&quot;</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="n">response</span>
+</pre></div>
+<p>The previous mixin overrides the render_to_response method to just return the text &#8220;Hello, world&#8221;. For instance
+we could define the following&nbsp;class:</p>
+<div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">DummyTextResponseView</span><span class="p">(</span><span class="n">NonHtmlResponseMixin</span><span class="p">,</span> <span class="n">TemplateView</span><span class="p">,):</span>
+  <span class="k">pass</span>
+</pre></div>
+<p>which can be added as a route to <tt class="docutils literal">urls.py</tt> (using the <tt class="docutils literal">as_view</tt> method) and will always return the &#8220;Hello, world&#8221;&nbsp;text.</p>
+<p>Here&#8217;s something more complicated: A Mixin that can be used along with a DetailView and will output the properties of the
+object as&nbsp;text:</p>
+<div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">TextPropertiesResponseMixin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+  <span class="k">def</span><span class="w"> </span><span class="nf">render_to_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="o">**</span><span class="n">response_kwargs</span><span class="p">):</span>
+      <span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">content_type</span><span class="o">=</span><span class="s1">&#39;text/plain; charset=utf-8&#39;</span><span class="p">)</span>
+      <span class="n">o</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_object</span><span class="p">()</span>
+      <span class="n">o</span><span class="o">.</span><span class="n">_meta</span><span class="o">.</span><span class="n">fields</span>
+      <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">o</span><span class="o">.</span><span class="n">_meta</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span>
+          <span class="n">response</span><span class="o">.</span><span class="n">write</span> <span class="p">(</span><span class="sa">u</span><span class="s1">&#39;</span><span class="si">{0}</span><span class="s1">: </span><span class="si">{1}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>  <span class="n">unicode</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">))</span> <span class="p">)</span> <span class="p">)</span>
+      <span class="k">return</span> <span class="n">response</span>
+</pre></div>
+<p>and can be used like&nbsp;this</p>
+<div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">TextPropertiesDetailView</span><span class="p">(</span><span class="n">TextPropertiesResponseMixin</span><span class="p">,</span> <span class="n">FooDetailView</span><span class="p">,):</span>
+  <span class="k">pass</span>
+</pre></div>
+<p>The above mixin will use the get_object() method of the DetailView to get the object and then output
+it as text. We can create similar mixins that will integrate with other types of CBVs, for instance
+to export a ListView as an <span class="caps">CSV</span> or generate an png from a DetailView of an Image&nbsp;file.</p>
+</div>
+<div class="section" id="a-more-complex-example">
+<h2><a class="toc-backref" href="#toc-entry-5">A more complex&nbsp;example</a></h2>
+<p>The previous examples all built upon an existing view (either a TemplateView, a DetailView or a ListView).
+However, an existing view that will fit our requirements won&#8217;t always be available. For instance,
+sometimes I want to export data from my database using a raw <span class="caps">SQL</span> query. Also I&#8217;d like to be able to easily
+export this data as csv or&nbsp;excel.</p>
+<p>First of all, we need to define a view that will inherit from <tt class="docutils literal">View</tt> and export the data as a <span class="caps">CSV</span>:</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">unicodecsv</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">connection</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.views.generic</span><span class="w"> </span><span class="kn">import</span> <span class="n">View</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">CsvRawSqlExportView</span><span class="p">(</span><span class="n">View</span><span class="p">,</span> <span class="p">):</span>
+  <span class="n">sql</span> <span class="o">=</span> <span class="s1">&#39;select 1+1&#39;</span>
+  <span class="n">headers</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;res&#39;</span><span class="p">]</span>
+  <span class="n">params</span> <span class="o">=</span> <span class="p">[]</span>
+
+  <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+      <span class="k">def</span><span class="w"> </span><span class="nf">generate_data</span><span class="p">(</span><span class="n">cursor</span><span class="p">):</span>
+          <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">():</span>
+              <span class="k">yield</span> <span class="n">row</span>
+
+      <span class="n">cursor</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+      <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+      <span class="n">generator</span> <span class="o">=</span> <span class="n">generate_data</span><span class="p">(</span><span class="n">cursor</span><span class="p">)</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">render_to_response</span><span class="p">(</span><span class="n">generator</span><span class="p">)</span>
+
+  <span class="k">def</span><span class="w"> </span><span class="nf">render_to_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">generator</span><span class="p">,</span> <span class="o">**</span><span class="n">response_kwargs</span><span class="p">):</span>
+      <span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">content_type</span><span class="o">=</span><span class="s1">&#39;text/plain; charset=utf-8&#39;</span><span class="p">)</span>
+      <span class="n">response</span><span class="p">[</span><span class="s1">&#39;Content-Disposition&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;attachment; filename=export.csv&#39;</span>
+      <span class="n">w</span> <span class="o">=</span> <span class="n">unicodecsv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+      <span class="n">w</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">headers</span><span class="p">)</span>
+      <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">generator</span><span class="p">:</span>
+          <span class="n">w</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+      <span class="k">return</span> <span class="n">response</span>
+</pre></div>
+<p>The above View has three attributes:
+* sql, which is a string with the raw sql that will be executed
+* headers, which is an array with the names of each header of the resulting data
+* params, which is an array with parameters that may need to be passed to the&nbsp;query</p>
+<p>The <tt class="docutils literal">get</tt> method executes the query and passes the result to <tt class="docutils literal">render_to_response</tt>
+using a generator.  The <tt class="docutils literal">render_to_response</tt> method instantiates an HttpResponse
+object with the correct attributes and writes the <span class="caps">CSV</span> to the response object using&nbsp;unicodecsv.</p>
+<p>We can now quickly create a route that will export data from the users&nbsp;table:</p>
+<div class="highlight"><pre><span></span><span class="n">url</span><span class="p">(</span>
+    <span class="sa">r</span><span class="s1">&#39;^raw_export_users/$&#39;</span><span class="p">,</span>
+    <span class="n">views</span><span class="o">.</span><span class="n">CsvRawSqlExportView</span><span class="o">.</span><span class="n">as_view</span><span class="p">(</span>
+        <span class="n">sql</span><span class="o">=</span><span class="s1">&#39;select id, username from auth_user&#39;</span><span class="p">,</span>
+        <span class="n">headers</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;username&#39;</span><span class="p">]</span>
+    <span class="p">)</span> <span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;raw_export_users&#39;</span>
+<span class="p">),</span>
+</pre></div>
+<p>If instead of <span class="caps">CSV</span> we wanted to export to <span class="caps">XLS</span> (using xlwt), we&#8217;d just need to create a&nbsp;Mixin:</p>
+<div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">XlsRawSqlResponseMixin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+  <span class="k">def</span><span class="w"> </span><span class="nf">render_to_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">generator</span><span class="p">,</span> <span class="o">**</span><span class="n">response_kwargs</span><span class="p">):</span>
+      <span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">content_type</span><span class="o">=</span><span class="s1">&#39;application/ms-excel&#39;</span><span class="p">)</span>
+      <span class="n">response</span><span class="p">[</span><span class="s1">&#39;Content-Disposition&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;attachment; filename=export.xls&#39;</span>
+      <span class="n">wb</span> <span class="o">=</span> <span class="n">xlwt</span><span class="o">.</span><span class="n">Workbook</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+      <span class="n">ws</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_sheet</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
+
+      <span class="k">for</span> <span class="n">j</span><span class="p">,</span><span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">headers</span><span class="p">):</span>
+              <span class="n">ws</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">c</span><span class="p">)</span>
+
+      <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">generator</span><span class="p">):</span>
+          <span class="k">for</span> <span class="n">j</span><span class="p">,</span><span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
+              <span class="n">ws</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">c</span><span class="p">)</span>
+
+      <span class="n">wb</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+      <span class="k">return</span> <span class="n">response</span>
+</pre></div>
+<p>and create a View that inherits from <tt class="docutils literal">CsvRawSqlExportView</tt> and uses the above&nbsp;mixin:</p>
+<div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">XlsRawSqlExportView</span><span class="p">(</span> <span class="n">XlsRawSqlResponseMixin</span><span class="p">,</span> <span class="n">CsvRawSqlExportView</span> <span class="p">):</span>
+  <span class="k">pass</span>
+</pre></div>
+<p>and route to that view to get the <span class="caps">XLS</span>:</p>
+<div class="highlight"><pre><span></span><span class="n">url</span><span class="p">(</span>
+    <span class="sa">r</span><span class="s1">&#39;^raw_export_users/$&#39;</span><span class="p">,</span>
+    <span class="n">views</span><span class="o">.</span><span class="n">XlsRawSqlExportView</span><span class="o">.</span><span class="n">as_view</span><span class="p">(</span>
+        <span class="n">sql</span><span class="o">=</span><span class="s1">&#39;select id, username from auth_user&#39;</span><span class="p">,</span>
+        <span class="n">headers</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;username&#39;</span><span class="p">]),</span>
+    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;raw_export_users&#39;</span>
+<span class="p">),</span>
+</pre></div>
+</div>
+<div class="section" id="conclusion">
+<h2><a class="toc-backref" href="#toc-entry-6">Conclusion</a></h2>
+<p>Using the above techniques we can define CBVs that will output their content in various content types
+beyond <span class="caps">HTML</span>. This will help us write write clean and <span class="caps">DRY</span>&nbsp;code.</p>
+</div>
+</div>
+  		</article>
+  		<article>
+<header>
+      <h1 class="entry-title">
+        <a href="https://spapas.github.io/2014/06/30/rest-flask-mongodb-heroku/">Implementing a simple, Heroku-hosted REST service using Flask and mongoDB</a>
+      </h1>
+    <p class="meta">
+<time datetime="2014-06-30T15:23:00+03:00" pubdate>Mon 30 June 2014</time>    </p>
+</header>
+
+<div class="entry-content"><div class="contents topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#introduction" id="toc-entry-1">Introduction</a></li>
+<li><a class="reference internal" href="#requirements" id="toc-entry-2">Requirements</a></li>
+<li><a class="reference internal" href="#implementing-the-rest-service" id="toc-entry-3">Implementing the <span class="caps">REST</span>&nbsp;service</a></li>
+<li><a class="reference internal" href="#testing-it-locally" id="toc-entry-4">Testing it&nbsp;locally</a></li>
+<li><a class="reference internal" href="#deploying-to-heroku" id="toc-entry-5">Deploying to&nbsp;Heroku</a></li>
+</ul>
+</div>
+<div class="section" id="introduction">
+<h2><a class="toc-backref" href="#toc-entry-1">Introduction</a></h2>
+<p>In the following, I will describe how I used <a class="reference external" href="http://flask.pocoo.org/">Flask</a>, a very nice web <em>microframework</em> for python along  with <a class="reference external" href="http://www.mongodb.org/">mongoDB</a>, the most
+popular No-<span class="caps">SQL</span> database to implement a simple <span class="caps">REST</span> service that was hosted on <a class="reference external" href="https://dashboard.heroku.com/apps">Heroku</a>. This <span class="caps">REST</span> service would get readings from
+a number of sensors from an Android&nbsp;device.</p>
+<p>I chose Flask instead of Django mainly because the <span class="caps">REST</span> service that I needed to implement would be very simple and most of
+the Django bells and whistles (<span class="caps">ORM</span>, auth, admin, etc) wouldn&#8217;t be needed anyway. Also, Flask is much quicker to set-up than
+Django since almost everything (views, urls, etc) can be put inside one python&nbsp;module.</p>
+<p>Concerning the choice of a NoSQL persistance solution (mongoDB), I wanted to have a table (or collection as it is called in the
+mongoDB world) of readings from the sensor. Each reading would just have a timestamp and various other
+arbitrary data depending on the type of the reading, so saving it as a <span class="caps">JSON</span> document in a NoSQL database is a good&nbsp;solution.</p>
+<p>Finally, all the above will be deployed to Heroku which offers some great services for deploying python code in the&nbsp;cloud.</p>
+</div>
+<div class="section" id="requirements">
+<h2><a class="toc-backref" href="#toc-entry-2">Requirements</a></h2>
+<p>I propose creating a file named <tt class="docutils literal">requirements.txt</tt> that will host the required packages for your project, so you will be
+able to setup your projects after creating a virtual environment with <a class="reference external" href="http://virtualenv.readthedocs.org/en/latest/">virtualenv</a> just by running <tt class="docutils literal">pip install <span class="pre">-r</span> requirements.txt</tt>.
+Also, the requirements.txt is required for deploying python to&nbsp;Heroku.</p>
+<p>So, for my case, the contents of requirements.txt are the&nbsp;following:</p>
+<pre class="code literal-block">
+Flask==0.10.1
+Flask-PyMongo==0.3.0
+Flask-RESTful==0.2.12
+Jinja2==2.7.3
+MarkupSafe==0.23
+Werkzeug==0.9.6
+aniso8601==0.82
+gunicorn==19.0.0
+itsdangerous==0.24
+pymongo==2.7.1
+pytz==2014.4
+six==1.7.2
+</pre>
+<ul class="simple">
+<li>Flask-PyMongo is a simple wrapper for Flask around pymongo which is the python mongoDB&nbsp;driver.</li>
+<li>Flask-RESTful is a simple library for creating <span class="caps">REST</span> APIs - it needs aniso8601 and&nbsp;pytz.</li>
+<li>Jinja2 is the template library for Flask (we won&#8217;t use it but it is required by Flask installation) - it needs&nbsp;MarkupSafe.</li>
+<li>Werkzeug is a <span class="caps">WSGI</span> utility library - required by&nbsp;Flask</li>
+<li>gunicorn is a <span class="caps">WSGI</span> <span class="caps">HTTP</span> server - needed for deployment to&nbsp;Heroku</li>
+<li>itsdangerous is used to sign data for usage in untrusted&nbsp;environments</li>
+<li>six is the python 2/3 compatibility&nbsp;layer</li>
+</ul>
+</div>
+<div class="section" id="implementing-the-rest-service">
+<h2><a class="toc-backref" href="#toc-entry-3">Implementing the <span class="caps">REST</span>&nbsp;service</a></h2>
+<p>Instead of using just one single file for our Flask web application, we will create a python module to contain it and a
+file named <tt class="docutils literal">runserver.py</tt> that will start a local development server to test&nbsp;it:</p>
+<p>So, in the same folder as the <tt class="docutils literal">requirements.txt</tt> create a folder named <tt class="docutils literal">flask_rest_service</tt> and in there put
+two files: <tt class="docutils literal">__init__.py</tt> and <tt class="docutils literal">resources.py</tt>.</p>
+<p>The <tt class="docutils literal">__init__.py</tt> initializes our Flask application, our mongoDB connection and our Flask-RESTful&nbsp;api:</p>
+<pre class="code literal-block">
+import os
+from flask import Flask
+from flask.ext import restful
+from flask.ext.pymongo import PyMongo
+from flask import make_response
+from bson.json_util import dumps
+
+MONGO_URL = os.environ.get('MONGO_URL')
+if not MONGO_URL:
+    MONGO_URL = &quot;mongodb://localhost:27017/rest&quot;;
+
+app = Flask(__name__)
+
+app.config['MONGO_URI'] = MONGO_URL
+mongo = PyMongo(app)
+
+def output_json(obj, code, headers=None):
+    resp = make_response(dumps(obj), code)
+    resp.headers.extend(headers or {})
+    return resp
+
+DEFAULT_REPRESENTATIONS = {'application/json': output_json}
+api = restful.Api(app)
+api.representations = DEFAULT_REPRESENTATIONS
+
+import flask_rest_service.resources
+</pre>
+<p>So what happens here? After the imports, we check if we have a MONGO_URL environment variable. This is
+how we set options in Heroku. If such option does not exist in the environment then we are in our
+development environment so we set it to the localhost (we must have a running mongoDB installation in
+our dev&nbsp;environment).</p>
+<p>In the next lines, we initialize our Flask application and our mongoDB connection (pymongo
+uses a <tt class="docutils literal">MONGO_URI</tt> configuration option to know the database <span class="caps">URI</span>).</p>
+<p>The <tt class="docutils literal">output_json</tt> is used to dump the <span class="caps">BSON</span> encoded mongoDB objects to <span class="caps">JSON</span> and was borrowed from
+<a class="reference external" href="http://blog.alienretro.com/using-mongodb-with-flask-restful/">alienretro&#8217;s blog</a> &#8212; we initialize our restful <span class="caps">REST</span> <span class="caps">API</span> with this&nbsp;function.</p>
+<p>Finally, we import the <tt class="docutils literal">resources.py</tt> module which actually defines our <span class="caps">REST</span>&nbsp;resources.</p>
+<pre class="code literal-block">
+import json
+from flask import request, abort
+from flask.ext import restful
+from flask.ext.restful import reqparse
+from flask_rest_service import app, api, mongo
+from bson.objectid import ObjectId
+
+class ReadingList(restful.Resource):
+    def __init__(self, *args, **kwargs):
+        self.parser = reqparse.RequestParser()
+        self.parser.add_argument('reading', type=str)
+        super(ReadingList, self).__init__()
+
+    def get(self):
+        return  [x for x in mongo.db.readings.find()]
+
+    def post(self):
+        args = self.parser.parse_args()
+        if not args['reading']:
+            abort(400)
+
+        jo = json.loads(args['reading'])
+        reading_id =  mongo.db.readings.insert(jo)
+        return mongo.db.readings.find_one({&quot;_id&quot;: reading_id})
+
+
+class Reading(restful.Resource):
+    def get(self, reading_id):
+        return mongo.db.readings.find_one_or_404({&quot;_id&quot;: reading_id})
+
+    def delete(self, reading_id):
+        mongo.db.readings.find_one_or_404({&quot;_id&quot;: reading_id})
+        mongo.db.readings.remove({&quot;_id&quot;: reading_id})
+        return '', 204
+
+
+class Root(restful.Resource):
+    def get(self):
+        return {
+            'status': 'OK',
+            'mongo': str(mongo.db),
+        }
+
+api.add_resource(Root, '/')
+api.add_resource(ReadingList, '/readings/')
+api.add_resource(Reading, '/readings/&lt;ObjectId:reading_id&gt;')
+</pre>
+<p>Here we define three <tt class="docutils literal">Resource</tt> classes and add them to our previously defined <tt class="docutils literal">api</tt>: <tt class="docutils literal">Root</tt>, <tt class="docutils literal">Reading</tt> and <tt class="docutils literal">ReadingList</tt>.</p>
+<p><tt class="docutils literal">Root</tt> just returns a dictionary with an <span class="caps">OK</span> status and some info on our mongodb&nbsp;connection.</p>
+<p><tt class="docutils literal">Reading</tt> has gets an ObjectId
+(which is the mongodb primary key) as a parameter and depending on the <span class="caps">HTTP</span> operation, it returns the reading with that
+id when receiving an <tt class="docutils literal"><span class="caps">HTTP</span> <span class="caps">GET</span></tt> and deletes the reading with that id when receiving an <tt class="docutils literal"><span class="caps">HTTP</span> <span class="caps">DELETE</span></tt>.</p>
+<p><tt class="docutils literal">ReadingList</tt> will return all readings when receiving an <tt class="docutils literal"><span class="caps">HTTP</span> <span class="caps">GET</span></tt> and will create a new reading when
+receiving an <tt class="docutils literal"><span class="caps">HTTP</span> <span class="caps">POST</span></tt> The <tt class="docutils literal">post</tt> function uses the parser defined in <tt class="docutils literal">__init__</tt> which requires
+a <tt class="docutils literal">reading</tt> parameter with the actual reading to be&nbsp;inserted.</p>
+</div>
+<div class="section" id="testing-it-locally">
+<h2><a class="toc-backref" href="#toc-entry-4">Testing it&nbsp;locally</a></h2>
+<p>In order to run the development server, you will need to install and start mongodb locally which is beyond the scope of this post. After that
+create a file named <tt class="docutils literal">runserver.py</tt> in the same folder as with the <tt class="docutils literal">requirements.txt</tt>
+and the <tt class="docutils literal">flask_rest_service</tt> folder. The contents of this file should&nbsp;be:</p>
+<pre class="code literal-block">
+from flask_rest_service import app
+app.run(debug=True)
+</pre>
+<p>When you run this file with <tt class="docutils literal">python runserver.py</tt> you should be able top visit your rest service at <a class="reference external" href="http://localhost:5000">http://localhost:5000</a> and get
+an &#8220;<span class="caps">OK</span>&#8221;&nbsp;status.</p>
+</div>
+<div class="section" id="deploying-to-heroku">
+<h2><a class="toc-backref" href="#toc-entry-5">Deploying to&nbsp;Heroku</a></h2>
+<p>To deploy to Heroku, you must create a <tt class="docutils literal">Procfile</tt> that contains the workers of your application. In our case, the
+<tt class="docutils literal">Procfile</tt> should contain the&nbsp;following:</p>
+<pre class="code literal-block">
+web: gunicorn flask_rest_service:app
+</pre>
+<p>Also, you should add a .gitignore file with the&nbsp;following:</p>
+<pre class="code literal-block">
+*.pyc
+</pre>
+<p>Finally, to deploy your application to Heroku you can follow the instructions here: <a class="reference external" href="https://devcenter.heroku.com/articles/getting-started-with-python">https://devcenter.heroku.com/articles/getting-started-with-python</a>:</p>
+<ul class="simple">
+<li>Initialize a git repository and commit&nbsp;everything:</li>
+</ul>
+<pre class="code literal-block">
+git init
+git add .
+git commit -m
+</pre>
+<ul class="simple">
+<li>Create a new Heroku application (after logging in to heroku with <tt class="docutils literal">heroku login</tt>) and set the MONGO_URL environment variable (of course you have to obtain ths MONGO_URL variable for your heroku envirotnment by adding a mongoDB&nbsp;database):</li>
+</ul>
+<pre class="code literal-block">
+heroku create
+heroku config:set MONGO_URL=mongodb://user:pass&#64;mongoprovider.com:27409/rest
+</pre>
+<ul class="simple">
+<li>And finally push your master branch to the heroku remote&nbsp;repository:</li>
+</ul>
+<pre class="code literal-block">
+git push heroku master
+</pre>
+<p>If everything went ok you should be able to start a worker for your application, check that the worker is running, and finally visit&nbsp;it:</p>
+<pre class="code literal-block">
+heroku ps:scale web=1
+heroku ps
+heroku open
+</pre>
+<p>If everything was ok you should see an status-<span class="caps">OK</span> <span class="caps">JSON</span>&nbsp;!</p>
+</div>
+</div>
+  		</article>
+  		<article>
+<header>
+      <h1 class="entry-title">
+        <a href="https://spapas.github.io/2014/04/11/django-generic-formviews-for-objects/">Django generic FormViews for objects</a>
+      </h1>
+    <p class="meta">
+<time datetime="2014-04-11T10:23:00+03:00" pubdate>Fri 11 April 2014</time>    </p>
+</header>
+
+<div class="entry-content"><div class="contents topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#introduction" id="toc-entry-1">Introduction</a></li>
+<li><a class="reference internal" href="#a-quick-introduction-to-the-formview" id="toc-entry-2">A quick introduction to the <tt class="docutils literal">FormView</tt></a></li>
+<li><a class="reference internal" href="#a-quick-introduction-to-the-singleobjectmixin" id="toc-entry-3">A quick introduction to the <tt class="docutils literal">SingleObjectMixin</tt></a></li>
+<li><a class="reference internal" href="#being-generic-and-dry" id="toc-entry-4">Being generic and <span class="caps">DRY</span></a></li>
+<li><a class="reference internal" href="#being-more-generic-and-dry" id="toc-entry-5">Being more generic and <span class="caps">DRY</span></a></li>
+<li><a class="reference internal" href="#other-options" id="toc-entry-6">Other&nbsp;options</a></li>
+</ul>
+</div>
+<div class="section" id="introduction">
+<h2><a class="toc-backref" href="#toc-entry-1">Introduction</a></h2>
+<p>We recently needed to create a number of views for changing the status of an Application model instance for our organization.
+An Application model instance can be filled and then cancelled, submitted, acceptted etc - for each of these status changes a form should be
+presented to the user. When the user submits the form the status of the Application will be&nbsp;changed.</p>
+<p>To implement the above requirement we created a generic FormView that acts on the specific model instance. This
+used two basic <span class="caps">CBV</span> components: The <tt class="docutils literal">FormView</tt> for the form manipulation and the <tt class="docutils literal">SingleObjectMixing</tt> for the
+object&nbsp;handling.</p>
+<p>Django <a class="reference external" href="https://docs.djangoproject.com/en/1.6/topics/class-based-views/">Class Based Views</a> (CBVs) can be used to create reusable Views using normal class inheritance. Most
+people use the well-known <tt class="docutils literal">CreateView</tt>, <tt class="docutils literal">UpdateView</tt>, <tt class="docutils literal">DetailView</tt> and <tt class="docutils literal">ListView</tt>, however, as we
+will see below, the <tt class="docutils literal">FormView</tt> will help us write <span class="caps">DRY</span>&nbsp;code.</p>
+<p>I have to notice here that an invaluable tool to help you understanding CBVs is the <a class="reference external" href="http://ccbv.co.uk/"><span class="caps">CBV</span> inspector</a> which
+has a nice web interface for browsing the <span class="caps">CBV</span> hierarchies, attributes and&nbsp;methods.</p>
+</div>
+<div class="section" id="a-quick-introduction-to-the-formview">
+<h2><a class="toc-backref" href="#toc-entry-2">A quick introduction to the <tt class="docutils literal">FormView</tt></a></h2>
+<p>A simple <tt class="docutils literal">FormView</tt> can be defined like this (<a class="reference external" href="http://ccbv.co.uk/projects/Django/1.6/django.views.generic.edit/FormView/"><span class="caps">CBV</span> FormView</a>):</p>
+<pre class="code literal-block">
+class MyFormView(FormView):
+  form_class = forms.MyFormView
+  template_name = 'my_template.html'
+</pre>
+<p>The above can be used in urls.py like&nbsp;this:</p>
+<pre class="code literal-block">
+urlpatterns = patterns('',
+  url(r'^my_formview/$', views.MyFormView.as_view() , name='my_formview' ),
+</pre>
+<p>This will present a form to the user when he visits the <tt class="docutils literal">my_formview</tt>  url &#8212; however this form won&#8217;t do anything. To allow
+the form to actually do something when it&#8217;s been submitted we need to override the <tt class="docutils literal">form_valid</tt> method.</p>
+<pre class="code literal-block">
+def form_valid(self, form):
+    value = form.cleaned_data['value']
+    messages.info(self.request, &quot;MyForm submitted with value {0}!&quot;.format(value) )
+    return HttpResponseRedirect( reverse('my_formview') )
+</pre>
+<p>As you can see the submitted form is passed in the method and can be used to receive its <tt class="docutils literal">cleaned_data</tt>. The <tt class="docutils literal">FormView</tt>
+has various other options for instance a <tt class="docutils literal">form_invalid</tt> method, an <tt class="docutils literal">initial</tt> attribute to set the initial values for the form&nbsp;etc.</p>
+</div>
+<div class="section" id="a-quick-introduction-to-the-singleobjectmixin">
+<h2><a class="toc-backref" href="#toc-entry-3">A quick introduction to the <tt class="docutils literal">SingleObjectMixin</tt></a></h2>
+<p>A <tt class="docutils literal">SingleObjectMixin</tt> adds a number of attributes <span class="amp">&amp;</span> methods to a view that can be used for object manipulation. The
+most important ones is the <tt class="docutils literal">model</tt> and <tt class="docutils literal">queryset</tt> attributes and the <tt class="docutils literal">get_queryset</tt> and <tt class="docutils literal">get_object()</tt>. To use
+the <tt class="docutils literal">SingleObjectMixin</tt> in your <span class="caps">CBV</span> just add it to the list of the classes to inherit from and define either the
+<tt class="docutils literal">model</tt> or the <tt class="docutils literal">queryset</tt> attribute. After that you may pass a <tt class="docutils literal">pk</tt> parameter to your view and you will get an
+<tt class="docutils literal">object</tt> context variable in the template with the selected&nbsp;object!</p>
+</div>
+<div class="section" id="being-generic-and-dry">
+<h2><a class="toc-backref" href="#toc-entry-4">Being generic and <span class="caps">DRY</span></a></h2>
+<p>We can more or less now understand how we should use <tt class="docutils literal">FormView</tt> and <tt class="docutils literal">SingleObjectMixin</tt> to generate our
+generic <tt class="docutils literal">FormView</tt> for acting on objects: Our <tt class="docutils literal">FormView</tt> should <em>get</em> the object using the <tt class="docutils literal">SingleObjectMixin</tt>
+and change it when the form is submitted using the values from the form. A first implementation would be the&nbsp;following:</p>
+<pre class="code literal-block">
+class GenericObjectFormView1(FormView, SingleObjectMixin):
+
+    def form_valid(self, form):
+        obj = self.get_object()
+        obj.change_status(form)
+        return HttpResponseRedirect( obj.get_absolute_url() )
+</pre>
+<p>So our <tt class="docutils literal">GenericObjectFormView1</tt> class inherits from <tt class="docutils literal">FormView</tt> and <tt class="docutils literal">SingleObjectMixin</tt>. The only thing that we have
+to assure is that the Model we want to act on needs to implement a <tt class="docutils literal">change_status</tt> method which gets the <tt class="docutils literal">form</tt> and
+changes the status of that object based on its value. For instance, two implementations can be the&nbsp;following:</p>
+<pre class="code literal-block">
+class CancelObjectFormView(GenericObjectFormView1):
+    template_name = 'cancel.html'
+    form_class = forms.CancelForm
+    model = models.Application
+
+class SubmitObjectFormView(GenericObjectFormView1):
+    template_name = 'submit.html'
+    form_class = forms.SubmitForm
+    model = models.Application
+</pre>
+</div>
+<div class="section" id="being-more-generic-and-dry">
+<h2><a class="toc-backref" href="#toc-entry-5">Being more generic and <span class="caps">DRY</span></a></h2>
+<p>The previous implementation has two&nbsp;problems:</p>
+<ul class="simple">
+<li>What happens if the status of the object should not be changed even if the form <em>is</em>&nbsp;valid?</li>
+<li>We shouldn&#8217;t need to create a new template for every new <tt class="docutils literal">GenericObjectFormView</tt> since all these templates will just output the object information, ask a question for the status change and output the&nbsp;form.</li>
+</ul>
+<p>Let&#8217;s write a new version of our GenericObjectFormView that actually resolves&nbsp;these:</p>
+<pre class="code literal-block">
+class GenericObjectFormView2(FormView, SingleObjectMixin):
+    template_name = 'generic_formview.html'
+    ok_message = ''
+    not_ok_message = ''
+    title = ''
+    question =''
+
+    def form_valid(self, form):
+        obj = self.get_object()
+        r = obj.change_status(form)
+        if r:
+            messages.info(self.request, self.yes_message)
+        else:
+            messages.info(self.request, self.not_ok_message)
+        return HttpResponseRedirect( obj.get_absolute_url() )
+
+    def get_context_data(self, **kwargs):
+        context = super(GenericYesNoFormView2, self).get_context_data(**kwargs)
+        context['title'] = self.title
+        context['question'] = self.question
+        return context
+</pre>
+<p>The above adds an ok and not ok message which will be outputed if the status can or cannot be changed. To accomplish this,
+the <tt class="docutils literal">change_status</tt> method should now return a boolean value to mark if the action was ok or not. Also, a generic template
+will now be used. This template has two placeholders: One for the title of the page (<tt class="docutils literal">title</tt> attribute) and one for the
+question asked to the user (<tt class="docutils literal">question</tt> attribute). Now we can use it like&nbsp;this:</p>
+<pre class="code literal-block">
+class CancelObjectFormView(GenericObjectFormView2):
+    form_class = forms.CancelForm
+    model = models.Application
+    ok_message = 'Cancel success!'
+    not_ok_message = 'Not able to cancel!'
+    title = 'Cancel an object'
+    question = 'Do you want to cancel this object?'
+
+class SubmitObjectFormView(GenericObjectFormView2):
+    form_class = forms.SubmitForm
+    model = models.Application
+    ok_message = 'Submit  ok'
+    not_ok_message = 'Cannot submit!'
+    title = 'Submit an object'
+    question ='Do you want to submit this object?'
+</pre>
+</div>
+<div class="section" id="other-options">
+<h2><a class="toc-backref" href="#toc-entry-6">Other&nbsp;options</a></h2>
+<p>We&#8217;ve just got a glimpse of how we can use CBVs to increase the DRYness of our Django applications. There are various
+extra things that we can add to our <tt class="docutils literal">GenericObjectFormView2</tt> as attributes which will be defined by inheriting
+classes. Some ideas is to check if the current user actually has access to modify the object (hint: override the
+<tt class="docutils literal">get_object</tt> method of <tt class="docutils literal">SingleObjectMixin</tt>) or render the form diffirently depending on the current user (hint:
+override the <tt class="docutils literal">get_form_kwargs</tt> method of <tt class="docutils literal">FormView</tt>).</p>
+</div>
+</div>
+  		</article>
+<div class="pagination">
+    <a class="prev" href="https://spapas.github.io/index14.html">&larr; Older</a>
+
+    <a class="next" href="https://spapas.github.io/index12.html">Newer &rarr;</a>
+  <br />
+</div></div>
+<aside class="sidebar">
+  
+  <section>
+    <br />
+    <a href='/feeds/all.atom.xml'>Atom</a>
+    |
+    <a href='/feeds/all.rss.xml'>RSS</a>
+  </section>
+
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <!-- Sidebar unit -->
+  <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7673322832689008" data-ad-slot="2720624730"
+    data-ad-format="auto" data-full-width-responsive="true"></ins>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+
+
+  <script async src="https://cse.google.com/cse.js?cx=612920e5ca9da850c"></script>
+  <div class="gcse-search"></div>
+
+  
+  <section>
+    <h1>Support me</h1>
+
+    You can show your appreciation for anything useful you've found here by 
+    buying me a coffee 
+    <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="spapas" data-color="#FFDD00" data-emoji=""  data-font="Lato" data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff" ></script>
+
+    or donating me some bitcoin to this address:
+    <small><pre>bc1qx42vp8napheaewhnx0rk0mttdrdrtvw6czvxhl</pre></small>
+    <svg shape-rendering="crispEdges" height="200" width="200" viewBox="0 0 29 29" class="qrcode">
+      <path fill="#FFFFFF" d="M0,0 h29v29H0z"></path><path fill="#000000" d="M0 0h7v1H0zM9 0h2v1H9zM12 0h1v1H12zM14 0h2v1H14zM18 0h2v1H18zM22,0 h7v1H22zM0 1h1v1H0zM6 1h1v1H6zM8 1h1v1H8zM11 1h1v1H11zM14 1h5v1H14zM22 1h1v1H22zM28,1 h1v1H28zM0 2h1v1H0zM2 2h3v1H2zM6 2h1v1H6zM8 2h4v1H8zM17 2h1v1H17zM22 2h1v1H22zM24 2h3v1H24zM28,2 h1v1H28zM0 3h1v1H0zM2 3h3v1H2zM6 3h1v1H6zM9 3h2v1H9zM14 3h3v1H14zM18 3h1v1H18zM22 3h1v1H22zM24 3h3v1H24zM28,3 h1v1H28zM0 4h1v1H0zM2 4h3v1H2zM6 4h1v1H6zM8 4h1v1H8zM11 4h1v1H11zM13 4h1v1H13zM15 4h2v1H15zM18 4h1v1H18zM22 4h1v1H22zM24 4h3v1H24zM28,4 h1v1H28zM0 5h1v1H0zM6 5h1v1H6zM8 5h2v1H8zM14 5h2v1H14zM19 5h2v1H19zM22 5h1v1H22zM28,5 h1v1H28zM0 6h7v1H0zM8 6h1v1H8zM10 6h1v1H10zM12 6h1v1H12zM14 6h1v1H14zM16 6h1v1H16zM18 6h1v1H18zM20 6h1v1H20zM22,6 h7v1H22zM8 7h2v1H8zM11 7h1v1H11zM15 7h1v1H15zM17 7h2v1H17zM0 8h2v1H0zM3 8h1v1H3zM6 8h2v1H6zM10 8h1v1H10zM12 8h3v1H12zM20 8h1v1H20zM22 8h3v1H22zM26 8h2v1H26zM1 9h1v1H1zM3 9h3v1H3zM8 9h1v1H8zM10 9h1v1H10zM12 9h2v1H12zM16 9h2v1H16zM20 9h1v1H20zM22 9h1v1H22zM25 9h1v1H25zM27,9 h2v1H27zM0 10h1v1H0zM3 10h2v1H3zM6 10h1v1H6zM8 10h3v1H8zM12 10h2v1H12zM16 10h1v1H16zM19 10h1v1H19zM22 10h3v1H22zM27 10h1v1H27zM0 11h1v1H0zM2 11h1v1H2zM4 11h2v1H4zM7 11h1v1H7zM13 11h4v1H13zM18 11h4v1H18zM26 11h2v1H26zM0 12h1v1H0zM2 12h3v1H2zM6 12h1v1H6zM11 12h1v1H11zM13 12h1v1H13zM15 12h3v1H15zM20 12h1v1H20zM22 12h2v1H22zM27,12 h2v1H27zM4 13h1v1H4zM8 13h3v1H8zM12 13h1v1H12zM14 13h1v1H14zM17 13h4v1H17zM25 13h2v1H25zM0 14h1v1H0zM4 14h3v1H4zM8 14h2v1H8zM11 14h3v1H11zM16 14h1v1H16zM21 14h2v1H21zM24,14 h5v1H24zM3 15h3v1H3zM7 15h2v1H7zM10 15h1v1H10zM12 15h2v1H12zM15 15h1v1H15zM17 15h2v1H17zM20 15h2v1H20zM23 15h1v1H23zM1 16h1v1H1zM4 16h1v1H4zM6 16h4v1H6zM16 16h2v1H16zM20 16h1v1H20zM23 16h1v1H23zM25 16h1v1H25zM28,16 h1v1H28zM2 17h1v1H2zM5 17h1v1H5zM7 17h2v1H7zM11 17h3v1H11zM17 17h1v1H17zM22 17h1v1H22zM25 17h1v1H25zM27,17 h2v1H27zM0 18h1v1H0zM3 18h1v1H3zM5 18h4v1H5zM10 18h1v1H10zM12 18h1v1H12zM18 18h1v1H18zM20 18h1v1H20zM22 18h2v1H22zM25,18 h4v1H25zM2 19h3v1H2zM8 19h1v1H8zM16 19h2v1H16zM21 19h1v1H21zM23 19h1v1H23zM25 19h1v1H25zM27 19h1v1H27zM0 20h1v1H0zM2 20h5v1H2zM8 20h2v1H8zM13 20h4v1H13zM19 20h6v1H19zM26 20h1v1H26zM28,20 h1v1H28zM8 21h2v1H8zM12 21h3v1H12zM16 21h1v1H16zM20 21h1v1H20zM24 21h1v1H24zM26,21 h3v1H26zM0 22h7v1H0zM8 22h3v1H8zM17 22h1v1H17zM20 22h1v1H20zM22 22h1v1H22zM24 22h2v1H24zM27 22h1v1H27zM0 23h1v1H0zM6 23h1v1H6zM10 23h2v1H10zM13 23h2v1H13zM19 23h2v1H19zM24,23 h5v1H24zM0 24h1v1H0zM2 24h3v1H2zM6 24h1v1H6zM9 24h2v1H9zM12 24h2v1H12zM17 24h1v1H17zM20 24h6v1H20zM28,24 h1v1H28zM0 25h1v1H0zM2 25h3v1H2zM6 25h1v1H6zM8 25h3v1H8zM12 25h1v1H12zM14 25h1v1H14zM18 25h1v1H18zM22 25h3v1H22zM26 25h1v1H26zM0 26h1v1H0zM2 26h3v1H2zM6 26h1v1H6zM10 26h5v1H10zM16 26h3v1H16zM21 26h1v1H21zM24 26h1v1H24zM26 26h1v1H26zM28,26 h1v1H28zM0 27h1v1H0zM6 27h1v1H6zM8 27h3v1H8zM12 27h4v1H12zM17 27h1v1H17zM20 27h1v1H20zM23 27h2v1H23zM27 27h1v1H27zM0 28h7v1H0zM8 28h3v1H8zM14 28h1v1H14zM16 28h3v1H16zM20 28h1v1H20zM22 28h1v1H22zM24 28h2v1H24zM27 28h1v1H27z"></path>
+    </svg>
+  </section>
+  
+
+  <section>
+    <h1>Subscribe</h1>
+    Do you want to get notified via email when I post new content?
+    <style>
+      .subscribe-button {
+        /* margin: 10px !important; */
+        padding: 10px !important;
+        background-color: black;
+        display: inline-block;
+        color: white !important;
+        text-decoration: none;
+
+        line-height: 36px !important;
+        height: 37px !important;
+        text-decoration: none !important;
+        display: inline-block !important;
+        color: #ffffff !important;
+        background-color: #000000 !important;
+        border-radius: 3px !important;
+        border: 1px solid transparent !important;
+        padding: 1px 9px !important;
+        font-size: 23px !important;
+        letter-spacing: 0.6px !important;
+        box-shadow: 0px 1px 2px rgba(190, 190, 190, 0.5) !important;
+        -webkit-box-shadow: 0px 1px 2px 2px rgba(190, 190, 190, 0.5) !important;
+        margin: 0 auto !important;
+        font-family: 'Cookie', cursive !important;
+        -webkit-box-sizing: border-box !important;
+        box-sizing: border-box !important;
+        -o-transition: 0.3s all linear !important;
+        -webkit-transition: 0.3s all linear !important;
+        -moz-transition: 0.3s all linear !important;
+        -ms-transition: 0.3s all linear !important;
+        transition: 0.3s all linear !important;
+
+      }
+    </style>
+    <a class='subscribe-button' target="_blank" href="http://eepurl.com/dxI3PP">Click here to subscribe!</a>
+  </section>
+
+
+  <section>
+    <h1>Recent Posts</h1>
+    <ul id="recent_posts">
+      <li class="post">
+        <a href="https://spapas.github.io/2024/08/22/multiple-erl-elixir-windows/">Multiple Erlang/Elixir versions in Windows</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/11/29/openid-connect-tutorial/">A simple OpenID connect tutorial</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/05/23/simple-django-datatables-integration/">Simple Django - DataTables integration</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/05/22/ai-auto-subtitling/">AI auto-subtitling</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/05/12/disable-your-forms/">HTML form disable after submit</a>
+      </li>
+    </ul>
+  </section>
+  <section>
+
+    <h1>Categories</h1>
+    <ul id="recent_posts">
+      <li><a href="https://spapas.github.io/category/ai.html">ai</a></li>
+      <li><a href="https://spapas.github.io/category/android.html">android</a></li>
+      <li><a href="https://spapas.github.io/category/clojure.html">clojure</a></li>
+      <li><a href="https://spapas.github.io/category/css.html">css</a></li>
+      <li><a href="https://spapas.github.io/category/django.html">django</a></li>
+      <li><a href="https://spapas.github.io/category/elixir.html">elixir</a></li>
+      <li><a href="https://spapas.github.io/category/flask.html">flask</a></li>
+      <li><a href="https://spapas.github.io/category/gaming.html">gaming</a></li>
+      <li><a href="https://spapas.github.io/category/git.html">git</a></li>
+      <li><a href="https://spapas.github.io/category/html.html">html</a></li>
+      <li><a href="https://spapas.github.io/category/javascript.html">javascript</a></li>
+      <li><a href="https://spapas.github.io/category/networking.html">networking</a></li>
+      <li><a href="https://spapas.github.io/category/pelican.html">pelican</a></li>
+      <li><a href="https://spapas.github.io/category/postgresql.html">postgresql</a></li>
+      <li><a href="https://spapas.github.io/category/python.html">python</a></li>
+      <li><a href="https://spapas.github.io/category/spring.html">spring</a></li>
+      <li><a href="https://spapas.github.io/category/unix.html">unix</a></li>
+      <li><a href="https://spapas.github.io/category/wagtail.html">wagtail</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Tags</h1>
+    <a href="https://spapas.github.io/tag/erlang.html">erlang</a>,    <a href="https://spapas.github.io/tag/elixir.html">elixir</a>,    <a href="https://spapas.github.io/tag/windows.html">windows</a>,    <a href="https://spapas.github.io/tag/openid.html">openid</a>,    <a href="https://spapas.github.io/tag/openid-connect.html">openid-connect</a>,    <a href="https://spapas.github.io/tag/oidc.html">oidc</a>,    <a href="https://spapas.github.io/tag/http.html">http</a>,    <a href="https://spapas.github.io/tag/keycloak.html">keycloak</a>,    <a href="https://spapas.github.io/tag/python.html">python</a>,    <a href="https://spapas.github.io/tag/django.html">django</a>,    <a href="https://spapas.github.io/tag/jquery.html">jquery</a>,    <a href="https://spapas.github.io/tag/datatables.html">datatables</a>,    <a href="https://spapas.github.io/tag/ai.html">ai</a>,    <a href="https://spapas.github.io/tag/whisper.html">whisper</a>,    <a href="https://spapas.github.io/tag/whispercpp.html">whisper.cpp</a>,    <a href="https://spapas.github.io/tag/subtitles.html">subtitles</a>,    <a href="https://spapas.github.io/tag/video.html">video</a>,    <a href="https://spapas.github.io/tag/auto-subtitling.html">auto-subtitling</a>,    <a href="https://spapas.github.io/tag/subtitiling.html">subtitiling</a>,    <a href="https://spapas.github.io/tag/transcribe.html">transcribe</a>,    <a href="https://spapas.github.io/tag/html.html">html</a>,    <a href="https://spapas.github.io/tag/javascript.html">javascript</a>,    <a href="https://spapas.github.io/tag/media.html">media</a>,    <a href="https://spapas.github.io/tag/storage.html">storage</a>,    <a href="https://spapas.github.io/tag/unpoly.html">unpoly</a>,    <a href="https://spapas.github.io/tag/access.html">access</a>,    <a href="https://spapas.github.io/tag/database.html">database</a>,    <a href="https://spapas.github.io/tag/accdb.html">accdb</a>,    <a href="https://spapas.github.io/tag/mdb.html">mdb</a>,    <a href="https://spapas.github.io/tag/postgresql.html">postgresql</a>,    <a href="https://spapas.github.io/tag/development.html">development</a>,    <a href="https://spapas.github.io/tag/inlines.html">inlines</a>,    <a href="https://spapas.github.io/tag/clojure.html">clojure</a>,    <a href="https://spapas.github.io/tag/cmd.html">cmd</a>,    <a href="https://spapas.github.io/tag/pdf.html">pdf</a>,    <a href="https://spapas.github.io/tag/wkhtmltopdf.html">wkhtmltopdf</a>,    <a href="https://spapas.github.io/tag/forward-proxy.html">forward-proxy</a>,    <a href="https://spapas.github.io/tag/reverse-proxy.html">reverse-proxy</a>,    <a href="https://spapas.github.io/tag/proxy.html">proxy</a>,    <a href="https://spapas.github.io/tag/networking.html">networking</a>,    <a href="https://spapas.github.io/tag/dj-rest-auth.html">dj-rest-auth</a>,    <a href="https://spapas.github.io/tag/rest.html">rest</a>,    <a href="https://spapas.github.io/tag/django-rest-framework.html">django-rest-framework</a>,    <a href="https://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="https://spapas.github.io/tag/tokens.html">tokens</a>,    <a href="https://spapas.github.io/tag/migrations.html">migrations</a>,    <a href="https://spapas.github.io/tag/foreignkey.html">foreignkey</a>,    <a href="https://spapas.github.io/tag/dark-souls.html">dark-souls</a>,    <a href="https://spapas.github.io/tag/dark-souls-2.html">dark-souls-2</a>,    <a href="https://spapas.github.io/tag/dark-souls-3.html">dark-souls-3</a>,    <a href="https://spapas.github.io/tag/autohotkey.html">autohotkey</a>,    <a href="https://spapas.github.io/tag/matplotlib.html">matplotlib</a>,    <a href="https://spapas.github.io/tag/hashids.html">hashids</a>,    <a href="https://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="https://spapas.github.io/tag/osmon.html">osmon</a>,    <a href="https://spapas.github.io/tag/phoenix.html">phoenix</a>,    <a href="https://spapas.github.io/tag/os-monitoring.html">os-monitoring</a>,    <a href="https://spapas.github.io/tag/forms.html">forms</a>,    <a href="https://spapas.github.io/tag/django-crispy-forms.html">django-crispy-forms</a>,    <a href="https://spapas.github.io/tag/django-widget-tweaks.html">django-widget-tweaks</a>,    <a href="https://spapas.github.io/tag/ecto.html">ecto</a>,    <a href="https://spapas.github.io/tag/queries.html">queries</a>,    <a href="https://spapas.github.io/tag/declarative.html">declarative</a>,    <a href="https://spapas.github.io/tag/form.html">form</a>,    <a href="https://spapas.github.io/tag/php.html">php</a>,    <a href="https://spapas.github.io/tag/select2.html">select2</a>,    <a href="https://spapas.github.io/tag/autocompelte.html">autocompelte</a>,    <a href="https://spapas.github.io/tag/ajax.html">ajax</a>,    <a href="https://spapas.github.io/tag/android.html">android</a>,    <a href="https://spapas.github.io/tag/kotlin.html">kotlin</a>,    <a href="https://spapas.github.io/tag/adapter.html">adapter</a>,    <a href="https://spapas.github.io/tag/filter.html">filter</a>,    <a href="https://spapas.github.io/tag/async.html">async</a>,    <a href="https://spapas.github.io/tag/tasks.html">tasks</a>,    <a href="https://spapas.github.io/tag/django-rq.html">django-rq</a>,    <a href="https://spapas.github.io/tag/rq.html">rq</a>,    <a href="https://spapas.github.io/tag/du.html">du</a>,    <a href="https://spapas.github.io/tag/unix.html">unix</a>,    <a href="https://spapas.github.io/tag/linux.html">linux</a>,    <a href="https://spapas.github.io/tag/disk-usage.html">disk-usage</a>,    <a href="https://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="https://spapas.github.io/tag/middleware.html">middleware</a>,    <a href="https://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="https://spapas.github.io/tag/react.html">react</a>,    <a href="https://spapas.github.io/tag/redux.html">redux</a>,    <a href="https://spapas.github.io/tag/hyperapp.html">hyperapp</a>,    <a href="https://spapas.github.io/tag/immutable.html">immutable</a>,    <a href="https://spapas.github.io/tag/es6.html">es6</a>,    <a href="https://spapas.github.io/tag/youtube.html">youtube</a>,    <a href="https://spapas.github.io/tag/youtube-dl.html">youtube-dl</a>,    <a href="https://spapas.github.io/tag/ffmpeg.html">ffmpeg</a>,    <a href="https://spapas.github.io/tag/django-rest-auth.html">django-rest-auth</a>,    <a href="https://spapas.github.io/tag/python-2.html">python-2</a>,    <a href="https://spapas.github.io/tag/python-3.html">python-3</a>,    <a href="https://spapas.github.io/tag/plpgsql.html">plpgsql</a>,    <a href="https://spapas.github.io/tag/component.html">component</a>,    <a href="https://spapas.github.io/tag/ag-grid.html">ag-grid</a>,    <a href="https://spapas.github.io/tag/grid.html">grid</a>,    <a href="https://spapas.github.io/tag/bash.html">bash</a>,    <a href="https://spapas.github.io/tag/cron.html">cron</a>,    <a href="https://spapas.github.io/tag/pandas.html">pandas</a>,    <a href="https://spapas.github.io/tag/scipy.html">scipy</a>,    <a href="https://spapas.github.io/tag/numpy.html">numpy</a>,    <a href="https://spapas.github.io/tag/pivot.html">pivot</a>,    <a href="https://spapas.github.io/tag/pivot_table.html">pivot_table</a>,    <a href="https://spapas.github.io/tag/ipython.html">ipython</a>,    <a href="https://spapas.github.io/tag/jupyter.html">jupyter</a>,    <a href="https://spapas.github.io/tag/notebook.html">notebook</a>,    <a href="https://spapas.github.io/tag/query.html">query</a>,    <a href="https://spapas.github.io/tag/q.html">q</a>,    <a href="https://spapas.github.io/tag/imgur.html">imgur</a>,    <a href="https://spapas.github.io/tag/console.html">console</a>,    <a href="https://spapas.github.io/tag/research.html">research</a>,    <a href="https://spapas.github.io/tag/debug.html">debug</a>,    <a href="https://spapas.github.io/tag/werkzeug.html">werkzeug</a>,    <a href="https://spapas.github.io/tag/django-extensions.html">django-extensions</a>,    <a href="https://spapas.github.io/tag/404.html">404</a>,    <a href="https://spapas.github.io/tag/error.html">error</a>,    <a href="https://spapas.github.io/tag/spring.html">spring</a>,    <a href="https://spapas.github.io/tag/spring-boot.html">spring-boot</a>,    <a href="https://spapas.github.io/tag/java.html">java</a>,    <a href="https://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="https://spapas.github.io/tag/profiles.html">profiles</a>,    <a href="https://spapas.github.io/tag/settings.html">settings</a>,    <a href="https://spapas.github.io/tag/properties.html">properties</a>,    <a href="https://spapas.github.io/tag/yaml.html">yaml</a>,    <a href="https://spapas.github.io/tag/configuration.html">configuration</a>,    <a href="https://spapas.github.io/tag/deploy.html">deploy</a>,    <a href="https://spapas.github.io/tag/initd.html">init.d</a>,    <a href="https://spapas.github.io/tag/react-redux.html">react-redux</a>,    <a href="https://spapas.github.io/tag/redux-thunk.html">redux-thunk</a>,    <a href="https://spapas.github.io/tag/redux-form.html">redux-form</a>,    <a href="https://spapas.github.io/tag/react-router.html">react-router</a>,    <a href="https://spapas.github.io/tag/react-router-redux.html">react-router-redux</a>,    <a href="https://spapas.github.io/tag/react-notification.html">react-notification</a>,    <a href="https://spapas.github.io/tag/history.html">history</a>,    <a href="https://spapas.github.io/tag/babel.html">babel</a>,    <a href="https://spapas.github.io/tag/babelify.html">babelify</a>,    <a href="https://spapas.github.io/tag/browserify.html">browserify</a>,    <a href="https://spapas.github.io/tag/watchify.html">watchify</a>,    <a href="https://spapas.github.io/tag/uglify.html">uglify</a>,    <a href="https://spapas.github.io/tag/boilerplate.html">boilerplate</a>,    <a href="https://spapas.github.io/tag/tutorial.html">tutorial</a>,    <a href="https://spapas.github.io/tag/introduction.html">introduction</a>,    <a href="https://spapas.github.io/tag/fixed-data-tables.html">fixed-data-tables</a>,    <a href="https://spapas.github.io/tag/fixeddatatable.html">FixedDataTable</a>,    <a href="https://spapas.github.io/tag/reportlab.html">reportlab</a>,    <a href="https://spapas.github.io/tag/xhtml2pdf.html">xhtml2pdf</a>,    <a href="https://spapas.github.io/tag/node.html">node</a>,    <a href="https://spapas.github.io/tag/npm.html">npm</a>,    <a href="https://spapas.github.io/tag/generic.html">generic</a>,    <a href="https://spapas.github.io/tag/tables.html">tables</a>,    <a href="https://spapas.github.io/tag/flux.html">flux</a>,    <a href="https://spapas.github.io/tag/jobs.html">jobs</a>,    <a href="https://spapas.github.io/tag/asynchronous.html">asynchronous</a>,    <a href="https://spapas.github.io/tag/scheduling.html">scheduling</a>,    <a href="https://spapas.github.io/tag/redis.html">redis</a>,    <a href="https://spapas.github.io/tag/pusher.html">pusher</a>,    <a href="https://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="https://spapas.github.io/tag/css.html">css</a>,    <a href="https://spapas.github.io/tag/design.html">design</a>,    <a href="https://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>,    <a href="https://spapas.github.io/tag/less.html">less</a>,    <a href="https://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="https://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="https://spapas.github.io/tag/security.html">security</a>,    <a href="https://spapas.github.io/tag/google.html">google</a>,    <a href="https://spapas.github.io/tag/flask.html">flask</a>,    <a href="https://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="https://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="https://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="https://spapas.github.io/tag/git.html">git</a>,    <a href="https://spapas.github.io/tag/github.html">github</a>,    <a href="https://spapas.github.io/tag/branching.html">branching</a>,    <a href="https://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="https://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="https://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="https://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="https://spapas.github.io/tag/rst.html">rst</a>  </section>
+
+  <section>
+    <h1>Yearly archives</h1>
+    <a href="https://spapas.github.io/posts/2013/">2013</a>,    <a href="https://spapas.github.io/posts/2014/">2014</a>,    <a href="https://spapas.github.io/posts/2015/">2015</a>,    <a href="https://spapas.github.io/posts/2016/">2016</a>,    <a href="https://spapas.github.io/posts/2017/">2017</a>,    <a href="https://spapas.github.io/posts/2018/">2018</a>,    <a href="https://spapas.github.io/posts/2019/">2019</a>,    <a href="https://spapas.github.io/posts/2020/">2020</a>,    <a href="https://spapas.github.io/posts/2021/">2021</a>,    <a href="https://spapas.github.io/posts/2022/">2022</a>,    <a href="https://spapas.github.io/posts/2023/">2023</a>,    <a href="https://spapas.github.io/posts/2024/">2024</a>  </section>
+
+
+
+  <section>
+    <h1>GitHub Repos</h1>
+    <ul id="gh_repos">
+      <li class="loading">Status updating...</li>
+    </ul>
+      <a href="https://github.com/spapas">@spapas</a> on GitHub
+    <script  src="//code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      $(function(){
+          if (!window.jXHR){
+              var jxhr = document.createElement('script');
+              jxhr.type = 'text/javascript';
+              jxhr.src = 'https://spapas.github.io/theme/js/jXHR.js';
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(jxhr, s);
+          }
+
+          github.showRepos({
+              user: 'spapas',
+              count: 5,
+              skip_forks: true,
+              target: '#gh_repos'
+          });
+      });
+    </script>
+    <script src="https://spapas.github.io/theme/js/github.js" type="text/javascript"> </script>
+  </section>
+
+
+  <section>
+    <a href="https://twitter.com/_serafeim_?ref_src=twsrc%5Etfw" class="twitter-follow-button"
+      data-show-count="false">Follow @_serafeim_</a>
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+  </section>
+
+</aside>    </div>
+  </div>
+  <footer role="contentinfo"><p>
+    Copyright &copy;  2013&ndash;2024  Serafeim Papastefanos &mdash;
+  <span class="credit">Powered by <a href="http://getpelican.com">Pelican</a></span>
+</p></footer>
+  <script src="https://spapas.github.io/theme/js/modernizr-2.0.js"></script>
+  <script src="https://spapas.github.io/theme/js/ender.js"></script>
+  <script src="https://spapas.github.io/theme/js/octopress.js" type="text/javascript"></script>
+  <script src="https://spapas.github.io/theme/js/ads.js"></script>
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-44750952-1', 'auto');
+
+    ga('send', 'pageview');
+    </script>
+
+<script defer data-domain="spapas.github.io" src="https://plausible.hcg.gr/js/script.js"></script>  <script type="text/javascript">
+    var disqus_shortname = 'spapas-github-io';
+    (function() {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = "//" + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+     })();
+  </script>
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+</body>
+
+</html>

@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="google-site-verification" content="5_8DTmIiEq4gFvNAfxAD6TsGOgrMAjp8lQFQvfA6zZc" />
+    <title>/var/</title>
+    <meta name="author" content="Serafeim Papastefanos">
+
+
+    
+<style type="text/css">
+pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: var(--jp-cell-editor-active-background) }
+.highlight { background: var(--jp-cell-editor-background); color: var(--jp-mirror-editor-variable-color) }
+.highlight .c { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment */
+.highlight .err { color: var(--jp-mirror-editor-error-color) } /* Error */
+.highlight .k { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword */
+.highlight .o { color: var(--jp-mirror-editor-operator-color); font-weight: bold } /* Operator */
+.highlight .p { color: var(--jp-mirror-editor-punctuation-color) } /* Punctuation */
+.highlight .ch { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Preproc */
+.highlight .cpf { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Single */
+.highlight .cs { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Special */
+.highlight .kc { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Pseudo */
+.highlight .kr { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Type */
+.highlight .m { color: var(--jp-mirror-editor-number-color) } /* Literal.Number */
+.highlight .s { color: var(--jp-mirror-editor-string-color) } /* Literal.String */
+.highlight .ow { color: var(--jp-mirror-editor-operator-color); font-weight: bold } /* Operator.Word */
+.highlight .pm { color: var(--jp-mirror-editor-punctuation-color) } /* Punctuation.Marker */
+.highlight .w { color: var(--jp-mirror-editor-variable-color) } /* Text.Whitespace */
+.highlight .mb { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Bin */
+.highlight .mf { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Float */
+.highlight .mh { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Hex */
+.highlight .mi { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Integer */
+.highlight .mo { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Oct */
+.highlight .sa { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Affix */
+.highlight .sb { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Backtick */
+.highlight .sc { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Char */
+.highlight .dl { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Delimiter */
+.highlight .sd { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Doc */
+.highlight .s2 { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Double */
+.highlight .se { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Escape */
+.highlight .sh { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Heredoc */
+.highlight .si { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Interpol */
+.highlight .sx { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Other */
+.highlight .sr { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Regex */
+.highlight .s1 { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Single */
+.highlight .ss { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Symbol */
+.highlight .il { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Integer.Long */
+</style>
+
+<style type="text/css">
+/* Overrides of notebook CSS for static HTML export */
+div.entry-content {
+  overflow: visible;
+  padding: 8px;
+}
+.input_area {
+  padding: 0.2em;
+}
+
+a.heading-anchor {
+ white-space: normal;
+}
+
+.rendered_html
+code {
+ font-size: .8em;
+}
+
+pre.ipynb {
+  color: black;
+  background: #f7f7f7;
+  border: none;
+  box-shadow: none;
+  margin-bottom: 0;
+  padding: 0;
+  margin: 0px;
+  font-size: 13px;
+}
+
+/* remove the prompt div from text cells */
+div.text_cell .prompt {
+    display: none;
+}
+
+/* remove horizontal padding from text cells, */
+/* so it aligns with outer body text */
+div.text_cell_render {
+    padding: 0.5em 0em;
+}
+
+img.anim_icon{padding:0; border:0; vertical-align:middle; -webkit-box-shadow:none; -box-shadow:none}
+
+div.collapseheader {
+    width=100%;
+    background-color:#d3d3d3;
+    padding: 2px;
+    cursor: pointer;
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+</style>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true,
+        displayMath: [['$$','$$'], ["\\[","\\]"]]
+    }
+});
+</script>
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+    $("div.collapseheader").click(function () {
+    $header = $(this).children("span").first();
+    $codearea = $(this).children(".input_area");
+    console.log($(this).children());
+    $codearea.slideToggle(500, function () {
+        $header.text(function () {
+            return $codearea.is(":visible") ? "Collapse Code" : "Expand Code";
+        });
+    });
+});
+});
+</script>
+
+
+
+
+    <!-- http://t.co/dKP3o1e -->
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+    <link href="https://spapas.github.io/favicon.png" rel="icon">
+
+    <link href="https://spapas.github.io/theme/css/main.css" media="screen, projection" rel="stylesheet"
+      type="text/css">
+
+    <link href="https://spapas.github.io/theme/css/extra_style.css" media="screen, projection" rel="stylesheet"
+      type="text/css">
+
+    <link href="https://fonts.googleapis.com/css?family=Fira+Mono|Fira+Sans:400,700&amp;subset=greek" rel="stylesheet">
+
+<style>
+#gHPzseYvFrhZ123 {
+  padding: 5px !important;
+  display: block;
+  margin-bottom: 10px !important;
+  background: #900;
+  color: #fff;
+  border-radius: 5px;
+  font-size: 1.0rem !important;
+}
+</style>
+
+
+  <script>
+    
+      
+  </script>
+
+    <script data-ad-client="ca-pub-7673322832689008" async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
+      onerror="adBlockFunction();"></script>
+  </head>
+
+<body>
+  <header role="banner"><hgroup>
+  <h1><a href="https://spapas.github.io/">/var/</a></h1>
+    <h2>Various programming stuff</h2>
+</hgroup></header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+</ul>
+
+
+<ul class="main-navigation">
+      <li >
+        <a href="https://spapas.github.io/category/ai.html">Ai</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/android.html">Android</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/clojure.html">Clojure</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/css.html">Css</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/django.html">Django</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/elixir.html">Elixir</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/flask.html">Flask</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/gaming.html">Gaming</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/git.html">Git</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/html.html">Html</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/javascript.html">Javascript</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/networking.html">Networking</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/pelican.html">Pelican</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/postgresql.html">Postgresql</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/python.html">Python</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/spring.html">Spring</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/unix.html">Unix</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/wagtail.html">Wagtail</a>
+      </li>
+</ul></nav>
+  <div id="main">
+    <div id="content">
+    <div id="gHPzseYvFrhZ123">
+      Hello! If you are using an ad blocker but find something useful here 
+      and want to support me please consider disabling your ad blocker for this site. 
+      <br />
+      <br />
+      Thank you,<br />
+      Serafeim
+      
+    </div>
+<div class="blog-index">
+  		<article>
+<header>
+      <h1 class="entry-title">
+        <a href="https://spapas.github.io/2020/05/15/elixir-osmon-alerts/">Getting alerts from OS Mon in your Elixir application</a>
+      </h1>
+    <p class="meta">
+<time datetime="2020-05-15T14:20:00+03:00" pubdate>Fri 15 May 2020</time>    </p>
+</header>
+
+<div class="entry-content"><p>When I upgraded my <a class="reference external" href="https://github.com/spapas/phxcrd/">Phoenix template application</a> to Phoenix 1.5.1 I also enabled the new
+<a class="reference external" href="https://github.com/phoenixframework/phoenix_live_dashboard">Phoenix LiveDashboard</a> and its &#8220;<span class="caps">OS</span> Data&#8221; tab. To enable that <span class="caps">OS</span> Data tab you have to
+enable the <tt class="docutils literal">:os_mon</tt> erlang application by adding it (along with <tt class="docutils literal">:logger</tt> and <tt class="docutils literal">:runtime_tools</tt>) to
+your <tt class="docutils literal">extra_applications</tt> setting <a class="reference external" href="https://hexdocs.pm/phoenix_live_dashboard/os_mon.html#enabling-os_mon">as described here</a>.</p>
+<p>When I enabled the <tt class="docutils literal">os_mon</tt> application I immediately saw a warning in my logs that one of disks is almost full (which is
+a fact). I knew that I wanted to understand how these warnings are generated and if I could handle them with
+some custom code to send an email for&nbsp;example.</p>
+<p>This journey lead me to an interesting erlang rabbit hole which I&#8217;ll describe in this small&nbsp;post.</p>
+<div class="section" id="the-os-mon-erlang-application">
+<h2>The os_mon erlang&nbsp;application</h2>
+<p><a class="reference external" href="http://erlang.org/doc/man/os_mon_app.html">os_mon</a> is an erlang application that, when started will run 4 processes for monitoring
+<span class="caps">CPU</span> load, disk, memory and some <span class="caps">OS</span> settings. These don&#8217;t work for all operating systems
+but memory and disk which are the most interesting to me do work on both unix and&nbsp;Windows.</p>
+<p>The disk and memory monitoring processes are called <tt class="docutils literal">memsup</tt> and <tt class="docutils literal">disksup</tt> and run a periodic
+configurable check that checks if the  memory or disk space usage is above a (configurable)
+threshold. If the usage is over the threashold then an error will be reported to the
+<a class="reference external" href="http://erlang.org/doc/man/alarm_handler.html"><span class="caps">SASL</span> alarm handler</a> (<span class="caps">SASL</span> is erlang&#8217;s System Architecture Support&nbsp;Libraries).</p>
+</div>
+<div class="section" id="the-alarm-handler-situation">
+<h2>The alarm handler&nbsp;situation</h2>
+<p>The <span class="caps">SASL</span> alarm handler is a process that implements the <a class="reference external" href="http://erlang.org/doc/man/gen_event.html">gen_event</a> behavior. It must
+be noted that this behavior is <a class="reference external" href="https://pattern-match.com/blog/2018/08/31/what-is-wrong-with-gen-event-an-update/">rather controversial</a> and should not be used
+for your own event handling (you can use your own gen server solution or gen stage).
+A <tt class="docutils literal">gen_event</tt> process is an event manager. This event manager keeps a list of
+event handlers; when an event happens the event manager will notify each of the
+event handlers. Each event handler is just a module so when an event occurs all
+event handlers will be run in the same process one after the other (that&#8217;s the
+actual reason of why gen_event is not very&nbsp;loved).</p>
+<p>The <span class="caps">SASL</span> alarm handler (the gen_event event manager)
+is implemented in a module named <tt class="docutils literal">:alarm_handler</tt>. A rather
+unfortunate decision is that the default simple alarm handler
+(the gen_event event handler) is <em>also</em> implemented
+in the same module so in the following you&#8217;ll see <tt class="docutils literal">:alarm_handler</tt> twice!</p>
+<p>The default simple alarm handler can be exchanged with your own custom implementation or
+you can even add additional alarm handlers so they&#8217;ll be called one after the&nbsp;other.</p>
+<p>To add another custom event handler for alarms, you&#8217;ll use the <a class="reference external" href="http://erlang.org/doc/man/gen_event.html#add_handler-3">add_handler</a> method of gen_event. To change it
+with your own, you&#8217;ll use the <a class="reference external" href="http://erlang.org/doc/man/gen_event.html#swap_handler-3">swap_handler</a> of gen_event. When the default simple alarm handler
+is swapped it will return a list of the existing alarms in the system which will the be passed to
+the new alarm&nbsp;handler.</p>
+</div>
+<div class="section" id="a-simple-alarm-handler-implementation">
+<h2>A simple alarm handler&nbsp;implementation</h2>
+<p>As noted in the docs, an alarm handler implementation must handle the following two&nbsp;events:</p>
+<p><tt class="docutils literal">{:set_alarm, {alarm_id, alarm_description}}</tt> and
+<tt class="docutils literal">{:clear_alarm, alarm_id}</tt>. The first one will be called from the event manager when a new alarm
+is created and the send one when the cause of the alarm not longer&nbsp;exists.</p>
+<p>Let&#8217;s see a simple implementation of an alarm event&nbsp;handler:</p>
+<div class="highlight"><pre><span></span><span class="w">  </span><span class="kd">defmodule</span><span class="w"> </span><span class="nc">Phxcrd.AlarmHandler</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span><span class="kn">import</span><span class="w"> </span><span class="nc">Bamboo.Email</span>
+<span class="w">  </span><span class="kn">require</span><span class="w"> </span><span class="nc">Logger</span>
+
+<span class="w">  </span><span class="kd">def</span><span class="w"> </span><span class="n">init</span><span class="p">({</span><span class="n">_args</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="ss">:alarm_handler</span><span class="p">,</span><span class="w"> </span><span class="n">alarms</span><span class="p">}})</span><span class="w"> </span><span class="k">do</span>
+<span class="w">    </span><span class="nc">Logger</span><span class="o">.</span><span class="n">debug</span><span class="w">  </span><span class="s2">&quot;Custom alarm handler init!&quot;</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">{</span><span class="n">alarm_id</span><span class="p">,</span><span class="w"> </span><span class="n">alarm_description</span><span class="p">}</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">alarms</span><span class="p">,</span><span class="w"> </span><span class="ss">do</span><span class="p">:</span><span class="w"> </span><span class="n">handle_alarm</span><span class="p">(</span><span class="n">alarm_id</span><span class="p">,</span><span class="w"> </span><span class="n">alarm_description</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w"> </span><span class="p">[]}</span>
+<span class="w">  </span><span class="k">end</span>
+
+<span class="w">  </span><span class="kd">def</span><span class="w"> </span><span class="n">handle_event</span><span class="p">({</span><span class="ss">:set_alarm</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="n">alarm_id</span><span class="p">,</span><span class="w"> </span><span class="n">alarm_description</span><span class="p">}},</span><span class="w"> </span><span class="n">state</span><span class="p">)</span><span class="w"> </span><span class="k">do</span>
+<span class="w">    </span><span class="nc">Logger</span><span class="o">.</span><span class="n">warn</span><span class="w">  </span><span class="s2">&quot;Got an alarm &quot;</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="nc">Atom</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">alarm_id</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="s2">&quot; &quot;</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="n">alarm_description</span>
+<span class="w">    </span><span class="n">handle_alarm</span><span class="p">(</span><span class="n">alarm_id</span><span class="p">,</span><span class="w"> </span><span class="n">alarm_description</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w"> </span><span class="n">state</span><span class="p">}</span>
+<span class="w">  </span><span class="k">end</span>
+
+<span class="w">  </span><span class="kd">def</span><span class="w"> </span><span class="n">handle_event</span><span class="p">({</span><span class="ss">:clear_alarm</span><span class="p">,</span><span class="w"> </span><span class="n">alarm_id</span><span class="p">},</span><span class="w"> </span><span class="n">state</span><span class="p">)</span><span class="w"> </span><span class="k">do</span>
+<span class="w">    </span><span class="nc">Logger</span><span class="o">.</span><span class="n">debug</span><span class="w">  </span><span class="s2">&quot;Clearing the alarm  &quot;</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w">  </span><span class="nc">Atom</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">alarm_id</span><span class="p">)</span>
+<span class="w">    </span><span class="n">state</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">IO</span><span class="o">.</span><span class="n">inspect</span>
+<span class="w">    </span><span class="p">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w"> </span><span class="n">state</span><span class="p">}</span>
+<span class="w">  </span><span class="k">end</span>
+
+<span class="w">  </span><span class="kd">def</span><span class="w"> </span><span class="n">handle_alarm</span><span class="p">(</span><span class="n">alarm_id</span><span class="p">,</span><span class="w"> </span><span class="n">alarm_description</span><span class="p">)</span><span class="w"> </span><span class="k">do</span>
+<span class="w">    </span><span class="nc">Logger</span><span class="o">.</span><span class="n">debug</span><span class="w">  </span><span class="s2">&quot;Handling alarm &quot;</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w">  </span><span class="nc">Atom</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">alarm_id</span><span class="p">)</span>
+
+<span class="w">    </span><span class="n">new_email</span><span class="p">(</span>
+<span class="w">      </span><span class="ss">to</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;foo@foo.com&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">from</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bar@bar.gr&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">subject</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;New alarm!&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">html_body</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;strong&gt;Alert:&quot;</span><span class="w">  </span><span class="o">&lt;&gt;</span><span class="w">  </span><span class="nc">Atom</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">alarm_id</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="s2">&quot; &quot;</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="n">alarm_description</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w">  </span><span class="s2">&quot;&lt;/strong&gt;&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">text_body</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Alert:&quot;</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w">  </span><span class="nc">Atom</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">alarm_id</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="s2">&quot; &quot;</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="n">alarm_description</span>
+<span class="w">    </span><span class="p">)</span>
+<span class="w">    </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">Phxcrd.Mailer</span><span class="o">.</span><span class="n">deliver_later</span><span class="p">()</span>
+
+<span class="w">    </span><span class="nc">Logger</span><span class="o">.</span><span class="n">debug</span><span class="w">  </span><span class="s2">&quot;End handling alarm &quot;</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="nc">Atom</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">alarm_id</span><span class="p">)</span>
+<span class="w">  </span><span class="k">end</span>
+
+<span class="k">end</span>
+</pre></div>
+<p>This implementation also has an <tt class="docutils literal">init</tt> function that is called when the handler
+is first started. Notice that it receives a list of the existing alarms; for each
+one of them I&#8217;ll calle the handle_alarm function. This is needed to handle any
+existing alarms when the application is starting. The <tt class="docutils literal">:set_alarm</tt> handler also
+calls <tt class="docutils literal">handle_alarm</tt> passing the <tt class="docutils literal">alarm_id</tt> and <tt class="docutils literal">alarm_description</tt> it&nbsp;received.</p>
+<p>The <tt class="docutils literal">clear_alarm</tt> doesn&#8217;t do anything (it would be useful if this module used state to
+keep a list of the current alarms). Finally, the <tt class="docutils literal">handle_alarm</tt> will just send an
+email using <a class="reference external" href="https://github.com/fewlinesco/bamboo_smtp">bamboo_smtp</a>. Notice that I use deliver_later() to send the mail&nbsp;asynchronously.</p>
+<p>As you can see this is a very simple example. You can do more things here but I think that
+getting the Alarm email should be enough for most&nbsp;situations!</p>
+</div>
+<div class="section" id="integrating-the-alarm-handler-into-your-elixir-app">
+<h2>Integrating the alarm handler into your elixir&nbsp;app</h2>
+<p>To use the above mentioned custom alarm event handler I&#8217;ve added the following line to
+the start of my  <tt class="docutils literal">Application.start</tt> function:</p>
+<div class="highlight"><pre><span></span><span class="ss">:gen_event</span><span class="o">.</span><span class="n">swap_handler</span><span class="p">(</span><span class="ss">:alarm_handler</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="ss">:alarm_handler</span><span class="p">,</span><span class="w"> </span><span class="ss">:swap</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="nc">Phxcrd.AlarmHandler</span><span class="p">,</span><span class="w"> </span><span class="ss">:ok</span><span class="p">})</span>
+</pre></div>
+<p>Please notice that the <tt class="docutils literal">:alarm_handler</tt> atom is encountered twice: The first is the event manager
+module (for which we want to swich the event handler) while the second is the event handler module
+(which is the one we want to&nbsp;replace).</p>
+</div>
+<div class="section" id="os-mon-configuration">
+<h2>os_mon&nbsp;configuration</h2>
+<p>The are a number of options you can configure for <cite>os_mon</cite>. You can find them all at the manual page.
+For example, just add the following to your <tt class="docutils literal">config.exs</tt>:</p>
+<div class="highlight"><pre><span></span><span class="n">config</span><span class="w"> </span><span class="ss">:os_mon</span><span class="p">,</span>
+<span class="w">  </span><span class="ss">disk_space_check_interval</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">  </span><span class="ss">memory_check_interval</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span>
+<span class="w">  </span><span class="ss">disk_almost_full_threshold</span><span class="p">:</span><span class="w"> </span><span class="mf">0.90</span><span class="p">,</span>
+<span class="w">  </span><span class="ss">start_cpu_sup</span><span class="p">:</span><span class="w"> </span><span class="no">false</span>
+</pre></div>
+<p>This will set the interval for disk space check to 1 minute, for memory check to 5 minutes, the
+disk usage threshold to 90% and will not start the cpu_sup process to get <span class="caps">CPU</span>&nbsp;info.</p>
+</div>
+<div class="section" id="testing-with-the-terminal">
+<h2>Testing with the&nbsp;terminal</h2>
+<p>If no alerts are active in your system, you can test your custom event handler using something like this
+from an <tt class="docutils literal">iex <span class="pre">-S</span> mix</tt> terminal:</p>
+<div class="highlight"><pre><span></span><span class="ss">:alarm_handler</span><span class="o">.</span><span class="n">set_alarm</span><span class="p">({</span><span class="ss">:koko</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;ZZZZZZZZZ&quot;</span><span class="p">}</span>
+<span class="c1"># or</span>
+<span class="ss">:alarm_handler</span><span class="o">.</span><span class="n">clear_alarm</span><span class="p">(</span><span class="ss">:koko</span><span class="p">)</span>
+</pre></div>
+<p>Also you can see some of the current data or configuration&nbsp;options:</p>
+<div class="highlight"><pre><span></span><span class="n">iex</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">&gt;</span><span class="w"> </span><span class="ss">:disksup</span><span class="o">.</span><span class="n">get_disk_data</span>
+<span class="p">[{</span><span class="s1">&#39;C:\\&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">234195964</span><span class="p">,</span><span class="w"> </span><span class="mi">55</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="s1">&#39;E:\\&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">822396924</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">}]</span>
+
+<span class="c1"># or</span>
+<span class="n">iex</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span><span class="o">&gt;</span><span class="w"> </span><span class="ss">:disksup</span><span class="o">.</span><span class="n">get_check_interval</span>
+<span class="mi">60000</span>
+</pre></div>
+<p>Please notice that the check interval is in seconds when you set it, in ms when you retrieve&nbsp;it.</p>
+</div>
+<div class="section" id="conclusion">
+<h2>Conclusion</h2>
+<p>The above should help you if you also want to better understand alert_handler, os_mon and
+how to configure it to run your own custom alert handlers. Of course in a production server
+you should have proper monitoring tools for the health of your server but since os_mon is more
+or less free thanks to erlang, why not add another safety&nbsp;valve?</p>
+<p>If you want to take a look at an application that has everything configured, take a
+look at my <a class="reference external" href="https://github.com/spapas/phxcrd/">Phoenix template application</a>.</p>
+</div>
+</div>
+  		</article>
+  		<article>
+<header>
+      <h1 class="entry-title">
+        <a href="https://spapas.github.io/2020/03/27/wagtail-add-latest-changes/">Adding a latest-changes list to your Wagtail site</a>
+      </h1>
+    <p class="meta">
+<time datetime="2020-03-27T14:20:00+02:00" pubdate>Fri 27 March 2020</time>    </p>
+</header>
+
+<div class="entry-content"><p>I think that a very important tool for a new production <a class="reference external" href="https://wagtail.io">Wagtail</a> site is to have a list
+where you&#8217;ll be able to take a look at the latest changes. Most editors are not
+experienced enough when using a new tool so it&#8217;s easy to make bad quality edits. A
+user could take a look at their changes and guide them if something&#8217;s not up to good&nbsp;standards.</p>
+<p>In this article I&#8217;ll present a simple way to add a latest-changes list in your Wagtail site.
+This is working excellent with Wagtail 2.9, I haven&#8217;t tested it with other wagtail versions
+so your milage may vary. In the meantime, I&#8217;ll also introduce a bunch of concepts of Wagtail
+I find&nbsp;interesting.</p>
+<p><strong>Update 08/05/2020</strong> Please notice that this article was originally written for Wagtail 2.8
+projects. However, Wagtail 2.8 didn&#8217;t have an official <span class="caps">API</span> for adding reports thus I had to
+check the source code for some things. Those things since were not part of any <span class="caps">API</span> have
+been changed and are not working in Wagtail&nbsp;2.9.</p>
+<p>Thus I&#8217;ve updated
+the project to use the proper APIs and work with Wagtail 2.9 (and hopefully the next versions).
+If you want to see what&#8217;s changed between the two versions you can take a look at
+<a class="reference external" href="https://github.com/spapas/wagtail-latest-changes/commit/d751cd7978fc99c3b2f10e84c2f9b72c555f0930">this commit</a> from the companion project. You may also want to take a look at the
+<a class="reference external" href="https://docs.wagtail.io/en/stable/advanced_topics/adding_reports.html">adding reports</a> tutorial on the Wagtail&nbsp;docs.</p>
+<div class="section" id="a-starter-project">
+<h2>A starter&nbsp;project</h2>
+<p>Let&#8217;s create a simple wagtail-starter project (this is for windows you should be able to easily follow the same steps in Unix like&nbsp;systems):</p>
+<pre class="code literal-block">
+C:\progr\py3&gt;mkdir wagtail-starter
+C:\progr\py3&gt;cd wagtail-starter
+C:\progr\py3\wagtail-starter&gt;py -3 -m venv venv
+C:\progr\py3\wagtail-starter&gt;venv\Scripts\activate
+(venv) C:\progr\py3\wagtail-starter&gt;pip install wagtail
+(venv) C:\progr\py3\wagtail-starter&gt;wagtail.exe start wagtail_starter
+(venv) C:\progr\py3\wagtail-starter&gt;cd wagtail_starter
+(venv) C:\progr\py3\wagtail-starter\wagtail_starter&gt;python manage.py migrate
+(venv) C:\progr\py3\wagtail-starter\wagtail_starter&gt;python manage.py createsuperuser
+(venv) C:\progr\py3\wagtail-starter\wagtail_starter&gt;python manage.py runserver
+</pre>
+<p>When you&#8217;ve finished all the above you should be able to go to <a class="reference external" href="http://127.0.0.1/">http://127.0.0.1/</a> and see your homepage and then
+visit <a class="reference external" href="http://127.0.0.1/admin/">http://127.0.0.1/admin/</a> and login with your superuser. What we&#8217;d like to do is add a &#8220;Latest changes&#8221;
+link in the &#8220;Reports&#8221; admin section like&nbsp;this:</p>
+<img alt="New menu" src="/images/latest-changes-template.png" style="width: 580px;" />
+</div>
+<div class="section" id="implementing-the-latest-changes-menu">
+<h2>Implementing the latest-changes&nbsp;menu</h2>
+<div class="section" id="start-with-a-new-app">
+<h3>Start with a new&nbsp;app</h3>
+<p>To start the menu implementation I recommend putting everything related to it in a separate django application
+so you can easily re-use it to multiple sites. For this, let&#8217;s create a new django app&nbsp;using:</p>
+<pre class="code literal-block">
+(venv) C:\progr\py3\wagtail-starter\wagtail_starter&gt;python manage.py startapp latest_changes
+</pre>
+<p>And add <tt class="docutils literal">'latest_changes'</tt> to the list of our <tt class="docutils literal">INSTALLED_APPS</tt> at the file <tt class="docutils literal">wagtail_starter\settings\base.py</tt>.</p>
+</div>
+<div class="section" id="add-the-view">
+<h3>Add the&nbsp;view</h3>
+<p>Let&#8217;s add the code for the view that will display the latest changes page. Modify the latest_changes/views.py file like&nbsp;this:</p>
+<pre class="code literal-block">
+from django.shortcuts import render
+from wagtail.admin.views.reports import PageReportView
+from wagtail.core.models import UserPagePermissionsProxy
+from wagtail.core.models import Page
+
+
+class LatestChangesView(PageReportView):
+    template_name = &quot;reports/latest_changes.html&quot;
+    title = &quot;Latest changes&quot;
+    header_icon = &quot;date&quot;
+
+    def get_queryset(self):
+        self.queryset = Page.objects.order_by(&quot;-last_published_at&quot;)
+        return super().get_queryset()
+
+    def dispatch(self, request, *args, **kwargs):
+        if not UserPagePermissionsProxy(request.user).can_remove_locks():
+            return permission_denied(request)
+        return super().dispatch(request, *args, **kwargs)
+</pre>
+<p>As you can see the above code adds a very small view that overrides <tt class="docutils literal">PageReportView</tt> which is used
+also by the locked pages view so most things are already implemented by that view. The only thing we do
+here is to override the <tt class="docutils literal">get_queryset</tt> method to denote which pages we want to display and
+the <tt class="docutils literal">dispatch</tt> to add some permission checks. Here we check that a user <tt class="docutils literal">can_remove_locks</tt> but we
+could do other checks if needed. Finally, notice that we have overriden the template name which we&#8217;ll
+define in a&nbsp;minute.</p>
+<p>Beyond <tt class="docutils literal">PageReportView</tt> that should be used for generating <tt class="docutils literal">Page</tt> reports, you can override
+<tt class="docutils literal">ReportView</tt> which can be used to implement generic&nbsp;reports.</p>
+<p>To properly add that view in our urls.py we can use a wagtail hook named <tt class="docutils literal">register_admin_py</tt>. Wagtail hooks
+are a great way to excend the wagtail admin; to use them, you have to generate a file name <tt class="docutils literal">wagtail_hooks.py</tt>
+in one of your apps. This file will be auto-impoted by wagtail when your app is&nbsp;started.</p>
+<p>Thus, in our case we&#8217;ll add a <tt class="docutils literal">wagtail_hooks.py</tt> file in the <tt class="docutils literal">latest_changes</tt> app with the following&nbsp;code:</p>
+<pre class="code literal-block">
+from django.http import HttpResponse
+from django.conf.urls import url
+from wagtail.core import hooks
+from .views import LatestChangesView
+
+&#64;hooks.register('register_admin_urls')
+def urlconf_time():
+  return [
+    url(r'^latest_changes/$', LatestChangesView.as_view(), name='latest_changes'),
+  ]
+</pre>
+<p>The above just hooks up the <tt class="docutils literal">LatestChangesView</tt> we defined before to the <tt class="docutils literal">/admin/latest_changes/</tt> url.</p>
+<p>If everything&#8217;s ok till now you should be able to visit: <a class="reference external" href="http://127.0.0.1:8000/admin/latest_changes/">http://127.0.0.1:8000/admin/latest_changes/</a> and
+get an error for a missing template - remember that we haven&#8217;t yet defined <tt class="docutils literal">utils/reports/latest_changes.html</tt>.</p>
+</div>
+<div class="section" id="add-the-template">
+<h3>Add the&nbsp;template</h3>
+<p>To add the template we&#8217;ll need to create a folder named <tt class="docutils literal">templates</tt> under our <tt class="docutils literal">latest_changes</tt> app and then
+add a <tt class="docutils literal">reports</tt> folder to it. Finally in that folder add a <tt class="docutils literal">latest_changes.html</tt>. So the full path of
+the <tt class="docutils literal">latest_changes.html</tt> should be: <tt class="docutils literal">wagtail_starter\latest_changes\templates\reports\latest_changes.html</tt>:</p>
+<pre class="code literal-block">
+{% extends 'wagtailadmin/reports/base_page_report.html' %}
+{% load i18n %}
+{% block listing %}
+    {% include &quot;reports/_list_latest.html&quot; %}
+{% endblock %}
+
+{% block no_results %}
+    &lt;p&gt;{% trans &quot;No changes found.&quot; %}&lt;/p&gt;
+{% endblock %}
+</pre>
+<p>I&#8217;ve selected the <tt class="docutils literal">reports</tt> subfolder just to be compatible with what wagtail does, you can just put <tt class="docutils literal">latest_changes.html</tt>  directly
+under <tt class="docutils literal">templates</tt>; don&#8217;t forget to update the <tt class="docutils literal">LatestChangesView</tt> defined before though! This template extends the
+<tt class="docutils literal">base_page_report.html</tt> template that Wagtail provides for page reports. It also includes a
+snippet named <tt class="docutils literal">reports/_list_latest.html&quot; thus you also need to add a ``_list_latest.html</tt> file in the same folder with the
+following&nbsp;contents:</p>
+<pre class="code literal-block">
+{% extends &quot;wagtailadmin/pages/listing/_list_explore.html&quot; %}
+
+{% load i18n wagtailadmin_tags %}
+
+{% block post_parent_page_headers %}
+&lt;tr&gt;
+&lt;th&gt;Title&lt;/th&gt;
+&lt;th&gt;Last update&lt;/th&gt;
+&lt;th&gt;Kind&lt;/th&gt;
+&lt;th&gt;Status&lt;/th&gt;
+&lt;th&gt;Owner / last publish / last edit&lt;/th&gt;
+&lt;/tr&gt;
+{% endblock %}
+
+{% block page_navigation %}
+    &lt;td&gt;
+        {{ page.owner }} / {{ page.live_revision.user }} / {{ page.get_latest_revision.user }}
+    &lt;/td&gt;
+{% endblock %}
+</pre>
+<p>Please notice that my <tt class="docutils literal">_list_latest.html</tt> snippet extends the Wagtail provided <tt class="docutils literal">_list_explore.html</tt> template and
+overrides some things that can be overriden from that file. If you want to do more changes you&#8217;ll need to copy over
+everything and change things as you wish instead of&nbsp;extending.</p>
+<p>Also, keep in mind that because you added a <tt class="docutils literal">templates</tt> folder you&#8217;ll need to restart your django development&nbsp;server.</p>
+<p>Finally, if everything is ok until now you should be able to visit <a class="reference external" href="http://127.0.0.1:8000/admin/latest_changes/">http://127.0.0.1:8000/admin/latest_changes/</a> and see
+your view! It will say &#8220;No changes found&#8221; if you&#8217;ve followed the steps here; just go to Pages - Home from the wagtail
+menu and edit that page (just save it). Now visit <a class="reference external" href="http://127.0.0.1:8000/admin/latest_changes/">http://127.0.0.1:8000/admin/latest_changes/</a> again and behold! Your
+own latest changes&nbsp;view:</p>
+<img alt="The view" src="/images/last_changes_view.png" style="width: 780px;" />
+</div>
+<div class="section" id="displaying-our-menu-item">
+<h3>Displaying our menu&nbsp;item</h3>
+<p>The last piece of the puzzle missing is to actually display a menu item under the Reports menu of wagtail admin. For this
+we are going to use our friends, the wagtail hooks. So, change the wagtail_hooks.py file like this (I&#8217;m also including
+the code from adding the&nbsp;url):</p>
+<pre class="code literal-block">
+from django.http import HttpResponse
+from django.conf.urls import url
+from django.urls import reverse
+from wagtail.admin.menu import MenuItem
+from wagtail.core import hooks
+from wagtail.core.models import UserPagePermissionsProxy
+from .views import LatestChangesView
+
+&#64;hooks.register('register_admin_urls')
+def urlconf_time():
+    return [
+      url(r'^latest_changes/$', LatestChangesView.as_view(), name='latest_changes'),
+    ]
+
+
+class LatestChangesPagesMenuItem(MenuItem):
+    def is_shown(self, request):
+        return UserPagePermissionsProxy(request.user).can_remove_locks()
+
+
+&#64;hooks.register(&quot;register_reports_menu_item&quot;)
+def register_latest_changes_menu_item():
+    return LatestChangesPagesMenuItem(
+        &quot;Latest changes&quot;, reverse(&quot;latest_changes&quot;), classnames=&quot;icon icon-date&quot;, order=100,
+    )
+</pre>
+<p>The above code uses the <tt class="docutils literal">register_reports_menu_item</tt> which is a hook that can be used to add a child
+specifically to the Reports menu item. Notice that it uses the <tt class="docutils literal">LatestChangesPagesMenuItem</tt> which
+is a class that inherits from <tt class="docutils literal">MenuItem</tt>; the only thing that is overriden there is the <tt class="docutils literal">is_shown</tt>
+method so it will have the same permissions as the <tt class="docutils literal">LatestChangesView</tt> we defined above so user
+that will see the menu item will also have permissions to display the view. Here&#8217;s the final menu&nbsp;item:</p>
+<img alt="The menu item" src="/images/latest_changes_menu.png" style="width: 380px;" />
+</div>
+<div class="section" id="conclusion">
+<h3>Conclusion</h3>
+<p>We&#8217;ve seen the steps required to add a latest pages view to your wagtail admin site. I have to admit that
+it is a little work however the nice thing is that this is all self-included in a single application. You can
+just get tha application and copy over it to your wagtail site; after you add that application to INSTALLED_APPS
+you should get the whole functionality without any more modifications to your project. To help you more
+with this I&#8217;ve included the whole code of this project in the <a class="reference external" href="https://github.com/spapas/wagtail-latest-changes">https://github.com/spapas/wagtail-latest-changes</a>&nbsp;repository.</p>
+<p>You can either clone this repository to see the functionality or just copy over the <tt class="docutils literal">latest_changes</tt> folder to
+your wagtail project to include the functionality directly (don&#8217;t forget to fix the <tt class="docutils literal">INSTALLED_APPS</tt> setting)!
+It should work with all Wagtail 2.9 and later&nbsp;projects.</p>
+</div>
+</div>
+</div>
+  		</article>
+  		<article>
+<header>
+      <h1 class="entry-title">
+        <a href="https://spapas.github.io/2020/03/18/django-crispy-form-quick-easy-layout/">Quick and easy layout of django forms using django-crispy-forms and django-widget-tweaks</a>
+      </h1>
+    <p class="meta">
+<time datetime="2020-03-18T11:20:00+02:00" pubdate>Wed 18 March 2020</time>    </p>
+</header>
+
+<div class="entry-content"><p>One of the first problems you have when you want to create a traditional <span class="caps">HTML</span> django site (i.e
+not an <span class="caps">SPA</span> one) is how to properly and beautifully layout your forms. In this small article I&#8217;ll
+talk about two very useful django packages that will help you have great layouts in your forms:
+<a class="reference external" href="https://github.com/django-crispy-forms/django-crispy-forms">django-crispy-forms</a>  and <a class="reference external" href="https://github.com/jazzband/django-widget-tweaks">django-widget-tweaks</a>.</p>
+<div class="section" id="django-crispy-forms">
+<h2>django-crispy-forms</h2>
+<p>The django-crispy-forms django package is a great way to properly format your forms. If you don&#8217;t
+already use it I totally recommend to check it out; it&#8217;s very useful and you&#8217;ll definitely love it
+if you are a heavy django forms user. It helps you properly layout your forms either implicitly or&nbsp;explicitly.</p>
+<p>For explicitly laying out your forms you should add a <tt class="docutils literal">FormHelper</tt> to your django form class and
+use the <tt class="docutils literal">{% crispy %}</tt> template tag. You can use this to explicitly define your form layout with
+as much detail as you want since you have full control. I won&#8217;t go into more details about this since it&#8217;s
+<a class="reference external" href="https://django-crispy-forms.readthedocs.io/en/latest/crispy_tag_forms.html#crispy-tag-with-forms">explained thoroughly in the docs</a>.</p>
+<p>For implicitly laying out your forms, you will just use the <tt class="docutils literal">|crispy</tt> template filter. This gets a
+normal django form (without any modifications) and converts it to a crispy form based on the <a class="reference external" href="https://django-crispy-forms.readthedocs.io/en/latest/install.html#template-packs">template pack</a>
+you are using. This works great for many situations however sometimes you&#8217;ll need to have more control
+over this without going to the extra effort to add a complete layout to each of your forms using
+the <tt class="docutils literal">FormHelper</tt>.</p>
+<p>So how do you resolve this? Enter the <tt class="docutils literal">|as_crispy_field</tt> template filter. To use that filter you&#8217;ll need
+to add the <tt class="docutils literal">{% load crispy_forms_tags %}</tt> lines to your template and then you can pass any one of your
+form&#8217;s fields to it so it will be properly &#8220;crispified&#8221;! Let&#8217;s see a quick example of adding the fields of
+a form in a <tt class="docutils literal">&lt;div <span class="pre">class='col-md-6'&gt;</span></tt> so they will be in two columns (using&nbsp;bootstrap):</p>
+<pre class="code literal-block">
+&lt;form class='form' method=&quot;POST&quot;&gt;
+    &lt;div class='row'&gt;
+        {% for field in form %}
+            &lt;div class='col-md-6'&gt;
+              {{ field|as_crispy_field }}
+            &lt;/div&gt;
+        {% endfor %}
+        {% csrf_token %}
+    &lt;/div&gt;
+    &lt;input class='btn btn-primary' type='submit'&gt;
+&lt;/form&gt;
+</pre>
+<p>So the above code enumerates all form fields and uses the <tt class="docutils literal">|as_crispy_field</tt> to properly add the
+crispified information to it. If you want to re-use the above two column layout in multiple forms and
+be more dry you can create a template snippet and <tt class="docutils literal">{% include %}</tt> it in the part of your code you
+want the form to be&nbsp;rendered.</p>
+</div>
+<div class="section" id="django-widget-tweaks">
+<h2>django-widget-tweaks</h2>
+<p>Using the <tt class="docutils literal">as_crispy_field</tt> is excellent however sometimes you may need even more control
+of your for fields, for example add an extra class (like <tt class="docutils literal"><span class="pre">form-control-lg</span></tt>) to your form controls.
+The answer to this is the django-widget-tweaks package: It enables you to easily modify form
+fields by adding classes, attributes etc to them from within your django&nbsp;templates.</p>
+<p>To use it you need to add a <tt class="docutils literal">{% load widget_tweaks %}</tt> to your templates. Then you&#8217;ll be
+able to use the <tt class="docutils literal">|add_class</tt> form field to add a class to your form field. For example the
+previous example can be modified like this to have smaller&nbsp;controls:</p>
+<pre class="code literal-block">
+&lt;form class='form' method=&quot;POST&quot;&gt;
+    &lt;div class='row'&gt;
+        {% for field in form %}
+            &lt;div class='col-md-6'&gt;
+              {{ field|add_class:&quot;form-control-sm&quot;|as_crispy_field }}
+            &lt;/div&gt;
+        {% endfor %}
+        {% csrf_token %}
+    &lt;/div&gt;
+    &lt;input class='btn btn-primary' type='submit'&gt;
+&lt;/form&gt;
+</pre>
+<p>Please notice that I use both <tt class="docutils literal">add_class</tt> and <tt class="docutils literal">as_crispy_fields</tt> together; notice the
+order, the <tt class="docutils literal">add_class</tt> needs to be <em>before</em> the <tt class="docutils literal">as_crispy_field</tt> or you&#8217;ll get an error. This
+way the django form field will have the <tt class="docutils literal"><span class="pre">form-control-sm</span></tt> class <em>and</em> then be rendered as a
+crispy&nbsp;field.</p>
+<p>Let&#8217;s now suppose that you need to more control over your fields. For example you need to add a class
+only to your select fields or even only to a particular field (depending on its name). To do that
+you can use the <tt class="docutils literal">name</tt> and <tt class="docutils literal">field.widget.input_type</tt> attributes of each for field. So, to make
+select fields smaller and with a <tt class="docutils literal">warning</tt> background and fields that have a name of <tt class="docutils literal">name</tt>
+or <tt class="docutils literal">year</tt> larger you can use something like&nbsp;this:</p>
+<pre class="code literal-block">
+&lt;form class='form' method=&quot;POST&quot;&gt;
+    &lt;div class='row'&gt;
+        {% for field in form %}
+          {% if field.name == 'name' or field.name == 'year' %}
+              {{ field|add_class:&quot;form-control-lg&quot;|as_crispy_field }}
+          {% elif field.field.widget.input_type == 'select' %}
+              {{ field|add_class:&quot;form-control-sm&quot;|add_class:&quot;bg-warning&quot;|as_crispy_field }}
+          {% else %}
+              {{ field|as_crispy_field }}
+          {% endif %}
+        {% endfor %}
+        {% csrf_token %}
+    &lt;/div&gt;
+    &lt;input class='btn btn-primary' type='submit'&gt;
+&lt;/form&gt;
+</pre>
+<p>Using the above techniques you should be able to quickly layout and format your form fields with
+much control! If you need something more I recommend going the <tt class="docutils literal">FormLayout</tt> route I mentioned
+in the&nbsp;beginning.</p>
+</div>
+</div>
+  		</article>
+  		<article>
+<header>
+      <h1 class="entry-title">
+        <a href="https://spapas.github.io/2019/10/17/declarative-ecto-query-sorting/">Declarative Ecto query sorting</a>
+      </h1>
+    <p class="meta">
+<time datetime="2019-10-17T12:20:00+03:00" pubdate>Thu 17 October 2019</time>    </p>
+</header>
+
+<div class="entry-content"><p>In a <a class="reference external" href="https://spapas.github.io/2019/07/25/declarative-ecto-query-filters/">previous article</a> I presented a method for declaring dynamic filters for your ecto queries.
+Continuing this article, I&#8217;ll present here a way to allow dynamic sorting for your queries using
+fields that may even span&nbsp;relations.</p>
+<div class="section" id="what-will-it-do">
+<h2>What will it&nbsp;do</h2>
+<p>The solution is a couple of function that can be put inside the <tt class="docutils literal">QueryFilterEx</tt> I mentioned
+in the <a class="reference external" href="https://spapas.github.io/2019/07/25/declarative-ecto-query-filters/">previous article</a>. Please make sure that you&#8217;ve completely read and understand this
+article before continuing&nbsp;here.</p>
+<p>To use the dynamic sorting function you&#8217;ll need to declare the fields that would allow sorting using
+a simple array of strings. The sort fields should then be added as links to your phoenix page which
+will then pass an <tt class="docutils literal">order_by=field_name</tt> query parameter to your&nbsp;controller.</p>
+<p>The module has a very simple <span class="caps">API</span> consisting of a single&nbsp;function:</p>
+<ul class="simple">
+<li><tt class="docutils literal">sort_by_params(query, params, allowed_sort_fields)</tt>: Pass it the query, the <tt class="docutils literal"><span class="caps">GET</span></tt> request parameters you got from your form and the declared sort fields array to return you a sorted&nbsp;query</li>
+</ul>
+<p>You can find a sample of the technique presented in this article in my <span class="caps">PHXCRD</span> repository:
+<a class="reference external" href="https://github.com/spapas/phxcrd">https://github.com/spapas/phxcrd</a>  for example in the <tt class="docutils literal">user_controller</tt> or <tt class="docutils literal">authority_controller</tt>.</p>
+</div>
+<div class="section" id="preparing-the-query">
+<h2>Preparing the&nbsp;query</h2>
+<p>In order to use dynamic sorting you&#8217;ll need to properly &#8220;prepare&#8221; your Ecto query by <em>naming all your relations</em>
+as I&#8217;ve already explained in the <a class="reference external" href="https://spapas.github.io/2019/07/25/declarative-ecto-query-filters/">previous article</a>.</p>
+</div>
+<div class="section" id="declaring-the-sort-fields">
+<h2>Declaring the sort&nbsp;fields</h2>
+<p>To declare the sort fields you&#8217;ll just add an array of fields you&#8217;ll want to allow sorting on. Each field
+should have the form <tt class="docutils literal">binding_name__field_name</tt> where <tt class="docutils literal">binding_name</tt> is the name of the table
+you&#8217;ve declared in your
+query and <tt class="docutils literal">field_name</tt> is the name of the field that the query will be sorted by. This is the way
+that the sort
+fields will also be declared in the phoenix html page. Django users will definitely remember the
+<tt class="docutils literal">model__field</tt> convention.</p>
+<p>Declaring the sort fields here and using them again in the html page may seem reduntant, however
+it is absolute necessary to declare a priori which fields are allowed because the sort http params
+will be received
+as strings and to be used in queries these strings will be converted to atoms. The number of atoms is
+finite (there&#8217;s an absolute limit of allowed atoms in an erlang program; if that limit is surpassed
+your program will crash) so you can&#8217;t allow the user to pass whatever he wants (so if the <tt class="docutils literal">order_by</tt>
+parameter does not contain one of the fields you declare here then no strings will be converted to&nbsp;atoms).</p>
+</div>
+<div class="section" id="integrating-with-a-controller">
+<h2>Integrating with a&nbsp;controller</h2>
+<p>As an example let&#8217;s see how the dynamic sort fields will be integrated with the phxcrd user_controller.
+The query I&#8217;d like to filter on is the following (see that everything I&#8217;ll need is named using <tt class="docutils literal">:as</tt>):</p>
+<div class="highlight"><pre><span></span><span class="n">from</span><span class="p">(</span><span class="n">u</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nc">User</span><span class="p">,</span><span class="w"> </span><span class="ss">as</span><span class="p">:</span><span class="w"> </span><span class="ss">:user</span><span class="p">,</span>
+<span class="w">  </span><span class="ss">left_join</span><span class="p">:</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nc">Authority</span><span class="p">,</span><span class="w"> </span><span class="ss">as</span><span class="p">:</span><span class="w"> </span><span class="ss">:authority</span><span class="p">,</span>
+<span class="w">  </span><span class="ss">on</span><span class="p">:</span><span class="w"> </span><span class="n">a</span><span class="o">.</span><span class="n">id</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">u</span><span class="o">.</span><span class="n">authority_id</span><span class="p">,</span>
+<span class="w">  </span><span class="ss">left_join</span><span class="p">:</span><span class="w"> </span><span class="n">up</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nc">UserPermission</span><span class="p">,</span>
+<span class="w">  </span><span class="ss">on</span><span class="p">:</span><span class="w"> </span><span class="n">up</span><span class="o">.</span><span class="n">user_id</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">u</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+<span class="w">  </span><span class="ss">left_join</span><span class="p">:</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nc">Permission</span><span class="p">,</span><span class="w"> </span><span class="ss">as</span><span class="p">:</span><span class="w"> </span><span class="ss">:permission</span><span class="p">,</span>
+<span class="w">  </span><span class="ss">on</span><span class="p">:</span><span class="w"> </span><span class="n">up</span><span class="o">.</span><span class="n">permission_id</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">p</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+<span class="w">  </span><span class="ss">preload</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="ss">authority</span><span class="p">:</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="ss">permissions</span><span class="p">:</span><span class="w"> </span><span class="n">p</span><span class="p">]</span>
+<span class="p">)</span>
+</pre></div>
+<p>To declare the sort fields I like to create a module attribute ending with <tt class="docutils literal">sort_fields</tt>, something like
+<tt class="docutils literal">&#64;user_sort_fields</tt> for example. Here&#8217;s the sort fields I&#8217;m going to use for&nbsp;user_controller:</p>
+<div class="highlight"><pre><span></span><span class="na">@user_sort_fields</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="s2">&quot;user__username&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;user__name&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;user__last_login&quot;</span>
+<span class="p">]</span>
+</pre></div>
+<p>So it will only allow the <tt class="docutils literal">user.username</tt>, <tt class="docutils literal">user.name</tt> and <tt class="docutils literal">user.last_login</tt> fields for sorting.
+I could easily sort by <tt class="docutils literal">authority.name</tt> or <tt class="docutils literal">permission.name</tt> in a similar&nbsp;fashion.</p>
+<p>Finally, here&#8217;s the full code of the index&nbsp;controller:</p>
+<div class="highlight"><pre><span></span><span class="kd">def</span><span class="w"> </span><span class="n">index</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span><span class="w"> </span><span class="n">params</span><span class="p">)</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span><span class="n">changeset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nc">QueryFilterEx</span><span class="o">.</span><span class="n">get_changeset_from_params</span><span class="p">(</span><span class="n">params</span><span class="p">,</span><span class="w"> </span><span class="na">@user_filters</span><span class="p">)</span>
+
+<span class="w">  </span><span class="n">users</span><span class="w"> </span><span class="o">=</span>
+<span class="w">    </span><span class="n">from</span><span class="p">(</span><span class="n">u</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nc">User</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">as</span><span class="p">:</span><span class="w"> </span><span class="ss">:user</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">left_join</span><span class="p">:</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nc">Authority</span><span class="p">,</span><span class="w"> </span><span class="ss">as</span><span class="p">:</span><span class="w"> </span><span class="ss">:authority</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">on</span><span class="p">:</span><span class="w"> </span><span class="n">a</span><span class="o">.</span><span class="n">id</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">u</span><span class="o">.</span><span class="n">authority_id</span><span class="p">,</span>
+
+<span class="w">      </span><span class="ss">left_join</span><span class="p">:</span><span class="w"> </span><span class="n">up</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nc">UserPermission</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">on</span><span class="p">:</span><span class="w"> </span><span class="n">up</span><span class="o">.</span><span class="n">user_id</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">u</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">left_join</span><span class="p">:</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nc">Permission</span><span class="p">,</span><span class="w"> </span><span class="ss">as</span><span class="p">:</span><span class="w"> </span><span class="ss">:permission</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">on</span><span class="p">:</span><span class="w"> </span><span class="n">up</span><span class="o">.</span><span class="n">permission_id</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">p</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">preload</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="ss">authority</span><span class="p">:</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="ss">permissions</span><span class="p">:</span><span class="w"> </span><span class="n">p</span><span class="p">]</span>
+<span class="w">    </span><span class="p">)</span>
+<span class="w">    </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">QueryFilterEx</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">changeset</span><span class="p">,</span><span class="w"> </span><span class="na">@user_filters</span><span class="p">)</span>
+<span class="w">    </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">QueryFilterEx</span><span class="o">.</span><span class="n">sort_by_params</span><span class="p">(</span><span class="n">params</span><span class="p">,</span><span class="w"> </span><span class="na">@user_sort_fields</span><span class="p">)</span>
+<span class="w">    </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">Repo</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+<span class="w">  </span><span class="n">render</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;index.html&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">users</span><span class="p">:</span><span class="w"> </span><span class="n">users</span><span class="p">,</span><span class="w"> </span><span class="ss">changeset</span><span class="p">:</span><span class="w"> </span><span class="n">changeset</span><span class="p">)</span>
+<span class="k">end</span>
+</pre></div>
+<p>Notice that this is exactly the
+same as the controller I discussed in the dynamic filters article with the addition of the
+<tt class="docutils literal">QueryFilterEx.sort_by_params(params, &#64;user_sort_fields)</tt> pipe to do the&nbsp;sorting.</p>
+</div>
+<div class="section" id="the-template">
+<h2>The&nbsp;template</h2>
+<p>The template for the user index action is also the same with a couple of minor changes: Instead of
+using a static header for the table title I will use a link that will change the sorting&nbsp;order:</p>
+<div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">thead</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">tr</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">th</span><span class="p">&gt;</span>
+      <span class="err">&lt;</span>%= link gettext(&quot;Username&quot;), to: create_order_url(@conn, &quot;user__username&quot;) %&gt;
+    <span class="p">&lt;/</span><span class="nt">th</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">th</span><span class="p">&gt;</span>
+      <span class="err">&lt;</span>%= link gettext(&quot;Name&quot;), to: create_order_url(@conn, &quot;user__name&quot;) %&gt;
+    <span class="p">&lt;/</span><span class="nt">th</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">th</span><span class="p">&gt;</span>First name<span class="p">&lt;/</span><span class="nt">th</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">th</span><span class="p">&gt;</span>Last name<span class="p">&lt;/</span><span class="nt">th</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">th</span><span class="p">&gt;</span>Email<span class="p">&lt;/</span><span class="nt">th</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">th</span><span class="p">&gt;</span>Am / Am phxcrd<span class="p">&lt;/</span><span class="nt">th</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">th</span><span class="p">&gt;</span>Kind<span class="p">&lt;/</span><span class="nt">th</span><span class="p">&gt;</span>
+
+    <span class="p">&lt;</span><span class="nt">th</span><span class="p">&gt;</span>
+      <span class="err">&lt;</span>%= link gettext(&quot;Last login&quot;), to: create_order_url(@conn, &quot;user__last_login&quot;) %&gt;
+    <span class="p">&lt;/</span><span class="nt">th</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">th</span><span class="p">&gt;</span>Is enabled<span class="p">&lt;/</span><span class="nt">th</span><span class="p">&gt;</span>
+
+    <span class="p">&lt;</span><span class="nt">th</span><span class="p">&gt;&lt;/</span><span class="nt">th</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">tr</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">thead</span><span class="p">&gt;</span>
+</pre></div>
+<p>Notice that I just used the <tt class="docutils literal">create_order_url</tt> function passing it the <tt class="docutils literal">&#64;conn</tt> and the
+sort field. This <tt class="docutils literal">create_order_url</tt> function is implemented in a module I include in
+all my views and will properly add an <tt class="docutils literal">order_by=field</tt> in the url (it will also add
+an <tt class="docutils literal"><span class="pre">order_by=-field</span></tt> if the same header is clicked twice). I will explain it more
+in the following&nbsp;sections.</p>
+<p>Finally, please notice that if you use pagination and sorting you need to properly handle the <tt class="docutils literal">order_by</tt>
+query parameter when creating the next-previous page links. Actually, there are three things
+competing on their url parameter dominance; I&#8217;d like to talk about that in the next&nbsp;interlude.</p>
+<div class="section" id="interlude-http-get-parameter-priority">
+<h3>Interlude: <span class="caps">HTTP</span> <span class="caps">GET</span> parameter&nbsp;priority</h3>
+<p>Now, in an index page you will probably have three things all of which will want to put parameters
+to your urls to be&nbsp;activated:</p>
+<ul class="simple">
+<li>Query filtering; this will put a <tt class="docutils literal">filter</tt> query parameter to filter your query. Notice that because of how phoenix works (it allows maps in the query parameters) the filter can be a single query parameter but contain multiple filters (i.e the filter will be something like <tt class="docutils literal"><span class="pre">%{&quot;key1&quot;</span> =&gt; &quot;value1&quot;, &quot;key2&quot; =&gt; &quot;value2&quot;}</tt></li>
+<li>Order by: This will put an <tt class="docutils literal">order_by</tt> query parameter to denote the field that the query will be&nbsp;sorted</li>
+<li>Pagination: This will put an <tt class="docutils literal">page</tt> query parameter to denote the current&nbsp;page</li>
+</ul>
+<p>I like to give them a priority in the order I&#8217;ve listed them; when one of them is changed, it will
+<em>clear</em> the ones following it. So if the query filters are changed both the pagination and the order by
+fields will be cleared, if the order by field is changed then only the pagination field will be cleared
+but if the pagination field is changed both the query filters and the order by fields will be kept&nbsp;there.</p>
+<p>I think that&#8217;s the best way to do it from an <span class="caps">UX</span> point of view; try to think about it and you&#8217;ll probably&nbsp;agree.</p>
+</div>
+</div>
+<div class="section" id="how-does-this-work">
+<h2>How does this&nbsp;work?</h2>
+<p>In this section I&#8217;ll try to explain exactly how the dynamic sort fields&nbsp;work.</p>
+<p>So I&#8217;ll split this explanation in two parts: Explain <tt class="docutils literal">create_order_url</tt>
+and then explain <tt class="docutils literal">sort_by_params</tt>.</p>
+<div class="section" id="create-order-url">
+<h3><tt class="docutils literal">create_order_url</tt></h3>
+<p>This function receives three parameters: The current <tt class="docutils literal">&#64;conn</tt>, the name of a <tt class="docutils literal">field</tt> to
+sort by and an optional list of query parameters that need to be kept while creating the
+order by links. I&#8217;ve put this function in a <tt class="docutils literal">ViewHelpers</tt> module that I am including to
+all my views (by adding an <tt class="docutils literal">import PhxcrdWeb.ViewHelpers</tt> line to the <tt class="docutils literal">PhxcrdWeb</tt> module).</p>
+<p>Let&#8217;s take a look at the&nbsp;code:</p>
+<div class="highlight"><pre><span></span><span class="kd">def</span><span class="w"> </span><span class="n">create_order_url</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span><span class="w"> </span><span class="n">field_name</span><span class="p">,</span><span class="w"> </span><span class="n">allowed_keys</span><span class="w"> </span><span class="p">\\</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;filter&quot;</span><span class="p">])</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span><span class="nc">Phoenix.Controller</span><span class="o">.</span><span class="n">current_url</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span><span class="w"> </span><span class="n">get_order_params</span><span class="p">(</span><span class="n">conn</span><span class="o">.</span><span class="n">params</span><span class="p">,</span><span class="w"> </span><span class="n">allowed_keys</span><span class="p">,</span><span class="w"> </span><span class="n">field_name</span><span class="p">))</span>
+<span class="k">end</span>
+</pre></div>
+<p>This doesn&#8217;t do much, it just uses the phoenix&#8217;s <tt class="docutils literal">current_url</tt> that generates a new
+url to the current page, passing it a dictionary
+of http get parameters that should be appended to the url that
+are created through <tt class="docutils literal">get_order_params</tt>. Notice that there&#8217;s an
+<tt class="docutils literal">allowed_keys</tt> parameter that contains the query parameters that we need to keep after
+the sorting (see the previous interlude).
+By default I pass the <tt class="docutils literal">filter</tt> query parameter so if theres a filter (check
+my previous article) it will keep it when sorting (but any pagination will be cleared;
+if I sort by a new field I want to go to the first page there&#8217;s no reason for me to keep
+seeing the page I was on before changing the order&nbsp;by).</p>
+<p>The <tt class="docutils literal">get_order_params</tt> receives the query parameters of the current connection (as a map),
+the allowed keys I mentioned before and the actual name of the field to sort on. This method is a
+little more&nbsp;complex:</p>
+<div class="highlight"><pre><span></span><span class="kd">defp</span><span class="w"> </span><span class="n">get_order_params</span><span class="p">(</span><span class="n">params</span><span class="p">,</span><span class="w"> </span><span class="n">allowed_keys</span><span class="p">,</span><span class="w"> </span><span class="n">order_key</span><span class="p">)</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span><span class="n">params</span>
+<span class="w">  </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">Map</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">allowed_keys</span><span class="w"> </span><span class="o">++</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;order_by&quot;</span><span class="p">])</span>
+<span class="w">  </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">Enum</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">fn</span><span class="w"> </span><span class="p">{</span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">v</span><span class="p">}</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span><span class="nc">String</span><span class="o">.</span><span class="n">to_atom</span><span class="p">(</span><span class="n">k</span><span class="p">),</span><span class="w"> </span><span class="n">v</span><span class="p">}</span><span class="w"> </span><span class="k">end</span><span class="p">)</span>
+<span class="w">  </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">Map</span><span class="o">.</span><span class="n">new</span><span class="p">()</span>
+<span class="w">  </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">Map</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+<span class="w">    </span><span class="ss">:order_by</span><span class="p">,</span>
+<span class="w">    </span><span class="n">order_key</span><span class="p">,</span>
+<span class="w">    </span><span class="o">&amp;</span><span class="k">case</span><span class="w"> </span><span class="ni">&amp;1</span><span class="w"> </span><span class="k">do</span>
+<span class="w">      </span><span class="s2">&quot;-&quot;</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="o">^</span><span class="n">order_key</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">order_key</span>
+<span class="w">      </span><span class="o">^</span><span class="n">order_key</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="s2">&quot;-&quot;</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="n">order_key</span>
+<span class="w">      </span><span class="bp">_</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="s2">&quot;-&quot;</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="n">order_key</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">  </span><span class="p">)</span>
+<span class="k">end</span>
+</pre></div>
+<p>It only keeps the parameters in the <tt class="docutils literal">allowed_keys</tt> list and the current <tt class="docutils literal">order_by</tt> parameter
+(if there&#8217;s one)  discarding everything else. It will then convert the keys of the map to atoms and
+put them in a new map. Finally, it will update the <tt class="docutils literal">order_by</tt> field (if exists) either by
+switching the <tt class="docutils literal">-</tt> in front of the field to declare asc/desc sorting or adding it for the field
+that was clicked. Actually the logic of that <tt class="docutils literal">Map.update</tt> is the&nbsp;following:</p>
+<ul class="simple">
+<li>If there&#8217;s no <tt class="docutils literal">:order_by</tt> key then add it and assign the passed <tt class="docutils literal">order_key</tt></li>
+<li>If the current value of <tt class="docutils literal">:order_by</tt> is equal to <tt class="docutils literal">order_key</tt> with or without a <tt class="docutils literal">-</tt> then toggle the <tt class="docutils literal">-</tt> (this happens when you click on a field that is already used for&nbsp;sorting)</li>
+<li>If the current value of <tt class="docutils literal">:order_by</tt> is anything else (i.e not the same as the <tt class="docutils literal">order_key</tt>) then just change <tt class="docutils literal">:order_by</tt> to <tt class="docutils literal"><span class="pre">-orderKey</span></tt> (this happens when there&#8217;s sorting but you click on a different field, not the one used for the&nbsp;sorting)</li>
+</ul>
+<p>Notice that this juggling between map, list of keywords and then map again (using <tt class="docutils literal">Enum.map</tt> and then
+<tt class="docutils literal">Map.new</tt> etc) is needed because
+the query parameters are in a map with strings as keys form (<tt class="docutils literal"><span class="pre">%{&quot;key&quot;</span> =&gt; &quot;value&quot;}</tt>) while
+the <tt class="docutils literal">current_url</tt> function needs the query params in a map with atoms as keys form
+(<tt class="docutils literal">%{key: &quot;value&quot;}</tt>).</p>
+</div>
+<div class="section" id="sort-by-params">
+<h3><tt class="docutils literal">sort_by_params</tt></h3>
+<p>The <tt class="docutils literal">sort_by_params</tt> method gets three parameters: The <tt class="docutils literal">query</tt> that will be sorted,
+the existing http parameters map (so as to retrieve the <tt class="docutils literal">order_by</tt> value)
+and the declared list of allowed sorting fields. Let&#8217;s take a look at&nbsp;it:</p>
+<div class="highlight"><pre><span></span><span class="kd">def</span><span class="w"> </span><span class="n">sort_by_params</span><span class="p">(</span><span class="n">qs</span><span class="p">,</span><span class="w"> </span><span class="p">%{</span><span class="s2">&quot;order_by&quot;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s2">&quot;-&quot;</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="n">val</span><span class="p">},</span><span class="w"> </span><span class="n">allowed</span><span class="p">),</span>
+<span class="w">  </span><span class="ss">do</span><span class="p">:</span><span class="w"> </span><span class="n">do_sort_by_params</span><span class="p">(</span><span class="n">qs</span><span class="p">,</span><span class="w"> </span><span class="n">val</span><span class="p">,</span><span class="w"> </span><span class="ss">:asc</span><span class="p">,</span><span class="w"> </span><span class="n">allowed</span><span class="p">)</span>
+
+<span class="kd">def</span><span class="w"> </span><span class="n">sort_by_params</span><span class="p">(</span><span class="n">qs</span><span class="p">,</span><span class="w"> </span><span class="p">%{</span><span class="s2">&quot;order_by&quot;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">val</span><span class="p">},</span><span class="w"> </span><span class="n">allowed</span><span class="p">),</span>
+<span class="w">  </span><span class="ss">do</span><span class="p">:</span><span class="w"> </span><span class="n">do_sort_by_params</span><span class="p">(</span><span class="n">qs</span><span class="p">,</span><span class="w"> </span><span class="n">val</span><span class="p">,</span><span class="w"> </span><span class="ss">:desc</span><span class="p">,</span><span class="w"> </span><span class="n">allowed</span><span class="p">)</span>
+
+<span class="kd">def</span><span class="w"> </span><span class="n">sort_by_params</span><span class="p">(</span><span class="n">qs</span><span class="p">,</span><span class="w"> </span><span class="bp">_</span><span class="p">,</span><span class="w"> </span><span class="bp">_</span><span class="p">),</span><span class="w"> </span><span class="ss">do</span><span class="p">:</span><span class="w"> </span><span class="n">qs</span>
+</pre></div>
+<p>This multi-legged function will only do something if there&#8217;s an <tt class="docutils literal">order_by</tt> parameter in the http
+parameters (else it will just return the query as is) and will call <tt class="docutils literal">do_sort_by_params</tt> passing
+it the received query,
+either <tt class="docutils literal">:asc</tt> or <tt class="docutils literal">:desc</tt> (depending if there&#8217;s a <tt class="docutils literal">-</tt> in front of the value) and the
+received allowed fields&nbsp;list.</p>
+<p>The <tt class="docutils literal">do_sort_by_params</tt> makes sure that the passed parameter is in the allowed list
+and if yes
+it creates the atoms of the binding and field name (using <tt class="docutils literal">String.to_atom</tt>) and
+does the actual sorting to the passed&nbsp;query:</p>
+<div class="highlight"><pre><span></span><span class="kd">defp</span><span class="w"> </span><span class="n">do_sort_by_params</span><span class="p">(</span><span class="n">qs</span><span class="p">,</span><span class="w"> </span><span class="n">val</span><span class="p">,</span><span class="w"> </span><span class="n">ord</span><span class="p">,</span><span class="w"> </span><span class="n">allowed</span><span class="p">)</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="n">val</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">allowed</span><span class="w"> </span><span class="k">do</span>
+<span class="w">    </span><span class="p">[</span><span class="n">binding</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">val</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">String</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;__&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">Enum</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="o">&amp;</span><span class="nc">String</span><span class="o">.</span><span class="n">to_atom</span><span class="o">/</span><span class="mi">1</span><span class="p">)</span>
+<span class="w">    </span><span class="n">qs</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="n">order_by</span><span class="p">([{</span><span class="o">^</span><span class="n">binding</span><span class="p">,</span><span class="w"> </span><span class="n">t</span><span class="p">}],</span><span class="w"> </span><span class="p">[{</span><span class="o">^</span><span class="n">ord</span><span class="p">,</span><span class="w"> </span><span class="n">field</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="o">^</span><span class="n">name</span><span class="p">)}])</span>
+<span class="w">  </span><span class="k">else</span>
+<span class="w">    </span><span class="n">qs</span>
+<span class="w">  </span><span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+<p>The line <tt class="docutils literal">qs |&gt; <span class="pre">order_by([{^binding,</span> <span class="pre">t}],</span> <span class="pre">[{^ord,</span> field(t, <span class="pre">^name)}])</span></tt> may seem a little
+complex but it has been thoroughly explained in the previous&nbsp;article.</p>
+</div>
+</div>
+<div class="section" id="conclusion">
+<h2>Conclusion</h2>
+<p>By using the methods described here you can easily add a dynamic sorting to your queries
+through fields that may span relations just by creating a bunch of http <span class="caps">GET</span> links
+and passing them an <tt class="docutils literal">order_by</tt> query&nbsp;parameter.</p>
+</div>
+</div>
+  		</article>
+  		<article>
+<header>
+      <h1 class="entry-title">
+        <a href="https://spapas.github.io/2019/10/03/html-form-submit-php/">How to properly handle an HTML form</a>
+      </h1>
+    <p class="meta">
+<time datetime="2019-10-03T14:20:00+03:00" pubdate>Thu 03 October 2019</time>    </p>
+</header>
+
+<div class="entry-content"><p>One of the simplest things somebody would like to do in a web application is to display a form to the user and then handle the data the application
+received from the form. This is a very common task however there are many loose ends and things that a new developer can do wrong. Recently, I tried
+to explain this to somebody however I couldn&#8217;t find a tutorial containing all the information I think it is important. So I decided to write it&nbsp;here.</p>
+<p>To make it very easy to test it and understand it I decided to use <span class="caps">PHP</span> to handle the form submission. I must confess that I don&#8217;t like <span class="caps">PHP</span> and I never
+use it in production apps (unless I need to support an existing one). However, for such simple tasks and examples <span class="caps">PHP</span> is probably the easiest thing for
+a new developer to understand: Just create a <tt class="docutils literal">.php</tt> file and put it in a folder in your apache <tt class="docutils literal">htdocs</tt>; there now you can test the&nbsp;behavior!</p>
+<p>This tutorial will be as comprehensive as possible and will try to explain all things that I feel that need explaining. However I won&#8217;t go into details
+about <span class="caps">HTML</span> or <span class="caps">PHP</span> syntax; you&#8217;ll need to know some things about them to understand what&#8217;s going on here; after all the important thing is to understand
+the big picture so you can re-implement them in your case (or understand why your web framework does what it&nbsp;does).</p>
+<div class="section" id="a-quick-http-primer">
+<h2>A quick <span class="caps">HTTP</span>&nbsp;primer</h2>
+<p>So, what happens during a form display and submission? To properly understand that you need to know what an <span class="caps">HTTP</span> request is. An <span class="caps">HTTP</span> request is the way
+the browser &#8220;requests&#8221; a <span class="caps">URL</span> from a web server. This is thoroughly explained in the <span class="caps">HTTP</span> protocol however, for our purposes here it should suffice to say
+that an <span class="caps">HTTP</span> request is a text message that is send from the browser/<span class="caps">HTTP</span> Client to the <span class="caps">HTTP</span>/web server. This message should have the following&nbsp;format:</p>
+<pre class="code literal-block">
+METHOD PATH HTTP/VERSION
+Header 1: Value 1
+Header 2: Value 2
+
+Request data
+</pre>
+<p>The <tt class="docutils literal"><span class="caps">METHOD</span></tt> can be one of various methods supported in the <span class="caps">HTTP</span> protocol like <cite><span class="caps">GET</span>, <span class="caps">POST</span>, <span class="caps">PUT</span>, <span class="caps">OPTIONS</span></cite> etc however the most popular and the ones we&#8217;ll talk about here
+are <tt class="docutils literal"><span class="caps">GET</span></tt> and <tt class="docutils literal"><span class="caps">POST</span></tt>. The <tt class="docutils literal"><span class="caps">PATH</span></tt> is the actual url of the &#8220;page&#8221; you want to view without the server part. So if you are visiting <tt class="docutils literal"><span class="pre">http://www.example.com/path/to/page.html</span></tt>
+the path parameter will have a value of <tt class="docutils literal">/path/to/page.html</tt>. The <tt class="docutils literal"><span class="caps">HTTP</span>/<span class="caps">VERSION</span></tt> will contain the version of <span class="caps">HTTP</span> the client uses; usually it is something like
+<tt class="docutils literal"><span class="caps">HTTP</span>/1.1</tt>. Finally, after that first line there&#8217;s a bunch of optional headers with various extra information the client wants to pass to the
+server (for example what encoding it supports, what&#8217;s the host it connects to&nbsp;etc).</p>
+<p>Additionally, in case
+of a <tt class="docutils literal"><span class="caps">POST</span></tt> request the headers are followed by a blank line which in turn is followed by a chunk of &#8220;data&#8221; that the client passes to the&nbsp;server.</p>
+<p>The server will then response back with a text message similar to this (<span class="caps">HTTP</span>&nbsp;Response):</p>
+<pre class="code literal-block">
+HTTP/VERSION STATUS
+Header 1: Value 1
+Header 2: Value 2
+
+Response data
+</pre>
+<p>The <tt class="docutils literal"><span class="caps">HTTP</span>/<span class="caps">VERSION</span></tt> will also be something like <tt class="docutils literal"><span class="caps">HTTP</span>/1.1</tt> while the <tt class="docutils literal"><span class="caps">STATUS</span></tt> will be the status of the response. This status
+is a 3-digit numeric value followed by a textual description of the
+status. There are <a class="reference external" href="https://httpstatuses.com/">various statuses that you can receive</a>, however the statuses can be grouped by the number they start with like&nbsp;this:</p>
+<ul class="simple">
+<li>1xx: Information; rarely&nbsp;used</li>
+<li>2xx: Success; status 200 is the most common&nbsp;one</li>
+<li>3xx: Redirection (browser must visit another page); either permanent or&nbsp;temporary</li>
+<li>4xx: Client error; 404 is page not found (also access denied errors will be&nbsp;40x)</li>
+<li>5xx: Server error; something fishy happened to the server while&nbsp;responding</li>
+</ul>
+<p>In this article we&#8217;ll mainly talk about 2xx and 3xx: A <tt class="docutils literal">200 <span class="caps">OK</span></tt> answer is the most common one, it means that the <span class="caps">HTTP</span> request was
+completed successfully. A <tt class="docutils literal">302 <span class="caps">FOUND</span></tt> request means that the browser should display a &#8220;different&#8221; path; that path will be provided in
+a <tt class="docutils literal">Location: path</tt> header. When the browser receives a redirect it will do another <tt class="docutils literal"><span class="caps">GET</span></tt> request to retrieve the redirect to&nbsp;page.</p>
+<p>Notice that the Headers and Data parts of the server reply may also be optional like for the client however they usually exist
+(especially with a 200 response; without the data the client won&#8217;t have anything to&nbsp;display).</p>
+<p>So when a browser &#8220;requests&#8221; a page it will send an <span class="caps">HTTP</span> <tt class="docutils literal"><span class="caps">GET</span></tt> to the path. This happens all the time when we visit(click) links or entering
+urls to our browser. However, when we submit an <span class="caps">HTML</span> form the situation is a little more&nbsp;complex.</p>
+</div>
+<div class="section" id="form-methods">
+<h2>Form&nbsp;methods</h2>
+<p>An html form is a <tt class="docutils literal">&lt;form&gt;</tt> tag that contains a bunch of <tt class="docutils literal">&lt;input&gt;</tt> elements each one of which should have <em>at least</em> a name property.
+One of the inputs will usually be is a submit&nbsp;button.</p>
+<p>Also, the form tag has two important&nbsp;attributes:</p>
+<ul class="simple">
+<li><tt class="docutils literal">action</tt>: Defines the url where the post will be submitted to; it can be omitted to submit the form to the current&nbsp;path</li>
+<li><tt class="docutils literal">method</tt>: Will be either <span class="caps">GET</span> or <span class="caps">POST</span></li>
+</ul>
+<p>Thus, a sample form is something&nbsp;like:</p>
+<div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">form</span> <span class="na">method</span><span class="o">=</span><span class="s">&quot;GET&quot;</span> <span class="na">action</span><span class="o">=</span><span class="s">&quot;form.php&quot;</span> <span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&#39;text&#39;</span> <span class="na">name</span><span class="o">=</span><span class="s">&#39;input1&#39;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&#39;text&#39;</span> <span class="na">name</span><span class="o">=</span><span class="s">&#39;input2&#39;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&#39;submit&#39;</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+</pre></div>
+<p>So what are the differences between a <tt class="docutils literal">&lt;form <span class="pre">method='<span class="caps">GET</span>'&gt;</span></tt> and a <tt class="docutils literal">&lt;form <span class="pre">method='<span class="caps">POST</span>'&gt;</span></tt>?</p>
+<ul class="simple">
+<li>Submitting an <span class="caps">HTML</span> form will translate to either an <span class="caps">HTTP</span> <span class="caps">GET</span> request or an <span class="caps">HTTP</span> <span class="caps">POST</span> request to the server depending on the method&nbsp;attribute</li>
+<li>The data of a <span class="caps">GET</span> form will be encoded in the <span class="caps">PATH</span> of the <span class="caps">HTTP</span> request while the data of the <span class="caps">POST</span> form will be in the corresponding data part of the <span class="caps">HTTP</span>&nbsp;Request</li>
+<li>A form that is submitted with <span class="caps">GET</span> should be idempotent i.e it should <em>not</em> modify anything in the server; a form that is submitted with <span class="caps">POST</span> should modify something the&nbsp;server</li>
+</ul>
+<p>So, the form we defined previously (that has a <span class="caps">GET</span> method) will issue the following <span class="caps">HTTP</span> request (if we fill the values value1 and value2 to the&nbsp;inputs):</p>
+<pre class="code literal-block">
+GET /form.php?input1=value1&amp;input2=value2 HTTP/1.1
+</pre>
+<p>One the other hand if the form had a <span class="caps">POST</span> method the <span class="caps">HTTP</span> request would be like&nbsp;this:</p>
+<pre class="code literal-block">
+POST /form.php HTTP/1.1
+
+input1=value1&amp;input2=value2
+</pre>
+<p>Notice that in the first case the data is in the <span class="caps">PATH</span> in the 1st line of the request while in the second case it is passed in the data section.
+Also, in both cases the encoded data of the form is similar to <tt class="docutils literal">input1=value1&amp;input2=value2</tt>: it is a list of <tt class="docutils literal">key=value</tt> pairs seperated
+with <tt class="docutils literal">&amp;</tt> where the <tt class="docutils literal">name</tt> attribute of each <tt class="docutils literal">input</tt> is used as the&nbsp;key.</p>
+<p>Concerning the idempotency of the action; this is not something that the <span class="caps">HTTP</span> protocol can enforce but it relies on the developer to implement it.
+When a form will not change anything to the server then it should be implemented as a method=<span class="caps">GET</span>. For example when you have a form with a search
+box that just returns some results. On the other hand, when a form does change things for example when you create a new item in an application
+then it should be implemented as a method=<span class="caps">POST</span>.</p>
+<p>The browser has a different behavior after a <span class="caps">GET</span> vs after a <span class="caps">POST</span> because it expects that when you do a <span class="caps">GET</span> request then it won&#8217;t matter if that
+request is repeated many times. One the other hand, the browser will try to prevent you from submitting a request many times (because something is
+changed in the server so the user must do it intentionally by for example pressing a button to submit the&nbsp;form).</p>
+</div>
+<div class="section" id="proper-form-handling">
+<h2>Proper form&nbsp;handling</h2>
+<p>So, following the previous section we can now explain how to handle a form&nbsp;properly:</p>
+<p>For a <span class="caps">GET</span> form we don&#8217;t have to do anything fancy; we just retrieve the parameter values and we display the data these parameters correspond to
+just like if we displayed any other&nbsp;page.</p>
+<p>For a <span class="caps">POST</span> form however we need to be extra careful as to avoid re-duplication of data and have a good user experience: When a <span class="caps">POST</span> form is
+submitted we need first to make sure that the submitted parameters are valid (for example there are no missing required fields). If the form is not
+valid then we will return a status 200 <span class="caps">OK</span> explaining to the user what went wrong; we usually return the same page containing the initial form with
+the fields that had errors&nbsp;marked.</p>
+<p>On the other hand, if the form <em>was valid</em> we need to do the actual action that the form corresponds to; for example insert something to the database.
+After this is finished we should return a <em>redirect</em> (302) to either a different or even the same page. This will result to the browsing doing a
+<span class="caps">GET</span> request to the page we redirect to so there would be no danger of the user refreshing the page and resubmitting the form. We should <em>not</em>
+return a 200 <span class="caps">OK</span> after a <span class="caps">POST</span> request because then the user would be able to press F5 to duplicate the previous <span class="caps">POST</span> request (and re-insert the&nbsp;data).</p>
+<p>One extra thing that we need to consider is how should we inform the user that his action was successful after the form submission and
+redirection? As we said, we can&#8217;t return a 200 <span class="caps">OK</span> message so we can&#8217;t really &#8220;create&#8221; the response, we instead need to redirect to another page.
+A common practice for this is to use a &#8220;flash&#8221; message; this is offered by many web frameworks through specific functions
+but can be easily implemented. I&#8217;ll explain how in the next&nbsp;section.</p>
+</div>
+<div class="section" id="implementing-flash-messages">
+<h2>Implementing flash&nbsp;messages</h2>
+<p>Before talking about the flash message I&#8217;d like to quickly explain what&#8217;s a cookie and a browser session in <span class="caps">HTTP</span>, because
+the flash message builds upon these&nbsp;concepts:</p>
+<p>A cookie is a way for the server to tell the client to store some information to be re-used later. What happens is that
+the server returns an <span class="caps">HTTP</span> header line similar to <tt class="docutils literal"><span class="pre">Set-Cookie:</span> <span class="pre">cookie-name=cookie-value</span></tt>. When the client receives that
+header line it will pass an <span class="caps">HTTP</span> header line similar to <tt class="docutils literal">Cookie:&nbsp; <span class="pre">cookie-name=cookie-value</span></tt> to all future requests
+so the server will know which value it had send to the client (there are various options for expiring cookies etc but they
+are not important here). This may seem like a primitive solution however because <span class="caps">HTTP</span> is a stateless protocol
+that&#8217;s the only way for the server to store information about a client. If you disable cookies completely in a browser
+then there won&#8217;t be a way for the server to remember you, for example you won&#8217;t be able to login&nbsp;anywhere!</p>
+<p>A session is a better way to store info about the client that builds upon the cookies. What happens is that when a client visits
+a site for the first time (so it has no cookies for that particular site) the server will send back a cookie named <tt class="docutils literal">session_id</tt> (or something like
+that) containing a very big random number. The server will save this session id number in a persistent storage (for example in a
+database or a text file) and will correlate that number with information for that particular client. When the client sends back that
+<tt class="docutils literal">session_id</tt> cookie the server will fetch the correlated info for that particular client from the persistent storage (and may
+update them etc). This way the server can store whatever info it wants about a particular client. The server usually keeps a
+a dictionary (map) of key-values for each&nbsp;session.</p>
+<p>Now, a flash message is some information (message) that should be displayed to the user <em>once</em>. For example a message like
+&#8220;Your form has been&nbsp;submitted!&#8221;.</p>
+<p>A simple way to implement this is to add a <tt class="docutils literal">message</tt>
+attribute to the session when you want to display the flash message. The next page that is displayed (irrelevantly if there&#8217;s a redirect involved)
+will check to see if there&#8217;s a <tt class="docutils literal">message</tt> attribute to the session; if yes it will display the actual message and remove the <tt class="docutils literal">message</tt> attribute
+from the session (so it won&#8217;t be displayed&nbsp;again).</p>
+</div>
+<div class="section" id="implementing-the-form-submission">
+<h2>Implementing the form&nbsp;submission</h2>
+<p>Following the above guidelines I&#8217;ll present here a typical, production-ready form submission for <span class="caps">PHP</span>. Some choices I&#8217;ve&nbsp;made:</p>
+<ul class="simple">
+<li>I am going to implement a <span class="caps">POST</span> form since a <span class="caps">GET</span> form doesn&#8217;t need any special&nbsp;handling</li>
+<li>The form handler will be the same <span class="caps">PHP</span> page as the one displaying the form. This is a usual thing to do, you check the <span class="caps">HTTP</span> method and either display the form as-is (if it is <span class="caps">GET</span>) or handle the submission (if it is <span class="caps">POST</span>)</li>
+<li>When the form is submitted successfully redirect to the same page and display a flash&nbsp;message</li>
+<li>Check for valid input and display the error&nbsp;message</li>
+</ul>
+<p>So without further ado here&#8217;s the complete php code that will submit your form; store it in a file named <tt class="docutils literal">test.php</tt>:</p>
+<div class="highlight"><pre><span></span><span class="x">&lt;!DOCTYPE HTML&gt;</span>
+<span class="x">&lt;html&gt;</span>
+
+<span class="x">&lt;head&gt;</span>
+<span class="x">  &lt;meta charset=&quot;UTF-8&quot;&gt;</span>
+<span class="x">  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;</span>
+<span class="x">  &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;ie=edge&quot;&gt;</span>
+<span class="x">  &lt;title&gt;TEST FORM&lt;/title&gt;</span>
+<span class="x">  &lt;link href=&quot;https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css&quot; rel=&quot;stylesheet&quot;&gt;</span>
+<span class="x">&lt;/head&gt;</span>
+
+<span class="x">&lt;body class=&quot;bg-gray-100&quot;&gt;</span>
+<span class="x">  &lt;div class=&quot;px-8 py-8 w-1/2 m-auto&quot;&gt;</span>
+
+<span class="x">    </span><span class="cp">&lt;?php</span>
+    <span class="nb">session_start</span><span class="p">();</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$_SESSION</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">]</span> <span class="o">??</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">echo</span> <span class="s1">&#39;&lt;div class=&quot;rounded bg-green-300 px-2 py-2&quot;&gt;&#39;</span><span class="o">.</span><span class="nv">$_SESSION</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">]</span><span class="o">.</span><span class="s1">&#39;&lt;/div&gt;&#39;</span><span class="p">;</span>
+      <span class="nb">unset</span><span class="p">(</span><span class="nv">$_SESSION</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">]);</span>
+    <span class="p">}</span>
+
+    <span class="nv">$nameErr</span> <span class="o">=</span> <span class="nv">$wsErr</span> <span class="o">=</span> <span class="nv">$name</span> <span class="o">=</span> <span class="nv">$comment</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">;</span>
+    <span class="nv">$formValid</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s2">&quot;REQUEST_METHOD&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="k">empty</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]))</span> <span class="p">{</span>
+        <span class="nv">$nameErr</span> <span class="o">=</span> <span class="s2">&quot;Name is required&quot;</span><span class="p">;</span>
+        <span class="nv">$formValid</span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nv">$name</span> <span class="o">=</span> <span class="nv">$_POST</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">];</span>
+      <span class="p">}</span>
+
+      <span class="k">if</span> <span class="p">(</span><span class="k">empty</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s2">&quot;comment&quot;</span><span class="p">]))</span> <span class="p">{</span>
+        <span class="nv">$comment</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">;</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nv">$comment</span> <span class="o">=</span> <span class="nv">$_POST</span><span class="p">[</span><span class="s2">&quot;comment&quot;</span><span class="p">];</span>
+      <span class="p">}</span>
+
+      <span class="k">if</span> <span class="p">(</span><span class="nv">$formValid</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="mi">1</span> <span class="o">==</span> <span class="nb">rand</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="p">{</span>
+          <span class="nv">$_SESSION</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Success! You have submitted the values: &lt;b&gt;&quot;</span> <span class="o">.</span> <span class="nv">$name</span> <span class="o">.</span> <span class="s2">&quot; / &quot;</span> <span class="o">.</span> <span class="nv">$comment</span> <span class="o">.</span> <span class="s2">&quot;&lt;/b&gt;&quot;</span><span class="p">;</span>
+          <span class="nb">header</span><span class="p">(</span><span class="s1">&#39;Location: ./test.php&#39;</span><span class="p">);</span>
+          <span class="k">exit</span><span class="p">();</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+          <span class="nv">$wsErr</span> <span class="o">=</span> <span class="s2">&quot;Error while trying to submit the form!&quot;</span><span class="p">;</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="cp">?&gt;</span>
+
+<span class="x">    &lt;h1 class=&quot;text-4xl font-bold text-indigo-500&quot;&gt;Test a PHP form!&lt;/h1&gt;</span>
+
+<span class="x">    &lt;form class=&#39;border border-blue-800 rounded p-2&#39; method=&quot;POST&quot;&gt;</span>
+
+<span class="x">      </span><span class="cp">&lt;?</span><span class="o">=</span> <span class="nv">$wsErr</span> <span class="o">?</span> <span class="s2">&quot;&lt;div class=&#39;text-red-600 py-3&#39;&gt;&quot;</span> <span class="o">.</span> <span class="nv">$wsErr</span> <span class="o">.</span> <span class="s2">&quot;&lt;/div&gt;&quot;</span> <span class="o">:</span> <span class="s2">&quot;&quot;</span> <span class="cp">?&gt;</span>
+
+<span class="x">      &lt;div class=&quot;p-1&quot;&gt;</span>
+<span class="x">        &lt;label for=&quot;name&quot;&gt;Name:&lt;/label&gt; &lt;input class=&quot;border border-blue-800 rounded&quot; id=&quot;name&quot; type=&quot;text&quot; name=&quot;name&quot; value=&quot;</span><span class="cp">&lt;?</span><span class="o">=</span> <span class="nv">$name</span> <span class="cp">?&gt;</span><span class="x">&quot;&gt;</span>
+<span class="x">        &lt;span class=&quot;text-red-600&quot;&gt;* </span><span class="cp">&lt;?</span><span class="o">=</span> <span class="nv">$nameErr</span><span class="p">;</span> <span class="cp">?&gt;</span><span class="x">&lt;/span&gt;</span>
+<span class="x">      &lt;/div&gt;</span>
+
+<span class="x">      &lt;div class=&quot;p-1&quot;&gt;</span>
+<span class="x">        &lt;label for=&quot;comment&quot;&gt;Comment:&lt;/label&gt; &lt;textarea class=&quot;border border-blue-800 rounded&quot; id=&quot;comment&quot; name=&quot;comment&quot; rows=&quot;5&quot; cols=&quot;40&quot;&gt;</span><span class="cp">&lt;?</span><span class="o">=</span> <span class="nv">$comment</span> <span class="cp">?&gt;</span><span class="x">&lt;/textarea&gt;</span>
+<span class="x">      &lt;/div&gt;</span>
+
+<span class="x">      &lt;input class=&quot;rounded px-2 my-4 py-2 bg-blue-800 text-gray-100&quot; type=&quot;submit&quot; name=&quot;submit&quot; value=&quot;Save&quot;&gt;</span>
+<span class="x">    &lt;/form&gt;</span>
+<span class="x">  &lt;/div&gt;</span>
+<span class="x">&lt;/body&gt;</span>
+<span class="x">&lt;/html&gt;</span>
+</pre></div>
+<p>So how is that working? As we can see there&#8217;s the php code first and the html is following (with some sprinkles of php). The <span class="caps">HTML</span> code is rather simple: It will
+display a <tt class="docutils literal"><span class="caps">POST</span></tt> form with two inputs named <tt class="docutils literal">name</tt> and <tt class="docutils literal">comment</tt>. Notice that we pass the <tt class="docutils literal">$name</tt> and <tt class="docutils literal">$comment</tt> php variables as their values.
+It also has a submit button and will display the <tt class="docutils literal">$wsErr</tt> variable if it is not null (which means that there was an error while submitting the data). The <span class="caps">PHP</span>
+code now first starts the session (i.e it passes the <tt class="docutils literal">session_id</tt> cookie to the client if such a cookie does not exist) checks to see if there&#8217;s a
+<tt class="docutils literal">message</tt> attribute to the session. If such a message exists it will display it in a rounded green panel and remove that from the session (so it won&#8217;t be displayed
+again next&nbsp;time):</p>
+<div class="highlight"><pre><span></span><span class="x">session_start();</span>
+<span class="x">if ($_SESSION[&#39;message&#39;] ?? &#39;&#39;) {</span>
+<span class="x">  echo &#39;&lt;div class=&quot;rounded bg-green-300 px-2 py-2&quot;&gt;&#39;.$_SESSION[&#39;message&#39;].&#39;&lt;/div&gt;&#39;;</span>
+<span class="x">  unset($_SESSION[&#39;message&#39;]);</span>
+<span class="x">}</span>
+</pre></div>
+<p>After that there are some variable initializations and we check if the <span class="caps">HTTP</span> request is <tt class="docutils literal"><span class="caps">POST</span></tt> (if the request is <span class="caps">GET</span> we&#8217;ll just disply the <span class="caps">HTML</span>):</p>
+<div class="highlight"><pre><span></span><span class="x">if ($_SERVER[&quot;REQUEST_METHOD&quot;] == &quot;POST&quot;) {</span>
+</pre></div>
+<p>For each of the inputs we check if they are empty or not and assign their values to the corresponding php variable. If the name is empty then we&#8217;ll
+set <tt class="docutils literal">$formValid = false;</tt> and add an error message since this field is required. Then, if <tt class="docutils literal">$formValid</tt> is not false we can do the actual action
+(for example write to the database). I&#8217;ve simulated that using a coin-toss with rand (so there&#8217;s a 50% possibility that the action will fail). If
+the action &#8220;failed&#8221; then nothing happened in the database so we should return the same page with the <tt class="docutils literal">wsErr</tt> variable containing the&nbsp;error.</p>
+<p>However if the action is successful that means that the data has been inserted to the database so we&#8217;ll need to set the flash message and do
+the redirect (the name of the page containing the form is <tt class="docutils literal">/test.php</tt> so we&#8217;ll redirect to&nbsp;it):</p>
+<div class="highlight"><pre><span></span><span class="x">$_SESSION[&#39;message&#39;] = &quot;Success! You have submitted the values: &lt;b&gt;&quot; . $name . &quot; / &quot; . $comment . &quot;&lt;/b&gt;&quot;;</span>
+<span class="x">header(&#39;Location: ./test.php&#39;);</span>
+<span class="x">exit();</span>
+</pre></div>
+<p>The two commands above (<tt class="docutils literal">header</tt> and <tt class="docutils literal">exit</tt>) will do the actual redirect in php. Since the session contains the <tt class="docutils literal">message</tt> it will
+be displayed after the redirect has&nbsp;finished!</p>
+</div>
+<div class="section" id="conclusion">
+<h2>Conclusion</h2>
+<p>So following the above tutorial, here&#8217;s what you should absolutely do to submit an <span class="caps">HTML</span>&nbsp;form:</p>
+<ul class="simple">
+<li>Use <span class="caps">HTTP</span> <span class="caps">POST</span> if the form is going to change data on the server; use <span class="caps">HTTP</span> <span class="caps">GET</span> otherwise (mainly for search/filter&nbsp;forms)</li>
+<li>When using <span class="caps">POST</span>: Redirect when the form is valid and the action on the server has finished successfully; never return a 200 <span class="caps">OK</span> status when you&#8217;ve changed things in the server&nbsp;(database)</li>
+<li>Use flash messages to pass information to the user after a&nbsp;redirect</li>
+</ul>
+</div>
+</div>
+  		</article>
+<div class="pagination">
+    <a class="prev" href="https://spapas.github.io/index6.html">&larr; Older</a>
+
+    <a class="next" href="https://spapas.github.io/index4.html">Newer &rarr;</a>
+  <br />
+</div></div>
+<aside class="sidebar">
+  
+  <section>
+    <br />
+    <a href='/feeds/all.atom.xml'>Atom</a>
+    |
+    <a href='/feeds/all.rss.xml'>RSS</a>
+  </section>
+
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <!-- Sidebar unit -->
+  <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7673322832689008" data-ad-slot="2720624730"
+    data-ad-format="auto" data-full-width-responsive="true"></ins>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+
+
+  <script async src="https://cse.google.com/cse.js?cx=612920e5ca9da850c"></script>
+  <div class="gcse-search"></div>
+
+  
+  <section>
+    <h1>Support me</h1>
+
+    You can show your appreciation for anything useful you've found here by 
+    buying me a coffee 
+    <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="spapas" data-color="#FFDD00" data-emoji=""  data-font="Lato" data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff" ></script>
+
+    or donating me some bitcoin to this address:
+    <small><pre>bc1qx42vp8napheaewhnx0rk0mttdrdrtvw6czvxhl</pre></small>
+    <svg shape-rendering="crispEdges" height="200" width="200" viewBox="0 0 29 29" class="qrcode">
+      <path fill="#FFFFFF" d="M0,0 h29v29H0z"></path><path fill="#000000" d="M0 0h7v1H0zM9 0h2v1H9zM12 0h1v1H12zM14 0h2v1H14zM18 0h2v1H18zM22,0 h7v1H22zM0 1h1v1H0zM6 1h1v1H6zM8 1h1v1H8zM11 1h1v1H11zM14 1h5v1H14zM22 1h1v1H22zM28,1 h1v1H28zM0 2h1v1H0zM2 2h3v1H2zM6 2h1v1H6zM8 2h4v1H8zM17 2h1v1H17zM22 2h1v1H22zM24 2h3v1H24zM28,2 h1v1H28zM0 3h1v1H0zM2 3h3v1H2zM6 3h1v1H6zM9 3h2v1H9zM14 3h3v1H14zM18 3h1v1H18zM22 3h1v1H22zM24 3h3v1H24zM28,3 h1v1H28zM0 4h1v1H0zM2 4h3v1H2zM6 4h1v1H6zM8 4h1v1H8zM11 4h1v1H11zM13 4h1v1H13zM15 4h2v1H15zM18 4h1v1H18zM22 4h1v1H22zM24 4h3v1H24zM28,4 h1v1H28zM0 5h1v1H0zM6 5h1v1H6zM8 5h2v1H8zM14 5h2v1H14zM19 5h2v1H19zM22 5h1v1H22zM28,5 h1v1H28zM0 6h7v1H0zM8 6h1v1H8zM10 6h1v1H10zM12 6h1v1H12zM14 6h1v1H14zM16 6h1v1H16zM18 6h1v1H18zM20 6h1v1H20zM22,6 h7v1H22zM8 7h2v1H8zM11 7h1v1H11zM15 7h1v1H15zM17 7h2v1H17zM0 8h2v1H0zM3 8h1v1H3zM6 8h2v1H6zM10 8h1v1H10zM12 8h3v1H12zM20 8h1v1H20zM22 8h3v1H22zM26 8h2v1H26zM1 9h1v1H1zM3 9h3v1H3zM8 9h1v1H8zM10 9h1v1H10zM12 9h2v1H12zM16 9h2v1H16zM20 9h1v1H20zM22 9h1v1H22zM25 9h1v1H25zM27,9 h2v1H27zM0 10h1v1H0zM3 10h2v1H3zM6 10h1v1H6zM8 10h3v1H8zM12 10h2v1H12zM16 10h1v1H16zM19 10h1v1H19zM22 10h3v1H22zM27 10h1v1H27zM0 11h1v1H0zM2 11h1v1H2zM4 11h2v1H4zM7 11h1v1H7zM13 11h4v1H13zM18 11h4v1H18zM26 11h2v1H26zM0 12h1v1H0zM2 12h3v1H2zM6 12h1v1H6zM11 12h1v1H11zM13 12h1v1H13zM15 12h3v1H15zM20 12h1v1H20zM22 12h2v1H22zM27,12 h2v1H27zM4 13h1v1H4zM8 13h3v1H8zM12 13h1v1H12zM14 13h1v1H14zM17 13h4v1H17zM25 13h2v1H25zM0 14h1v1H0zM4 14h3v1H4zM8 14h2v1H8zM11 14h3v1H11zM16 14h1v1H16zM21 14h2v1H21zM24,14 h5v1H24zM3 15h3v1H3zM7 15h2v1H7zM10 15h1v1H10zM12 15h2v1H12zM15 15h1v1H15zM17 15h2v1H17zM20 15h2v1H20zM23 15h1v1H23zM1 16h1v1H1zM4 16h1v1H4zM6 16h4v1H6zM16 16h2v1H16zM20 16h1v1H20zM23 16h1v1H23zM25 16h1v1H25zM28,16 h1v1H28zM2 17h1v1H2zM5 17h1v1H5zM7 17h2v1H7zM11 17h3v1H11zM17 17h1v1H17zM22 17h1v1H22zM25 17h1v1H25zM27,17 h2v1H27zM0 18h1v1H0zM3 18h1v1H3zM5 18h4v1H5zM10 18h1v1H10zM12 18h1v1H12zM18 18h1v1H18zM20 18h1v1H20zM22 18h2v1H22zM25,18 h4v1H25zM2 19h3v1H2zM8 19h1v1H8zM16 19h2v1H16zM21 19h1v1H21zM23 19h1v1H23zM25 19h1v1H25zM27 19h1v1H27zM0 20h1v1H0zM2 20h5v1H2zM8 20h2v1H8zM13 20h4v1H13zM19 20h6v1H19zM26 20h1v1H26zM28,20 h1v1H28zM8 21h2v1H8zM12 21h3v1H12zM16 21h1v1H16zM20 21h1v1H20zM24 21h1v1H24zM26,21 h3v1H26zM0 22h7v1H0zM8 22h3v1H8zM17 22h1v1H17zM20 22h1v1H20zM22 22h1v1H22zM24 22h2v1H24zM27 22h1v1H27zM0 23h1v1H0zM6 23h1v1H6zM10 23h2v1H10zM13 23h2v1H13zM19 23h2v1H19zM24,23 h5v1H24zM0 24h1v1H0zM2 24h3v1H2zM6 24h1v1H6zM9 24h2v1H9zM12 24h2v1H12zM17 24h1v1H17zM20 24h6v1H20zM28,24 h1v1H28zM0 25h1v1H0zM2 25h3v1H2zM6 25h1v1H6zM8 25h3v1H8zM12 25h1v1H12zM14 25h1v1H14zM18 25h1v1H18zM22 25h3v1H22zM26 25h1v1H26zM0 26h1v1H0zM2 26h3v1H2zM6 26h1v1H6zM10 26h5v1H10zM16 26h3v1H16zM21 26h1v1H21zM24 26h1v1H24zM26 26h1v1H26zM28,26 h1v1H28zM0 27h1v1H0zM6 27h1v1H6zM8 27h3v1H8zM12 27h4v1H12zM17 27h1v1H17zM20 27h1v1H20zM23 27h2v1H23zM27 27h1v1H27zM0 28h7v1H0zM8 28h3v1H8zM14 28h1v1H14zM16 28h3v1H16zM20 28h1v1H20zM22 28h1v1H22zM24 28h2v1H24zM27 28h1v1H27z"></path>
+    </svg>
+  </section>
+  
+
+  <section>
+    <h1>Subscribe</h1>
+    Do you want to get notified via email when I post new content?
+    <style>
+      .subscribe-button {
+        /* margin: 10px !important; */
+        padding: 10px !important;
+        background-color: black;
+        display: inline-block;
+        color: white !important;
+        text-decoration: none;
+
+        line-height: 36px !important;
+        height: 37px !important;
+        text-decoration: none !important;
+        display: inline-block !important;
+        color: #ffffff !important;
+        background-color: #000000 !important;
+        border-radius: 3px !important;
+        border: 1px solid transparent !important;
+        padding: 1px 9px !important;
+        font-size: 23px !important;
+        letter-spacing: 0.6px !important;
+        box-shadow: 0px 1px 2px rgba(190, 190, 190, 0.5) !important;
+        -webkit-box-shadow: 0px 1px 2px 2px rgba(190, 190, 190, 0.5) !important;
+        margin: 0 auto !important;
+        font-family: 'Cookie', cursive !important;
+        -webkit-box-sizing: border-box !important;
+        box-sizing: border-box !important;
+        -o-transition: 0.3s all linear !important;
+        -webkit-transition: 0.3s all linear !important;
+        -moz-transition: 0.3s all linear !important;
+        -ms-transition: 0.3s all linear !important;
+        transition: 0.3s all linear !important;
+
+      }
+    </style>
+    <a class='subscribe-button' target="_blank" href="http://eepurl.com/dxI3PP">Click here to subscribe!</a>
+  </section>
+
+
+  <section>
+    <h1>Recent Posts</h1>
+    <ul id="recent_posts">
+      <li class="post">
+        <a href="https://spapas.github.io/2024/08/22/multiple-erl-elixir-windows/">Multiple Erlang/Elixir versions in Windows</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/11/29/openid-connect-tutorial/">A simple OpenID connect tutorial</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/05/23/simple-django-datatables-integration/">Simple Django - DataTables integration</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/05/22/ai-auto-subtitling/">AI auto-subtitling</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/05/12/disable-your-forms/">HTML form disable after submit</a>
+      </li>
+    </ul>
+  </section>
+  <section>
+
+    <h1>Categories</h1>
+    <ul id="recent_posts">
+      <li><a href="https://spapas.github.io/category/ai.html">ai</a></li>
+      <li><a href="https://spapas.github.io/category/android.html">android</a></li>
+      <li><a href="https://spapas.github.io/category/clojure.html">clojure</a></li>
+      <li><a href="https://spapas.github.io/category/css.html">css</a></li>
+      <li><a href="https://spapas.github.io/category/django.html">django</a></li>
+      <li><a href="https://spapas.github.io/category/elixir.html">elixir</a></li>
+      <li><a href="https://spapas.github.io/category/flask.html">flask</a></li>
+      <li><a href="https://spapas.github.io/category/gaming.html">gaming</a></li>
+      <li><a href="https://spapas.github.io/category/git.html">git</a></li>
+      <li><a href="https://spapas.github.io/category/html.html">html</a></li>
+      <li><a href="https://spapas.github.io/category/javascript.html">javascript</a></li>
+      <li><a href="https://spapas.github.io/category/networking.html">networking</a></li>
+      <li><a href="https://spapas.github.io/category/pelican.html">pelican</a></li>
+      <li><a href="https://spapas.github.io/category/postgresql.html">postgresql</a></li>
+      <li><a href="https://spapas.github.io/category/python.html">python</a></li>
+      <li><a href="https://spapas.github.io/category/spring.html">spring</a></li>
+      <li><a href="https://spapas.github.io/category/unix.html">unix</a></li>
+      <li><a href="https://spapas.github.io/category/wagtail.html">wagtail</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Tags</h1>
+    <a href="https://spapas.github.io/tag/erlang.html">erlang</a>,    <a href="https://spapas.github.io/tag/elixir.html">elixir</a>,    <a href="https://spapas.github.io/tag/windows.html">windows</a>,    <a href="https://spapas.github.io/tag/openid.html">openid</a>,    <a href="https://spapas.github.io/tag/openid-connect.html">openid-connect</a>,    <a href="https://spapas.github.io/tag/oidc.html">oidc</a>,    <a href="https://spapas.github.io/tag/http.html">http</a>,    <a href="https://spapas.github.io/tag/keycloak.html">keycloak</a>,    <a href="https://spapas.github.io/tag/python.html">python</a>,    <a href="https://spapas.github.io/tag/django.html">django</a>,    <a href="https://spapas.github.io/tag/jquery.html">jquery</a>,    <a href="https://spapas.github.io/tag/datatables.html">datatables</a>,    <a href="https://spapas.github.io/tag/ai.html">ai</a>,    <a href="https://spapas.github.io/tag/whisper.html">whisper</a>,    <a href="https://spapas.github.io/tag/whispercpp.html">whisper.cpp</a>,    <a href="https://spapas.github.io/tag/subtitles.html">subtitles</a>,    <a href="https://spapas.github.io/tag/video.html">video</a>,    <a href="https://spapas.github.io/tag/auto-subtitling.html">auto-subtitling</a>,    <a href="https://spapas.github.io/tag/subtitiling.html">subtitiling</a>,    <a href="https://spapas.github.io/tag/transcribe.html">transcribe</a>,    <a href="https://spapas.github.io/tag/html.html">html</a>,    <a href="https://spapas.github.io/tag/javascript.html">javascript</a>,    <a href="https://spapas.github.io/tag/media.html">media</a>,    <a href="https://spapas.github.io/tag/storage.html">storage</a>,    <a href="https://spapas.github.io/tag/unpoly.html">unpoly</a>,    <a href="https://spapas.github.io/tag/access.html">access</a>,    <a href="https://spapas.github.io/tag/database.html">database</a>,    <a href="https://spapas.github.io/tag/accdb.html">accdb</a>,    <a href="https://spapas.github.io/tag/mdb.html">mdb</a>,    <a href="https://spapas.github.io/tag/postgresql.html">postgresql</a>,    <a href="https://spapas.github.io/tag/development.html">development</a>,    <a href="https://spapas.github.io/tag/inlines.html">inlines</a>,    <a href="https://spapas.github.io/tag/clojure.html">clojure</a>,    <a href="https://spapas.github.io/tag/cmd.html">cmd</a>,    <a href="https://spapas.github.io/tag/pdf.html">pdf</a>,    <a href="https://spapas.github.io/tag/wkhtmltopdf.html">wkhtmltopdf</a>,    <a href="https://spapas.github.io/tag/forward-proxy.html">forward-proxy</a>,    <a href="https://spapas.github.io/tag/reverse-proxy.html">reverse-proxy</a>,    <a href="https://spapas.github.io/tag/proxy.html">proxy</a>,    <a href="https://spapas.github.io/tag/networking.html">networking</a>,    <a href="https://spapas.github.io/tag/dj-rest-auth.html">dj-rest-auth</a>,    <a href="https://spapas.github.io/tag/rest.html">rest</a>,    <a href="https://spapas.github.io/tag/django-rest-framework.html">django-rest-framework</a>,    <a href="https://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="https://spapas.github.io/tag/tokens.html">tokens</a>,    <a href="https://spapas.github.io/tag/migrations.html">migrations</a>,    <a href="https://spapas.github.io/tag/foreignkey.html">foreignkey</a>,    <a href="https://spapas.github.io/tag/dark-souls.html">dark-souls</a>,    <a href="https://spapas.github.io/tag/dark-souls-2.html">dark-souls-2</a>,    <a href="https://spapas.github.io/tag/dark-souls-3.html">dark-souls-3</a>,    <a href="https://spapas.github.io/tag/autohotkey.html">autohotkey</a>,    <a href="https://spapas.github.io/tag/matplotlib.html">matplotlib</a>,    <a href="https://spapas.github.io/tag/hashids.html">hashids</a>,    <a href="https://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="https://spapas.github.io/tag/osmon.html">osmon</a>,    <a href="https://spapas.github.io/tag/phoenix.html">phoenix</a>,    <a href="https://spapas.github.io/tag/os-monitoring.html">os-monitoring</a>,    <a href="https://spapas.github.io/tag/forms.html">forms</a>,    <a href="https://spapas.github.io/tag/django-crispy-forms.html">django-crispy-forms</a>,    <a href="https://spapas.github.io/tag/django-widget-tweaks.html">django-widget-tweaks</a>,    <a href="https://spapas.github.io/tag/ecto.html">ecto</a>,    <a href="https://spapas.github.io/tag/queries.html">queries</a>,    <a href="https://spapas.github.io/tag/declarative.html">declarative</a>,    <a href="https://spapas.github.io/tag/form.html">form</a>,    <a href="https://spapas.github.io/tag/php.html">php</a>,    <a href="https://spapas.github.io/tag/select2.html">select2</a>,    <a href="https://spapas.github.io/tag/autocompelte.html">autocompelte</a>,    <a href="https://spapas.github.io/tag/ajax.html">ajax</a>,    <a href="https://spapas.github.io/tag/android.html">android</a>,    <a href="https://spapas.github.io/tag/kotlin.html">kotlin</a>,    <a href="https://spapas.github.io/tag/adapter.html">adapter</a>,    <a href="https://spapas.github.io/tag/filter.html">filter</a>,    <a href="https://spapas.github.io/tag/async.html">async</a>,    <a href="https://spapas.github.io/tag/tasks.html">tasks</a>,    <a href="https://spapas.github.io/tag/django-rq.html">django-rq</a>,    <a href="https://spapas.github.io/tag/rq.html">rq</a>,    <a href="https://spapas.github.io/tag/du.html">du</a>,    <a href="https://spapas.github.io/tag/unix.html">unix</a>,    <a href="https://spapas.github.io/tag/linux.html">linux</a>,    <a href="https://spapas.github.io/tag/disk-usage.html">disk-usage</a>,    <a href="https://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="https://spapas.github.io/tag/middleware.html">middleware</a>,    <a href="https://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="https://spapas.github.io/tag/react.html">react</a>,    <a href="https://spapas.github.io/tag/redux.html">redux</a>,    <a href="https://spapas.github.io/tag/hyperapp.html">hyperapp</a>,    <a href="https://spapas.github.io/tag/immutable.html">immutable</a>,    <a href="https://spapas.github.io/tag/es6.html">es6</a>,    <a href="https://spapas.github.io/tag/youtube.html">youtube</a>,    <a href="https://spapas.github.io/tag/youtube-dl.html">youtube-dl</a>,    <a href="https://spapas.github.io/tag/ffmpeg.html">ffmpeg</a>,    <a href="https://spapas.github.io/tag/django-rest-auth.html">django-rest-auth</a>,    <a href="https://spapas.github.io/tag/python-2.html">python-2</a>,    <a href="https://spapas.github.io/tag/python-3.html">python-3</a>,    <a href="https://spapas.github.io/tag/plpgsql.html">plpgsql</a>,    <a href="https://spapas.github.io/tag/component.html">component</a>,    <a href="https://spapas.github.io/tag/ag-grid.html">ag-grid</a>,    <a href="https://spapas.github.io/tag/grid.html">grid</a>,    <a href="https://spapas.github.io/tag/bash.html">bash</a>,    <a href="https://spapas.github.io/tag/cron.html">cron</a>,    <a href="https://spapas.github.io/tag/pandas.html">pandas</a>,    <a href="https://spapas.github.io/tag/scipy.html">scipy</a>,    <a href="https://spapas.github.io/tag/numpy.html">numpy</a>,    <a href="https://spapas.github.io/tag/pivot.html">pivot</a>,    <a href="https://spapas.github.io/tag/pivot_table.html">pivot_table</a>,    <a href="https://spapas.github.io/tag/ipython.html">ipython</a>,    <a href="https://spapas.github.io/tag/jupyter.html">jupyter</a>,    <a href="https://spapas.github.io/tag/notebook.html">notebook</a>,    <a href="https://spapas.github.io/tag/query.html">query</a>,    <a href="https://spapas.github.io/tag/q.html">q</a>,    <a href="https://spapas.github.io/tag/imgur.html">imgur</a>,    <a href="https://spapas.github.io/tag/console.html">console</a>,    <a href="https://spapas.github.io/tag/research.html">research</a>,    <a href="https://spapas.github.io/tag/debug.html">debug</a>,    <a href="https://spapas.github.io/tag/werkzeug.html">werkzeug</a>,    <a href="https://spapas.github.io/tag/django-extensions.html">django-extensions</a>,    <a href="https://spapas.github.io/tag/404.html">404</a>,    <a href="https://spapas.github.io/tag/error.html">error</a>,    <a href="https://spapas.github.io/tag/spring.html">spring</a>,    <a href="https://spapas.github.io/tag/spring-boot.html">spring-boot</a>,    <a href="https://spapas.github.io/tag/java.html">java</a>,    <a href="https://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="https://spapas.github.io/tag/profiles.html">profiles</a>,    <a href="https://spapas.github.io/tag/settings.html">settings</a>,    <a href="https://spapas.github.io/tag/properties.html">properties</a>,    <a href="https://spapas.github.io/tag/yaml.html">yaml</a>,    <a href="https://spapas.github.io/tag/configuration.html">configuration</a>,    <a href="https://spapas.github.io/tag/deploy.html">deploy</a>,    <a href="https://spapas.github.io/tag/initd.html">init.d</a>,    <a href="https://spapas.github.io/tag/react-redux.html">react-redux</a>,    <a href="https://spapas.github.io/tag/redux-thunk.html">redux-thunk</a>,    <a href="https://spapas.github.io/tag/redux-form.html">redux-form</a>,    <a href="https://spapas.github.io/tag/react-router.html">react-router</a>,    <a href="https://spapas.github.io/tag/react-router-redux.html">react-router-redux</a>,    <a href="https://spapas.github.io/tag/react-notification.html">react-notification</a>,    <a href="https://spapas.github.io/tag/history.html">history</a>,    <a href="https://spapas.github.io/tag/babel.html">babel</a>,    <a href="https://spapas.github.io/tag/babelify.html">babelify</a>,    <a href="https://spapas.github.io/tag/browserify.html">browserify</a>,    <a href="https://spapas.github.io/tag/watchify.html">watchify</a>,    <a href="https://spapas.github.io/tag/uglify.html">uglify</a>,    <a href="https://spapas.github.io/tag/boilerplate.html">boilerplate</a>,    <a href="https://spapas.github.io/tag/tutorial.html">tutorial</a>,    <a href="https://spapas.github.io/tag/introduction.html">introduction</a>,    <a href="https://spapas.github.io/tag/fixed-data-tables.html">fixed-data-tables</a>,    <a href="https://spapas.github.io/tag/fixeddatatable.html">FixedDataTable</a>,    <a href="https://spapas.github.io/tag/reportlab.html">reportlab</a>,    <a href="https://spapas.github.io/tag/xhtml2pdf.html">xhtml2pdf</a>,    <a href="https://spapas.github.io/tag/node.html">node</a>,    <a href="https://spapas.github.io/tag/npm.html">npm</a>,    <a href="https://spapas.github.io/tag/generic.html">generic</a>,    <a href="https://spapas.github.io/tag/tables.html">tables</a>,    <a href="https://spapas.github.io/tag/flux.html">flux</a>,    <a href="https://spapas.github.io/tag/jobs.html">jobs</a>,    <a href="https://spapas.github.io/tag/asynchronous.html">asynchronous</a>,    <a href="https://spapas.github.io/tag/scheduling.html">scheduling</a>,    <a href="https://spapas.github.io/tag/redis.html">redis</a>,    <a href="https://spapas.github.io/tag/pusher.html">pusher</a>,    <a href="https://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="https://spapas.github.io/tag/css.html">css</a>,    <a href="https://spapas.github.io/tag/design.html">design</a>,    <a href="https://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>,    <a href="https://spapas.github.io/tag/less.html">less</a>,    <a href="https://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="https://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="https://spapas.github.io/tag/security.html">security</a>,    <a href="https://spapas.github.io/tag/google.html">google</a>,    <a href="https://spapas.github.io/tag/flask.html">flask</a>,    <a href="https://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="https://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="https://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="https://spapas.github.io/tag/git.html">git</a>,    <a href="https://spapas.github.io/tag/github.html">github</a>,    <a href="https://spapas.github.io/tag/branching.html">branching</a>,    <a href="https://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="https://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="https://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="https://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="https://spapas.github.io/tag/rst.html">rst</a>  </section>
+
+  <section>
+    <h1>Yearly archives</h1>
+    <a href="https://spapas.github.io/posts/2013/">2013</a>,    <a href="https://spapas.github.io/posts/2014/">2014</a>,    <a href="https://spapas.github.io/posts/2015/">2015</a>,    <a href="https://spapas.github.io/posts/2016/">2016</a>,    <a href="https://spapas.github.io/posts/2017/">2017</a>,    <a href="https://spapas.github.io/posts/2018/">2018</a>,    <a href="https://spapas.github.io/posts/2019/">2019</a>,    <a href="https://spapas.github.io/posts/2020/">2020</a>,    <a href="https://spapas.github.io/posts/2021/">2021</a>,    <a href="https://spapas.github.io/posts/2022/">2022</a>,    <a href="https://spapas.github.io/posts/2023/">2023</a>,    <a href="https://spapas.github.io/posts/2024/">2024</a>  </section>
+
+
+
+  <section>
+    <h1>GitHub Repos</h1>
+    <ul id="gh_repos">
+      <li class="loading">Status updating...</li>
+    </ul>
+      <a href="https://github.com/spapas">@spapas</a> on GitHub
+    <script  src="//code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      $(function(){
+          if (!window.jXHR){
+              var jxhr = document.createElement('script');
+              jxhr.type = 'text/javascript';
+              jxhr.src = 'https://spapas.github.io/theme/js/jXHR.js';
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(jxhr, s);
+          }
+
+          github.showRepos({
+              user: 'spapas',
+              count: 5,
+              skip_forks: true,
+              target: '#gh_repos'
+          });
+      });
+    </script>
+    <script src="https://spapas.github.io/theme/js/github.js" type="text/javascript"> </script>
+  </section>
+
+
+  <section>
+    <a href="https://twitter.com/_serafeim_?ref_src=twsrc%5Etfw" class="twitter-follow-button"
+      data-show-count="false">Follow @_serafeim_</a>
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+  </section>
+
+</aside>    </div>
+  </div>
+  <footer role="contentinfo"><p>
+    Copyright &copy;  2013&ndash;2024  Serafeim Papastefanos &mdash;
+  <span class="credit">Powered by <a href="http://getpelican.com">Pelican</a></span>
+</p></footer>
+  <script src="https://spapas.github.io/theme/js/modernizr-2.0.js"></script>
+  <script src="https://spapas.github.io/theme/js/ender.js"></script>
+  <script src="https://spapas.github.io/theme/js/octopress.js" type="text/javascript"></script>
+  <script src="https://spapas.github.io/theme/js/ads.js"></script>
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-44750952-1', 'auto');
+
+    ga('send', 'pageview');
+    </script>
+
+<script defer data-domain="spapas.github.io" src="https://plausible.hcg.gr/js/script.js"></script>  <script type="text/javascript">
+    var disqus_shortname = 'spapas-github-io';
+    (function() {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = "//" + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+     })();
+  </script>
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+</body>
+
+</html>

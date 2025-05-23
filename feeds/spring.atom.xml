@@ -1,0 +1,533 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>/var/ - spring</title><link href="https://www.spapas.net/" rel="alternate"></link><link href="https://www.spapas.net/feeds/spring.atom.xml" rel="self"></link><id>https://www.spapas.net/</id><updated>2016-03-31T19:20:00+03:00</updated><subtitle>Various programming stuff</subtitle><entry><title>Configuring Spring Boot</title><link href="https://www.spapas.net/2016/03/31/spring-boot-settings/" rel="alternate"></link><published>2016-03-31T19:20:00+03:00</published><updated>2016-03-31T19:20:00+03:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:www.spapas.net,2016-03-31:/2016/03/31/spring-boot-settings/</id><summary type="html">&lt;p class="first last"&gt;Configuring your Spring Boot applications using application properties, profiles, locan  settings and command line arguments and deploying them using&amp;nbsp;init.d!&lt;/p&gt;
+</summary><content type="html">&lt;div class="contents topic" id="contents"&gt;
+&lt;p class="topic-title"&gt;&lt;a class="reference internal" href="#top"&gt;Contents&lt;/a&gt;&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#introduction" id="toc-entry-1"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#properties-vs-yml-files" id="toc-entry-2"&gt;properties vs yml&amp;nbsp;files&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#structuring-your-configuration-files" id="toc-entry-3"&gt;Structuring your configuration files&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#main-application-settings" id="toc-entry-4"&gt;Main application&amp;nbsp;settings&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#profiles" id="toc-entry-5"&gt;Profiles&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#some-more-advanced-profile-usage" id="toc-entry-6"&gt;Some more advanced profile&amp;nbsp;usage&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#overriding-settings" id="toc-entry-7"&gt;Overriding settings&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#using-a-config-application-properties" id="toc-entry-8"&gt;Using a&amp;nbsp;config/application.properties&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#passing-command-line-arguments" id="toc-entry-9"&gt;Passing command line&amp;nbsp;arguments&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#deploying-spring-boot-applications" id="toc-entry-10"&gt;Deploying Spring Boot&amp;nbsp;applications&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#conclusion" id="toc-entry-11"&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="introduction"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-1"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The &lt;a class="reference external" href="http://projects.spring.io/spring-boot/"&gt;Spring Boot&lt;/a&gt; project is great way of building Java applications using
+Spring. Instead of trying to integrate everything by hand (and usually
+end up with a configuration hell) you use spring-boot to help you to
+bootstrap your application: Just include its
+dependencies in your pom.xml and Spring Boot will try its
+best to auto-configure all these&amp;nbsp;components!&lt;/p&gt;
+&lt;p&gt;Of course, no matter how hard Spring Boot tries to auto-configure everything,
+you&amp;#8217;ll still need to pass some configuration to configure your databases,
+caches, email sending, security etc. Thankfully, Spring Boot
+can be configured without &lt;em&gt;any&lt;/em&gt; xml (actually, its a bad practice to
+use xml-based configuration with it), using plain Java .properties
+files or (if you prefer the more compact syntax) &lt;a class="reference external" href="https://en.wikipedia.org/wiki/YAML"&gt;&lt;span class="caps"&gt;YAML&lt;/span&gt;&lt;/a&gt; .yml&amp;nbsp;files!&lt;/p&gt;
+&lt;p&gt;In this guide, along with a simple introduction to the way Spring Boot configuration
+works, we&amp;#8217;ll talk about a specific way of stucturing your settings configuration files in
+order to&amp;nbsp;have:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;A global configuration file that will contain all your&amp;nbsp;settings&lt;/li&gt;
+&lt;li&gt;Different settings for each of your environments (development, &lt;span class="caps"&gt;UAT&lt;/span&gt;, staging, production and&amp;nbsp;test)&lt;/li&gt;
+&lt;li&gt;A way to configure your passwords and other sensitive data (that you don&amp;#8217;t want to put to your &lt;span class="caps"&gt;VCS&lt;/span&gt;)&lt;/li&gt;
+&lt;li&gt;Being able to override any setting in any&amp;nbsp;environment&lt;/li&gt;
+&lt;li&gt;Deploying your Spring Boot app in Linux using &lt;tt class="docutils literal"&gt;init.d&lt;/tt&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;To quickly test the proposed settings configuration I&amp;#8217;ve created a simple
+Spring Boot project &amp;#64; &lt;a class="reference external" href="https://github.com/spapas/spring-boot-config"&gt;https://github.com/spapas/spring-boot-config&lt;/a&gt;. Just clone
+it, optionally change the packaged settings (more on this later), package it (&lt;tt class="docutils literal"&gt;mvn package&lt;/tt&gt;), optionally change
+the &lt;tt class="docutils literal"&gt;config&lt;/tt&gt; settings (more on this also later) and run it
+(using something like &lt;tt class="docutils literal"&gt;java &lt;span class="pre"&gt;-jar&lt;/span&gt; &lt;span class="pre"&gt;spring-boot-config-0.0.1-&lt;span class="caps"&gt;SNAPSHOT&lt;/span&gt;.jar&lt;/span&gt;&lt;/tt&gt;) optionally passing it command line settings (more on this
+also later). You&amp;#8217;ll then be able to visit &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://127.0.0.1:8080&lt;/span&gt;&lt;/tt&gt; and check the current&amp;nbsp;settings!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="properties-vs-yml-files"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-2"&gt;properties vs yml&amp;nbsp;files&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;You can use two kinds of files to configure your settings: Normal Java .properties files
+or &lt;a class="reference external" href="https://en.wikipedia.org/wiki/YAML"&gt;&lt;span class="caps"&gt;YAML&lt;/span&gt;&lt;/a&gt; .yml files. The .properties files have the&amp;nbsp;form:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+config.value.a=1
+config.value.b=2
+config.value.c=3
+&lt;/pre&gt;
+&lt;p&gt;while the .yml files are&amp;nbsp;like:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+config:
+    value:
+        a: 1
+        b: 2
+        c: 3
+&lt;/pre&gt;
+&lt;p&gt;You may use whatever you wish - in the examples I&amp;#8217;ll use normal Java .properties
+files because they are more compact (you don&amp;#8217;t need to use multiple lines to represent
+a single setting like in &lt;span class="caps"&gt;YAML&lt;/span&gt;).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="structuring-your-configuration-files"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-3"&gt;Structuring your configuration&amp;nbsp;files&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Spring Boot reads its configuration from &lt;a class="reference external" href="https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-external-config.html"&gt;various places&lt;/a&gt;, however in this article we&amp;#8217;ll talk
+about four of them which should be enough for most cases. Starting from the most global to the most
+specific ones (i.e the latter ones will override the previous ones) these&amp;nbsp;are:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Main (global) application&amp;nbsp;settings&lt;/li&gt;
+&lt;li&gt;Profile&amp;nbsp;settings&lt;/li&gt;
+&lt;li&gt;Local (/config)&amp;nbsp;settings&lt;/li&gt;
+&lt;li&gt;Command line&amp;nbsp;arguments&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The first two are setting files that will be contained inside the artifact (jar or war) that will be
+created and should be commited to your version control system. I&amp;#8217;ll call them jar-packaged
+settings. The other two won&amp;#8217;t be commited to the version control but will be created directly
+on the server to-deploy. Let&amp;#8217;s see a little more about&amp;nbsp;them:&lt;/p&gt;
+&lt;div class="section" id="main-application-settings"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-4"&gt;Main application&amp;nbsp;settings&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;These are kept in a file named &lt;tt class="docutils literal"&gt;application.properties&lt;/tt&gt; (or &lt;tt class="docutils literal"&gt;yml&lt;/tt&gt; &amp;#8212; from now on I&amp;#8217;ll just use
+&lt;cite&gt;.properties`&lt;/cite&gt; but keep in mind that you may use &lt;tt class="docutils literal"&gt;.yml&lt;/tt&gt;): This file should reside
+inside the &lt;tt class="docutils literal"&gt;src\main\resources&lt;/tt&gt; folder
+of your project and ideally contain all the settings your spring-boot application users. Some
+of these settings will be overriden by settings kept in the next source so they may have a
+default value or even be empty if they will be always overriden (or contain sensitive data
+like passwords), however I still prefer to list
+them all in this file even as placeholders to have a central source of all the settings that
+your Spring Boot application&amp;nbsp;uses.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="profiles"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-5"&gt;Profiles&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;A profile is a set of settings that can be configured to override settings from &lt;tt class="docutils literal"&gt;application.properties&lt;/tt&gt;.
+Each profile is contained in a file named &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;application-profilename.properties&lt;/span&gt;&lt;/tt&gt; where &lt;tt class="docutils literal"&gt;profilename&lt;/tt&gt; is
+the name of the profile. Now, a profile could configure anything you want, however
+for most projects I propose to
+have the following&amp;nbsp;profiles:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;dev&lt;/tt&gt; for your local development&amp;nbsp;settings&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;uat&lt;/tt&gt; for your &lt;span class="caps"&gt;UAT&lt;/span&gt; server&amp;nbsp;settings&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;staging&lt;/tt&gt; for your staging server&amp;nbsp;settings&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;prod&lt;/tt&gt; for your production&amp;nbsp;settings&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;test&lt;/tt&gt; for running your&amp;nbsp;tests&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;(depending of course on what are your requirements, some projects may not
+need &lt;tt class="docutils literal"&gt;uat&lt;/tt&gt; or &lt;tt class="docutils literal"&gt;staging&lt;/tt&gt; but all projects should have a &lt;tt class="docutils literal"&gt;dev&lt;/tt&gt;, a &lt;tt class="docutils literal"&gt;prod&lt;/tt&gt; and a &lt;tt class="docutils literal"&gt;test&lt;/tt&gt; profile).
+The configuration for these environemnts needs to be different for obvious reasons.
+For example when developing you may want
+to use a local database, when running tests an ephemeral in memory database
+and your production database when deploying to production.
+These profile configuration files will be stored inside your &lt;tt class="docutils literal"&gt;src\main\resources&lt;/tt&gt; folder,
+right next to the &lt;tt class="docutils literal"&gt;application.properties&lt;/tt&gt;, i.e you&amp;#8217;ll have
+&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;application-dev.properties&lt;/span&gt;&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;application-prod.properties&lt;/span&gt;&lt;/tt&gt;,
+&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;application-test.properties&lt;/span&gt;&lt;/tt&gt; etc - and all these files will be kept
+in your &lt;span class="caps"&gt;VCS&lt;/span&gt; (and will also be jar-packaged since they will be
+contained in the resulting&amp;nbsp;artifact).&lt;/p&gt;
+&lt;p&gt;How do you select which profile is active each time (i.e pick it
+when running the Spring Boot application under
+its corresponding&amp;nbsp;environment)?&lt;/p&gt;
+&lt;p&gt;For tests, since they can be run by a different &lt;tt class="docutils literal"&gt;Main&lt;/tt&gt; than
+the normal application, you should use the &lt;tt class="docutils literal"&gt;&amp;#64;ActiveProfiles&lt;/tt&gt; annotation
+(for example &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;&amp;#64;ActiveProfiles(&amp;quot;test&amp;quot;)&lt;/span&gt;&lt;/tt&gt;) to make sure that the tests
+will run with the correct settings. So if the contents of your &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;application-test.properties&lt;/span&gt;&lt;/tt&gt;
+are &lt;tt class="docutils literal"&gt;config.value=Hello test!&lt;/tt&gt; running this test should produce no&amp;nbsp;errors:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nd"&gt;@RunWith&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;SpringJUnit4ClassRunner&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;class&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nd"&gt;@SpringApplicationConfiguration&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;classes&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;SpringBootConfigApplication&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;class&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nd"&gt;@ActiveProfiles&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;test&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;SpringBootConfigApplicationTests&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nd"&gt;@Value&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;${config.value}&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kd"&gt;private&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nd"&gt;@Value&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;${spring.profiles.active}&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kd"&gt;private&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;profile&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nd"&gt;@Test&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;contextLoads&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;assertThat&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;is&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Hello test!&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;assertThat&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;profile&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;is&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;test&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;To activate a different profile when running your Spring Boot applications
+you&amp;#8217;ll need to use the &lt;tt class="docutils literal"&gt;spring.profiles.active&lt;/tt&gt; setting, so if you set
+&lt;tt class="docutils literal"&gt;spring.profiles.active=prod&lt;/tt&gt; in your &lt;tt class="docutils literal"&gt;application.properties&lt;/tt&gt; and
+create the packaged jar (or war) then you&amp;#8217;ll have the production settings
+when you run your application (i.e the contents of &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;application-prod.properties&lt;/span&gt;&lt;/tt&gt;
+will be used to override your &lt;tt class="docutils literal"&gt;application.properties&lt;/tt&gt;). Of course, to deploy it
+to &lt;span class="caps"&gt;UAT&lt;/span&gt;, you&amp;#8217;ll need to change
+&lt;tt class="docutils literal"&gt;spring.profiles.active&lt;/tt&gt; to &lt;tt class="docutils literal"&gt;uat&lt;/tt&gt; and re-create the packaged artifact &amp;#8212;
+see some repetition and penal labour here? Definitely you don&amp;#8217;t want to do re-create
+your artifacts for each of the environments you may want to deploy &amp;#8212;
+we&amp;#8217;ll see in the next sections how to improve this flow by overriding
+jar-packaged&amp;nbsp;settings!&lt;/p&gt;
+&lt;div class="section" id="some-more-advanced-profile-usage"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#toc-entry-6"&gt;Some more advanced profile&amp;nbsp;usage&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;You may have noticed in the previous section that the name of the
+annotation is &lt;tt class="docutils literal"&gt;&amp;#64;ActiveProfiles&lt;/tt&gt; and the name of the setting
+&lt;tt class="docutils literal"&gt;spring.profiles.active&lt;/tt&gt; - both in plural. This of course is
+on purpose: You may have &lt;em&gt;more than one&lt;/em&gt; active&amp;nbsp;profiles!&lt;/p&gt;
+&lt;p&gt;This, along with the fact that you can make &lt;tt class="docutils literal"&gt;&amp;#64;Components&lt;/tt&gt; or &lt;tt class="docutils literal"&gt;&amp;#64;Configuration&lt;/tt&gt;
+available &lt;em&gt;only&lt;/em&gt; on certail profiles is a really powerful&amp;nbsp;tool!&lt;/p&gt;
+&lt;p&gt;Here are some&amp;nbsp;examples:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Configure two spring-security &lt;tt class="docutils literal"&gt;&amp;#64;Configuration&lt;/tt&gt; s: Use in memory security for your dev environment, while using &lt;span class="caps"&gt;LDAP&lt;/span&gt; for your&amp;nbsp;production.&lt;/li&gt;
+&lt;li&gt;If you want to support more than one database you can configure multiple profiles &amp;#8212; and use them along with the dev/uat/prod I mentioned&amp;nbsp;before.&lt;/li&gt;
+&lt;li&gt;Create verbose and non-verbose logging profiles and quickly change between&amp;nbsp;them&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="overriding-settings"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-7"&gt;Overriding&amp;nbsp;settings&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;All the above settings we&amp;#8217;ve defined should be safely kept inside
+your &lt;span class="caps"&gt;VCS&lt;/span&gt; - however we wouldn&amp;#8217;t like storing passwords or other
+sensitive data to a &lt;span class="caps"&gt;VCS&lt;/span&gt;! Sensitive settings should be empty
+(or have a default value) when
+saved to &lt;span class="caps"&gt;VCS&lt;/span&gt; and overriden by &amp;#8220;local&amp;#8221;&amp;nbsp;settings.&lt;/p&gt;
+&lt;p&gt;Also, all the previous are jar-packaged
+and we definitely need a way to override them without messing
+with the artifacts (for example, we need to select the
+correct profile for running the application by overriding
+&lt;tt class="docutils literal"&gt;spring.profiles.active&lt;/tt&gt;).&lt;/p&gt;
+&lt;p&gt;There two methods of overriding settings, and these are the last
+two methods of the four we discussed&amp;nbsp;above:&lt;/p&gt;
+&lt;div class="section" id="using-a-config-application-properties"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#toc-entry-8"&gt;Using a&amp;nbsp;config/application.properties&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;You can put files in a directory named &lt;tt class="docutils literal"&gt;config&lt;/tt&gt; that is at the same level
+as the location from which you try to run your jar. These file should be
+named either &lt;tt class="docutils literal"&gt;application.properties&lt;/tt&gt; or &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;application-profilename.properties&lt;/span&gt;&lt;/tt&gt;
+and will be used to override your jar-packaged&amp;nbsp;settings.&lt;/p&gt;
+&lt;p&gt;What happens is that Spring will at first try to load a file named &lt;tt class="docutils literal"&gt;config/application.properties&lt;/tt&gt; that will
+override your jar-packaged &lt;tt class="docutils literal"&gt;application.properties&lt;/tt&gt; (so here you can set your current profile). Then, it will also try to load
+a file named &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;config/application-profilename.properties&lt;/span&gt;&lt;/tt&gt; that will override
+your jar-packaged &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;application-profilename.properties&lt;/span&gt;&lt;/tt&gt; (so here you may
+override any profile related&amp;nbsp;properties).&lt;/p&gt;
+&lt;p&gt;The priority of the files from lowest to&amp;nbsp;highest:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;jar-packaged &lt;tt class="docutils literal"&gt;application.properties&lt;/tt&gt;&lt;/li&gt;
+&lt;li&gt;local &lt;tt class="docutils literal"&gt;config/application.properties&lt;/tt&gt;&lt;/li&gt;
+&lt;li&gt;jar-packaged &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;application-profilename.properties&lt;/span&gt;&lt;/tt&gt;&lt;/li&gt;
+&lt;li&gt;local &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;config/application-profilename.properties&lt;/span&gt;&lt;/tt&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;So (repeating for emphasis) the settings in your jar-packaged &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;application-profilename.properties&lt;/span&gt;&lt;/tt&gt; will &lt;em&gt;only&lt;/em&gt;
+be overriden by &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;config/application-profilename.properties&lt;/span&gt;&lt;/tt&gt; (and not by the &lt;tt class="docutils literal"&gt;config/application.properties&lt;/tt&gt;
+which will only override settings on the jar-packaged &lt;tt class="docutils literal"&gt;application.properties&lt;/tt&gt;).&lt;/p&gt;
+&lt;p&gt;Also, to make everything clear about where the &lt;tt class="docutils literal"&gt;config&lt;/tt&gt; directory should be&amp;nbsp;kept:&lt;/p&gt;
+&lt;p&gt;If the current directory from which you&amp;#8217;ll run your jar is &lt;tt class="docutils literal"&gt;/home/serafeim&lt;/tt&gt; and
+you want to execute &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;/opt/spring/my-spring-app.jar&lt;/span&gt;&lt;/tt&gt; (so you&amp;#8217;ll run something like
+&lt;tt class="docutils literal"&gt;/home/serafeim$ java &lt;span class="pre"&gt;-jar&lt;/span&gt; &lt;span class="pre"&gt;/opt/spring/my-spring-app.jar&lt;/span&gt;&lt;/tt&gt;) then
+the &lt;tt class="docutils literal"&gt;config&lt;/tt&gt; directory should
+be at &lt;tt class="docutils literal"&gt;/home/serafeim/config&lt;/tt&gt; (i.e at the same directory from where you execute
+jar). Normally however and to avoid confusion, the best approach would
+be to just put it at &lt;tt class="docutils literal"&gt;/opt/spring/config&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;cd /opt/spring&lt;/tt&gt; before running
+your jar (so &lt;tt class="docutils literal"&gt;config&lt;/tt&gt; will be right next to your jar and run the jar from the&amp;nbsp;directory).&lt;/p&gt;
+&lt;p&gt;Finally, my recommendation is to keep these &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;config/*properties&lt;/span&gt;&lt;/tt&gt; files off version control
+(after all they should be different for each of your environments - common settings should
+go to the jar-packaged files)
+and to put only the profile selection setting and sensitive settings there. That means that
+the &lt;tt class="docutils literal"&gt;config/application.properties&lt;/tt&gt; file should &lt;em&gt;only&lt;/em&gt; contain a &lt;tt class="docutils literal"&gt;spring.profiles.active=profilename&lt;/tt&gt;
+setting to set the correct profile for this instance of your app and the &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;config/application-profilename.properties&lt;/span&gt;&lt;/tt&gt;
+will contain all sensitive information that you&amp;#8217;ll need to run that&amp;nbsp;profile.&lt;/p&gt;
+&lt;p&gt;For example in your &lt;span class="caps"&gt;UAT&lt;/span&gt; server you&amp;#8217;ll have &lt;tt class="docutils literal"&gt;spring.profiles.active=uat&lt;/tt&gt; in your &lt;tt class="docutils literal"&gt;application.properties&lt;/tt&gt;
+and your uat server passwords in your &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;application-uat.properties&lt;/span&gt;&lt;/tt&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="passing-command-line-arguments"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#toc-entry-9"&gt;Passing command line&amp;nbsp;arguments&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;The most specific way of overriding parameters (including the active profile of course) is by
+directly passing these parameters as arguments when running your jar. For example,
+if you run &lt;tt class="docutils literal"&gt;java &lt;span class="pre"&gt;-Dconfig.value=foo&lt;/span&gt; &lt;span class="pre"&gt;-jar&lt;/span&gt; &lt;span class="pre"&gt;my-spring-app.jar&lt;/span&gt;&lt;/tt&gt; then the &lt;tt class="docutils literal"&gt;config.value&lt;/tt&gt;
+will always have a value of &lt;tt class="docutils literal"&gt;foo&lt;/tt&gt; no matter what you have in your other config&amp;nbsp;files.&lt;/p&gt;
+&lt;p&gt;That&amp;#8217;s a different way to set your active profile (by passing &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;-Dspring.profiles.active=profilename&lt;/span&gt;&lt;/tt&gt;)
+or to quickly set sensitive settings however
+I prefer to keep the settings in properties files (and not to put them in scripts where they will definitely
+be missed and will be more difficult to be managed)
+so I&amp;#8217;ll recommend the previous way of using a non-commited to version control local config/application.properties.
+Use command line arguments only for quick tests (run something with a specific setting to test how it&amp;nbsp;works).&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="deploying-spring-boot-applications"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-10"&gt;Deploying Spring Boot&amp;nbsp;applications&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;If you check
+the deployment documentation of Spring Boot you&amp;#8217;ll see that it has various hints on
+&lt;a class="reference external" href="http://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/htmlsingle/#deployment"&gt;on deploying Spring Boot applications&lt;/a&gt;. I won&amp;#8217;t go into much detail about these however I&amp;#8217;ll
+represent my recommendation on deploying Spring Boot apps on Linux as an init.d&amp;nbsp;script:&lt;/p&gt;
+&lt;p&gt;What is really interesting about Spring boot is that it allows you to make your jar-packaged jars &lt;a class="reference external" href="https://docs.spring.io/spring-boot/docs/current/reference/html/deployment-install.html"&gt;executable as an init.d script&lt;/a&gt; so that you will
+be able to manage it using something like &lt;tt class="docutils literal"&gt;service springbootapp start/stop/restart&lt;/tt&gt; etc. To do that,
+you&amp;#8217;ll just need to add the &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;&amp;lt;executable&amp;gt;true&amp;lt;/executable&amp;gt;&lt;/span&gt;&lt;/tt&gt; &lt;tt class="docutils literal"&gt;configuration&lt;/tt&gt; for your pom&amp;#8217;s
+&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;spring-boot-maven-plugin&lt;/span&gt;&lt;/tt&gt;. This will add some things in the start of your resulting jar file
+that will make it behave as a unix init.d script. If you take a look at your package artifact
+you&amp;#8217;ll see something like&amp;nbsp;this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/bin/bash&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;#    .   ____          _            __ _ _&lt;/span&gt;
+&lt;span class="c1"&gt;#   /\\ / ___&amp;#39;_ __ _ _(_)_ __  __ _ \ \ \ \&lt;/span&gt;
+&lt;span class="c1"&gt;#  ( ( )\___ | &amp;#39;_ | &amp;#39;_| | &amp;#39;_ \/ _` | \ \ \ \&lt;/span&gt;
+&lt;span class="c1"&gt;#   \\/  ___)| |_)| | | | | || (_| |  ) ) ) )&lt;/span&gt;
+&lt;span class="c1"&gt;#    &amp;#39;  |____| .__|_| |_|_| |_\__, | / / / /&lt;/span&gt;
+&lt;span class="c1"&gt;#   =========|_|==============|___/=/_/_/_/&lt;/span&gt;
+&lt;span class="c1"&gt;#   :: Spring Boot Startup Script ::&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+
+&lt;span class="c1"&gt;### BEGIN INIT INFO&lt;/span&gt;
+&lt;span class="c1"&gt;# Provides:          spring-boot-config&lt;/span&gt;
+&lt;span class="c1"&gt;# Required-Start:    $remote_fs $syslog $network&lt;/span&gt;
+&lt;span class="c1"&gt;# Required-Stop:     $remote_fs $syslog $network&lt;/span&gt;
+&lt;span class="c1"&gt;# Default-Start:     2 3 4 5&lt;/span&gt;
+&lt;span class="c1"&gt;# Default-Stop:      0 1 6&lt;/span&gt;
+&lt;span class="c1"&gt;# Short-Description: spring-boot-config&lt;/span&gt;
+&lt;span class="c1"&gt;# Description:       Demo project for Spring Boot configuration&lt;/span&gt;
+&lt;span class="c1"&gt;# chkconfig:         2345 99 01&lt;/span&gt;
+&lt;span class="c1"&gt;### END INIT INFO&lt;/span&gt;
+
+&lt;span class="o"&gt;[[&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-n&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$DEBUG&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;]]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;set&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-x
+
+&lt;span class="c1"&gt;# Initialize variables that cannot be provided by a .conf file&lt;/span&gt;
+&lt;span class="nv"&gt;WORKING_DIR&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;&lt;span class="nb"&gt;pwd&lt;/span&gt;&lt;span class="k"&gt;)&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+&lt;span class="c1"&gt;# shellcheck disable=SC2153&lt;/span&gt;
+&lt;span class="o"&gt;[[&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-n&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$JARFILE&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;]]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;jarfile&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$JARFILE&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+&lt;span class="o"&gt;[[&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-n&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$APP_NAME&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;]]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;identity&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$APP_NAME&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+
+...
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;One thing that may seem puzzling at first is that if make this jar executable
+and try to run it you&amp;#8217;ll see that, instead of offering you the well known
+options of the init scripts (Usage &amp;#8230; start/stop/restart etc)  it will immediatelly
+run the application! This is because the embedded script is smart enough to
+check that it will be executed as an init script only when it is executed
+as a link from &lt;tt class="docutils literal"&gt;/etc/init.d&lt;/tt&gt; - else it will immediately run the&amp;nbsp;application.&lt;/p&gt;
+&lt;p&gt;If
+you want to quickly test that behavior, you may override the &lt;tt class="docutils literal"&gt;&lt;span class="caps"&gt;MODE&lt;/span&gt;&lt;/tt&gt; parameter
+which forces the mode of operation of the jar. If you want to run it as a
+script (without using a links from /etc/ini.d) then just set &lt;tt class="docutils literal"&gt;&lt;span class="caps"&gt;MODE&lt;/span&gt;=service&lt;/tt&gt;.
+So, try&amp;nbsp;runnin:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;gt; MODE=service ./springapplication.jar
+Usage: ./hsk9eea.jar {start|stop|restart|force-reload|status|run}
+&lt;/pre&gt;
+&lt;p&gt;Success! Of course, this is just for testing purposes, to actually deploy
+your application then please create a link to it from &lt;tt class="docutils literal"&gt;/etc/init.d&lt;/tt&gt; as
+proposed by the Spring Boot&amp;nbsp;docs.&lt;/p&gt;
+&lt;p&gt;If you want to &lt;a class="reference external" href="http://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/htmlsingle/#deployment-script-customization"&gt;customize the init.d script&lt;/a&gt;  you can use a file named
+&lt;tt class="docutils literal"&gt;sprinbootapp.conf&lt;/tt&gt; in the same directory as your &lt;tt class="docutils literal"&gt;springbootapp.jar&lt;/tt&gt;
+(i.e it should have the same name as your jar with an extension of .conf). The
+options from it will be sourced before running your application &amp;#8212; for example
+you could set the active profile using &lt;tt class="docutils literal"&gt;RUN_ARGS&lt;/tt&gt;, however as I already
+recommended, explicitly setting it to a file named &lt;tt class="docutils literal"&gt;config/applications.properties&lt;/tt&gt;
+is&amp;nbsp;preferrable.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="conclusion"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-11"&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Using the described file structure you should be able to fully configure Spring Boot and have all the
+goodies you&amp;#8217;d expect from a modern framework: global settings, profiles, non-version control settings! Also, using the
+advanced profiles techniques (multiple profiles, profile enabled
+&amp;#64;Components and &amp;#64;Configurations) you&amp;#8217;ll be able to implement
+some really complex configurations! Finally, you&amp;#8217;ll be able to really
+quickly deploy the resulting jar as an init.d system&amp;nbsp;service!&lt;/p&gt;
+&lt;/div&gt;
+</content><category term="spring"></category><category term="spring"></category><category term="spring-boot"></category><category term="java"></category><category term="ldap"></category><category term="profiles"></category><category term="settings"></category><category term="properties"></category><category term="yaml"></category><category term="configuration"></category><category term="deploy"></category><category term="init.d"></category></entry><entry><title>Using custom authorities with spring-security LDAP authentication</title><link href="https://www.spapas.net/2013/10/14/spring-ldap-custom-authorities/" rel="alternate"></link><published>2013-10-14T08:55:00+03:00</published><updated>2013-10-14T08:55:00+03:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:www.spapas.net,2013-10-14:/2013/10/14/spring-ldap-custom-authorities/</id><summary type="html">&lt;p class="first last"&gt;Configuring spring-security for logging in through &lt;span class="caps"&gt;LDAP&lt;/span&gt; but retrieving the user&amp;#8217;s authorities from a custom (non-ldap)&amp;nbsp;source.&lt;/p&gt;
+</summary><content type="html">&lt;div class="contents topic" id="contents"&gt;
+&lt;p class="topic-title"&gt;&lt;a class="reference internal" href="#top"&gt;Contents&lt;/a&gt;&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#introduction" id="toc-entry-1"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#a-basic-spring-security-setup" id="toc-entry-2"&gt;A basic spring security&amp;nbsp;setup&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#spring-security-ldap-with-custom-authorities" id="toc-entry-3"&gt;Spring security &lt;span class="caps"&gt;LDAP&lt;/span&gt; with custom authorities&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#contextsource" id="toc-entry-4"&gt;contextSource&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#usersearch" id="toc-entry-5"&gt;userSearch&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#ldapauthprovider" id="toc-entry-6"&gt;ldapAuthProvider&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#customldapauthoritiespopulator" id="toc-entry-7"&gt;CustomLdapAuthoritiesPopulator&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#example" id="toc-entry-8"&gt;Example&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#conclusion" id="toc-entry-9"&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="introduction"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-1"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;One very useful component of the &lt;a class="reference external" href="http://spring.io/"&gt;spring&lt;/a&gt; java framework is &lt;a class="reference external" href="http://projects.spring.io/spring-security/"&gt;spring-security&lt;/a&gt; since it allows consistent usage of various security providers for
+authentication and authorization. Although I&amp;#8217;ve found a great number of basic spring-security tutorials on the internet, I wasn&amp;#8217;t able to find a complete solution for my own&amp;nbsp;requirements:&lt;/p&gt;
+&lt;p&gt;Logging in with &lt;span class="caps"&gt;LDAP&lt;/span&gt; but configuring the authorities &lt;a class="footnote-reference" href="#footnote-1" id="footnote-reference-1"&gt;[*]&lt;/a&gt; of the logged in user with the help of a custom method and not through &lt;span class="caps"&gt;LDAP&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;I think that the above is a common requirement in many organizations: There is a central &lt;span class="caps"&gt;LDAP&lt;/span&gt; repository in which the usernames and passwords of the users are stored, but the groups of the users are not stored there. Or maybe the groups that are actually stored in the &lt;span class="caps"&gt;LDAP&lt;/span&gt; cannot be transformed easily to application specific groups for each&amp;nbsp;application.&lt;/p&gt;
+&lt;p&gt;You may find the working spring project that uses ldap and a custom groups populator here: &lt;a class="reference external" href="https://github.com/spapas/SpringLdapCustomAuthorities/"&gt;https://github.com/spapas/SpringLdapCustomAuthorities/&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="a-basic-spring-security-setup"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-2"&gt;A basic spring security&amp;nbsp;setup&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;I&amp;#8217;ve created a very basic setup for spring-security for a spring-mvc project. Please take a look here for a more thorough explanation of a simple spring-security project &lt;a class="reference external" href="http://www.mkyong.com/spring-security/spring-security-hello-world-example/"&gt;http://www.mkyong.com/spring-security/spring-security-hello-world-example/&lt;/a&gt; and here &lt;a class="reference external" href="http://www.codeproject.com/Articles/253901/Getting-Started-Spring-Security"&gt;http://www.codeproject.com/Articles/253901/Getting-Started-Spring-Security&lt;/a&gt; for a great explanation of the various spring-security&amp;nbsp;classes.&lt;/p&gt;
+&lt;p&gt;In my setup there is a controller that defines two mappings, the &amp;#8220;/&amp;#8221; which is the homepage that has a link to the &amp;#8220;/enter&amp;#8221; and the &amp;#8220;/enter&amp;#8221; which is an internal page in which only authorized users have access. When the user clicks on &amp;#8220;enter&amp;#8221; he will be represented with a login form first. If the use logs in successfully, the enter.jsp will list the username and the authorities of the logged in user through the following spring-security&amp;nbsp;tags:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;&amp;lt;%@&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;taglib&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;prefix&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;sec&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;uri&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;http://www.springframework.org/security/tags&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;%&amp;gt;&lt;/span&gt;
+[...]
+Username:&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;sec:authentication&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;property=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;principal.username&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;/&amp;gt;&amp;lt;br&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;/&amp;gt;&lt;/span&gt;
+Authorities:&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;sec:authentication&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;property=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;principal.authorities&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;/&amp;gt;&amp;lt;br&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;/&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;The authentication provider is an in memory service in which the username, password and authorities of each user are defined in the &lt;span class="caps"&gt;XML&lt;/span&gt;. So this is a simple spring-security example that can be found in a number of places on the internet. The security rules, login form and the authentication provider are configured with the following &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;security-config.xml&lt;/span&gt;&lt;/tt&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;beans:beans&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;xmlns=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;http://www.springframework.org/schema/security&amp;quot;&lt;/span&gt;
+&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="na"&gt;xmlns:beans=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;http://www.springframework.org/schema/beans&amp;quot;&lt;/span&gt;
+&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="na"&gt;xmlns:xsi=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;http://www.w3.org/2001/XMLSchema-instance&amp;quot;&lt;/span&gt;
+&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="na"&gt;xsi:schemaLocation=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;http://www.springframework.org/schema/beans&lt;/span&gt;
+&lt;span class="s"&gt;                   http://www.springframework.org/schema/beans/spring-beans-3.1.xsd&lt;/span&gt;
+&lt;span class="s"&gt;                   http://www.springframework.org/schema/security&lt;/span&gt;
+&lt;span class="s"&gt;                   http://www.springframework.org/schema/security/spring-security-3.1.xsd&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+
+&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;http&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;pattern=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;/static/**&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;security=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;none&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;/&amp;gt;&lt;/span&gt;
+
+&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;http&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;use-expressions=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;true&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;intercept-url&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;pattern=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;/&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;access=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;permitAll&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;/&amp;gt;&lt;/span&gt;
+&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;intercept-url&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;pattern=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;/enter&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;access=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;hasRole(&amp;#39;user&amp;#39;)&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;/&amp;gt;&lt;/span&gt;
+&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;intercept-url&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;pattern=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;/**&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;access=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;denyAll&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;/&amp;gt;&lt;/span&gt;
+&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;form-login&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;default-target-url=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;/&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;/&amp;gt;&lt;/span&gt;
+&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;logout&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="na"&gt;logout-success-url=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;/&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;/&amp;gt;&lt;/span&gt;
+&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;/http&amp;gt;&lt;/span&gt;
+
+&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;authentication-manager&amp;gt;&lt;/span&gt;
+&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;authentication-provider&amp;gt;&lt;/span&gt;
+&lt;span class="w"&gt;           &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;user-service&amp;gt;&lt;/span&gt;
+&lt;span class="w"&gt;               &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;user&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;name=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;spapas&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;password=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;123&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;authorities=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;admin, user, nonldap&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;/&amp;gt;&lt;/span&gt;
+&lt;span class="w"&gt;               &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;user&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;name=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;serafeim&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;password=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;123&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;authorities=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;user&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;/&amp;gt;&lt;/span&gt;
+&lt;span class="w"&gt;           &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;/user-service&amp;gt;&lt;/span&gt;
+&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;/authentication-provider&amp;gt;&lt;/span&gt;
+&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;/authentication-manager&amp;gt;&lt;/span&gt;
+
+&lt;span class="nt"&gt;&amp;lt;/beans:beans&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;When we run this application and go to the /enter, we will get the following&amp;nbsp;output:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Username:&amp;nbsp;spapas&lt;/p&gt;
+&lt;p&gt;Authorities: [admin, nonldap,&amp;nbsp;user]&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;div class="section" id="spring-security-ldap-with-custom-authorities"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-3"&gt;Spring security &lt;span class="caps"&gt;LDAP&lt;/span&gt; with custom&amp;nbsp;authorities&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The previous application can be modified to login through &lt;span class="caps"&gt;LDAP&lt;/span&gt; and get the authorities from a custom class. The main differences are in the &lt;tt class="docutils literal"&gt;pom.xml&lt;/tt&gt; which adsd the &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;spring-security-ldap&lt;/span&gt;&lt;/tt&gt; dependency, the addition of a &lt;tt class="docutils literal"&gt;CustomLdapAuthoritiesPopulator.java&lt;/tt&gt; which does the actual mapping of username to authority and various changes to the &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;security-config.xml&lt;/span&gt;&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;As you will see we had to define our security beans mainly using spring beans and not using the various elements from security namespace like &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;&amp;lt;ldap-server&amp;gt;&lt;/span&gt;&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;&amp;lt;ldap-authentication-provder&amp;gt;&lt;/span&gt;&lt;/tt&gt;. For a good tutorial on using these elements and ldap in spring security in general check these out: &lt;a class="reference external" href="http://docs.spring.io/spring-security/site/docs/3.1.x/reference/ldap.html"&gt;http://docs.spring.io/spring-security/site/docs/3.1.x/reference/ldap.html&lt;/a&gt; and &lt;a class="reference external" href="http://krams915.blogspot.gr/2011/01/spring-security-mvc-using-ldap.html"&gt;http://krams915.blogspot.gr/2011/01/spring-security-mvc-using-ldap.html&lt;/a&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;beans:beans&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;xmlns=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;http://www.springframework.org/schema/security&amp;quot;&lt;/span&gt;
+&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="na"&gt;xmlns:beans=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;http://www.springframework.org/schema/beans&amp;quot;&lt;/span&gt;
+&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="na"&gt;xmlns:xsi=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;http://www.w3.org/2001/XMLSchema-instance&amp;quot;&lt;/span&gt;
+&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="na"&gt;xsi:schemaLocation=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;http://www.springframework.org/schema/beans&lt;/span&gt;
+&lt;span class="s"&gt;                   http://www.springframework.org/schema/beans/spring-beans-3.1.xsd&lt;/span&gt;
+&lt;span class="s"&gt;                   http://www.springframework.org/schema/security&lt;/span&gt;
+&lt;span class="s"&gt;                   http://www.springframework.org/schema/security/spring-security-3.1.xsd&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+
+&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;http&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;pattern=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;/static/**&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;security=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;none&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;/&amp;gt;&lt;/span&gt;
+
+&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;http&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;use-expressions=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;true&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;intercept-url&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;pattern=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;/&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;access=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;permitAll&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;/&amp;gt;&lt;/span&gt;
+&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;intercept-url&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;pattern=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;/enter&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;access=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;hasRole(&amp;#39;user&amp;#39;)&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;/&amp;gt;&lt;/span&gt;
+&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;intercept-url&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;pattern=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;/**&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;access=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;denyAll&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;/&amp;gt;&lt;/span&gt;
+&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;form-login&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;default-target-url=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;/&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;/&amp;gt;&lt;/span&gt;
+&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;logout&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="na"&gt;logout-success-url=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;/&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;/&amp;gt;&lt;/span&gt;
+&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;/http&amp;gt;&lt;/span&gt;
+
+&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;beans:bean&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;id=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;contextSource&amp;quot;&lt;/span&gt;
+&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="na"&gt;class=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;org.springframework.security.ldap.DefaultSpringSecurityContextSource&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;beans:constructor-arg&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;value=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;ldap://login.serafeim.gr:389/dc=serafeim,dc=gr&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;/&amp;gt;&lt;/span&gt;
+&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;beans:property&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;name=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;anonymousReadOnly&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;value=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;true&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;/&amp;gt;&lt;/span&gt;
+&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;/beans:bean&amp;gt;&lt;/span&gt;
+
+&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;beans:bean&lt;/span&gt;
+&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="na"&gt;id=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;userSearch&amp;quot;&lt;/span&gt;
+&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="na"&gt;class=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;org.springframework.security.ldap.search.FilterBasedLdapUserSearch&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;beans:constructor-arg&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;index=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;0&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;value=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;/&amp;gt;&lt;/span&gt;
+&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;beans:constructor-arg&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;index=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;1&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;value=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;(uid={0})&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;/&amp;gt;&lt;/span&gt;
+&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;beans:constructor-arg&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;index=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;2&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;ref=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;contextSource&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;/&amp;gt;&lt;/span&gt;
+&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;/beans:bean&amp;gt;&lt;/span&gt;
+
+&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;beans:bean&lt;/span&gt;
+&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="na"&gt;id=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;ldapAuthProvider&amp;quot;&lt;/span&gt;
+&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="na"&gt;class=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;org.springframework.security.ldap.authentication.LdapAuthenticationProvider&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;beans:constructor-arg&amp;gt;&lt;/span&gt;
+&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;beans:bean&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;class=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;org.springframework.security.ldap.authentication.BindAuthenticator&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;beans:constructor-arg&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;ref=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;contextSource&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;/&amp;gt;&lt;/span&gt;
+&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;beans:property&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;name=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;userSearch&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;ref=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;userSearch&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;/&amp;gt;&lt;/span&gt;
+&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="cm"&gt;&amp;lt;!--&lt;/span&gt;
+&lt;span class="cm"&gt;         &amp;lt;beans:property name=&amp;quot;userDnPatterns&amp;quot;&amp;gt;&lt;/span&gt;
+&lt;span class="cm"&gt;           &amp;lt;beans:list&amp;gt;&amp;lt;beans:value&amp;gt;uid={0},ou=People&amp;lt;/beans:value&amp;gt;&amp;lt;/beans:list&amp;gt;&lt;/span&gt;
+&lt;span class="cm"&gt;         &amp;lt;/beans:property&amp;gt;&lt;/span&gt;
+&lt;span class="cm"&gt;         --&amp;gt;&lt;/span&gt;
+&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;/beans:bean&amp;gt;&lt;/span&gt;
+&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;/beans:constructor-arg&amp;gt;&lt;/span&gt;
+&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;beans:constructor-arg&amp;gt;&lt;/span&gt;
+&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;beans:bean&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;class=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;gr.serafeim.springldapcustom.CustomLdapAuthoritiesPopulator&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;/&amp;gt;&lt;/span&gt;
+&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;/beans:constructor-arg&amp;gt;&lt;/span&gt;
+&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;/beans:bean&amp;gt;&lt;/span&gt;
+
+&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;authentication-manager&amp;gt;&lt;/span&gt;
+&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;authentication-provider&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="na"&gt;ref=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;ldapAuthProvider&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;/&amp;gt;&lt;/span&gt;
+&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;/authentication-manager&amp;gt;&lt;/span&gt;
+
+&lt;span class="nt"&gt;&amp;lt;/beans:beans&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;So, in the above configuration we&amp;#8217;ve defined three spring beans: &lt;tt class="docutils literal"&gt;contextSource&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;userSearch&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;ldapAuthProvider&lt;/tt&gt;. The &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;&amp;lt;authentication-manager&amp;gt;&lt;/span&gt;&lt;/tt&gt; element uses the &lt;tt class="docutils literal"&gt;ldapAuthProvider&lt;/tt&gt; as an authentication provider. Below we will explain these&amp;nbsp;beans:&lt;/p&gt;
+&lt;div class="section" id="contextsource"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-4"&gt;contextSource&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The contextSource bean defines the actual &lt;span class="caps"&gt;LDAP&lt;/span&gt; server that we are going to connect to. It has the class &lt;tt class="docutils literal"&gt;o.s.s.ldap.DefaultSpringSecurityContextSource&lt;/tt&gt;. This will need to be passed to other beans that would need to connect to the server for a number of operations. We pass to it the url of our &lt;span class="caps"&gt;LDAP&lt;/span&gt; server and set its &lt;tt class="docutils literal"&gt;anonymousReadOnly&lt;/tt&gt; property to true. The &lt;tt class="docutils literal"&gt;anonymousReadOnly&lt;/tt&gt; defines if we can anonymously connect to our &lt;span class="caps"&gt;LDAP&lt;/span&gt; server in order to perform the search operation below. If we cannot connect anonymously then we have to set its &lt;tt class="docutils literal"&gt;userDn&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;password&lt;/tt&gt; properties.&lt;/p&gt;
+&lt;p&gt;A very interesting question is if the &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;&amp;lt;ldap-server&amp;gt;&lt;/span&gt;&lt;/tt&gt; element of the spring security namespace is related to &lt;tt class="docutils literal"&gt;the o.s.s.ldap.DefaultSpringSecurityContextSource&lt;/tt&gt; like our &lt;tt class="docutils literal"&gt;contextSource&lt;/tt&gt;. To find out, we need to check the &lt;tt class="docutils literal"&gt;o.s.s.config.SecurityNamespaceHandler&lt;/tt&gt; class of the &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;spring-security-config.jar&lt;/span&gt;&lt;/tt&gt;. In there we see the &lt;tt class="docutils literal"&gt;loadParsers&lt;/tt&gt; method which has the line: &lt;tt class="docutils literal"&gt;parsers.put(Elements.LDAP_SERVER, new &lt;span class="pre"&gt;LdapServerBeanDefinitionParser());&lt;/span&gt;&lt;/tt&gt;. The constant &lt;tt class="docutils literal"&gt;o.s.s.config.Elements.LDAP_SERVER&lt;/tt&gt; has the value of &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;&amp;quot;ldap-server&amp;quot;&lt;/span&gt;&lt;/tt&gt; as expected, so we need to see what does the class &lt;tt class="docutils literal"&gt;o.s.s.config.ldap.LdapServerBeanDefinitionParser&lt;/tt&gt; do. This class has a parse() method that receives the xml that was used to instantiate the &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;&amp;lt;ldap-server&amp;gt;&lt;/span&gt;&lt;/tt&gt; element and, depending an on the actualy configuration, instantiates a bean of the class &lt;tt class="docutils literal"&gt;o.s.s.ldap.DefaultSpringSecurityContextSource&lt;/tt&gt; with an id of &lt;tt class="docutils literal"&gt;o.s.s.securityContextSource&lt;/tt&gt; that will be used by the other elements in the security namespace&amp;nbsp;!&lt;/p&gt;
+&lt;p&gt;This actually solves another question I had concerning the following&amp;nbsp;error:&lt;/p&gt;
+&lt;blockquote&gt;
+No bean named &amp;#8216;org.springframework.security.authenticationManager&amp;#8217; is defined: Did you forget to add a gobal &amp;lt;authentication-manager&amp;gt; element to your configuration (with child &amp;lt;authentication-provider&amp;gt;  elements)? Alternatively you can use the authentication-manager-ref attribute on your &amp;lt;http&amp;gt; and &amp;lt;global-method-security&amp;gt; elements.&lt;/blockquote&gt;
+&lt;p&gt;What happens is that when spring-security-configuration encounters an &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;&amp;lt;authentication-manager&amp;gt;&lt;/span&gt;&lt;/tt&gt; it will instantiate a bean named &lt;tt class="docutils literal"&gt;o.s.s.authenticationManager&lt;/tt&gt;  having the class
+&lt;tt class="docutils literal"&gt;o.s.s.authentication.ProviderManager&lt;/tt&gt; and will create and pass to it a &lt;tt class="docutils literal"&gt;providers&lt;/tt&gt; list with all the authentication providers that are defined inside the &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;&amp;lt;authentication-manager&amp;gt;&lt;/span&gt;&lt;/tt&gt; element with &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;&amp;lt;authentication-provider&amp;gt;&lt;/span&gt;&lt;/tt&gt; nodes. So, if you encounter the above error, the problem is that for some reason your &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;&amp;lt;authentication-manager&amp;gt;&lt;/span&gt;&lt;/tt&gt; is not configured correctly, so no &lt;tt class="docutils literal"&gt;o.s.s.authenticatioManager&lt;/tt&gt; bean is&amp;nbsp;created!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="usersearch"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-5"&gt;userSearch&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The &lt;tt class="docutils literal"&gt;userSearch&lt;/tt&gt; bean is needed if we don&amp;#8217;t know exactly where our users are stored in the &lt;span class="caps"&gt;LDAP&lt;/span&gt; directory so we will use this bean as a search filter. If we do know our user tree then we won&amp;#8217;t need this bean at all as will be explained later. It has the class &lt;tt class="docutils literal"&gt;o.s.s.ldap.search.FilterBasedLdapUserSearch&lt;/tt&gt; and gets three constructor parameters: &lt;tt class="docutils literal"&gt;searchBase&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;searchFilter&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;contextSource&lt;/tt&gt;. The &lt;tt class="docutils literal"&gt;searchBase&lt;/tt&gt; is from where in the &lt;span class="caps"&gt;LDAP&lt;/span&gt; tree to start searching (empty in our case), the &lt;tt class="docutils literal"&gt;searchFilter&lt;/tt&gt; defines where is the username (uid in our case) and the &lt;tt class="docutils literal"&gt;contextSource&lt;/tt&gt; has been defined&amp;nbsp;before.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="ldapauthprovider"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-6"&gt;ldapAuthProvider&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;This is the actual &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;authentication-provider&lt;/span&gt;&lt;/tt&gt; that the spring-security &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;authentication-manager&lt;/span&gt;&lt;/tt&gt; is going to use. It is an instance of class &lt;tt class="docutils literal"&gt;o.s.s.ldap.authentication.LdapAuthenticationProvider&lt;/tt&gt; which has two main properties: An &lt;tt class="docutils literal"&gt;o.s.s.ldap.authentication.LdapAuthenticator&lt;/tt&gt; implementation and an &lt;tt class="docutils literal"&gt;o.s.s.ldap.userdetails.LdapAuthoritiesPopulator&lt;/tt&gt; implementation. The first interface defines an &lt;tt class="docutils literal"&gt;authenticate&lt;/tt&gt; method and is used to actually authenticate the user with the &lt;span class="caps"&gt;LDAP&lt;/span&gt; server. The second interface defines a &lt;tt class="docutils literal"&gt;getGrantedAuthorities&lt;/tt&gt; which returns the roles for the authenticated user. The LdapAuthoritiesPopulator parameter is actually optional (so we can use &lt;span class="caps"&gt;LDAP&lt;/span&gt; to authenticate only the users) and we can provide our own implementation to have custom authorities for our application. That is exactly what we&amp;#8217;ve done&amp;nbsp;here.&lt;/p&gt;
+&lt;p&gt;The two arguments used to initialize the ldapAuthProvoder are one instance of &lt;tt class="docutils literal"&gt;o.s.s.ldap.authentication.BindAuthenticator&lt;/tt&gt; which is a simple authenticator that tries to bind with the given credentials to the &lt;span class="caps"&gt;LDAP&lt;/span&gt; server to check the credentials and one instance of a custom class named &lt;tt class="docutils literal"&gt;g.s.s.CustomLdapAuthoritiesPopulator&lt;/tt&gt; which is the actual implementation of the custom roles provider. The &lt;tt class="docutils literal"&gt;BindAuthenticator&lt;/tt&gt; gets the &lt;tt class="docutils literal"&gt;contextSource&lt;/tt&gt; as a constructor parameter and its &lt;tt class="docutils literal"&gt;userSearch&lt;/tt&gt; property is set with the &lt;tt class="docutils literal"&gt;userSearch&lt;/tt&gt; bean defined previously. If we instead knew the actual place of the users, we could use the commented out &lt;tt class="docutils literal"&gt;userDnPatterns&lt;/tt&gt; property which takes a list of possible places in the &lt;span class="caps"&gt;LDAP&lt;/span&gt; catalog which will be checked for the&amp;nbsp;username.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="customldapauthoritiespopulator"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-7"&gt;CustomLdapAuthoritiesPopulator&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The &lt;tt class="docutils literal"&gt;CustomLdapAuthoritiesPopulator&lt;/tt&gt; just needs to implement the &lt;tt class="docutils literal"&gt;LdapAuthoritiesPopulator&lt;/tt&gt; interface. Here&amp;#8217;s our&amp;nbsp;implmentation:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kn"&gt;package&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;gr.serafeim.springldapcustom&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="kn"&gt;import&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;java.util.Collection&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;java.util.HashSet&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;org.springframework.ldap.core.DirContextOperations&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;org.springframework.security.core.GrantedAuthority&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;org.springframework.security.core.authority.SimpleGrantedAuthority&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;org.springframework.stereotype.Component&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="nd"&gt;@Component&lt;/span&gt;
+&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;CustomLdapAuthoritiesPopulator&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;implements&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;LdapAuthoritiesPopulator&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="nd"&gt;@Override&lt;/span&gt;
+&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Collection&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;?&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;extends&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;GrantedAuthority&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;getGrantedAuthorities&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+&lt;span class="w"&gt;                       &lt;/span&gt;&lt;span class="n"&gt;DirContextOperations&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;userData&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;username&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;               &lt;/span&gt;&lt;span class="n"&gt;Collection&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;GrantedAuthority&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;gas&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;new&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;HashSet&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;GrantedAuthority&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;span class="w"&gt;               &lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;username&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;equals&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;spapas&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;                       &lt;/span&gt;&lt;span class="n"&gt;gas&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;add&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;new&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;SimpleGrantedAuthority&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;admin&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
+&lt;span class="w"&gt;               &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="w"&gt;               &lt;/span&gt;&lt;span class="n"&gt;gas&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;add&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;new&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;SimpleGrantedAuthority&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;user&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
+&lt;span class="w"&gt;               &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;gas&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;The &lt;tt class="docutils literal"&gt;getGrantedAuthorities&lt;/tt&gt; just checks the username and add another role if it is a specific one. Of course here we would autowire our user roles repository and query the database to get the roles of the user, however I&amp;#8217;m not going to do that for the case of&amp;nbsp;simplicity.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="example"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-8"&gt;Example&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;When we run this application and go to the /enter, after logging in with our &lt;span class="caps"&gt;LDAP&lt;/span&gt; credentials as spapas, we will get the following&amp;nbsp;output:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Username:&amp;nbsp;spapas&lt;/p&gt;
+&lt;p&gt;Authorities: [admin,&amp;nbsp;user]&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="conclusion"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-9"&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;In the previous a complete example of configuring a custom authorities populator was represented. Using this configuration we can login through the &lt;span class="caps"&gt;LDAP&lt;/span&gt; server of our organization but use application specific roles for our logged-in&amp;nbsp;users.&lt;/p&gt;
+&lt;!-- font-size: 0.5em;
+vertical-align: top; --&gt;
+&lt;table class="docutils footnote" frame="void" id="footnote-1" rules="none"&gt;
+&lt;colgroup&gt;&lt;col class="label" /&gt;&lt;col /&gt;&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#footnote-reference-1"&gt;[*]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;Which is how spring calls the groups/roles the user belongs to&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+</content><category term="spring"></category><category term="spring"></category><category term="spring-security"></category><category term="java"></category><category term="ldap"></category><category term="authentication"></category></entry></feed>

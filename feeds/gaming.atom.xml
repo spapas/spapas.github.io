@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>/var/ - gaming</title><link href="https://www.spapas.net/" rel="alternate"></link><link href="https://www.spapas.net/feeds/gaming.atom.xml" rel="self"></link><id>https://www.spapas.net/</id><updated>2021-06-15T14:20:00+03:00</updated><subtitle>Various programming stuff</subtitle><entry><title>Saving in Dark Souls</title><link href="https://www.spapas.net/2021/06/15/dark-souls-saves/" rel="alternate"></link><published>2021-06-15T14:20:00+03:00</published><updated>2021-06-15T14:20:00+03:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:www.spapas.net,2021-06-15:/2021/06/15/dark-souls-saves/</id><summary type="html">&lt;p class="first last"&gt;How to properly save your game in the Dark Souls&amp;nbsp;trilogy&lt;/p&gt;
+</summary><content type="html">&lt;div class="section" id="introduction"&gt;
+&lt;h2&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;The Dark Souls Trilogy (1-2-3) from FromSoftware is one of the modern gaming classics. The games should
+be experienced by everybody because of their excellent gameplay, combat mechanics, atmosphere and
+character development. The defining characteristic of the Dark Souls Trilogy and what scares most gamers
+is their over the top&amp;nbsp;difficulty.&lt;/p&gt;
+&lt;p&gt;This great difficulty is increased even more because of the saving mechanism of these games: There&amp;#8217;s a
+single save game in the game, if you die you&amp;#8217;ll return to a previous checkpoint (called bonfire). These
+checkpoint are sparcely located within the gaming world and they are not always near boss fights, so
+if you die in a boss fight you may need to kill enemies for sometime before you reach the boss again to
+retry. Also, everything is permanent so if you
+screw up somehow (i.e you kill an important &lt;span class="caps"&gt;NPC&lt;/span&gt;) there&amp;#8217;s no way to &amp;#8220;restore&amp;#8221; your game; you&amp;#8217;ll lose him
+(and his items if he&amp;#8217;s a merchant) for the rest of your current&amp;nbsp;game!&lt;/p&gt;
+&lt;p&gt;If the above seems too difficult for you to even try, fear not! There a particular way to have &amp;#8220;real&amp;#8221; saves in all three
+Dark Souls games, even if it is a little cumbersome. It will be much less cumbersome than having to restart
+the game because you killed an important &lt;span class="caps"&gt;NPC&lt;/span&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="disclaimer"&gt;
+&lt;h2&gt;Disclaimer&lt;/h2&gt;
+&lt;p&gt;Before describing the technique I&amp;#8217;d like to provide some disclaimer&amp;nbsp;points:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;The Dark Souls Trilogy should be experienced as-is. You shouldn&amp;#8217;t use this method because you&amp;#8217;ll make the games easier and not as difficult as it was intented by their publisher. Use it only as a last resort when you are going to abandon the&amp;nbsp;game.&lt;/li&gt;
+&lt;li&gt;Most other Dark Souls players will mock you and hate you for using these&amp;nbsp;techniques.&lt;/li&gt;
+&lt;li&gt;You may break your save if you do something wrong so I won&amp;#8217;t be held responsible for losing your&amp;nbsp;progress.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="how-dark-souls-saves-your-game"&gt;
+&lt;h2&gt;How Dark Souls saves your&amp;nbsp;game&lt;/h2&gt;
+&lt;p&gt;All three Dark Souls games have a particular directory in your hard disk where they place their save game. There&amp;#8217;s a single file with your save game that has an extension endingg in&amp;nbsp;.sl2.&lt;/p&gt;
+&lt;p&gt;From my &lt;span class="caps"&gt;PC&lt;/span&gt;, the folders and names of each of these games are the&amp;nbsp;following:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Dark Souls Remastered: Folder &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;C:\Users\username\Documents\&lt;span class="caps"&gt;NBGI&lt;/span&gt;\&lt;span class="caps"&gt;DARK&lt;/span&gt;&lt;/span&gt; &lt;span class="caps"&gt;SOULS&lt;/span&gt; &lt;span class="caps"&gt;REMASTERED&lt;/span&gt;\1638&lt;/tt&gt;, filename: &lt;tt class="docutils literal"&gt;&lt;span class="caps"&gt;DRAKS0005&lt;/span&gt;.sl2&lt;/tt&gt;&lt;/li&gt;
+&lt;li&gt;Dark Souls 2: Scholar of the First Sin: &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;C:\Users\username\AppData\Roaming\DarkSoulsII\0110000100000666\&lt;/span&gt;&lt;/tt&gt;, filename: &lt;tt class="docutils literal"&gt;&lt;span class="caps"&gt;DS2SOFS0000&lt;/span&gt;.sl2&lt;/tt&gt;&lt;/li&gt;
+&lt;li&gt;Dark Souls 3: &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;C:\Users\username\AppData\Roaming\DarkSoulsIII\0110000100000666\&lt;/span&gt;&lt;/tt&gt;, filename: &lt;tt class="docutils literal"&gt;&lt;span class="caps"&gt;DS3000&lt;/span&gt;.sl2&lt;/tt&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Notice that the username will be your user&amp;#8217;s username while the numbers you see will probably be&amp;nbsp;different.&lt;/p&gt;
+&lt;p&gt;Now, when some particular action occurs (i.e when you kill an enemy) the game will overwrite the file in the folder with a new one
+with the changes. You will see a flame in the top right of your screen when this happens. Notice that this happens on particular moments,
+for example if you are just moving without encountering enemies your game won&amp;#8217;t be saved (so if for example you make a difficult jump
+the game won&amp;#8217;t be saved right after the jump). Also, Dark Souls will save your game when you quit (so if you do a difficult jump, quit the game
+and restart you will be after the&amp;nbsp;jump).&lt;/p&gt;
+&lt;p&gt;The above description enables you to actually have proper saves: Quit the game (not completely, just display the title screen),
+backup the save file in a different location, start the game.
+If you die, quit the game (again just display the title screen), copy over from the backup to the save location and start the game again.
+Notice that you should always quit the
+game before restoring from a save file because Dark Souls reads the saves only then.
+If you copy over a backup save while playing the game the
+backup will be just overwritten with the new save&amp;nbsp;data.&lt;/p&gt;
+&lt;p&gt;However you can backup your game without actually quitting: When you&amp;#8217;ve reach a point you feel it needs saving, just alt+tab outside of your game
+copy over the save to a backup location (you can even give it a proper name) and continue playing. When you want to load that save you&amp;#8217;ll need to
+quit, restore the backup and start the game again. Notice that when you do this the game will show you a warning that you &amp;#8220;did not properly quit
+the game&amp;#8221;. From what I can understand, when you quit the game Dark Souls writes some flag to your save game. If you shut down your &lt;span class="caps"&gt;PC&lt;/span&gt; while
+playing (or copy over the save game) then Dark Souls won&amp;#8217;t write that flag to your save game. However from my experience in all three Dark Souls
+games this warning doesn&amp;#8217;t mean anything, the game will continue normally without any&amp;nbsp;problems.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="making-it-simpler"&gt;
+&lt;h2&gt;Making it&amp;nbsp;simpler&lt;/h2&gt;
+&lt;p&gt;Copying over the save game in a different location is cumbersome and makes it easy to do mistakes (i.e copy instead of restoring your backup
+save, copy over the current save to your backup). To make this process easier I will give you here a simple autohotkey script that will do
+this for you using F7 to backup your save and F8 to restore it (don&amp;#8217;t forget that you can only restore when you have quit the game and see the
+title&amp;nbsp;screen).&lt;/p&gt;
+&lt;p&gt;To use this script you need the excellent &lt;a class="reference external" href="https://www.autohotkey.com/"&gt;autohotkey&lt;/a&gt; utility. Download and install it and then execute the script by double clicking it (it needs to have an .ahk&amp;nbsp;extension):&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+#SingleInstance Force
+#MaxHotkeysPerInterval 99999
+SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
+SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
+
+
+SAVE_FOLDER_DS := &amp;quot;C:\Users\serafeim\AppData\Roaming\DarkSoulsII\0110000100000666\&amp;quot;
+SAVE_FILENAME_DS := &amp;quot;DS2SOFS0000.sl2&amp;quot;
+BACKUP_FOLDER_DS := &amp;quot;C:\Users\serafeim\Documents\ds2\&amp;quot;
+
+
+GetFolderMax(f)
+{
+  MAX := 0
+  Loop, Files, %f%\*.*
+  {
+    NUM_EXT := 1 * A_LoopFileExt
+
+    if (NUM_EXT&amp;gt; MAX)
+    {
+      MAX := NUM_EXT
+    }
+  }
+
+  return MAX
+}
+
+F7::
+{
+  ;MsgBox % &amp;quot;F7&amp;quot;
+  ;MsgBox % &amp;quot;Will copy &amp;quot; . SAVE_FILENAME_DS . &amp;quot; to &amp;quot; . BACKUP_FOLDER_DS
+
+  MAX_P1 := GetFolderMax(BACKUP_FOLDER_DS) + 1
+  ;MsgBox % &amp;quot;Max + 1 is &amp;quot; . MAX_P1
+
+  SOURCE := SAVE_FOLDER_DS . SAVE_FILENAME_DS
+  DEST := BACKUP_FOLDER_DS . SAVE_FILENAME_DS . &amp;quot;.&amp;quot; . MAX_P1
+
+  ;MsgBox % &amp;quot;Will copy &amp;quot; . SOURCE . &amp;quot; to &amp;quot; . DEST
+  FileCopy, %SOURCE%, %DEST%
+  return
+}
+
+F8::
+{
+  ;MsgBox % &amp;quot;F8&amp;quot;
+  MAX := GetFolderMax(BACKUP_FOLDER_DS)
+  MAX_FILE := BACKUP_FOLDER_DS . SAVE_FILENAME_DS . &amp;quot;.&amp;quot; . MAX
+  ;MsgBox % &amp;quot;Maxfile is &amp;quot; . MAX_FILE
+
+  SOURCE := MAX_FILE
+  DEST := SAVE_FOLDER_DS . SAVE_FILENAME_DS
+
+  ;MsgBox % &amp;quot;Will copy &amp;quot; . SOURCE . &amp;quot; to &amp;quot; . DEST
+  FileCopy, %SOURCE%, %DEST%, 1
+  return
+}
+&lt;/pre&gt;
+&lt;p&gt;The script is very easy to understand but I&amp;#8217;ll explain it a bit here: First of all you need to define the
+&lt;tt class="docutils literal"&gt;SAVE_FOLDER_DS, SAVE_FILENAME_DS&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;BACKUP_FOLDER_DS&lt;/tt&gt; variables. The first two are the folder and
+filename of your game (in my example I&amp;#8217;m using it for &lt;span class="caps"&gt;DS2&lt;/span&gt;). The &lt;tt class="docutils literal"&gt;BACKUP_FOLDER_DS&lt;/tt&gt; is where you want your
+backups to be placed. This script will backup your save file in that folder when you press F7. To keep better
+backups it will append an increasing number in the end of your filename so when you press F7 you will see
+that it will create a file named &lt;tt class="docutils literal"&gt;&lt;span class="caps"&gt;DS2SOFS0000&lt;/span&gt;.sl2.0&lt;/tt&gt;, then &lt;tt class="docutils literal"&gt;&lt;span class="caps"&gt;DS2SOFS0000&lt;/span&gt;.sl2.1&lt;/tt&gt; etc in the &lt;tt class="docutils literal"&gt;BACKUP_FOLDER_DS&lt;/tt&gt;.
+When you press F8 it will get the file with the biggest number in the end, strip that number and copy it over your
+Dark Souls save&amp;nbsp;file.&lt;/p&gt;
+&lt;p&gt;As you can see there&amp;#8217;s a &lt;tt class="docutils literal"&gt;GetFolderMax&lt;/tt&gt; function that retrieves the max number from your backup folder. Then,
+F7 and F8 will use that function to either copy over your Dark Souls save file in the backup with an increased
+number or retrieve the latest one and restore it in your save&amp;nbsp;folder.&lt;/p&gt;
+&lt;p&gt;The script works independently of the game so if you configure it and press F7 you should see that the backup file
+will be created. Also if you delete (or rename) your Dark Souls save file and press F8 you should see that it will
+be restore by the&amp;nbsp;backup.&lt;/p&gt;
+&lt;p&gt;So using the above script, my play workflow is like this: Start Dark Souls, kill an enemy, press F7, kill another
+enemy, press F7 (depending on how difficult the enemies are of course). Die from an enemy,
+quit the game, press F8, continue my&amp;nbsp;game.&lt;/p&gt;
+&lt;p&gt;One thing to notice is that in Windows 10 it seems that the hotkeys are not captured from autohotkey when the game
+runs in full screen. When I run the games in a window it works fine. Some people say that if you run autohotkey
+as administrator it will capture the key-presses but it didn&amp;#8217;t work fine for&amp;nbsp;me.&lt;/p&gt;
+&lt;/div&gt;
+</content><category term="gaming"></category><category term="dark-souls"></category><category term="dark-souls-2"></category><category term="dark-souls-3"></category><category term="autohotkey"></category></entry></feed>

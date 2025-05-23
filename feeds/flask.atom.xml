@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>/var/ - flask</title><link href="https://www.spapas.net/" rel="alternate"></link><link href="https://www.spapas.net/feeds/flask.atom.xml" rel="self"></link><id>https://www.spapas.net/</id><updated>2014-06-30T15:23:00+03:00</updated><subtitle>Various programming stuff</subtitle><entry><title>Implementing a simple, Heroku-hosted REST service using Flask and mongoDB</title><link href="https://www.spapas.net/2014/06/30/rest-flask-mongodb-heroku/" rel="alternate"></link><published>2014-06-30T15:23:00+03:00</published><updated>2014-06-30T15:23:00+03:00</updated><author><name>Serafeim Papastefanos</name></author><id>tag:www.spapas.net,2014-06-30:/2014/06/30/rest-flask-mongodb-heroku/</id><summary type="html">&lt;p class="first last"&gt;An implementation &lt;span class="amp"&gt;&amp;amp;&lt;/span&gt; discussion of a simple &lt;span class="caps"&gt;REST&lt;/span&gt; service with Flask that is hosted on Heroku and is using mongoDB for&amp;nbsp;persistance.&lt;/p&gt;
+</summary><content type="html">&lt;div class="contents topic" id="contents"&gt;
+&lt;p class="topic-title"&gt;&lt;a class="reference internal" href="#top"&gt;Contents&lt;/a&gt;&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#introduction" id="toc-entry-1"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#requirements" id="toc-entry-2"&gt;Requirements&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#implementing-the-rest-service" id="toc-entry-3"&gt;Implementing the &lt;span class="caps"&gt;REST&lt;/span&gt;&amp;nbsp;service&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#testing-it-locally" id="toc-entry-4"&gt;Testing it&amp;nbsp;locally&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#deploying-to-heroku" id="toc-entry-5"&gt;Deploying to&amp;nbsp;Heroku&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="introduction"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-1"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;In the following, I will describe how I used &lt;a class="reference external" href="http://flask.pocoo.org/"&gt;Flask&lt;/a&gt;, a very nice web &lt;em&gt;microframework&lt;/em&gt; for python along  with &lt;a class="reference external" href="http://www.mongodb.org/"&gt;mongoDB&lt;/a&gt;, the most
+popular No-&lt;span class="caps"&gt;SQL&lt;/span&gt; database to implement a simple &lt;span class="caps"&gt;REST&lt;/span&gt; service that was hosted on &lt;a class="reference external" href="https://dashboard.heroku.com/apps"&gt;Heroku&lt;/a&gt;. This &lt;span class="caps"&gt;REST&lt;/span&gt; service would get readings from
+a number of sensors from an Android&amp;nbsp;device.&lt;/p&gt;
+&lt;p&gt;I chose Flask instead of Django mainly because the &lt;span class="caps"&gt;REST&lt;/span&gt; service that I needed to implement would be very simple and most of
+the Django bells and whistles (&lt;span class="caps"&gt;ORM&lt;/span&gt;, auth, admin, etc) wouldn&amp;#8217;t be needed anyway. Also, Flask is much quicker to set-up than
+Django since almost everything (views, urls, etc) can be put inside one python&amp;nbsp;module.&lt;/p&gt;
+&lt;p&gt;Concerning the choice of a NoSQL persistance solution (mongoDB), I wanted to have a table (or collection as it is called in the
+mongoDB world) of readings from the sensor. Each reading would just have a timestamp and various other
+arbitrary data depending on the type of the reading, so saving it as a &lt;span class="caps"&gt;JSON&lt;/span&gt; document in a NoSQL database is a good&amp;nbsp;solution.&lt;/p&gt;
+&lt;p&gt;Finally, all the above will be deployed to Heroku which offers some great services for deploying python code in the&amp;nbsp;cloud.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="requirements"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-2"&gt;Requirements&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;I propose creating a file named &lt;tt class="docutils literal"&gt;requirements.txt&lt;/tt&gt; that will host the required packages for your project, so you will be
+able to setup your projects after creating a virtual environment with &lt;a class="reference external" href="http://virtualenv.readthedocs.org/en/latest/"&gt;virtualenv&lt;/a&gt; just by running &lt;tt class="docutils literal"&gt;pip install &lt;span class="pre"&gt;-r&lt;/span&gt; requirements.txt&lt;/tt&gt;.
+Also, the requirements.txt is required for deploying python to&amp;nbsp;Heroku.&lt;/p&gt;
+&lt;p&gt;So, for my case, the contents of requirements.txt are the&amp;nbsp;following:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+Flask==0.10.1
+Flask-PyMongo==0.3.0
+Flask-RESTful==0.2.12
+Jinja2==2.7.3
+MarkupSafe==0.23
+Werkzeug==0.9.6
+aniso8601==0.82
+gunicorn==19.0.0
+itsdangerous==0.24
+pymongo==2.7.1
+pytz==2014.4
+six==1.7.2
+&lt;/pre&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Flask-PyMongo is a simple wrapper for Flask around pymongo which is the python mongoDB&amp;nbsp;driver.&lt;/li&gt;
+&lt;li&gt;Flask-RESTful is a simple library for creating &lt;span class="caps"&gt;REST&lt;/span&gt; APIs - it needs aniso8601 and&amp;nbsp;pytz.&lt;/li&gt;
+&lt;li&gt;Jinja2 is the template library for Flask (we won&amp;#8217;t use it but it is required by Flask installation) - it needs&amp;nbsp;MarkupSafe.&lt;/li&gt;
+&lt;li&gt;Werkzeug is a &lt;span class="caps"&gt;WSGI&lt;/span&gt; utility library - required by&amp;nbsp;Flask&lt;/li&gt;
+&lt;li&gt;gunicorn is a &lt;span class="caps"&gt;WSGI&lt;/span&gt; &lt;span class="caps"&gt;HTTP&lt;/span&gt; server - needed for deployment to&amp;nbsp;Heroku&lt;/li&gt;
+&lt;li&gt;itsdangerous is used to sign data for usage in untrusted&amp;nbsp;environments&lt;/li&gt;
+&lt;li&gt;six is the python 2/3 compatibility&amp;nbsp;layer&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="implementing-the-rest-service"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-3"&gt;Implementing the &lt;span class="caps"&gt;REST&lt;/span&gt;&amp;nbsp;service&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Instead of using just one single file for our Flask web application, we will create a python module to contain it and a
+file named &lt;tt class="docutils literal"&gt;runserver.py&lt;/tt&gt; that will start a local development server to test&amp;nbsp;it:&lt;/p&gt;
+&lt;p&gt;So, in the same folder as the &lt;tt class="docutils literal"&gt;requirements.txt&lt;/tt&gt; create a folder named &lt;tt class="docutils literal"&gt;flask_rest_service&lt;/tt&gt; and in there put
+two files: &lt;tt class="docutils literal"&gt;__init__.py&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;resources.py&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;The &lt;tt class="docutils literal"&gt;__init__.py&lt;/tt&gt; initializes our Flask application, our mongoDB connection and our Flask-RESTful&amp;nbsp;api:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+import os
+from flask import Flask
+from flask.ext import restful
+from flask.ext.pymongo import PyMongo
+from flask import make_response
+from bson.json_util import dumps
+
+MONGO_URL = os.environ.get('MONGO_URL')
+if not MONGO_URL:
+    MONGO_URL = &amp;quot;mongodb://localhost:27017/rest&amp;quot;;
+
+app = Flask(__name__)
+
+app.config['MONGO_URI'] = MONGO_URL
+mongo = PyMongo(app)
+
+def output_json(obj, code, headers=None):
+    resp = make_response(dumps(obj), code)
+    resp.headers.extend(headers or {})
+    return resp
+
+DEFAULT_REPRESENTATIONS = {'application/json': output_json}
+api = restful.Api(app)
+api.representations = DEFAULT_REPRESENTATIONS
+
+import flask_rest_service.resources
+&lt;/pre&gt;
+&lt;p&gt;So what happens here? After the imports, we check if we have a MONGO_URL environment variable. This is
+how we set options in Heroku. If such option does not exist in the environment then we are in our
+development environment so we set it to the localhost (we must have a running mongoDB installation in
+our dev&amp;nbsp;environment).&lt;/p&gt;
+&lt;p&gt;In the next lines, we initialize our Flask application and our mongoDB connection (pymongo
+uses a &lt;tt class="docutils literal"&gt;MONGO_URI&lt;/tt&gt; configuration option to know the database &lt;span class="caps"&gt;URI&lt;/span&gt;).&lt;/p&gt;
+&lt;p&gt;The &lt;tt class="docutils literal"&gt;output_json&lt;/tt&gt; is used to dump the &lt;span class="caps"&gt;BSON&lt;/span&gt; encoded mongoDB objects to &lt;span class="caps"&gt;JSON&lt;/span&gt; and was borrowed from
+&lt;a class="reference external" href="http://blog.alienretro.com/using-mongodb-with-flask-restful/"&gt;alienretro&amp;#8217;s blog&lt;/a&gt; &amp;#8212; we initialize our restful &lt;span class="caps"&gt;REST&lt;/span&gt; &lt;span class="caps"&gt;API&lt;/span&gt; with this&amp;nbsp;function.&lt;/p&gt;
+&lt;p&gt;Finally, we import the &lt;tt class="docutils literal"&gt;resources.py&lt;/tt&gt; module which actually defines our &lt;span class="caps"&gt;REST&lt;/span&gt;&amp;nbsp;resources.&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+import json
+from flask import request, abort
+from flask.ext import restful
+from flask.ext.restful import reqparse
+from flask_rest_service import app, api, mongo
+from bson.objectid import ObjectId
+
+class ReadingList(restful.Resource):
+    def __init__(self, *args, **kwargs):
+        self.parser = reqparse.RequestParser()
+        self.parser.add_argument('reading', type=str)
+        super(ReadingList, self).__init__()
+
+    def get(self):
+        return  [x for x in mongo.db.readings.find()]
+
+    def post(self):
+        args = self.parser.parse_args()
+        if not args['reading']:
+            abort(400)
+
+        jo = json.loads(args['reading'])
+        reading_id =  mongo.db.readings.insert(jo)
+        return mongo.db.readings.find_one({&amp;quot;_id&amp;quot;: reading_id})
+
+
+class Reading(restful.Resource):
+    def get(self, reading_id):
+        return mongo.db.readings.find_one_or_404({&amp;quot;_id&amp;quot;: reading_id})
+
+    def delete(self, reading_id):
+        mongo.db.readings.find_one_or_404({&amp;quot;_id&amp;quot;: reading_id})
+        mongo.db.readings.remove({&amp;quot;_id&amp;quot;: reading_id})
+        return '', 204
+
+
+class Root(restful.Resource):
+    def get(self):
+        return {
+            'status': 'OK',
+            'mongo': str(mongo.db),
+        }
+
+api.add_resource(Root, '/')
+api.add_resource(ReadingList, '/readings/')
+api.add_resource(Reading, '/readings/&amp;lt;ObjectId:reading_id&amp;gt;')
+&lt;/pre&gt;
+&lt;p&gt;Here we define three &lt;tt class="docutils literal"&gt;Resource&lt;/tt&gt; classes and add them to our previously defined &lt;tt class="docutils literal"&gt;api&lt;/tt&gt;: &lt;tt class="docutils literal"&gt;Root&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;Reading&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;ReadingList&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;Root&lt;/tt&gt; just returns a dictionary with an &lt;span class="caps"&gt;OK&lt;/span&gt; status and some info on our mongodb&amp;nbsp;connection.&lt;/p&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;Reading&lt;/tt&gt; has gets an ObjectId
+(which is the mongodb primary key) as a parameter and depending on the &lt;span class="caps"&gt;HTTP&lt;/span&gt; operation, it returns the reading with that
+id when receiving an &lt;tt class="docutils literal"&gt;&lt;span class="caps"&gt;HTTP&lt;/span&gt; &lt;span class="caps"&gt;GET&lt;/span&gt;&lt;/tt&gt; and deletes the reading with that id when receiving an &lt;tt class="docutils literal"&gt;&lt;span class="caps"&gt;HTTP&lt;/span&gt; &lt;span class="caps"&gt;DELETE&lt;/span&gt;&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;ReadingList&lt;/tt&gt; will return all readings when receiving an &lt;tt class="docutils literal"&gt;&lt;span class="caps"&gt;HTTP&lt;/span&gt; &lt;span class="caps"&gt;GET&lt;/span&gt;&lt;/tt&gt; and will create a new reading when
+receiving an &lt;tt class="docutils literal"&gt;&lt;span class="caps"&gt;HTTP&lt;/span&gt; &lt;span class="caps"&gt;POST&lt;/span&gt;&lt;/tt&gt; The &lt;tt class="docutils literal"&gt;post&lt;/tt&gt; function uses the parser defined in &lt;tt class="docutils literal"&gt;__init__&lt;/tt&gt; which requires
+a &lt;tt class="docutils literal"&gt;reading&lt;/tt&gt; parameter with the actual reading to be&amp;nbsp;inserted.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="testing-it-locally"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-4"&gt;Testing it&amp;nbsp;locally&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;In order to run the development server, you will need to install and start mongodb locally which is beyond the scope of this post. After that
+create a file named &lt;tt class="docutils literal"&gt;runserver.py&lt;/tt&gt; in the same folder as with the &lt;tt class="docutils literal"&gt;requirements.txt&lt;/tt&gt;
+and the &lt;tt class="docutils literal"&gt;flask_rest_service&lt;/tt&gt; folder. The contents of this file should&amp;nbsp;be:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+from flask_rest_service import app
+app.run(debug=True)
+&lt;/pre&gt;
+&lt;p&gt;When you run this file with &lt;tt class="docutils literal"&gt;python runserver.py&lt;/tt&gt; you should be able top visit your rest service at &lt;a class="reference external" href="http://localhost:5000"&gt;http://localhost:5000&lt;/a&gt; and get
+an &amp;#8220;&lt;span class="caps"&gt;OK&lt;/span&gt;&amp;#8221;&amp;nbsp;status.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="deploying-to-heroku"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-5"&gt;Deploying to&amp;nbsp;Heroku&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;To deploy to Heroku, you must create a &lt;tt class="docutils literal"&gt;Procfile&lt;/tt&gt; that contains the workers of your application. In our case, the
+&lt;tt class="docutils literal"&gt;Procfile&lt;/tt&gt; should contain the&amp;nbsp;following:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+web: gunicorn flask_rest_service:app
+&lt;/pre&gt;
+&lt;p&gt;Also, you should add a .gitignore file with the&amp;nbsp;following:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+*.pyc
+&lt;/pre&gt;
+&lt;p&gt;Finally, to deploy your application to Heroku you can follow the instructions here: &lt;a class="reference external" href="https://devcenter.heroku.com/articles/getting-started-with-python"&gt;https://devcenter.heroku.com/articles/getting-started-with-python&lt;/a&gt;:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Initialize a git repository and commit&amp;nbsp;everything:&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre class="code literal-block"&gt;
+git init
+git add .
+git commit -m
+&lt;/pre&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Create a new Heroku application (after logging in to heroku with &lt;tt class="docutils literal"&gt;heroku login&lt;/tt&gt;) and set the MONGO_URL environment variable (of course you have to obtain ths MONGO_URL variable for your heroku envirotnment by adding a mongoDB&amp;nbsp;database):&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre class="code literal-block"&gt;
+heroku create
+heroku config:set MONGO_URL=mongodb://user:pass&amp;#64;mongoprovider.com:27409/rest
+&lt;/pre&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;And finally push your master branch to the heroku remote&amp;nbsp;repository:&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre class="code literal-block"&gt;
+git push heroku master
+&lt;/pre&gt;
+&lt;p&gt;If everything went ok you should be able to start a worker for your application, check that the worker is running, and finally visit&amp;nbsp;it:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+heroku ps:scale web=1
+heroku ps
+heroku open
+&lt;/pre&gt;
+&lt;p&gt;If everything was ok you should see an status-&lt;span class="caps"&gt;OK&lt;/span&gt; &lt;span class="caps"&gt;JSON&lt;/span&gt;&amp;nbsp;!&lt;/p&gt;
+&lt;/div&gt;
+</content><category term="flask"></category><category term="flask"></category><category term="mongodb"></category><category term="heroku"></category><category term="python"></category><category term="rest"></category></entry></feed>

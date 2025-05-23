@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="google-site-verification" content="5_8DTmIiEq4gFvNAfxAD6TsGOgrMAjp8lQFQvfA6zZc" />
+    <title>PDFs in Django: The essential guide &mdash; /var/</title>
+    <meta name="author" content="Serafeim Papastefanos">
+
+
+    
+<style type="text/css">
+pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: var(--jp-cell-editor-active-background) }
+.highlight { background: var(--jp-cell-editor-background); color: var(--jp-mirror-editor-variable-color) }
+.highlight .c { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment */
+.highlight .err { color: var(--jp-mirror-editor-error-color) } /* Error */
+.highlight .k { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword */
+.highlight .o { color: var(--jp-mirror-editor-operator-color); font-weight: bold } /* Operator */
+.highlight .p { color: var(--jp-mirror-editor-punctuation-color) } /* Punctuation */
+.highlight .ch { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Preproc */
+.highlight .cpf { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Single */
+.highlight .cs { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Special */
+.highlight .kc { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Pseudo */
+.highlight .kr { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Type */
+.highlight .m { color: var(--jp-mirror-editor-number-color) } /* Literal.Number */
+.highlight .s { color: var(--jp-mirror-editor-string-color) } /* Literal.String */
+.highlight .ow { color: var(--jp-mirror-editor-operator-color); font-weight: bold } /* Operator.Word */
+.highlight .pm { color: var(--jp-mirror-editor-punctuation-color) } /* Punctuation.Marker */
+.highlight .w { color: var(--jp-mirror-editor-variable-color) } /* Text.Whitespace */
+.highlight .mb { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Bin */
+.highlight .mf { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Float */
+.highlight .mh { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Hex */
+.highlight .mi { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Integer */
+.highlight .mo { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Oct */
+.highlight .sa { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Affix */
+.highlight .sb { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Backtick */
+.highlight .sc { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Char */
+.highlight .dl { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Delimiter */
+.highlight .sd { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Doc */
+.highlight .s2 { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Double */
+.highlight .se { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Escape */
+.highlight .sh { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Heredoc */
+.highlight .si { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Interpol */
+.highlight .sx { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Other */
+.highlight .sr { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Regex */
+.highlight .s1 { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Single */
+.highlight .ss { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Symbol */
+.highlight .il { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Integer.Long */
+</style>
+
+<style type="text/css">
+/* Overrides of notebook CSS for static HTML export */
+div.entry-content {
+  overflow: visible;
+  padding: 8px;
+}
+.input_area {
+  padding: 0.2em;
+}
+
+a.heading-anchor {
+ white-space: normal;
+}
+
+.rendered_html
+code {
+ font-size: .8em;
+}
+
+pre.ipynb {
+  color: black;
+  background: #f7f7f7;
+  border: none;
+  box-shadow: none;
+  margin-bottom: 0;
+  padding: 0;
+  margin: 0px;
+  font-size: 13px;
+}
+
+/* remove the prompt div from text cells */
+div.text_cell .prompt {
+    display: none;
+}
+
+/* remove horizontal padding from text cells, */
+/* so it aligns with outer body text */
+div.text_cell_render {
+    padding: 0.5em 0em;
+}
+
+img.anim_icon{padding:0; border:0; vertical-align:middle; -webkit-box-shadow:none; -box-shadow:none}
+
+div.collapseheader {
+    width=100%;
+    background-color:#d3d3d3;
+    padding: 2px;
+    cursor: pointer;
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+</style>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true,
+        displayMath: [['$$','$$'], ["\\[","\\]"]]
+    }
+});
+</script>
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+    $("div.collapseheader").click(function () {
+    $header = $(this).children("span").first();
+    $codearea = $(this).children(".input_area");
+    console.log($(this).children());
+    $codearea.slideToggle(500, function () {
+        $header.text(function () {
+            return $codearea.is(":visible") ? "Collapse Code" : "Expand Code";
+        });
+    });
+});
+});
+</script>
+
+
+
+
+
+
+    <!-- http://t.co/dKP3o1e -->
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+    <link href="https://www.spapas.net/favicon.png" rel="icon">
+
+    <link href="https://www.spapas.net/theme/css/main.css" media="screen, projection" rel="stylesheet"
+      type="text/css">
+
+    <link href="https://www.spapas.net/theme/css/extra_style.css" media="screen, projection" rel="stylesheet"
+      type="text/css">
+
+    <link href="https://fonts.googleapis.com/css?family=Fira+Mono|Fira+Sans:400,700&amp;subset=greek" rel="stylesheet">
+
+<style>
+#gHPzseYvFrhZ123 {
+  padding: 5px !important;
+  display: block;
+  margin-bottom: 10px !important;
+  background: #900;
+  color: #fff;
+  border-radius: 5px;
+  font-size: 1.0rem !important;
+}
+</style>
+
+
+  <script>
+    
+      
+  </script>
+
+    <script data-ad-client="ca-pub-7673322832689008" async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
+      onerror="adBlockFunction();"></script>
+  </head>
+
+<body>
+  <header role="banner"><hgroup>
+  <h1><a href="https://www.spapas.net/">/var/</a></h1>
+    <h2>Various programming stuff</h2>
+</hgroup></header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+</ul>
+
+
+<ul class="main-navigation">
+      <li >
+        <a href="https://www.spapas.net/category/ai.html">Ai</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/android.html">Android</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/clojure.html">Clojure</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/css.html">Css</a>
+      </li>
+      <li class="active">
+        <a href="https://www.spapas.net/category/django.html">Django</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/elixir.html">Elixir</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/flask.html">Flask</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/gaming.html">Gaming</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/git.html">Git</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/html.html">Html</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/javascript.html">Javascript</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/networking.html">Networking</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/pelican.html">Pelican</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/postgresql.html">Postgresql</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/python.html">Python</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/spring.html">Spring</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/unix.html">Unix</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/wagtail.html">Wagtail</a>
+      </li>
+</ul></nav>
+  <div id="main">
+    <div id="content">
+    <div id="gHPzseYvFrhZ123">
+      Hello! If you are using an ad blocker but find something useful here 
+      and want to support me please consider disabling your ad blocker for this site. 
+      <br />
+      <br />
+      Thank you,<br />
+      Serafeim
+      
+    </div>
+<div>
+  <article class="hentry" role="article">
+<header>
+      <h1 class="entry-title">PDFs in Django: The essential guide</h1>
+    <p class="meta">
+<time datetime="2015-11-27T10:20:00+02:00" pubdate>Fri 27 November 2015</time>    </p>
+</header>
+
+<div class="entry-content"><div class="contents topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#introduction" id="toc-entry-1">Introduction</a></li>
+<li><a class="reference internal" href="#the-players" id="toc-entry-2">The players</a><ul>
+<li><a class="reference internal" href="#reportlab" id="toc-entry-3">ReportLab</a></li>
+<li><a class="reference internal" href="#xhtml2pdf" id="toc-entry-4">xhtml2pdf</a></li>
+<li><a class="reference internal" href="#pypdf2" id="toc-entry-5">PyPDF2</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#django-integration" id="toc-entry-6">Django integration</a><ul>
+<li><a class="reference internal" href="#using-a-plain-old-view" id="toc-entry-7">Using a plain old&nbsp;view</a></li>
+<li><a class="reference internal" href="#using-a-cbv" id="toc-entry-8">Using a <span class="caps">CBV</span></a></li>
+<li><a class="reference internal" href="#how-does-django-xhtml2pdf-loads-resources" id="toc-entry-9">How does django-xhtml2pdf loads&nbsp;resources</a></li>
+<li><a class="reference internal" href="#using-a-common-style-for-your-pdfs" id="toc-entry-10">Using a common style for your&nbsp;PDFs</a></li>
+<li><a class="reference internal" href="#changing-the-font-to-a-unicode-enabled-one" id="toc-entry-11">Changing the font (to a Unicode enabled&nbsp;one)</a></li>
+<li><a class="reference internal" href="#configure-django-for-debugging-pdf-creation" id="toc-entry-12">Configure Django for debugging <span class="caps">PDF</span>&nbsp;creation</a></li>
+<li><a class="reference internal" href="#concatenating-pdfs-in-django" id="toc-entry-13">Concatenating PDFs in&nbsp;Django</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#more-advanced-xhtml2pdf-features" id="toc-entry-14">More advanced xhtml2pdf features</a><ul>
+<li><a class="reference internal" href="#laying-out" id="toc-entry-15">Laying&nbsp;out</a></li>
+<li><a class="reference internal" href="#extra-stuff" id="toc-entry-16">Extra&nbsp;stuff</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#conclusion" id="toc-entry-17">Conclusion</a></li>
+</ul>
+</div>
+<p><strong>Upgrade 23/05/2018</strong> I&#8217;ve upgraded the sample project (<a class="reference external" href="https://github.com/spapas/django-pdf-guide">https://github.com/spapas/django-pdf-guide</a>) for usage with Django 2.0 and Python 3.x.
+There were very few changes between the old, Django 1.8 compatible project and the new one. To see the differences, you can just clone it
+and do a <tt class="docutils literal">git diff <span class="pre">django-1.8</span> <span class="pre">django-2.0</span></tt>: Most are related to changes between django 1.8 and django 2.0 (in the <span class="caps">URL</span> configuration use <tt class="docutils literal">path</tt> instead of <tt class="docutils literal">url</tt>,
+use new style middleware etc) and between python 2.7 and 3.x (small changes in import syntax, <tt class="docutils literal">StringIO</tt> has been moved to the <tt class="docutils literal">io</tt> package). There&#8217;s also
+a couple of requirement upgrades, the most important are the upgrade to <tt class="docutils literal">xhtml2pdf 0.2.2</tt> and using my own fork of <tt class="docutils literal">django_xhtml2pdf</tt> since django_xhtml2pdf
+does not seem to be maintained&nbsp;anymore.</p>
+<div class="section" id="introduction">
+<h2><a class="toc-backref" href="#toc-entry-1">Introduction</a></h2>
+<p>I&#8217;ve noticed that although it is easy to create PDFs with
+Python, there&#8217;s no complete guide on how to
+integrate these tools with Django and resolve the problems
+that you&#8217;ll encounter when trying to actually create PDFs
+from your Django web&nbsp;application.</p>
+<p>In this article I will present the solution I use for
+creating PDFs with Django, along with various tips on how to
+solve most of your common requirements. Specifically, here
+are some things that we&#8217;ll&nbsp;cover:</p>
+<ul class="simple">
+<li>Learn how to create PDFs &#8220;by&nbsp;hand&#8221;</li>
+<li>Create PDFs with Django using a normal Djang Template (similar to an <span class="caps">HTML</span>&nbsp;page)</li>
+<li>Change the fonts of your&nbsp;PDFs</li>
+<li>Use styling in your&nbsp;output</li>
+<li>Create&nbsp;layouts</li>
+<li>Embed images to your&nbsp;PDFs</li>
+<li>Add page&nbsp;numbers</li>
+<li>Merge (concatenate)&nbsp;PDFs</li>
+</ul>
+</div>
+<div class="section" id="the-players">
+<h2><a class="toc-backref" href="#toc-entry-2">The&nbsp;players</a></h2>
+<p>We are going to use the following main&nbsp;tools:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://bitbucket.org/rptlab/reportlab">ReportLab</a> is an open source python library for creating PDFs. It uses a low-level <span class="caps">API</span> that allows &#8220;drawing&#8221; strings on specific coordinates  on the <span class="caps">PDF</span> - for people familiar with creating PDFs in Java it is more or less <a class="reference external" href="http://itextpdf.com/">iText</a> for&nbsp;python.</li>
+<li><a class="reference external" href="https://github.com/chrisglass/xhtml2pdf">xhtml2pdf</a> (formerly named <em>pisa</em>) is an open source library that can convert <span class="caps">HTML</span>/<span class="caps">CSS</span> pages to <span class="caps">PDF</span> using&nbsp;ReportLab.</li>
+<li><a class="reference external" href="https://github.com/chrisglass/django-xhtml2pdf">django-xhtml2pdf</a> is a wrapper around xhtml2pdf that makes integration with Django&nbsp;easier.</li>
+<li><a class="reference external" href="https://github.com/mstamy2/PyPDF2">PyPDF2</a> is an open source tool of that can split, merge and transform pages of <span class="caps">PDF</span>&nbsp;files.</li>
+</ul>
+<p>I&#8217;ve created a <a class="reference external" href="https://github.com/spapas/django-pdf-guide">django project</a> <a class="reference external" href="https://github.com/spapas/django-pdf-guide">https://github.com/spapas/django-pdf-guide</a> with everything covered here. Please clone it,
+install its requirements and play with it to see how everything works&nbsp;!</p>
+<p>Before integrating the above tools to a Django project, I&#8217;d like to describe them individually a bit more. Any files
+I mention below will be included in this&nbsp;project.</p>
+<div class="section" id="reportlab">
+<h3><a class="toc-backref" href="#toc-entry-3">ReportLab</a></h3>
+<p>ReportLab offers a really low <span class="caps">API</span> for creating PDFs. It is something like having a <tt class="docutils literal">canvas.drawString()</tt> method (for
+people familiar with drawing APIs) for your <span class="caps">PDF</span> page. Let&#8217;s take a look at an example, creating a <span class="caps">PDF</span> with a simple&nbsp;string:</p>
+<div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">reportlab.pdfgen</span><span class="w"> </span><span class="kn">import</span> <span class="n">canvas</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">reportlab.rl_config</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">reportlab</span><span class="o">.</span><span class="n">rl_config</span><span class="o">.</span><span class="n">warnOnMissingFontGlyphs</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">canvas</span><span class="o">.</span><span class="n">Canvas</span><span class="p">(</span><span class="s2">&quot;./hello1.pdf&quot;</span><span class="p">,)</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">drawString</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="s2">&quot;Hello World&quot;</span><span class="p">)</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">showPage</span><span class="p">()</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</pre></div>
+<p>Save the above in a file named testreportlab1.py. If you run python testreportlab1.py (in an environment that has
+reportlab of cours) you should see no errors and a pdf named <tt class="docutils literal">hello1.pdf</tt> created. If you open it in your <span class="caps">PDF</span>
+reader you&#8217;ll see a blank page with &#8220;Hello World&#8221; written in its lower right&nbsp;corner.</p>
+<p>If you try to add a unicode text, for example &#8220;Καλημέρα ελλάδα&#8221;, you should see something like the&nbsp;following:</p>
+<img alt="Hello PDF" src="/images/hellopdf2.png" style="width: 480px;" />
+<p>It seems that the default font that ReportLab uses does not have a good support for accented greek characters
+since they are missing  (and probably for various other&nbsp;characters).</p>
+<p>To resolve this, we could try changing the font to one that contains the missing symbols. You can find free
+fonts on the internet (for example the <cite>DejaVu</cite> font), or even grab one from your system fonts (in windows,
+check out <tt class="docutils literal"><span class="pre">c:\windows\fonts\</span></tt>). In any case, just copy the ttf file of your font inside the folder of
+your project and crate a file named testreportlab2.py with the following (I am using the DejaVuSans&nbsp;font):</p>
+<div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">reportlab.rl_config</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">reportlab.pdfbase</span><span class="w"> </span><span class="kn">import</span> <span class="n">pdfmetrics</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">reportlab.pdfbase.ttfonts</span><span class="w"> </span><span class="kn">import</span> <span class="n">TTFont</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">canvas</span><span class="o">.</span><span class="n">Canvas</span><span class="p">(</span><span class="s2">&quot;./hello2.pdf&quot;</span><span class="p">,)</span>
+    <span class="n">reportlab</span><span class="o">.</span><span class="n">rl_config</span><span class="o">.</span><span class="n">warnOnMissingFontGlyphs</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">pdfmetrics</span><span class="o">.</span><span class="n">registerFont</span><span class="p">(</span><span class="n">TTFont</span><span class="p">(</span><span class="s1">&#39;DejaVuSans&#39;</span><span class="p">,</span> <span class="s1">&#39;DejaVuSans.ttf&#39;</span><span class="p">))</span>
+
+    <span class="n">c</span><span class="o">.</span><span class="n">setFont</span><span class="p">(</span><span class="s1">&#39;DejaVuSans&#39;</span><span class="p">,</span> <span class="mi">22</span><span class="p">)</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">drawString</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;Καλημέρα ελλάδα.&quot;</span><span class="p">)</span>
+
+    <span class="n">c</span><span class="o">.</span><span class="n">showPage</span><span class="p">()</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</pre></div>
+<p>The above was just a scratch on the surface of ReportLab, mainly to be confident that
+everything <em>will</em> work fine for non-english speaking people! To find out more, you should check the  <a class="reference external" href="http://www.reportlab.com/docs/reportlab-userguide.pdf">ReportLab open-source User Guide</a>.</p>
+<p>I also have to mention that
+<a class="reference external" href="http://reportlab.com/">the company behind ReportLab</a> offers some great commercial solutions based on ReportLab for creating PDFs (similar to <a class="reference external" href="http://community.jaspersoft.com/project/jasperreports-library">JasperReports</a>) - check it out
+if you need support or advanced&nbsp;capabilities.</p>
+</div>
+<div class="section" id="xhtml2pdf">
+<h3><a class="toc-backref" href="#toc-entry-4">xhtml2pdf</a></h3>
+<p>The xhtml2pdf is a really great library that allows you to use html files as a template
+to a <span class="caps">PDF</span>. Of course, an html cannot always be converted to a <span class="caps">PDF</span> since,
+unfortunately, PDFs <em>do</em> have&nbsp;pages.</p>
+<p>xhtml2pdf has a nice executable script that can be used to test its capabilities. After
+you install it (either globally or to a virtual environment) you should be able to find
+out the executable <tt class="docutils literal">$<span class="caps">PYTHON</span>/scripts/xhtml2pdf</tt> (or <tt class="docutils literal">xhtml2pdf.exe</tt> if you are in
+Windows) and a corresponding python script &#64; <tt class="docutils literal"><span class="pre">$<span class="caps">PYTHON</span>/scripts/xhtml2pdf-script.py</span></tt>.</p>
+<p>Let&#8217;s try to use xhtml2pdf to explore some of its capabilities. Create a file named
+testxhtml2pdf.html with the following contents and run <tt class="docutils literal">xhtml2pdf testxhtml2pdf.html</tt>:</p>
+<div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">meta</span> <span class="na">http-equiv</span><span class="o">=</span><span class="s">&quot;Content-Type&quot;</span> <span class="na">content</span><span class="o">=</span><span class="s">&quot;text/html; charset=utf-8&quot;</span> <span class="p">/&gt;</span>
+<span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>Testing xhtml2pdf <span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">ul</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;&lt;</span><span class="nt">b</span><span class="p">&gt;</span>Hello, world!<span class="p">&lt;/</span><span class="nt">b</span><span class="p">&gt;&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;&lt;</span><span class="nt">i</span><span class="p">&gt;</span>Hello, italics<span class="p">&lt;/</span><span class="nt">i</span><span class="p">&gt;&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;</span>Καλημέρα Ελλάδα!<span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">hr</span> <span class="p">/&gt;</span>
+    <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus nulla erat, porttitor ut venenatis eget,
+    tempor et purus. Nullam nec erat vel enim euismod auctor et at nisl. Integer posuere bibendum condimentum. Ut
+    euismod velit ut porttitor condimentum. In ullamcorper nulla at lectus fermentum aliquam. Nunc elementum commodo
+    dui, id pulvinar ex viverra id. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos
+    himenaeos.<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+
+    <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>Interdum et malesuada fames ac ante ipsum primis in faucibus. Sed aliquam vitae lectus sit amet accumsan. Morbi
+    nibh urna, condimentum nec volutpat at, lobortis sit amet odio. Etiam quis neque interdum sapien cursus ornare. Cras
+    commodo lacinia sapien nec porta. Suspendisse potenti. Nulla hendrerit dolor et rutrum consectetur.<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">hr</span> <span class="p">/&gt;</span>
+    <span class="p">&lt;</span><span class="nt">img</span>  <span class="na">width</span><span class="o">=</span><span class="s">&quot;26&quot;</span> <span class="na">height</span><span class="o">=</span><span class="s">&quot;20&quot;</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;data:image/gif;base64,R0lGODlhEAAOALMAAOazToeHh0tLS/7LZv/0jvb29t/f3//Ub//ge8WSLf/</span>
+<span class="s">    rhf/3kdbW1mxsbP//mf///yH5BAAAAAAALAAAAAAQAA4AAARe8L1Ekyky67QZ1hLnjM5UUde0ECwLJoExKcppV0aCcGCmTIHEIUEqjgaORCMxIC6e0C</span>
+<span class="s">    cguWw6aFjsVMkkIr7g77ZKPJjPZqIyd7sJAgVGoEGv2xsBxqNgYPj/gAwXEQA7&quot;</span>  <span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">hr</span> <span class="p">/&gt;</span>
+    <span class="p">&lt;</span><span class="nt">table</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">tr</span><span class="p">&gt;</span>
+            <span class="p">&lt;</span><span class="nt">th</span><span class="p">&gt;</span>header0<span class="p">&lt;/</span><span class="nt">th</span><span class="p">&gt;&lt;</span><span class="nt">th</span><span class="p">&gt;</span>header1<span class="p">&lt;/</span><span class="nt">th</span><span class="p">&gt;&lt;</span><span class="nt">th</span><span class="p">&gt;</span>header2<span class="p">&lt;/</span><span class="nt">th</span><span class="p">&gt;&lt;</span><span class="nt">th</span><span class="p">&gt;</span>header3<span class="p">&lt;/</span><span class="nt">th</span><span class="p">&gt;&lt;</span><span class="nt">th</span><span class="p">&gt;</span>header4<span class="p">&lt;/</span><span class="nt">th</span><span class="p">&gt;&lt;</span><span class="nt">th</span><span class="p">&gt;</span>header5<span class="p">&lt;/</span><span class="nt">th</span><span class="p">&gt;</span>
+        <span class="p">&lt;/</span><span class="nt">tr</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">tr</span><span class="p">&gt;</span>
+            <span class="p">&lt;</span><span class="nt">td</span><span class="p">&gt;</span>Hello World!!!<span class="p">&lt;/</span><span class="nt">td</span><span class="p">&gt;&lt;</span><span class="nt">td</span><span class="p">&gt;</span>Hello World!!!<span class="p">&lt;/</span><span class="nt">td</span><span class="p">&gt;&lt;</span><span class="nt">td</span><span class="p">&gt;</span>Hello World!!!<span class="p">&lt;/</span><span class="nt">td</span><span class="p">&gt;&lt;</span><span class="nt">td</span><span class="p">&gt;</span>Hello World!!!<span class="p">&lt;/</span><span class="nt">td</span><span class="p">&gt;&lt;</span><span class="nt">td</span><span class="p">&gt;</span>Hello World!!!<span class="p">&lt;/</span><span class="nt">td</span><span class="p">&gt;&lt;</span><span class="nt">td</span><span class="p">&gt;</span>Hello World!!!<span class="p">&lt;/</span><span class="nt">td</span><span class="p">&gt;</span>
+        <span class="p">&lt;/</span><span class="nt">tr</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">tr</span><span class="p">&gt;</span>
+            <span class="p">&lt;</span><span class="nt">td</span><span class="p">&gt;</span>Hello World!!!<span class="p">&lt;/</span><span class="nt">td</span><span class="p">&gt;&lt;</span><span class="nt">td</span><span class="p">&gt;</span>Hello World!!!<span class="p">&lt;/</span><span class="nt">td</span><span class="p">&gt;&lt;</span><span class="nt">td</span><span class="p">&gt;</span>Hello World!!!<span class="p">&lt;/</span><span class="nt">td</span><span class="p">&gt;&lt;</span><span class="nt">td</span><span class="p">&gt;</span>Hello World!!!<span class="p">&lt;/</span><span class="nt">td</span><span class="p">&gt;&lt;</span><span class="nt">td</span><span class="p">&gt;</span>Hello World!!!<span class="p">&lt;/</span><span class="nt">td</span><span class="p">&gt;&lt;</span><span class="nt">td</span><span class="p">&gt;</span>Hello World!!!<span class="p">&lt;/</span><span class="nt">td</span><span class="p">&gt;</span>
+        <span class="p">&lt;/</span><span class="nt">tr</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">tr</span><span class="p">&gt;</span>
+            <span class="p">&lt;</span><span class="nt">td</span><span class="p">&gt;</span>Hello World!!!<span class="p">&lt;/</span><span class="nt">td</span><span class="p">&gt;&lt;</span><span class="nt">td</span><span class="p">&gt;</span>Hello World!!!<span class="p">&lt;/</span><span class="nt">td</span><span class="p">&gt;&lt;</span><span class="nt">td</span><span class="p">&gt;</span>Hello World!!!<span class="p">&lt;/</span><span class="nt">td</span><span class="p">&gt;&lt;</span><span class="nt">td</span><span class="p">&gt;</span>Hello World!!!<span class="p">&lt;/</span><span class="nt">td</span><span class="p">&gt;&lt;</span><span class="nt">td</span><span class="p">&gt;</span>Hello World!!!<span class="p">&lt;/</span><span class="nt">td</span><span class="p">&gt;&lt;</span><span class="nt">td</span><span class="p">&gt;</span>Hello World!!!<span class="p">&lt;/</span><span class="nt">td</span><span class="p">&gt;</span>
+        <span class="p">&lt;/</span><span class="nt">tr</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">tr</span><span class="p">&gt;</span>
+            <span class="p">&lt;</span><span class="nt">td</span><span class="p">&gt;</span>Hello World!!!<span class="p">&lt;/</span><span class="nt">td</span><span class="p">&gt;&lt;</span><span class="nt">td</span><span class="p">&gt;</span>Hello World!!!<span class="p">&lt;/</span><span class="nt">td</span><span class="p">&gt;&lt;</span><span class="nt">td</span><span class="p">&gt;</span>Hello World!!!<span class="p">&lt;/</span><span class="nt">td</span><span class="p">&gt;&lt;</span><span class="nt">td</span><span class="p">&gt;</span>Hello World!!!<span class="p">&lt;/</span><span class="nt">td</span><span class="p">&gt;&lt;</span><span class="nt">td</span><span class="p">&gt;</span>Hello World!!!<span class="p">&lt;/</span><span class="nt">td</span><span class="p">&gt;&lt;</span><span class="nt">td</span><span class="p">&gt;</span>Hello World!!!<span class="p">&lt;/</span><span class="nt">td</span><span class="p">&gt;</span>
+        <span class="p">&lt;/</span><span class="nt">tr</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">table</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</pre></div>
+<p>Please notice the <tt class="docutils literal">&lt;meta <span class="pre">http-equiv=&quot;Content-Type&quot;</span> <span class="pre">content=&quot;text/html;</span> <span class="pre">charset=utf-8&quot;</span> /&gt;</tt> in the above <span class="caps">HTML</span> &#8212; also it is saved as
+Unicode (Encoding - Covert to <span class="caps">UTF</span>-8 in Notepad++). The result (<tt class="docutils literal">testxhtml2pdf.pdf</tt>) should&nbsp;have:</p>
+<ul class="simple">
+<li>A nice header&nbsp;(h1)</li>
+<li>Paragraphs</li>
+<li>Horizontal&nbsp;lines</li>
+<li>No support for greek characters (same problem as with&nbsp;reportlab)</li>
+<li>Images (I am inlining it as a base 64&nbsp;image)</li>
+<li>A&nbsp;list</li>
+<li>A&nbsp;table</li>
+</ul>
+<p>Before moving on, I&#8217;d like to fix the problem with the greek characters. You should
+set the font to one supporting greek characters, just like you did with ReportLab before.
+This can be done with the help of the <tt class="docutils literal"><span class="pre">&#64;font-face</span></tt> <a class="reference external" href="https://github.com/xhtml2pdf/xhtml2pdf/blob/master/doc/usage.rst#fonts">css directive</a>. So, let&#8217;s create
+a file named <tt class="docutils literal">testxhtml2pdf2.html</tt> with the following&nbsp;contents:</p>
+<div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">meta</span> <span class="na">http-equiv</span><span class="o">=</span><span class="s">&quot;Content-Type&quot;</span> <span class="na">content</span><span class="o">=</span><span class="s">&quot;text/html; charset=utf-8&quot;</span> <span class="p">/&gt;</span>
+
+    <span class="p">&lt;</span><span class="nt">style</span><span class="p">&gt;</span>
+<span class="w">        </span><span class="p">@</span><span class="k">font-face</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">font-family</span><span class="o">:</span><span class="w"> </span><span class="nt">DejaVuSans</span><span class="o">;</span>
+<span class="w">            </span><span class="nt">src</span><span class="o">:</span><span class="w"> </span><span class="nt">url</span><span class="o">(</span><span class="s2">&quot;c:/progr/py/django-pdf-guide/django_pdf_guide/DejaVuSans.ttf&quot;</span><span class="o">);</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="nt">body</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">font-family</span><span class="p">:</span><span class="w"> </span><span class="n">DejaVuSans</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">&lt;/</span><span class="nt">style</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>Δοκιμή του xhtml2pdf <span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">ul</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;</span>Καλημέρα Ελλάδα!<span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
+
+<span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</pre></div>
+<p>Before running <tt class="docutils literal">xhtml2pdf testxhtml2pdf2.html</tt>, please make
+sure to change the url of the font file above to the absolute path of that font in your
+local system . As a result, after running xhhtml2pdf
+you
+should see the unicode characters without&nbsp;problems.</p>
+<p>I have to mention here that I wasn&#8217;t able to use the font from a relative path, that&#8217;s
+why I used the absolute one. In case something is not right, try
+running it with the <tt class="docutils literal"><span class="pre">-d</span></tt> option to output debugging information (something like
+<tt class="docutils literal">xhtml2pdf <span class="pre">-d</span> testxhtml2pdf2.html</tt>). You must see a line like this&nbsp;one:</p>
+<pre class="code literal-block">
+DEBUG [xhtml2pdf] C:\progr\py\django-pdf-guide\venv\lib\site-packages\xhtml2pdf\context.py line 857: Load font 'c:\\progr\\py\\django-pdf-guide\\django_pdf_guide\\DejaVuSans.ttf'
+</pre>
+<p>to make sure that the font is actually&nbsp;loaded!</p>
+</div>
+<div class="section" id="pypdf2">
+<h3><a class="toc-backref" href="#toc-entry-5">PyPDF2</a></h3>
+<p>The PyPDF2 library can be used to extract pages from a <span class="caps">PDF</span> to a new one
+or combine pages from different PDFs to a a new one. A common requirement is
+to have the first and page of a report as static PDFs, create the contents
+of this report through your app as a <span class="caps">PDF</span> and combine all three PDFs (front page,
+content and back page) to the resulting <span class="caps">PDF</span>.</p>
+<p>Let&#8217;s see a quick example of combining two&nbsp;PDFs:</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PyPDF2</span><span class="w"> </span><span class="kn">import</span> <span class="n">PdfFileMerger</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">pdfs</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">pdfs</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">pdfs</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">exit</span><span class="p">(</span><span class="s2">&quot;Please enter at least two pdfs for merging!&quot;</span><span class="p">)</span>
+
+    <span class="n">merger</span> <span class="o">=</span> <span class="n">PdfFileMerger</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">pdf</span> <span class="ow">in</span> <span class="n">pdfs</span><span class="p">:</span>
+        <span class="n">merger</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fileobj</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="n">pdf</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">))</span>
+
+    <span class="n">output</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;output.pdf&quot;</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span>
+    <span class="n">merger</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+</pre></div>
+<p>The above will try to open all input parameters (as files) and append them to a the&nbsp;output.pdf.</p>
+</div>
+</div>
+<div class="section" id="django-integration">
+<h2><a class="toc-backref" href="#toc-entry-6">Django&nbsp;integration</a></h2>
+<p>To integrate the <span class="caps">PDF</span> creation process with django we&#8217;ll use a simple app with only one model about books. We are
+going to use the django-xhtml2pdf library &#8212; I recommend installing the latest version (from github
+using something like <tt class="docutils literal">pip install <span class="pre">-e</span> <span class="pre">git+https://github.com/chrisglass/django-xhtml2pdf.git#egg=django-xhtml2pdf</span></tt>
+) since the pip package has not been updated in a long&nbsp;time!</p>
+<div class="section" id="using-a-plain-old-view">
+<h3><a class="toc-backref" href="#toc-entry-7">Using a plain old&nbsp;view</a></h3>
+<p>The simplest case is to just create plain old view to display the <span class="caps">PDF</span>. We&#8217;ll use django-xhtml2pdf along with the
+followig django&nbsp;template:</p>
+<div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">meta</span> <span class="na">http-equiv</span><span class="o">=</span><span class="s">&quot;Content-Type&quot;</span> <span class="na">content</span><span class="o">=</span><span class="s">&quot;text/html; charset=utf-8&quot;</span> <span class="p">/&gt;</span>
+<span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>Books<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">table</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">tr</span><span class="p">&gt;</span>
+            <span class="p">&lt;</span><span class="nt">th</span><span class="p">&gt;</span>ID<span class="p">&lt;/</span><span class="nt">th</span><span class="p">&gt;&lt;</span><span class="nt">th</span><span class="p">&gt;</span>Title<span class="p">&lt;/</span><span class="nt">th</span><span class="p">&gt;</span>
+        <span class="p">&lt;/</span><span class="nt">tr</span><span class="p">&gt;</span>
+        {% for book in books %}
+            <span class="p">&lt;</span><span class="nt">tr</span><span class="p">&gt;</span>
+                <span class="p">&lt;</span><span class="nt">td</span><span class="p">&gt;</span>{{ book.id }}<span class="p">&lt;/</span><span class="nt">td</span><span class="p">&gt;&lt;</span><span class="nt">td</span><span class="p">&gt;</span>{{ book.title }}<span class="p">&lt;/</span><span class="nt">td</span><span class="p">&gt;</span>
+            <span class="p">&lt;/</span><span class="nt">tr</span><span class="p">&gt;</span>
+        {% endfor %}
+    <span class="p">&lt;/</span><span class="nt">table</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</pre></div>
+<p>Name it as <tt class="docutils literal">books_plain_old_view.html</tt> and put it on <tt class="docutils literal">books/templates</tt> directory. The view that
+returns the above template as <span class="caps">PDF</span> is the&nbsp;following:</p>
+<div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">HttpResponse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django_xhtml2pdf.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_pdf</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">books_plain_old_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">resp</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">content_type</span><span class="o">=</span><span class="s1">&#39;application/pdf&#39;</span><span class="p">)</span>
+    <span class="n">context</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;books&#39;</span><span class="p">:</span> <span class="n">Book</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="p">}</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">generate_pdf</span><span class="p">(</span><span class="s1">&#39;books_plain_old_view.html&#39;</span><span class="p">,</span> <span class="n">file_object</span><span class="o">=</span><span class="n">resp</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
+</pre></div>
+<p>We just use the <tt class="docutils literal">generate_pdf</tt> method of django-xhtml2pdf to help us generate the <span class="caps">PDF</span>, passing it
+our response object and a context dictionary (containing all&nbsp;books).</p>
+<p>Instead of the simple <span class="caps">HTTP</span> response above, we could add a &#8216;Content Disposition&#8217; <span class="caps">HTTP</span> header to
+our response
+(or use the django-xhtml2pdf method <tt class="docutils literal">render_to_pdf_response</tt> instead of <tt class="docutils literal">generate_pdf</tt>)
+to suggest a default filename for the file to be saved by adding the&nbsp;line</p>
+<pre class="code literal-block">
+resp['Content-Disposition'] = 'attachment; filename=&quot;output.pdf&quot;'
+</pre>
+<p>after the definition of <tt class="docutils literal">resp</tt>.</p>
+<p>This will have the extra effect, at least in Chrome and Firefox to show the &#8220;Save File&#8221; dialog
+when clicking on the link instead of retrieving the <span class="caps">PDF</span> and displaying it inside* the browser&nbsp;window.</p>
+</div>
+<div class="section" id="using-a-cbv">
+<h3><a class="toc-backref" href="#toc-entry-8">Using a <span class="caps">CBV</span></a></h3>
+<p>I don&#8217;t really recommend using plain old Django views - instead I propose to always use Class Based Views
+for their DRYness. The best approach is to create a mixin that would allow any kind of <span class="caps">CBV</span> (at least any
+kind of <span class="caps">CBV</span> that uses a template) to be rendered in <span class="caps">PDF</span>. Here&#8217;s how we could implement a <tt class="docutils literal">PdfResponseMixin</tt>:</p>
+<div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">PdfResponseMixin</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">render_to_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="o">**</span><span class="n">response_kwargs</span><span class="p">):</span>
+        <span class="n">context</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_context_data</span><span class="p">()</span>
+        <span class="n">template</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_template_names</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">resp</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">content_type</span><span class="o">=</span><span class="s1">&#39;application/pdf&#39;</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">generate_pdf</span><span class="p">(</span><span class="n">template</span><span class="p">,</span> <span class="n">file_object</span><span class="o">=</span><span class="n">resp</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+</pre></div>
+<p>Now, we could use this mixin to create <span class="caps">PDF</span> outputting views from any other view! For example, here&#8217;s how
+we could create a book list in&nbsp;pdf:</p>
+<div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">BookPdfListView</span><span class="p">(</span><span class="n">PdfResponseMixin</span><span class="p">,</span> <span class="n">ListView</span><span class="p">):</span>
+    <span class="n">context_object_name</span> <span class="o">=</span> <span class="s1">&#39;books&#39;</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Book</span>
+</pre></div>
+<p>To display it, you could use the same template as <tt class="docutils literal">books_plain_old_view.html</tt> (so either add a <tt class="docutils literal"><span class="pre">template_name='books_plain_old_view.html'</span></tt>
+property to the class or copy <tt class="docutils literal">books_plain_old_view.html</tt> to <tt class="docutils literal">books/book_list.html</tt>).</p>
+<p>Also, as another example, here&#8217;s a <tt class="docutils literal">BookPdfDetailView</tt> that outputs <span class="caps">PDF</span>:</p>
+<div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">BookPdfDetailView</span><span class="p">(</span><span class="n">PdfResponseMixin</span><span class="p">,</span> <span class="n">DetailView</span><span class="p">):</span>
+    <span class="n">context_object_name</span> <span class="o">=</span> <span class="s1">&#39;book&#39;</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Book</span>
+</pre></div>
+<p>and a corresponding template (name it <tt class="docutils literal">books/book_detail.html</tt>):</p>
+<div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">meta</span> <span class="na">http-equiv</span><span class="o">=</span><span class="s">&quot;Content-Type&quot;</span> <span class="na">content</span><span class="o">=</span><span class="s">&quot;text/html; charset=utf-8&quot;</span> <span class="p">/&gt;</span>
+<span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>Book Detail<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">b</span><span class="p">&gt;</span>ID<span class="p">&lt;/</span><span class="nt">b</span><span class="p">&gt;</span>: <span class="cp">{{</span> <span class="nv">book.id</span> <span class="cp">}}</span> <span class="p">&lt;</span><span class="nt">br</span> <span class="p">/&gt;</span>
+    <span class="p">&lt;</span><span class="nt">b</span><span class="p">&gt;</span>Title<span class="p">&lt;/</span><span class="nt">b</span><span class="p">&gt;</span>: <span class="cp">{{</span> <span class="nv">book.title</span> <span class="cp">}}</span> <span class="p">&lt;</span><span class="nt">br</span> <span class="p">/&gt;</span>
+<span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</pre></div>
+<p>To add the content-disposition header and a name for your <span class="caps">PDF</span>, you can use the following&nbsp;mixin:</p>
+<div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">PdfResponseMixin</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="p">):</span>
+    <span class="n">pdf_name</span> <span class="o">=</span> <span class="s2">&quot;output&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_pdf_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pdf_name</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">render_to_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="o">**</span><span class="n">response_kwargs</span><span class="p">):</span>
+        <span class="n">context</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_context_data</span><span class="p">()</span>
+        <span class="n">template</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_template_names</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">resp</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">content_type</span><span class="o">=</span><span class="s1">&#39;application/pdf&#39;</span><span class="p">)</span>
+        <span class="n">resp</span><span class="p">[</span><span class="s1">&#39;Content-Disposition&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;attachment; filename=&quot;</span><span class="si">{0}</span><span class="s1">.pdf&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_pdf_name</span><span class="p">())</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">generate_pdf</span><span class="p">(</span><span class="n">template</span><span class="p">,</span> <span class="n">file_object</span><span class="o">=</span><span class="n">resp</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+</pre></div>
+<p>You see that, in order to havea configurable output name for our <span class="caps">PDF</span> and be consistent with the other
+django CBVs, a <tt class="docutils literal">pdf_name</tt> class attribute and a <tt class="docutils literal">get_pdf_name</tt> instance method are added. When
+using the above mixin in your classes you can either provide a value for <tt class="docutils literal">pdf_name</tt> (to use the same for all
+your instances), or override <tt class="docutils literal">get_pdf_name</tt> to have a dynamic&nbsp;value!</p>
+</div>
+<div class="section" id="how-does-django-xhtml2pdf-loads-resources">
+<h3><a class="toc-backref" href="#toc-entry-9">How does django-xhtml2pdf loads&nbsp;resources</a></h3>
+<p>Before doing more advanced things, we need to understand how <tt class="docutils literal"><span class="pre">django-xhtml2pdf</span></tt> works and specifically
+how we can refer to things like css, images, fonts etc from our <span class="caps">PDF</span> templates.
+If you check the <a class="reference external" href="https://github.com/chrisglass/django-xhtml2pdf/blob/master/django_xhtml2pdf/utils.py">utils.py of django-xhtml2pdf</a> you&#8217;ll see that it uses a function named <tt class="docutils literal">fetch_resources</tt>
+for loading these resources. This function checks to see if the resource starts with <tt class="docutils literal">/MEDIA_URL</tt> or
+<tt class="docutils literal">/STATIC_URL</tt> and converts it to a local (filesystem) path. For example, if you refer to a font like
+<tt class="docutils literal">/static/font1.ttf</tt> in your <span class="caps">PDF</span> template, <tt class="docutils literal">xhtml2pdf</tt> will try to load the file <tt class="docutils literal">STATIC_ROOT + /font1.ttf</tt>
+(and if it does not find the file you want to refer to there it will check all <tt class="docutils literal">STATICFILES_DIRS</tt> entries).</p>
+<p>Thus, you can just put your resources into your <tt class="docutils literal">STATIC_ROOT</tt> directory and use the <tt class="docutils literal">{% static %}</tt>
+template tag to create <span class="caps">URL</span> paths for them &#8212; django-xhtml2pdf will convert these to local paths and
+everything will work&nbsp;fine.</p>
+<p><strong>Please notice that you *need* to have configured &#8220;STATIC_ROOT&#8220; for this to work</strong> &#8212; if <tt class="docutils literal">STATIC_ROOT</tt> is
+empty (and, for example you use <tt class="docutils literal">static</tt> directories in your apps) then the described substitution
+mechanism will <em>not</em> work. Also, notice that the <tt class="docutils literal">/static</tt> directory inside your apps <em>cannot be used</em>
+for fetch resources like this
+(due to how <tt class="docutils literal">fetch_resources</tt> is implemented it only checks if the static resource is contained inside
+the <tt class="docutils literal">STATIC_ROOT</tt> or in one of the the <tt class="docutils literal">STATICFILES_DIRS</tt>) so be careful to either put the static files
+you need to load from PDFs (fonts, styles and possibly images) to either the <tt class="docutils literal">STATIC_ROOT</tt> or the
+one of the <tt class="docutils literal">STATICFILES_DIRS</tt>.</p>
+</div>
+<div class="section" id="using-a-common-style-for-your-pdfs">
+<h3><a class="toc-backref" href="#toc-entry-10">Using a common style for your&nbsp;PDFs</a></h3>
+<p>If you need to create a lot of similar PDFs then you&#8217;ll probably want to
+use a bunch of common styles for them (same fonts, headers etc). This could be done using
+the <tt class="docutils literal">{% static %}</tt> trick we saw on the previous section. However, if we include the
+styling css as a static file then we won&#8217;t be able to use the static-file-uri-to-local-path
+mechanism described above (since the <tt class="docutils literal">{% static %}</tt> template tag won&#8217;t work in static&nbsp;files).</p>
+<p>Thankfully, not everything is lost &#8212; Django comes to the rescue!!! We can create a single <span class="caps">CSS</span> file
+that would be used by all our <span class="caps">PDF</span> templates and <em>include</em> it in the templates using the <tt class="docutils literal">{% include %}</tt> Django
+template tag! Django will think that this will be a normal template and paste its contents where we wanted and
+also execute the templates&nbsp;tags!</p>
+<p>We&#8217;ll see an example of all this in the next&nbsp;section.</p>
+</div>
+<div class="section" id="changing-the-font-to-a-unicode-enabled-one">
+<h3><a class="toc-backref" href="#toc-entry-11">Changing the font (to a Unicode enabled&nbsp;one)</a></h3>
+<p>The time has finally arrived to change the font! It&#8217;s easy if you know exactly what to do. First of all
+configure your <tt class="docutils literal">STATIC_ROOT</tt> and <tt class="docutils literal">STATIC_URL</tt> setting, for example <tt class="docutils literal">STATIC_ROOT = <span class="pre">os.path.join(BASE_DIR,'static')</span></tt>
+and <tt class="docutils literal">STATIC_URL = '/static/'</tt>.</p>
+<p>Then, add a template-css file for your fonts in one of your templates directories. I am naming the
+file <tt class="docutils literal">pdfstylefonts.css</tt> and I&#8217;ve put it to <tt class="docutils literal">books/templates</tt>:</p>
+<div class="highlight"><pre><span></span><span class="p">{</span><span class="err">%</span><span class="w"> </span><span class="err">load</span><span class="w"> </span><span class="err">static</span><span class="w"> </span><span class="err">%</span><span class="p">}</span>
+<span class="p">@</span><span class="k">font-face</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">font-family</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;Calibri&quot;</span><span class="o">;</span>
+<span class="w">    </span><span class="nt">src</span><span class="o">:</span><span class="w"> </span><span class="nt">url</span><span class="o">(</span><span class="p">{</span><span class="err">%</span><span class="w"> </span><span class="err">static</span><span class="w"> </span><span class="err">&quot;fonts/calibri.ttf&quot;</span><span class="w"> </span><span class="err">%</span><span class="p">}</span><span class="o">);</span>
+<span class="p">}</span>
+<span class="p">@</span><span class="k">font-face</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">font-family</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;Calibri&quot;</span><span class="o">;</span>
+<span class="w">    </span><span class="nt">src</span><span class="o">:</span><span class="w"> </span><span class="nt">url</span><span class="o">(</span><span class="p">{</span><span class="err">%</span><span class="w"> </span><span class="err">static</span><span class="w"> </span><span class="err">&quot;fonts/calibrib.ttf&quot;</span><span class="w"> </span><span class="err">%</span><span class="p">}</span><span class="o">);</span>
+<span class="w">    </span><span class="nt">font-weight</span><span class="o">:</span><span class="w"> </span><span class="nt">bold</span><span class="o">;</span>
+<span class="p">}</span>
+<span class="p">@</span><span class="k">font-face</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">font-family</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;Calibri&quot;</span><span class="o">;</span>
+<span class="w">    </span><span class="nt">src</span><span class="o">:</span><span class="w"> </span><span class="nt">url</span><span class="o">(</span><span class="p">{</span><span class="err">%</span><span class="w"> </span><span class="err">static</span><span class="w"> </span><span class="err">&quot;fonts/calibrii.ttf&quot;</span><span class="w"> </span><span class="err">%</span><span class="p">}</span><span class="o">);</span>
+<span class="w">    </span><span class="nt">font-style</span><span class="o">:</span><span class="w"> </span><span class="nt">italic</span><span class="o">,</span><span class="w"> </span><span class="nt">oblique</span><span class="o">;</span>
+<span class="p">}</span>
+<span class="p">@</span><span class="k">font-face</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">font-family</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;Calibri&quot;</span><span class="o">;</span>
+<span class="w">    </span><span class="nt">src</span><span class="o">:</span><span class="w"> </span><span class="nt">url</span><span class="o">(</span><span class="p">{</span><span class="err">%</span><span class="w"> </span><span class="err">static</span><span class="w"> </span><span class="err">&quot;fonts/calibriz.ttf&quot;</span><span class="w"> </span><span class="err">%</span><span class="p">}</span><span class="o">);</span>
+<span class="w">    </span><span class="nt">font-weight</span><span class="o">:</span><span class="w"> </span><span class="nt">bold</span><span class="o">;</span>
+<span class="w">    </span><span class="nt">font-style</span><span class="o">:</span><span class="w"> </span><span class="nt">italic</span><span class="o">,</span><span class="w"> </span><span class="nt">oblique</span><span class="o">;</span>
+<span class="p">}</span>
+</pre></div>
+<p>I am using Calibri family of fonts (copied from <tt class="docutils literal"><span class="pre">c:\windows\fonts</span></tt>) for this &#8212; I&#8217;ve also configured
+all styles (bold, italic, bold-italic) of this font family to use the correct ttf files. All the
+ttf files have been copied to the directory <tt class="docutils literal">static/fonts/</tt>.</p>
+<p>Now, add another css file that will be your global <span class="caps">PDF</span> styles. This should be put to the <tt class="docutils literal">static</tt> directory
+and could be named <tt class="docutils literal">pdfstyle.css</tt>:</p>
+<div class="highlight"><pre><span></span><span class="nt">h1</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">color</span><span class="p">:</span><span class="w"> </span><span class="kc">blue</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="o">*,</span><span class="w"> </span><span class="nt">html</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">font-family</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Calibri&quot;</span><span class="p">;</span>
+<span class="w">    </span><span class="k">font-size</span><span class="p">:</span><span class="mi">11</span><span class="kt">pt</span><span class="p">;</span>
+<span class="w">    </span><span class="k">color</span><span class="p">:</span><span class="w"> </span><span class="kc">red</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<p>Next, here&#8217;s a template that lists all books (and contain some greek characters &#8212; the title of the books also contain
+greek characters) &#8212; I&#8217;ve named it <tt class="docutils literal">book_list_ex.html</tt>:</p>
+<div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">static</span> <span class="cp">%}</span>
+<span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">meta</span> <span class="na">http-equiv</span><span class="o">=</span><span class="s">&quot;Content-Type&quot;</span> <span class="na">content</span><span class="o">=</span><span class="s">&quot;text/html; charset=utf-8&quot;</span> <span class="p">/&gt;</span>
+    <span class="p">&lt;</span><span class="nt">style</span><span class="p">&gt;</span>
+<span class="w">        </span><span class="cp">{%</span> <span class="k">include</span> <span class="s2">&quot;pdfstylefonts.css&quot;</span> <span class="cp">%}</span>
+<span class="w">    </span><span class="p">&lt;/</span><span class="nt">style</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">link</span> <span class="na">rel</span><span class="o">=</span><span class="s">&#39;stylesheet&#39;</span> <span class="na">href</span><span class="o">=</span><span class="s">&#39;</span><span class="cp">{%</span> <span class="k">static</span> <span class="s2">&quot;pdfstyle.css&quot;</span> <span class="cp">%}</span><span class="s">&#39;</span><span class="p">/&gt;</span>
+<span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>Λίστα βιβλίων<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">img</span> <span class="na">src</span><span class="o">=</span><span class="s">&#39;</span><span class="cp">{%</span> <span class="k">static</span> <span class="s2">&quot;pony.png&quot;</span> <span class="cp">%}</span><span class="s">&#39;</span> <span class="p">/&gt;</span>
+    <span class="p">&lt;</span><span class="nt">table</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">tr</span><span class="p">&gt;</span>
+            <span class="p">&lt;</span><span class="nt">th</span><span class="p">&gt;</span>ID<span class="p">&lt;/</span><span class="nt">th</span><span class="p">&gt;&lt;</span><span class="nt">th</span><span class="p">&gt;</span>Title<span class="p">&lt;/</span><span class="nt">th</span><span class="p">&gt;&lt;</span><span class="nt">th</span><span class="p">&gt;</span>Cover<span class="p">&lt;/</span><span class="nt">th</span><span class="p">&gt;</span>
+        <span class="p">&lt;/</span><span class="nt">tr</span><span class="p">&gt;</span>
+        <span class="cp">{%</span> <span class="k">for</span> <span class="nv">book</span> <span class="k">in</span> <span class="nv">books</span> <span class="cp">%}</span>
+            <span class="p">&lt;</span><span class="nt">tr</span><span class="p">&gt;</span>
+                <span class="p">&lt;</span><span class="nt">td</span><span class="p">&gt;</span><span class="cp">{{</span> <span class="nv">book.id</span> <span class="cp">}}</span><span class="p">&lt;/</span><span class="nt">td</span><span class="p">&gt;&lt;</span><span class="nt">td</span><span class="p">&gt;</span><span class="cp">{{</span> <span class="nv">book.title</span> <span class="cp">}}</span><span class="p">&lt;/</span><span class="nt">td</span><span class="p">&gt;&lt;</span><span class="nt">td</span><span class="p">&gt;&lt;</span><span class="nt">img</span> <span class="na">src</span><span class="o">=</span><span class="s">&#39;</span><span class="cp">{{</span> <span class="nv">book.cover.url</span> <span class="cp">}}</span><span class="s">&#39;</span> <span class="p">/&gt;&lt;/</span><span class="nt">td</span><span class="p">&gt;</span>
+            <span class="p">&lt;/</span><span class="nt">tr</span><span class="p">&gt;</span>
+        <span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
+    <span class="p">&lt;/</span><span class="nt">table</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</pre></div>
+<p>You&#8217;ll see that the <tt class="docutils literal">pdfstylefonts.css</tt> is included as a Django template (so that <tt class="docutils literal">{% static %}</tt> will
+work in that file) while <tt class="docutils literal">pdfstyle.css</tt> is included using <tt class="docutils literal">{% static %}</tt>.
+Als, notice that I&#8217;ve also added a static image (using the <tt class="docutils literal">{% static %}</tt> tag) and a dynamic (media)
+file to show off how great the url-to-local-path mechanism works. Please notice that for the
+media files to work fine in your development environment you need to configure the
+<tt class="docutils literal">MEDIA_URL</tt> and <tt class="docutils literal">MEDIA_ROOT</tt> settigns (similar to <tt class="docutils literal">STATIC_URL</tt> and <tt class="docutils literal">STATIC_ROOT</tt>) and follow the
+<a class="reference external" href="https://docs.djangoproject.com/en/1.8/howto/static-files/#serving-files-uploaded-by-a-user-during-development">serve files uploaded by a user during development</a> tutorial on Django&nbsp;docs.</p>
+<p>Finally, if you configure a PdfResponseMixin ListView like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">BookExPdfListView</span><span class="p">(</span><span class="n">PdfResponseMixin</span><span class="p">,</span> <span class="n">ListView</span><span class="p">):</span>
+    <span class="n">context_object_name</span> <span class="o">=</span> <span class="s1">&#39;books&#39;</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Book</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s1">&#39;books/book_list_ex.html&#39;</span>
+</pre></div>
+<p>you should see be able to see the correct (calibri) font (defined in <tt class="docutils literal">pdfstylefonts.css</tt>), with unicode characters without problems
+including both the static and user uploaded images and with the styles defined in the pdf stylesheet (<tt class="docutils literal">pdfstyle.css</tt>).</p>
+</div>
+<div class="section" id="configure-django-for-debugging-pdf-creation">
+<h3><a class="toc-backref" href="#toc-entry-12">Configure Django for debugging <span class="caps">PDF</span>&nbsp;creation</a></h3>
+<p>If you experience any problems, you can configure xhtml2pdf to output <span class="caps">DEBUG</span> information. To do this,
+you may change your django logging configuration like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><span class="n">LOGGING</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;version&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s1">&#39;disable_existing_loggers&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="s1">&#39;handlers&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;console&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="s1">&#39;logging.StreamHandler&#39;</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;loggers&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;xhtml2pdf&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;handlers&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;console&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="s1">&#39;DEBUG&#39;</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+<p>This configuration will keep existing loggers (<tt class="docutils literal">'disable_existing_loggers': False,</tt>) and will configure
+<tt class="docutils literal">xhtml2pdf</tt> to log its output to the console, helping us find out why some things won&#8217;t be&nbsp;working.</p>
+</div>
+<div class="section" id="concatenating-pdfs-in-django">
+<h3><a class="toc-backref" href="#toc-entry-13">Concatenating PDFs in&nbsp;Django</a></h3>
+<p>The final section of the <span class="caps">PDF</span>-Django-integration is to explain how we can concatenate PDFs in django using PyPDF2. There may be
+some other requirements like extracting pages from PDFs however the most common one as explained before is to just append
+the pages of one <span class="caps">PDF</span> after the other &#8212; after all using PyPDF2 is really easy after you get the hang of&nbsp;it.</p>
+<p>To be more <span class="caps">DRY</span>, I will create a <tt class="docutils literal">CoverPdfResponseMixin</tt> that will output a <span class="caps">PDF</span> <em>with</em> a cover. To be <em>even more</em> <span class="caps">DRY</span>,
+I will refactor <tt class="docutils literal">PdfResponseMixin</tt> to put some common code in an extra method so that <tt class="docutils literal">CoverPdfResponseMixin</tt> could inherit from&nbsp;it:</p>
+<div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">PdfResponseMixin</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_pdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_object</span><span class="p">,</span> <span class="p">):</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_context_data</span><span class="p">()</span>
+        <span class="n">template</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_template_names</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">generate_pdf</span><span class="p">(</span><span class="n">template</span><span class="p">,</span> <span class="n">file_object</span><span class="o">=</span><span class="n">file_object</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">render_to_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="o">**</span><span class="n">response_kwargs</span><span class="p">):</span>
+        <span class="n">resp</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">content_type</span><span class="o">=</span><span class="s1">&#39;application/pdf&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write_pdf</span><span class="p">(</span><span class="n">resp</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">resp</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">CoverPdfResponseMixin</span><span class="p">(</span><span class="n">PdfResponseMixin</span><span class="p">,</span> <span class="p">):</span>
+    <span class="n">cover_pdf</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">render_to_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="o">**</span><span class="n">response_kwargs</span><span class="p">):</span>
+        <span class="n">merger</span> <span class="o">=</span> <span class="n">PdfFileMerger</span><span class="p">()</span>
+        <span class="n">merger</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cover_pdf</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">))</span>
+
+        <span class="n">pdf_fo</span> <span class="o">=</span> <span class="n">StringIO</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write_pdf</span><span class="p">(</span><span class="n">pdf_fo</span><span class="p">)</span>
+        <span class="n">merger</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pdf_fo</span><span class="p">)</span>
+
+        <span class="n">resp</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">content_type</span><span class="o">=</span><span class="s1">&#39;application/pdf&#39;</span><span class="p">)</span>
+        <span class="n">merger</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">resp</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">resp</span>
+</pre></div>
+<p>So, <tt class="docutils literal">PdfResponseMixin</tt> now has a <tt class="docutils literal">write_pdf</tt> method that gets a file-like object and outputs the <span class="caps">PDF</span> there.
+The new mixin, <tt class="docutils literal">CoverPdfResponseMixin</tt> has a <tt class="docutils literal">cover_pdf</tt> attribute that should be configured with the filesystem
+path of the cover file. The <tt class="docutils literal">render_to_response</tt> method now will create a <tt class="docutils literal">PdfFileMerger</tt> (which is empty
+initially) to which it appends the contents <tt class="docutils literal">cover_pdf</tt>. After that, it creates a file-stream (using StreamIO)
+and uses <tt class="docutils literal">write_pdf</tt> to create the <span class="caps">PDF</span> there and appends that file-stream to the merger. Finally, it writes
+the merger contents to the <tt class="docutils literal">HttpResponse</tt>.</p>
+<p>One thing that I&#8217;ve seen is that if you want to concatenate many PDFs with many pages sometimes you&#8217;ll get
+a strange an error when using <tt class="docutils literal">PdfFileMerger</tt>. I was able to overcome this by reading and appending the pages of each
+<span class="caps">PDF</span> to-be-appended one by one using the <tt class="docutils literal">PdfFileReader</tt> and <tt class="docutils literal">PdfFileWriter</tt> objects. Here&#8217;s a small snippet of how
+this could be&nbsp;done:</p>
+<div class="highlight"><pre><span></span><span class="n">pdfs</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># List of pdfs to be concatenated</span>
+<span class="n">writer</span> <span class="o">=</span> <span class="n">PdfFileWriter</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">pdf</span> <span class="ow">in</span> <span class="n">pdfs</span><span class="p">:</span>
+    <span class="n">reader</span> <span class="o">=</span> <span class="n">PdfFileReader</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">pdf</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">reader</span><span class="o">.</span><span class="n">getNumPages</span><span class="p">()):</span>
+        <span class="n">writer</span><span class="o">.</span><span class="n">addPage</span><span class="p">(</span><span class="n">reader</span><span class="o">.</span><span class="n">getPage</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+
+<span class="n">resp</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">content_type</span><span class="o">=</span><span class="s1">&#39;application/pdf&#39;</span><span class="p">)</span>
+<span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">resp</span><span class="p">)</span>
+<span class="k">return</span> <span class="n">resp</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="more-advanced-xhtml2pdf-features">
+<h2><a class="toc-backref" href="#toc-entry-14">More advanced xhtml2pdf&nbsp;features</a></h2>
+<p>In this section I will present some information on how to use various xhtml2pdf features
+to create the most common required printed document features, for example adding page
+numbers, adding headers and footers&nbsp;etc.</p>
+<div class="section" id="laying-out">
+<h3><a class="toc-backref" href="#toc-entry-15">Laying&nbsp;out</a></h3>
+<p>To find out how you can create your pages you should read the
+<a class="reference external" href="https://github.com/xhtml2pdf/xhtml2pdf/blob/master/doc/usage.rst#defining-page-layouts">defining page layouts</a> section of the xhtml2pdf manual. There
+you&#8217;ll see that the basic components of laying out in xhtml2pdf is
+&#64;page to create pages and &#64;frames to create rectangular components
+inside these pages. So each page will have a number of frames
+inside it. These frames are seperated to static and dynamic. Staticsome
+should be used for things like headers
+and footers (so they&#8217;ll be the same across all pages) and dynamic will
+contain the main content of the&nbsp;report.</p>
+<p>For pages you can use any page size you want, not just the specified ones. For example, in one of my
+projects I wanted to create a <span class="caps">PDF</span> print on a normal plastic card, so I&#8217;d used the
+following <tt class="docutils literal">size: 8.56cm 5.398cm;</tt>. Also, page templates can be named
+and you can use different ones in the same <span class="caps">PDF</span> (so you could create
+a cover page with a different page template, use it first and then continue
+with the normal pages). To name a tempalte you just use &#64;page template_name {}
+and to change the template use the combination of the following two xhtml2pdf&nbsp;tags:</p>
+<div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">pdf:nexttemplate</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;back_page&quot;</span> <span class="p">/&gt;</span>
+<span class="p">&lt;</span><span class="nt">pdf:nextpage</span> <span class="p">/&gt;</span>
+</pre></div>
+<p>Now, one thing I&#8217;ve noticed is that you are not able to use a named template for the first
+page of your <span class="caps">PDF</span>. So, what I&#8217;ve done is that I create an anonymous (default) page for the
+first page of the report. If I want to <em>reuse</em> it in another page, I copy it and name it
+accordingly. I will give an example&nbsp;shortly.</p>
+<p>Now, for frames, I recommend using the <tt class="docutils literal"><span class="pre">-pdf-frame-border:</span> 1;</tt> command for debugging where
+they are actually printed. Also, I recommend using a normal ruler and measuring completely
+where you want them to be. For example, for the following&nbsp;frame:</p>
+<div class="highlight"><pre><span></span><span class="p">@</span><span class="k">frame</span><span class="w"> </span><span class="nt">photo_frame</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">-pdf-frame-border</span><span class="o">:</span><span class="w"> </span><span class="nt">1</span><span class="o">;</span>
+<span class="w">        </span><span class="nt">top</span><span class="o">:</span><span class="w">  </span><span class="nt">2</span><span class="p">.</span><span class="nc">4cm</span><span class="o">;</span>
+<span class="w">        </span><span class="nt">left</span><span class="o">:</span><span class="w"> </span><span class="nt">6</span><span class="p">.</span><span class="nc">2cm</span><span class="o">;</span>
+<span class="w">        </span><span class="nt">width</span><span class="o">:</span><span class="w"> </span><span class="nt">1</span><span class="p">.</span><span class="nc">9cm</span><span class="o">;</span>
+<span class="w">        </span><span class="nt">height</span><span class="o">:</span><span class="w"> </span><span class="nt">2</span><span class="p">.</span><span class="nc">2cm</span><span class="o">;</span>
+<span class="p">}</span>
+</pre></div>
+<p>I&#8217;d used a ruler to find out that I want it to start 2.4 cm from the top of my page (actually a credit card)
+and 6.2 cm from the left and have a width and height of 1.9 and 2.2&nbsp;cm.</p>
+<p>I recommend naming all frames to be able to distinguish them however I don&#8217;t think that their name plays
+any other role. However, for static frames you must define the id of the content they will contain using <tt class="docutils literal"><span class="pre">-pdf-frame-content</span></tt>
+in the css and a div with the corresponding id in the <span class="caps">PDF</span> template. For example, you could define a frame header like&nbsp;this</p>
+<div class="highlight"><pre><span></span><span class="p">@</span><span class="k">frame</span><span class="w"> </span><span class="nt">header</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nt">-pdf-frame-content</span><span class="o">:</span><span class="w"> </span><span class="nt">headerContent</span><span class="o">;</span>
+<span class="w">  </span><span class="nt">width</span><span class="o">:</span><span class="w"> </span><span class="nt">8in</span><span class="o">;</span>
+<span class="w">  </span><span class="nt">top</span><span class="o">:</span><span class="w"> </span><span class="nt">0</span><span class="p">.</span><span class="nc">5cm</span><span class="o">;</span>
+<span class="w">  </span><span class="nt">margin-left</span><span class="o">:</span><span class="w"> </span><span class="nt">0</span><span class="p">.</span><span class="nc">5cm</span><span class="o">;</span>
+<span class="w">  </span><span class="nt">margin-right</span><span class="o">:</span><span class="w"> </span><span class="nt">0</span><span class="p">.</span><span class="nc">5cm</span><span class="o">;</span>
+<span class="w">  </span><span class="nt">height</span><span class="o">:</span><span class="w"> </span><span class="nt">2cm</span><span class="o">;</span>
+<span class="p">}</span>
+</pre></div>
+<p>and its content like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">&#39;headerContent&#39;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">h1</span> <span class="p">&gt;</span>
+    Header !
+  <span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</pre></div>
+<p>Please notice that if for some reason the stuff you want to put in your static frames does not fit there the frame will
+be totally empty. This means that if you have size for three lines but you want to output five lines in a static frame
+then you&#8217;ll see no&nbsp;lines!</p>
+<p>Now, for dynamic content you can expect the opposite behavior:
+You <em>cannot</em> select to which dynamic frame your content goes, instead the content just just flows to the first dynamic frame it
+fits! If it does not fit in any dynamic frames in the current page then a new page will be&nbsp;created.</p>
+<p>I&#8217;d like to present a full example here on the already mentioned project of printing a plastic card for the books. I had two page layouts,
+one for the front page having a frame with the owner&#8217;s data and another frame with his photo and one for the back page having
+a barcode. This is a Django template that is used to print not only but a <span class="caps">PDF</span> with a group of these&nbsp;cards:</p>
+<div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">meta</span> <span class="na">http-equiv</span><span class="o">=</span><span class="s">&quot;Content-Type&quot;</span> <span class="na">content</span><span class="o">=</span><span class="s">&quot;text/html; charset=utf-8&quot;</span> <span class="p">/&gt;</span>
+<span class="p">&lt;</span><span class="nt">style</span><span class="p">&gt;</span>
+<span class="w">    </span><span class="cp">{%</span> <span class="k">include</span> <span class="s2">&quot;pdfstylefonts.css&quot;</span> <span class="cp">%}</span>
+<span class="p">&lt;/</span><span class="nt">style</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">style</span> <span class="na">type</span><span class="o">=</span><span class="s">&#39;text/css&#39;</span><span class="p">&gt;</span>
+<span class="w">    </span><span class="p">@</span><span class="k">page</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">size</span><span class="o">:</span><span class="w"> </span><span class="nt">8</span><span class="p">.</span><span class="nc">56cm</span><span class="w"> </span><span class="nt">5</span><span class="p">.</span><span class="nc">398cm</span><span class="o">;</span>
+<span class="w">        </span><span class="nt">margin</span><span class="o">:</span><span class="w"> </span><span class="nt">0</span><span class="p">.</span><span class="nc">0cm</span><span class="w"> </span><span class="nt">0</span><span class="p">.</span><span class="nc">0cm</span><span class="w"> </span><span class="nt">0</span><span class="p">.</span><span class="nc">0cm</span><span class="w"> </span><span class="nt">0</span><span class="p">.</span><span class="nc">0cm</span><span class="o">;</span>
+<span class="w">        </span><span class="nt">padding</span><span class="o">:</span><span class="w"> </span><span class="nt">0</span><span class="o">;</span>
+
+<span class="w">        </span><span class="p">@</span><span class="k">frame</span><span class="w"> </span><span class="nt">table_frame</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c">/* -pdf-frame-border: 1; */</span>
+<span class="w">            </span><span class="nt">top</span><span class="o">:</span><span class="w">  </span><span class="nt">2</span><span class="p">.</span><span class="nc">4cm</span><span class="o">;</span>
+<span class="w">            </span><span class="nt">left</span><span class="o">:</span><span class="w"> </span><span class="nt">0</span><span class="p">.</span><span class="nc">4cm</span><span class="o">;</span>
+<span class="w">            </span><span class="nt">width</span><span class="o">:</span><span class="w"> </span><span class="nt">5</span><span class="p">.</span><span class="nc">5cm</span><span class="o">;</span>
+<span class="w">            </span><span class="nt">height</span><span class="o">:</span><span class="w"> </span><span class="nt">3cm</span><span class="o">;</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="p">@</span><span class="k">frame</span><span class="w"> </span><span class="nt">photo_frame</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c">/* -pdf-frame-border: 1; */</span>
+<span class="w">            </span><span class="nt">top</span><span class="o">:</span><span class="w">  </span><span class="nt">2</span><span class="p">.</span><span class="nc">4cm</span><span class="o">;</span>
+<span class="w">            </span><span class="nt">left</span><span class="o">:</span><span class="w"> </span><span class="nt">6</span><span class="p">.</span><span class="nc">2cm</span><span class="o">;</span>
+<span class="w">            </span><span class="nt">width</span><span class="o">:</span><span class="w"> </span><span class="nt">1</span><span class="p">.</span><span class="nc">9cm</span><span class="o">;</span>
+<span class="w">            </span><span class="nt">height</span><span class="o">:</span><span class="w"> </span><span class="nt">2</span><span class="p">.</span><span class="nc">2cm</span><span class="o">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="p">@</span><span class="k">page</span><span class="w"> </span><span class="nt">front_page</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">size</span><span class="o">:</span><span class="w"> </span><span class="nt">8</span><span class="p">.</span><span class="nc">56cm</span><span class="w"> </span><span class="nt">5</span><span class="p">.</span><span class="nc">398cm</span><span class="o">;</span>
+<span class="w">        </span><span class="nt">margin</span><span class="o">:</span><span class="w"> </span><span class="nt">0</span><span class="p">.</span><span class="nc">0cm</span><span class="w"> </span><span class="nt">0</span><span class="p">.</span><span class="nc">0cm</span><span class="w"> </span><span class="nt">0</span><span class="p">.</span><span class="nc">0cm</span><span class="w"> </span><span class="nt">0</span><span class="p">.</span><span class="nc">0cm</span><span class="o">;</span>
+<span class="w">        </span><span class="nt">padding</span><span class="o">:</span><span class="w"> </span><span class="nt">0</span><span class="o">;</span>
+
+<span class="w">        </span><span class="p">@</span><span class="k">frame</span><span class="w"> </span><span class="nt">table_frame</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c">/* -pdf-frame-border: 1; */</span>
+<span class="w">            </span><span class="nt">top</span><span class="o">:</span><span class="w">  </span><span class="nt">2</span><span class="p">.</span><span class="nc">4cm</span><span class="o">;</span>
+<span class="w">            </span><span class="nt">left</span><span class="o">:</span><span class="w"> </span><span class="nt">0</span><span class="p">.</span><span class="nc">4cm</span><span class="o">;</span>
+<span class="w">            </span><span class="nt">width</span><span class="o">:</span><span class="w"> </span><span class="nt">5</span><span class="p">.</span><span class="nc">5cm</span><span class="o">;</span>
+<span class="w">            </span><span class="nt">height</span><span class="o">:</span><span class="w"> </span><span class="nt">3cm</span><span class="o">;</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="p">@</span><span class="k">frame</span><span class="w"> </span><span class="nt">photo_frame</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c">/* -pdf-frame-border: 1; */</span>
+<span class="w">            </span><span class="nt">top</span><span class="o">:</span><span class="w">  </span><span class="nt">2</span><span class="p">.</span><span class="nc">4cm</span><span class="o">;</span>
+<span class="w">            </span><span class="nt">left</span><span class="o">:</span><span class="w"> </span><span class="nt">6</span><span class="p">.</span><span class="nc">2cm</span><span class="o">;</span>
+<span class="w">            </span><span class="nt">width</span><span class="o">:</span><span class="w"> </span><span class="nt">1</span><span class="p">.</span><span class="nc">9cm</span><span class="o">;</span>
+<span class="w">            </span><span class="nt">height</span><span class="o">:</span><span class="w"> </span><span class="nt">2</span><span class="p">.</span><span class="nc">2cm</span><span class="o">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="p">@</span><span class="k">page</span><span class="w"> </span><span class="nt">back_page</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">size</span><span class="o">:</span><span class="w"> </span><span class="nt">8</span><span class="p">.</span><span class="nc">56cm</span><span class="w"> </span><span class="nt">5</span><span class="p">.</span><span class="nc">398cm</span><span class="o">;</span>
+<span class="w">        </span><span class="nt">margin</span><span class="o">:</span><span class="w"> </span><span class="nt">0</span><span class="p">.</span><span class="nc">0cm</span><span class="w"> </span><span class="nt">0</span><span class="p">.</span><span class="nc">0cm</span><span class="w"> </span><span class="nt">0</span><span class="p">.</span><span class="nc">0cm</span><span class="w"> </span><span class="nt">0</span><span class="p">.</span><span class="nc">0cm</span><span class="o">;</span>
+<span class="w">        </span><span class="nt">padding</span><span class="o">:</span><span class="w"> </span><span class="nt">0</span><span class="o">;</span>
+
+<span class="w">        </span><span class="p">@</span><span class="k">frame</span><span class="w"> </span><span class="nt">barcode_frame</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c">/* -pdf-frame-border: 1; */</span>
+<span class="w">            </span><span class="nt">top</span><span class="o">:</span><span class="w">  </span><span class="nt">3</span><span class="p">.</span><span class="nc">9cm</span><span class="o">;</span>
+<span class="w">            </span><span class="nt">left</span><span class="o">:</span><span class="w"> </span><span class="nt">1</span><span class="p">.</span><span class="nc">8cm</span><span class="o">;</span>
+<span class="w">            </span><span class="nt">width</span><span class="o">:</span><span class="w"> </span><span class="nt">4</span><span class="p">.</span><span class="nc">9cm</span><span class="o">;</span>
+<span class="w">            </span><span class="nt">height</span><span class="o">:</span><span class="w"> </span><span class="nt">1</span><span class="p">.</span><span class="nc">1cm</span><span class="o">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="o">*,</span><span class="w"> </span><span class="nt">html</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">font-family</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Calibri&quot;</span><span class="p">;</span>
+<span class="w">        </span><span class="k">font-size</span><span class="p">:</span><span class="w"> </span><span class="mi">8</span><span class="kt">pt</span><span class="p">;</span>
+<span class="w">        </span><span class="k">line-height</span><span class="p">:</span><span class="w"> </span><span class="mi">80</span><span class="kt">%</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="p">.</span><span class="nc">bigger</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">font-size</span><span class="p">:</span><span class="mi">9</span><span class="kt">pt</span><span class="p">;</span>
+<span class="w">        </span><span class="k">font-weight</span><span class="p">:</span><span class="w"> </span><span class="kc">bold</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">&lt;/</span><span class="nt">style</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+    <span class="cp">{%</span> <span class="k">for</span> <span class="nv">book</span> <span class="k">in</span> <span class="nv">books</span> <span class="cp">%}</span>
+        <span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>
+            <span class="cp">&lt;! -- Here I print the card data. It fits exactly in the table_frame so ... -&gt;</span>
+            <span class="cp">{{</span> <span class="nv">book.title</span> <span class="cp">}}</span><span class="p">&lt;</span><span class="nt">br</span> <span class="p">/&gt;</span>
+            Data line 2<span class="p">&lt;</span><span class="nt">br</span> <span class="p">/&gt;</span>
+            Data line 3<span class="p">&lt;</span><span class="nt">br</span> <span class="p">/&gt;</span>
+            Data line 4<span class="p">&lt;</span><span class="nt">br</span> <span class="p">/&gt;</span>
+            Data line 5<span class="p">&lt;</span><span class="nt">br</span> <span class="p">/&gt;</span>
+            Data line 6<span class="p">&lt;</span><span class="nt">br</span> <span class="p">/&gt;</span>
+            Data line 7<span class="p">&lt;</span><span class="nt">br</span> <span class="p">/&gt;</span>
+            Data line 8<span class="p">&lt;</span><span class="nt">br</span> <span class="p">/&gt;</span>
+            Data line 9<span class="p">&lt;</span><span class="nt">br</span> <span class="p">/&gt;</span>
+            Data line 10<span class="p">&lt;</span><span class="nt">br</span> <span class="p">/&gt;</span>
+        <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>
+            <span class="cp">&lt;! -- This photo here will be outputted to the photo_frame --&gt;</span>
+            <span class="p">&lt;</span><span class="nt">img</span> <span class="na">src</span><span class="o">=</span><span class="s">&#39;</span><span class="cp">{{</span> <span class="nv">book.cover.url</span> <span class="cp">}}</span><span class="s">&#39;</span> <span class="na">style</span><span class="o">=</span><span class="s">&#39;width:1.9cm ; height: 2.2cm ; &#39;</span> <span class="p">/&gt;</span>
+        <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+
+        <span class="cp">&lt;! -- Now the template is chaned to print the back of the card --&gt;</span>
+        <span class="p">&lt;</span><span class="nt">pdf:nexttemplate</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;back_page&quot;</span> <span class="p">/&gt;</span>
+        <span class="p">&lt;</span><span class="nt">pdf:nextpage</span> <span class="p">/&gt;</span>
+
+        <span class="p">&lt;</span><span class="nt">div</span> <span class="p">&gt;</span>
+            <span class="p">&lt;</span><span class="nt">center</span><span class="p">&gt;</span>
+                <span class="cp">&lt;! -- Print the barcode to the barcode_frame --&gt;</span>
+                <span class="p">&lt;</span><span class="nt">pdf:barcode</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">book.id</span> <span class="cp">}}</span><span class="s">&quot;</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;code128&quot;</span> <span class="na">humanreadable</span><span class="o">=</span><span class="s">&quot;1&quot;</span> <span class="na">barwidth</span><span class="o">=</span><span class="s">&quot;0.43mm&quot;</span> <span class="na">barheight</span><span class="o">=</span><span class="s">&quot;0.6cm&quot;</span> <span class="na">align</span><span class="o">=</span><span class="s">&quot;middle&quot;</span> <span class="p">/&gt;</span>
+            <span class="p">&lt;/</span><span class="nt">center</span><span class="p">&gt;</span>
+        <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+        <span class="cm">&lt;!-- Use the front_page template again for the next card --&gt;</span>
+        <span class="p">&lt;</span><span class="nt">pdf:nexttemplate</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;front_page&quot;</span> <span class="p">/&gt;</span>
+        <span class="p">&lt;</span><span class="nt">pdf:nextpage</span> <span class="p">/&gt;</span>
+    <span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
+<span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</pre></div>
+<p>Notice that I want to print exactly 10 lines in the <tt class="docutils literal">table_frame</tt> (that&#8217;s why I use &lt;br /&gt; to go to next line) &#8212; if I had printed
+3-4 lines (for example) then the photo <em>would fit</em> in the <tt class="docutils literal">table_frame</tt> and would be printed there and <em>not</em> in the <tt class="docutils literal">photo_frame</tt>! Also,
+another interesting thing is that if I had
+outputed 8-9 lines then the photo wouldn&#8217;t fit in that small space and would also be printed to the <tt class="docutils literal">photo_frame</tt>.</p>
+</div>
+<div class="section" id="extra-stuff">
+<h3><a class="toc-backref" href="#toc-entry-16">Extra&nbsp;stuff</a></h3>
+<p>Some extra things I want to mention concerning&nbsp;xhtml2pdf:</p>
+<ul class="simple">
+<li><tt class="docutils literal">&lt;pdf:pagenumber&gt;</tt> to output the current page number (please end the line after this&nbsp;tag)</li>
+<li><tt class="docutils literal">&lt;pdf:pagecount&gt;</tt> to output the total page number (please end the line after this&nbsp;tag)</li>
+</ul>
+<p>So if you want to print a footer with the pages, I recommend something like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">&#39;footerContent&#39;</span><span class="p">&gt;</span>
+  Page <span class="p">&lt;</span><span class="nt">pdf:pagenumber</span><span class="p">&gt;</span>
+  from <span class="p">&lt;</span><span class="nt">pdf:pagecount</span><span class="p">&gt;</span>
+  total
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</pre></div>
+<p>Notice how the lines end after the&nbsp;tags.</p>
+<ul class="simple">
+<li><tt class="docutils literal">&lt;pdf:barcode&gt;</tt>: Output a barcode in your <span class="caps">PDF</span>. Here are the possible barcode types: I2of5, Standard39, Extended39, Standard93, Extended93, <span class="caps">MSI</span>, Codabar, Code11, <span class="caps">FIM</span>, <span class="caps">POSTNET</span>, USPS_4State, Code128, <span class="caps">EAN13</span>, <span class="caps">EAN8</span>, <span class="caps">QR</span>.</li>
+<li>You may add a page background image using  the <tt class="docutils literal"><span class="pre">background-image</span></tt> property of <tt class="docutils literal">&#64;page</tt>.</li>
+</ul>
+<p>For example, if you want the templates you create from your development/<span class="caps">UAT</span> systems to be different
+than the production ones you could do something like&nbsp;this:</p>
+<pre class="code literal-block">
+&#64;page {
+    {% if DEBUG %}
+        background-image: url({% static &quot;debug.png&quot; %});
+    {% endif %}
+    &lt;!-- Other page properties --&gt;
+}
+</pre>
+</div>
+</div>
+<div class="section" id="conclusion">
+<h2><a class="toc-backref" href="#toc-entry-17">Conclusion</a></h2>
+<p>I hope that using the techniques described in this essential guide you&#8217;ll
+be able to create great looking <span class="caps">PDF</span> documents from your Django application
+and overcome any difficulties that may arise. If you feel that there&#8217;s something
+I&#8217;ve not covered properly (and is not covered by the documentation) please comment
+out and I&#8217;ll be happy to research it a bit and update the article with&nbsp;info.</p>
+<p>I am using all the above in various production applications for a long time and everything
+is smooth so don&#8217;t afraid to create PDFs from&nbsp;Django!</p>
+</div>
+</div>
+    <footer>
+<p class="meta">
+  <span class="byline author vcard">
+    Posted by <span class="fn">
+        Serafeim Papastefanos
+    </span>
+  </span>
+<time datetime="2015-11-27T10:20:00+02:00" pubdate>Fri 27 November 2015</time>  <span class="categories">
+    <a class='category' href='https://www.spapas.net/category/django.html'>django</a>
+  </span>
+  <span class="categories">
+    <a class="category" href="https://www.spapas.net/tag/pdf.html">pdf</a>,    <a class="category" href="https://www.spapas.net/tag/django.html">django</a>,    <a class="category" href="https://www.spapas.net/tag/reportlab.html">reportlab</a>,    <a class="category" href="https://www.spapas.net/tag/python.html">python</a>,    <a class="category" href="https://www.spapas.net/tag/xhtml2pdf.html">xhtml2pdf</a>  </span>
+</p><div class="sharing">
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="https://www.spapas.net/2015/11/27/pdf-in-django/" data-via="" data-counturl="https://www.spapas.net/2015/11/27/pdf-in-django/" >Tweet</a>
+</div>    </footer>
+  </article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript></div>
+  </section>
+</div>
+<aside class="sidebar">
+  
+  <section>
+    <br />
+    <a href='/feeds/all.atom.xml'>Atom</a>
+    |
+    <a href='/feeds/all.rss.xml'>RSS</a>
+  </section>
+
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <!-- Sidebar unit -->
+  <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7673322832689008" data-ad-slot="2720624730"
+    data-ad-format="auto" data-full-width-responsive="true"></ins>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+
+
+  <script async src="https://cse.google.com/cse.js?cx=612920e5ca9da850c"></script>
+  <div class="gcse-search"></div>
+
+  
+  <section>
+    <h1>Support me</h1>
+
+    You can show your appreciation for anything useful you've found here by 
+    buying me a coffee 
+    <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="spapas" data-color="#FFDD00" data-emoji=""  data-font="Lato" data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff" ></script>
+
+    or donating me some bitcoin to this address:
+    <small><pre>bc1qx42vp8napheaewhnx0rk0mttdrdrtvw6czvxhl</pre></small>
+    <svg shape-rendering="crispEdges" height="200" width="200" viewBox="0 0 29 29" class="qrcode">
+      <path fill="#FFFFFF" d="M0,0 h29v29H0z"></path><path fill="#000000" d="M0 0h7v1H0zM9 0h2v1H9zM12 0h1v1H12zM14 0h2v1H14zM18 0h2v1H18zM22,0 h7v1H22zM0 1h1v1H0zM6 1h1v1H6zM8 1h1v1H8zM11 1h1v1H11zM14 1h5v1H14zM22 1h1v1H22zM28,1 h1v1H28zM0 2h1v1H0zM2 2h3v1H2zM6 2h1v1H6zM8 2h4v1H8zM17 2h1v1H17zM22 2h1v1H22zM24 2h3v1H24zM28,2 h1v1H28zM0 3h1v1H0zM2 3h3v1H2zM6 3h1v1H6zM9 3h2v1H9zM14 3h3v1H14zM18 3h1v1H18zM22 3h1v1H22zM24 3h3v1H24zM28,3 h1v1H28zM0 4h1v1H0zM2 4h3v1H2zM6 4h1v1H6zM8 4h1v1H8zM11 4h1v1H11zM13 4h1v1H13zM15 4h2v1H15zM18 4h1v1H18zM22 4h1v1H22zM24 4h3v1H24zM28,4 h1v1H28zM0 5h1v1H0zM6 5h1v1H6zM8 5h2v1H8zM14 5h2v1H14zM19 5h2v1H19zM22 5h1v1H22zM28,5 h1v1H28zM0 6h7v1H0zM8 6h1v1H8zM10 6h1v1H10zM12 6h1v1H12zM14 6h1v1H14zM16 6h1v1H16zM18 6h1v1H18zM20 6h1v1H20zM22,6 h7v1H22zM8 7h2v1H8zM11 7h1v1H11zM15 7h1v1H15zM17 7h2v1H17zM0 8h2v1H0zM3 8h1v1H3zM6 8h2v1H6zM10 8h1v1H10zM12 8h3v1H12zM20 8h1v1H20zM22 8h3v1H22zM26 8h2v1H26zM1 9h1v1H1zM3 9h3v1H3zM8 9h1v1H8zM10 9h1v1H10zM12 9h2v1H12zM16 9h2v1H16zM20 9h1v1H20zM22 9h1v1H22zM25 9h1v1H25zM27,9 h2v1H27zM0 10h1v1H0zM3 10h2v1H3zM6 10h1v1H6zM8 10h3v1H8zM12 10h2v1H12zM16 10h1v1H16zM19 10h1v1H19zM22 10h3v1H22zM27 10h1v1H27zM0 11h1v1H0zM2 11h1v1H2zM4 11h2v1H4zM7 11h1v1H7zM13 11h4v1H13zM18 11h4v1H18zM26 11h2v1H26zM0 12h1v1H0zM2 12h3v1H2zM6 12h1v1H6zM11 12h1v1H11zM13 12h1v1H13zM15 12h3v1H15zM20 12h1v1H20zM22 12h2v1H22zM27,12 h2v1H27zM4 13h1v1H4zM8 13h3v1H8zM12 13h1v1H12zM14 13h1v1H14zM17 13h4v1H17zM25 13h2v1H25zM0 14h1v1H0zM4 14h3v1H4zM8 14h2v1H8zM11 14h3v1H11zM16 14h1v1H16zM21 14h2v1H21zM24,14 h5v1H24zM3 15h3v1H3zM7 15h2v1H7zM10 15h1v1H10zM12 15h2v1H12zM15 15h1v1H15zM17 15h2v1H17zM20 15h2v1H20zM23 15h1v1H23zM1 16h1v1H1zM4 16h1v1H4zM6 16h4v1H6zM16 16h2v1H16zM20 16h1v1H20zM23 16h1v1H23zM25 16h1v1H25zM28,16 h1v1H28zM2 17h1v1H2zM5 17h1v1H5zM7 17h2v1H7zM11 17h3v1H11zM17 17h1v1H17zM22 17h1v1H22zM25 17h1v1H25zM27,17 h2v1H27zM0 18h1v1H0zM3 18h1v1H3zM5 18h4v1H5zM10 18h1v1H10zM12 18h1v1H12zM18 18h1v1H18zM20 18h1v1H20zM22 18h2v1H22zM25,18 h4v1H25zM2 19h3v1H2zM8 19h1v1H8zM16 19h2v1H16zM21 19h1v1H21zM23 19h1v1H23zM25 19h1v1H25zM27 19h1v1H27zM0 20h1v1H0zM2 20h5v1H2zM8 20h2v1H8zM13 20h4v1H13zM19 20h6v1H19zM26 20h1v1H26zM28,20 h1v1H28zM8 21h2v1H8zM12 21h3v1H12zM16 21h1v1H16zM20 21h1v1H20zM24 21h1v1H24zM26,21 h3v1H26zM0 22h7v1H0zM8 22h3v1H8zM17 22h1v1H17zM20 22h1v1H20zM22 22h1v1H22zM24 22h2v1H24zM27 22h1v1H27zM0 23h1v1H0zM6 23h1v1H6zM10 23h2v1H10zM13 23h2v1H13zM19 23h2v1H19zM24,23 h5v1H24zM0 24h1v1H0zM2 24h3v1H2zM6 24h1v1H6zM9 24h2v1H9zM12 24h2v1H12zM17 24h1v1H17zM20 24h6v1H20zM28,24 h1v1H28zM0 25h1v1H0zM2 25h3v1H2zM6 25h1v1H6zM8 25h3v1H8zM12 25h1v1H12zM14 25h1v1H14zM18 25h1v1H18zM22 25h3v1H22zM26 25h1v1H26zM0 26h1v1H0zM2 26h3v1H2zM6 26h1v1H6zM10 26h5v1H10zM16 26h3v1H16zM21 26h1v1H21zM24 26h1v1H24zM26 26h1v1H26zM28,26 h1v1H28zM0 27h1v1H0zM6 27h1v1H6zM8 27h3v1H8zM12 27h4v1H12zM17 27h1v1H17zM20 27h1v1H20zM23 27h2v1H23zM27 27h1v1H27zM0 28h7v1H0zM8 28h3v1H8zM14 28h1v1H14zM16 28h3v1H16zM20 28h1v1H20zM22 28h1v1H22zM24 28h2v1H24zM27 28h1v1H27z"></path>
+    </svg>
+  </section>
+  
+
+  <section>
+    <h1>Subscribe</h1>
+    Do you want to get notified via email when I post new content?
+    <style>
+      .subscribe-button {
+        /* margin: 10px !important; */
+        padding: 10px !important;
+        background-color: black;
+        display: inline-block;
+        color: white !important;
+        text-decoration: none;
+
+        line-height: 36px !important;
+        height: 37px !important;
+        text-decoration: none !important;
+        display: inline-block !important;
+        color: #ffffff !important;
+        background-color: #000000 !important;
+        border-radius: 3px !important;
+        border: 1px solid transparent !important;
+        padding: 1px 9px !important;
+        font-size: 23px !important;
+        letter-spacing: 0.6px !important;
+        box-shadow: 0px 1px 2px rgba(190, 190, 190, 0.5) !important;
+        -webkit-box-shadow: 0px 1px 2px 2px rgba(190, 190, 190, 0.5) !important;
+        margin: 0 auto !important;
+        font-family: 'Cookie', cursive !important;
+        -webkit-box-sizing: border-box !important;
+        box-sizing: border-box !important;
+        -o-transition: 0.3s all linear !important;
+        -webkit-transition: 0.3s all linear !important;
+        -moz-transition: 0.3s all linear !important;
+        -ms-transition: 0.3s all linear !important;
+        transition: 0.3s all linear !important;
+
+      }
+    </style>
+    <a class='subscribe-button' target="_blank" href="http://eepurl.com/dxI3PP">Click here to subscribe!</a>
+  </section>
+
+
+  <section>
+    <h1>Recent Posts</h1>
+    <ul id="recent_posts">
+      <li class="post">
+        <a href="https://www.spapas.net/2024/08/22/multiple-erl-elixir-windows/">Multiple Erlang/Elixir versions in Windows</a>
+      </li>
+      <li class="post">
+        <a href="https://www.spapas.net/2023/11/29/openid-connect-tutorial/">A simple OpenID connect tutorial</a>
+      </li>
+      <li class="post">
+        <a href="https://www.spapas.net/2023/05/23/simple-django-datatables-integration/">Simple Django - DataTables integration</a>
+      </li>
+      <li class="post">
+        <a href="https://www.spapas.net/2023/05/22/ai-auto-subtitling/">AI auto-subtitling</a>
+      </li>
+      <li class="post">
+        <a href="https://www.spapas.net/2023/05/12/disable-your-forms/">HTML form disable after submit</a>
+      </li>
+    </ul>
+  </section>
+  <section>
+
+    <h1>Categories</h1>
+    <ul id="recent_posts">
+      <li><a href="https://www.spapas.net/category/ai.html">ai</a></li>
+      <li><a href="https://www.spapas.net/category/android.html">android</a></li>
+      <li><a href="https://www.spapas.net/category/clojure.html">clojure</a></li>
+      <li><a href="https://www.spapas.net/category/css.html">css</a></li>
+      <li><a href="https://www.spapas.net/category/django.html">django</a></li>
+      <li><a href="https://www.spapas.net/category/elixir.html">elixir</a></li>
+      <li><a href="https://www.spapas.net/category/flask.html">flask</a></li>
+      <li><a href="https://www.spapas.net/category/gaming.html">gaming</a></li>
+      <li><a href="https://www.spapas.net/category/git.html">git</a></li>
+      <li><a href="https://www.spapas.net/category/html.html">html</a></li>
+      <li><a href="https://www.spapas.net/category/javascript.html">javascript</a></li>
+      <li><a href="https://www.spapas.net/category/networking.html">networking</a></li>
+      <li><a href="https://www.spapas.net/category/pelican.html">pelican</a></li>
+      <li><a href="https://www.spapas.net/category/postgresql.html">postgresql</a></li>
+      <li><a href="https://www.spapas.net/category/python.html">python</a></li>
+      <li><a href="https://www.spapas.net/category/spring.html">spring</a></li>
+      <li><a href="https://www.spapas.net/category/unix.html">unix</a></li>
+      <li><a href="https://www.spapas.net/category/wagtail.html">wagtail</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Tags</h1>
+    <a href="https://www.spapas.net/tag/erlang.html">erlang</a>,    <a href="https://www.spapas.net/tag/elixir.html">elixir</a>,    <a href="https://www.spapas.net/tag/windows.html">windows</a>,    <a href="https://www.spapas.net/tag/openid.html">openid</a>,    <a href="https://www.spapas.net/tag/openid-connect.html">openid-connect</a>,    <a href="https://www.spapas.net/tag/oidc.html">oidc</a>,    <a href="https://www.spapas.net/tag/http.html">http</a>,    <a href="https://www.spapas.net/tag/keycloak.html">keycloak</a>,    <a href="https://www.spapas.net/tag/python.html">python</a>,    <a href="https://www.spapas.net/tag/django.html">django</a>,    <a href="https://www.spapas.net/tag/jquery.html">jquery</a>,    <a href="https://www.spapas.net/tag/datatables.html">datatables</a>,    <a href="https://www.spapas.net/tag/ai.html">ai</a>,    <a href="https://www.spapas.net/tag/whisper.html">whisper</a>,    <a href="https://www.spapas.net/tag/whispercpp.html">whisper.cpp</a>,    <a href="https://www.spapas.net/tag/subtitles.html">subtitles</a>,    <a href="https://www.spapas.net/tag/video.html">video</a>,    <a href="https://www.spapas.net/tag/auto-subtitling.html">auto-subtitling</a>,    <a href="https://www.spapas.net/tag/subtitiling.html">subtitiling</a>,    <a href="https://www.spapas.net/tag/transcribe.html">transcribe</a>,    <a href="https://www.spapas.net/tag/html.html">html</a>,    <a href="https://www.spapas.net/tag/javascript.html">javascript</a>,    <a href="https://www.spapas.net/tag/media.html">media</a>,    <a href="https://www.spapas.net/tag/storage.html">storage</a>,    <a href="https://www.spapas.net/tag/unpoly.html">unpoly</a>,    <a href="https://www.spapas.net/tag/access.html">access</a>,    <a href="https://www.spapas.net/tag/database.html">database</a>,    <a href="https://www.spapas.net/tag/accdb.html">accdb</a>,    <a href="https://www.spapas.net/tag/mdb.html">mdb</a>,    <a href="https://www.spapas.net/tag/postgresql.html">postgresql</a>,    <a href="https://www.spapas.net/tag/development.html">development</a>,    <a href="https://www.spapas.net/tag/inlines.html">inlines</a>,    <a href="https://www.spapas.net/tag/clojure.html">clojure</a>,    <a href="https://www.spapas.net/tag/cmd.html">cmd</a>,    <a href="https://www.spapas.net/tag/pdf.html">pdf</a>,    <a href="https://www.spapas.net/tag/wkhtmltopdf.html">wkhtmltopdf</a>,    <a href="https://www.spapas.net/tag/forward-proxy.html">forward-proxy</a>,    <a href="https://www.spapas.net/tag/reverse-proxy.html">reverse-proxy</a>,    <a href="https://www.spapas.net/tag/proxy.html">proxy</a>,    <a href="https://www.spapas.net/tag/networking.html">networking</a>,    <a href="https://www.spapas.net/tag/dj-rest-auth.html">dj-rest-auth</a>,    <a href="https://www.spapas.net/tag/rest.html">rest</a>,    <a href="https://www.spapas.net/tag/django-rest-framework.html">django-rest-framework</a>,    <a href="https://www.spapas.net/tag/authentication.html">authentication</a>,    <a href="https://www.spapas.net/tag/tokens.html">tokens</a>,    <a href="https://www.spapas.net/tag/migrations.html">migrations</a>,    <a href="https://www.spapas.net/tag/foreignkey.html">foreignkey</a>,    <a href="https://www.spapas.net/tag/dark-souls.html">dark-souls</a>,    <a href="https://www.spapas.net/tag/dark-souls-2.html">dark-souls-2</a>,    <a href="https://www.spapas.net/tag/dark-souls-3.html">dark-souls-3</a>,    <a href="https://www.spapas.net/tag/autohotkey.html">autohotkey</a>,    <a href="https://www.spapas.net/tag/matplotlib.html">matplotlib</a>,    <a href="https://www.spapas.net/tag/hashids.html">hashids</a>,    <a href="https://www.spapas.net/tag/wagtail.html">wagtail</a>,    <a href="https://www.spapas.net/tag/osmon.html">osmon</a>,    <a href="https://www.spapas.net/tag/phoenix.html">phoenix</a>,    <a href="https://www.spapas.net/tag/os-monitoring.html">os-monitoring</a>,    <a href="https://www.spapas.net/tag/forms.html">forms</a>,    <a href="https://www.spapas.net/tag/django-crispy-forms.html">django-crispy-forms</a>,    <a href="https://www.spapas.net/tag/django-widget-tweaks.html">django-widget-tweaks</a>,    <a href="https://www.spapas.net/tag/ecto.html">ecto</a>,    <a href="https://www.spapas.net/tag/queries.html">queries</a>,    <a href="https://www.spapas.net/tag/declarative.html">declarative</a>,    <a href="https://www.spapas.net/tag/form.html">form</a>,    <a href="https://www.spapas.net/tag/php.html">php</a>,    <a href="https://www.spapas.net/tag/select2.html">select2</a>,    <a href="https://www.spapas.net/tag/autocompelte.html">autocompelte</a>,    <a href="https://www.spapas.net/tag/ajax.html">ajax</a>,    <a href="https://www.spapas.net/tag/android.html">android</a>,    <a href="https://www.spapas.net/tag/kotlin.html">kotlin</a>,    <a href="https://www.spapas.net/tag/adapter.html">adapter</a>,    <a href="https://www.spapas.net/tag/filter.html">filter</a>,    <a href="https://www.spapas.net/tag/async.html">async</a>,    <a href="https://www.spapas.net/tag/tasks.html">tasks</a>,    <a href="https://www.spapas.net/tag/django-rq.html">django-rq</a>,    <a href="https://www.spapas.net/tag/rq.html">rq</a>,    <a href="https://www.spapas.net/tag/du.html">du</a>,    <a href="https://www.spapas.net/tag/unix.html">unix</a>,    <a href="https://www.spapas.net/tag/linux.html">linux</a>,    <a href="https://www.spapas.net/tag/disk-usage.html">disk-usage</a>,    <a href="https://www.spapas.net/tag/cbv.html">cbv</a>,    <a href="https://www.spapas.net/tag/middleware.html">middleware</a>,    <a href="https://www.spapas.net/tag/class-based-views.html">class-based-views</a>,    <a href="https://www.spapas.net/tag/react.html">react</a>,    <a href="https://www.spapas.net/tag/redux.html">redux</a>,    <a href="https://www.spapas.net/tag/hyperapp.html">hyperapp</a>,    <a href="https://www.spapas.net/tag/immutable.html">immutable</a>,    <a href="https://www.spapas.net/tag/es6.html">es6</a>,    <a href="https://www.spapas.net/tag/youtube.html">youtube</a>,    <a href="https://www.spapas.net/tag/youtube-dl.html">youtube-dl</a>,    <a href="https://www.spapas.net/tag/ffmpeg.html">ffmpeg</a>,    <a href="https://www.spapas.net/tag/django-rest-auth.html">django-rest-auth</a>,    <a href="https://www.spapas.net/tag/python-2.html">python-2</a>,    <a href="https://www.spapas.net/tag/python-3.html">python-3</a>,    <a href="https://www.spapas.net/tag/plpgsql.html">plpgsql</a>,    <a href="https://www.spapas.net/tag/component.html">component</a>,    <a href="https://www.spapas.net/tag/ag-grid.html">ag-grid</a>,    <a href="https://www.spapas.net/tag/grid.html">grid</a>,    <a href="https://www.spapas.net/tag/bash.html">bash</a>,    <a href="https://www.spapas.net/tag/cron.html">cron</a>,    <a href="https://www.spapas.net/tag/pandas.html">pandas</a>,    <a href="https://www.spapas.net/tag/scipy.html">scipy</a>,    <a href="https://www.spapas.net/tag/numpy.html">numpy</a>,    <a href="https://www.spapas.net/tag/pivot.html">pivot</a>,    <a href="https://www.spapas.net/tag/pivot_table.html">pivot_table</a>,    <a href="https://www.spapas.net/tag/ipython.html">ipython</a>,    <a href="https://www.spapas.net/tag/jupyter.html">jupyter</a>,    <a href="https://www.spapas.net/tag/notebook.html">notebook</a>,    <a href="https://www.spapas.net/tag/query.html">query</a>,    <a href="https://www.spapas.net/tag/q.html">q</a>,    <a href="https://www.spapas.net/tag/imgur.html">imgur</a>,    <a href="https://www.spapas.net/tag/console.html">console</a>,    <a href="https://www.spapas.net/tag/research.html">research</a>,    <a href="https://www.spapas.net/tag/debug.html">debug</a>,    <a href="https://www.spapas.net/tag/werkzeug.html">werkzeug</a>,    <a href="https://www.spapas.net/tag/django-extensions.html">django-extensions</a>,    <a href="https://www.spapas.net/tag/404.html">404</a>,    <a href="https://www.spapas.net/tag/error.html">error</a>,    <a href="https://www.spapas.net/tag/spring.html">spring</a>,    <a href="https://www.spapas.net/tag/spring-boot.html">spring-boot</a>,    <a href="https://www.spapas.net/tag/java.html">java</a>,    <a href="https://www.spapas.net/tag/ldap.html">ldap</a>,    <a href="https://www.spapas.net/tag/profiles.html">profiles</a>,    <a href="https://www.spapas.net/tag/settings.html">settings</a>,    <a href="https://www.spapas.net/tag/properties.html">properties</a>,    <a href="https://www.spapas.net/tag/yaml.html">yaml</a>,    <a href="https://www.spapas.net/tag/configuration.html">configuration</a>,    <a href="https://www.spapas.net/tag/deploy.html">deploy</a>,    <a href="https://www.spapas.net/tag/initd.html">init.d</a>,    <a href="https://www.spapas.net/tag/react-redux.html">react-redux</a>,    <a href="https://www.spapas.net/tag/redux-thunk.html">redux-thunk</a>,    <a href="https://www.spapas.net/tag/redux-form.html">redux-form</a>,    <a href="https://www.spapas.net/tag/react-router.html">react-router</a>,    <a href="https://www.spapas.net/tag/react-router-redux.html">react-router-redux</a>,    <a href="https://www.spapas.net/tag/react-notification.html">react-notification</a>,    <a href="https://www.spapas.net/tag/history.html">history</a>,    <a href="https://www.spapas.net/tag/babel.html">babel</a>,    <a href="https://www.spapas.net/tag/babelify.html">babelify</a>,    <a href="https://www.spapas.net/tag/browserify.html">browserify</a>,    <a href="https://www.spapas.net/tag/watchify.html">watchify</a>,    <a href="https://www.spapas.net/tag/uglify.html">uglify</a>,    <a href="https://www.spapas.net/tag/boilerplate.html">boilerplate</a>,    <a href="https://www.spapas.net/tag/tutorial.html">tutorial</a>,    <a href="https://www.spapas.net/tag/introduction.html">introduction</a>,    <a href="https://www.spapas.net/tag/fixed-data-tables.html">fixed-data-tables</a>,    <a href="https://www.spapas.net/tag/fixeddatatable.html">FixedDataTable</a>,    <a href="https://www.spapas.net/tag/reportlab.html">reportlab</a>,    <a href="https://www.spapas.net/tag/xhtml2pdf.html">xhtml2pdf</a>,    <a href="https://www.spapas.net/tag/node.html">node</a>,    <a href="https://www.spapas.net/tag/npm.html">npm</a>,    <a href="https://www.spapas.net/tag/generic.html">generic</a>,    <a href="https://www.spapas.net/tag/tables.html">tables</a>,    <a href="https://www.spapas.net/tag/flux.html">flux</a>,    <a href="https://www.spapas.net/tag/jobs.html">jobs</a>,    <a href="https://www.spapas.net/tag/asynchronous.html">asynchronous</a>,    <a href="https://www.spapas.net/tag/scheduling.html">scheduling</a>,    <a href="https://www.spapas.net/tag/redis.html">redis</a>,    <a href="https://www.spapas.net/tag/pusher.html">pusher</a>,    <a href="https://www.spapas.net/tag/auditing.html">auditing</a>,    <a href="https://www.spapas.net/tag/css.html">css</a>,    <a href="https://www.spapas.net/tag/design.html">design</a>,    <a href="https://www.spapas.net/tag/boostrap-material-design.html">boostrap-material-design</a>,    <a href="https://www.spapas.net/tag/less.html">less</a>,    <a href="https://www.spapas.net/tag/nodejs.html">node.js</a>,    <a href="https://www.spapas.net/tag/gmail.html">gmail</a>,    <a href="https://www.spapas.net/tag/security.html">security</a>,    <a href="https://www.spapas.net/tag/google.html">google</a>,    <a href="https://www.spapas.net/tag/flask.html">flask</a>,    <a href="https://www.spapas.net/tag/mongodb.html">mongodb</a>,    <a href="https://www.spapas.net/tag/heroku.html">heroku</a>,    <a href="https://www.spapas.net/tag/spring-security.html">spring-security</a>,    <a href="https://www.spapas.net/tag/git.html">git</a>,    <a href="https://www.spapas.net/tag/github.html">github</a>,    <a href="https://www.spapas.net/tag/branching.html">branching</a>,    <a href="https://www.spapas.net/tag/static-html.html">static-html</a>,    <a href="https://www.spapas.net/tag/githubio.html">github.io</a>,    <a href="https://www.spapas.net/tag/pelican.html">pelican</a>,    <a href="https://www.spapas.net/tag/github-pages.html">github-pages</a>,    <a href="https://www.spapas.net/tag/rst.html">rst</a>  </section>
+
+  <section>
+    <h1>Yearly archives</h1>
+    <a href="https://www.spapas.net/posts/2013/">2013</a>,    <a href="https://www.spapas.net/posts/2014/">2014</a>,    <a href="https://www.spapas.net/posts/2015/">2015</a>,    <a href="https://www.spapas.net/posts/2016/">2016</a>,    <a href="https://www.spapas.net/posts/2017/">2017</a>,    <a href="https://www.spapas.net/posts/2018/">2018</a>,    <a href="https://www.spapas.net/posts/2019/">2019</a>,    <a href="https://www.spapas.net/posts/2020/">2020</a>,    <a href="https://www.spapas.net/posts/2021/">2021</a>,    <a href="https://www.spapas.net/posts/2022/">2022</a>,    <a href="https://www.spapas.net/posts/2023/">2023</a>,    <a href="https://www.spapas.net/posts/2024/">2024</a>  </section>
+
+
+
+  <section>
+    <h1>GitHub Repos</h1>
+    <ul id="gh_repos">
+      <li class="loading">Status updating...</li>
+    </ul>
+      <a href="https://github.com/spapas">@spapas</a> on GitHub
+    <script  src="//code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      $(function(){
+          if (!window.jXHR){
+              var jxhr = document.createElement('script');
+              jxhr.type = 'text/javascript';
+              jxhr.src = 'https://www.spapas.net/theme/js/jXHR.js';
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(jxhr, s);
+          }
+
+          github.showRepos({
+              user: 'spapas',
+              count: 5,
+              skip_forks: true,
+              target: '#gh_repos'
+          });
+      });
+    </script>
+    <script src="https://www.spapas.net/theme/js/github.js" type="text/javascript"> </script>
+  </section>
+
+
+  <section>
+    <a href="https://twitter.com/_serafeim_?ref_src=twsrc%5Etfw" class="twitter-follow-button"
+      data-show-count="false">Follow @_serafeim_</a>
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+  </section>
+
+</aside>    </div>
+  </div>
+  <footer role="contentinfo"><p>
+    Copyright &copy;  2013&ndash;2024  Serafeim Papastefanos &mdash;
+  <span class="credit">Powered by <a href="http://getpelican.com">Pelican</a></span>
+</p></footer>
+  <script src="https://www.spapas.net/theme/js/modernizr-2.0.js"></script>
+  <script src="https://www.spapas.net/theme/js/ender.js"></script>
+  <script src="https://www.spapas.net/theme/js/octopress.js" type="text/javascript"></script>
+  <script src="https://www.spapas.net/theme/js/ads.js"></script>
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-44750952-1', 'auto');
+
+    ga('send', 'pageview');
+    </script>
+
+<script defer data-domain="spapas.net" src="https://plausible.hcg.gr/js/script.js"></script>  <script type="text/javascript">
+    var disqus_shortname = 'spapas-github-io';
+    var disqus_identifier = '/2015/11/27/pdf-in-django/';
+    var disqus_url = 'https://www.spapas.net/2015/11/27/pdf-in-django/';
+    var disqus_title = 'PDFs in Django: The essential&nbsp;guide';
+    (function() {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = "//" + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+     })();
+  </script>
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+</body>
+
+</html>

@@ -31,7 +31,7 @@ jupyter-core==4.4.0
 Markdown==3.8.1
 MarkupSafe==1.1.0
 mistune==3.2.1
-nbconvert==7.17.0
+nbconvert==7.17.1
 nbformat==4.4.0
 notebook==5.7.4
 pandocfilters==1.4.2

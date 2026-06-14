@@ -1,0 +1,1847 @@
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="google-site-verification" content="5_8DTmIiEq4gFvNAfxAD6TsGOgrMAjp8lQFQvfA6zZc" />
+    <title>/var/</title>
+    <meta name="author" content="Serafeim Papastefanos">
+
+
+    
+<style type="text/css">
+pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: var(--jp-cell-editor-active-background) }
+.highlight { background: var(--jp-cell-editor-background); color: var(--jp-mirror-editor-variable-color) }
+.highlight .c { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment */
+.highlight .err { color: var(--jp-mirror-editor-error-color) } /* Error */
+.highlight .k { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword */
+.highlight .o { color: var(--jp-mirror-editor-operator-color); font-weight: bold } /* Operator */
+.highlight .p { color: var(--jp-mirror-editor-punctuation-color) } /* Punctuation */
+.highlight .ch { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Preproc */
+.highlight .cpf { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Single */
+.highlight .cs { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Special */
+.highlight .kc { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Pseudo */
+.highlight .kr { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Type */
+.highlight .m { color: var(--jp-mirror-editor-number-color) } /* Literal.Number */
+.highlight .s { color: var(--jp-mirror-editor-string-color) } /* Literal.String */
+.highlight .ow { color: var(--jp-mirror-editor-operator-color); font-weight: bold } /* Operator.Word */
+.highlight .pm { color: var(--jp-mirror-editor-punctuation-color) } /* Punctuation.Marker */
+.highlight .w { color: var(--jp-mirror-editor-variable-color) } /* Text.Whitespace */
+.highlight .mb { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Bin */
+.highlight .mf { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Float */
+.highlight .mh { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Hex */
+.highlight .mi { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Integer */
+.highlight .mo { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Oct */
+.highlight .sa { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Affix */
+.highlight .sb { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Backtick */
+.highlight .sc { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Char */
+.highlight .dl { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Delimiter */
+.highlight .sd { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Doc */
+.highlight .s2 { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Double */
+.highlight .se { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Escape */
+.highlight .sh { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Heredoc */
+.highlight .si { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Interpol */
+.highlight .sx { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Other */
+.highlight .sr { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Regex */
+.highlight .s1 { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Single */
+.highlight .ss { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Symbol */
+.highlight .il { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Integer.Long */
+</style>
+
+<style type="text/css">
+/* Overrides of notebook CSS for static HTML export */
+div.entry-content {
+  overflow: visible;
+  padding: 8px;
+}
+.input_area {
+  padding: 0.2em;
+}
+
+a.heading-anchor {
+ white-space: normal;
+}
+
+.rendered_html
+code {
+ font-size: .8em;
+}
+
+pre.ipynb {
+  color: black;
+  background: #f7f7f7;
+  border: none;
+  box-shadow: none;
+  margin-bottom: 0;
+  padding: 0;
+  margin: 0px;
+  font-size: 13px;
+}
+
+/* remove the prompt div from text cells */
+div.text_cell .prompt {
+    display: none;
+}
+
+/* remove horizontal padding from text cells, */
+/* so it aligns with outer body text */
+div.text_cell_render {
+    padding: 0.5em 0em;
+}
+
+img.anim_icon{padding:0; border:0; vertical-align:middle; -webkit-box-shadow:none; -box-shadow:none}
+
+div.collapseheader {
+    width=100%;
+    background-color:#d3d3d3;
+    padding: 2px;
+    cursor: pointer;
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+</style>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true,
+        displayMath: [['$$','$$'], ["\\[","\\]"]]
+    }
+});
+</script>
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+    $("div.collapseheader").click(function () {
+    $header = $(this).children("span").first();
+    $codearea = $(this).children(".input_area");
+    console.log($(this).children());
+    $codearea.slideToggle(500, function () {
+        $header.text(function () {
+            return $codearea.is(":visible") ? "Collapse Code" : "Expand Code";
+        });
+    });
+});
+});
+</script>
+
+
+
+
+    <!-- http://t.co/dKP3o1e -->
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+    <link href="https://spapas.github.io/favicon.png" rel="icon">
+
+    <link href="https://spapas.github.io/theme/css/main.css" media="screen, projection" rel="stylesheet"
+      type="text/css">
+
+    <link href="https://spapas.github.io/theme/css/extra_style.css" media="screen, projection" rel="stylesheet"
+      type="text/css">
+
+    <link href="https://fonts.googleapis.com/css?family=Fira+Mono|Fira+Sans:400,700&amp;subset=greek" rel="stylesheet">
+
+<style>
+#gHPzseYvFrhZ123 {
+  padding: 5px !important;
+  display: block;
+  margin-bottom: 10px !important;
+  background: #900;
+  color: #fff;
+  border-radius: 5px;
+  font-size: 1.0rem !important;
+}
+</style>
+
+
+  <script>
+    
+      
+  </script>
+
+    <script data-ad-client="ca-pub-7673322832689008" async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
+      onerror="adBlockFunction();"></script>
+  </head>
+
+<body>
+  <header role="banner"><hgroup>
+  <h1><a href="https://spapas.github.io/">/var/</a></h1>
+    <h2>Various programming stuff</h2>
+</hgroup></header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+</ul>
+
+
+<ul class="main-navigation">
+      <li >
+        <a href="https://spapas.github.io/category/ai.html">Ai</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/android.html">Android</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/clojure.html">Clojure</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/css.html">Css</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/django.html">Django</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/elixir.html">Elixir</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/flask.html">Flask</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/gaming.html">Gaming</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/git.html">Git</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/html.html">Html</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/javascript.html">Javascript</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/networking.html">Networking</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/pelican.html">Pelican</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/postgresql.html">Postgresql</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/python.html">Python</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/spring.html">Spring</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/unix.html">Unix</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/wagtail.html">Wagtail</a>
+      </li>
+</ul></nav>
+  <div id="main">
+    <div id="content">
+    <div id="gHPzseYvFrhZ123">
+      Hello! If you are using an ad blocker but find something useful here 
+      and want to support me please consider disabling your ad blocker for this site. 
+      <br />
+      <br />
+      Thank you,<br />
+      Serafeim
+      
+    </div>
+<div class="blog-index">
+  		<article>
+<header>
+      <h1 class="entry-title">
+        <a href="https://spapas.github.io/2014/02/13/wagtail-tutorial/">A Wagtail tutorial</a>
+      </h1>
+    <p class="meta">
+<time datetime="2014-02-13T21:20:00+02:00" pubdate>Thu 13 February 2014</time>    </p>
+</header>
+
+<div class="entry-content"><p><a href="http://wagtail.io">Wagtail</a> is a new Open Source <a href="https://www.djangoproject.com">Django</a>-based <span class="caps">CMS</span>. In this 20 minute tutorial we will see how you can create a blog from scratch using Wagtail. If you want to see some more examples of usage please take a look at the <a href="https://github.com/torchbox/wagtaildemo">wagtaildemo</a> GitHub&nbsp;project.</p>
+<p>To follow this tutorial you will need to have <a href="http://python.org/">Python</a> 2.7 installed with a working version of <a href="https://pypi.python.org/pypi/pip">pip</a> and <a href="https://pypi.python.org/pypi/virtualenv">virtualenv</a>.</p>
+<p><strong>Update</strong>: The result of this tutorial has been deployed to <a href="https://www.heroku.com/">Heroku</a>: <a href="http://gentle-refuge-2590.herokuapp.com/">http://gentle-refuge-2590.herokuapp.com/</a> - you may visit the <a href="http://gentle-refuge-2590.herokuapp.com/admin/">admin site</a> and login with root / 123 to play with Wagtail! Please don&#8217;t do anything naughty !!! Also, notice that <a href="https://devcenter.heroku.com/articles/dynos#isolation-and-security">because of how Heroku works</a> you won&#8217;t be able to upload&nbsp;anything.</p>
+<p><strong>Update 08/09/2015: This tutorial has been written during the first days of Wagtail, when documentation and tutorials about it were sparce; right now it should be considered by all accounts obsolete and <em>not</em> be followed! Instead, you should read the official (and very well written) tutorial @ http://docs.wagtail.io/en/latest/getting_started/tutorial.html in the official Wagtail&nbsp;documentation!</strong></p>
+<h2 id="installing-the-wagtail-dependencies">Installing the wagtail&nbsp;dependencies</h2>
+<p>It is recomended to create a new virtual environment that will host the wagtail tutorial. After you have changed to the virtual environment you will need to installl the Wagtail requirements. Create a file named <code>requirements.txt</code> containing the&nbsp;following:</p>
+<div class="highlight"><pre><span></span><code>Django==1.6.2
+South==1.0.0
+django-compressor==1.4
+django-modelcluster==0.3
+-e git://github.com/torchbox/wagtail.git#egg=wagtail
+django-taggit==0.11.2
+django-libsass==0.2
+</code></pre></div>
+
+<p>and run
+<code>pip install -r requirements.txt</code>.  If you use Microsoft Windows you <em>will</em> experience problems with Pillow and lxml. Please download the 
+installation executables from https://pypi.python.org/pypi/Pillow/2.3.0 and https://pypi.python.org/pypi/lxml/3.3.1, install 
+them using <code>easy_install Pillow-2.3.0.x-py2.7.exe</code> and <code>easy_install lxml-3.3.1.x-py2.7.exe</code> (from inside your virtual environment) 
+and then install the other requirements. Also please use the latest version of Wagtail (hosted on github) because it has some changes from 
+the pypi (so <em>don&#8217;t</em> do a <code>pip install wagtail</code>).</p>
+<p><strong>Warning:</strong> Unfortuanately, no official binaries for libsass (which is a django-libsass requirement) are (yet) available for Windows. I
+have compiled a version for win32 and python 2.7 (which I use) using the <a href="http://www.confusedbycode.com/articles/compiling-python-modules.html">instructions found here</a>. You can download this version 
+<a href="https://spapas.github.io/images/libsass-0.3.0-cp27-none-win32.whl">as a wheel package</a>. Notice that because libsass was compiled with <span class="caps">VC</span> Express 2013
+you should also install the <a href="http://www.microsoft.com/en-us/download/details.aspx?id=40784">Visual C++ 2013 redistributable</a> package from&nbsp;Microsoft.</p>
+<p><em>Please use it at your own risk&nbsp;!!!</em></p>
+<p>To install <a href="http://pythonwheels.com/">wheels</a> you have to use a version of pip &gt;= 1.4 (so do an <code>easy_install -U pip</code> from your
+virtual environment if you have a previous version) and then you can just do a normal <code>pip install libsass-0.3.0-cp27-none-win32.whl</code>. </p>
+<p><strong>Warning no2:</strong> More unfortuanately, there seem to be <a href="https://github.com/torchbox/wagtail/issues/133">a number of issues</a> with how libsass handles <code>@import</code> statements
+in Windows. Until this is fixed, Windows users are recommened to use the command line (Ruby) sass compiler. To use it, please
+install Ruby in your system and then install sass with <code>gem install sass -v "&gt;=3.3.0alpha" --pre</code>. After that, in the <code>COMPRESS_PRECOMPILERS</code> 
+setting of your <code>settings.py</code> (discussed in the next section), change the line <code>('text/x-scss', 'django_libsass.SassCompiler'),</code> to 
+<code>('text/x-scss', 'sass --scss  {infile} {outfile}'),</code>.</p>
+<h2 id="creating-and-configuring-your-project">Creating and configuring your&nbsp;project</h2>
+<p>Wagtail has to &#8220;live&#8221; inside a normal Django project so you now may create a new Django project by&nbsp;issuing:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>&lt;PATH_OF_YOUR_VIRTUAL_ENV&gt;/scripts/django-admin.py<span class="w"> </span>startproject<span class="w"> </span>wagtailtutorial
+</code></pre></div>
+
+<p>If you use Unix you can just run <code>django-admin.py</code> etc however if you try to do the same in windows you
+will find out that windows tries to run the .py file with the python executable that is assigned through
+explorer (which of course is your main python installation) and <em>not</em> through your path! That&#8217;s why
+all our commands will be in the form <code>python script.py</code> to make sure that Windows picks the python
+executable from your path (which, if you&#8217;re inside the virtual enviroment will be the correct&nbsp;one).</p>
+<p>Inside the <code>wagtailtutorial</code> folder you will see a file named <code>manage.py</code> and another folder named <code>wagtailtutorial</code>. Inside this <code>wagtailtutorial</code> folder you will find <code>settings.py</code> and <code>urls.py</code> which need to be&nbsp;changed.</p>
+<p>Starting with <code>urls.py</code>, remove everything and change it like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">django.conf.urls</span><span class="w"> </span><span class="kn">import</span> <span class="n">patterns</span><span class="p">,</span> <span class="n">include</span><span class="p">,</span> <span class="n">url</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.conf.urls.static</span><span class="w"> </span><span class="kn">import</span> <span class="n">static</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.views.generic.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">RedirectView</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib</span><span class="w"> </span><span class="kn">import</span> <span class="n">admin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os.path</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">wagtail.wagtailcore</span><span class="w"> </span><span class="kn">import</span> <span class="n">urls</span> <span class="k">as</span> <span class="n">wagtail_urls</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">wagtail.wagtailadmin</span><span class="w"> </span><span class="kn">import</span> <span class="n">urls</span> <span class="k">as</span> <span class="n">wagtailadmin_urls</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">wagtail.wagtailimages</span><span class="w"> </span><span class="kn">import</span> <span class="n">urls</span> <span class="k">as</span> <span class="n">wagtailimages_urls</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">wagtail.wagtailembeds</span><span class="w"> </span><span class="kn">import</span> <span class="n">urls</span> <span class="k">as</span> <span class="n">wagtailembeds_urls</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">wagtail.wagtaildocs</span><span class="w"> </span><span class="kn">import</span> <span class="n">admin_urls</span> <span class="k">as</span> <span class="n">wagtaildocs_admin_urls</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">wagtail.wagtaildocs</span><span class="w"> </span><span class="kn">import</span> <span class="n">urls</span> <span class="k">as</span> <span class="n">wagtaildocs_urls</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">wagtail.wagtailsnippets</span><span class="w"> </span><span class="kn">import</span> <span class="n">urls</span> <span class="k">as</span> <span class="n">wagtailsnippets_urls</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">wagtail.wagtailsearch.urls</span><span class="w"> </span><span class="kn">import</span> <span class="n">frontend</span> <span class="k">as</span> <span class="n">wagtailsearch_frontend_urls</span><span class="p">,</span> <span class="n">admin</span> <span class="k">as</span> <span class="n">wagtailsearch_admin_urls</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">wagtail.wagtailusers</span><span class="w"> </span><span class="kn">import</span> <span class="n">urls</span> <span class="k">as</span> <span class="n">wagtailusers_urls</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">wagtail.wagtailredirects</span><span class="w"> </span><span class="kn">import</span> <span class="n">urls</span> <span class="k">as</span> <span class="n">wagtailredirects_urls</span>
+
+<span class="n">admin</span><span class="o">.</span><span class="n">autodiscover</span><span class="p">()</span>
+
+
+<span class="c1"># Signal handlers</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">wagtail.wagtailsearch</span><span class="w"> </span><span class="kn">import</span> <span class="n">register_signal_handlers</span> <span class="k">as</span> <span class="n">wagtailsearch_register_signal_handlers</span>
+<span class="n">wagtailsearch_register_signal_handlers</span><span class="p">()</span>
+
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+    <span class="n">url</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^django-admin/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">urls</span><span class="p">)),</span>
+
+    <span class="n">url</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^admin/images/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">wagtailimages_urls</span><span class="p">)),</span>
+    <span class="n">url</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^admin/embeds/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">wagtailembeds_urls</span><span class="p">)),</span>
+    <span class="n">url</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^admin/documents/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">wagtaildocs_admin_urls</span><span class="p">)),</span>
+    <span class="n">url</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^admin/snippets/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">wagtailsnippets_urls</span><span class="p">)),</span>
+    <span class="n">url</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^admin/search/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">wagtailsearch_admin_urls</span><span class="p">)),</span>
+    <span class="n">url</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^admin/users/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">wagtailusers_urls</span><span class="p">)),</span>
+    <span class="n">url</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^admin/redirects/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">wagtailredirects_urls</span><span class="p">)),</span>
+    <span class="n">url</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^admin/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">wagtailadmin_urls</span><span class="p">)),</span>
+    <span class="n">url</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^search/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">wagtailsearch_frontend_urls</span><span class="p">)),</span>
+    <span class="n">url</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^documents/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">wagtaildocs_urls</span><span class="p">)),</span>
+
+    <span class="c1"># For anything not caught by a more specific rule above, hand over to</span>
+    <span class="c1"># Wagtail&#39;s serving mechanism</span>
+    <span class="n">url</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">wagtail_urls</span><span class="p">)),</span>
+<span class="p">)</span>
+
+
+<span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.staticfiles.urls</span><span class="w"> </span><span class="kn">import</span> <span class="n">staticfiles_urlpatterns</span>
+
+    <span class="n">urlpatterns</span> <span class="o">+=</span> <span class="n">staticfiles_urlpatterns</span><span class="p">()</span> <span class="c1"># tell gunicorn where static files are in dev mode</span>
+    <span class="n">urlpatterns</span> <span class="o">+=</span> <span class="n">static</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">MEDIA_URL</span> <span class="o">+</span> <span class="s1">&#39;images/&#39;</span><span class="p">,</span> <span class="n">document_root</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">MEDIA_ROOT</span><span class="p">,</span> <span class="s1">&#39;images&#39;</span><span class="p">))</span>
+</code></pre></div>
+
+<p>You can se that there is a signal handler when a searchable thing is added or changed to handle indexing for search, normal django admin is mapped under /django-admin since /admin is use for Wagtail (of course you may map Wagtail wherever you&#8217;d like), inclusion of various wagtail related urls and finally a Wagtail handling everything else. Finally there are some handlers for media and static&nbsp;files.</p>
+<p>After that please change your <code>settings.py</code> like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Django settings for wagtailtutorial project.</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+<span class="n">PROJECT_ROOT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">)</span>
+
+<span class="n">DEBUG</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">TEMPLATE_DEBUG</span> <span class="o">=</span> <span class="n">DEBUG</span>
+
+<span class="n">ADMINS</span> <span class="o">=</span> <span class="p">()</span>
+<span class="n">MANAGERS</span> <span class="o">=</span> <span class="n">ADMINS</span>
+
+<span class="n">DATABASES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;ENGINE&#39;</span><span class="p">:</span> <span class="s1">&#39;django.db.backends.sqlite3&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;NAME&#39;</span><span class="p">:</span> <span class="n">PROJECT_ROOT</span><span class="o">+</span><span class="s1">&#39;/wagtailtutorial.db&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;USER&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;PASSWORD&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;HOST&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>  <span class="c1"># Set to empty string for localhost.</span>
+        <span class="s1">&#39;PORT&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>  <span class="c1"># Set to empty string for default.</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">CONN_MAX_AGE</span> <span class="o">=</span> <span class="mi">600</span>  <span class="c1"># number of seconds database connections should persist for</span>
+<span class="n">ALLOWED_HOSTS</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">TIME_ZONE</span> <span class="o">=</span> <span class="s1">&#39;Europe/London&#39;</span>
+<span class="n">LANGUAGE_CODE</span> <span class="o">=</span> <span class="s1">&#39;en-gb&#39;</span>
+<span class="n">SITE_ID</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">USE_I18N</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">USE_L10N</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">USE_TZ</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">MEDIA_ROOT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PROJECT_ROOT</span><span class="p">,</span> <span class="s1">&#39;media&#39;</span><span class="p">)</span>
+<span class="n">MEDIA_URL</span> <span class="o">=</span> <span class="s1">&#39;/media/&#39;</span>
+<span class="n">STATIC_ROOT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PROJECT_ROOT</span><span class="p">,</span> <span class="s1">&#39;static&#39;</span><span class="p">)</span>
+<span class="n">STATIC_URL</span> <span class="o">=</span> <span class="s1">&#39;/static/&#39;</span>
+<span class="n">STATICFILES_DIRS</span> <span class="o">=</span> <span class="p">()</span>
+
+<span class="n">STATICFILES_FINDERS</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s1">&#39;django.contrib.staticfiles.finders.FileSystemFinder&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;django.contrib.staticfiles.finders.AppDirectoriesFinder&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;compressor.finders.CompressorFinder&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">SECRET_KEY</span> <span class="o">=</span> <span class="s1">&#39;wq21wtjo3@d_qfjvd-#td!</span><span class="si">%7g</span><span class="s1">fy2updj2z+nev^k$iy%=m4_tr&#39;</span>
+
+<span class="n">TEMPLATE_LOADERS</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s1">&#39;django.template.loaders.filesystem.Loader&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;django.template.loaders.app_directories.Loader&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">MIDDLEWARE_CLASSES</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s1">&#39;django.middleware.common.CommonMiddleware&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;django.contrib.sessions.middleware.SessionMiddleware&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;django.middleware.csrf.CsrfViewMiddleware&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;django.contrib.auth.middleware.AuthenticationMiddleware&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;django.contrib.messages.middleware.MessageMiddleware&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;django.middleware.clickjacking.XFrameOptionsMiddleware&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;wagtail.wagtailcore.middleware.SiteMiddleware&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;wagtail.wagtailredirects.middleware.RedirectMiddleware&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">global_settings</span>
+<span class="n">TEMPLATE_CONTEXT_PROCESSORS</span> <span class="o">=</span> <span class="n">global_settings</span><span class="o">.</span><span class="n">TEMPLATE_CONTEXT_PROCESSORS</span> <span class="o">+</span> <span class="p">(</span>
+    <span class="s1">&#39;django.core.context_processors.request&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">ROOT_URLCONF</span> <span class="o">=</span> <span class="s1">&#39;wagtailtutorial.urls&#39;</span>
+<span class="n">WSGI_APPLICATION</span> <span class="o">=</span> <span class="s1">&#39;wagtailtutorial.wsgi.application&#39;</span>
+<span class="n">TEMPLATE_DIRS</span> <span class="o">=</span> <span class="p">()</span>
+
+<span class="n">INSTALLED_APPS</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s1">&#39;django.contrib.auth&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;django.contrib.contenttypes&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;django.contrib.sessions&#39;</span><span class="p">,</span>
+    <span class="c1"># &#39;django.contrib.sites&#39;,  # Wagtail uses its own site management logic</span>
+    <span class="s1">&#39;django.contrib.messages&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;django.contrib.staticfiles&#39;</span><span class="p">,</span>
+
+    <span class="s1">&#39;south&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;compressor&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;taggit&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;modelcluster&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;django.contrib.admin&#39;</span><span class="p">,</span>
+
+    <span class="s1">&#39;wagtail.wagtailcore&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;wagtail.wagtailadmin&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;wagtail.wagtaildocs&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;wagtail.wagtailsnippets&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;wagtail.wagtailusers&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;wagtail.wagtailimages&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;wagtail.wagtailembeds&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;wagtail.wagtailsearch&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;wagtail.wagtailredirects&#39;</span><span class="p">,</span>
+
+    <span class="s1">&#39;tutorial&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">EMAIL_SUBJECT_PREFIX</span> <span class="o">=</span> <span class="s1">&#39;[wagtailtutorial] &#39;</span>
+
+<span class="n">INTERNAL_IPS</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="s1">&#39;10.0.2.2&#39;</span><span class="p">)</span>
+
+<span class="n">COMPRESS_PRECOMPILERS</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="p">(</span><span class="s1">&#39;text/x-scss&#39;</span><span class="p">,</span> <span class="s1">&#39;django_libsass.SassCompiler&#39;</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="c1"># Auth settings</span>
+<span class="n">LOGIN_URL</span> <span class="o">=</span> <span class="s1">&#39;django.contrib.auth.views.login&#39;</span>
+<span class="n">LOGIN_REDIRECT_URL</span> <span class="o">=</span> <span class="s1">&#39;wagtailadmin_home&#39;</span>
+
+<span class="n">LOGGING</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;version&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s1">&#39;disable_existing_loggers&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="s1">&#39;filters&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;require_debug_false&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;()&#39;</span><span class="p">:</span> <span class="s1">&#39;django.utils.log.RequireDebugFalse&#39;</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;handlers&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;mail_admins&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="s1">&#39;ERROR&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;filters&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;require_debug_false&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="s1">&#39;django.utils.log.AdminEmailHandler&#39;</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;loggers&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;django.request&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;handlers&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;mail_admins&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="s1">&#39;ERROR&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;propagate&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+
+<span class="c1"># WAGTAIL SETTINGS</span>
+<span class="n">WAGTAIL_SITE_NAME</span> <span class="o">=</span> <span class="s1">&#39;wagtailtutorial&#39;</span>
+
+<span class="c1"># Override the search results template for wagtailsearch</span>
+<span class="n">WAGTAILSEARCH_RESULTS_TEMPLATE</span> <span class="o">=</span> <span class="s1">&#39;tutorial/search_results.html&#39;</span>
+<span class="n">WAGTAILSEARCH_RESULTS_TEMPLATE_AJAX</span> <span class="o">=</span> <span class="s1">&#39;tutorial/includes/search_listing.html&#39;</span>
+
+<span class="n">WAGTAILSEARCH_ES_INDEX</span> <span class="o">=</span> <span class="s1">&#39;wagtailtutorial&#39;</span>
+</code></pre></div>
+
+<p>The most important thing to notice is that  the <code>INSTALLED_APPS</code> contains the usual apps from django.*, <a href="http://south.aeracode.org/">south</a> for database migrations, <a href="https://github.com/django-compressor/django-compressor">django-compressor</a> to support compressing static files (and automatic translating from less to css), <a href="https://github.com/alex/django-taggit">django-taggit</a> to add support for tags, and <a href="https://github.com/torchbox/django-modelcluster/">django-modelcluster</a> which adds support from clusters (groups) of models. It also contains the wagtail.* applications and the tutorial application which is where we will create our blog. Also there are two Wagtail related middleware (one to add a site attribute to each request and one to hand redirects), configuring django-compressor to use <code>django_libsass</code> to compile <code>less</code> files, and some other, not so important Wagtail&nbsp;settings.</p>
+<p>So let&#8217;s create the missing tutorial application by&nbsp;issuing:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>manage.py<span class="w"> </span>startapp<span class="w"> </span>tutorial
+</code></pre></div>
+
+<p>Now we&#8217;ll have a <code>tutorial</code> folder waiting to define our blog structure inside the <code>wagtailtutorial</code> folder!</p>
+<h2 id="checking-to-see-if-everything-works">Checking to see if everything&nbsp;works</h2>
+<p>Before continuing with our blog creation let&#8217;s make sure that everything works, first of all by generating the database&nbsp;schema:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>manage.py<span class="w"> </span>syncdb
+</code></pre></div>
+
+<p>In the superuser question answer yes and add a superuser. Then you can run the migrations - however because there are some problems with the way SQLite3 runs migrations it is recommended to run the migrations in two&nbsp;steps:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>manage.py<span class="w"> </span>migrate<span class="w"> </span><span class="m">0001</span><span class="w"> </span>--all
+python<span class="w"> </span>manage.py<span class="w"> </span>migrate
+</code></pre></div>
+
+<p>Finally, you now may try&nbsp;a</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>manage.py<span class="w"> </span>runserver
+</code></pre></div>
+
+<p>and visit <code>http://127.0.0.1:8000</code>. If everything worked fine you will get&nbsp;a</p>
+<blockquote>
+<p>Welcome to your new Wagtail&nbsp;site!</p>
+</blockquote>
+<p>page &#8212; congratulations&nbsp;!</p>
+<p>The homepage is rather simple (for now!) but you may already navigate to http://127.0.0.1:8000/admin and from there, login to Wagtail admin with the superuser you created earlier. 
+Now you may start experiencing Wagtail&nbsp;! </p>
+<p><img alt="Wagtail admin index" src="https://spapas.github.io/images/wagtail-index.png"></p>
+<h2 id="exploring-wagtail-admin">Exploring Wagtail&nbsp;admin</h2>
+<p>When you login to Wagtail admin you will see a menu at the left with the&nbsp;options:</p>
+<ul>
+<li>Explorer is used to actually manage the content of your&nbsp;site</li>
+<li>Search is used for searching through your&nbsp;content</li>
+<li>Images is used to manage your&nbsp;images</li>
+<li>Documents is used to manage your&nbsp;Documents</li>
+<li>Snippets is used for side bars&nbsp;etc</li>
+<li>Users is used for User&nbsp;management</li>
+<li>Redirects is used to redirect to a specific&nbsp;page</li>
+<li>Editors picks is used to promote search&nbsp;results</li>
+</ul>
+<p>Of the previous, the one needing more explanation is Explorer: Clicking it you will see that a label named &#8220;Welcome to your Wagtail site!&#8221; will open. This is the root Page of your site. If you click at it you will go to the actions of this page. The actions you can do here is:
+ - Add Child Page
+ - Edit
+ - View Live
+ - Move
+ - Delete
+ -&nbsp;Unpublish</p>
+<p>The Pages (and more generally the Content) of Wagtail are Django Models that are saved through a Tree hierarchy. However, if you click &#8220;Add Child Page&#8221; you won&#8217;t be able to add anything because you must create your own Page types (we will see how it is done in the next&nbsp;section). </p>
+<p>When you click edit you will be able to edit the parts of the page (each part is a normal Field of the model). Also, you will see that the form is split into two tabs: Content and Promote. In the Content for instance you will see that the &#8220;Welcome to your Wagtail site!&#8221; has only a &#8220;Title&#8221; CharField. These are the fields that will be available to all Pages since &#8220;Welcome to your Wagtail site!&#8221; has a class of <code>Page</code> from which every other page should inherit. After you finish editing a page you may save it as a draft, publish, sent it for moderation (if you don&#8217;t have the rights to publish it)&nbsp;etc.</p>
+<h2 id="creating-our-blog">Creating our&nbsp;blog</h2>
+<p>Each of our Page types is a normal Django Model which inherits from <code>Page</code>. Let&#8217;s suppose that our posts should contain a title, a body and a created date. Add the following to <code>tutorials/models.py</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">django.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">models</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">wagtail.wagtailcore.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Page</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">wagtail.wagtailcore.fields</span><span class="w"> </span><span class="kn">import</span> <span class="n">RichTextField</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">wagtail.wagtailadmin.edit_handlers</span><span class="w"> </span><span class="kn">import</span> <span class="n">FieldPanel</span>    
+
+<span class="k">class</span><span class="w"> </span><span class="nc">BlogPage</span><span class="p">(</span><span class="n">Page</span><span class="p">):</span>
+    <span class="n">body</span> <span class="o">=</span> <span class="n">RichTextField</span><span class="p">()</span>
+    <span class="n">date</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateField</span><span class="p">(</span><span class="s2">&quot;Post date&quot;</span><span class="p">)</span>
+    <span class="n">search_name</span> <span class="o">=</span> <span class="s2">&quot;Blog Page&quot;</span>
+
+    <span class="n">indexed_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;body&#39;</span><span class="p">,</span> <span class="p">)</span>
+
+<span class="n">BlogPage</span><span class="o">.</span><span class="n">content_panels</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">FieldPanel</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="n">classname</span><span class="o">=</span><span class="s2">&quot;full title&quot;</span><span class="p">),</span>
+    <span class="n">FieldPanel</span><span class="p">(</span><span class="s1">&#39;date&#39;</span><span class="p">),</span>
+    <span class="n">FieldPanel</span><span class="p">(</span><span class="s1">&#39;body&#39;</span><span class="p">,</span> <span class="n">classname</span><span class="o">=</span><span class="s2">&quot;full&quot;</span><span class="p">),</span>
+<span class="p">]</span>
+</code></pre></div>
+
+<p>and run <code>python manage.py syncdb</code> to create the <code>tutorial_blogpage</code> table. </p>
+<p>Now, if you visit again the /admin and click on the &#8220;Add Child Page&#8221; action of &#8220;Welcome to your new Wagtail Site!&#8221; you will see the &#8220;Blog Page&#8221; page and after you click it you will be able to see a form with the Fields you defined <em>and</em> title(title, body, date). The title is a field inherited from Page, along with the fields  in the Promote&nbsp;tab. </p>
+<p>In our declaration of BlogPage we added three <code>FieldPanel</code>s on its content_panes. A <code>FieldPanel</code> is a special edit handler for each Field. That is why when you try to edit the body you will see a rich text toolbar that enables you to not only format text but also embed images, documents and even oembed links. If you hadn&#8217;t included the <code>FieldPanel('body', classname="full")</code> then you wouldn&#8217;t see the rich text&nbsp;editor.</p>
+<p><img alt="Editing pages in Wagtail" src="https://spapas.github.io/images/wagtail-edit-page.png"></p>
+<p>So now we can add as many posts as we&nbsp;like! </p>
+<p>The time has come to take a look at our fine blog post: After we publish our page we click to the view live action&nbsp;and&#8230; </p>
+<blockquote>
+<p>TemplateDoesNotExist at&nbsp;/hello-world/</p>
+<p>tutorial/blog_page.html</p>
+</blockquote>
+<p>:(</p>
+<p>A template seems to be missing &#8212; actually we have totally forgotten about the presentation of our blog &#8212; we&#8217;ll talk about this in the next section&nbsp;!</p>
+<p>However, before going there we should also create an Index page type collecting our&nbsp;posts. </p>
+<p>For this, we will change our <code>models.py</code> to&nbsp;this:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">django.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">models</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">wagtail.wagtailcore.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Page</span><span class="p">,</span> <span class="n">Orderable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">wagtail.wagtailcore.fields</span><span class="w"> </span><span class="kn">import</span> <span class="n">RichTextField</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">wagtail.wagtailadmin.edit_handlers</span><span class="w"> </span><span class="kn">import</span> <span class="n">FieldPanel</span>  <span class="p">,</span><span class="n">MultiFieldPanel</span><span class="p">,</span><span class="n">InlinePanel</span><span class="p">,</span> <span class="n">PageChooserPanel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">modelcluster.fields</span><span class="w"> </span><span class="kn">import</span> <span class="n">ParentalKey</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">BlogPage</span><span class="p">(</span><span class="n">Page</span><span class="p">):</span>
+    <span class="n">body</span> <span class="o">=</span> <span class="n">RichTextField</span><span class="p">()</span>
+    <span class="n">date</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateField</span><span class="p">(</span><span class="s2">&quot;Post date&quot;</span><span class="p">)</span>
+    <span class="n">indexed_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;body&#39;</span><span class="p">,</span> <span class="p">)</span>
+    <span class="n">search_name</span> <span class="o">=</span> <span class="s2">&quot;Blog Page&quot;</span>
+
+<span class="n">BlogPage</span><span class="o">.</span><span class="n">content_panels</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">FieldPanel</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="n">classname</span><span class="o">=</span><span class="s2">&quot;full title&quot;</span><span class="p">),</span>
+    <span class="n">FieldPanel</span><span class="p">(</span><span class="s1">&#39;date&#39;</span><span class="p">),</span>
+    <span class="n">FieldPanel</span><span class="p">(</span><span class="s1">&#39;body&#39;</span><span class="p">,</span> <span class="n">classname</span><span class="o">=</span><span class="s2">&quot;full&quot;</span><span class="p">),</span>
+<span class="p">]</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">LinkFields</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">link_page</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span>
+        <span class="s1">&#39;wagtailcore.Page&#39;</span><span class="p">,</span>
+        <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;+&#39;</span>
+    <span class="p">)</span>
+
+    <span class="n">panels</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">PageChooserPanel</span><span class="p">(</span><span class="s1">&#39;link_page&#39;</span><span class="p">),</span>
+    <span class="p">]</span>
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">abstract</span> <span class="o">=</span> <span class="kc">True</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">RelatedLink</span><span class="p">(</span><span class="n">LinkFields</span><span class="p">):</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">,</span> <span class="n">help_text</span><span class="o">=</span><span class="s2">&quot;Link title&quot;</span><span class="p">)</span>
+    <span class="n">panels</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">FieldPanel</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">),</span>
+        <span class="n">MultiFieldPanel</span><span class="p">(</span><span class="n">LinkFields</span><span class="o">.</span><span class="n">panels</span><span class="p">,</span> <span class="s2">&quot;Link&quot;</span><span class="p">),</span>
+    <span class="p">]</span>
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">abstract</span> <span class="o">=</span> <span class="kc">True</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">BlogIndexPageRelatedLink</span><span class="p">(</span><span class="n">Orderable</span><span class="p">,</span> <span class="n">RelatedLink</span><span class="p">):</span>
+    <span class="n">page</span> <span class="o">=</span> <span class="n">ParentalKey</span><span class="p">(</span><span class="s1">&#39;tutorial.BlogIndexPage&#39;</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;related_links&#39;</span><span class="p">)</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">BlogIndexPage</span><span class="p">(</span><span class="n">Page</span><span class="p">):</span>
+    <span class="n">intro</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span>
+    <span class="n">indexed_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;body&#39;</span><span class="p">,</span> <span class="p">)</span>
+    <span class="n">search_name</span> <span class="o">=</span> <span class="s2">&quot;Blog Index Page&quot;</span>
+
+<span class="n">BlogIndexPage</span><span class="o">.</span><span class="n">content_panels</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">FieldPanel</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="n">classname</span><span class="o">=</span><span class="s2">&quot;full title&quot;</span><span class="p">),</span>
+    <span class="n">FieldPanel</span><span class="p">(</span><span class="s1">&#39;intro&#39;</span><span class="p">,</span> <span class="n">classname</span><span class="o">=</span><span class="s2">&quot;full&quot;</span><span class="p">),</span>
+    <span class="n">InlinePanel</span><span class="p">(</span><span class="n">BlogIndexPage</span><span class="p">,</span> <span class="s1">&#39;related_links&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Related links&quot;</span><span class="p">),</span>
+<span class="p">]</span>    
+</code></pre></div>
+
+<p>The above adds a way to put <code>related_links</code> to a <code>BlogIndexPage</code> &#8212; these related_links are the <code>BlogPage</code>s that actually belong to the blog - so now, we can add a blog index page and add all our blog posts to&nbsp;it!</p>
+<p>Now that we&#8217;ve created the BlogPage and BlogIndexPage pages it&#8217;s time to take a look at how we will actually display our&nbsp;blog&#8230;</p>
+<h2 id="creating-templates-for-pages">Creating templates for <em>Page</em>s</h2>
+<p>A normal Django template can be used to display each page type. Wagtail either generates automatically (by seperating underscors with capital letters in camelcase for instance BlogIndexPage -&gt; blog_index_page) or you can use the template class attribute. Let&#8217;s add a <code>templates</code> foler within the <code>tutorial</code> foler and add another folder named <code>tutorial</code> inside <code>templates</code> and ten add a file named <code>blog_index_page.html</code> to <code>templates</code> with the following content (you must have the following hierarchy <code>wagtailtutorial/tutorial/templates/tutorial/blog_index_page.html</code>):</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>{{ self.title }}<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+        Intro: {{ self.intro }}
+        <span class="p">&lt;</span><span class="nt">hr</span> <span class="p">/&gt;</span>
+        {% for rl in self.related_links.all %}
+            <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>{{ rl.title }}: <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&#39;{{ rl.link_page.url }}&#39;</span><span class="p">&gt;</span>{{ rl.link_page }}<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+        {% endfor %}
+    <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>So self is the context name of the  BlogPageIndex instance that is used to render this page. Beyond that, it&#8217;s normal&nbsp;django.</p>
+<p><img alt="Rendering the Blog Index" src="https://spapas.github.io/images/wagtail-index-template.png"></p>
+<p>Now you can view your Blog Index &#8212; however before clicking on a link to also view your posts add the template for your <code>BlogPost</code> (<code>tutorial/blog_page.html</code>):</p>
+<div class="highlight"><pre><span></span><code>{% load rich_text %}
+<span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>{{ self.title }}<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+        Date: {{ self.date }}
+        {{ self.body | richtext }}
+    <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>    
+</code></pre></div>
+
+<p>The extra thing here is the <code>richtext</code> filter which renders a <code>RichTextField</code> correctly. Of course the above templates are just examples - check <code>wagtaildemo</code> for a much better template&nbsp;design.</p>
+<p>Woo-hoo &#8212; now I can totally start blogging !!!&nbsp;\o/</p>
+<p>&#8230;</p>
+<p>&#8230;</p>
+<p>But &#8230; when I go to 127.0.0.1:8000 it displays the ugly &#8220;Welcome to your new Wagtail site!&#8221;. I don&#8217;t want to see that any more&nbsp;!!!</p>
+<p>No problemo - check the next section of the tutorial&nbsp;:)</p>
+<h2 id="changing-your-home-page">Changing your home&nbsp;page</h2>
+<p>Wagtail uses the concept of <em>sites</em> to define groups of pages hosted in the <em>same</em> server. To make more clear what site is, you have to use the good old django admin which can be found at <code>http://127.0.0.1:8000/django-admin/</code>. Check the localhost[default] site entry: You will see that each site has a name, a root page (currently the &#8220;Welcome to your new Wagtail site!&#8221;) and an is_default check. So,  change the root page of the localhost site to your BlogIndexPage and go to <code>http://127.0.0.1:8000/</code> &#8230; Yes ! The blog is alive&nbsp;:)</p>
+<h2 id="where-to-go-from-here">Where to go from&nbsp;here</h2>
+<p>You are now ready to start adding more pages to your blog, adding functionality to it (don&#8217;t forget that everything is just Django models and templates so you can
+change it at will), or even creating a completely different kind of site by adding other Page types. For a more complete site with lots of examples please check 
+<a href="https://github.com/torchbox/wagtaildemo">wagtaildemo</a>. There is
+no complete documentation yet however you&nbsp;can </p>
+<blockquote>
+<p>Use the source&nbsp;Luke!</p>
+</blockquote></div>
+  		</article>
+  		<article>
+<header>
+      <h1 class="entry-title">
+        <a href="https://spapas.github.io/2013/12/24/django-dynamic-forms/">Django dynamic forms</a>
+      </h1>
+    <p class="meta">
+<time datetime="2013-12-24T14:20:00+02:00" pubdate>Tue 24 December 2013</time>    </p>
+</header>
+
+<div class="entry-content"><div class="contents topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#introduction" id="toc-entry-1">Introduction</a></li>
+<li><a class="reference internal" href="#describing-a-django-form-in-json" id="toc-entry-2">Describing a django form in <span class="caps">JSON</span></a></li>
+<li><a class="reference internal" href="#creating-the-form-fields" id="toc-entry-3">Creating the form&nbsp;fields</a></li>
+<li><a class="reference internal" href="#creating-the-actual-form" id="toc-entry-4">Creating the actual&nbsp;form</a></li>
+<li><a class="reference internal" href="#using-the-dynamic-form" id="toc-entry-5">Using the dynamic&nbsp;form</a></li>
+</ul>
+</div>
+<div class="section" id="introduction">
+<h2><a class="toc-backref" href="#toc-entry-1">Introduction</a></h2>
+<p>To define a form in django, a developer has to create a class which extends
+<tt class="docutils literal">django.forms.Form</tt>
+and has  a number of attributes extending from <tt class="docutils literal">django.forms.Field</tt>. This makes
+it very easy for the developer to create static forms, but creating
+dynamic forms whose fields can be changed depending on the data contributed by the
+users of the application is not so&nbsp;obvious.</p>
+<p>Of course, some people may argue that they can do whatever
+they want just by spitting html input tags to their templates, however this totally violates
+<span class="caps">DRY</span> and any serious django developer would prefer to write <a class="reference external" href="http://thedailywtf.com/Articles/A_Case_of_the_MUMPS.aspx"><span class="caps">MUMPS</span></a> than creating
+html&nbsp;dynamically.</p>
+<p>The implementation I will present here had been developed for an old project: In that
+project there was a number of services which could be edited dynamically by the
+moderators. For each service, the moderators would generate a questionnaire to
+get input from the users which would be defined  using <span class="caps">JSON</span>. When the users needed
+to submit information for each service, a dynamic django form would be generated
+from this <span class="caps">JSON</span> and the answers would be saved to no-<span class="caps">SQL</span> database like&nbsp;MongoDB.</p>
+</div>
+<div class="section" id="describing-a-django-form-in-json">
+<h2><a class="toc-backref" href="#toc-entry-2">Describing a django form in <span class="caps">JSON</span></a></h2>
+<p>A <span class="caps">JSON</span> described django form is just an array of field <span class="caps">JSON</span> objects. Each field
+object  has three required attributes: name which is the keyword of the field, label which is
+how the label of the field and type which is the type of the input of that field. The
+supported types are text, textarea, integer, radio, select, checkbox. Now, depending
+on the type of the field, there could be also some more required attributes, for instace
+text has a max_length attribute and select has a choices attribute (which is an array
+of name/value objects). Also there are two optional attributes,
+required with a default value of False and help_text with a default value of&nbsp;&#8221;.</p>
+<p>As you can understand these map one by one to the corresponding attributes of the
+actual django form fields. An example containing a complete <span class="caps">JSON</span> described form
+is the&nbsp;following:</p>
+<pre class="code literal-block">
+[
+    {
+        &quot;name&quot;: &quot;firstname&quot;,
+        &quot;label&quot;: &quot;First Name&quot;,
+        &quot;type&quot;: &quot;text&quot;,
+        &quot;max_length&quot;: 25,
+        &quot;required&quot;: 1
+    },
+    {
+        &quot;name&quot;: &quot;lastname&quot;,
+        &quot;label&quot;: &quot;Last Name&quot;,
+        &quot;type&quot;: &quot;text&quot;,
+        &quot;max_length&quot;: 25,
+        &quot;required&quot;: 1
+    },
+    {
+        &quot;name&quot;: &quot;smallcv&quot;,
+        &quot;label&quot;: &quot;Small CV&quot;,
+        &quot;type&quot;: &quot;textarea&quot;,
+        &quot;help_text&quot;: &quot;Please insert a small CV&quot;
+    },
+    {
+        &quot;name&quot;: &quot;age&quot;,
+        &quot;label&quot;: &quot;Age&quot;,
+        &quot;type&quot;: &quot;integer&quot;,
+        &quot;max_value&quot;: 200,
+        &quot;min_value&quot;: 0
+    },
+    {
+        &quot;name&quot;: &quot;marital_status&quot;,
+        &quot;label&quot;: &quot;Marital Status&quot;,
+        &quot;type&quot;: &quot;radio&quot;,
+        &quot;choices&quot;: [
+            {&quot;name&quot;: &quot;Single&quot;, &quot;value&quot;:&quot;single&quot;},
+            {&quot;name&quot;: &quot;Married&quot;, &quot;value&quot;:&quot;married&quot;},
+            {&quot;name&quot;: &quot;Divorced&quot;, &quot;value&quot;:&quot;divorced&quot;},
+            {&quot;name&quot;: &quot;Widower&quot;, &quot;value&quot;:&quot;widower&quot;}
+        ]
+    },
+    {
+        &quot;name&quot;: &quot;occupation&quot;,
+        &quot;label&quot;: &quot;Occupation&quot;,
+        &quot;type&quot;: &quot;select&quot;,
+        &quot;choices&quot;: [
+            {&quot;name&quot;: &quot;Farmer&quot;, &quot;value&quot;:&quot;farmer&quot;},
+            {&quot;name&quot;: &quot;Engineer&quot;, &quot;value&quot;:&quot;engineer&quot;},
+            {&quot;name&quot;: &quot;Teacher&quot;, &quot;value&quot;:&quot;teacher&quot;},
+            {&quot;name&quot;: &quot;Office Clerk&quot;, &quot;value&quot;:&quot;office_clerk&quot;},
+            {&quot;name&quot;: &quot;Merchant&quot;, &quot;value&quot;:&quot;merchant&quot;},
+            {&quot;name&quot;: &quot;Unemployed&quot;, &quot;value&quot;:&quot;unemployed&quot;},
+            {&quot;name&quot;: &quot;Retired&quot;, &quot;value&quot;:&quot;retired&quot;},
+            {&quot;name&quot;: &quot;Other&quot;, &quot;value&quot;:&quot;other&quot;}
+        ]
+    },
+    {
+        &quot;name&quot;: &quot;internet&quot;,
+        &quot;label&quot;: &quot;Internet Access&quot;,
+        &quot;type&quot;: &quot;checkbox&quot;
+    }
+]
+</pre>
+<p>The above <span class="caps">JSON</span> string can be easily converted to an array of dictionaries with the following&nbsp;code:</p>
+<pre class="code literal-block">
+import json
+fields=json.loads(json_fields)
+</pre>
+</div>
+<div class="section" id="creating-the-form-fields">
+<h2><a class="toc-backref" href="#toc-entry-3">Creating the form&nbsp;fields</a></h2>
+<p>The most import part in the django dynamic form creation is to convert the above array
+of field-describing dictionaries to actual objects of type <tt class="docutils literal">django.forms.Field</tt>.</p>
+<p>To help with that I implemented a class named <tt class="docutils literal">FieldHandler</tt> which gets an
+array of field dictionaries and after initialization will have an attribute named <tt class="docutils literal">formfields</tt> which
+will be a dictionary with keys the names of each field an values the corresponding <tt class="docutils literal">django.forms.Field</tt> objects. The implementation is as&nbsp;follows:</p>
+<pre class="code literal-block">
+import django.forms
+
+class FieldHandler():
+    formfields = {}
+    def __init__(self, fields):
+        for field in fields:
+            options = self.get_options(field)
+            f = getattr(self, &quot;create_field_for_&quot;+field['type'] )(field, options)
+            self.formfields[field['name']] = f
+
+    def get_options(self, field):
+        options = {}
+        options['label'] = field['label']
+        options['help_text'] = field.get(&quot;help_text&quot;, None)
+        options['required'] = bool(field.get(&quot;required&quot;, 0) )
+        return options
+
+    def create_field_for_text(self, field, options):
+        options['max_length'] = int(field.get(&quot;max_length&quot;, &quot;20&quot;) )
+        return django.forms.CharField(**options)
+
+    def create_field_for_textarea(self, field, options):
+        options['max_length'] = int(field.get(&quot;max_value&quot;, &quot;9999&quot;) )
+        return django.forms.CharField(widget=django.forms.Textarea, **options)
+
+    def create_field_for_integer(self, field, options):
+        options['max_value'] = int(field.get(&quot;max_value&quot;, &quot;999999999&quot;) )
+        options['min_value'] = int(field.get(&quot;min_value&quot;, &quot;-999999999&quot;) )
+        return django.forms.IntegerField(**options)
+
+    def create_field_for_radio(self, field, options):
+        options['choices'] = [ (c['value'], c['name'] ) for c in field['choices'] ]
+        return django.forms.ChoiceField(widget=django.forms.RadioSelect,   **options)
+
+    def create_field_for_select(self, field, options):
+        options['choices']  = [ (c['value'], c['name'] ) for c in field['choices'] ]
+        return django.forms.ChoiceField(  **options)
+
+    def create_field_for_checkbox(self, field, options):
+        return django.forms.BooleanField(widget=django.forms.CheckboxInput, **options)
+</pre>
+<p>As can be seen, in the <tt class="docutils literal">__init__</tt> method, the <tt class="docutils literal">get_options</tt> method is called first which
+returns a dictionary with the common options (label, help_text, required). After that,
+depending on the type of each field the correct method will be generated with
+<tt class="docutils literal">getattr(self, <span class="pre">&quot;create_field_for_&quot;+field['type']</span> )</tt> (so if type is text this
+will return a reference to the create_field_for_text method) and then called passing
+the field dictinary and the options returned from <tt class="docutils literal">get_options</tt>. Each one of
+the <tt class="docutils literal">create_field_for_xxx</tt> methods will extract the required (or optional)
+attributes for the specific field type, update options and initialize the correct Field passing
+the options as kwargs. Finally the formfields attribute will be updated with the name
+and Field&nbsp;object.</p>
+</div>
+<div class="section" id="creating-the-actual-form">
+<h2><a class="toc-backref" href="#toc-entry-4">Creating the actual&nbsp;form</a></h2>
+<p>To create the actual dynamic <tt class="docutils literal">django.forms.Form</tt> I used the function <tt class="docutils literal">get_form</tt>
+which receives a string with the json description, parses it to a python array,
+creates the array of fields with the help of <tt class="docutils literal">FieldHandler</tt> and then generates
+the <tt class="docutils literal">Form</tt> class with <tt class="docutils literal">type</tt> passing it <tt class="docutils literal">django.forms.Form</tt> as a parent
+and the array of <tt class="docutils literal">django.forms.Field</tt> from <tt class="docutils literal">FieldHandler</tt> as&nbsp;attributes:</p>
+<pre class="code literal-block">
+def get_form(jstr):
+    fields=json.loads(jstr)
+    fh = FieldHandler(fields)
+    return type('DynaForm', (django.forms.Form,), fh.formfields )
+</pre>
+</div>
+<div class="section" id="using-the-dynamic-form">
+<h2><a class="toc-backref" href="#toc-entry-5">Using the dynamic&nbsp;form</a></h2>
+<p>The result of <tt class="docutils literal">get_form</tt> can be used as a normal form class. As an&nbsp;example:</p>
+<pre class="code literal-block">
+import dynaform
+
+def dform(request):
+    json_form = get_json_form_from_somewhere()
+    form_class = dynaform.get_form(json_form)
+    data = {}
+    if request.method == 'POST':
+        form = form_class(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+    else:
+        form = form_class()
+
+    return render_to_response( &quot;dform.html&quot;, {
+        'form': form,  'data': data,
+    }, RequestContext(request) )
+</pre>
+<p>So, we have to get our <span class="caps">JSON</span> form description from somewhere (for instance
+a field in a model) and then generate the form class with <tt class="docutils literal">get_form</tt>.
+After that we follow the normal procedure of checking if the <tt class="docutils literal">request.method</tt>
+is <span class="caps">POST</span> so we pass the <span class="caps">POST</span> data to the form and check if it is value or
+we just create an empty form. As a result we just pass the data that was
+read from the form to the view for&nbsp;presentation.</p>
+</div>
+</div>
+  		</article>
+  		<article>
+<header>
+      <h1 class="entry-title">
+        <a href="https://spapas.github.io/2013/11/05/django-authoritiy-data/">Django authority data</a>
+      </h1>
+    <p class="meta">
+<time datetime="2013-11-05T14:20:00+02:00" pubdate>Tue 05 November 2013</time>    </p>
+</header>
+
+<div class="entry-content"><div class="contents topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#introduction" id="toc-entry-1">Introduction</a></li>
+<li><a class="reference internal" href="#defining-authorities" id="toc-entry-2">Defining authorities</a><ul>
+<li><a class="reference internal" href="#using-groups" id="toc-entry-3">Using&nbsp;groups</a></li>
+<li><a class="reference internal" href="#by-storing-the-authority-to-the-session" id="toc-entry-4">By storing the authority to the&nbsp;session</a></li>
+<li><a class="reference internal" href="#by-using-a-custom-user-profile" id="toc-entry-5">By using a Custom User&nbsp;Profile</a></li>
+<li><a class="reference internal" href="#getting-the-authority-of-the-user-has-to-be-dry" id="toc-entry-6">Getting the authority of the user has to be <span class="caps">DRY</span></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#adding-authority-data" id="toc-entry-7">Adding authority&nbsp;data</a></li>
+<li><a class="reference internal" href="#conclusion" id="toc-entry-8">Conclusion</a></li>
+</ul>
+</div>
+<div class="section" id="introduction">
+<h2><a class="toc-backref" href="#toc-entry-1">Introduction</a></h2>
+<p>One common requirement in an organization is to separate users in authorities (meaning departments / units / branches etc)
+and each authority have its own data. So users belonging to the &#8220;Athens Branch&#8221; won&#8217;t be able to
+edit data submitted from users of the &#8220;Thessaloniki&nbsp;Branch&#8221;.</p>
+<p>This is a special case of the more general row-level-security in which each instance of a domain object will
+have an <span class="caps">ACL</span>. Row-level-security would need a many-to-many relation between object instances and authorities, something
+that would be overkill in our&nbsp;case.</p>
+<p>Authority data is also a more general case of the user-data meaning that each user can have access
+to data that he inserts in the system. Implementing user-data is easy using the techniques we will present&nbsp;below.</p>
+<p>We have to notice that the django permissions do not support our requirements since they define security for all instances of a&nbsp;model.</p>
+</div>
+<div class="section" id="defining-authorities">
+<h2><a class="toc-backref" href="#toc-entry-2">Defining&nbsp;authorities</a></h2>
+<p>In order to have custom authorities I propose first of all to add an Authority model that would define the authority. Even if
+your authorities only have a name I believe that adding the Authority model would be beneficial.
+Now, there are many ways to separate normal django users (<tt class="docutils literal">django.contrib.auth.models.User</tt>) to&nbsp;authorities:</p>
+<div class="section" id="using-groups">
+<h3><a class="toc-backref" href="#toc-entry-3">Using&nbsp;groups</a></h3>
+<p>Just define a <tt class="docutils literal">django.contrib.auth.models.Group</tt> for each authority and add the users to the groups you want using the django-admin.
+Your Authority model would have an one-to-one relation with the <tt class="docutils literal">django.contrib.auth.models.Group</tt> so you will be able to find out the other
+information of the authority (since django groups only have&nbsp;names).</p>
+<p>Now you can just get the groups for the user and find out his authorities. This could lead to problems when users belong to django groups
+that are not related to authorities so you must filter these out (for instance by checking which groups actually have a corresponding&nbsp;Authority).</p>
+</div>
+<div class="section" id="by-storing-the-authority-to-the-session">
+<h3><a class="toc-backref" href="#toc-entry-4">By storing the authority to the&nbsp;session</a></h3>
+<p>When the user logs in you can add an attribute to the session that would save the authority of the user. To do that, you should define
+a custom middleware that checks to see if there is an authority attribute to the session and if not it will do whatever it needs to find it and set it.
+An example is&nbsp;this:</p>
+<pre class="code literal-block">
+class CustomAuthorityMiddleware:
+  def process_request(self, request):
+    if not request.session.get('authority'):
+      authority = get_the_authority(request.user)
+      request.session['authority']=authority
+</pre>
+<p>This way, whenever you want to find out the authority of the user you just check the&nbsp;session.</p>
+</div>
+<div class="section" id="by-using-a-custom-user-profile">
+<h3><a class="toc-backref" href="#toc-entry-5">By using a Custom User&nbsp;Profile</a></h3>
+<p>Just create a <a class="reference external" href="https://docs.djangoproject.com/en/dev/topics/auth/customizing/#extending-the-existing-user-model">django user profile</a> and add to it a <tt class="docutils literal">ForeignKey</tt> to your Authority&nbsp;model:</p>
+<pre class="code literal-block">
+class Profile(models.Model):
+  user = models.OneToOneField('django.auth.User')
+  authority = models.ForeignKey('authorities.Authority', blank=True, null=True )
+
+class Authority(models.Model):
+  id = models.IntegerField(primary_key = True)
+  name = models.CharField(max_length=64, )
+  auth_type = models.CharField(max_length=16, )
+</pre>
+<p>You can get the authority of the user through <tt class="docutils literal">request.user.profile.authority</tt>.</p>
+</div>
+<div class="section" id="getting-the-authority-of-the-user-has-to-be-dry">
+<h3><a class="toc-backref" href="#toc-entry-6">Getting the authority of the user has to be <span class="caps">DRY</span></a></h3>
+<p>Whatever method you use to define the authorities of your users you have to remember that it is very
+important to define somewhere a function that will return the authority (or authorities) of a
+user. You need to define a function even in the simple case in which your function would just return <tt class="docutils literal">request.user.profile.authority</tt>.
+This will greatly help you when you wish to add some logic to this, for instance &#8220;quickly disable users belonging to Authority X
+or temporary move users from Authority Y to authority&nbsp;Z&#8221;.</p>
+<p>Let us suppose that you have defined a <tt class="docutils literal">get_user_authority</tt> function. Also, you need to define a <tt class="docutils literal">has_access</tt> function
+that would decide if a users/request has access to a particular object. This also needs to be <span class="caps">DRY</span>.</p>
+</div>
+</div>
+<div class="section" id="adding-authority-data">
+<h2><a class="toc-backref" href="#toc-entry-7">Adding authority&nbsp;data</a></h2>
+<p>To define authority data you have to add a field to your model that would define its authority, for instance like&nbsp;this:</p>
+<pre class="code literal-block">
+class AuthorityData(models.Model):
+  authority = models.ForeignKey('authorities.Authority', editable=False,)
+</pre>
+<p>This field should not be editable (at least by your end users) because they shouldn&#8217;t be able to change the authority of the data they&nbsp;insert.</p>
+<p>If you want to have user-data then just add a <tt class="docutils literal"><span class="pre">models.ForeignKey('django.auth.User',</span> editable=False)</tt></p>
+<p>Now, your Create and Update Class Based Views have to pass the request to your forms and also your Detail and Update <span class="caps">CBV</span> should allow only getting
+objects that belong to the authority of the&nbsp;user:</p>
+<pre class="code literal-block">
+class AuthorityDataCreateView(CreateView):
+  model=models.AuthorityData
+
+  def get_form_kwargs(self):
+      kwargs = super(AuthorityDataCreateView, self).get_form_kwargs()
+      kwargs.update({'request': self.request})
+      return kwargs
+
+class AuthorityDataDetailView(DetailView):
+  def get_object(self, queryset=None):
+      obj = super(AuthorityDataDetailView, self).get_object(queryset)
+      if if not user_has_access(obj, self.request):
+          raise Http404(u&quot;Access Denied&quot;)
+      return obj
+
+class AuthorityDataUpdateView(UpdateView):
+  model=models.AuthorityData
+
+  def get_form_kwargs(self):
+      kwargs = super(AuthorityDataUpdateView, self).get_form_kwargs()
+      kwargs.update({'request': self.request})
+      return kwargs
+
+  def get_object(self, queryset=None):
+      obj = super(AuthorityDataUpdateView, self).get_object(queryset)
+      if if not user_has_access(obj, self.request):
+          raise Http404(u&quot;Access Denied&quot;)
+      return obj
+</pre>
+<p>Your ModelForm can now use the request to get the Authority and set it (don&#8217;t forget
+that you should not use <tt class="docutils literal">Meta.exclude</tt> but instead use <tt class="docutils literal">Meta.include</tt>!):</p>
+<pre class="code literal-block">
+class AuthorityDataModelForm(forms.ModelForm):
+    class Meta:
+      model = models.AuthorityData
+      exclude = ('authority',)
+
+    def __init__(self, *args, **kwargs):
+      self.request = kwargs.pop('request', None)
+      super(ActionModelForm, self).__init__(*args, **kwargs)
+
+
+    def save(self, force_insert=False, force_update=False, commit=True):
+      obj = super(AuthorityDataModelForm, self).save(commit=False)
+      if obj:
+          obj.authority = get_user_authority(self.request)
+          obj.save()
+      return obj
+</pre>
+<p>The previous work fine for Create/Detail/Update CBVs but not for ListsViews. List views querysets
+and in general all queries to the object have to be filtered through&nbsp;authority.</p>
+<pre class="code literal-block">
+class AuthorityDataListView(ListView):
+  def get_queryset(self):
+    queryset = super(AuthorityDataModelForm, self).get_queryset()
+    return queryset.filter(authority = get_user_authority(request))
+</pre>
+</div>
+<div class="section" id="conclusion">
+<h2><a class="toc-backref" href="#toc-entry-8">Conclusion</a></h2>
+<p>Using the above techniques we can define authority (or just user) data. Your AuthorityData should
+have a <tt class="docutils literal">ForeignKey</tt> to your Authority  and you have configure your queries, ModelForms and CBVs
+to use that. If you have more than one models that belong to an authority and want to stay <span class="caps">DRY</span> then you&#8217;d need
+to define all the above as <a class="reference external" href="https://docs.djangoproject.com/en/dev/topics/class-based-views/mixins/">mixins</a>.</p>
+</div>
+</div>
+  		</article>
+  		<article>
+<header>
+      <h1 class="entry-title">
+        <a href="https://spapas.github.io/2013/10/14/spring-ldap-custom-authorities/">Using custom authorities with spring-security LDAP authentication</a>
+      </h1>
+    <p class="meta">
+<time datetime="2013-10-14T08:55:00+03:00" pubdate>Mon 14 October 2013</time>    </p>
+</header>
+
+<div class="entry-content"><div class="contents topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#introduction" id="toc-entry-1">Introduction</a></li>
+<li><a class="reference internal" href="#a-basic-spring-security-setup" id="toc-entry-2">A basic spring security&nbsp;setup</a></li>
+<li><a class="reference internal" href="#spring-security-ldap-with-custom-authorities" id="toc-entry-3">Spring security <span class="caps">LDAP</span> with custom authorities</a><ul>
+<li><a class="reference internal" href="#contextsource" id="toc-entry-4">contextSource</a></li>
+<li><a class="reference internal" href="#usersearch" id="toc-entry-5">userSearch</a></li>
+<li><a class="reference internal" href="#ldapauthprovider" id="toc-entry-6">ldapAuthProvider</a></li>
+<li><a class="reference internal" href="#customldapauthoritiespopulator" id="toc-entry-7">CustomLdapAuthoritiesPopulator</a></li>
+<li><a class="reference internal" href="#example" id="toc-entry-8">Example</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#conclusion" id="toc-entry-9">Conclusion</a></li>
+</ul>
+</div>
+<div class="section" id="introduction">
+<h2><a class="toc-backref" href="#toc-entry-1">Introduction</a></h2>
+<p>One very useful component of the <a class="reference external" href="http://spring.io/">spring</a> java framework is <a class="reference external" href="http://projects.spring.io/spring-security/">spring-security</a> since it allows consistent usage of various security providers for
+authentication and authorization. Although I&#8217;ve found a great number of basic spring-security tutorials on the internet, I wasn&#8217;t able to find a complete solution for my own&nbsp;requirements:</p>
+<p>Logging in with <span class="caps">LDAP</span> but configuring the authorities <a class="footnote-reference" href="#footnote-1" id="footnote-reference-1">[*]</a> of the logged in user with the help of a custom method and not through <span class="caps">LDAP</span>.</p>
+<p>I think that the above is a common requirement in many organizations: There is a central <span class="caps">LDAP</span> repository in which the usernames and passwords of the users are stored, but the groups of the users are not stored there. Or maybe the groups that are actually stored in the <span class="caps">LDAP</span> cannot be transformed easily to application specific groups for each&nbsp;application.</p>
+<p>You may find the working spring project that uses ldap and a custom groups populator here: <a class="reference external" href="https://github.com/spapas/SpringLdapCustomAuthorities/">https://github.com/spapas/SpringLdapCustomAuthorities/</a></p>
+</div>
+<div class="section" id="a-basic-spring-security-setup">
+<h2><a class="toc-backref" href="#toc-entry-2">A basic spring security&nbsp;setup</a></h2>
+<p>I&#8217;ve created a very basic setup for spring-security for a spring-mvc project. Please take a look here for a more thorough explanation of a simple spring-security project <a class="reference external" href="http://www.mkyong.com/spring-security/spring-security-hello-world-example/">http://www.mkyong.com/spring-security/spring-security-hello-world-example/</a> and here <a class="reference external" href="http://www.codeproject.com/Articles/253901/Getting-Started-Spring-Security">http://www.codeproject.com/Articles/253901/Getting-Started-Spring-Security</a> for a great explanation of the various spring-security&nbsp;classes.</p>
+<p>In my setup there is a controller that defines two mappings, the &#8220;/&#8221; which is the homepage that has a link to the &#8220;/enter&#8221; and the &#8220;/enter&#8221; which is an internal page in which only authorized users have access. When the user clicks on &#8220;enter&#8221; he will be represented with a login form first. If the use logs in successfully, the enter.jsp will list the username and the authorities of the logged in user through the following spring-security&nbsp;tags:</p>
+<div class="highlight"><pre><span></span><span class="k">&lt;%@</span><span class="w"> </span><span class="n">taglib</span><span class="w"> </span><span class="n">prefix</span><span class="o">=</span><span class="s">&quot;sec&quot;</span><span class="w"> </span><span class="n">uri</span><span class="o">=</span><span class="s">&quot;http://www.springframework.org/security/tags&quot;</span><span class="w"> </span><span class="k">%&gt;</span>
+[...]
+Username:<span class="w"> </span><span class="nt">&lt;sec:authentication</span><span class="w"> </span><span class="na">property=</span><span class="s">&quot;principal.username&quot;</span><span class="w"> </span><span class="nt">/&gt;&lt;br</span><span class="w"> </span><span class="nt">/&gt;</span>
+Authorities:<span class="w"> </span><span class="nt">&lt;sec:authentication</span><span class="w"> </span><span class="na">property=</span><span class="s">&quot;principal.authorities&quot;</span><span class="nt">/&gt;&lt;br</span><span class="w"> </span><span class="nt">/&gt;</span>
+</pre></div>
+<p>The authentication provider is an in memory service in which the username, password and authorities of each user are defined in the <span class="caps">XML</span>. So this is a simple spring-security example that can be found in a number of places on the internet. The security rules, login form and the authentication provider are configured with the following <tt class="docutils literal"><span class="pre">security-config.xml</span></tt>:</p>
+<div class="highlight"><pre><span></span><span class="nt">&lt;beans:beans</span><span class="w"> </span><span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/security&quot;</span>
+<span class="w">   </span><span class="na">xmlns:beans=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
+<span class="w">   </span><span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+<span class="w">   </span><span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://www.springframework.org/schema/beans</span>
+<span class="s">                   http://www.springframework.org/schema/beans/spring-beans-3.1.xsd</span>
+<span class="s">                   http://www.springframework.org/schema/security</span>
+<span class="s">                   http://www.springframework.org/schema/security/spring-security-3.1.xsd&quot;</span><span class="nt">&gt;</span>
+
+<span class="w">   </span><span class="nt">&lt;http</span><span class="w"> </span><span class="na">pattern=</span><span class="s">&quot;/static/**&quot;</span><span class="w"> </span><span class="na">security=</span><span class="s">&quot;none&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+
+<span class="w">   </span><span class="nt">&lt;http</span><span class="w"> </span><span class="na">use-expressions=</span><span class="s">&quot;true&quot;</span><span class="nt">&gt;</span>
+<span class="w">       </span><span class="nt">&lt;intercept-url</span><span class="w"> </span><span class="na">pattern=</span><span class="s">&quot;/&quot;</span><span class="w"> </span><span class="na">access=</span><span class="s">&quot;permitAll&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">       </span><span class="nt">&lt;intercept-url</span><span class="w"> </span><span class="na">pattern=</span><span class="s">&quot;/enter&quot;</span><span class="w"> </span><span class="na">access=</span><span class="s">&quot;hasRole(&#39;user&#39;)&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">       </span><span class="nt">&lt;intercept-url</span><span class="w"> </span><span class="na">pattern=</span><span class="s">&quot;/**&quot;</span><span class="w"> </span><span class="na">access=</span><span class="s">&quot;denyAll&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">       </span><span class="nt">&lt;form-login</span><span class="w"> </span><span class="na">default-target-url=</span><span class="s">&quot;/&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">       </span><span class="nt">&lt;logout</span><span class="w">  </span><span class="na">logout-success-url=</span><span class="s">&quot;/&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">   </span><span class="nt">&lt;/http&gt;</span>
+
+<span class="w">   </span><span class="nt">&lt;authentication-manager&gt;</span>
+<span class="w">       </span><span class="nt">&lt;authentication-provider&gt;</span>
+<span class="w">           </span><span class="nt">&lt;user-service&gt;</span>
+<span class="w">               </span><span class="nt">&lt;user</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;spapas&quot;</span><span class="w"> </span><span class="na">password=</span><span class="s">&quot;123&quot;</span><span class="w"> </span><span class="na">authorities=</span><span class="s">&quot;admin, user, nonldap&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">               </span><span class="nt">&lt;user</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;serafeim&quot;</span><span class="w"> </span><span class="na">password=</span><span class="s">&quot;123&quot;</span><span class="w"> </span><span class="na">authorities=</span><span class="s">&quot;user&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">           </span><span class="nt">&lt;/user-service&gt;</span>
+<span class="w">       </span><span class="nt">&lt;/authentication-provider&gt;</span>
+<span class="w">   </span><span class="nt">&lt;/authentication-manager&gt;</span>
+
+<span class="nt">&lt;/beans:beans&gt;</span>
+</pre></div>
+<p>When we run this application and go to the /enter, we will get the following&nbsp;output:</p>
+<blockquote>
+<p>Username:&nbsp;spapas</p>
+<p>Authorities: [admin, nonldap,&nbsp;user]</p>
+</blockquote>
+</div>
+<div class="section" id="spring-security-ldap-with-custom-authorities">
+<h2><a class="toc-backref" href="#toc-entry-3">Spring security <span class="caps">LDAP</span> with custom&nbsp;authorities</a></h2>
+<p>The previous application can be modified to login through <span class="caps">LDAP</span> and get the authorities from a custom class. The main differences are in the <tt class="docutils literal">pom.xml</tt> which adsd the <tt class="docutils literal"><span class="pre">spring-security-ldap</span></tt> dependency, the addition of a <tt class="docutils literal">CustomLdapAuthoritiesPopulator.java</tt> which does the actual mapping of username to authority and various changes to the <tt class="docutils literal"><span class="pre">security-config.xml</span></tt>.</p>
+<p>As you will see we had to define our security beans mainly using spring beans and not using the various elements from security namespace like <tt class="docutils literal"><span class="pre">&lt;ldap-server&gt;</span></tt> and <tt class="docutils literal"><span class="pre">&lt;ldap-authentication-provder&gt;</span></tt>. For a good tutorial on using these elements and ldap in spring security in general check these out: <a class="reference external" href="http://docs.spring.io/spring-security/site/docs/3.1.x/reference/ldap.html">http://docs.spring.io/spring-security/site/docs/3.1.x/reference/ldap.html</a> and <a class="reference external" href="http://krams915.blogspot.gr/2011/01/spring-security-mvc-using-ldap.html">http://krams915.blogspot.gr/2011/01/spring-security-mvc-using-ldap.html</a>.</p>
+<div class="highlight"><pre><span></span><span class="nt">&lt;beans:beans</span><span class="w"> </span><span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/security&quot;</span>
+<span class="w">   </span><span class="na">xmlns:beans=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
+<span class="w">   </span><span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+<span class="w">   </span><span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://www.springframework.org/schema/beans</span>
+<span class="s">                   http://www.springframework.org/schema/beans/spring-beans-3.1.xsd</span>
+<span class="s">                   http://www.springframework.org/schema/security</span>
+<span class="s">                   http://www.springframework.org/schema/security/spring-security-3.1.xsd&quot;</span><span class="nt">&gt;</span>
+
+<span class="w">   </span><span class="nt">&lt;http</span><span class="w"> </span><span class="na">pattern=</span><span class="s">&quot;/static/**&quot;</span><span class="w"> </span><span class="na">security=</span><span class="s">&quot;none&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+
+<span class="w">   </span><span class="nt">&lt;http</span><span class="w"> </span><span class="na">use-expressions=</span><span class="s">&quot;true&quot;</span><span class="w"> </span><span class="nt">&gt;</span>
+<span class="w">     </span><span class="nt">&lt;intercept-url</span><span class="w"> </span><span class="na">pattern=</span><span class="s">&quot;/&quot;</span><span class="w"> </span><span class="na">access=</span><span class="s">&quot;permitAll&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">     </span><span class="nt">&lt;intercept-url</span><span class="w"> </span><span class="na">pattern=</span><span class="s">&quot;/enter&quot;</span><span class="w"> </span><span class="na">access=</span><span class="s">&quot;hasRole(&#39;user&#39;)&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">     </span><span class="nt">&lt;intercept-url</span><span class="w"> </span><span class="na">pattern=</span><span class="s">&quot;/**&quot;</span><span class="w"> </span><span class="na">access=</span><span class="s">&quot;denyAll&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">     </span><span class="nt">&lt;form-login</span><span class="w"> </span><span class="na">default-target-url=</span><span class="s">&quot;/&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">     </span><span class="nt">&lt;logout</span><span class="w">  </span><span class="na">logout-success-url=</span><span class="s">&quot;/&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">   </span><span class="nt">&lt;/http&gt;</span>
+
+<span class="w">   </span><span class="nt">&lt;beans:bean</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;contextSource&quot;</span>
+<span class="w">         </span><span class="na">class=</span><span class="s">&quot;org.springframework.security.ldap.DefaultSpringSecurityContextSource&quot;</span><span class="nt">&gt;</span>
+<span class="w">     </span><span class="nt">&lt;beans:constructor-arg</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;ldap://login.serafeim.gr:389/dc=serafeim,dc=gr&quot;</span><span class="nt">/&gt;</span>
+<span class="w">     </span><span class="nt">&lt;beans:property</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;anonymousReadOnly&quot;</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;true&quot;</span><span class="nt">/&gt;</span>
+<span class="w">   </span><span class="nt">&lt;/beans:bean&gt;</span>
+
+<span class="w">   </span><span class="nt">&lt;beans:bean</span>
+<span class="w">         </span><span class="na">id=</span><span class="s">&quot;userSearch&quot;</span>
+<span class="w">         </span><span class="na">class=</span><span class="s">&quot;org.springframework.security.ldap.search.FilterBasedLdapUserSearch&quot;</span><span class="nt">&gt;</span>
+<span class="w">     </span><span class="nt">&lt;beans:constructor-arg</span><span class="w"> </span><span class="na">index=</span><span class="s">&quot;0&quot;</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;&quot;</span><span class="nt">/&gt;</span>
+<span class="w">     </span><span class="nt">&lt;beans:constructor-arg</span><span class="w"> </span><span class="na">index=</span><span class="s">&quot;1&quot;</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;(uid={0})&quot;</span><span class="nt">/&gt;</span>
+<span class="w">     </span><span class="nt">&lt;beans:constructor-arg</span><span class="w"> </span><span class="na">index=</span><span class="s">&quot;2&quot;</span><span class="w"> </span><span class="na">ref=</span><span class="s">&quot;contextSource&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">   </span><span class="nt">&lt;/beans:bean&gt;</span>
+
+<span class="w">   </span><span class="nt">&lt;beans:bean</span>
+<span class="w">         </span><span class="na">id=</span><span class="s">&quot;ldapAuthProvider&quot;</span>
+<span class="w">         </span><span class="na">class=</span><span class="s">&quot;org.springframework.security.ldap.authentication.LdapAuthenticationProvider&quot;</span><span class="nt">&gt;</span>
+<span class="w">     </span><span class="nt">&lt;beans:constructor-arg&gt;</span>
+<span class="w">       </span><span class="nt">&lt;beans:bean</span><span class="w"> </span><span class="na">class=</span><span class="s">&quot;org.springframework.security.ldap.authentication.BindAuthenticator&quot;</span><span class="nt">&gt;</span>
+<span class="w">         </span><span class="nt">&lt;beans:constructor-arg</span><span class="w"> </span><span class="na">ref=</span><span class="s">&quot;contextSource&quot;</span><span class="nt">/&gt;</span>
+<span class="w">         </span><span class="nt">&lt;beans:property</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;userSearch&quot;</span><span class="w"> </span><span class="na">ref=</span><span class="s">&quot;userSearch&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">         </span><span class="cm">&lt;!--</span>
+<span class="cm">         &lt;beans:property name=&quot;userDnPatterns&quot;&gt;</span>
+<span class="cm">           &lt;beans:list&gt;&lt;beans:value&gt;uid={0},ou=People&lt;/beans:value&gt;&lt;/beans:list&gt;</span>
+<span class="cm">         &lt;/beans:property&gt;</span>
+<span class="cm">         --&gt;</span>
+<span class="w">       </span><span class="nt">&lt;/beans:bean&gt;</span>
+<span class="w">     </span><span class="nt">&lt;/beans:constructor-arg&gt;</span>
+<span class="w">     </span><span class="nt">&lt;beans:constructor-arg&gt;</span>
+<span class="w">       </span><span class="nt">&lt;beans:bean</span><span class="w"> </span><span class="na">class=</span><span class="s">&quot;gr.serafeim.springldapcustom.CustomLdapAuthoritiesPopulator&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">     </span><span class="nt">&lt;/beans:constructor-arg&gt;</span>
+<span class="w">   </span><span class="nt">&lt;/beans:bean&gt;</span>
+
+<span class="w">   </span><span class="nt">&lt;authentication-manager&gt;</span>
+<span class="w">     </span><span class="nt">&lt;authentication-provider</span><span class="w"> </span><span class="na">ref=</span><span class="s">&quot;ldapAuthProvider&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">   </span><span class="nt">&lt;/authentication-manager&gt;</span>
+
+<span class="nt">&lt;/beans:beans&gt;</span>
+</pre></div>
+<p>So, in the above configuration we&#8217;ve defined three spring beans: <tt class="docutils literal">contextSource</tt>, <tt class="docutils literal">userSearch</tt> and <tt class="docutils literal">ldapAuthProvider</tt>. The <tt class="docutils literal"><span class="pre">&lt;authentication-manager&gt;</span></tt> element uses the <tt class="docutils literal">ldapAuthProvider</tt> as an authentication provider. Below we will explain these&nbsp;beans:</p>
+<div class="section" id="contextsource">
+<h3><a class="toc-backref" href="#toc-entry-4">contextSource</a></h3>
+<p>The contextSource bean defines the actual <span class="caps">LDAP</span> server that we are going to connect to. It has the class <tt class="docutils literal">o.s.s.ldap.DefaultSpringSecurityContextSource</tt>. This will need to be passed to other beans that would need to connect to the server for a number of operations. We pass to it the url of our <span class="caps">LDAP</span> server and set its <tt class="docutils literal">anonymousReadOnly</tt> property to true. The <tt class="docutils literal">anonymousReadOnly</tt> defines if we can anonymously connect to our <span class="caps">LDAP</span> server in order to perform the search operation below. If we cannot connect anonymously then we have to set its <tt class="docutils literal">userDn</tt> and <tt class="docutils literal">password</tt> properties.</p>
+<p>A very interesting question is if the <tt class="docutils literal"><span class="pre">&lt;ldap-server&gt;</span></tt> element of the spring security namespace is related to <tt class="docutils literal">the o.s.s.ldap.DefaultSpringSecurityContextSource</tt> like our <tt class="docutils literal">contextSource</tt>. To find out, we need to check the <tt class="docutils literal">o.s.s.config.SecurityNamespaceHandler</tt> class of the <tt class="docutils literal"><span class="pre">spring-security-config.jar</span></tt>. In there we see the <tt class="docutils literal">loadParsers</tt> method which has the line: <tt class="docutils literal">parsers.put(Elements.LDAP_SERVER, new <span class="pre">LdapServerBeanDefinitionParser());</span></tt>. The constant <tt class="docutils literal">o.s.s.config.Elements.LDAP_SERVER</tt> has the value of <tt class="docutils literal"><span class="pre">&quot;ldap-server&quot;</span></tt> as expected, so we need to see what does the class <tt class="docutils literal">o.s.s.config.ldap.LdapServerBeanDefinitionParser</tt> do. This class has a parse() method that receives the xml that was used to instantiate the <tt class="docutils literal"><span class="pre">&lt;ldap-server&gt;</span></tt> element and, depending an on the actualy configuration, instantiates a bean of the class <tt class="docutils literal">o.s.s.ldap.DefaultSpringSecurityContextSource</tt> with an id of <tt class="docutils literal">o.s.s.securityContextSource</tt> that will be used by the other elements in the security namespace&nbsp;!</p>
+<p>This actually solves another question I had concerning the following&nbsp;error:</p>
+<blockquote>
+No bean named &#8216;org.springframework.security.authenticationManager&#8217; is defined: Did you forget to add a gobal &lt;authentication-manager&gt; element to your configuration (with child &lt;authentication-provider&gt;  elements)? Alternatively you can use the authentication-manager-ref attribute on your &lt;http&gt; and &lt;global-method-security&gt; elements.</blockquote>
+<p>What happens is that when spring-security-configuration encounters an <tt class="docutils literal"><span class="pre">&lt;authentication-manager&gt;</span></tt> it will instantiate a bean named <tt class="docutils literal">o.s.s.authenticationManager</tt>  having the class
+<tt class="docutils literal">o.s.s.authentication.ProviderManager</tt> and will create and pass to it a <tt class="docutils literal">providers</tt> list with all the authentication providers that are defined inside the <tt class="docutils literal"><span class="pre">&lt;authentication-manager&gt;</span></tt> element with <tt class="docutils literal"><span class="pre">&lt;authentication-provider&gt;</span></tt> nodes. So, if you encounter the above error, the problem is that for some reason your <tt class="docutils literal"><span class="pre">&lt;authentication-manager&gt;</span></tt> is not configured correctly, so no <tt class="docutils literal">o.s.s.authenticatioManager</tt> bean is&nbsp;created!</p>
+</div>
+<div class="section" id="usersearch">
+<h3><a class="toc-backref" href="#toc-entry-5">userSearch</a></h3>
+<p>The <tt class="docutils literal">userSearch</tt> bean is needed if we don&#8217;t know exactly where our users are stored in the <span class="caps">LDAP</span> directory so we will use this bean as a search filter. If we do know our user tree then we won&#8217;t need this bean at all as will be explained later. It has the class <tt class="docutils literal">o.s.s.ldap.search.FilterBasedLdapUserSearch</tt> and gets three constructor parameters: <tt class="docutils literal">searchBase</tt>, <tt class="docutils literal">searchFilter</tt> and <tt class="docutils literal">contextSource</tt>. The <tt class="docutils literal">searchBase</tt> is from where in the <span class="caps">LDAP</span> tree to start searching (empty in our case), the <tt class="docutils literal">searchFilter</tt> defines where is the username (uid in our case) and the <tt class="docutils literal">contextSource</tt> has been defined&nbsp;before.</p>
+</div>
+<div class="section" id="ldapauthprovider">
+<h3><a class="toc-backref" href="#toc-entry-6">ldapAuthProvider</a></h3>
+<p>This is the actual <tt class="docutils literal"><span class="pre">authentication-provider</span></tt> that the spring-security <tt class="docutils literal"><span class="pre">authentication-manager</span></tt> is going to use. It is an instance of class <tt class="docutils literal">o.s.s.ldap.authentication.LdapAuthenticationProvider</tt> which has two main properties: An <tt class="docutils literal">o.s.s.ldap.authentication.LdapAuthenticator</tt> implementation and an <tt class="docutils literal">o.s.s.ldap.userdetails.LdapAuthoritiesPopulator</tt> implementation. The first interface defines an <tt class="docutils literal">authenticate</tt> method and is used to actually authenticate the user with the <span class="caps">LDAP</span> server. The second interface defines a <tt class="docutils literal">getGrantedAuthorities</tt> which returns the roles for the authenticated user. The LdapAuthoritiesPopulator parameter is actually optional (so we can use <span class="caps">LDAP</span> to authenticate only the users) and we can provide our own implementation to have custom authorities for our application. That is exactly what we&#8217;ve done&nbsp;here.</p>
+<p>The two arguments used to initialize the ldapAuthProvoder are one instance of <tt class="docutils literal">o.s.s.ldap.authentication.BindAuthenticator</tt> which is a simple authenticator that tries to bind with the given credentials to the <span class="caps">LDAP</span> server to check the credentials and one instance of a custom class named <tt class="docutils literal">g.s.s.CustomLdapAuthoritiesPopulator</tt> which is the actual implementation of the custom roles provider. The <tt class="docutils literal">BindAuthenticator</tt> gets the <tt class="docutils literal">contextSource</tt> as a constructor parameter and its <tt class="docutils literal">userSearch</tt> property is set with the <tt class="docutils literal">userSearch</tt> bean defined previously. If we instead knew the actual place of the users, we could use the commented out <tt class="docutils literal">userDnPatterns</tt> property which takes a list of possible places in the <span class="caps">LDAP</span> catalog which will be checked for the&nbsp;username.</p>
+</div>
+<div class="section" id="customldapauthoritiespopulator">
+<h3><a class="toc-backref" href="#toc-entry-7">CustomLdapAuthoritiesPopulator</a></h3>
+<p>The <tt class="docutils literal">CustomLdapAuthoritiesPopulator</tt> just needs to implement the <tt class="docutils literal">LdapAuthoritiesPopulator</tt> interface. Here&#8217;s our&nbsp;implmentation:</p>
+<div class="highlight"><pre><span></span><span class="kn">package</span><span class="w"> </span><span class="nn">gr.serafeim.springldapcustom</span><span class="p">;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.util.Collection</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.util.HashSet</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">org.springframework.ldap.core.DirContextOperations</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">org.springframework.security.core.GrantedAuthority</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">org.springframework.security.core.authority.SimpleGrantedAuthority</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">org.springframework.stereotype.Component</span><span class="p">;</span>
+
+<span class="nd">@Component</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">CustomLdapAuthoritiesPopulator</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">LdapAuthoritiesPopulator</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="nd">@Override</span>
+<span class="w">       </span><span class="kd">public</span><span class="w"> </span><span class="n">Collection</span><span class="o">&lt;?</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">GrantedAuthority</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">getGrantedAuthorities</span><span class="p">(</span>
+<span class="w">                       </span><span class="n">DirContextOperations</span><span class="w"> </span><span class="n">userData</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">username</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">               </span><span class="n">Collection</span><span class="o">&lt;</span><span class="n">GrantedAuthority</span><span class="o">&gt;</span><span class="w"> </span><span class="n">gas</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HashSet</span><span class="o">&lt;</span><span class="n">GrantedAuthority</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="w">               </span><span class="k">if</span><span class="p">(</span><span class="n">username</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="s">&quot;spapas&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                       </span><span class="n">gas</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">SimpleGrantedAuthority</span><span class="p">(</span><span class="s">&quot;admin&quot;</span><span class="p">));</span>
+<span class="w">               </span><span class="p">}</span>
+<span class="w">               </span><span class="n">gas</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">SimpleGrantedAuthority</span><span class="p">(</span><span class="s">&quot;user&quot;</span><span class="p">));</span>
+<span class="w">               </span><span class="k">return</span><span class="w"> </span><span class="n">gas</span><span class="p">;</span>
+<span class="w">       </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+<p>The <tt class="docutils literal">getGrantedAuthorities</tt> just checks the username and add another role if it is a specific one. Of course here we would autowire our user roles repository and query the database to get the roles of the user, however I&#8217;m not going to do that for the case of&nbsp;simplicity.</p>
+</div>
+<div class="section" id="example">
+<h3><a class="toc-backref" href="#toc-entry-8">Example</a></h3>
+<p>When we run this application and go to the /enter, after logging in with our <span class="caps">LDAP</span> credentials as spapas, we will get the following&nbsp;output:</p>
+<blockquote>
+<p>Username:&nbsp;spapas</p>
+<p>Authorities: [admin,&nbsp;user]</p>
+</blockquote>
+</div>
+</div>
+<div class="section" id="conclusion">
+<h2><a class="toc-backref" href="#toc-entry-9">Conclusion</a></h2>
+<p>In the previous a complete example of configuring a custom authorities populator was represented. Using this configuration we can login through the <span class="caps">LDAP</span> server of our organization but use application specific roles for our logged-in&nbsp;users.</p>
+<!-- font-size: 0.5em;
+vertical-align: top; -->
+<table class="docutils footnote" frame="void" id="footnote-1" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-1">[*]</a></td><td>Which is how spring calls the groups/roles the user belongs to</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+  		</article>
+  		<article>
+<header>
+      <h1 class="entry-title">
+        <a href="https://spapas.github.io/2013/10/08/git-branches/">git branches</a>
+      </h1>
+    <p class="meta">
+<time datetime="2013-10-08T13:20:00+03:00" pubdate>Tue 08 October 2013</time>    </p>
+</header>
+
+<div class="entry-content"><div class="contents topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#introduction" id="toc-entry-1">Introduction</a></li>
+<li><a class="reference internal" href="#creating-a-new-git-repository" id="toc-entry-2">Creating a new git&nbsp;repository</a></li>
+<li><a class="reference internal" href="#branching" id="toc-entry-3">Branching</a></li>
+<li><a class="reference internal" href="#remote-branches" id="toc-entry-4">Remote&nbsp;branches</a></li>
+</ul>
+</div>
+<div class="section" id="introduction">
+<h2><a class="toc-backref" href="#toc-entry-1">Introduction</a></h2>
+<p>A <a class="reference external" href="http://git-scm.com/book/en/Git-Branching-What-a-Branch-Is">branch</a> is a very interesting git feature. With this you may have more than one <em>branches</em> in the same repository. The main
+usage of this feature would be to create different versions of your source code to parallel test development of different features.
+When the development of each of these features has been finished then the different versions would need to be combined (or merged) to a
+single version. Of course, merging is not always the result of branching - some branches may exist indefinitely or other may just  be
+deleted without&nbsp;merging.</p>
+<p>I will try to experiment with it and comment on the&nbsp;results.</p>
+</div>
+<div class="section" id="creating-a-new-git-repository">
+<h2><a class="toc-backref" href="#toc-entry-2">Creating a new git&nbsp;repository</a></h2>
+<p>Let&#8217;s start by creating a new git&nbsp;repository:</p>
+<pre class="code literal-block">
+D:\&gt;mkdir testgit
+D:\&gt;cd testgit
+D:\testgit&gt;echo contents 11 &gt; file1.txt
+D:\testgit&gt;echo contents 222 &gt; file2.txt
+D:\testgit&gt;echo 3333 &gt; file2.txt
+D:\testgit&gt;copy con file3.txt
+line 1 of file 3
+
+line 3 of file 3
+
+test
+
+line 7 of file 3
+^Z
+       1 files copied.
+
+D:\testgit&gt;git init
+Initialized empty Git repository in D:/testgit/.git/
+D:\testgit&gt;git add .
+D:\testgit&gt;git commit -m Initial
+[master (root-commit) 96ca9af] Initial
+ 3 files changed, 9 insertions(+)
+ create mode 100644 file1.txt
+ create mode 100644 file2.txt
+ create mode 100644 file3.txt
+</pre>
+<p>To see the branch we are in we can use the <tt class="docutils literal">git branch</tt> command. Also <tt class="docutils literal">git status</tt> outputs the current&nbsp;branch:</p>
+<pre class="code literal-block">
+D:\testgit&gt;git status
+# On branch master
+nothing to commit, working directory clean
+D:\testgit&gt;git branch
+* master
+</pre>
+<p>So, it seems that when we create a new repository, a &#8220;master&#8221; branch is&nbsp;created.</p>
+</div>
+<div class="section" id="branching">
+<h2><a class="toc-backref" href="#toc-entry-3">Branching</a></h2>
+<p>Lets create a new branch and change our working branch to&nbsp;it:</p>
+<pre class="code literal-block">
+D:\testgit&gt;git branch slave
+D:\testgit&gt;git branch
+* master
+  slave
+D:\testgit&gt;git checkout slave
+Switched to branch 'slave'
+D:\testgit&gt;git branch
+  master
+* slave
+</pre>
+<p>We can see that now the slave branch is the current one. Let&#8217;s do some changes and add commit them to the slave&nbsp;branch:</p>
+<pre class="code literal-block">
+D:\testgit&gt;git branch
+  master
+* slave
+D:\testgit&gt;echo new file1 contents &gt; file1.txt
+D:\testgit&gt;git commit -m &quot;Slave modification&quot;
+[slave b6083ad] Slave modification
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+D:\testgit&gt;git checkout master
+Switched to branch 'master'
+D:\testgit&gt;more file1.txt
+contents 11
+D:\testgit&gt;git checkout slave
+Switched to branch 'slave'
+D:\testgit&gt;more file1.txt
+new file1 contents
+</pre>
+<p>So the contents of file1.txt in the branch master is <tt class="docutils literal">contents 11</tt> while the contents of the same file
+in the branch slave is <tt class="docutils literal">new file1 contents</tt>.</p>
+<p>An interested behaviour is what happens with uncommit changes when changing branches. Let&#8217;s try deleting a&nbsp;file:</p>
+<pre class="code literal-block">
+D:\testgit&gt;del file2.txt
+D:\testgit&gt;git status
+# On branch master
+# Changes not staged for commit:
+#   (use &quot;git add/rm &lt;file&gt;...&quot; to update what will be committed)
+#   (use &quot;git checkout -- &lt;file&gt;...&quot; to discard changes in working directory)
+#
+#       deleted:    file2.txt
+#
+no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&quot;)
+D:\testgit&gt;git checkout slave
+D       file2.txt
+Switched to branch 'slave'
+D:\testgit&gt;git status
+# On branch slave
+# Changes not staged for commit:
+#   (use &quot;git add/rm &lt;file&gt;...&quot; to update what will be committed)
+#   (use &quot;git checkout -- &lt;file&gt;...&quot; to discard changes in working directory)
+#
+#       deleted:    file2.txt
+#
+no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&quot;)
+D:\testgit&gt;git add -A
+D:\testgit&gt;git status
+# On branch slave
+# Changes to be committed:
+#   (use &quot;git reset HEAD &lt;file&gt;...&quot; to unstage)
+#
+#       deleted:    file2.txt
+#
+D:\testgit&gt;git checkout master
+D       file2.txt
+Switched to branch 'master'
+D:\testgit&gt;git status
+# On branch master
+# Changes to be committed:
+#   (use &quot;git reset HEAD &lt;file&gt;...&quot; to unstage)
+#
+#       deleted:    file2.txt
+#
+</pre>
+<p>So, our changes are not correlated with a branch until we commit them! Let&#8217;s commit them to the master repository and confirm&nbsp;that:</p>
+<pre class="code literal-block">
+D:\testgit&gt;git commit -m &quot;Deleted file2.txt&quot;
+[master 6f8749d] Deleted file2.txt
+ 1 file changed, 1 deletion(-)
+ delete mode 100644 file2.txt
+D:\testgit&gt;git status
+# On branch master
+nothing to commit, working directory clean
+D:\testgit&gt;dir file2.txt
+[...]
+File not found
+D:\testgit&gt;git checkout slave
+Switched to branch 'slave'
+D:\testgit&gt;git status
+# On branch slave
+nothing to commit, working directory clean
+D:\testgit&gt;dir file2.txt
+[...]
+08/10/2013  05:59 pm                15 file2.txt
+</pre>
+<p>This is interesting&#8230; Let&#8217;s try modifying the file2.txt (which does not exist to the master&nbsp;branch):</p>
+<pre class="code literal-block">
+D:\testgit&gt;git branch
+  master
+* slave
+D:\testgit&gt;echo new file2 contents &gt; file2.txt
+D:\testgit&gt;git add .
+D:\testgit&gt;git status
+# On branch slave
+# Changes to be committed:
+#   (use &quot;git reset HEAD &lt;file&gt;...&quot; to unstage)
+#
+#       modified:   file2.txt
+#
+D:\testgit&gt;git checkout master
+error: Your local changes to the following files would be overwritten by checkout:
+       file2.txt
+Please, commit your changes or stash them before you can switch branches.
+Aborting
+</pre>
+<p>We won&#8217;t be able to change the current branch until we commit the conflicting&nbsp;change:</p>
+<pre class="code literal-block">
+D:\testgit&gt;git commit -m &quot;Modified file2&quot;
+[slave b5af832] Modified file2
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+D:\testgit&gt;git checkout master
+Switched to branch 'master'
+</pre>
+</div>
+<div class="section" id="remote-branches">
+<h2><a class="toc-backref" href="#toc-entry-4">Remote&nbsp;branches</a></h2>
+<p>For each local repository you can define a number of remote repositories, or <a class="reference external" href="http://git-scm.com/book/en/Git-Basics-Working-with-Remotes">remotes</a> as git calls them.
+When you clone a repository from github.com, your local repository will have one remote, named origin. We will
+try to add the same remote by hand. Let&#8217;s suppose that we have created a repository in github.com named
+testgit. After that we wil&nbsp;issue:</p>
+<pre class="code literal-block">
+D:\testgit&gt;git remote
+D:\testgit&gt;git remote add origin https://github.com/spapas/testgit.git
+D:\testgit&gt;git remote
+origin
+</pre>
+<p>So no we have one remote named origin that is linked with <a class="reference external" href="https://github.com/spapas/testgit.git">https://github.com/spapas/testgit.git</a>. Let&#8217;s try to push our master
+branch to the origin&nbsp;remote:</p>
+<pre class="code literal-block">
+D:\testgit&gt;git push origin master
+Username for 'https://github.com': spapas
+Password for 'https://spapas&#64;github.com':
+Counting objects: 7, done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (5/5), done.
+Writing objects: 100% (7/7), 531 bytes, done.
+Total 7 (delta 1), reused 0 (delta 0)
+To https://github.com/spapas/testgit.git
+ * [new branch]      master -&gt; master
+D:\testgit&gt;git branch -r
+  master
+* slave
+  remote/origin/master
+</pre>
+<p>We see now that we have <em>three</em> branches. Two local (master slave) and one remote (origin/master).  We will also add the slave remote&nbsp;(origin/slave):</p>
+<pre class="code literal-block">
+D:\testgit&gt;git branch -r
+  origin/master
+  origin/slave
+</pre>
+<p>Let&#8217;s do a change to our local repository and then push them to the&nbsp;remote:</p>
+<pre class="code literal-block">
+D:\testgit&gt;notepad file3.txt
+D:\testgit&gt;git add .
+D:\testgit&gt;git status
+# On branch slave
+# Changes to be committed:
+#   (use &quot;git reset HEAD &lt;file&gt;...&quot; to unstage)
+#
+#       modified:   file3.txt
+#
+D:\testgit&gt;git commit -m &quot;Changed file3.txt&quot;
+[slave ce3b7b9] Changed file3.txt
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+D:\testgit&gt;git push origin slave
+Username for 'https://github.com': spapas
+Password for 'https://spapas&#64;github.com':
+Counting objects: 5, done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (3/3), done.
+Writing objects: 100% (3/3), 299 bytes, done.
+Total 3 (delta 1), reused 0 (delta 0)
+To https://github.com/spapas/testgit.git
+   b5af832..ce3b7b9  slave -&gt; slave
+</pre>
+<p>Everything works as expected. The final thing to test is to try checking out a remote&nbsp;branch:</p>
+<pre class="code literal-block">
+D:\testgit&gt;git checkout master
+Switched to branch 'master'
+D:\testgit&gt;echo new new file1 &gt; file1.txt
+D:\testgit&gt;more file1.txt
+ new new file1
+D:\testgit&gt;git checkout origin/master
+M       file1.txt
+Note: checking out 'origin/master'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by performing another checkout.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -b with the checkout command again. Example:
+
+  git checkout -b new_branch_name
+
+HEAD is now at 6f8749d... Deleted file2.txt
+D:\testgit&gt;git status
+# Not currently on any branch.
+# Changes not staged for commit:
+#   (use &quot;git add &lt;file&gt;...&quot; to update what will be committed)
+#   (use &quot;git checkout -- &lt;file&gt;...&quot; to discard changes in working directory)
+#
+#       modified:   file1.txt
+#
+no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&quot;)
+D:\testgit&gt;more file1.txt
+new new file1
+</pre>
+<p>So, it seems that  when we check out the remote branch, we won&#8217;t have any local branches, however the change we did to the file1.txt
+is transfered just like when switching from one local repository to another. We can then add the changes and&nbsp;commit:</p>
+<pre class="code literal-block">
+D:\testgit&gt;git add .
+D:\testgit&gt;git commit
+[detached HEAD 506674c] foo
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+ D:\testgit&gt;git status
+# Not currently on any branch.
+nothing to commit, working directory clean
+D:\testgit&gt;git branch
+* (no branch)
+  master
+  slave
+</pre>
+<p>So we are working with an unnamed branch! We have to name it to be able to work without&nbsp;problems:</p>
+<pre class="code literal-block">
+D:\testgit&gt;git checkout -b named_branch
+Switched to a new branch 'named_branch'
+D:\testgit&gt;git branch
+  master
+* named_branch
+  slave
+</pre>
+<p>Finally we may push again the named_branch to our remote&nbsp;origin.</p>
+</div>
+</div>
+  		</article>
+<div class="pagination">
+    <a class="prev" href="https://spapas.github.io/index15.html">&larr; Older</a>
+
+    <a class="next" href="https://spapas.github.io/index13.html">Newer &rarr;</a>
+  <br />
+</div></div>
+<aside class="sidebar">
+  
+  <section>
+    <br />
+    <a href='/feeds/all.atom.xml'>Atom</a>
+    |
+    <a href='/feeds/all.rss.xml'>RSS</a>
+  </section>
+
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <!-- Sidebar unit -->
+  <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7673322832689008" data-ad-slot="2720624730"
+    data-ad-format="auto" data-full-width-responsive="true"></ins>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+
+
+  <script async src="https://cse.google.com/cse.js?cx=612920e5ca9da850c"></script>
+  <div class="gcse-search"></div>
+
+  
+  <section>
+    <h1>Support me</h1>
+
+    You can show your appreciation for anything useful you've found here by 
+    buying me a coffee 
+    <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="spapas" data-color="#FFDD00" data-emoji=""  data-font="Lato" data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff" ></script>
+
+    or donating me some bitcoin to this address:
+    <small><pre>bc1qx42vp8napheaewhnx0rk0mttdrdrtvw6czvxhl</pre></small>
+    <svg shape-rendering="crispEdges" height="200" width="200" viewBox="0 0 29 29" class="qrcode">
+      <path fill="#FFFFFF" d="M0,0 h29v29H0z"></path><path fill="#000000" d="M0 0h7v1H0zM9 0h2v1H9zM12 0h1v1H12zM14 0h2v1H14zM18 0h2v1H18zM22,0 h7v1H22zM0 1h1v1H0zM6 1h1v1H6zM8 1h1v1H8zM11 1h1v1H11zM14 1h5v1H14zM22 1h1v1H22zM28,1 h1v1H28zM0 2h1v1H0zM2 2h3v1H2zM6 2h1v1H6zM8 2h4v1H8zM17 2h1v1H17zM22 2h1v1H22zM24 2h3v1H24zM28,2 h1v1H28zM0 3h1v1H0zM2 3h3v1H2zM6 3h1v1H6zM9 3h2v1H9zM14 3h3v1H14zM18 3h1v1H18zM22 3h1v1H22zM24 3h3v1H24zM28,3 h1v1H28zM0 4h1v1H0zM2 4h3v1H2zM6 4h1v1H6zM8 4h1v1H8zM11 4h1v1H11zM13 4h1v1H13zM15 4h2v1H15zM18 4h1v1H18zM22 4h1v1H22zM24 4h3v1H24zM28,4 h1v1H28zM0 5h1v1H0zM6 5h1v1H6zM8 5h2v1H8zM14 5h2v1H14zM19 5h2v1H19zM22 5h1v1H22zM28,5 h1v1H28zM0 6h7v1H0zM8 6h1v1H8zM10 6h1v1H10zM12 6h1v1H12zM14 6h1v1H14zM16 6h1v1H16zM18 6h1v1H18zM20 6h1v1H20zM22,6 h7v1H22zM8 7h2v1H8zM11 7h1v1H11zM15 7h1v1H15zM17 7h2v1H17zM0 8h2v1H0zM3 8h1v1H3zM6 8h2v1H6zM10 8h1v1H10zM12 8h3v1H12zM20 8h1v1H20zM22 8h3v1H22zM26 8h2v1H26zM1 9h1v1H1zM3 9h3v1H3zM8 9h1v1H8zM10 9h1v1H10zM12 9h2v1H12zM16 9h2v1H16zM20 9h1v1H20zM22 9h1v1H22zM25 9h1v1H25zM27,9 h2v1H27zM0 10h1v1H0zM3 10h2v1H3zM6 10h1v1H6zM8 10h3v1H8zM12 10h2v1H12zM16 10h1v1H16zM19 10h1v1H19zM22 10h3v1H22zM27 10h1v1H27zM0 11h1v1H0zM2 11h1v1H2zM4 11h2v1H4zM7 11h1v1H7zM13 11h4v1H13zM18 11h4v1H18zM26 11h2v1H26zM0 12h1v1H0zM2 12h3v1H2zM6 12h1v1H6zM11 12h1v1H11zM13 12h1v1H13zM15 12h3v1H15zM20 12h1v1H20zM22 12h2v1H22zM27,12 h2v1H27zM4 13h1v1H4zM8 13h3v1H8zM12 13h1v1H12zM14 13h1v1H14zM17 13h4v1H17zM25 13h2v1H25zM0 14h1v1H0zM4 14h3v1H4zM8 14h2v1H8zM11 14h3v1H11zM16 14h1v1H16zM21 14h2v1H21zM24,14 h5v1H24zM3 15h3v1H3zM7 15h2v1H7zM10 15h1v1H10zM12 15h2v1H12zM15 15h1v1H15zM17 15h2v1H17zM20 15h2v1H20zM23 15h1v1H23zM1 16h1v1H1zM4 16h1v1H4zM6 16h4v1H6zM16 16h2v1H16zM20 16h1v1H20zM23 16h1v1H23zM25 16h1v1H25zM28,16 h1v1H28zM2 17h1v1H2zM5 17h1v1H5zM7 17h2v1H7zM11 17h3v1H11zM17 17h1v1H17zM22 17h1v1H22zM25 17h1v1H25zM27,17 h2v1H27zM0 18h1v1H0zM3 18h1v1H3zM5 18h4v1H5zM10 18h1v1H10zM12 18h1v1H12zM18 18h1v1H18zM20 18h1v1H20zM22 18h2v1H22zM25,18 h4v1H25zM2 19h3v1H2zM8 19h1v1H8zM16 19h2v1H16zM21 19h1v1H21zM23 19h1v1H23zM25 19h1v1H25zM27 19h1v1H27zM0 20h1v1H0zM2 20h5v1H2zM8 20h2v1H8zM13 20h4v1H13zM19 20h6v1H19zM26 20h1v1H26zM28,20 h1v1H28zM8 21h2v1H8zM12 21h3v1H12zM16 21h1v1H16zM20 21h1v1H20zM24 21h1v1H24zM26,21 h3v1H26zM0 22h7v1H0zM8 22h3v1H8zM17 22h1v1H17zM20 22h1v1H20zM22 22h1v1H22zM24 22h2v1H24zM27 22h1v1H27zM0 23h1v1H0zM6 23h1v1H6zM10 23h2v1H10zM13 23h2v1H13zM19 23h2v1H19zM24,23 h5v1H24zM0 24h1v1H0zM2 24h3v1H2zM6 24h1v1H6zM9 24h2v1H9zM12 24h2v1H12zM17 24h1v1H17zM20 24h6v1H20zM28,24 h1v1H28zM0 25h1v1H0zM2 25h3v1H2zM6 25h1v1H6zM8 25h3v1H8zM12 25h1v1H12zM14 25h1v1H14zM18 25h1v1H18zM22 25h3v1H22zM26 25h1v1H26zM0 26h1v1H0zM2 26h3v1H2zM6 26h1v1H6zM10 26h5v1H10zM16 26h3v1H16zM21 26h1v1H21zM24 26h1v1H24zM26 26h1v1H26zM28,26 h1v1H28zM0 27h1v1H0zM6 27h1v1H6zM8 27h3v1H8zM12 27h4v1H12zM17 27h1v1H17zM20 27h1v1H20zM23 27h2v1H23zM27 27h1v1H27zM0 28h7v1H0zM8 28h3v1H8zM14 28h1v1H14zM16 28h3v1H16zM20 28h1v1H20zM22 28h1v1H22zM24 28h2v1H24zM27 28h1v1H27z"></path>
+    </svg>
+  </section>
+  
+
+  <section>
+    <h1>Subscribe</h1>
+    Do you want to get notified via email when I post new content?
+    <style>
+      .subscribe-button {
+        /* margin: 10px !important; */
+        padding: 10px !important;
+        background-color: black;
+        display: inline-block;
+        color: white !important;
+        text-decoration: none;
+
+        line-height: 36px !important;
+        height: 37px !important;
+        text-decoration: none !important;
+        display: inline-block !important;
+        color: #ffffff !important;
+        background-color: #000000 !important;
+        border-radius: 3px !important;
+        border: 1px solid transparent !important;
+        padding: 1px 9px !important;
+        font-size: 23px !important;
+        letter-spacing: 0.6px !important;
+        box-shadow: 0px 1px 2px rgba(190, 190, 190, 0.5) !important;
+        -webkit-box-shadow: 0px 1px 2px 2px rgba(190, 190, 190, 0.5) !important;
+        margin: 0 auto !important;
+        font-family: 'Cookie', cursive !important;
+        -webkit-box-sizing: border-box !important;
+        box-sizing: border-box !important;
+        -o-transition: 0.3s all linear !important;
+        -webkit-transition: 0.3s all linear !important;
+        -moz-transition: 0.3s all linear !important;
+        -ms-transition: 0.3s all linear !important;
+        transition: 0.3s all linear !important;
+
+      }
+    </style>
+    <a class='subscribe-button' target="_blank" href="http://eepurl.com/dxI3PP">Click here to subscribe!</a>
+  </section>
+
+
+  <section>
+    <h1>Recent Posts</h1>
+    <ul id="recent_posts">
+      <li class="post">
+        <a href="https://spapas.github.io/2024/08/22/multiple-erl-elixir-windows/">Multiple Erlang/Elixir versions in Windows</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/11/29/openid-connect-tutorial/">A simple OpenID connect tutorial</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/05/23/simple-django-datatables-integration/">Simple Django - DataTables integration</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/05/22/ai-auto-subtitling/">AI auto-subtitling</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/05/12/disable-your-forms/">HTML form disable after submit</a>
+      </li>
+    </ul>
+  </section>
+  <section>
+
+    <h1>Categories</h1>
+    <ul id="recent_posts">
+      <li><a href="https://spapas.github.io/category/ai.html">ai</a></li>
+      <li><a href="https://spapas.github.io/category/android.html">android</a></li>
+      <li><a href="https://spapas.github.io/category/clojure.html">clojure</a></li>
+      <li><a href="https://spapas.github.io/category/css.html">css</a></li>
+      <li><a href="https://spapas.github.io/category/django.html">django</a></li>
+      <li><a href="https://spapas.github.io/category/elixir.html">elixir</a></li>
+      <li><a href="https://spapas.github.io/category/flask.html">flask</a></li>
+      <li><a href="https://spapas.github.io/category/gaming.html">gaming</a></li>
+      <li><a href="https://spapas.github.io/category/git.html">git</a></li>
+      <li><a href="https://spapas.github.io/category/html.html">html</a></li>
+      <li><a href="https://spapas.github.io/category/javascript.html">javascript</a></li>
+      <li><a href="https://spapas.github.io/category/networking.html">networking</a></li>
+      <li><a href="https://spapas.github.io/category/pelican.html">pelican</a></li>
+      <li><a href="https://spapas.github.io/category/postgresql.html">postgresql</a></li>
+      <li><a href="https://spapas.github.io/category/python.html">python</a></li>
+      <li><a href="https://spapas.github.io/category/spring.html">spring</a></li>
+      <li><a href="https://spapas.github.io/category/unix.html">unix</a></li>
+      <li><a href="https://spapas.github.io/category/wagtail.html">wagtail</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Tags</h1>
+    <a href="https://spapas.github.io/tag/erlang.html">erlang</a>,    <a href="https://spapas.github.io/tag/elixir.html">elixir</a>,    <a href="https://spapas.github.io/tag/windows.html">windows</a>,    <a href="https://spapas.github.io/tag/openid.html">openid</a>,    <a href="https://spapas.github.io/tag/openid-connect.html">openid-connect</a>,    <a href="https://spapas.github.io/tag/oidc.html">oidc</a>,    <a href="https://spapas.github.io/tag/http.html">http</a>,    <a href="https://spapas.github.io/tag/keycloak.html">keycloak</a>,    <a href="https://spapas.github.io/tag/python.html">python</a>,    <a href="https://spapas.github.io/tag/django.html">django</a>,    <a href="https://spapas.github.io/tag/jquery.html">jquery</a>,    <a href="https://spapas.github.io/tag/datatables.html">datatables</a>,    <a href="https://spapas.github.io/tag/ai.html">ai</a>,    <a href="https://spapas.github.io/tag/whisper.html">whisper</a>,    <a href="https://spapas.github.io/tag/whispercpp.html">whisper.cpp</a>,    <a href="https://spapas.github.io/tag/subtitles.html">subtitles</a>,    <a href="https://spapas.github.io/tag/video.html">video</a>,    <a href="https://spapas.github.io/tag/auto-subtitling.html">auto-subtitling</a>,    <a href="https://spapas.github.io/tag/subtitiling.html">subtitiling</a>,    <a href="https://spapas.github.io/tag/transcribe.html">transcribe</a>,    <a href="https://spapas.github.io/tag/html.html">html</a>,    <a href="https://spapas.github.io/tag/javascript.html">javascript</a>,    <a href="https://spapas.github.io/tag/media.html">media</a>,    <a href="https://spapas.github.io/tag/storage.html">storage</a>,    <a href="https://spapas.github.io/tag/unpoly.html">unpoly</a>,    <a href="https://spapas.github.io/tag/access.html">access</a>,    <a href="https://spapas.github.io/tag/database.html">database</a>,    <a href="https://spapas.github.io/tag/accdb.html">accdb</a>,    <a href="https://spapas.github.io/tag/mdb.html">mdb</a>,    <a href="https://spapas.github.io/tag/postgresql.html">postgresql</a>,    <a href="https://spapas.github.io/tag/development.html">development</a>,    <a href="https://spapas.github.io/tag/inlines.html">inlines</a>,    <a href="https://spapas.github.io/tag/clojure.html">clojure</a>,    <a href="https://spapas.github.io/tag/cmd.html">cmd</a>,    <a href="https://spapas.github.io/tag/pdf.html">pdf</a>,    <a href="https://spapas.github.io/tag/wkhtmltopdf.html">wkhtmltopdf</a>,    <a href="https://spapas.github.io/tag/forward-proxy.html">forward-proxy</a>,    <a href="https://spapas.github.io/tag/reverse-proxy.html">reverse-proxy</a>,    <a href="https://spapas.github.io/tag/proxy.html">proxy</a>,    <a href="https://spapas.github.io/tag/networking.html">networking</a>,    <a href="https://spapas.github.io/tag/dj-rest-auth.html">dj-rest-auth</a>,    <a href="https://spapas.github.io/tag/rest.html">rest</a>,    <a href="https://spapas.github.io/tag/django-rest-framework.html">django-rest-framework</a>,    <a href="https://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="https://spapas.github.io/tag/tokens.html">tokens</a>,    <a href="https://spapas.github.io/tag/migrations.html">migrations</a>,    <a href="https://spapas.github.io/tag/foreignkey.html">foreignkey</a>,    <a href="https://spapas.github.io/tag/dark-souls.html">dark-souls</a>,    <a href="https://spapas.github.io/tag/dark-souls-2.html">dark-souls-2</a>,    <a href="https://spapas.github.io/tag/dark-souls-3.html">dark-souls-3</a>,    <a href="https://spapas.github.io/tag/autohotkey.html">autohotkey</a>,    <a href="https://spapas.github.io/tag/matplotlib.html">matplotlib</a>,    <a href="https://spapas.github.io/tag/hashids.html">hashids</a>,    <a href="https://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="https://spapas.github.io/tag/osmon.html">osmon</a>,    <a href="https://spapas.github.io/tag/phoenix.html">phoenix</a>,    <a href="https://spapas.github.io/tag/os-monitoring.html">os-monitoring</a>,    <a href="https://spapas.github.io/tag/forms.html">forms</a>,    <a href="https://spapas.github.io/tag/django-crispy-forms.html">django-crispy-forms</a>,    <a href="https://spapas.github.io/tag/django-widget-tweaks.html">django-widget-tweaks</a>,    <a href="https://spapas.github.io/tag/ecto.html">ecto</a>,    <a href="https://spapas.github.io/tag/queries.html">queries</a>,    <a href="https://spapas.github.io/tag/declarative.html">declarative</a>,    <a href="https://spapas.github.io/tag/form.html">form</a>,    <a href="https://spapas.github.io/tag/php.html">php</a>,    <a href="https://spapas.github.io/tag/select2.html">select2</a>,    <a href="https://spapas.github.io/tag/autocompelte.html">autocompelte</a>,    <a href="https://spapas.github.io/tag/ajax.html">ajax</a>,    <a href="https://spapas.github.io/tag/android.html">android</a>,    <a href="https://spapas.github.io/tag/kotlin.html">kotlin</a>,    <a href="https://spapas.github.io/tag/adapter.html">adapter</a>,    <a href="https://spapas.github.io/tag/filter.html">filter</a>,    <a href="https://spapas.github.io/tag/async.html">async</a>,    <a href="https://spapas.github.io/tag/tasks.html">tasks</a>,    <a href="https://spapas.github.io/tag/django-rq.html">django-rq</a>,    <a href="https://spapas.github.io/tag/rq.html">rq</a>,    <a href="https://spapas.github.io/tag/du.html">du</a>,    <a href="https://spapas.github.io/tag/unix.html">unix</a>,    <a href="https://spapas.github.io/tag/linux.html">linux</a>,    <a href="https://spapas.github.io/tag/disk-usage.html">disk-usage</a>,    <a href="https://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="https://spapas.github.io/tag/middleware.html">middleware</a>,    <a href="https://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="https://spapas.github.io/tag/react.html">react</a>,    <a href="https://spapas.github.io/tag/redux.html">redux</a>,    <a href="https://spapas.github.io/tag/hyperapp.html">hyperapp</a>,    <a href="https://spapas.github.io/tag/immutable.html">immutable</a>,    <a href="https://spapas.github.io/tag/es6.html">es6</a>,    <a href="https://spapas.github.io/tag/youtube.html">youtube</a>,    <a href="https://spapas.github.io/tag/youtube-dl.html">youtube-dl</a>,    <a href="https://spapas.github.io/tag/ffmpeg.html">ffmpeg</a>,    <a href="https://spapas.github.io/tag/django-rest-auth.html">django-rest-auth</a>,    <a href="https://spapas.github.io/tag/python-2.html">python-2</a>,    <a href="https://spapas.github.io/tag/python-3.html">python-3</a>,    <a href="https://spapas.github.io/tag/plpgsql.html">plpgsql</a>,    <a href="https://spapas.github.io/tag/component.html">component</a>,    <a href="https://spapas.github.io/tag/ag-grid.html">ag-grid</a>,    <a href="https://spapas.github.io/tag/grid.html">grid</a>,    <a href="https://spapas.github.io/tag/bash.html">bash</a>,    <a href="https://spapas.github.io/tag/cron.html">cron</a>,    <a href="https://spapas.github.io/tag/pandas.html">pandas</a>,    <a href="https://spapas.github.io/tag/scipy.html">scipy</a>,    <a href="https://spapas.github.io/tag/numpy.html">numpy</a>,    <a href="https://spapas.github.io/tag/pivot.html">pivot</a>,    <a href="https://spapas.github.io/tag/pivot_table.html">pivot_table</a>,    <a href="https://spapas.github.io/tag/ipython.html">ipython</a>,    <a href="https://spapas.github.io/tag/jupyter.html">jupyter</a>,    <a href="https://spapas.github.io/tag/notebook.html">notebook</a>,    <a href="https://spapas.github.io/tag/query.html">query</a>,    <a href="https://spapas.github.io/tag/q.html">q</a>,    <a href="https://spapas.github.io/tag/imgur.html">imgur</a>,    <a href="https://spapas.github.io/tag/console.html">console</a>,    <a href="https://spapas.github.io/tag/research.html">research</a>,    <a href="https://spapas.github.io/tag/debug.html">debug</a>,    <a href="https://spapas.github.io/tag/werkzeug.html">werkzeug</a>,    <a href="https://spapas.github.io/tag/django-extensions.html">django-extensions</a>,    <a href="https://spapas.github.io/tag/404.html">404</a>,    <a href="https://spapas.github.io/tag/error.html">error</a>,    <a href="https://spapas.github.io/tag/spring.html">spring</a>,    <a href="https://spapas.github.io/tag/spring-boot.html">spring-boot</a>,    <a href="https://spapas.github.io/tag/java.html">java</a>,    <a href="https://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="https://spapas.github.io/tag/profiles.html">profiles</a>,    <a href="https://spapas.github.io/tag/settings.html">settings</a>,    <a href="https://spapas.github.io/tag/properties.html">properties</a>,    <a href="https://spapas.github.io/tag/yaml.html">yaml</a>,    <a href="https://spapas.github.io/tag/configuration.html">configuration</a>,    <a href="https://spapas.github.io/tag/deploy.html">deploy</a>,    <a href="https://spapas.github.io/tag/initd.html">init.d</a>,    <a href="https://spapas.github.io/tag/react-redux.html">react-redux</a>,    <a href="https://spapas.github.io/tag/redux-thunk.html">redux-thunk</a>,    <a href="https://spapas.github.io/tag/redux-form.html">redux-form</a>,    <a href="https://spapas.github.io/tag/react-router.html">react-router</a>,    <a href="https://spapas.github.io/tag/react-router-redux.html">react-router-redux</a>,    <a href="https://spapas.github.io/tag/react-notification.html">react-notification</a>,    <a href="https://spapas.github.io/tag/history.html">history</a>,    <a href="https://spapas.github.io/tag/babel.html">babel</a>,    <a href="https://spapas.github.io/tag/babelify.html">babelify</a>,    <a href="https://spapas.github.io/tag/browserify.html">browserify</a>,    <a href="https://spapas.github.io/tag/watchify.html">watchify</a>,    <a href="https://spapas.github.io/tag/uglify.html">uglify</a>,    <a href="https://spapas.github.io/tag/boilerplate.html">boilerplate</a>,    <a href="https://spapas.github.io/tag/tutorial.html">tutorial</a>,    <a href="https://spapas.github.io/tag/introduction.html">introduction</a>,    <a href="https://spapas.github.io/tag/fixed-data-tables.html">fixed-data-tables</a>,    <a href="https://spapas.github.io/tag/fixeddatatable.html">FixedDataTable</a>,    <a href="https://spapas.github.io/tag/reportlab.html">reportlab</a>,    <a href="https://spapas.github.io/tag/xhtml2pdf.html">xhtml2pdf</a>,    <a href="https://spapas.github.io/tag/node.html">node</a>,    <a href="https://spapas.github.io/tag/npm.html">npm</a>,    <a href="https://spapas.github.io/tag/generic.html">generic</a>,    <a href="https://spapas.github.io/tag/tables.html">tables</a>,    <a href="https://spapas.github.io/tag/flux.html">flux</a>,    <a href="https://spapas.github.io/tag/jobs.html">jobs</a>,    <a href="https://spapas.github.io/tag/asynchronous.html">asynchronous</a>,    <a href="https://spapas.github.io/tag/scheduling.html">scheduling</a>,    <a href="https://spapas.github.io/tag/redis.html">redis</a>,    <a href="https://spapas.github.io/tag/pusher.html">pusher</a>,    <a href="https://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="https://spapas.github.io/tag/css.html">css</a>,    <a href="https://spapas.github.io/tag/design.html">design</a>,    <a href="https://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>,    <a href="https://spapas.github.io/tag/less.html">less</a>,    <a href="https://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="https://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="https://spapas.github.io/tag/security.html">security</a>,    <a href="https://spapas.github.io/tag/google.html">google</a>,    <a href="https://spapas.github.io/tag/flask.html">flask</a>,    <a href="https://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="https://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="https://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="https://spapas.github.io/tag/git.html">git</a>,    <a href="https://spapas.github.io/tag/github.html">github</a>,    <a href="https://spapas.github.io/tag/branching.html">branching</a>,    <a href="https://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="https://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="https://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="https://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="https://spapas.github.io/tag/rst.html">rst</a>  </section>
+
+  <section>
+    <h1>Yearly archives</h1>
+    <a href="https://spapas.github.io/posts/2013/">2013</a>,    <a href="https://spapas.github.io/posts/2014/">2014</a>,    <a href="https://spapas.github.io/posts/2015/">2015</a>,    <a href="https://spapas.github.io/posts/2016/">2016</a>,    <a href="https://spapas.github.io/posts/2017/">2017</a>,    <a href="https://spapas.github.io/posts/2018/">2018</a>,    <a href="https://spapas.github.io/posts/2019/">2019</a>,    <a href="https://spapas.github.io/posts/2020/">2020</a>,    <a href="https://spapas.github.io/posts/2021/">2021</a>,    <a href="https://spapas.github.io/posts/2022/">2022</a>,    <a href="https://spapas.github.io/posts/2023/">2023</a>,    <a href="https://spapas.github.io/posts/2024/">2024</a>  </section>
+
+
+
+  <section>
+    <h1>GitHub Repos</h1>
+    <ul id="gh_repos">
+      <li class="loading">Status updating...</li>
+    </ul>
+      <a href="https://github.com/spapas">@spapas</a> on GitHub
+    <script  src="//code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      $(function(){
+          if (!window.jXHR){
+              var jxhr = document.createElement('script');
+              jxhr.type = 'text/javascript';
+              jxhr.src = 'https://spapas.github.io/theme/js/jXHR.js';
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(jxhr, s);
+          }
+
+          github.showRepos({
+              user: 'spapas',
+              count: 5,
+              skip_forks: true,
+              target: '#gh_repos'
+          });
+      });
+    </script>
+    <script src="https://spapas.github.io/theme/js/github.js" type="text/javascript"> </script>
+  </section>
+
+
+  <section>
+    <a href="https://twitter.com/_serafeim_?ref_src=twsrc%5Etfw" class="twitter-follow-button"
+      data-show-count="false">Follow @_serafeim_</a>
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+  </section>
+
+</aside>    </div>
+  </div>
+  <footer role="contentinfo"><p>
+    Copyright &copy;  2013&ndash;2024  Serafeim Papastefanos &mdash;
+  <span class="credit">Powered by <a href="http://getpelican.com">Pelican</a></span>
+</p></footer>
+  <script src="https://spapas.github.io/theme/js/modernizr-2.0.js"></script>
+  <script src="https://spapas.github.io/theme/js/ender.js"></script>
+  <script src="https://spapas.github.io/theme/js/octopress.js" type="text/javascript"></script>
+  <script src="https://spapas.github.io/theme/js/ads.js"></script>
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-44750952-1', 'auto');
+
+    ga('send', 'pageview');
+    </script>
+
+<script defer data-domain="spapas.github.io" src="https://plausible.hcg.gr/js/script.js"></script>  <script type="text/javascript">
+    var disqus_shortname = 'spapas-github-io';
+    (function() {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = "//" + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+     })();
+  </script>
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+</body>
+
+</html>

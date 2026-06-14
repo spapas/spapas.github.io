@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="google-site-verification" content="5_8DTmIiEq4gFvNAfxAD6TsGOgrMAjp8lQFQvfA6zZc" />
+    <title>Configuring Spring Boot &mdash; /var/</title>
+    <meta name="author" content="Serafeim Papastefanos">
+
+
+    
+<style type="text/css">
+pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: var(--jp-cell-editor-active-background) }
+.highlight { background: var(--jp-cell-editor-background); color: var(--jp-mirror-editor-variable-color) }
+.highlight .c { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment */
+.highlight .err { color: var(--jp-mirror-editor-error-color) } /* Error */
+.highlight .k { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword */
+.highlight .o { color: var(--jp-mirror-editor-operator-color); font-weight: bold } /* Operator */
+.highlight .p { color: var(--jp-mirror-editor-punctuation-color) } /* Punctuation */
+.highlight .ch { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Preproc */
+.highlight .cpf { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Single */
+.highlight .cs { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Special */
+.highlight .kc { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Pseudo */
+.highlight .kr { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Type */
+.highlight .m { color: var(--jp-mirror-editor-number-color) } /* Literal.Number */
+.highlight .s { color: var(--jp-mirror-editor-string-color) } /* Literal.String */
+.highlight .ow { color: var(--jp-mirror-editor-operator-color); font-weight: bold } /* Operator.Word */
+.highlight .pm { color: var(--jp-mirror-editor-punctuation-color) } /* Punctuation.Marker */
+.highlight .w { color: var(--jp-mirror-editor-variable-color) } /* Text.Whitespace */
+.highlight .mb { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Bin */
+.highlight .mf { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Float */
+.highlight .mh { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Hex */
+.highlight .mi { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Integer */
+.highlight .mo { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Oct */
+.highlight .sa { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Affix */
+.highlight .sb { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Backtick */
+.highlight .sc { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Char */
+.highlight .dl { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Delimiter */
+.highlight .sd { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Doc */
+.highlight .s2 { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Double */
+.highlight .se { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Escape */
+.highlight .sh { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Heredoc */
+.highlight .si { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Interpol */
+.highlight .sx { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Other */
+.highlight .sr { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Regex */
+.highlight .s1 { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Single */
+.highlight .ss { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Symbol */
+.highlight .il { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Integer.Long */
+</style>
+
+<style type="text/css">
+/* Overrides of notebook CSS for static HTML export */
+div.entry-content {
+  overflow: visible;
+  padding: 8px;
+}
+.input_area {
+  padding: 0.2em;
+}
+
+a.heading-anchor {
+ white-space: normal;
+}
+
+.rendered_html
+code {
+ font-size: .8em;
+}
+
+pre.ipynb {
+  color: black;
+  background: #f7f7f7;
+  border: none;
+  box-shadow: none;
+  margin-bottom: 0;
+  padding: 0;
+  margin: 0px;
+  font-size: 13px;
+}
+
+/* remove the prompt div from text cells */
+div.text_cell .prompt {
+    display: none;
+}
+
+/* remove horizontal padding from text cells, */
+/* so it aligns with outer body text */
+div.text_cell_render {
+    padding: 0.5em 0em;
+}
+
+img.anim_icon{padding:0; border:0; vertical-align:middle; -webkit-box-shadow:none; -box-shadow:none}
+
+div.collapseheader {
+    width=100%;
+    background-color:#d3d3d3;
+    padding: 2px;
+    cursor: pointer;
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+</style>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true,
+        displayMath: [['$$','$$'], ["\\[","\\]"]]
+    }
+});
+</script>
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+    $("div.collapseheader").click(function () {
+    $header = $(this).children("span").first();
+    $codearea = $(this).children(".input_area");
+    console.log($(this).children());
+    $codearea.slideToggle(500, function () {
+        $header.text(function () {
+            return $codearea.is(":visible") ? "Collapse Code" : "Expand Code";
+        });
+    });
+});
+});
+</script>
+
+
+
+
+
+
+    <!-- http://t.co/dKP3o1e -->
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+    <link href="https://spapas.github.io/favicon.png" rel="icon">
+
+    <link href="https://spapas.github.io/theme/css/main.css" media="screen, projection" rel="stylesheet"
+      type="text/css">
+
+    <link href="https://spapas.github.io/theme/css/extra_style.css" media="screen, projection" rel="stylesheet"
+      type="text/css">
+
+    <link href="https://fonts.googleapis.com/css?family=Fira+Mono|Fira+Sans:400,700&amp;subset=greek" rel="stylesheet">
+
+<style>
+#gHPzseYvFrhZ123 {
+  padding: 5px !important;
+  display: block;
+  margin-bottom: 10px !important;
+  background: #900;
+  color: #fff;
+  border-radius: 5px;
+  font-size: 1.0rem !important;
+}
+</style>
+
+
+  <script>
+    
+      
+  </script>
+
+    <script data-ad-client="ca-pub-7673322832689008" async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
+      onerror="adBlockFunction();"></script>
+  </head>
+
+<body>
+  <header role="banner"><hgroup>
+  <h1><a href="https://spapas.github.io/">/var/</a></h1>
+    <h2>Various programming stuff</h2>
+</hgroup></header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+</ul>
+
+
+<ul class="main-navigation">
+      <li >
+        <a href="https://spapas.github.io/category/ai.html">Ai</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/android.html">Android</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/clojure.html">Clojure</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/css.html">Css</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/django.html">Django</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/elixir.html">Elixir</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/flask.html">Flask</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/gaming.html">Gaming</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/git.html">Git</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/html.html">Html</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/javascript.html">Javascript</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/networking.html">Networking</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/pelican.html">Pelican</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/postgresql.html">Postgresql</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/python.html">Python</a>
+      </li>
+      <li class="active">
+        <a href="https://spapas.github.io/category/spring.html">Spring</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/unix.html">Unix</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/wagtail.html">Wagtail</a>
+      </li>
+</ul></nav>
+  <div id="main">
+    <div id="content">
+    <div id="gHPzseYvFrhZ123">
+      Hello! If you are using an ad blocker but find something useful here 
+      and want to support me please consider disabling your ad blocker for this site. 
+      <br />
+      <br />
+      Thank you,<br />
+      Serafeim
+      
+    </div>
+<div>
+  <article class="hentry" role="article">
+<header>
+      <h1 class="entry-title">Configuring Spring Boot</h1>
+    <p class="meta">
+<time datetime="2016-03-31T19:20:00+03:00" pubdate>Thu 31 March 2016</time>    </p>
+</header>
+
+<div class="entry-content"><div class="contents topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#introduction" id="toc-entry-1">Introduction</a></li>
+<li><a class="reference internal" href="#properties-vs-yml-files" id="toc-entry-2">properties vs yml&nbsp;files</a></li>
+<li><a class="reference internal" href="#structuring-your-configuration-files" id="toc-entry-3">Structuring your configuration files</a><ul>
+<li><a class="reference internal" href="#main-application-settings" id="toc-entry-4">Main application&nbsp;settings</a></li>
+<li><a class="reference internal" href="#profiles" id="toc-entry-5">Profiles</a><ul>
+<li><a class="reference internal" href="#some-more-advanced-profile-usage" id="toc-entry-6">Some more advanced profile&nbsp;usage</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#overriding-settings" id="toc-entry-7">Overriding settings</a><ul>
+<li><a class="reference internal" href="#using-a-config-application-properties" id="toc-entry-8">Using a&nbsp;config/application.properties</a></li>
+<li><a class="reference internal" href="#passing-command-line-arguments" id="toc-entry-9">Passing command line&nbsp;arguments</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#deploying-spring-boot-applications" id="toc-entry-10">Deploying Spring Boot&nbsp;applications</a></li>
+<li><a class="reference internal" href="#conclusion" id="toc-entry-11">Conclusion</a></li>
+</ul>
+</div>
+<div class="section" id="introduction">
+<h2><a class="toc-backref" href="#toc-entry-1">Introduction</a></h2>
+<p>The <a class="reference external" href="http://projects.spring.io/spring-boot/">Spring Boot</a> project is great way of building Java applications using
+Spring. Instead of trying to integrate everything by hand (and usually
+end up with a configuration hell) you use spring-boot to help you to
+bootstrap your application: Just include its
+dependencies in your pom.xml and Spring Boot will try its
+best to auto-configure all these&nbsp;components!</p>
+<p>Of course, no matter how hard Spring Boot tries to auto-configure everything,
+you&#8217;ll still need to pass some configuration to configure your databases,
+caches, email sending, security etc. Thankfully, Spring Boot
+can be configured without <em>any</em> xml (actually, its a bad practice to
+use xml-based configuration with it), using plain Java .properties
+files or (if you prefer the more compact syntax) <a class="reference external" href="https://en.wikipedia.org/wiki/YAML"><span class="caps">YAML</span></a> .yml&nbsp;files!</p>
+<p>In this guide, along with a simple introduction to the way Spring Boot configuration
+works, we&#8217;ll talk about a specific way of stucturing your settings configuration files in
+order to&nbsp;have:</p>
+<ul class="simple">
+<li>A global configuration file that will contain all your&nbsp;settings</li>
+<li>Different settings for each of your environments (development, <span class="caps">UAT</span>, staging, production and&nbsp;test)</li>
+<li>A way to configure your passwords and other sensitive data (that you don&#8217;t want to put to your <span class="caps">VCS</span>)</li>
+<li>Being able to override any setting in any&nbsp;environment</li>
+<li>Deploying your Spring Boot app in Linux using <tt class="docutils literal">init.d</tt></li>
+</ul>
+<p>To quickly test the proposed settings configuration I&#8217;ve created a simple
+Spring Boot project &#64; <a class="reference external" href="https://github.com/spapas/spring-boot-config">https://github.com/spapas/spring-boot-config</a>. Just clone
+it, optionally change the packaged settings (more on this later), package it (<tt class="docutils literal">mvn package</tt>), optionally change
+the <tt class="docutils literal">config</tt> settings (more on this also later) and run it
+(using something like <tt class="docutils literal">java <span class="pre">-jar</span> <span class="pre">spring-boot-config-0.0.1-<span class="caps">SNAPSHOT</span>.jar</span></tt>) optionally passing it command line settings (more on this
+also later). You&#8217;ll then be able to visit <tt class="docutils literal"><span class="pre">http://127.0.0.1:8080</span></tt> and check the current&nbsp;settings!</p>
+</div>
+<div class="section" id="properties-vs-yml-files">
+<h2><a class="toc-backref" href="#toc-entry-2">properties vs yml&nbsp;files</a></h2>
+<p>You can use two kinds of files to configure your settings: Normal Java .properties files
+or <a class="reference external" href="https://en.wikipedia.org/wiki/YAML"><span class="caps">YAML</span></a> .yml files. The .properties files have the&nbsp;form:</p>
+<pre class="code literal-block">
+config.value.a=1
+config.value.b=2
+config.value.c=3
+</pre>
+<p>while the .yml files are&nbsp;like:</p>
+<pre class="code literal-block">
+config:
+    value:
+        a: 1
+        b: 2
+        c: 3
+</pre>
+<p>You may use whatever you wish - in the examples I&#8217;ll use normal Java .properties
+files because they are more compact (you don&#8217;t need to use multiple lines to represent
+a single setting like in <span class="caps">YAML</span>).</p>
+</div>
+<div class="section" id="structuring-your-configuration-files">
+<h2><a class="toc-backref" href="#toc-entry-3">Structuring your configuration&nbsp;files</a></h2>
+<p>Spring Boot reads its configuration from <a class="reference external" href="https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-external-config.html">various places</a>, however in this article we&#8217;ll talk
+about four of them which should be enough for most cases. Starting from the most global to the most
+specific ones (i.e the latter ones will override the previous ones) these&nbsp;are:</p>
+<ul class="simple">
+<li>Main (global) application&nbsp;settings</li>
+<li>Profile&nbsp;settings</li>
+<li>Local (/config)&nbsp;settings</li>
+<li>Command line&nbsp;arguments</li>
+</ul>
+<p>The first two are setting files that will be contained inside the artifact (jar or war) that will be
+created and should be commited to your version control system. I&#8217;ll call them jar-packaged
+settings. The other two won&#8217;t be commited to the version control but will be created directly
+on the server to-deploy. Let&#8217;s see a little more about&nbsp;them:</p>
+<div class="section" id="main-application-settings">
+<h3><a class="toc-backref" href="#toc-entry-4">Main application&nbsp;settings</a></h3>
+<p>These are kept in a file named <tt class="docutils literal">application.properties</tt> (or <tt class="docutils literal">yml</tt> &#8212; from now on I&#8217;ll just use
+<cite>.properties`</cite> but keep in mind that you may use <tt class="docutils literal">.yml</tt>): This file should reside
+inside the <tt class="docutils literal">src\main\resources</tt> folder
+of your project and ideally contain all the settings your spring-boot application users. Some
+of these settings will be overriden by settings kept in the next source so they may have a
+default value or even be empty if they will be always overriden (or contain sensitive data
+like passwords), however I still prefer to list
+them all in this file even as placeholders to have a central source of all the settings that
+your Spring Boot application&nbsp;uses.</p>
+</div>
+<div class="section" id="profiles">
+<h3><a class="toc-backref" href="#toc-entry-5">Profiles</a></h3>
+<p>A profile is a set of settings that can be configured to override settings from <tt class="docutils literal">application.properties</tt>.
+Each profile is contained in a file named <tt class="docutils literal"><span class="pre">application-profilename.properties</span></tt> where <tt class="docutils literal">profilename</tt> is
+the name of the profile. Now, a profile could configure anything you want, however
+for most projects I propose to
+have the following&nbsp;profiles:</p>
+<ul class="simple">
+<li><tt class="docutils literal">dev</tt> for your local development&nbsp;settings</li>
+<li><tt class="docutils literal">uat</tt> for your <span class="caps">UAT</span> server&nbsp;settings</li>
+<li><tt class="docutils literal">staging</tt> for your staging server&nbsp;settings</li>
+<li><tt class="docutils literal">prod</tt> for your production&nbsp;settings</li>
+<li><tt class="docutils literal">test</tt> for running your&nbsp;tests</li>
+</ul>
+<p>(depending of course on what are your requirements, some projects may not
+need <tt class="docutils literal">uat</tt> or <tt class="docutils literal">staging</tt> but all projects should have a <tt class="docutils literal">dev</tt>, a <tt class="docutils literal">prod</tt> and a <tt class="docutils literal">test</tt> profile).
+The configuration for these environemnts needs to be different for obvious reasons.
+For example when developing you may want
+to use a local database, when running tests an ephemeral in memory database
+and your production database when deploying to production.
+These profile configuration files will be stored inside your <tt class="docutils literal">src\main\resources</tt> folder,
+right next to the <tt class="docutils literal">application.properties</tt>, i.e you&#8217;ll have
+<tt class="docutils literal"><span class="pre">application-dev.properties</span></tt>, <tt class="docutils literal"><span class="pre">application-prod.properties</span></tt>,
+<tt class="docutils literal"><span class="pre">application-test.properties</span></tt> etc - and all these files will be kept
+in your <span class="caps">VCS</span> (and will also be jar-packaged since they will be
+contained in the resulting&nbsp;artifact).</p>
+<p>How do you select which profile is active each time (i.e pick it
+when running the Spring Boot application under
+its corresponding&nbsp;environment)?</p>
+<p>For tests, since they can be run by a different <tt class="docutils literal">Main</tt> than
+the normal application, you should use the <tt class="docutils literal">&#64;ActiveProfiles</tt> annotation
+(for example <tt class="docutils literal"><span class="pre">&#64;ActiveProfiles(&quot;test&quot;)</span></tt>) to make sure that the tests
+will run with the correct settings. So if the contents of your <tt class="docutils literal"><span class="pre">application-test.properties</span></tt>
+are <tt class="docutils literal">config.value=Hello test!</tt> running this test should produce no&nbsp;errors:</p>
+<div class="highlight"><pre><span></span><span class="nd">@RunWith</span><span class="p">(</span><span class="n">SpringJUnit4ClassRunner</span><span class="p">.</span><span class="na">class</span><span class="p">)</span>
+<span class="nd">@SpringApplicationConfiguration</span><span class="p">(</span><span class="n">classes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SpringBootConfigApplication</span><span class="p">.</span><span class="na">class</span><span class="p">)</span>
+<span class="nd">@ActiveProfiles</span><span class="p">(</span><span class="s">&quot;test&quot;</span><span class="p">)</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">SpringBootConfigApplicationTests</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="nd">@Value</span><span class="p">(</span><span class="s">&quot;${config.value}&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">value</span><span class="p">;</span>
+
+<span class="w">    </span><span class="nd">@Value</span><span class="p">(</span><span class="s">&quot;${spring.profiles.active}&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">profile</span><span class="p">;</span>
+
+<span class="w">    </span><span class="nd">@Test</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">contextLoads</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">assertThat</span><span class="p">(</span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">is</span><span class="p">(</span><span class="s">&quot;Hello test!&quot;</span><span class="p">));</span>
+<span class="w">        </span><span class="n">assertThat</span><span class="p">(</span><span class="n">profile</span><span class="p">,</span><span class="w"> </span><span class="n">is</span><span class="p">(</span><span class="s">&quot;test&quot;</span><span class="p">));</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+<p>To activate a different profile when running your Spring Boot applications
+you&#8217;ll need to use the <tt class="docutils literal">spring.profiles.active</tt> setting, so if you set
+<tt class="docutils literal">spring.profiles.active=prod</tt> in your <tt class="docutils literal">application.properties</tt> and
+create the packaged jar (or war) then you&#8217;ll have the production settings
+when you run your application (i.e the contents of <tt class="docutils literal"><span class="pre">application-prod.properties</span></tt>
+will be used to override your <tt class="docutils literal">application.properties</tt>). Of course, to deploy it
+to <span class="caps">UAT</span>, you&#8217;ll need to change
+<tt class="docutils literal">spring.profiles.active</tt> to <tt class="docutils literal">uat</tt> and re-create the packaged artifact &#8212;
+see some repetition and penal labour here? Definitely you don&#8217;t want to do re-create
+your artifacts for each of the environments you may want to deploy &#8212;
+we&#8217;ll see in the next sections how to improve this flow by overriding
+jar-packaged&nbsp;settings!</p>
+<div class="section" id="some-more-advanced-profile-usage">
+<h4><a class="toc-backref" href="#toc-entry-6">Some more advanced profile&nbsp;usage</a></h4>
+<p>You may have noticed in the previous section that the name of the
+annotation is <tt class="docutils literal">&#64;ActiveProfiles</tt> and the name of the setting
+<tt class="docutils literal">spring.profiles.active</tt> - both in plural. This of course is
+on purpose: You may have <em>more than one</em> active&nbsp;profiles!</p>
+<p>This, along with the fact that you can make <tt class="docutils literal">&#64;Components</tt> or <tt class="docutils literal">&#64;Configuration</tt>
+available <em>only</em> on certail profiles is a really powerful&nbsp;tool!</p>
+<p>Here are some&nbsp;examples:</p>
+<ul class="simple">
+<li>Configure two spring-security <tt class="docutils literal">&#64;Configuration</tt> s: Use in memory security for your dev environment, while using <span class="caps">LDAP</span> for your&nbsp;production.</li>
+<li>If you want to support more than one database you can configure multiple profiles &#8212; and use them along with the dev/uat/prod I mentioned&nbsp;before.</li>
+<li>Create verbose and non-verbose logging profiles and quickly change between&nbsp;them</li>
+</ul>
+</div>
+</div>
+<div class="section" id="overriding-settings">
+<h3><a class="toc-backref" href="#toc-entry-7">Overriding&nbsp;settings</a></h3>
+<p>All the above settings we&#8217;ve defined should be safely kept inside
+your <span class="caps">VCS</span> - however we wouldn&#8217;t like storing passwords or other
+sensitive data to a <span class="caps">VCS</span>! Sensitive settings should be empty
+(or have a default value) when
+saved to <span class="caps">VCS</span> and overriden by &#8220;local&#8221;&nbsp;settings.</p>
+<p>Also, all the previous are jar-packaged
+and we definitely need a way to override them without messing
+with the artifacts (for example, we need to select the
+correct profile for running the application by overriding
+<tt class="docutils literal">spring.profiles.active</tt>).</p>
+<p>There two methods of overriding settings, and these are the last
+two methods of the four we discussed&nbsp;above:</p>
+<div class="section" id="using-a-config-application-properties">
+<h4><a class="toc-backref" href="#toc-entry-8">Using a&nbsp;config/application.properties</a></h4>
+<p>You can put files in a directory named <tt class="docutils literal">config</tt> that is at the same level
+as the location from which you try to run your jar. These file should be
+named either <tt class="docutils literal">application.properties</tt> or <tt class="docutils literal"><span class="pre">application-profilename.properties</span></tt>
+and will be used to override your jar-packaged&nbsp;settings.</p>
+<p>What happens is that Spring will at first try to load a file named <tt class="docutils literal">config/application.properties</tt> that will
+override your jar-packaged <tt class="docutils literal">application.properties</tt> (so here you can set your current profile). Then, it will also try to load
+a file named <tt class="docutils literal"><span class="pre">config/application-profilename.properties</span></tt> that will override
+your jar-packaged <tt class="docutils literal"><span class="pre">application-profilename.properties</span></tt> (so here you may
+override any profile related&nbsp;properties).</p>
+<p>The priority of the files from lowest to&nbsp;highest:</p>
+<ul class="simple">
+<li>jar-packaged <tt class="docutils literal">application.properties</tt></li>
+<li>local <tt class="docutils literal">config/application.properties</tt></li>
+<li>jar-packaged <tt class="docutils literal"><span class="pre">application-profilename.properties</span></tt></li>
+<li>local <tt class="docutils literal"><span class="pre">config/application-profilename.properties</span></tt></li>
+</ul>
+<p>So (repeating for emphasis) the settings in your jar-packaged <tt class="docutils literal"><span class="pre">application-profilename.properties</span></tt> will <em>only</em>
+be overriden by <tt class="docutils literal"><span class="pre">config/application-profilename.properties</span></tt> (and not by the <tt class="docutils literal">config/application.properties</tt>
+which will only override settings on the jar-packaged <tt class="docutils literal">application.properties</tt>).</p>
+<p>Also, to make everything clear about where the <tt class="docutils literal">config</tt> directory should be&nbsp;kept:</p>
+<p>If the current directory from which you&#8217;ll run your jar is <tt class="docutils literal">/home/serafeim</tt> and
+you want to execute <tt class="docutils literal"><span class="pre">/opt/spring/my-spring-app.jar</span></tt> (so you&#8217;ll run something like
+<tt class="docutils literal">/home/serafeim$ java <span class="pre">-jar</span> <span class="pre">/opt/spring/my-spring-app.jar</span></tt>) then
+the <tt class="docutils literal">config</tt> directory should
+be at <tt class="docutils literal">/home/serafeim/config</tt> (i.e at the same directory from where you execute
+jar). Normally however and to avoid confusion, the best approach would
+be to just put it at <tt class="docutils literal">/opt/spring/config</tt> and <tt class="docutils literal">cd /opt/spring</tt> before running
+your jar (so <tt class="docutils literal">config</tt> will be right next to your jar and run the jar from the&nbsp;directory).</p>
+<p>Finally, my recommendation is to keep these <tt class="docutils literal"><span class="pre">config/*properties</span></tt> files off version control
+(after all they should be different for each of your environments - common settings should
+go to the jar-packaged files)
+and to put only the profile selection setting and sensitive settings there. That means that
+the <tt class="docutils literal">config/application.properties</tt> file should <em>only</em> contain a <tt class="docutils literal">spring.profiles.active=profilename</tt>
+setting to set the correct profile for this instance of your app and the <tt class="docutils literal"><span class="pre">config/application-profilename.properties</span></tt>
+will contain all sensitive information that you&#8217;ll need to run that&nbsp;profile.</p>
+<p>For example in your <span class="caps">UAT</span> server you&#8217;ll have <tt class="docutils literal">spring.profiles.active=uat</tt> in your <tt class="docutils literal">application.properties</tt>
+and your uat server passwords in your <tt class="docutils literal"><span class="pre">application-uat.properties</span></tt></p>
+</div>
+<div class="section" id="passing-command-line-arguments">
+<h4><a class="toc-backref" href="#toc-entry-9">Passing command line&nbsp;arguments</a></h4>
+<p>The most specific way of overriding parameters (including the active profile of course) is by
+directly passing these parameters as arguments when running your jar. For example,
+if you run <tt class="docutils literal">java <span class="pre">-Dconfig.value=foo</span> <span class="pre">-jar</span> <span class="pre">my-spring-app.jar</span></tt> then the <tt class="docutils literal">config.value</tt>
+will always have a value of <tt class="docutils literal">foo</tt> no matter what you have in your other config&nbsp;files.</p>
+<p>That&#8217;s a different way to set your active profile (by passing <tt class="docutils literal"><span class="pre">-Dspring.profiles.active=profilename</span></tt>)
+or to quickly set sensitive settings however
+I prefer to keep the settings in properties files (and not to put them in scripts where they will definitely
+be missed and will be more difficult to be managed)
+so I&#8217;ll recommend the previous way of using a non-commited to version control local config/application.properties.
+Use command line arguments only for quick tests (run something with a specific setting to test how it&nbsp;works).</p>
+</div>
+</div>
+</div>
+<div class="section" id="deploying-spring-boot-applications">
+<h2><a class="toc-backref" href="#toc-entry-10">Deploying Spring Boot&nbsp;applications</a></h2>
+<p>If you check
+the deployment documentation of Spring Boot you&#8217;ll see that it has various hints on
+<a class="reference external" href="http://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/htmlsingle/#deployment">on deploying Spring Boot applications</a>. I won&#8217;t go into much detail about these however I&#8217;ll
+represent my recommendation on deploying Spring Boot apps on Linux as an init.d&nbsp;script:</p>
+<p>What is really interesting about Spring boot is that it allows you to make your jar-packaged jars <a class="reference external" href="https://docs.spring.io/spring-boot/docs/current/reference/html/deployment-install.html">executable as an init.d script</a> so that you will
+be able to manage it using something like <tt class="docutils literal">service springbootapp start/stop/restart</tt> etc. To do that,
+you&#8217;ll just need to add the <tt class="docutils literal"><span class="pre">&lt;executable&gt;true&lt;/executable&gt;</span></tt> <tt class="docutils literal">configuration</tt> for your pom&#8217;s
+<tt class="docutils literal"><span class="pre">spring-boot-maven-plugin</span></tt>. This will add some things in the start of your resulting jar file
+that will make it behave as a unix init.d script. If you take a look at your package artifact
+you&#8217;ll see something like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+<span class="c1">#</span>
+<span class="c1">#    .   ____          _            __ _ _</span>
+<span class="c1">#   /\\ / ___&#39;_ __ _ _(_)_ __  __ _ \ \ \ \</span>
+<span class="c1">#  ( ( )\___ | &#39;_ | &#39;_| | &#39;_ \/ _` | \ \ \ \</span>
+<span class="c1">#   \\/  ___)| |_)| | | | | || (_| |  ) ) ) )</span>
+<span class="c1">#    &#39;  |____| .__|_| |_|_| |_\__, | / / / /</span>
+<span class="c1">#   =========|_|==============|___/=/_/_/_/</span>
+<span class="c1">#   :: Spring Boot Startup Script ::</span>
+<span class="c1">#</span>
+
+<span class="c1">### BEGIN INIT INFO</span>
+<span class="c1"># Provides:          spring-boot-config</span>
+<span class="c1"># Required-Start:    $remote_fs $syslog $network</span>
+<span class="c1"># Required-Stop:     $remote_fs $syslog $network</span>
+<span class="c1"># Default-Start:     2 3 4 5</span>
+<span class="c1"># Default-Stop:      0 1 6</span>
+<span class="c1"># Short-Description: spring-boot-config</span>
+<span class="c1"># Description:       Demo project for Spring Boot configuration</span>
+<span class="c1"># chkconfig:         2345 99 01</span>
+<span class="c1">### END INIT INFO</span>
+
+<span class="o">[[</span><span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$DEBUG</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">set</span><span class="w"> </span>-x
+
+<span class="c1"># Initialize variables that cannot be provided by a .conf file</span>
+<span class="nv">WORKING_DIR</span><span class="o">=</span><span class="s2">&quot;</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">&quot;</span>
+<span class="c1"># shellcheck disable=SC2153</span>
+<span class="o">[[</span><span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$JARFILE</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nv">jarfile</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$JARFILE</span><span class="s2">&quot;</span>
+<span class="o">[[</span><span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$APP_NAME</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nv">identity</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$APP_NAME</span><span class="s2">&quot;</span>
+
+...
+</pre></div>
+<p>One thing that may seem puzzling at first is that if make this jar executable
+and try to run it you&#8217;ll see that, instead of offering you the well known
+options of the init scripts (Usage &#8230; start/stop/restart etc)  it will immediatelly
+run the application! This is because the embedded script is smart enough to
+check that it will be executed as an init script only when it is executed
+as a link from <tt class="docutils literal">/etc/init.d</tt> - else it will immediately run the&nbsp;application.</p>
+<p>If
+you want to quickly test that behavior, you may override the <tt class="docutils literal"><span class="caps">MODE</span></tt> parameter
+which forces the mode of operation of the jar. If you want to run it as a
+script (without using a links from /etc/ini.d) then just set <tt class="docutils literal"><span class="caps">MODE</span>=service</tt>.
+So, try&nbsp;runnin:</p>
+<pre class="code literal-block">
+&gt; MODE=service ./springapplication.jar
+Usage: ./hsk9eea.jar {start|stop|restart|force-reload|status|run}
+</pre>
+<p>Success! Of course, this is just for testing purposes, to actually deploy
+your application then please create a link to it from <tt class="docutils literal">/etc/init.d</tt> as
+proposed by the Spring Boot&nbsp;docs.</p>
+<p>If you want to <a class="reference external" href="http://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/htmlsingle/#deployment-script-customization">customize the init.d script</a>  you can use a file named
+<tt class="docutils literal">sprinbootapp.conf</tt> in the same directory as your <tt class="docutils literal">springbootapp.jar</tt>
+(i.e it should have the same name as your jar with an extension of .conf). The
+options from it will be sourced before running your application &#8212; for example
+you could set the active profile using <tt class="docutils literal">RUN_ARGS</tt>, however as I already
+recommended, explicitly setting it to a file named <tt class="docutils literal">config/applications.properties</tt>
+is&nbsp;preferrable.</p>
+</div>
+<div class="section" id="conclusion">
+<h2><a class="toc-backref" href="#toc-entry-11">Conclusion</a></h2>
+<p>Using the described file structure you should be able to fully configure Spring Boot and have all the
+goodies you&#8217;d expect from a modern framework: global settings, profiles, non-version control settings! Also, using the
+advanced profiles techniques (multiple profiles, profile enabled
+&#64;Components and &#64;Configurations) you&#8217;ll be able to implement
+some really complex configurations! Finally, you&#8217;ll be able to really
+quickly deploy the resulting jar as an init.d system&nbsp;service!</p>
+</div>
+</div>
+    <footer>
+<p class="meta">
+  <span class="byline author vcard">
+    Posted by <span class="fn">
+        Serafeim Papastefanos
+    </span>
+  </span>
+<time datetime="2016-03-31T19:20:00+03:00" pubdate>Thu 31 March 2016</time>  <span class="categories">
+    <a class='category' href='https://spapas.github.io/category/spring.html'>spring</a>
+  </span>
+  <span class="categories">
+    <a class="category" href="https://spapas.github.io/tag/spring.html">spring</a>,    <a class="category" href="https://spapas.github.io/tag/spring-boot.html">spring-boot</a>,    <a class="category" href="https://spapas.github.io/tag/java.html">java</a>,    <a class="category" href="https://spapas.github.io/tag/ldap.html">ldap</a>,    <a class="category" href="https://spapas.github.io/tag/profiles.html">profiles</a>,    <a class="category" href="https://spapas.github.io/tag/settings.html">settings</a>,    <a class="category" href="https://spapas.github.io/tag/properties.html">properties</a>,    <a class="category" href="https://spapas.github.io/tag/yaml.html">yaml</a>,    <a class="category" href="https://spapas.github.io/tag/configuration.html">configuration</a>,    <a class="category" href="https://spapas.github.io/tag/deploy.html">deploy</a>,    <a class="category" href="https://spapas.github.io/tag/initd.html">init.d</a>  </span>
+</p><div class="sharing">
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="https://spapas.github.io/2016/03/31/spring-boot-settings/" data-via="" data-counturl="https://spapas.github.io/2016/03/31/spring-boot-settings/" >Tweet</a>
+</div>    </footer>
+  </article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript></div>
+  </section>
+</div>
+<aside class="sidebar">
+  
+  <section>
+    <br />
+    <a href='/feeds/all.atom.xml'>Atom</a>
+    |
+    <a href='/feeds/all.rss.xml'>RSS</a>
+  </section>
+
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <!-- Sidebar unit -->
+  <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7673322832689008" data-ad-slot="2720624730"
+    data-ad-format="auto" data-full-width-responsive="true"></ins>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+
+
+  <script async src="https://cse.google.com/cse.js?cx=612920e5ca9da850c"></script>
+  <div class="gcse-search"></div>
+
+  
+  <section>
+    <h1>Support me</h1>
+
+    You can show your appreciation for anything useful you've found here by 
+    buying me a coffee 
+    <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="spapas" data-color="#FFDD00" data-emoji=""  data-font="Lato" data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff" ></script>
+
+    or donating me some bitcoin to this address:
+    <small><pre>bc1qx42vp8napheaewhnx0rk0mttdrdrtvw6czvxhl</pre></small>
+    <svg shape-rendering="crispEdges" height="200" width="200" viewBox="0 0 29 29" class="qrcode">
+      <path fill="#FFFFFF" d="M0,0 h29v29H0z"></path><path fill="#000000" d="M0 0h7v1H0zM9 0h2v1H9zM12 0h1v1H12zM14 0h2v1H14zM18 0h2v1H18zM22,0 h7v1H22zM0 1h1v1H0zM6 1h1v1H6zM8 1h1v1H8zM11 1h1v1H11zM14 1h5v1H14zM22 1h1v1H22zM28,1 h1v1H28zM0 2h1v1H0zM2 2h3v1H2zM6 2h1v1H6zM8 2h4v1H8zM17 2h1v1H17zM22 2h1v1H22zM24 2h3v1H24zM28,2 h1v1H28zM0 3h1v1H0zM2 3h3v1H2zM6 3h1v1H6zM9 3h2v1H9zM14 3h3v1H14zM18 3h1v1H18zM22 3h1v1H22zM24 3h3v1H24zM28,3 h1v1H28zM0 4h1v1H0zM2 4h3v1H2zM6 4h1v1H6zM8 4h1v1H8zM11 4h1v1H11zM13 4h1v1H13zM15 4h2v1H15zM18 4h1v1H18zM22 4h1v1H22zM24 4h3v1H24zM28,4 h1v1H28zM0 5h1v1H0zM6 5h1v1H6zM8 5h2v1H8zM14 5h2v1H14zM19 5h2v1H19zM22 5h1v1H22zM28,5 h1v1H28zM0 6h7v1H0zM8 6h1v1H8zM10 6h1v1H10zM12 6h1v1H12zM14 6h1v1H14zM16 6h1v1H16zM18 6h1v1H18zM20 6h1v1H20zM22,6 h7v1H22zM8 7h2v1H8zM11 7h1v1H11zM15 7h1v1H15zM17 7h2v1H17zM0 8h2v1H0zM3 8h1v1H3zM6 8h2v1H6zM10 8h1v1H10zM12 8h3v1H12zM20 8h1v1H20zM22 8h3v1H22zM26 8h2v1H26zM1 9h1v1H1zM3 9h3v1H3zM8 9h1v1H8zM10 9h1v1H10zM12 9h2v1H12zM16 9h2v1H16zM20 9h1v1H20zM22 9h1v1H22zM25 9h1v1H25zM27,9 h2v1H27zM0 10h1v1H0zM3 10h2v1H3zM6 10h1v1H6zM8 10h3v1H8zM12 10h2v1H12zM16 10h1v1H16zM19 10h1v1H19zM22 10h3v1H22zM27 10h1v1H27zM0 11h1v1H0zM2 11h1v1H2zM4 11h2v1H4zM7 11h1v1H7zM13 11h4v1H13zM18 11h4v1H18zM26 11h2v1H26zM0 12h1v1H0zM2 12h3v1H2zM6 12h1v1H6zM11 12h1v1H11zM13 12h1v1H13zM15 12h3v1H15zM20 12h1v1H20zM22 12h2v1H22zM27,12 h2v1H27zM4 13h1v1H4zM8 13h3v1H8zM12 13h1v1H12zM14 13h1v1H14zM17 13h4v1H17zM25 13h2v1H25zM0 14h1v1H0zM4 14h3v1H4zM8 14h2v1H8zM11 14h3v1H11zM16 14h1v1H16zM21 14h2v1H21zM24,14 h5v1H24zM3 15h3v1H3zM7 15h2v1H7zM10 15h1v1H10zM12 15h2v1H12zM15 15h1v1H15zM17 15h2v1H17zM20 15h2v1H20zM23 15h1v1H23zM1 16h1v1H1zM4 16h1v1H4zM6 16h4v1H6zM16 16h2v1H16zM20 16h1v1H20zM23 16h1v1H23zM25 16h1v1H25zM28,16 h1v1H28zM2 17h1v1H2zM5 17h1v1H5zM7 17h2v1H7zM11 17h3v1H11zM17 17h1v1H17zM22 17h1v1H22zM25 17h1v1H25zM27,17 h2v1H27zM0 18h1v1H0zM3 18h1v1H3zM5 18h4v1H5zM10 18h1v1H10zM12 18h1v1H12zM18 18h1v1H18zM20 18h1v1H20zM22 18h2v1H22zM25,18 h4v1H25zM2 19h3v1H2zM8 19h1v1H8zM16 19h2v1H16zM21 19h1v1H21zM23 19h1v1H23zM25 19h1v1H25zM27 19h1v1H27zM0 20h1v1H0zM2 20h5v1H2zM8 20h2v1H8zM13 20h4v1H13zM19 20h6v1H19zM26 20h1v1H26zM28,20 h1v1H28zM8 21h2v1H8zM12 21h3v1H12zM16 21h1v1H16zM20 21h1v1H20zM24 21h1v1H24zM26,21 h3v1H26zM0 22h7v1H0zM8 22h3v1H8zM17 22h1v1H17zM20 22h1v1H20zM22 22h1v1H22zM24 22h2v1H24zM27 22h1v1H27zM0 23h1v1H0zM6 23h1v1H6zM10 23h2v1H10zM13 23h2v1H13zM19 23h2v1H19zM24,23 h5v1H24zM0 24h1v1H0zM2 24h3v1H2zM6 24h1v1H6zM9 24h2v1H9zM12 24h2v1H12zM17 24h1v1H17zM20 24h6v1H20zM28,24 h1v1H28zM0 25h1v1H0zM2 25h3v1H2zM6 25h1v1H6zM8 25h3v1H8zM12 25h1v1H12zM14 25h1v1H14zM18 25h1v1H18zM22 25h3v1H22zM26 25h1v1H26zM0 26h1v1H0zM2 26h3v1H2zM6 26h1v1H6zM10 26h5v1H10zM16 26h3v1H16zM21 26h1v1H21zM24 26h1v1H24zM26 26h1v1H26zM28,26 h1v1H28zM0 27h1v1H0zM6 27h1v1H6zM8 27h3v1H8zM12 27h4v1H12zM17 27h1v1H17zM20 27h1v1H20zM23 27h2v1H23zM27 27h1v1H27zM0 28h7v1H0zM8 28h3v1H8zM14 28h1v1H14zM16 28h3v1H16zM20 28h1v1H20zM22 28h1v1H22zM24 28h2v1H24zM27 28h1v1H27z"></path>
+    </svg>
+  </section>
+  
+
+  <section>
+    <h1>Subscribe</h1>
+    Do you want to get notified via email when I post new content?
+    <style>
+      .subscribe-button {
+        /* margin: 10px !important; */
+        padding: 10px !important;
+        background-color: black;
+        display: inline-block;
+        color: white !important;
+        text-decoration: none;
+
+        line-height: 36px !important;
+        height: 37px !important;
+        text-decoration: none !important;
+        display: inline-block !important;
+        color: #ffffff !important;
+        background-color: #000000 !important;
+        border-radius: 3px !important;
+        border: 1px solid transparent !important;
+        padding: 1px 9px !important;
+        font-size: 23px !important;
+        letter-spacing: 0.6px !important;
+        box-shadow: 0px 1px 2px rgba(190, 190, 190, 0.5) !important;
+        -webkit-box-shadow: 0px 1px 2px 2px rgba(190, 190, 190, 0.5) !important;
+        margin: 0 auto !important;
+        font-family: 'Cookie', cursive !important;
+        -webkit-box-sizing: border-box !important;
+        box-sizing: border-box !important;
+        -o-transition: 0.3s all linear !important;
+        -webkit-transition: 0.3s all linear !important;
+        -moz-transition: 0.3s all linear !important;
+        -ms-transition: 0.3s all linear !important;
+        transition: 0.3s all linear !important;
+
+      }
+    </style>
+    <a class='subscribe-button' target="_blank" href="http://eepurl.com/dxI3PP">Click here to subscribe!</a>
+  </section>
+
+
+  <section>
+    <h1>Recent Posts</h1>
+    <ul id="recent_posts">
+      <li class="post">
+        <a href="https://spapas.github.io/2024/08/22/multiple-erl-elixir-windows/">Multiple Erlang/Elixir versions in Windows</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/11/29/openid-connect-tutorial/">A simple OpenID connect tutorial</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/05/23/simple-django-datatables-integration/">Simple Django - DataTables integration</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/05/22/ai-auto-subtitling/">AI auto-subtitling</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/05/12/disable-your-forms/">HTML form disable after submit</a>
+      </li>
+    </ul>
+  </section>
+  <section>
+
+    <h1>Categories</h1>
+    <ul id="recent_posts">
+      <li><a href="https://spapas.github.io/category/ai.html">ai</a></li>
+      <li><a href="https://spapas.github.io/category/android.html">android</a></li>
+      <li><a href="https://spapas.github.io/category/clojure.html">clojure</a></li>
+      <li><a href="https://spapas.github.io/category/css.html">css</a></li>
+      <li><a href="https://spapas.github.io/category/django.html">django</a></li>
+      <li><a href="https://spapas.github.io/category/elixir.html">elixir</a></li>
+      <li><a href="https://spapas.github.io/category/flask.html">flask</a></li>
+      <li><a href="https://spapas.github.io/category/gaming.html">gaming</a></li>
+      <li><a href="https://spapas.github.io/category/git.html">git</a></li>
+      <li><a href="https://spapas.github.io/category/html.html">html</a></li>
+      <li><a href="https://spapas.github.io/category/javascript.html">javascript</a></li>
+      <li><a href="https://spapas.github.io/category/networking.html">networking</a></li>
+      <li><a href="https://spapas.github.io/category/pelican.html">pelican</a></li>
+      <li><a href="https://spapas.github.io/category/postgresql.html">postgresql</a></li>
+      <li><a href="https://spapas.github.io/category/python.html">python</a></li>
+      <li><a href="https://spapas.github.io/category/spring.html">spring</a></li>
+      <li><a href="https://spapas.github.io/category/unix.html">unix</a></li>
+      <li><a href="https://spapas.github.io/category/wagtail.html">wagtail</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Tags</h1>
+    <a href="https://spapas.github.io/tag/erlang.html">erlang</a>,    <a href="https://spapas.github.io/tag/elixir.html">elixir</a>,    <a href="https://spapas.github.io/tag/windows.html">windows</a>,    <a href="https://spapas.github.io/tag/openid.html">openid</a>,    <a href="https://spapas.github.io/tag/openid-connect.html">openid-connect</a>,    <a href="https://spapas.github.io/tag/oidc.html">oidc</a>,    <a href="https://spapas.github.io/tag/http.html">http</a>,    <a href="https://spapas.github.io/tag/keycloak.html">keycloak</a>,    <a href="https://spapas.github.io/tag/python.html">python</a>,    <a href="https://spapas.github.io/tag/django.html">django</a>,    <a href="https://spapas.github.io/tag/jquery.html">jquery</a>,    <a href="https://spapas.github.io/tag/datatables.html">datatables</a>,    <a href="https://spapas.github.io/tag/ai.html">ai</a>,    <a href="https://spapas.github.io/tag/whisper.html">whisper</a>,    <a href="https://spapas.github.io/tag/whispercpp.html">whisper.cpp</a>,    <a href="https://spapas.github.io/tag/subtitles.html">subtitles</a>,    <a href="https://spapas.github.io/tag/video.html">video</a>,    <a href="https://spapas.github.io/tag/auto-subtitling.html">auto-subtitling</a>,    <a href="https://spapas.github.io/tag/subtitiling.html">subtitiling</a>,    <a href="https://spapas.github.io/tag/transcribe.html">transcribe</a>,    <a href="https://spapas.github.io/tag/html.html">html</a>,    <a href="https://spapas.github.io/tag/javascript.html">javascript</a>,    <a href="https://spapas.github.io/tag/media.html">media</a>,    <a href="https://spapas.github.io/tag/storage.html">storage</a>,    <a href="https://spapas.github.io/tag/unpoly.html">unpoly</a>,    <a href="https://spapas.github.io/tag/access.html">access</a>,    <a href="https://spapas.github.io/tag/database.html">database</a>,    <a href="https://spapas.github.io/tag/accdb.html">accdb</a>,    <a href="https://spapas.github.io/tag/mdb.html">mdb</a>,    <a href="https://spapas.github.io/tag/postgresql.html">postgresql</a>,    <a href="https://spapas.github.io/tag/development.html">development</a>,    <a href="https://spapas.github.io/tag/inlines.html">inlines</a>,    <a href="https://spapas.github.io/tag/clojure.html">clojure</a>,    <a href="https://spapas.github.io/tag/cmd.html">cmd</a>,    <a href="https://spapas.github.io/tag/pdf.html">pdf</a>,    <a href="https://spapas.github.io/tag/wkhtmltopdf.html">wkhtmltopdf</a>,    <a href="https://spapas.github.io/tag/forward-proxy.html">forward-proxy</a>,    <a href="https://spapas.github.io/tag/reverse-proxy.html">reverse-proxy</a>,    <a href="https://spapas.github.io/tag/proxy.html">proxy</a>,    <a href="https://spapas.github.io/tag/networking.html">networking</a>,    <a href="https://spapas.github.io/tag/dj-rest-auth.html">dj-rest-auth</a>,    <a href="https://spapas.github.io/tag/rest.html">rest</a>,    <a href="https://spapas.github.io/tag/django-rest-framework.html">django-rest-framework</a>,    <a href="https://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="https://spapas.github.io/tag/tokens.html">tokens</a>,    <a href="https://spapas.github.io/tag/migrations.html">migrations</a>,    <a href="https://spapas.github.io/tag/foreignkey.html">foreignkey</a>,    <a href="https://spapas.github.io/tag/dark-souls.html">dark-souls</a>,    <a href="https://spapas.github.io/tag/dark-souls-2.html">dark-souls-2</a>,    <a href="https://spapas.github.io/tag/dark-souls-3.html">dark-souls-3</a>,    <a href="https://spapas.github.io/tag/autohotkey.html">autohotkey</a>,    <a href="https://spapas.github.io/tag/matplotlib.html">matplotlib</a>,    <a href="https://spapas.github.io/tag/hashids.html">hashids</a>,    <a href="https://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="https://spapas.github.io/tag/osmon.html">osmon</a>,    <a href="https://spapas.github.io/tag/phoenix.html">phoenix</a>,    <a href="https://spapas.github.io/tag/os-monitoring.html">os-monitoring</a>,    <a href="https://spapas.github.io/tag/forms.html">forms</a>,    <a href="https://spapas.github.io/tag/django-crispy-forms.html">django-crispy-forms</a>,    <a href="https://spapas.github.io/tag/django-widget-tweaks.html">django-widget-tweaks</a>,    <a href="https://spapas.github.io/tag/ecto.html">ecto</a>,    <a href="https://spapas.github.io/tag/queries.html">queries</a>,    <a href="https://spapas.github.io/tag/declarative.html">declarative</a>,    <a href="https://spapas.github.io/tag/form.html">form</a>,    <a href="https://spapas.github.io/tag/php.html">php</a>,    <a href="https://spapas.github.io/tag/select2.html">select2</a>,    <a href="https://spapas.github.io/tag/autocompelte.html">autocompelte</a>,    <a href="https://spapas.github.io/tag/ajax.html">ajax</a>,    <a href="https://spapas.github.io/tag/android.html">android</a>,    <a href="https://spapas.github.io/tag/kotlin.html">kotlin</a>,    <a href="https://spapas.github.io/tag/adapter.html">adapter</a>,    <a href="https://spapas.github.io/tag/filter.html">filter</a>,    <a href="https://spapas.github.io/tag/async.html">async</a>,    <a href="https://spapas.github.io/tag/tasks.html">tasks</a>,    <a href="https://spapas.github.io/tag/django-rq.html">django-rq</a>,    <a href="https://spapas.github.io/tag/rq.html">rq</a>,    <a href="https://spapas.github.io/tag/du.html">du</a>,    <a href="https://spapas.github.io/tag/unix.html">unix</a>,    <a href="https://spapas.github.io/tag/linux.html">linux</a>,    <a href="https://spapas.github.io/tag/disk-usage.html">disk-usage</a>,    <a href="https://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="https://spapas.github.io/tag/middleware.html">middleware</a>,    <a href="https://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="https://spapas.github.io/tag/react.html">react</a>,    <a href="https://spapas.github.io/tag/redux.html">redux</a>,    <a href="https://spapas.github.io/tag/hyperapp.html">hyperapp</a>,    <a href="https://spapas.github.io/tag/immutable.html">immutable</a>,    <a href="https://spapas.github.io/tag/es6.html">es6</a>,    <a href="https://spapas.github.io/tag/youtube.html">youtube</a>,    <a href="https://spapas.github.io/tag/youtube-dl.html">youtube-dl</a>,    <a href="https://spapas.github.io/tag/ffmpeg.html">ffmpeg</a>,    <a href="https://spapas.github.io/tag/django-rest-auth.html">django-rest-auth</a>,    <a href="https://spapas.github.io/tag/python-2.html">python-2</a>,    <a href="https://spapas.github.io/tag/python-3.html">python-3</a>,    <a href="https://spapas.github.io/tag/plpgsql.html">plpgsql</a>,    <a href="https://spapas.github.io/tag/component.html">component</a>,    <a href="https://spapas.github.io/tag/ag-grid.html">ag-grid</a>,    <a href="https://spapas.github.io/tag/grid.html">grid</a>,    <a href="https://spapas.github.io/tag/bash.html">bash</a>,    <a href="https://spapas.github.io/tag/cron.html">cron</a>,    <a href="https://spapas.github.io/tag/pandas.html">pandas</a>,    <a href="https://spapas.github.io/tag/scipy.html">scipy</a>,    <a href="https://spapas.github.io/tag/numpy.html">numpy</a>,    <a href="https://spapas.github.io/tag/pivot.html">pivot</a>,    <a href="https://spapas.github.io/tag/pivot_table.html">pivot_table</a>,    <a href="https://spapas.github.io/tag/ipython.html">ipython</a>,    <a href="https://spapas.github.io/tag/jupyter.html">jupyter</a>,    <a href="https://spapas.github.io/tag/notebook.html">notebook</a>,    <a href="https://spapas.github.io/tag/query.html">query</a>,    <a href="https://spapas.github.io/tag/q.html">q</a>,    <a href="https://spapas.github.io/tag/imgur.html">imgur</a>,    <a href="https://spapas.github.io/tag/console.html">console</a>,    <a href="https://spapas.github.io/tag/research.html">research</a>,    <a href="https://spapas.github.io/tag/debug.html">debug</a>,    <a href="https://spapas.github.io/tag/werkzeug.html">werkzeug</a>,    <a href="https://spapas.github.io/tag/django-extensions.html">django-extensions</a>,    <a href="https://spapas.github.io/tag/404.html">404</a>,    <a href="https://spapas.github.io/tag/error.html">error</a>,    <a href="https://spapas.github.io/tag/spring.html">spring</a>,    <a href="https://spapas.github.io/tag/spring-boot.html">spring-boot</a>,    <a href="https://spapas.github.io/tag/java.html">java</a>,    <a href="https://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="https://spapas.github.io/tag/profiles.html">profiles</a>,    <a href="https://spapas.github.io/tag/settings.html">settings</a>,    <a href="https://spapas.github.io/tag/properties.html">properties</a>,    <a href="https://spapas.github.io/tag/yaml.html">yaml</a>,    <a href="https://spapas.github.io/tag/configuration.html">configuration</a>,    <a href="https://spapas.github.io/tag/deploy.html">deploy</a>,    <a href="https://spapas.github.io/tag/initd.html">init.d</a>,    <a href="https://spapas.github.io/tag/react-redux.html">react-redux</a>,    <a href="https://spapas.github.io/tag/redux-thunk.html">redux-thunk</a>,    <a href="https://spapas.github.io/tag/redux-form.html">redux-form</a>,    <a href="https://spapas.github.io/tag/react-router.html">react-router</a>,    <a href="https://spapas.github.io/tag/react-router-redux.html">react-router-redux</a>,    <a href="https://spapas.github.io/tag/react-notification.html">react-notification</a>,    <a href="https://spapas.github.io/tag/history.html">history</a>,    <a href="https://spapas.github.io/tag/babel.html">babel</a>,    <a href="https://spapas.github.io/tag/babelify.html">babelify</a>,    <a href="https://spapas.github.io/tag/browserify.html">browserify</a>,    <a href="https://spapas.github.io/tag/watchify.html">watchify</a>,    <a href="https://spapas.github.io/tag/uglify.html">uglify</a>,    <a href="https://spapas.github.io/tag/boilerplate.html">boilerplate</a>,    <a href="https://spapas.github.io/tag/tutorial.html">tutorial</a>,    <a href="https://spapas.github.io/tag/introduction.html">introduction</a>,    <a href="https://spapas.github.io/tag/fixed-data-tables.html">fixed-data-tables</a>,    <a href="https://spapas.github.io/tag/fixeddatatable.html">FixedDataTable</a>,    <a href="https://spapas.github.io/tag/reportlab.html">reportlab</a>,    <a href="https://spapas.github.io/tag/xhtml2pdf.html">xhtml2pdf</a>,    <a href="https://spapas.github.io/tag/node.html">node</a>,    <a href="https://spapas.github.io/tag/npm.html">npm</a>,    <a href="https://spapas.github.io/tag/generic.html">generic</a>,    <a href="https://spapas.github.io/tag/tables.html">tables</a>,    <a href="https://spapas.github.io/tag/flux.html">flux</a>,    <a href="https://spapas.github.io/tag/jobs.html">jobs</a>,    <a href="https://spapas.github.io/tag/asynchronous.html">asynchronous</a>,    <a href="https://spapas.github.io/tag/scheduling.html">scheduling</a>,    <a href="https://spapas.github.io/tag/redis.html">redis</a>,    <a href="https://spapas.github.io/tag/pusher.html">pusher</a>,    <a href="https://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="https://spapas.github.io/tag/css.html">css</a>,    <a href="https://spapas.github.io/tag/design.html">design</a>,    <a href="https://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>,    <a href="https://spapas.github.io/tag/less.html">less</a>,    <a href="https://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="https://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="https://spapas.github.io/tag/security.html">security</a>,    <a href="https://spapas.github.io/tag/google.html">google</a>,    <a href="https://spapas.github.io/tag/flask.html">flask</a>,    <a href="https://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="https://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="https://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="https://spapas.github.io/tag/git.html">git</a>,    <a href="https://spapas.github.io/tag/github.html">github</a>,    <a href="https://spapas.github.io/tag/branching.html">branching</a>,    <a href="https://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="https://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="https://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="https://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="https://spapas.github.io/tag/rst.html">rst</a>  </section>
+
+  <section>
+    <h1>Yearly archives</h1>
+    <a href="https://spapas.github.io/posts/2013/">2013</a>,    <a href="https://spapas.github.io/posts/2014/">2014</a>,    <a href="https://spapas.github.io/posts/2015/">2015</a>,    <a href="https://spapas.github.io/posts/2016/">2016</a>,    <a href="https://spapas.github.io/posts/2017/">2017</a>,    <a href="https://spapas.github.io/posts/2018/">2018</a>,    <a href="https://spapas.github.io/posts/2019/">2019</a>,    <a href="https://spapas.github.io/posts/2020/">2020</a>,    <a href="https://spapas.github.io/posts/2021/">2021</a>,    <a href="https://spapas.github.io/posts/2022/">2022</a>,    <a href="https://spapas.github.io/posts/2023/">2023</a>,    <a href="https://spapas.github.io/posts/2024/">2024</a>  </section>
+
+
+
+  <section>
+    <h1>GitHub Repos</h1>
+    <ul id="gh_repos">
+      <li class="loading">Status updating...</li>
+    </ul>
+      <a href="https://github.com/spapas">@spapas</a> on GitHub
+    <script  src="//code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      $(function(){
+          if (!window.jXHR){
+              var jxhr = document.createElement('script');
+              jxhr.type = 'text/javascript';
+              jxhr.src = 'https://spapas.github.io/theme/js/jXHR.js';
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(jxhr, s);
+          }
+
+          github.showRepos({
+              user: 'spapas',
+              count: 5,
+              skip_forks: true,
+              target: '#gh_repos'
+          });
+      });
+    </script>
+    <script src="https://spapas.github.io/theme/js/github.js" type="text/javascript"> </script>
+  </section>
+
+
+  <section>
+    <a href="https://twitter.com/_serafeim_?ref_src=twsrc%5Etfw" class="twitter-follow-button"
+      data-show-count="false">Follow @_serafeim_</a>
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+  </section>
+
+</aside>    </div>
+  </div>
+  <footer role="contentinfo"><p>
+    Copyright &copy;  2013&ndash;2024  Serafeim Papastefanos &mdash;
+  <span class="credit">Powered by <a href="http://getpelican.com">Pelican</a></span>
+</p></footer>
+  <script src="https://spapas.github.io/theme/js/modernizr-2.0.js"></script>
+  <script src="https://spapas.github.io/theme/js/ender.js"></script>
+  <script src="https://spapas.github.io/theme/js/octopress.js" type="text/javascript"></script>
+  <script src="https://spapas.github.io/theme/js/ads.js"></script>
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-44750952-1', 'auto');
+
+    ga('send', 'pageview');
+    </script>
+
+<script defer data-domain="spapas.github.io" src="https://plausible.hcg.gr/js/script.js"></script>  <script type="text/javascript">
+    var disqus_shortname = 'spapas-github-io';
+    var disqus_identifier = '/2016/03/31/spring-boot-settings/';
+    var disqus_url = 'https://spapas.github.io/2016/03/31/spring-boot-settings/';
+    var disqus_title = 'Configuring Spring&nbsp;Boot';
+    (function() {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = "//" + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+     })();
+  </script>
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+</body>
+
+</html>

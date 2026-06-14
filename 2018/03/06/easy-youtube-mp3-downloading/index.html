@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="google-site-verification" content="5_8DTmIiEq4gFvNAfxAD6TsGOgrMAjp8lQFQvfA6zZc" />
+    <title>Easy downloading youtube videos and mp3s using youtube-dl and python &mdash; /var/</title>
+    <meta name="author" content="Serafeim Papastefanos">
+
+
+    
+<style type="text/css">
+pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: var(--jp-cell-editor-active-background) }
+.highlight { background: var(--jp-cell-editor-background); color: var(--jp-mirror-editor-variable-color) }
+.highlight .c { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment */
+.highlight .err { color: var(--jp-mirror-editor-error-color) } /* Error */
+.highlight .k { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword */
+.highlight .o { color: var(--jp-mirror-editor-operator-color); font-weight: bold } /* Operator */
+.highlight .p { color: var(--jp-mirror-editor-punctuation-color) } /* Punctuation */
+.highlight .ch { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Preproc */
+.highlight .cpf { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Single */
+.highlight .cs { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Special */
+.highlight .kc { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Pseudo */
+.highlight .kr { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Type */
+.highlight .m { color: var(--jp-mirror-editor-number-color) } /* Literal.Number */
+.highlight .s { color: var(--jp-mirror-editor-string-color) } /* Literal.String */
+.highlight .ow { color: var(--jp-mirror-editor-operator-color); font-weight: bold } /* Operator.Word */
+.highlight .pm { color: var(--jp-mirror-editor-punctuation-color) } /* Punctuation.Marker */
+.highlight .w { color: var(--jp-mirror-editor-variable-color) } /* Text.Whitespace */
+.highlight .mb { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Bin */
+.highlight .mf { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Float */
+.highlight .mh { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Hex */
+.highlight .mi { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Integer */
+.highlight .mo { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Oct */
+.highlight .sa { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Affix */
+.highlight .sb { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Backtick */
+.highlight .sc { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Char */
+.highlight .dl { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Delimiter */
+.highlight .sd { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Doc */
+.highlight .s2 { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Double */
+.highlight .se { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Escape */
+.highlight .sh { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Heredoc */
+.highlight .si { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Interpol */
+.highlight .sx { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Other */
+.highlight .sr { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Regex */
+.highlight .s1 { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Single */
+.highlight .ss { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Symbol */
+.highlight .il { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Integer.Long */
+</style>
+
+<style type="text/css">
+/* Overrides of notebook CSS for static HTML export */
+div.entry-content {
+  overflow: visible;
+  padding: 8px;
+}
+.input_area {
+  padding: 0.2em;
+}
+
+a.heading-anchor {
+ white-space: normal;
+}
+
+.rendered_html
+code {
+ font-size: .8em;
+}
+
+pre.ipynb {
+  color: black;
+  background: #f7f7f7;
+  border: none;
+  box-shadow: none;
+  margin-bottom: 0;
+  padding: 0;
+  margin: 0px;
+  font-size: 13px;
+}
+
+/* remove the prompt div from text cells */
+div.text_cell .prompt {
+    display: none;
+}
+
+/* remove horizontal padding from text cells, */
+/* so it aligns with outer body text */
+div.text_cell_render {
+    padding: 0.5em 0em;
+}
+
+img.anim_icon{padding:0; border:0; vertical-align:middle; -webkit-box-shadow:none; -box-shadow:none}
+
+div.collapseheader {
+    width=100%;
+    background-color:#d3d3d3;
+    padding: 2px;
+    cursor: pointer;
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+</style>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true,
+        displayMath: [['$$','$$'], ["\\[","\\]"]]
+    }
+});
+</script>
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+    $("div.collapseheader").click(function () {
+    $header = $(this).children("span").first();
+    $codearea = $(this).children(".input_area");
+    console.log($(this).children());
+    $codearea.slideToggle(500, function () {
+        $header.text(function () {
+            return $codearea.is(":visible") ? "Collapse Code" : "Expand Code";
+        });
+    });
+});
+});
+</script>
+
+
+
+
+
+
+    <!-- http://t.co/dKP3o1e -->
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+    <link href="https://spapas.github.io/favicon.png" rel="icon">
+
+    <link href="https://spapas.github.io/theme/css/main.css" media="screen, projection" rel="stylesheet"
+      type="text/css">
+
+    <link href="https://spapas.github.io/theme/css/extra_style.css" media="screen, projection" rel="stylesheet"
+      type="text/css">
+
+    <link href="https://fonts.googleapis.com/css?family=Fira+Mono|Fira+Sans:400,700&amp;subset=greek" rel="stylesheet">
+
+<style>
+#gHPzseYvFrhZ123 {
+  padding: 5px !important;
+  display: block;
+  margin-bottom: 10px !important;
+  background: #900;
+  color: #fff;
+  border-radius: 5px;
+  font-size: 1.0rem !important;
+}
+</style>
+
+
+  <script>
+    
+      
+  </script>
+
+    <script data-ad-client="ca-pub-7673322832689008" async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
+      onerror="adBlockFunction();"></script>
+  </head>
+
+<body>
+  <header role="banner"><hgroup>
+  <h1><a href="https://spapas.github.io/">/var/</a></h1>
+    <h2>Various programming stuff</h2>
+</hgroup></header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+</ul>
+
+
+<ul class="main-navigation">
+      <li >
+        <a href="https://spapas.github.io/category/ai.html">Ai</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/android.html">Android</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/clojure.html">Clojure</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/css.html">Css</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/django.html">Django</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/elixir.html">Elixir</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/flask.html">Flask</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/gaming.html">Gaming</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/git.html">Git</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/html.html">Html</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/javascript.html">Javascript</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/networking.html">Networking</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/pelican.html">Pelican</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/postgresql.html">Postgresql</a>
+      </li>
+      <li class="active">
+        <a href="https://spapas.github.io/category/python.html">Python</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/spring.html">Spring</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/unix.html">Unix</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/wagtail.html">Wagtail</a>
+      </li>
+</ul></nav>
+  <div id="main">
+    <div id="content">
+    <div id="gHPzseYvFrhZ123">
+      Hello! If you are using an ad blocker but find something useful here 
+      and want to support me please consider disabling your ad blocker for this site. 
+      <br />
+      <br />
+      Thank you,<br />
+      Serafeim
+      
+    </div>
+<div>
+  <article class="hentry" role="article">
+<header>
+      <h1 class="entry-title">Easy downloading youtube videos and mp3s using youtube-dl and python</h1>
+    <p class="meta">
+<time datetime="2018-03-06T12:20:00+02:00" pubdate>Tue 06 March 2018</time>    </p>
+</header>
+
+<div class="entry-content"><p>In this article I am going to present you with an easy (and advertisement/malware free) way to download
+videos from youtube, converting them to mp3 if needed. Also, I will give some more useful hints, for
+example how to download multiple mp3s using a script, how to break a long mp3 to same-length parts
+so you could quickly skip tracks when you play it in your stereo&nbsp;etc.</p>
+<p>I am going to give specific instructions for Windows users - however everything I&#8217;ll propose should also be applicable
+to <span class="caps">OSX</span> or Linux users with minor&nbsp;modifications.</p>
+<p>The tools we are going to use&nbsp;are:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://rg3.github.io/youtube-dl/">youtube-dl</a> which is a python library for downloading videos from youtube (and some other&nbsp;sites)</li>
+<li><a class="reference external" href="https://www.ffmpeg.org">ffmpeg</a> which is a passepartout video/audio editing&nbsp;library</li>
+</ul>
+<div class="section" id="installation">
+<h2>Installation</h2>
+<p>To install youtube-dl I recommend installing it in your global python (2 or 3) package list using pip. Please read my
+<a class="reference external" href="https://spapas.github.io/2017/12/20/python-2-3-windows/">previous</a>&nbsp;article</p>
+<p>to see how you should install and use Python 2 or 3
+on Windows. Following the instructions from there, you can do the following to install youtube-dl in your global
+Python 3&nbsp;packages:</p>
+<pre class="code literal-block">
+py -3 -m pip install youtube-dl
+</pre>
+<p>To run youtube-dl you&#8217;ll write something like <tt class="docutils literal">py <span class="pre">-3</span> <span class="pre">-m</span> youtube_dl url_or_video_id</tt> (notice the underscore instead of dash since
+dashes are not supported in module names in python). For example try something like this <tt class="docutils literal">py <span class="pre">-3</span> <span class="pre">-m</span> youtube_dl YgtL4S7Hrwo</tt> and you&#8217;ll
+be rewarded with the 2016 Pycon talk from Guido van Rossum! If you find this a little too much too type don&#8217;t be afraid, I will give
+some hints later about how to improve&nbsp;this.</p>
+<p>To upgrade your youtube-dl installation you should do something like&nbsp;this:</p>
+<pre class="code literal-block">
+py -3 -m pip install -U youtube-dl
+</pre>
+<p>Notice that you must frequently upgrade your youtube-dl installation because sometimes youtube changes the requirements
+for viewing / downloading videos and your old version will not work. So if for some reason something is not correct when
+you use youtube-dl always try updating&nbsp;first.</p>
+<p>If you wanted you could also create a virtual environment (see instructions on previously mentioned article) and install youtube-dl locally there using <tt class="docutils literal">pip install <span class="pre">youtube-dl</span></tt>
+however I prefer to install it on the global packages to be really easy for me to call it from a command prompt I open. Notice
+that if you install youtube-dl in a virtualenv, after you activate that virtualenv you&#8217;ll be able to run it just by typing <tt class="docutils literal"><span class="pre">youtube-dl</span></tt>.</p>
+<p>Finally, If for some reason you don&#8217;t want want to mess with python and all this (or it just seems greek to you) then you
+may go on and directly download a <a class="reference external" href="https://yt-dl.org/latest/youtube-dl.exe">youtube-dl windows executable</a>. Just put it in your path and you should be good to&nbsp;go.</p>
+<p>To install ffmpeg, I recommend <a class="reference external" href="https://ffmpeg.zeranoe.com/builds/">downloading the Windows build from here</a> (select the correct Windows architecture of your system and
+always static linking - the version doesn&#8217;t matter). This will get you a zip - we are mainly interested to the three files under the
+<tt class="docutils literal">bin</tt> folder of that zip which should be copied to a directory under your&nbsp;path:</p>
+<ul class="simple">
+<li>ffmpeg is the passepartout video converting toot that we are going to&nbsp;use</li>
+<li>ffprobe will print some information about a file (about its container and video/audio&nbsp;streams)</li>
+<li>ffplay will play the file &#8212; not really recommended there are better tools but it is invaluable
+for testing; if it can be played be ffplay then ffmpeg will be able to properly read your&nbsp;file</li>
+</ul>
+<p>Notice I recommend copying things to a directory in your path. This is recommended and will save you from repeatedly typing the same things
+over and over. Also, later I will propose a bunch of <span class="caps">DOS</span> batch (.bat) files that can also be copied to that directory and help you even
+more in you youtube video downloading. To add a directory to the <span class="caps">PATH</span>, just press Windows+Pause Break, Advanced System Settings, Advanced,
+Environment Variables, edit the &#8220;Path&#8221; User variable (for your user) and append the directory&nbsp;there.</p>
+</div>
+<div class="section" id="using-youtube-dl">
+<h2>Using&nbsp;youtube-dl</h2>
+<p>As I&#8217;ve already explained before, to run youtube-dl you&#8217;ll either write something like <tt class="docutils literal">py <span class="pre">-3</span> <span class="pre">-m</span> youtube_dl</tt> (if you&#8217;ve installed it
+to your global python packages) or run youtube-dl if you&#8217;ve downloaded the pre-built exe or have installed it in a virtualenv. To save
+you from some keystrokes, you can create a batch file that will run and pass any more parameters to it, something like&nbsp;this:</p>
+<pre class="code literal-block">
+py -3 -m youtube_dl %*
+</pre>
+<p>(the %* will capture the remaining command line) so to get the previous video just run <tt class="docutils literal">getvideo YgtL4S7Hrwo</tt>
+(or getvideo <a class="reference external" href="https://www.youtube.com/watch?v=YgtL4S7Hrwo">https://www.youtube.com/watch?v=YgtL4S7Hrwo</a> - works the same with the video id or the complete&nbsp;url).</p>
+<p>One thing I&#8217;d like to mention here is that youtube-dl works fine with playlists and even channels. For example,
+to download all videos from PyCon 2017 just do&nbsp;this:</p>
+<p><tt class="docutils literal">getvideo <span class="pre">https://www.youtube.com/channel/UCrJhliKNQ8g0qoE_zvL8eVg/feed</span></tt> and you should see something&nbsp;like:</p>
+<pre class="code literal-block">
+E:\&gt;py -3 -m youtube_dl https://www.youtube.com/channel/UCrJhliKNQ8g0qoE_zvL8eVg/feed
+[youtube:channel] UCrJhliKNQ8g0qoE_zvL8eVg: Downloading channel page
+[youtube:playlist] UUrJhliKNQ8g0qoE_zvL8eVg: Downloading webpage
+[download] Downloading playlist: Uploads from PyCon 2017
+[youtube:playlist] UUrJhliKNQ8g0qoE_zvL8eVg: Downloading page #1
+[youtube:playlist] playlist Uploads from PyCon 2017: Downloading 143 videos
+[download] Downloading video 1 of 143
+[youtube] AjFfsOA7AQI: Downloading webpage
+[youtube] AjFfsOA7AQI: Downloading video info webpage
+[youtube] AjFfsOA7AQI: Extracting video information
+WARNING: Requested formats are incompatible for merge and will be merged into mkv.
+[download] Destination: Final remarks and conference close  - Pycon 2017-AjFfsOA7AQI.f137.mp4
+[download]   2.9% of 34.49MiB at 940.52KiB/s ETA 00:36
+</pre>
+<p>This is gonna take some time&nbsp;&#8230;</p>
+<p>Now, youtube-dl has <a class="reference external" href="https://github.com/rg3/youtube-dl/blob/master/README.md#options">many options</a> and can be configured with <a class="reference external" href="https://github.com/rg3/youtube-dl/blob/master/README.md#configuration">default values</a> depending on your
+requirements. I won&#8217;t go into detail about these except on some things I usually use, if you
+need some help feel free to ask&nbsp;me.</p>
+<p>When you download a video, youtube-dl will try to download the best quality possible for that video,
+however a video may have various different formats that can be queries by passing the option <tt class="docutils literal"><span class="pre">--list-formats</span></tt>
+to ffmpeg, for example here&#8217;s the output from the previously mentioned&nbsp;video:</p>
+<pre class="code literal-block">
+E:\&gt;getvideo YgtL4S7Hrwo --list-formats
+[youtube] YgtL4S7Hrwo: Downloading webpage
+[youtube] YgtL4S7Hrwo: Downloading video info webpage
+[youtube] YgtL4S7Hrwo: Extracting video information
+[info] Available formats for YgtL4S7Hrwo:
+format code  extension  resolution note
+249          webm       audio only DASH audio   53k , opus &#64; 50k, 15.14MiB
+250          webm       audio only DASH audio   72k , opus &#64; 70k, 20.29MiB
+171          webm       audio only DASH audio  111k , vorbis&#64;128k, 29.42MiB
+140          m4a        audio only DASH audio  130k , m4a_dash container, mp4a.40.2&#64;128k, 38.38MiB
+251          webm       audio only DASH audio  130k , opus &#64;160k, 36.94MiB
+278          webm       256x144    144p   58k , webm container, vp9, 30fps, video only, 11.01MiB
+242          webm       426x240    240p   88k , vp9, 30fps, video only, 12.40MiB
+160          mp4        256x144    144p  120k , avc1.4d400c, 30fps, video only, 33.64MiB
+243          webm       640x360    360p  153k , vp9, 30fps, video only, 23.48MiB
+134          mp4        640x360    360p  230k , avc1.4d401e, 30fps, video only, 28.91MiB
+133          mp4        426x240    240p  260k , avc1.4d4015, 30fps, video only, 74.75MiB
+244          webm       854x480    480p  289k , vp9, 30fps, video only, 39.31MiB
+135          mp4        854x480    480p  488k , avc1.4d401f, 30fps, video only, 56.43MiB
+247          webm       1280x720   720p  945k , vp9, 30fps, video only, 102.45MiB
+136          mp4        1280x720   720p 1074k , avc1.4d401f, 30fps, video only, 116.72MiB
+17           3gp        176x144    small , mp4v.20.3, mp4a.40.2&#64; 24k
+36           3gp        320x180    small , mp4v.20.3, mp4a.40.2
+43           webm       640x360    medium , vp8.0, vorbis&#64;128k
+18           mp4        640x360    medium , avc1.42001E, mp4a.40.2&#64; 96k
+22           mp4        1280x720   hd720 , avc1.64001F, mp4a.40.2&#64;192k (best)
+</pre>
+<p>As you can see, each has an id and defines an extension (container)  and info about its video and audio stream.
+You can download a <em>specific</em> format by using the -f command line otpion. For example , to download the audio-only
+format with the worst audio quality use <tt class="docutils literal"><span class="pre">C:\Users\serafeim&gt;getvideo</span> YgtL4S7Hrwo <span class="pre">-f</span> 249</tt>. Notice that there are
+formats with audio ony and other formats with vide only. To download the worst format possible (resulting in the
+smallest file size of course ) you can pass the <tt class="docutils literal"><span class="pre">-f</span> worst</tt> command line (there&#8217;s also a <tt class="docutils literal"><span class="pre">-f</span> best</tt> command line
+which is used by&nbsp;default).</p>
+<p>Another thing I&#8217;d like to point out here is that you can define an <a class="reference external" href="https://github.com/rg3/youtube-dl/blob/master/README.md#output-template">output template</a> using the <tt class="docutils literal"><span class="pre">-o</span></tt> option that
+will format the name of the output file of your video using the provided options. There are  <a class="reference external" href="https://github.com/rg3/youtube-dl/blob/master/README.md#output-template-examples">many examples in the docs</a>
+so I won&#8217;t go into any more details&nbsp;here.</p>
+<p>Another cool option is the -a that will help you download all videos from a file. For example, if you have a file
+named <tt class="docutils literal">videos.txt</tt> with the following&nbsp;contsnts:</p>
+<pre class="code literal-block">
+AjFfsOA7AQI
+3dDtACSYVx0
+G17E4Muylis
+</pre>
+<p>running <tt class="docutils literal">getvideo <span class="pre">-a</span> videos.txt <span class="pre">-f</span> worst</tt></p>
+<p>will get you all three videos in their worst quality. If you don&#8217;t want to create files then you can use something
+like&nbsp;this:</p>
+<pre class="code literal-block">
+for %i in (AjFfsOA7AQI 3dDtACSYVx0 G17E4Muylis) do getvideo %i -f worst
+</pre>
+<p>and it will run  getvideo for all three&nbsp;files.</p>
+<p>Some more options I&#8217;d like to recommend using&nbsp;are:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">--restrict-filenames</span></tt> to avoid strange&nbsp;filenames</li>
+<li><tt class="docutils literal"><span class="pre">--ignore-errors</span></tt> to ignore errors when download multiple files (from a playlist or a channel) - this is really
+useful because if you have a play with missing items youtube-dl will stop downloading the remaining files when it
+encounters the missing&nbsp;one</li>
+</ul>
+<p>If you want to always use these options you may add them to your configuration file (<tt class="docutils literal"><span class="pre">C:\Users\&lt;user</span> <span class="pre">name&gt;\youtube-dl.conf</span></tt>)
+or to the getvideo.bat defined above i.e getvideo.bat will&nbsp;be:</p>
+<pre class="code literal-block">
+py -3 -m youtube_dl --restrict-filenames --ignore-errors %*
+</pre>
+</div>
+<div class="section" id="extracting-mp3s">
+<h2>Extracting&nbsp;mp3s</h2>
+<p>The next step in this trip is to understand how to extract mp3s from videos that are downloaded from youtube. If you&#8217;ve
+payed attention you&#8217;d know that by now you can download audio-only formats from youtube - however they are in a format
+called <a class="reference external" href="https://en.wikipedia.org/wiki/Dynamic_Adaptive_Streaming_over_HTTP"><span class="caps">DASH</span></a> which most probably is <em>not</em> playable by your car stereo (<span class="caps">DASH</span> is specialized for streaming audio through <span class="caps">HTTP</span>).</p>
+<p>Thus, the proper way to get mp3s is to post-process
+the downloaded file using ffmpeg to convert it to mp3. This could be done manually (by doing something
+<tt class="docutils literal">ffmpeg <span class="pre">-i</span> input out.mp3</tt> &#8212; ffmpeg is smart enough to know how to convert per extension)
+but thankfully youtube-dl offers the <tt class="docutils literal"><span class="pre">-x</span></tt> (and friend) parameters to make this automatic. Using <tt class="docutils literal"><span class="pre">-x</span></tt> tells
+youtube-dl to extract the audio from the video (notice that youtube-dl is smart enough to download one of the audio-only
+formats so you don&#8217;t have ). Using -x alone may result in a different audio format (for example .ogg) so to force conversion to mp3
+you should also add the  <tt class="docutils literal"><span class="pre">--audio-format</span> mp3</tt> parameter. Thus, to download an mp3 you can use the following command
+line (continuing from the previous&nbsp;examples):</p>
+<pre class="code literal-block">
+py -3 -m youtube_dl --restrict-filenames --ignore-errors -x --audio-format mp3  AjFfsOA7AQI
+</pre>
+<p>or even better, create a <tt class="docutils literal">getmp3.bat</tt> batch file that will be used to retrieve an&nbsp;mp3:</p>
+<pre class="code literal-block">
+py -3 -m youtube_dl --restrict-filenames --ignore-errors -x --audio-format mp3 %1
+</pre>
+<p>Please notice that also in this case youtube-dl is smart enough to download an audio-only format thus
+you won&#8217;t need to select it by hand using <tt class="docutils literal"><span class="pre">-f</span></tt> to save&nbsp;bandwith.</p>
+</div>
+<div class="section" id="splitting-the-mp3-file-to-parts">
+<h2>Splitting the mp3 file to&nbsp;parts</h2>
+<p>Some people would like to split their large mp3 files to same-length segments. Of course it would be better
+for the file to be split by silence to individual songs (if the file contains songs) but these methods usually
+don&#8217;t work that good so I prefer the same length segments. To do that using ffmpeg you just need to add the
+following&nbsp;parameters:</p>
+<pre class="code literal-block">
+ffmpeg -i input.mp3 -segment_time 180 -f segment out.%03d.mp3&quot;
+</pre>
+<p>The segment time is in seconds (so each segment will be 3 minutes) while the output files will have a name like
+<tt class="docutils literal">out.001.mp3, out.002.mp3</tt> etc.</p>
+<p>What if you&#8217;d like to make the segmentation automatic? For this, I recommend writing a batch file with two
+commands - one to download the mp3 and a second one to call ffmpeg to segment the file. Notice that you
+could use the <tt class="docutils literal"><span class="pre">--postprocessor-args</span> <span class="caps">ARGS</span></tt> command line parameter to pass the required arguments to youtube-dl
+so it will be done in one command however I&#8217;d like to have a little more control thus I prefer two commands (if
+you decide to use <tt class="docutils literal"><span class="pre">--postprocessor-args</span> <span class="caps">ARGS</span></tt> keep in mind that args must be inside double quotes&nbsp;&#8220;&#8221;).</p>
+<p>Since we are going to use two commands, we need to feed the output file of youtube-dl to ffmpeg and specify a
+name for the ffmpeg output file-segments. The easiest way to do that is to just pass two parameters to the batch
+file - one for the video to download and one for its name. Copy the following to a file named <tt class="docutils literal">getmp3seg.bat</tt>:</p>
+<pre class="code literal-block">
+py -3 -m youtube_dl %1 -x --audio-format mp3 --audio-quality 128k -o %2.%%(ext)s&quot;
+ffmpeg -i %2.mp3 -segment_time 180 -f segment %2.%%03d.mp3
+del %2.mp3
+</pre>
+<p>You can then call it like this: <tt class="docutils literal">getmp3seg AjFfsOA7AQI test</tt>. The first line will download and covert
+the video to mp3 and put it in a file named <tt class="docutils literal">test.mp3</tt> (the %2 is the test, the %% is used to
+escape the % and the %(ext)s is the extensions - this is needed if you use something like -o %2.mp3
+youtube-dl will be confused when trying to convert the file to mp3 and will not work). The 2nd line
+will segment the file to 180 second seconds (notice that here also we need to escape %) and the third
+line will delete the original mp3. This leaves us with the following 4 files (the video was around 10 minutes): <tt class="docutils literal">test.000.mp3,
+test.001.mp3, test.002.mp3, test.003.mp3</tt>.</p>
+<p>One final thing I&#8217;d like to present here is a (more complex) script that you can use to download a video
+and segmentize it only if it is more than 360 seconds. For this, we will also use the <a class="reference external" href="http://ibiblio.org/mp3info/">mp3info</a> util which can
+be downloaded directly from the homepage and copied to the path. So copy the following to a script named <tt class="docutils literal">getmp3seg2.bat</tt>:</p>
+<pre class="code literal-block">
+&#64;echo off
+
+IF &quot;%2&quot;==&quot;&quot; GOTO HAVE_1
+
+py -3 -m youtube_dl %1 -x --audio-format mp3 -o %2.%%(ext)s&quot;
+
+FOR /f %%i IN ('mp3info -p &quot;%%S&quot; %2.mp3') DO SET koko=%%i
+
+IF %koko%  GTR 360 (
+        ECHO greater than or equal to 360
+        ffmpeg -i %2.mp3 -segment_time 180 -f segment %2.%%03d.mp3
+        del %2.mp3
+)  else (
+   ECHO less than 360
+)
+
+GOTO :eof
+
+:HAVE_1
+ECHO Please call this file with video id and title
+</pre>
+<p>This is a little more complex - I&#8217;ll explain it quickly: <tt class="docutils literal">&#64;echo off</tt> is used to suppress non needed output.
+The <tt class="docutils literal"><span class="caps">IF</span></tt> following makes sure that you have two parameters. The next line downloads the file and converts it to mp3. The <tt class="docutils literal"><span class="caps">FOR</span></tt>
+loop is a little strange but it&#8217;s result will be to retrieve the output of <tt class="docutils literal">mp3info <span class="pre">-o</span> &quot;%S&quot; title.mp3</tt> (which is the
+duration in seconds of that mp3) and assign it to the <tt class="docutils literal">koko</tt> variable. The next <tt class="docutils literal"><span class="caps">IF</span></tt> checks if <tt class="docutils literal">koko</tt> is greater than (<tt class="docutils literal"><span class="caps">GTR</span></tt>)
+360 seconds and if yes will run the conversion code we discussed before - else it will just output that it is less than 360&nbsp;seconds.</p>
+<p>Finally, there&#8217;s a <tt class="docutils literal"><span class="caps">GOTO</span>: eof</tt> line to skip printing the error message when the batch is called with less than two&nbsp;parameters.</p>
+</div>
+<div class="section" id="using-youtube-dl-from-python">
+<h2>Using youtube-dl from&nbsp;python</h2>
+<p>Integrating with youtube-dl from python is easy. Of course, you could just go on and directly call the command line
+however you can have more control. The most important class is <tt class="docutils literal">youtube_dl.YoutubeDL.YoutubeDL</tt>. You instantiate
+an object of this class class passing the parameters you&#8217;d like and call its <tt class="docutils literal">download()</tt> instance method passing
+a list of urls. Here&#8217;s a small script that downloads the input video&nbsp;ids:</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">youtube_dl</span><span class="w"> </span><span class="kn">import</span> <span class="n">YoutubeDL</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">ydl_opts</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">ydl</span> <span class="o">=</span> <span class="n">YoutubeDL</span><span class="p">(</span><span class="n">ydl_opts</span><span class="p">)</span>
+        <span class="n">ydl</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Enter list of urls to download&quot;</span><span class="p">)</span>
+        <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+<p>Save it in a file named getvideo.py and run it like <tt class="docutils literal">py <span class="pre">-3</span> getvideo.py AjFfsOA7AQI 3dDtACSYVx0 G17E4Muylis</tt> to download all three&nbsp;videos!</p>
+</div>
+<div class="section" id="fixing-your-unicode-names">
+<h2>Fixing your unicode&nbsp;names</h2>
+<p>The last thing I&#8217;d like to talk about concerns people that want to download videos with Unicode characters in their titles (for example&nbsp;Greek).</p>
+<p>Let&#8217;s suppose that you want to download the file vFVNOaUPRow which is piano music from a well-know greek composer. If you get it without parameters
+(for example <tt class="docutils literal">py <span class="pre">-3</span> <span class="pre">-m</span> youtube_dl <span class="pre">-x</span> <span class="pre">--audio-format</span> mp3 vFVNOaUPRow</tt>)
+you&#8217;ll get the following output file: <tt class="docutils literal">Ο Μάνος Χατζιδάκις. παίζει 11 κομμάτια στο <span class="pre">πιάνο-vFVNOaUPRow.f247.mp3</span></tt> (notice the greek characters) while, if
+you add the <tt class="docutils literal"><span class="pre">--restrict-filenames</span></tt> I mentioned before you&#8217;ll get <tt class="docutils literal"><span class="pre">_11-vFVNOaUPRow.f247.mp3</span></tt> (notice that the greek characters have been removed
+since they are not&nbsp;safe).</p>
+<p>So if you use the <tt class="docutils literal"><span class="pre">--restrict-filenames</span></tt> parameter you&#8217;ll get an output that contains <em>only</em> the video id (and any safe characters it may find) while
+if you don&#8217;t use it you&#8217;ll get the normal title of the video. However, most stereos <em>do not</em> display unicode characters properly so if I get this
+file to my car I&#8217;ll see garbage and I won&#8217;t be able to identify it &#8212; I will be able to listen it but not see its&nbsp;name!</p>
+<p>To fix that, I propose transliterating the unicode characters using the <a class="reference external" href="https://pypi.python.org/pypi/Unidecode">unidecode</a> library. Just install it using <tt class="docutils literal">pip</tt>. Then you can the following
+script to rename all mp3 files in a directory to using english characters&nbsp;only:</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">unidecode</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;mp3&#39;</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Renaming </span><span class="si">{0}</span><span class="s2"> to </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">unidecode</span><span class="o">.</span><span class="n">unidecode</span><span class="p">(</span><span class="n">file</span><span class="p">)))</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">unidecode</span><span class="o">.</span><span class="n">unidecode</span><span class="p">(</span><span class="n">file</span><span class="p">))</span>
+</pre></div>
+<p>Copy this to a file named transliterate.py and run it in a directory containing mp3 files (<tt class="docutils literal">py <span class="pre">-3</span> transliterate.py</tt>) to rename them to non-unicode&nbsp;characters.</p>
+</div>
+</div>
+    <footer>
+<p class="meta">
+  <span class="byline author vcard">
+    Posted by <span class="fn">
+        Serafeim Papastefanos
+    </span>
+  </span>
+<time datetime="2018-03-06T12:20:00+02:00" pubdate>Tue 06 March 2018</time>  <span class="categories">
+    <a class='category' href='https://spapas.github.io/category/python.html'>python</a>
+  </span>
+  <span class="categories">
+    <a class="category" href="https://spapas.github.io/tag/youtube.html">youtube</a>,    <a class="category" href="https://spapas.github.io/tag/youtube-dl.html">youtube-dl</a>,    <a class="category" href="https://spapas.github.io/tag/ffmpeg.html">ffmpeg</a>,    <a class="category" href="https://spapas.github.io/tag/python.html">python</a>  </span>
+</p><div class="sharing">
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="https://spapas.github.io/2018/03/06/easy-youtube-mp3-downloading/" data-via="" data-counturl="https://spapas.github.io/2018/03/06/easy-youtube-mp3-downloading/" >Tweet</a>
+</div>    </footer>
+  </article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript></div>
+  </section>
+</div>
+<aside class="sidebar">
+  
+  <section>
+    <br />
+    <a href='/feeds/all.atom.xml'>Atom</a>
+    |
+    <a href='/feeds/all.rss.xml'>RSS</a>
+  </section>
+
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <!-- Sidebar unit -->
+  <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7673322832689008" data-ad-slot="2720624730"
+    data-ad-format="auto" data-full-width-responsive="true"></ins>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+
+
+  <script async src="https://cse.google.com/cse.js?cx=612920e5ca9da850c"></script>
+  <div class="gcse-search"></div>
+
+  
+  <section>
+    <h1>Support me</h1>
+
+    You can show your appreciation for anything useful you've found here by 
+    buying me a coffee 
+    <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="spapas" data-color="#FFDD00" data-emoji=""  data-font="Lato" data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff" ></script>
+
+    or donating me some bitcoin to this address:
+    <small><pre>bc1qx42vp8napheaewhnx0rk0mttdrdrtvw6czvxhl</pre></small>
+    <svg shape-rendering="crispEdges" height="200" width="200" viewBox="0 0 29 29" class="qrcode">
+      <path fill="#FFFFFF" d="M0,0 h29v29H0z"></path><path fill="#000000" d="M0 0h7v1H0zM9 0h2v1H9zM12 0h1v1H12zM14 0h2v1H14zM18 0h2v1H18zM22,0 h7v1H22zM0 1h1v1H0zM6 1h1v1H6zM8 1h1v1H8zM11 1h1v1H11zM14 1h5v1H14zM22 1h1v1H22zM28,1 h1v1H28zM0 2h1v1H0zM2 2h3v1H2zM6 2h1v1H6zM8 2h4v1H8zM17 2h1v1H17zM22 2h1v1H22zM24 2h3v1H24zM28,2 h1v1H28zM0 3h1v1H0zM2 3h3v1H2zM6 3h1v1H6zM9 3h2v1H9zM14 3h3v1H14zM18 3h1v1H18zM22 3h1v1H22zM24 3h3v1H24zM28,3 h1v1H28zM0 4h1v1H0zM2 4h3v1H2zM6 4h1v1H6zM8 4h1v1H8zM11 4h1v1H11zM13 4h1v1H13zM15 4h2v1H15zM18 4h1v1H18zM22 4h1v1H22zM24 4h3v1H24zM28,4 h1v1H28zM0 5h1v1H0zM6 5h1v1H6zM8 5h2v1H8zM14 5h2v1H14zM19 5h2v1H19zM22 5h1v1H22zM28,5 h1v1H28zM0 6h7v1H0zM8 6h1v1H8zM10 6h1v1H10zM12 6h1v1H12zM14 6h1v1H14zM16 6h1v1H16zM18 6h1v1H18zM20 6h1v1H20zM22,6 h7v1H22zM8 7h2v1H8zM11 7h1v1H11zM15 7h1v1H15zM17 7h2v1H17zM0 8h2v1H0zM3 8h1v1H3zM6 8h2v1H6zM10 8h1v1H10zM12 8h3v1H12zM20 8h1v1H20zM22 8h3v1H22zM26 8h2v1H26zM1 9h1v1H1zM3 9h3v1H3zM8 9h1v1H8zM10 9h1v1H10zM12 9h2v1H12zM16 9h2v1H16zM20 9h1v1H20zM22 9h1v1H22zM25 9h1v1H25zM27,9 h2v1H27zM0 10h1v1H0zM3 10h2v1H3zM6 10h1v1H6zM8 10h3v1H8zM12 10h2v1H12zM16 10h1v1H16zM19 10h1v1H19zM22 10h3v1H22zM27 10h1v1H27zM0 11h1v1H0zM2 11h1v1H2zM4 11h2v1H4zM7 11h1v1H7zM13 11h4v1H13zM18 11h4v1H18zM26 11h2v1H26zM0 12h1v1H0zM2 12h3v1H2zM6 12h1v1H6zM11 12h1v1H11zM13 12h1v1H13zM15 12h3v1H15zM20 12h1v1H20zM22 12h2v1H22zM27,12 h2v1H27zM4 13h1v1H4zM8 13h3v1H8zM12 13h1v1H12zM14 13h1v1H14zM17 13h4v1H17zM25 13h2v1H25zM0 14h1v1H0zM4 14h3v1H4zM8 14h2v1H8zM11 14h3v1H11zM16 14h1v1H16zM21 14h2v1H21zM24,14 h5v1H24zM3 15h3v1H3zM7 15h2v1H7zM10 15h1v1H10zM12 15h2v1H12zM15 15h1v1H15zM17 15h2v1H17zM20 15h2v1H20zM23 15h1v1H23zM1 16h1v1H1zM4 16h1v1H4zM6 16h4v1H6zM16 16h2v1H16zM20 16h1v1H20zM23 16h1v1H23zM25 16h1v1H25zM28,16 h1v1H28zM2 17h1v1H2zM5 17h1v1H5zM7 17h2v1H7zM11 17h3v1H11zM17 17h1v1H17zM22 17h1v1H22zM25 17h1v1H25zM27,17 h2v1H27zM0 18h1v1H0zM3 18h1v1H3zM5 18h4v1H5zM10 18h1v1H10zM12 18h1v1H12zM18 18h1v1H18zM20 18h1v1H20zM22 18h2v1H22zM25,18 h4v1H25zM2 19h3v1H2zM8 19h1v1H8zM16 19h2v1H16zM21 19h1v1H21zM23 19h1v1H23zM25 19h1v1H25zM27 19h1v1H27zM0 20h1v1H0zM2 20h5v1H2zM8 20h2v1H8zM13 20h4v1H13zM19 20h6v1H19zM26 20h1v1H26zM28,20 h1v1H28zM8 21h2v1H8zM12 21h3v1H12zM16 21h1v1H16zM20 21h1v1H20zM24 21h1v1H24zM26,21 h3v1H26zM0 22h7v1H0zM8 22h3v1H8zM17 22h1v1H17zM20 22h1v1H20zM22 22h1v1H22zM24 22h2v1H24zM27 22h1v1H27zM0 23h1v1H0zM6 23h1v1H6zM10 23h2v1H10zM13 23h2v1H13zM19 23h2v1H19zM24,23 h5v1H24zM0 24h1v1H0zM2 24h3v1H2zM6 24h1v1H6zM9 24h2v1H9zM12 24h2v1H12zM17 24h1v1H17zM20 24h6v1H20zM28,24 h1v1H28zM0 25h1v1H0zM2 25h3v1H2zM6 25h1v1H6zM8 25h3v1H8zM12 25h1v1H12zM14 25h1v1H14zM18 25h1v1H18zM22 25h3v1H22zM26 25h1v1H26zM0 26h1v1H0zM2 26h3v1H2zM6 26h1v1H6zM10 26h5v1H10zM16 26h3v1H16zM21 26h1v1H21zM24 26h1v1H24zM26 26h1v1H26zM28,26 h1v1H28zM0 27h1v1H0zM6 27h1v1H6zM8 27h3v1H8zM12 27h4v1H12zM17 27h1v1H17zM20 27h1v1H20zM23 27h2v1H23zM27 27h1v1H27zM0 28h7v1H0zM8 28h3v1H8zM14 28h1v1H14zM16 28h3v1H16zM20 28h1v1H20zM22 28h1v1H22zM24 28h2v1H24zM27 28h1v1H27z"></path>
+    </svg>
+  </section>
+  
+
+  <section>
+    <h1>Subscribe</h1>
+    Do you want to get notified via email when I post new content?
+    <style>
+      .subscribe-button {
+        /* margin: 10px !important; */
+        padding: 10px !important;
+        background-color: black;
+        display: inline-block;
+        color: white !important;
+        text-decoration: none;
+
+        line-height: 36px !important;
+        height: 37px !important;
+        text-decoration: none !important;
+        display: inline-block !important;
+        color: #ffffff !important;
+        background-color: #000000 !important;
+        border-radius: 3px !important;
+        border: 1px solid transparent !important;
+        padding: 1px 9px !important;
+        font-size: 23px !important;
+        letter-spacing: 0.6px !important;
+        box-shadow: 0px 1px 2px rgba(190, 190, 190, 0.5) !important;
+        -webkit-box-shadow: 0px 1px 2px 2px rgba(190, 190, 190, 0.5) !important;
+        margin: 0 auto !important;
+        font-family: 'Cookie', cursive !important;
+        -webkit-box-sizing: border-box !important;
+        box-sizing: border-box !important;
+        -o-transition: 0.3s all linear !important;
+        -webkit-transition: 0.3s all linear !important;
+        -moz-transition: 0.3s all linear !important;
+        -ms-transition: 0.3s all linear !important;
+        transition: 0.3s all linear !important;
+
+      }
+    </style>
+    <a class='subscribe-button' target="_blank" href="http://eepurl.com/dxI3PP">Click here to subscribe!</a>
+  </section>
+
+
+  <section>
+    <h1>Recent Posts</h1>
+    <ul id="recent_posts">
+      <li class="post">
+        <a href="https://spapas.github.io/2024/08/22/multiple-erl-elixir-windows/">Multiple Erlang/Elixir versions in Windows</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/11/29/openid-connect-tutorial/">A simple OpenID connect tutorial</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/05/23/simple-django-datatables-integration/">Simple Django - DataTables integration</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/05/22/ai-auto-subtitling/">AI auto-subtitling</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/05/12/disable-your-forms/">HTML form disable after submit</a>
+      </li>
+    </ul>
+  </section>
+  <section>
+
+    <h1>Categories</h1>
+    <ul id="recent_posts">
+      <li><a href="https://spapas.github.io/category/ai.html">ai</a></li>
+      <li><a href="https://spapas.github.io/category/android.html">android</a></li>
+      <li><a href="https://spapas.github.io/category/clojure.html">clojure</a></li>
+      <li><a href="https://spapas.github.io/category/css.html">css</a></li>
+      <li><a href="https://spapas.github.io/category/django.html">django</a></li>
+      <li><a href="https://spapas.github.io/category/elixir.html">elixir</a></li>
+      <li><a href="https://spapas.github.io/category/flask.html">flask</a></li>
+      <li><a href="https://spapas.github.io/category/gaming.html">gaming</a></li>
+      <li><a href="https://spapas.github.io/category/git.html">git</a></li>
+      <li><a href="https://spapas.github.io/category/html.html">html</a></li>
+      <li><a href="https://spapas.github.io/category/javascript.html">javascript</a></li>
+      <li><a href="https://spapas.github.io/category/networking.html">networking</a></li>
+      <li><a href="https://spapas.github.io/category/pelican.html">pelican</a></li>
+      <li><a href="https://spapas.github.io/category/postgresql.html">postgresql</a></li>
+      <li><a href="https://spapas.github.io/category/python.html">python</a></li>
+      <li><a href="https://spapas.github.io/category/spring.html">spring</a></li>
+      <li><a href="https://spapas.github.io/category/unix.html">unix</a></li>
+      <li><a href="https://spapas.github.io/category/wagtail.html">wagtail</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Tags</h1>
+    <a href="https://spapas.github.io/tag/erlang.html">erlang</a>,    <a href="https://spapas.github.io/tag/elixir.html">elixir</a>,    <a href="https://spapas.github.io/tag/windows.html">windows</a>,    <a href="https://spapas.github.io/tag/openid.html">openid</a>,    <a href="https://spapas.github.io/tag/openid-connect.html">openid-connect</a>,    <a href="https://spapas.github.io/tag/oidc.html">oidc</a>,    <a href="https://spapas.github.io/tag/http.html">http</a>,    <a href="https://spapas.github.io/tag/keycloak.html">keycloak</a>,    <a href="https://spapas.github.io/tag/python.html">python</a>,    <a href="https://spapas.github.io/tag/django.html">django</a>,    <a href="https://spapas.github.io/tag/jquery.html">jquery</a>,    <a href="https://spapas.github.io/tag/datatables.html">datatables</a>,    <a href="https://spapas.github.io/tag/ai.html">ai</a>,    <a href="https://spapas.github.io/tag/whisper.html">whisper</a>,    <a href="https://spapas.github.io/tag/whispercpp.html">whisper.cpp</a>,    <a href="https://spapas.github.io/tag/subtitles.html">subtitles</a>,    <a href="https://spapas.github.io/tag/video.html">video</a>,    <a href="https://spapas.github.io/tag/auto-subtitling.html">auto-subtitling</a>,    <a href="https://spapas.github.io/tag/subtitiling.html">subtitiling</a>,    <a href="https://spapas.github.io/tag/transcribe.html">transcribe</a>,    <a href="https://spapas.github.io/tag/html.html">html</a>,    <a href="https://spapas.github.io/tag/javascript.html">javascript</a>,    <a href="https://spapas.github.io/tag/media.html">media</a>,    <a href="https://spapas.github.io/tag/storage.html">storage</a>,    <a href="https://spapas.github.io/tag/unpoly.html">unpoly</a>,    <a href="https://spapas.github.io/tag/access.html">access</a>,    <a href="https://spapas.github.io/tag/database.html">database</a>,    <a href="https://spapas.github.io/tag/accdb.html">accdb</a>,    <a href="https://spapas.github.io/tag/mdb.html">mdb</a>,    <a href="https://spapas.github.io/tag/postgresql.html">postgresql</a>,    <a href="https://spapas.github.io/tag/development.html">development</a>,    <a href="https://spapas.github.io/tag/inlines.html">inlines</a>,    <a href="https://spapas.github.io/tag/clojure.html">clojure</a>,    <a href="https://spapas.github.io/tag/cmd.html">cmd</a>,    <a href="https://spapas.github.io/tag/pdf.html">pdf</a>,    <a href="https://spapas.github.io/tag/wkhtmltopdf.html">wkhtmltopdf</a>,    <a href="https://spapas.github.io/tag/forward-proxy.html">forward-proxy</a>,    <a href="https://spapas.github.io/tag/reverse-proxy.html">reverse-proxy</a>,    <a href="https://spapas.github.io/tag/proxy.html">proxy</a>,    <a href="https://spapas.github.io/tag/networking.html">networking</a>,    <a href="https://spapas.github.io/tag/dj-rest-auth.html">dj-rest-auth</a>,    <a href="https://spapas.github.io/tag/rest.html">rest</a>,    <a href="https://spapas.github.io/tag/django-rest-framework.html">django-rest-framework</a>,    <a href="https://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="https://spapas.github.io/tag/tokens.html">tokens</a>,    <a href="https://spapas.github.io/tag/migrations.html">migrations</a>,    <a href="https://spapas.github.io/tag/foreignkey.html">foreignkey</a>,    <a href="https://spapas.github.io/tag/dark-souls.html">dark-souls</a>,    <a href="https://spapas.github.io/tag/dark-souls-2.html">dark-souls-2</a>,    <a href="https://spapas.github.io/tag/dark-souls-3.html">dark-souls-3</a>,    <a href="https://spapas.github.io/tag/autohotkey.html">autohotkey</a>,    <a href="https://spapas.github.io/tag/matplotlib.html">matplotlib</a>,    <a href="https://spapas.github.io/tag/hashids.html">hashids</a>,    <a href="https://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="https://spapas.github.io/tag/osmon.html">osmon</a>,    <a href="https://spapas.github.io/tag/phoenix.html">phoenix</a>,    <a href="https://spapas.github.io/tag/os-monitoring.html">os-monitoring</a>,    <a href="https://spapas.github.io/tag/forms.html">forms</a>,    <a href="https://spapas.github.io/tag/django-crispy-forms.html">django-crispy-forms</a>,    <a href="https://spapas.github.io/tag/django-widget-tweaks.html">django-widget-tweaks</a>,    <a href="https://spapas.github.io/tag/ecto.html">ecto</a>,    <a href="https://spapas.github.io/tag/queries.html">queries</a>,    <a href="https://spapas.github.io/tag/declarative.html">declarative</a>,    <a href="https://spapas.github.io/tag/form.html">form</a>,    <a href="https://spapas.github.io/tag/php.html">php</a>,    <a href="https://spapas.github.io/tag/select2.html">select2</a>,    <a href="https://spapas.github.io/tag/autocompelte.html">autocompelte</a>,    <a href="https://spapas.github.io/tag/ajax.html">ajax</a>,    <a href="https://spapas.github.io/tag/android.html">android</a>,    <a href="https://spapas.github.io/tag/kotlin.html">kotlin</a>,    <a href="https://spapas.github.io/tag/adapter.html">adapter</a>,    <a href="https://spapas.github.io/tag/filter.html">filter</a>,    <a href="https://spapas.github.io/tag/async.html">async</a>,    <a href="https://spapas.github.io/tag/tasks.html">tasks</a>,    <a href="https://spapas.github.io/tag/django-rq.html">django-rq</a>,    <a href="https://spapas.github.io/tag/rq.html">rq</a>,    <a href="https://spapas.github.io/tag/du.html">du</a>,    <a href="https://spapas.github.io/tag/unix.html">unix</a>,    <a href="https://spapas.github.io/tag/linux.html">linux</a>,    <a href="https://spapas.github.io/tag/disk-usage.html">disk-usage</a>,    <a href="https://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="https://spapas.github.io/tag/middleware.html">middleware</a>,    <a href="https://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="https://spapas.github.io/tag/react.html">react</a>,    <a href="https://spapas.github.io/tag/redux.html">redux</a>,    <a href="https://spapas.github.io/tag/hyperapp.html">hyperapp</a>,    <a href="https://spapas.github.io/tag/immutable.html">immutable</a>,    <a href="https://spapas.github.io/tag/es6.html">es6</a>,    <a href="https://spapas.github.io/tag/youtube.html">youtube</a>,    <a href="https://spapas.github.io/tag/youtube-dl.html">youtube-dl</a>,    <a href="https://spapas.github.io/tag/ffmpeg.html">ffmpeg</a>,    <a href="https://spapas.github.io/tag/django-rest-auth.html">django-rest-auth</a>,    <a href="https://spapas.github.io/tag/python-2.html">python-2</a>,    <a href="https://spapas.github.io/tag/python-3.html">python-3</a>,    <a href="https://spapas.github.io/tag/plpgsql.html">plpgsql</a>,    <a href="https://spapas.github.io/tag/component.html">component</a>,    <a href="https://spapas.github.io/tag/ag-grid.html">ag-grid</a>,    <a href="https://spapas.github.io/tag/grid.html">grid</a>,    <a href="https://spapas.github.io/tag/bash.html">bash</a>,    <a href="https://spapas.github.io/tag/cron.html">cron</a>,    <a href="https://spapas.github.io/tag/pandas.html">pandas</a>,    <a href="https://spapas.github.io/tag/scipy.html">scipy</a>,    <a href="https://spapas.github.io/tag/numpy.html">numpy</a>,    <a href="https://spapas.github.io/tag/pivot.html">pivot</a>,    <a href="https://spapas.github.io/tag/pivot_table.html">pivot_table</a>,    <a href="https://spapas.github.io/tag/ipython.html">ipython</a>,    <a href="https://spapas.github.io/tag/jupyter.html">jupyter</a>,    <a href="https://spapas.github.io/tag/notebook.html">notebook</a>,    <a href="https://spapas.github.io/tag/query.html">query</a>,    <a href="https://spapas.github.io/tag/q.html">q</a>,    <a href="https://spapas.github.io/tag/imgur.html">imgur</a>,    <a href="https://spapas.github.io/tag/console.html">console</a>,    <a href="https://spapas.github.io/tag/research.html">research</a>,    <a href="https://spapas.github.io/tag/debug.html">debug</a>,    <a href="https://spapas.github.io/tag/werkzeug.html">werkzeug</a>,    <a href="https://spapas.github.io/tag/django-extensions.html">django-extensions</a>,    <a href="https://spapas.github.io/tag/404.html">404</a>,    <a href="https://spapas.github.io/tag/error.html">error</a>,    <a href="https://spapas.github.io/tag/spring.html">spring</a>,    <a href="https://spapas.github.io/tag/spring-boot.html">spring-boot</a>,    <a href="https://spapas.github.io/tag/java.html">java</a>,    <a href="https://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="https://spapas.github.io/tag/profiles.html">profiles</a>,    <a href="https://spapas.github.io/tag/settings.html">settings</a>,    <a href="https://spapas.github.io/tag/properties.html">properties</a>,    <a href="https://spapas.github.io/tag/yaml.html">yaml</a>,    <a href="https://spapas.github.io/tag/configuration.html">configuration</a>,    <a href="https://spapas.github.io/tag/deploy.html">deploy</a>,    <a href="https://spapas.github.io/tag/initd.html">init.d</a>,    <a href="https://spapas.github.io/tag/react-redux.html">react-redux</a>,    <a href="https://spapas.github.io/tag/redux-thunk.html">redux-thunk</a>,    <a href="https://spapas.github.io/tag/redux-form.html">redux-form</a>,    <a href="https://spapas.github.io/tag/react-router.html">react-router</a>,    <a href="https://spapas.github.io/tag/react-router-redux.html">react-router-redux</a>,    <a href="https://spapas.github.io/tag/react-notification.html">react-notification</a>,    <a href="https://spapas.github.io/tag/history.html">history</a>,    <a href="https://spapas.github.io/tag/babel.html">babel</a>,    <a href="https://spapas.github.io/tag/babelify.html">babelify</a>,    <a href="https://spapas.github.io/tag/browserify.html">browserify</a>,    <a href="https://spapas.github.io/tag/watchify.html">watchify</a>,    <a href="https://spapas.github.io/tag/uglify.html">uglify</a>,    <a href="https://spapas.github.io/tag/boilerplate.html">boilerplate</a>,    <a href="https://spapas.github.io/tag/tutorial.html">tutorial</a>,    <a href="https://spapas.github.io/tag/introduction.html">introduction</a>,    <a href="https://spapas.github.io/tag/fixed-data-tables.html">fixed-data-tables</a>,    <a href="https://spapas.github.io/tag/fixeddatatable.html">FixedDataTable</a>,    <a href="https://spapas.github.io/tag/reportlab.html">reportlab</a>,    <a href="https://spapas.github.io/tag/xhtml2pdf.html">xhtml2pdf</a>,    <a href="https://spapas.github.io/tag/node.html">node</a>,    <a href="https://spapas.github.io/tag/npm.html">npm</a>,    <a href="https://spapas.github.io/tag/generic.html">generic</a>,    <a href="https://spapas.github.io/tag/tables.html">tables</a>,    <a href="https://spapas.github.io/tag/flux.html">flux</a>,    <a href="https://spapas.github.io/tag/jobs.html">jobs</a>,    <a href="https://spapas.github.io/tag/asynchronous.html">asynchronous</a>,    <a href="https://spapas.github.io/tag/scheduling.html">scheduling</a>,    <a href="https://spapas.github.io/tag/redis.html">redis</a>,    <a href="https://spapas.github.io/tag/pusher.html">pusher</a>,    <a href="https://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="https://spapas.github.io/tag/css.html">css</a>,    <a href="https://spapas.github.io/tag/design.html">design</a>,    <a href="https://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>,    <a href="https://spapas.github.io/tag/less.html">less</a>,    <a href="https://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="https://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="https://spapas.github.io/tag/security.html">security</a>,    <a href="https://spapas.github.io/tag/google.html">google</a>,    <a href="https://spapas.github.io/tag/flask.html">flask</a>,    <a href="https://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="https://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="https://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="https://spapas.github.io/tag/git.html">git</a>,    <a href="https://spapas.github.io/tag/github.html">github</a>,    <a href="https://spapas.github.io/tag/branching.html">branching</a>,    <a href="https://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="https://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="https://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="https://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="https://spapas.github.io/tag/rst.html">rst</a>  </section>
+
+  <section>
+    <h1>Yearly archives</h1>
+    <a href="https://spapas.github.io/posts/2013/">2013</a>,    <a href="https://spapas.github.io/posts/2014/">2014</a>,    <a href="https://spapas.github.io/posts/2015/">2015</a>,    <a href="https://spapas.github.io/posts/2016/">2016</a>,    <a href="https://spapas.github.io/posts/2017/">2017</a>,    <a href="https://spapas.github.io/posts/2018/">2018</a>,    <a href="https://spapas.github.io/posts/2019/">2019</a>,    <a href="https://spapas.github.io/posts/2020/">2020</a>,    <a href="https://spapas.github.io/posts/2021/">2021</a>,    <a href="https://spapas.github.io/posts/2022/">2022</a>,    <a href="https://spapas.github.io/posts/2023/">2023</a>,    <a href="https://spapas.github.io/posts/2024/">2024</a>  </section>
+
+
+
+  <section>
+    <h1>GitHub Repos</h1>
+    <ul id="gh_repos">
+      <li class="loading">Status updating...</li>
+    </ul>
+      <a href="https://github.com/spapas">@spapas</a> on GitHub
+    <script  src="//code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      $(function(){
+          if (!window.jXHR){
+              var jxhr = document.createElement('script');
+              jxhr.type = 'text/javascript';
+              jxhr.src = 'https://spapas.github.io/theme/js/jXHR.js';
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(jxhr, s);
+          }
+
+          github.showRepos({
+              user: 'spapas',
+              count: 5,
+              skip_forks: true,
+              target: '#gh_repos'
+          });
+      });
+    </script>
+    <script src="https://spapas.github.io/theme/js/github.js" type="text/javascript"> </script>
+  </section>
+
+
+  <section>
+    <a href="https://twitter.com/_serafeim_?ref_src=twsrc%5Etfw" class="twitter-follow-button"
+      data-show-count="false">Follow @_serafeim_</a>
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+  </section>
+
+</aside>    </div>
+  </div>
+  <footer role="contentinfo"><p>
+    Copyright &copy;  2013&ndash;2024  Serafeim Papastefanos &mdash;
+  <span class="credit">Powered by <a href="http://getpelican.com">Pelican</a></span>
+</p></footer>
+  <script src="https://spapas.github.io/theme/js/modernizr-2.0.js"></script>
+  <script src="https://spapas.github.io/theme/js/ender.js"></script>
+  <script src="https://spapas.github.io/theme/js/octopress.js" type="text/javascript"></script>
+  <script src="https://spapas.github.io/theme/js/ads.js"></script>
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-44750952-1', 'auto');
+
+    ga('send', 'pageview');
+    </script>
+
+<script defer data-domain="spapas.github.io" src="https://plausible.hcg.gr/js/script.js"></script>  <script type="text/javascript">
+    var disqus_shortname = 'spapas-github-io';
+    var disqus_identifier = '/2018/03/06/easy-youtube-mp3-downloading/';
+    var disqus_url = 'https://spapas.github.io/2018/03/06/easy-youtube-mp3-downloading/';
+    var disqus_title = 'Easy downloading youtube videos and mp3s using youtube-dl and&nbsp;python';
+    (function() {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = "//" + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+     })();
+  </script>
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+</body>
+
+</html>

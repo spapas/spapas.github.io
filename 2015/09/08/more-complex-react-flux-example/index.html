@@ -1,0 +1,1844 @@
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="google-site-verification" content="5_8DTmIiEq4gFvNAfxAD6TsGOgrMAjp8lQFQvfA6zZc" />
+    <title>A (little more) complex react and flux example &mdash; /var/</title>
+    <meta name="author" content="Serafeim Papastefanos">
+
+
+    
+<style type="text/css">
+pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: var(--jp-cell-editor-active-background) }
+.highlight { background: var(--jp-cell-editor-background); color: var(--jp-mirror-editor-variable-color) }
+.highlight .c { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment */
+.highlight .err { color: var(--jp-mirror-editor-error-color) } /* Error */
+.highlight .k { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword */
+.highlight .o { color: var(--jp-mirror-editor-operator-color); font-weight: bold } /* Operator */
+.highlight .p { color: var(--jp-mirror-editor-punctuation-color) } /* Punctuation */
+.highlight .ch { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Preproc */
+.highlight .cpf { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Single */
+.highlight .cs { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Special */
+.highlight .kc { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Pseudo */
+.highlight .kr { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Type */
+.highlight .m { color: var(--jp-mirror-editor-number-color) } /* Literal.Number */
+.highlight .s { color: var(--jp-mirror-editor-string-color) } /* Literal.String */
+.highlight .ow { color: var(--jp-mirror-editor-operator-color); font-weight: bold } /* Operator.Word */
+.highlight .pm { color: var(--jp-mirror-editor-punctuation-color) } /* Punctuation.Marker */
+.highlight .w { color: var(--jp-mirror-editor-variable-color) } /* Text.Whitespace */
+.highlight .mb { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Bin */
+.highlight .mf { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Float */
+.highlight .mh { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Hex */
+.highlight .mi { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Integer */
+.highlight .mo { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Oct */
+.highlight .sa { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Affix */
+.highlight .sb { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Backtick */
+.highlight .sc { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Char */
+.highlight .dl { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Delimiter */
+.highlight .sd { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Doc */
+.highlight .s2 { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Double */
+.highlight .se { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Escape */
+.highlight .sh { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Heredoc */
+.highlight .si { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Interpol */
+.highlight .sx { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Other */
+.highlight .sr { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Regex */
+.highlight .s1 { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Single */
+.highlight .ss { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Symbol */
+.highlight .il { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Integer.Long */
+</style>
+
+<style type="text/css">
+/* Overrides of notebook CSS for static HTML export */
+div.entry-content {
+  overflow: visible;
+  padding: 8px;
+}
+.input_area {
+  padding: 0.2em;
+}
+
+a.heading-anchor {
+ white-space: normal;
+}
+
+.rendered_html
+code {
+ font-size: .8em;
+}
+
+pre.ipynb {
+  color: black;
+  background: #f7f7f7;
+  border: none;
+  box-shadow: none;
+  margin-bottom: 0;
+  padding: 0;
+  margin: 0px;
+  font-size: 13px;
+}
+
+/* remove the prompt div from text cells */
+div.text_cell .prompt {
+    display: none;
+}
+
+/* remove horizontal padding from text cells, */
+/* so it aligns with outer body text */
+div.text_cell_render {
+    padding: 0.5em 0em;
+}
+
+img.anim_icon{padding:0; border:0; vertical-align:middle; -webkit-box-shadow:none; -box-shadow:none}
+
+div.collapseheader {
+    width=100%;
+    background-color:#d3d3d3;
+    padding: 2px;
+    cursor: pointer;
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+</style>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true,
+        displayMath: [['$$','$$'], ["\\[","\\]"]]
+    }
+});
+</script>
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+    $("div.collapseheader").click(function () {
+    $header = $(this).children("span").first();
+    $codearea = $(this).children(".input_area");
+    console.log($(this).children());
+    $codearea.slideToggle(500, function () {
+        $header.text(function () {
+            return $codearea.is(":visible") ? "Collapse Code" : "Expand Code";
+        });
+    });
+});
+});
+</script>
+
+
+
+
+
+
+    <!-- http://t.co/dKP3o1e -->
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+    <link href="https://spapas.github.io/favicon.png" rel="icon">
+
+    <link href="https://spapas.github.io/theme/css/main.css" media="screen, projection" rel="stylesheet"
+      type="text/css">
+
+    <link href="https://spapas.github.io/theme/css/extra_style.css" media="screen, projection" rel="stylesheet"
+      type="text/css">
+
+    <link href="https://fonts.googleapis.com/css?family=Fira+Mono|Fira+Sans:400,700&amp;subset=greek" rel="stylesheet">
+
+<style>
+#gHPzseYvFrhZ123 {
+  padding: 5px !important;
+  display: block;
+  margin-bottom: 10px !important;
+  background: #900;
+  color: #fff;
+  border-radius: 5px;
+  font-size: 1.0rem !important;
+}
+</style>
+
+
+  <script>
+    
+      
+  </script>
+
+    <script data-ad-client="ca-pub-7673322832689008" async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
+      onerror="adBlockFunction();"></script>
+  </head>
+
+<body>
+  <header role="banner"><hgroup>
+  <h1><a href="https://spapas.github.io/">/var/</a></h1>
+    <h2>Various programming stuff</h2>
+</hgroup></header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+</ul>
+
+
+<ul class="main-navigation">
+      <li >
+        <a href="https://spapas.github.io/category/ai.html">Ai</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/android.html">Android</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/clojure.html">Clojure</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/css.html">Css</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/django.html">Django</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/elixir.html">Elixir</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/flask.html">Flask</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/gaming.html">Gaming</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/git.html">Git</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/html.html">Html</a>
+      </li>
+      <li class="active">
+        <a href="https://spapas.github.io/category/javascript.html">Javascript</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/networking.html">Networking</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/pelican.html">Pelican</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/postgresql.html">Postgresql</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/python.html">Python</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/spring.html">Spring</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/unix.html">Unix</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/wagtail.html">Wagtail</a>
+      </li>
+</ul></nav>
+  <div id="main">
+    <div id="content">
+    <div id="gHPzseYvFrhZ123">
+      Hello! If you are using an ad blocker but find something useful here 
+      and want to support me please consider disabling your ad blocker for this site. 
+      <br />
+      <br />
+      Thank you,<br />
+      Serafeim
+      
+    </div>
+<div>
+  <article class="hentry" role="article">
+<header>
+      <h1 class="entry-title">A (little more) complex react and flux example</h1>
+    <p class="meta">
+<time datetime="2015-09-08T12:55:00+03:00" pubdate>Tue 08 September 2015</time>    </p>
+</header>
+
+<div class="entry-content"><div class="contents topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#introduction" id="toc-entry-1">Introduction</a></li>
+<li><a class="reference internal" href="#more-about-flux-components" id="toc-entry-2">More about Flux&nbsp;components</a></li>
+<li><a class="reference internal" href="#explaining-the-application-components" id="toc-entry-3">Explaining the application&nbsp;components</a></li>
+<li><a class="reference internal" href="#reusable-application-components" id="toc-entry-4">Reusable application components</a><ul>
+<li><a class="reference internal" href="#dropdown-react-js" id="toc-entry-5">DropDown.react.js</a></li>
+<li><a class="reference internal" href="#datepicker-react-js" id="toc-entry-6">DatePicker.react.js</a></li>
+<li><a class="reference internal" href="#pagingpanel-react-js" id="toc-entry-7">PagingPanel.react.js</a></li>
+<li><a class="reference internal" href="#searchpanel-react-js" id="toc-entry-8">SearchPanel.react.js</a></li>
+<li><a class="reference internal" href="#messagepanel" id="toc-entry-9">MessagePanel</a><ul>
+<li><a class="reference internal" href="#messagepanel-react-js" id="toc-entry-10">MessagePanel.react.js</a></li>
+<li><a class="reference internal" href="#messagestore-js" id="toc-entry-11">MessageStore.js</a></li>
+<li><a class="reference internal" href="#messageactions" id="toc-entry-12">MessageActions</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#non-reusable-application-components" id="toc-entry-13">Non-reusable application components</a><ul>
+<li><a class="reference internal" href="#booktable-react-js" id="toc-entry-14">BookTable.react.js</a></li>
+<li><a class="reference internal" href="#authordialog-react-js" id="toc-entry-15">AuthorDialog.react.js</a></li>
+<li><a class="reference internal" href="#authorpanel-react-js" id="toc-entry-16">AuthorPanel.react.js</a></li>
+<li><a class="reference internal" href="#statpanel-react-js" id="toc-entry-17">StatPanel.react.js</a></li>
+<li><a class="reference internal" href="#bookform-react-js" id="toc-entry-18">BookForm.react.js</a></li>
+<li><a class="reference internal" href="#bookpanel-react-js" id="toc-entry-19">BookPanel.react.js</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#the-actions" id="toc-entry-20">The&nbsp;Actions</a></li>
+<li><a class="reference internal" href="#the-stores" id="toc-entry-21">The Stores</a><ul>
+<li><a class="reference internal" href="#messagestore-js-1" id="toc-entry-22">MessageStore.js</a></li>
+<li><a class="reference internal" href="#authorstore-js" id="toc-entry-23">AuthorStore.js</a></li>
+<li><a class="reference internal" href="#categorystore-js" id="toc-entry-24">CategoryStore.js</a></li>
+<li><a class="reference internal" href="#bookstore-js" id="toc-entry-25">BookStore.js</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#conclusion" id="toc-entry-26">Conclusion</a></li>
+</ul>
+</div>
+<div class="section" id="introduction">
+<h2><a class="toc-backref" href="#toc-entry-1">Introduction</a></h2>
+<p>In <a class="reference external" href="https://spapas.github.io/2015/06/05/comprehensive-react-flux-tutorial/">previous</a>
+<a class="reference external" href="https://spapas.github.io/2015/07/02/comprehensive-react-flux-tutorial-2/">two</a> parts of this series, we have seen
+how we could implement a
+not-so-simple single page application with full <span class="caps">CRUD</span> capabilities
+using react only (in the <a class="reference external" href="https://spapas.github.io/2015/06/05/comprehensive-react-flux-tutorial/">first part</a> ) and then how to
+change it to use the flux architecture (in the <a class="reference external" href="https://spapas.github.io/2015/07/02/comprehensive-react-flux-tutorial-2/">second part</a>).</p>
+<p>In this, third, part, we will
+add some more capabilities to the previous app
+to prove how easy it is to create complex apps
+and continue the discussion on
+the Flux architecture. The source code of this project
+can
+be found at <a class="reference external" href="https://github.com/spapas/react-tutorial">https://github.com/spapas/react-tutorial</a> (tag name&nbsp;react-flux-complex).</p>
+<p>Here&#8217;s a demo of the final&nbsp;application:</p>
+<img alt="Our project" src="/images/demo2.gif" style="width: 780px;" />
+<p>We can see that, when compared to the previous version this one&nbsp;has:</p>
+<ul class="simple">
+<li>Sorting by table&nbsp;columns</li>
+<li>Pagination</li>
+<li>Message for&nbsp;loading</li>
+<li>Client side url updating (with&nbsp;hashes)</li>
+<li>Cascading drop downs (selecting category will filter out&nbsp;subcategories)</li>
+<li>Integration with jquery-ui&nbsp;datepicker</li>
+<li>Add a child object&nbsp;(author)</li>
+<li>Add authors with a modal dialog&nbsp;(popup)</li>
+<li>Delete authors (using the &#8220;-&#8221;&nbsp;button)</li>
+<li>Colored ajax result messages (green when all is ok, red with&nbsp;error)</li>
+<li>A statistics panel (number of books /&nbsp;authors)</li>
+</ul>
+<p>In the paragraphs below, beyond the whole architecture, we&#8217;ll see
+a bunch of techniques such&nbsp;as:</p>
+<ul class="simple">
+<li>Creating reusable flux&nbsp;components</li>
+<li>Integrating react with&nbsp;jquery</li>
+<li>Creating cascading&nbsp;dropdowns</li>
+<li>Updating URLs with&nbsp;hashes</li>
+<li>Adding pagination/sorting/querying to a table of&nbsp;results</li>
+<li>Displaying pop&nbsp;ups</li>
+</ul>
+</div>
+<div class="section" id="more-about-flux-components">
+<h2><a class="toc-backref" href="#toc-entry-2">More about Flux&nbsp;components</a></h2>
+<p>Before delving into the source code of the above application, I&#8217;d like to
+make crystal what is the proposed way to call methods in the flux chain
+and which types of components can include other types of components. Let&#8217;s
+take a look at the following&nbsp;diagram:</p>
+<img alt="flux dependencies" src="/images/react_flux_deps1.png" style="width: 480px;" />
+<p>The arrows display the dependencies of the Flux architecture - an arrow
+from X to Y means that a component of type Y could depend on an Component
+of type X (of example, a store could depend on an action or another store
+but not on a&nbsp;panel).</p>
+<p>In more detail, we can see that in the top of the hierarchy,
+having no dependencies are the
+Dispatcher and the Constants. The Dispatcher is just a single component
+(which actually is a singleton - only one dispatcher exists in each
+single page react-flux application)
+that inherits from the Facebook&#8217;s dispatcher and is imported by the
+action components (since action methods defined in action components
+call the <tt class="docutils literal">dispatch</tt> method of the dispatcher passing the correct
+parameters) and the stores which do the real actions when an action
+is dispatched, depending on the action type. The Constant components
+define constant values for the action types and are used by both
+the actions (to set the action types to the dispatch calls) and by
+the stores to be used on the switch statement when an action is
+dispatched. As an example, for BookActions we have the&nbsp;following</p>
+<pre class="code literal-block">
+var BookConstants = require('../constants/BookConstants')
+var AppDispatcher = require('../dispatcher/AppDispatcher').AppDispatcher;
+
+var BookActions = {
+    change_book: function(book) {
+        AppDispatcher.dispatch({
+            actionType: BookConstants.BOOK_CHANGE,
+            book: book
+        });
+    },
+// Other book actions [...]
+</pre>
+<p>and for&nbsp;BookStore</p>
+<pre class="code literal-block">
+var $ = require('jquery');
+var AppDispatcher = require('../dispatcher/AppDispatcher').AppDispatcher;
+var BookConstants = require('../constants/BookConstants')
+
+// [...]
+
+BookStore.dispatchToken = AppDispatcher.register(function(action) {
+    switch(action.actionType) {
+        case BookConstants.BOOK_EDIT:
+            _editBook(action.book);
+        break;
+// [...] other switch branches
+</pre>
+<p>An interesting thing to see is that the actions depend only on the Dispatcher
+and on the Constants, while the stores also depend on actions (not only
+from the same action types as the store type, for example AuthorStore depends
+on both AuthorActions and MessageActions) and on <em>other</em> stores. This means
+that the actions should be a &#8220;clean&#8221; component: Just declare your action methods
+whose only purpose is to pass the action type along with the required parameters
+to the&nbsp;dispatcher.</p>
+<p>On the other hand, the stores are depending on both actions and other stores.
+The action dependency is because sometimes when something is done in a store
+we need to notify another store to do something as a response to that. For
+example, in our case, when a book is updated we need to notify the message
+store to show the &#8220;Book updated ok&#8221; message. This preferrably should not be done by
+directly calling the corresponding method on the message store but instead
+by calling the corresponding action of MessageAction and passing the correct
+parameters (actually, the method that updates the message in MessageStore
+should be a private method that is called <em>only</em> through the&nbsp;action).</p>
+<p>One thing to notice here is that you <em>cannot</em> call (and dispatch) an action in the
+same call stack (meaning it is directly called) as of another dispatch or you&#8217;ll get a
+<tt class="docutils literal">Invariant Violation: <span class="pre">Dispatch.dispatch(...):</span> Cannot dispatch in the middle of a dispatch.</tt>
+error in your javascript console. Let&#8217;s see an example of what this means and how
+to avoid it because its a common error. Let&#8217;s say that we have the following
+code to a&nbsp;store:</p>
+<pre class="code literal-block">
+AppDispatcher.register(function(action) {
+    switch(action.actionType) {
+        case Constants.TEST_ERR:
+            TestActions.action1();
+        break;
+        case Constants.TEST_OK1:
+            setTimeout(function() {
+                TestActions.action1();
+            }, 0);
+
+        break;
+        case Constants.TEST_OK2:
+            $.get('/get/', function() {
+                TestActions.action1();
+            });
+
+        break;
+    }
+    return true;
+});
+</pre>
+<p>Here, the <tt class="docutils literal">TEST_ERR</tt> branch will throw an error because the <tt class="docutils literal">TestAction.action1</tt> is <em>in the same call stack</em>
+as this dispatch! On the other hand, both <tt class="docutils literal">TEST_OK1</tt> and <tt class="docutils literal">TEST_OK2</tt> will work: <tt class="docutils literal">TEST_OK2</tt> is the most
+usual, since most of the times we want to call an action as a result of an ajax call - however, sometimes we
+want to call an action without any ajax &#8212; in this case we use the setTimeout (with a timeout of 0 ms) in
+order to move the call to <tt class="docutils literal">TestActions.action1()</tt> to a different call&nbsp;stack.</p>
+<p>Now, as I mentioned before, there&#8217;s also a <em>different-store</em> dependency on stores.
+This dependency is needed because some stores may offer public methods for other stores to use
+(methods that don&#8217;t actually need to be dispatched through the dispatcher) and
+for the <tt class="docutils literal">waitFor</tt> method , in case there are two different
+stores that respond to a single action and want to have one store executing
+its dispatch method before the other.
+(the waitFor method takes the dispatchToken, which is the result of <tt class="docutils literal">Dispatcher.register</tt> of
+a different store as a parameter in order to wait for that action to&nbsp;finish).</p>
+<p>Finally, the Panels depend on both actions (to initiate an action as a response
+to user input) and stores (to read the state of the each required store when it
+is changed). Of course, not all panels actually depend on stores, since as we
+already know the state of a React app should be kept as high in the hierarchy
+as possible, so a central component will get the state of a store and pass the
+required state attributes to its children through parameters. On the other
+hand, every component that responds to user input will have to import
+am action object and call the corresponding method &#8212; we should never pass
+callbacks from a parent to a child component as a parameter anymore <em>unless</em>
+we want to make the component reusable (more on this&nbsp;later).</p>
+<p>Finally, as expected, because of their hierarchy the compoents depend on their
+child components (a BookTable depends on a BookTableRow&nbsp;etc).</p>
+</div>
+<div class="section" id="explaining-the-application-components">
+<h2><a class="toc-backref" href="#toc-entry-3">Explaining the application&nbsp;components</a></h2>
+<p>There are a lot of components that are needed for
+the above application. A bird&#8217;s eye view of the components
+and their hierarchies can be seen on the following&nbsp;figure:</p>
+<img alt="Our components" src="/images/complex_react_components.png" style="width: 780px;" />
+<p>We will first explain a bit the components that could be easily reused
+by other applications and after that the components that are specifically
+implemented for our book/author single page&nbsp;application.</p>
+</div>
+<div class="section" id="reusable-application-components">
+<h2><a class="toc-backref" href="#toc-entry-4">Reusable application&nbsp;components</a></h2>
+<p>We can see that beyond the specific components (<tt class="docutils literal">BookPanel</tt>, <tt class="docutils literal">BookTable</tt> etc)
+there&#8217;s a bunch of more general components (<tt class="docutils literal">DropDown</tt>, <tt class="docutils literal">DatePicker</tt>, <tt class="docutils literal">PagingPanel</tt>, <tt class="docutils literal">SearchPanel</tt>,
+<tt class="docutils literal">MessagePanel</tt>) that have names like they could be used by other applications (for example every application
+that wants to implement a DropDown could use our component) and not only by the
+Book-Author application. Let&#8217;s take a quick look at these components and if they
+are actually&nbsp;reusable:</p>
+<div class="section" id="dropdown-react-js">
+<h3><a class="toc-backref" href="#toc-entry-5">DropDown.react.js</a></h3>
+<pre class="code literal-block">
+var React = require('react');
+
+var DropDown = React.createClass({
+    render: function() {
+        var options = [];
+        options.push(&lt;option key='-1' value='' &gt;---&lt;/option&gt;);
+        if(this.props.options) {
+            this.props.options.forEach(function(option) {
+                options.push(&lt;option key={option.id} value={option.id}&gt;{option.name}&lt;/option&gt;);
+            });
+        }
+
+        return(
+            &lt;select ref='dropdown' value={this.props.value?this.props.value:''} onChange={this.onFormChange} &gt;
+                {options}
+            &lt;/select&gt;
+        );
+    },
+    onFormChange: function() {
+        var val = React.findDOMNode(this.refs.dropdown).value
+        this.props.dropDownValueChanged(val);
+    }
+});
+
+module.exports.DropDown = DropDown;
+</pre>
+<p>What we see here is that this component does not actually have a local state and will need three&nbsp;parameters:</p>
+<ul class="simple">
+<li>the list of options (<tt class="docutils literal">props.options</tt>)</li>
+<li>the curently selected option (<tt class="docutils literal">props.value</tt>)</li>
+<li>a callback to be called when the dropdown is changed (<tt class="docutils literal">props.dropDownValueChanged</tt>)</li>
+</ul>
+<p>By passing the above three parameters this dropdown component can be reused whenever a dropdown is needed!
+As we can see here we need to pass a callback function to this dropdown and call the corresponding action
+directly. This is important to have a reusable component: The component that includes each dropdown decides
+which should be the action on the dropdown value change. Another option if we wanted to avoid callbacks
+would be to pass an identifier as a property for each dropdown and the dropdown would call a generic
+dropdown action and passing this identifier &#8212; however I think that actually passing the callback is
+easier and makes the code much more&nbsp;readable.</p>
+</div>
+<div class="section" id="datepicker-react-js">
+<h3><a class="toc-backref" href="#toc-entry-6">DatePicker.react.js</a></h3>
+<p>The datepicker component has more or less the same structure as with the dropdown: It needs one parameter
+for its current value (<tt class="docutils literal">props.value</tt>) and another as the callback to the function when the date is
+changed (once again this is required to have a reusable&nbsp;component):</p>
+<pre class="code literal-block">
+var React = require('react');
+
+var DatePicker = React.createClass({
+    render: function() {
+        return(
+            &lt;input type='text' ref='date' value={this.props.value} onChange={this.handleChange} /&gt;
+        );
+    },
+    componentDidMount: function() {
+        $(React.findDOMNode(this)).datepicker({ dateFormat: 'yy-mm-dd' });
+        $(React.findDOMNode(this)).on('change', this.handleChange);
+    },
+    componentWillUnmount: function() {
+
+    },
+    handleChange: function() {
+        var date = React.findDOMNode(this.refs.date).value
+        this.props.onChange(date);
+    }
+});
+
+module.exports.DatePicker = DatePicker ;
+</pre>
+<p>Another thing we can see here is how can integrate jquery components with react: When
+the component is mounted, we get its <span class="caps">DOM</span> component using <tt class="docutils literal">React.findDomNode(this)</tt> and
+convert it to a datepicker. We also set its change function to be the passed&nbsp;callback.</p>
+</div>
+<div class="section" id="pagingpanel-react-js">
+<h3><a class="toc-backref" href="#toc-entry-7">PagingPanel.react.js</a></h3>
+<p>The paging panel is not actually a reusable component because it requires BookActions
+(to handle next and previous page clicks) - so
+it can&#8217;t be used by Authors (if authors was a table that is). However, we can easily
+change it to be reusable if we passed callbacks for next and previous page so that
+the component including PagingPanel would call the correct action on each click. Having
+a reusable PagingPangel is not needed for our application since only books have a&nbsp;table.</p>
+<pre class="code literal-block">
+var React = require('react');
+var BookActions = require('../actions/BookActions').BookActions;
+
+var PagingPanel = React.createClass({
+    render: function() {
+        return(
+            &lt;div className=&quot;row&quot;&gt;
+                {this.props.page==1?'':&lt;button onClick={this.onPreviousPageClick}&gt;&amp;lt;&lt;/button&gt;}
+                &amp;nbsp; Page {this.props.page} of {this.getTotalPages()} &amp;nbsp;
+                {this.props.page==this.getTotalPages()?'':&lt;button onClick={this.onNextPageClick} &gt;&amp;gt;&lt;/button&gt;}
+            &lt;/div&gt;
+        );
+    },
+    onNextPageClick: function(e) {
+        e.preventDefault();
+        BookActions.change_page(this.props.page+1)
+    },
+    onPreviousPageClick: function(e) {
+        e.preventDefault();
+        BookActions.change_page(this.props.page-1)
+    },
+    getTotalPages: function() {
+        return Math.ceil(this.props.total / this.props.page_size);
+    }
+})
+
+module.exports.PagingPanel = PagingPanel;
+</pre>
+<p>The component is very simple, it needs three&nbsp;parameters:</p>
+<ul class="simple">
+<li>the current page (<tt class="docutils literal">props.page</tt>)</li>
+<li>the page size (<tt class="docutils literal">props.page_size</tt>)</li>
+<li>the total pages number (<tt class="docutils literal">props.total</tt>)</li>
+</ul>
+<p>and just displayd the current page along with buttons to go to the next or previous page (if these buttons should be visible of&nbsp;course).</p>
+</div>
+<div class="section" id="searchpanel-react-js">
+<h3><a class="toc-backref" href="#toc-entry-8">SearchPanel.react.js</a></h3>
+<p>The SearchPanel is another panel that could be reusable if we&#8217;d passed a callbeck instead of calling the <tt class="docutils literal">BookActions.search</tt>
+action directly. The promise behavior has been explained in the previous posts and is needed to buffer the queries to the
+server when a user types his search&nbsp;query.</p>
+<pre class="code literal-block">
+var React = require('react');
+var BookActions = require('../actions/BookActions').BookActions;
+
+var SearchPanel = React.createClass({
+    getInitialState: function() {
+        return {
+            search: this.props.query,
+        }
+    },
+    componentWillReceiveProps: function(nextProps) {
+      this.setState({
+            search: nextProps.query
+      });
+    },
+    render: function() {
+        return (
+            &lt;div className=&quot;row&quot;&gt;
+                &lt;div className=&quot;one-fourth column&quot;&gt;
+                    Filter: &amp;nbsp;
+                    &lt;input ref='search' name='search' type='text' value={this.state.search} onChange={this.onSearchChange} /&gt;
+                    {this.state.search?&lt;button onClick={this.onClearSearch} &gt;x&lt;/button&gt;:''}
+                &lt;/div&gt;
+            &lt;/div&gt;
+        )
+    },
+    onSearchChange: function() {
+        var query = React.findDOMNode(this.refs.search).value;
+        if (this.promise) {
+            clearInterval(this.promise)
+        }
+        this.setState({
+            search: query
+        });
+        this.promise = setTimeout(function () {
+            BookActions.search(query);
+        }.bind(this), 400);
+    },
+    onClearSearch: function() {
+        this.setState({
+            search: ''
+        });
+        BookActions.search('');
+    }
+});
+
+module.exports.SearchPanel = SearchPanel;
+</pre>
+<p>As we can see, this panel is a little different than the previous ones because it actually handles its
+own local state: When the component should get properties from its parent compoent, its state will
+be updated to the <tt class="docutils literal">query</tt> attribute - so the current value of the search query gets updated through
+properties. However, when the value of the search input is changed, we see that the local state is
+changed immediately but the <tt class="docutils literal">BookActions.search</tt> (or the corresponding callback) gets called <em>only</em>
+when the timeout has&nbsp;passed!</p>
+<p>The above means that we can type whatever we want on the search input, but it at first it will be used
+only locally to immediately update the value of the input and, only after the timeout has fired the
+search action will be called. If we hadn&#8217;t used the local state it would be much more difficult to have
+this consistent behavior (we&#8217;d need to add two actions, one to handle the search query value change
+and another to handle the timeout firing &#8212; making everythimg much more&nbsp;complicated).</p>
+</div>
+<div class="section" id="messagepanel">
+<h3><a class="toc-backref" href="#toc-entry-9">MessagePanel</a></h3>
+<p>The MessagePanel is really interesting because it is a reusable component that actually has its own action and store module! This
+component can be reused in <em>different</em> applications that need to display message but <em>not</em> on the same application (because a single state
+is kept for all messages). If we wanted to use a different MessagePanel for Books or Authors then we&#8217;d need to keep both in the
+state <em>and</em> also it to the action to differentiate between messages for author and for book. Instead, by keeping a single Messages
+state for both Books and Authors we have a much more simple&nbsp;version.</p>
+<div class="section" id="messagepanel-react-js">
+<h4><a class="toc-backref" href="#toc-entry-10">MessagePanel.react.js</a></h4>
+<p>The MessagePanel component has a local state which responds to changes on MessageStore. When the
+state of MessageStore is changed the MessagePanel will be re-rendered with the new&nbsp;message.</p>
+<pre class="code literal-block">
+var React = require('react');
+var MessageStore = require('../stores/MessageStore').MessageStore;
+
+var MessagePanel = React.createClass({
+    getInitialState: function() {
+        return {
+
+        };
+    },
+    render: function() {
+        return(
+            &lt;div className=&quot;row&quot;&gt;
+                {this.state.message?&lt;div className={this.state.message.color}&gt;{this.state.message.text}&lt;/div&gt;:&quot;&quot;}
+            &lt;/div&gt;
+        );
+    },
+    _onChange: function() {
+        this.setState(MessageStore.getState());
+    },
+    componentWillUnmount: function() {
+        MessageStore.removeChangeListener(this._onChange);
+    },
+    componentDidMount: function() {
+        MessageStore.addChangeListener(this._onChange);
+    }
+})
+
+module.exports.MessagePanel = MessagePanel;
+</pre>
+</div>
+<div class="section" id="messagestore-js">
+<h4><a class="toc-backref" href="#toc-entry-11">MessageStore.js</a></h4>
+<p>The MessageStore has a (private) state containing a <tt class="docutils literal">message</tt> that gets updated
+only when the ccorresponding action is dispached. The store has a single state
+for all messages - it doesn&#8217;t care if the messages are for books or&nbsp;authors.</p>
+<pre class="code literal-block">
+var $ = require('jquery');
+var EventEmitter = require('events').EventEmitter;
+var AppDispatcher = require('../dispatcher/AppDispatcher').AppDispatcher;
+var BookConstants = require('../constants/BookConstants')
+
+var _state = {
+    message: {}
+};
+
+var MessageStore = $.extend({}, EventEmitter.prototype, {
+    getState: function() {
+        return _state;
+    },
+    emitChange: function() {
+        this.emit('change');
+    },
+    addChangeListener: function(callback) {
+        this.on('change', callback);
+    },
+    removeChangeListener: function(callback) {
+        this.removeListener('change', callback);
+    }
+});
+
+MessageStore.dispatchToken = AppDispatcher.register(function(action) {
+    switch(action.actionType) {
+        case BookConstants.MESSAGE_ADD:
+            _state.message = action.message;
+            MessageStore.emitChange();
+        break;
+    }
+    return true;
+});
+
+module.exports.MessageStore = MessageStore;
+</pre>
+</div>
+<div class="section" id="messageactions">
+<h4><a class="toc-backref" href="#toc-entry-12">MessageActions</a></h4>
+<p>Finally, there are two actions that are defined for the MessageStore: One for adding
+an ok message and one for adding an error message - both of which have the same
+message type (but pass a different color&nbsp;parameter).</p>
+<pre class="code literal-block">
+var AppDispatcher = require('../dispatcher/AppDispatcher').AppDispatcher;
+var BookConstants = require('../constants/BookConstants')
+
+var MessageActions = {
+    add_message_ok: function(msg) {
+        AppDispatcher.dispatch({
+            actionType: BookConstants.MESSAGE_ADD,
+            message: {
+                color: 'green',
+                text: msg
+            }
+        });
+    },
+    add_message_error: function(msg) {
+        AppDispatcher.dispatch({
+            actionType: BookConstants.MESSAGE_ADD,
+            message: {
+                color: 'green',
+                text: msg
+            }
+        });
+    }
+};
+
+module.exports.MessageActions = MessageActions;
+</pre>
+</div>
+</div>
+</div>
+<div class="section" id="non-reusable-application-components">
+<h2><a class="toc-backref" href="#toc-entry-13">Non-reusable application&nbsp;components</a></h2>
+<p>I don&#8217;t want to discuss the source code for all the non-reusable components since some of them
+are more or less the same with the previous version and are easy to understand just by
+checking the source code (BookTableRow and ButtonPanel). However, I&#8217;ll
+discuss the other, more complex components starting from the inside of the&nbsp;react-onion:</p>
+<div class="section" id="booktable-react-js">
+<h3><a class="toc-backref" href="#toc-entry-14">BookTable.react.js</a></h3>
+<p>I want to display this component to discuss how sorting is implemented: Each column has a key which,
+when passed to django-rest-framework will sort the results based on that key (the <tt class="docutils literal">__</tt> does a
+join so by <tt class="docutils literal">author__last_name</tt> we mean that we want to sort by the last_name field of the author
+of each book. Also, you can pass the key as it is to sort ascending or with a minus (-) in front
+(for example <tt class="docutils literal"><span class="pre">-author__last_name</span></tt>).</p>
+<pre class="code literal-block">
+var React = require('react');
+var BookTableRow = require('./BookTableRow.react').BookTableRow;
+var BookActions = require('../actions/BookActions').BookActions;
+
+var BookTable = React.createClass({
+    render: function() {
+        var rows = [];
+        this.props.books.forEach(function(book) {
+            rows.push(&lt;BookTableRow key={book.id} book={book} /&gt;);
+        });
+        return (
+            &lt;table&gt;
+                &lt;thead&gt;
+                    &lt;tr&gt;
+                        &lt;th&gt;&lt;a href='#' onClick={this.onClick.bind(this, 'id')}&gt;{this.showOrdering('id')} Id&lt;/a&gt;&lt;/th&gt;
+                        &lt;th&gt;&lt;a href='#' onClick={this.onClick.bind(this, 'title')}&gt;{this.showOrdering('title')} Title&lt;/a&gt;&lt;/th&gt;
+                        &lt;th&gt;&lt;a href='#' onClick={this.onClick.bind(this, 'subcategory__name')}&gt;{this.showOrdering('subcategory__name')} Category&lt;/a&gt;&lt;/th&gt;
+                        &lt;th&gt;&lt;a href='#' onClick={this.onClick.bind(this, 'publish_date')}&gt;{this.showOrdering('publish_date')} Publish date&lt;/a&gt;&lt;/th&gt;
+                        &lt;th&gt;&lt;a href='#' onClick={this.onClick.bind(this, 'author__last_name')}&gt;{this.showOrdering('author__last_name')} Author&lt;/a&gt;&lt;/th&gt;
+                        &lt;th&gt;Edit&lt;/th&gt;
+                    &lt;/tr&gt;
+                &lt;/thead&gt;
+                &lt;tbody&gt;{rows}&lt;/tbody&gt;
+            &lt;/table&gt;
+        );
+    },
+    onClick: function(v, e) {
+        e.preventDefault();
+        BookActions.sort_books(v);
+    },
+    showOrdering: function(v) {
+        if (v==this.props.ordering) {
+            return '+'
+        } else if ('-'+v==this.props.ordering) {
+            return '-'
+        }
+    }
+});
+
+module.exports.BookTable = BookTable ;
+</pre>
+<p>The only thing that needs explaining in this module is the line of the&nbsp;form</p>
+<pre class="code literal-block">
+&lt;th&gt;&lt;a href='#' onClick={this.onClick.bind(this, 'id')}&gt;{this.showOrdering('id')} Id&lt;/a&gt;&lt;/th&gt;
+</pre>
+<p>that creates the title of each column and triggers ascending or descending sorting on this column by
+clicking on it. So, we can see that we&#8217;ve create an onClick function that actually expects a value - the key
+to that column. To allow passing that value, we use the bind method of the function object which will
+create new a function that has this key as its first parameter. If we didn&#8217;t want to use bind, we&#8217;d need to
+creatre 5 different function (onIdClick, onTitleClick etc)! The most common usage of <tt class="docutils literal">bind</tt> is to actually <em>bind</em>
+a function to an object (that&#8217;s what the first parameter to this function does)
+so that calling this inside that function will refer to that object - here we leave the binding
+of the function to the same object and only do the parameter&nbsp;passing.</p>
+<p>Also, the showOrdering checks if the current ordering is the same as that column&#8217;s key and displays
+either a + (for ascending) or - (for descending) in front of the column&nbsp;title.</p>
+</div>
+<div class="section" id="authordialog-react-js">
+<h3><a class="toc-backref" href="#toc-entry-15">AuthorDialog.react.js</a></h3>
+<p>This is a handmade pop-up dialog that gets displayed when a new author is added (the + button is clicked)
+using only css to center it on the screen when it is displayed.
+We can see that it is either visible on invisible based on the <tt class="docutils literal">showDialog</tt> input property which actually
+is the only input this component requires. When it is visible and the ok or cancel button are pressed
+the corresponding action will be dispatched (which will actually close this popup by setting the <tt class="docutils literal">showDialog</tt>
+to&nbsp;false):</p>
+<pre class="code literal-block">
+var React = require('react');
+var AuthorActions = require('../actions/AuthorActions').AuthorActions;
+
+var AuthorDialog = React.createClass({
+
+    render: function() {
+        if (!this.props.showDialog) {
+            return (
+                &lt;div /&gt;
+            )
+        } else {
+            return(
+                &lt;div className='modal-dialog' id=&quot;dialog-form&quot;  &gt;
+                    &lt;label htmlFor=&quot;first_name&quot;&gt;First name:&lt;/label&gt; &lt;input type='text' ref='first_name' name='first_name' /&gt; &lt;br /&gt;
+                    &lt;label htmlFor=&quot;last_name&quot;&gt;Last name:&lt;/label&gt; &lt;input type='text' ref='last_name' name='last_name' /&gt; &lt;br /&gt;
+                    &lt;button onClick={this.onOk}&gt;Ok&lt;/button&gt;
+                    &lt;button onClick={this.onCancel} &gt;Cancel&lt;/button&gt;
+                &lt;/div&gt;
+
+            );
+        }
+    },
+    onCancel: function(e) {
+        e.preventDefault();
+        AuthorActions.hide_add_author();
+    },
+    onOk: function(e) {
+        e.preventDefault();
+        first_name = React.findDOMNode(this.refs.first_name).value;
+        last_name = React.findDOMNode(this.refs.last_name).value;
+        AuthorActions.add_author_ok({
+            first_name: first_name,
+            last_name: last_name
+        });
+    }
+});
+
+module.exports.AuthorDialog = AuthorDialog ;
+</pre>
+</div>
+<div class="section" id="authorpanel-react-js">
+<h3><a class="toc-backref" href="#toc-entry-16">AuthorPanel.react.js</a></h3>
+<p>The AuthorPanel displays the author select DropDown along with the + (add author) and
+- (delete author) buttons. It also contains the AuthorDialog which will be displayed
+or not depending on the value of the <tt class="docutils literal">showDialog</tt> property.</p>
+<pre class="code literal-block">
+var React = require('react');
+var DropDown = require('./DropDown.react').DropDown;
+var AuthorDialog = require('./AuthorDialog.react').AuthorDialog;
+var AuthorActions = require('../actions/AuthorActions').AuthorActions;
+
+var AuthorPanel = React.createClass({
+    getInitialState: function() {
+        return {};
+    },
+    render: function() {
+        var authorExists = false ;
+        if(this.props.authors) {
+            var ids = this.props.authors.map(function(x) {
+                return x.id*1;
+            });
+
+            if(ids.indexOf(1*this.props.author)&gt;=0 ) {
+                authorExists = true;
+            }
+        }
+
+        return(
+            &lt;div className='one-half column'&gt;
+                &lt;AuthorDialog showDialog={this.props.showDialog} /&gt;
+                &lt;label forHtml='date'&gt;Author&lt;/label&gt;
+                &lt;DropDown options={this.props.authors} dropDownValueChanged={this.props.onAuthorChanged} value={authorExists?this.props.author:''} /&gt;
+                &lt;button onClick={this.addAuthor} &gt;+&lt;/button&gt;
+                {authorExists?&lt;button onClick={this.deleteAuthor}&gt;-&lt;/button&gt;:&quot;&quot;}
+            &lt;/div&gt;
+        );
+    },
+    addAuthor: function(e) {
+        e.preventDefault();
+        console.log(&quot;ADD AUTHOR&quot;);
+        AuthorActions.show_add_author();
+    },
+    deleteAuthor: function(e) {
+        e.preventDefault();
+        AuthorActions.delete_author(this.props.author);
+        console.log(&quot;DELETE AUTHOR&quot;);
+        console.log(this.props.author);
+    },
+});
+
+module.exports.AuthorPanel = AuthorPanel;
+</pre>
+<p>As we can see, there are three properties that are passed to this&nbsp;component:</p>
+<ul class="simple">
+<li><tt class="docutils literal">props.author</tt>: The currently selected&nbsp;author</li>
+<li><tt class="docutils literal">props.authors</tt>: The list of all&nbsp;authors</li>
+<li><tt class="docutils literal">props.onAuthorChanged</tt>: A callback that is called when the author is changed. Here, we could have used an action (just like for add/delete author) instead of a callback, however its not actually required. When the author is changed, it means that the currently edited book&#8217;s author is changed. So we could propagate the change to the parent (form) component that handles the book change along with the other changes (i.e title, publish date&nbsp;etc).</li>
+</ul>
+</div>
+<div class="section" id="statpanel-react-js">
+<h3><a class="toc-backref" href="#toc-entry-17">StatPanel.react.js</a></h3>
+<p>The StatPanel is an interesting, read-only component that displays the number of
+authors and books. This component requests updates from both the <tt class="docutils literal">BookStore</tt> and
+<tt class="docutils literal">AuthorStore</tt> - when their state is updated the component will be re-rendered
+with the number of books and&nbsp;authors:</p>
+<pre class="code literal-block">
+var React = require('react');
+var BookStore = require('../stores/BookStore').BookStore;
+var AuthorStore = require('../stores/AuthorStore').AuthorStore;
+
+var StatPanel = React.createClass({
+    getInitialState: function() {
+        return {};
+    },
+    render: function() {
+        var book_len = '-';
+        var author_len = '-';
+        if(this.state.books) {
+            book_len = this.state.books.length
+        }
+        if(this.state.authors) {
+            author_len = this.state.authors.length
+        }
+        return(
+            &lt;div className=&quot;row&quot;&gt;
+                &lt;div className=&quot;one-half column&quot;&gt;
+                    Books number: {book_len}
+                &lt;/div&gt;
+                &lt;div className=&quot;one-half column&quot;&gt;
+                    Authors number: {author_len}
+                &lt;/div&gt;
+                &lt;br /&gt;
+            &lt;/div&gt;
+        );
+    },
+    _onBookChange: function() {
+        this.setState({
+            books:BookStore.getState().books
+        });
+    },
+    _onAuthorChange: function() {
+        this.setState({
+            authors: AuthorStore.getState().authors
+        });
+    },
+    componentWillUnmount: function() {
+        AuthorStore.removeChangeListener(this._onAuthorChange);
+        BookStore.removeChangeListener(this._onBookChange);
+    },
+    componentDidMount: function() {
+        AuthorStore.addChangeListener(this._onAuthorChange);
+        BookStore.addChangeListener(this._onBookChange);
+    }
+});
+
+module.exports.StatPanel = StatPanel ;
+</pre>
+<p>We&#8217;ve added different change listeners in case we wanted to do
+some more computations for book or author change (instead of just
+getting their books / authors property). Of course the same behavior
+could be achieved with just a single change listener that would
+get both the books and&nbsp;authors.</p>
+</div>
+<div class="section" id="bookform-react-js">
+<h3><a class="toc-backref" href="#toc-entry-18">BookForm.react.js</a></h3>
+<p>The BookForm is one of the most complex panels of this application (along with BookPanel) because
+it actually contains a bunch of other panels and has some callbacks for them to&nbsp;use.</p>
+<p>We can see that, as explained before, when the current book form values are changed (through callbacks) the change_book action will be&nbsp;called.</p>
+<pre class="code literal-block">
+var React = require('react');
+var BookActions = require('../actions/BookActions').BookActions;
+var DropDown = require('./DropDown.react.js').DropDown;
+var StatPanel = require('./StatPanel.react.js').StatPanel;
+var MessagePanel = require('./MessagePanel.react.js').MessagePanel;
+var DatePicker = require('./DatePicker.react.js').DatePicker;
+var ButtonPanel = require('./ButtonPanel.react.js').ButtonPanel;
+var AuthorPanel = require('./AuthorPanel.react.js').AuthorPanel;
+var CategoryStore = require('../stores/CategoryStore').CategoryStore;
+var AuthorStore = require('../stores/AuthorStore').AuthorStore;
+var loadCategories = require('../stores/CategoryStore').loadCategories;
+var loadAuthors = require('../stores/AuthorStore').loadAuthors;
+
+var BookForm = React.createClass({
+    getInitialState: function() {
+        return {};
+    },
+    render: function() {
+        return(
+            &lt;form onSubmit={this.onSubmit}&gt;
+                &lt;div className='row'&gt;
+                    &lt;div className='one-half column'&gt;
+                        &lt;label forHtml='title'&gt;Title&lt;/label&gt;
+                        &lt;input ref='title' name='title' type='text' value={this.props.book.title} onChange={this.onTitleChange} /&gt;
+                    &lt;/div&gt;
+                    &lt;div className='one-half column'&gt;
+                        &lt;label forHtml='date'&gt;Publish date&lt;/label&gt;
+                        &lt;DatePicker ref='date' onChange={this.onDateChange} value={this.props.book.publish_date} /&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+                &lt;div className='row'&gt;
+                    &lt;div className='one-half column'&gt;
+                        &lt;label forHtml='category'&gt;Category&lt;/label&gt;
+                        &lt;DropDown options={this.state.categories} dropDownValueChanged={this.onCategoryChanged} value={this.props.book.category} /&gt;
+                        &lt;DropDown options={this.state.subcategories} dropDownValueChanged={this.onSubCategoryChanged} value={this.props.book.subcategory} /&gt;
+                    &lt;/div&gt;
+                    &lt;AuthorPanel authors={this.state.authors} author={this.props.book.author} onAuthorChanged={this.onAuthorChanged} showDialog={this.state.showDialog} /&gt;
+                &lt;/div&gt;
+
+                &lt;ButtonPanel book={this.props.book}  /&gt;
+                &lt;MessagePanel /&gt;
+                &lt;StatPanel  /&gt;
+            &lt;/form&gt;
+        );
+    },
+    onSubmit: function(e) {
+        e.preventDefault();
+        BookActions.save(this.props.book)
+    },
+    onTitleChange: function() {
+        this.props.book.title = React.findDOMNode(this.refs.title).value;
+        BookActions.change_book(this.props.book);
+    },
+    onDateChange: function(date) {
+        this.props.book.publish_date = date;
+        BookActions.change_book(this.props.book);
+    },
+    onCategoryChanged: function(cat) {
+        this.props.book.category = cat;
+        this.props.book.subcategory = '';
+        BookActions.change_book(this.props.book);
+    },
+    onSubCategoryChanged: function(cat) {
+        this.props.book.subcategory = cat;
+        BookActions.change_book(this.props.book);
+    },
+    onAuthorChanged: function(author) {
+        this.props.book.author = author;
+        BookActions.change_book(this.props.book);
+    },
+    _onChangeCategories: function() {
+        this.setState(CategoryStore.getState());
+    },
+    _onChangeAuthors: function() {
+        this.setState(AuthorStore.getState());
+    },
+    componentWillUnmount: function() {
+        CategoryStore.removeChangeListener(this._onChangeCategories);
+        AuthorStore.removeChangeListener(this._onChangeAuthors);
+    },
+    componentDidMount: function() {
+        CategoryStore.addChangeListener(this._onChangeCategories);
+        AuthorStore.addChangeListener(this._onChangeAuthors);
+        loadCategories();
+        loadAuthors();
+    }
+});
+
+module.exports.BookForm = BookForm;
+</pre>
+<p>The above component listens for updates on both Category and Author store to update
+when the authors (when an author is added or deleted) and the categories are changed (for example to implement the cascading dropdown
+functionality), so the list of authors and the list of categories and subcategoreis are all stored in
+the local state. The book that is edited is just passed as a property - actually, this is the only
+property that this component needs to&nbsp;work.</p>
+</div>
+<div class="section" id="bookpanel-react-js">
+<h3><a class="toc-backref" href="#toc-entry-19">BookPanel.react.js</a></h3>
+<p>Finally, BookPanel is the last component we&#8217;ll talk about. This is the central component
+of the application - however we&#8217;ll see that it is not very complex (since most user interaction
+is performed in other components). This component just listens on changes in the BookStore state
+and depending on the parameters either displays the &#8220;Loading&#8221; message or the table of books
+(depending on the state of ajax calls that load the books). The other parameters like the
+list of books, the ordering of the books etc are passed to the child&nbsp;components.</p>
+<pre class="code literal-block">
+var React = require('react');
+var BookStore = require('../stores/BookStore').BookStore;
+var BookActions = require('../actions/BookActions').BookActions;
+var SearchPanel = require('./SearchPanel.react').SearchPanel;
+var BookTable = require('./BookTable.react').BookTable;
+var PagingPanel = require('./PagingPanel.react').PagingPanel;
+var BookForm = require('./BookForm.react').BookForm;
+
+var reloadBooks = require('../stores/BookStore').reloadBooks;
+
+var BookPanel = React.createClass({
+    getInitialState: function() {
+        return BookStore.getState();
+    },
+    render: function() {
+        return(
+            &lt;div className=&quot;row&quot;&gt;
+                &lt;div className=&quot;one-half column&quot;&gt;
+                    {
+                        this.state.loading?
+                        &lt;div class='loading' &gt;Loading...&lt;/div&gt;:
+                        &lt;div&gt;
+                            &lt;SearchPanel query={this.state.query} &gt;&lt;/SearchPanel&gt;
+                            &lt;BookTable books={this.state.books} ordering={this.state.ordering} /&gt;
+                            &lt;PagingPanel page_size='5' total={this.state.total} page={this.state.page} /&gt;
+                        &lt;/div&gt;
+                    }
+                &lt;/div&gt;
+                &lt;div className=&quot;one-half column&quot;&gt;
+                    &lt;BookForm
+                        book={this.state.editingBook}
+                    /&gt;
+                &lt;/div&gt;
+                &lt;br /&gt;
+            &lt;/div&gt;
+        );
+    },
+    _onChange: function() {
+        this.setState( BookStore.getState() );
+    },
+    componentWillUnmount: function() {
+        BookStore.removeChangeListener(this._onChange);
+    },
+    componentDidMount: function() {
+        BookStore.addChangeListener(this._onChange);
+        reloadBooks();
+    }
+});
+
+module.exports.BookPanel = BookPanel ;
+</pre>
+</div>
+</div>
+<div class="section" id="the-actions">
+<h2><a class="toc-backref" href="#toc-entry-20">The&nbsp;Actions</a></h2>
+<p>All actions are rather simple components without other dependencies as we&#8217;ve already discussed. They
+just define &#8220;actions&#8221; (which are simple functions) that create the correct parameter object type and pass it
+to the dispatcher. The only attribute that is required for this object is the <tt class="docutils literal">actionType</tt> that
+should get a value from the constants. I won&#8217;t go into any more detail about the actions &#8212; please check
+the source code and all your questions will be&nbsp;resolved.</p>
+</div>
+<div class="section" id="the-stores">
+<h2><a class="toc-backref" href="#toc-entry-21">The&nbsp;Stores</a></h2>
+<p>First of all, all stores are defined through the following code that is already discussed in the previous&nbsp;part:</p>
+<pre class="code literal-block">
+var MessageStore = $.extend({}, EventEmitter.prototype, {
+    getState: function() {
+        return _state;
+    },
+    emitChange: function() {
+        this.emit('change');
+    },
+    addChangeListener: function(callback) {
+        this.on('change', callback);
+    },
+    removeChangeListener: function(callback) {
+        this.removeListener('change', callback);
+    }
+});
+</pre>
+<p>When the state of a store is changed its <tt class="docutils literal">emitChange</tt> function will be called (I mean
+called manually from the code that actually changes the state and knows that it has
+actually been changed - nothing will be called automatically). When <tt class="docutils literal">emitChange</tt> is called,
+all the components that listen for changes for this component (that have called <tt class="docutils literal">addChangeListener</tt>
+of the store with a callback)
+will be notified (their callback will be called) and will use
+<tt class="docutils literal">getState</tt> of the store to get its current state - after that, these components will set their own state
+to re-render and display the changes to the&nbsp;store.</p>
+<p>Let&#8217;s now discuss the four stores defined &#8212; I will include only the parts of each file that are
+actually interesting, for everything else <em>use the source Luke</em>!</p>
+<div class="section" id="messagestore-js-1">
+<h3><a class="toc-backref" href="#toc-entry-22">MessageStore.js</a></h3>
+<p>A very simple store that goes together with MessagePanel and MessageActions. It just keeps a state with
+the current message object and just changes this message when the MESSAGE_ADD message
+type is dispatched. After changing the message, the listeners (only one in this case) will be notified to
+update the displayed&nbsp;message:</p>
+<pre class="code literal-block">
+var _state = {
+    message: {}
+};
+
+MessageStore.dispatchToken = AppDispatcher.register(function(action) {
+    switch(action.actionType) {
+        case BookConstants.MESSAGE_ADD:
+            _state.message = action.message;
+            MessageStore.emitChange();
+        break;
+    }
+    return true;
+});
+</pre>
+</div>
+<div class="section" id="authorstore-js">
+<h3><a class="toc-backref" href="#toc-entry-23">AuthorStore.js</a></h3>
+<p>Here we see that the local state has an array of the authors and a <tt class="docutils literal">showDialog</tt> flag that
+controls the state of the add author popup. For the <tt class="docutils literal">AUTHOR_ADD</tt> and <tt class="docutils literal">HIDE_ADD_AUTHOR</tt>
+cases of the dispatch we just change the state of this flag and emit the change; the <tt class="docutils literal">BookForm</tt>
+listens for changes to the <tt class="docutils literal">AuthorStore</tt> and will pass the <tt class="docutils literal">showDialog</tt> to the <tt class="docutils literal">AuthorPanel</tt>
+as a property which in turn will pass it to <tt class="docutils literal">AuthorDialog</tt> and it will display the panel (or not)
+depending on the value of that flag. This flag will also take a false value when the add author
+ajax call&nbsp;returns.</p>
+<p>The <tt class="docutils literal">showDialog</tt> flag is not related to the actual data but is <span class="caps">UI</span>-related. This
+is something that we should keep in mind when creating stores: Stores don&#8217;t only contain the actual
+data (like models in an <span class="caps">MVC</span> application) but they should also contain <span class="caps">UI</span> (controller/view in an <span class="caps">MVC</span>
+architecture) related information since that is <em>also</em> part of the&nbsp;state!</p>
+<p>We can see that the ajax calls just issue the corresponding <span class="caps">HTTP</span> method to the <tt class="docutils literal">authors_url</tt> and
+when they return the <tt class="docutils literal">add_message_ok</tt> or <tt class="docutils literal">add_message_error</tt> methods of
+<tt class="docutils literal">MessageActions</tt> will be called. These calls are in a different call stack so everything will work fine
+(please remember the discussion about dispatches in different call stacks&nbsp;before).</p>
+<p>Finally, on the success of <tt class="docutils literal">_load_authors</tt> the map array method is called to transform the returned data
+as we want&nbsp;it:</p>
+<pre class="code literal-block">
+var $ = require('jquery');
+
+var _state = {
+    authors: [],
+    showDialog: false
+}
+
+var _load_authors = function() {
+    $.ajax({
+        url: _props.authors_url,
+        dataType: 'json',
+        cache: false,
+        success: function(data) {
+            _state.authors = data.map(function(a){
+                return {
+                    id: a.id,
+                    name: a.last_name+' '+a.first_name
+                }
+            });
+            AuthorStore.emitChange();
+        },
+        error: function(xhr, status, err) {
+            MessageActions.add_message_error(err.toString());
+        }
+    });
+};
+
+var _deleteAuthor = function(authorId) {
+    $.ajax({
+        url: _props.authors_url+authorId,
+        method: 'DELETE',
+        cache: false,
+        success: function(data) {
+            _load_authors();
+            MessageActions.add_message_ok(&quot;Author delete ok&quot;);
+            AuthorActions.delete_author_ok();
+        },
+        error: function(xhr, status, err) {
+            MessageActions.add_message_error(err.toString());
+        }
+    });
+};
+
+var _addAuthor = function(author) {
+    $.ajax({
+        url: _props.authors_url,
+        dataType: 'json',
+        method: 'POST',
+        data:author,
+        cache: false,
+        success: function(data) {
+            MessageActions.add_message_ok(&quot;Author add  ok&quot;);
+            _state.showDialog = false;
+            _load_authors();
+        },
+        error: function(xhr, status, err) {
+            MessageActions.add_message_error(err.toString());
+        }
+    });
+
+};
+
+AuthorStore.dispatchToken = AppDispatcher.register(function(action) {
+    switch(action.actionType) {
+        case BookConstants.SHOW_ADD_AUTHOR:
+            _state.showDialog = true;
+            AuthorStore.emitChange();
+        break;
+        case BookConstants.HIDE_ADD_AUTHOR:
+            _state.showDialog = false;
+            AuthorStore.emitChange();
+        break;
+        case BookConstants.AUTHOR_ADD:
+            _addAuthor(action.author);
+        break;
+        case BookConstants.AUTHOR_DELETE:
+            _deleteAuthor(action.authorId);
+        break;
+    }
+    return true;
+});
+</pre>
+</div>
+<div class="section" id="categorystore-js">
+<h3><a class="toc-backref" href="#toc-entry-24">CategoryStore.js</a></h3>
+<p>The CategoryStore has an interesting functionality concerning the load_subcategory
+function. This function is called whenever a book is changed (so its category form field
+may be changed and the subcategories may be reloaded based on this category) or is edited
+(so the category is that of the new book and once again the subcategories may need to because
+rerendered). It is important that we <em>actually</em> pass the current category to the book to the
+action. If for example we wanted to retrieve that from the state of the BookStore then we&#8217;d
+need to use the <tt class="docutils literal">waitFor</tt> functionality of the dispatcher so that the category of the
+current book would be changed first then the load_category (that would read that value to
+read the subcategoreis) would be called after&nbsp;that.</p>
+<p>Also, another thing to notice here is that there&#8217;s a simple subcat_cache that for each category
+contains the subcategories of that category so that we won&#8217;t do repeated ajax calls to reload
+the subcategories each time the category is&nbsp;changed.</p>
+<pre class="code literal-block">
+var _state = {
+    categories: [],
+    subcategories: []
+}
+
+var _current_cat = ''
+var _subcat_cache = []
+
+var _load_categories = function() {
+    $.ajax({
+        url: _props.categories_url,
+        dataType: 'json',
+        cache: false,
+        success: function(data) {
+            _state.categories = data;
+            CategoryStore.emitChange();
+        },
+        error: function(xhr, status, err) {
+            console.error(this.props.url, status, err.toString());
+        }
+    });
+};
+
+var _load_subcategories = function(cat) {
+
+    if(!cat) {
+        _state.subcategories = [];
+        CategoryStore.emitChange();
+        return ;
+    }
+    if(_subcat_cache[cat]) {
+        _state.subcategories = _subcat_cache[cat] ;
+        CategoryStore.emitChange();
+    }
+    $.ajax({
+        url: _props.subcategories_url+'?category='+cat,
+        dataType: 'json',
+        cache: false,
+        success: function(data) {
+            _state.subcategories = data;
+            _subcat_cache[cat] = data;
+            CategoryStore.emitChange();
+        },
+        error: function(xhr, status, err) {
+            console.error(this.props.url, status, err.toString());
+        }
+    });
+};
+
+CategoryStore.dispatchToken = AppDispatcher.register(function(action) {
+    switch(action.actionType) {
+        case BookConstants.BOOK_EDIT:
+        case BookConstants.BOOK_CHANGE:
+            _load_subcategories(action.book.category);
+        break;
+        case BookConstants.BOOK_EDIT_CANCEL:
+            _state.subcategories = [];
+            CategoryStore.emitChange();
+        break;
+    }
+    return true;
+});
+</pre>
+</div>
+<div class="section" id="bookstore-js">
+<h3><a class="toc-backref" href="#toc-entry-25">BookStore.js</a></h3>
+<p>Here, beyond the book-related functionality we have also implemented the
+<span class="caps">URL</span> updating. The getUrlParameter that returns the value of a <span class="caps">URL</span> parameter has been taken from
+<a class="reference external" href="http://stackoverflow.com/questions/19491336/get-url-parameter-jquery">http://stackoverflow.com/questions/19491336/get-url-parameter-jquery</a>. Depending on the url parameters, we set some initial properties of
+the local state and, on the other hand, when the search query, ordering or page are changed,
+the <tt class="docutils literal">_update_href</tt> function is called to update the url parameters. This is not really related
+to the flux architecture beyond the initialization of&nbsp;state.</p>
+<p>Another thing to notice is that the when the <tt class="docutils literal">_search</tt> is executed whenever there&#8217;s
+a change in the list of books (query is updated, sorting is changed, page is changed or
+when an author is deleted since the books that have that author should now display an
+empty field). The setTimeout in the _search ajax return is to simulate a 400ms delay (in order for the &#8220;Loading&#8221; text to
+be&nbsp;visible).</p>
+<pre class="code literal-block">
+function getUrlParameter(sParam) {
+    var sPageURL = $(location).attr('hash');
+    sPageURL = sPageURL.substr(1)
+    var sURLVariables = sPageURL.split('&amp;');
+    for (var i = 0; i &lt; sURLVariables.length; i++)  {
+        var sParameterName = sURLVariables[i].split('=');
+        if (sParameterName[0] == sParam)  {
+            return sParameterName[1];
+        }
+    }
+}
+
+var _page_init = 1*getUrlParameter('page');
+if(!_page_init) _page_init = 1 ;
+var _ordering_init = getUrlParameter('ordering');
+if(!_ordering_init) _ordering_init = '' ;
+var _query_init = getUrlParameter('query');
+if(!_query_init) _query_init = ''
+
+var _state = {
+    loading: false,
+    books: [],
+    message:{},
+    page: _page_init,
+    total: 0,
+    editingBook: {},
+    query: _query_init,
+    ordering: _ordering_init
+}
+
+
+var _search = function() {
+    _state.loading = true;
+    BookStore.emitChange();
+
+    $.ajax({
+        url: _props.url+'?search='+_state.query+&quot;&amp;ordering=&quot;+_state.ordering+&quot;&amp;page=&quot;+_state.page,
+        dataType: 'json',
+        cache: false,
+        success: function(data) {
+            // Simulate a small delay in server response
+            setTimeout(function() {
+                _state.books = data.results;
+                _state.total = data.count;
+                _state.loading = false;
+                BookStore.emitChange();
+            }, 400);
+        },
+        error: function(xhr, status, err) {
+            _state.loading = false;
+            MessageActions.add_message_error(err.toString());
+            BookStore.emitChange();
+        }
+    });
+};
+
+var _reloadBooks = function() {
+    _search('');
+};
+
+
+var _clearEditingBook = function() {
+    _state.editingBook = {};
+};
+
+var _editBook = function(book) {
+    _state.editingBook = book;
+    BookStore.emitChange();
+};
+
+var _cancelEditBook = function() {
+    _clearEditingBook();
+    BookStore.emitChange();
+};
+
+var _update_href = function() {
+    var hash = 'page='+_state.page;
+    hash += '&amp;ordering='+_state.ordering;
+    hash += '&amp;query='+_state.query;
+    $(location).attr('hash', hash);
+}
+
+BookStore.dispatchToken = AppDispatcher.register(function(action) {
+    switch(action.actionType) {
+        case BookConstants.BOOK_EDIT:
+            _editBook(action.book);
+        break;
+        case BookConstants.BOOK_EDIT_CANCEL:
+            _cancelEditBook();
+        break;
+        case BookConstants.BOOK_SAVE:
+            _saveBook(action.book);
+        break;
+        case BookConstants.BOOK_SEARCH:
+            _state.query = action.query
+            _state.page = 1;
+            _update_href();
+            _search();
+        break;
+        case BookConstants.BOOK_DELETE:
+            _deleteBook(action.bookId);
+        break;
+        case BookConstants.BOOK_CHANGE:
+            _state.editingBook = action.book;
+            BookStore.emitChange();
+        break;
+        case BookConstants.BOOK_PAGE:
+            _state.page = action.page;
+            _update_href();
+            _search();
+        break;
+        case BookConstants.AUTHOR_DELETE_OK:
+            _search();
+        break;
+        case BookConstants.BOOK_SORT:
+            _state.page = 1;
+            if(_state.ordering == action.field) {
+                _state.ordering = '-'+_state.ordering
+            } else {
+                _state.ordering = action.field;
+            }
+            _update_href();
+            _search();
+        break;
+    }
+    return true;
+});
+</pre>
+</div>
+</div>
+<div class="section" id="conclusion">
+<h2><a class="toc-backref" href="#toc-entry-26">Conclusion</a></h2>
+<p>The application presented here has a number of techniques that will help
+you when you actually try to create a more complex react flux application.
+I hope that in the whole three part series I&#8217;ve thoroughly explained the
+flux architecture and how each
+part of (actions, stores, components) it works. Also, I tried to cover
+almost anything that somebody creating react/flux application
+will need to use &#8212; if you feel that something is not covered and
+could be integrated to the authors/book application I&#8217;d be happy
+to research and implement&nbsp;it!</p>
+</div>
+</div>
+    <footer>
+<p class="meta">
+  <span class="byline author vcard">
+    Posted by <span class="fn">
+        Serafeim Papastefanos
+    </span>
+  </span>
+<time datetime="2015-09-08T12:55:00+03:00" pubdate>Tue 08 September 2015</time>  <span class="categories">
+    <a class='category' href='https://spapas.github.io/category/javascript.html'>javascript</a>
+  </span>
+  <span class="categories">
+    <a class="category" href="https://spapas.github.io/tag/javascript.html">javascript</a>,    <a class="category" href="https://spapas.github.io/tag/python.html">python</a>,    <a class="category" href="https://spapas.github.io/tag/django.html">django</a>,    <a class="category" href="https://spapas.github.io/tag/react.html">react</a>,    <a class="category" href="https://spapas.github.io/tag/flux.html">flux</a>  </span>
+</p><div class="sharing">
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="https://spapas.github.io/2015/09/08/more-complex-react-flux-example/" data-via="" data-counturl="https://spapas.github.io/2015/09/08/more-complex-react-flux-example/" >Tweet</a>
+</div>    </footer>
+  </article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript></div>
+  </section>
+</div>
+<aside class="sidebar">
+  
+  <section>
+    <br />
+    <a href='/feeds/all.atom.xml'>Atom</a>
+    |
+    <a href='/feeds/all.rss.xml'>RSS</a>
+  </section>
+
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <!-- Sidebar unit -->
+  <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7673322832689008" data-ad-slot="2720624730"
+    data-ad-format="auto" data-full-width-responsive="true"></ins>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+
+
+  <script async src="https://cse.google.com/cse.js?cx=612920e5ca9da850c"></script>
+  <div class="gcse-search"></div>
+
+  
+  <section>
+    <h1>Support me</h1>
+
+    You can show your appreciation for anything useful you've found here by 
+    buying me a coffee 
+    <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="spapas" data-color="#FFDD00" data-emoji=""  data-font="Lato" data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff" ></script>
+
+    or donating me some bitcoin to this address:
+    <small><pre>bc1qx42vp8napheaewhnx0rk0mttdrdrtvw6czvxhl</pre></small>
+    <svg shape-rendering="crispEdges" height="200" width="200" viewBox="0 0 29 29" class="qrcode">
+      <path fill="#FFFFFF" d="M0,0 h29v29H0z"></path><path fill="#000000" d="M0 0h7v1H0zM9 0h2v1H9zM12 0h1v1H12zM14 0h2v1H14zM18 0h2v1H18zM22,0 h7v1H22zM0 1h1v1H0zM6 1h1v1H6zM8 1h1v1H8zM11 1h1v1H11zM14 1h5v1H14zM22 1h1v1H22zM28,1 h1v1H28zM0 2h1v1H0zM2 2h3v1H2zM6 2h1v1H6zM8 2h4v1H8zM17 2h1v1H17zM22 2h1v1H22zM24 2h3v1H24zM28,2 h1v1H28zM0 3h1v1H0zM2 3h3v1H2zM6 3h1v1H6zM9 3h2v1H9zM14 3h3v1H14zM18 3h1v1H18zM22 3h1v1H22zM24 3h3v1H24zM28,3 h1v1H28zM0 4h1v1H0zM2 4h3v1H2zM6 4h1v1H6zM8 4h1v1H8zM11 4h1v1H11zM13 4h1v1H13zM15 4h2v1H15zM18 4h1v1H18zM22 4h1v1H22zM24 4h3v1H24zM28,4 h1v1H28zM0 5h1v1H0zM6 5h1v1H6zM8 5h2v1H8zM14 5h2v1H14zM19 5h2v1H19zM22 5h1v1H22zM28,5 h1v1H28zM0 6h7v1H0zM8 6h1v1H8zM10 6h1v1H10zM12 6h1v1H12zM14 6h1v1H14zM16 6h1v1H16zM18 6h1v1H18zM20 6h1v1H20zM22,6 h7v1H22zM8 7h2v1H8zM11 7h1v1H11zM15 7h1v1H15zM17 7h2v1H17zM0 8h2v1H0zM3 8h1v1H3zM6 8h2v1H6zM10 8h1v1H10zM12 8h3v1H12zM20 8h1v1H20zM22 8h3v1H22zM26 8h2v1H26zM1 9h1v1H1zM3 9h3v1H3zM8 9h1v1H8zM10 9h1v1H10zM12 9h2v1H12zM16 9h2v1H16zM20 9h1v1H20zM22 9h1v1H22zM25 9h1v1H25zM27,9 h2v1H27zM0 10h1v1H0zM3 10h2v1H3zM6 10h1v1H6zM8 10h3v1H8zM12 10h2v1H12zM16 10h1v1H16zM19 10h1v1H19zM22 10h3v1H22zM27 10h1v1H27zM0 11h1v1H0zM2 11h1v1H2zM4 11h2v1H4zM7 11h1v1H7zM13 11h4v1H13zM18 11h4v1H18zM26 11h2v1H26zM0 12h1v1H0zM2 12h3v1H2zM6 12h1v1H6zM11 12h1v1H11zM13 12h1v1H13zM15 12h3v1H15zM20 12h1v1H20zM22 12h2v1H22zM27,12 h2v1H27zM4 13h1v1H4zM8 13h3v1H8zM12 13h1v1H12zM14 13h1v1H14zM17 13h4v1H17zM25 13h2v1H25zM0 14h1v1H0zM4 14h3v1H4zM8 14h2v1H8zM11 14h3v1H11zM16 14h1v1H16zM21 14h2v1H21zM24,14 h5v1H24zM3 15h3v1H3zM7 15h2v1H7zM10 15h1v1H10zM12 15h2v1H12zM15 15h1v1H15zM17 15h2v1H17zM20 15h2v1H20zM23 15h1v1H23zM1 16h1v1H1zM4 16h1v1H4zM6 16h4v1H6zM16 16h2v1H16zM20 16h1v1H20zM23 16h1v1H23zM25 16h1v1H25zM28,16 h1v1H28zM2 17h1v1H2zM5 17h1v1H5zM7 17h2v1H7zM11 17h3v1H11zM17 17h1v1H17zM22 17h1v1H22zM25 17h1v1H25zM27,17 h2v1H27zM0 18h1v1H0zM3 18h1v1H3zM5 18h4v1H5zM10 18h1v1H10zM12 18h1v1H12zM18 18h1v1H18zM20 18h1v1H20zM22 18h2v1H22zM25,18 h4v1H25zM2 19h3v1H2zM8 19h1v1H8zM16 19h2v1H16zM21 19h1v1H21zM23 19h1v1H23zM25 19h1v1H25zM27 19h1v1H27zM0 20h1v1H0zM2 20h5v1H2zM8 20h2v1H8zM13 20h4v1H13zM19 20h6v1H19zM26 20h1v1H26zM28,20 h1v1H28zM8 21h2v1H8zM12 21h3v1H12zM16 21h1v1H16zM20 21h1v1H20zM24 21h1v1H24zM26,21 h3v1H26zM0 22h7v1H0zM8 22h3v1H8zM17 22h1v1H17zM20 22h1v1H20zM22 22h1v1H22zM24 22h2v1H24zM27 22h1v1H27zM0 23h1v1H0zM6 23h1v1H6zM10 23h2v1H10zM13 23h2v1H13zM19 23h2v1H19zM24,23 h5v1H24zM0 24h1v1H0zM2 24h3v1H2zM6 24h1v1H6zM9 24h2v1H9zM12 24h2v1H12zM17 24h1v1H17zM20 24h6v1H20zM28,24 h1v1H28zM0 25h1v1H0zM2 25h3v1H2zM6 25h1v1H6zM8 25h3v1H8zM12 25h1v1H12zM14 25h1v1H14zM18 25h1v1H18zM22 25h3v1H22zM26 25h1v1H26zM0 26h1v1H0zM2 26h3v1H2zM6 26h1v1H6zM10 26h5v1H10zM16 26h3v1H16zM21 26h1v1H21zM24 26h1v1H24zM26 26h1v1H26zM28,26 h1v1H28zM0 27h1v1H0zM6 27h1v1H6zM8 27h3v1H8zM12 27h4v1H12zM17 27h1v1H17zM20 27h1v1H20zM23 27h2v1H23zM27 27h1v1H27zM0 28h7v1H0zM8 28h3v1H8zM14 28h1v1H14zM16 28h3v1H16zM20 28h1v1H20zM22 28h1v1H22zM24 28h2v1H24zM27 28h1v1H27z"></path>
+    </svg>
+  </section>
+  
+
+  <section>
+    <h1>Subscribe</h1>
+    Do you want to get notified via email when I post new content?
+    <style>
+      .subscribe-button {
+        /* margin: 10px !important; */
+        padding: 10px !important;
+        background-color: black;
+        display: inline-block;
+        color: white !important;
+        text-decoration: none;
+
+        line-height: 36px !important;
+        height: 37px !important;
+        text-decoration: none !important;
+        display: inline-block !important;
+        color: #ffffff !important;
+        background-color: #000000 !important;
+        border-radius: 3px !important;
+        border: 1px solid transparent !important;
+        padding: 1px 9px !important;
+        font-size: 23px !important;
+        letter-spacing: 0.6px !important;
+        box-shadow: 0px 1px 2px rgba(190, 190, 190, 0.5) !important;
+        -webkit-box-shadow: 0px 1px 2px 2px rgba(190, 190, 190, 0.5) !important;
+        margin: 0 auto !important;
+        font-family: 'Cookie', cursive !important;
+        -webkit-box-sizing: border-box !important;
+        box-sizing: border-box !important;
+        -o-transition: 0.3s all linear !important;
+        -webkit-transition: 0.3s all linear !important;
+        -moz-transition: 0.3s all linear !important;
+        -ms-transition: 0.3s all linear !important;
+        transition: 0.3s all linear !important;
+
+      }
+    </style>
+    <a class='subscribe-button' target="_blank" href="http://eepurl.com/dxI3PP">Click here to subscribe!</a>
+  </section>
+
+
+  <section>
+    <h1>Recent Posts</h1>
+    <ul id="recent_posts">
+      <li class="post">
+        <a href="https://spapas.github.io/2024/08/22/multiple-erl-elixir-windows/">Multiple Erlang/Elixir versions in Windows</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/11/29/openid-connect-tutorial/">A simple OpenID connect tutorial</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/05/23/simple-django-datatables-integration/">Simple Django - DataTables integration</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/05/22/ai-auto-subtitling/">AI auto-subtitling</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/05/12/disable-your-forms/">HTML form disable after submit</a>
+      </li>
+    </ul>
+  </section>
+  <section>
+
+    <h1>Categories</h1>
+    <ul id="recent_posts">
+      <li><a href="https://spapas.github.io/category/ai.html">ai</a></li>
+      <li><a href="https://spapas.github.io/category/android.html">android</a></li>
+      <li><a href="https://spapas.github.io/category/clojure.html">clojure</a></li>
+      <li><a href="https://spapas.github.io/category/css.html">css</a></li>
+      <li><a href="https://spapas.github.io/category/django.html">django</a></li>
+      <li><a href="https://spapas.github.io/category/elixir.html">elixir</a></li>
+      <li><a href="https://spapas.github.io/category/flask.html">flask</a></li>
+      <li><a href="https://spapas.github.io/category/gaming.html">gaming</a></li>
+      <li><a href="https://spapas.github.io/category/git.html">git</a></li>
+      <li><a href="https://spapas.github.io/category/html.html">html</a></li>
+      <li><a href="https://spapas.github.io/category/javascript.html">javascript</a></li>
+      <li><a href="https://spapas.github.io/category/networking.html">networking</a></li>
+      <li><a href="https://spapas.github.io/category/pelican.html">pelican</a></li>
+      <li><a href="https://spapas.github.io/category/postgresql.html">postgresql</a></li>
+      <li><a href="https://spapas.github.io/category/python.html">python</a></li>
+      <li><a href="https://spapas.github.io/category/spring.html">spring</a></li>
+      <li><a href="https://spapas.github.io/category/unix.html">unix</a></li>
+      <li><a href="https://spapas.github.io/category/wagtail.html">wagtail</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Tags</h1>
+    <a href="https://spapas.github.io/tag/erlang.html">erlang</a>,    <a href="https://spapas.github.io/tag/elixir.html">elixir</a>,    <a href="https://spapas.github.io/tag/windows.html">windows</a>,    <a href="https://spapas.github.io/tag/openid.html">openid</a>,    <a href="https://spapas.github.io/tag/openid-connect.html">openid-connect</a>,    <a href="https://spapas.github.io/tag/oidc.html">oidc</a>,    <a href="https://spapas.github.io/tag/http.html">http</a>,    <a href="https://spapas.github.io/tag/keycloak.html">keycloak</a>,    <a href="https://spapas.github.io/tag/python.html">python</a>,    <a href="https://spapas.github.io/tag/django.html">django</a>,    <a href="https://spapas.github.io/tag/jquery.html">jquery</a>,    <a href="https://spapas.github.io/tag/datatables.html">datatables</a>,    <a href="https://spapas.github.io/tag/ai.html">ai</a>,    <a href="https://spapas.github.io/tag/whisper.html">whisper</a>,    <a href="https://spapas.github.io/tag/whispercpp.html">whisper.cpp</a>,    <a href="https://spapas.github.io/tag/subtitles.html">subtitles</a>,    <a href="https://spapas.github.io/tag/video.html">video</a>,    <a href="https://spapas.github.io/tag/auto-subtitling.html">auto-subtitling</a>,    <a href="https://spapas.github.io/tag/subtitiling.html">subtitiling</a>,    <a href="https://spapas.github.io/tag/transcribe.html">transcribe</a>,    <a href="https://spapas.github.io/tag/html.html">html</a>,    <a href="https://spapas.github.io/tag/javascript.html">javascript</a>,    <a href="https://spapas.github.io/tag/media.html">media</a>,    <a href="https://spapas.github.io/tag/storage.html">storage</a>,    <a href="https://spapas.github.io/tag/unpoly.html">unpoly</a>,    <a href="https://spapas.github.io/tag/access.html">access</a>,    <a href="https://spapas.github.io/tag/database.html">database</a>,    <a href="https://spapas.github.io/tag/accdb.html">accdb</a>,    <a href="https://spapas.github.io/tag/mdb.html">mdb</a>,    <a href="https://spapas.github.io/tag/postgresql.html">postgresql</a>,    <a href="https://spapas.github.io/tag/development.html">development</a>,    <a href="https://spapas.github.io/tag/inlines.html">inlines</a>,    <a href="https://spapas.github.io/tag/clojure.html">clojure</a>,    <a href="https://spapas.github.io/tag/cmd.html">cmd</a>,    <a href="https://spapas.github.io/tag/pdf.html">pdf</a>,    <a href="https://spapas.github.io/tag/wkhtmltopdf.html">wkhtmltopdf</a>,    <a href="https://spapas.github.io/tag/forward-proxy.html">forward-proxy</a>,    <a href="https://spapas.github.io/tag/reverse-proxy.html">reverse-proxy</a>,    <a href="https://spapas.github.io/tag/proxy.html">proxy</a>,    <a href="https://spapas.github.io/tag/networking.html">networking</a>,    <a href="https://spapas.github.io/tag/dj-rest-auth.html">dj-rest-auth</a>,    <a href="https://spapas.github.io/tag/rest.html">rest</a>,    <a href="https://spapas.github.io/tag/django-rest-framework.html">django-rest-framework</a>,    <a href="https://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="https://spapas.github.io/tag/tokens.html">tokens</a>,    <a href="https://spapas.github.io/tag/migrations.html">migrations</a>,    <a href="https://spapas.github.io/tag/foreignkey.html">foreignkey</a>,    <a href="https://spapas.github.io/tag/dark-souls.html">dark-souls</a>,    <a href="https://spapas.github.io/tag/dark-souls-2.html">dark-souls-2</a>,    <a href="https://spapas.github.io/tag/dark-souls-3.html">dark-souls-3</a>,    <a href="https://spapas.github.io/tag/autohotkey.html">autohotkey</a>,    <a href="https://spapas.github.io/tag/matplotlib.html">matplotlib</a>,    <a href="https://spapas.github.io/tag/hashids.html">hashids</a>,    <a href="https://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="https://spapas.github.io/tag/osmon.html">osmon</a>,    <a href="https://spapas.github.io/tag/phoenix.html">phoenix</a>,    <a href="https://spapas.github.io/tag/os-monitoring.html">os-monitoring</a>,    <a href="https://spapas.github.io/tag/forms.html">forms</a>,    <a href="https://spapas.github.io/tag/django-crispy-forms.html">django-crispy-forms</a>,    <a href="https://spapas.github.io/tag/django-widget-tweaks.html">django-widget-tweaks</a>,    <a href="https://spapas.github.io/tag/ecto.html">ecto</a>,    <a href="https://spapas.github.io/tag/queries.html">queries</a>,    <a href="https://spapas.github.io/tag/declarative.html">declarative</a>,    <a href="https://spapas.github.io/tag/form.html">form</a>,    <a href="https://spapas.github.io/tag/php.html">php</a>,    <a href="https://spapas.github.io/tag/select2.html">select2</a>,    <a href="https://spapas.github.io/tag/autocompelte.html">autocompelte</a>,    <a href="https://spapas.github.io/tag/ajax.html">ajax</a>,    <a href="https://spapas.github.io/tag/android.html">android</a>,    <a href="https://spapas.github.io/tag/kotlin.html">kotlin</a>,    <a href="https://spapas.github.io/tag/adapter.html">adapter</a>,    <a href="https://spapas.github.io/tag/filter.html">filter</a>,    <a href="https://spapas.github.io/tag/async.html">async</a>,    <a href="https://spapas.github.io/tag/tasks.html">tasks</a>,    <a href="https://spapas.github.io/tag/django-rq.html">django-rq</a>,    <a href="https://spapas.github.io/tag/rq.html">rq</a>,    <a href="https://spapas.github.io/tag/du.html">du</a>,    <a href="https://spapas.github.io/tag/unix.html">unix</a>,    <a href="https://spapas.github.io/tag/linux.html">linux</a>,    <a href="https://spapas.github.io/tag/disk-usage.html">disk-usage</a>,    <a href="https://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="https://spapas.github.io/tag/middleware.html">middleware</a>,    <a href="https://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="https://spapas.github.io/tag/react.html">react</a>,    <a href="https://spapas.github.io/tag/redux.html">redux</a>,    <a href="https://spapas.github.io/tag/hyperapp.html">hyperapp</a>,    <a href="https://spapas.github.io/tag/immutable.html">immutable</a>,    <a href="https://spapas.github.io/tag/es6.html">es6</a>,    <a href="https://spapas.github.io/tag/youtube.html">youtube</a>,    <a href="https://spapas.github.io/tag/youtube-dl.html">youtube-dl</a>,    <a href="https://spapas.github.io/tag/ffmpeg.html">ffmpeg</a>,    <a href="https://spapas.github.io/tag/django-rest-auth.html">django-rest-auth</a>,    <a href="https://spapas.github.io/tag/python-2.html">python-2</a>,    <a href="https://spapas.github.io/tag/python-3.html">python-3</a>,    <a href="https://spapas.github.io/tag/plpgsql.html">plpgsql</a>,    <a href="https://spapas.github.io/tag/component.html">component</a>,    <a href="https://spapas.github.io/tag/ag-grid.html">ag-grid</a>,    <a href="https://spapas.github.io/tag/grid.html">grid</a>,    <a href="https://spapas.github.io/tag/bash.html">bash</a>,    <a href="https://spapas.github.io/tag/cron.html">cron</a>,    <a href="https://spapas.github.io/tag/pandas.html">pandas</a>,    <a href="https://spapas.github.io/tag/scipy.html">scipy</a>,    <a href="https://spapas.github.io/tag/numpy.html">numpy</a>,    <a href="https://spapas.github.io/tag/pivot.html">pivot</a>,    <a href="https://spapas.github.io/tag/pivot_table.html">pivot_table</a>,    <a href="https://spapas.github.io/tag/ipython.html">ipython</a>,    <a href="https://spapas.github.io/tag/jupyter.html">jupyter</a>,    <a href="https://spapas.github.io/tag/notebook.html">notebook</a>,    <a href="https://spapas.github.io/tag/query.html">query</a>,    <a href="https://spapas.github.io/tag/q.html">q</a>,    <a href="https://spapas.github.io/tag/imgur.html">imgur</a>,    <a href="https://spapas.github.io/tag/console.html">console</a>,    <a href="https://spapas.github.io/tag/research.html">research</a>,    <a href="https://spapas.github.io/tag/debug.html">debug</a>,    <a href="https://spapas.github.io/tag/werkzeug.html">werkzeug</a>,    <a href="https://spapas.github.io/tag/django-extensions.html">django-extensions</a>,    <a href="https://spapas.github.io/tag/404.html">404</a>,    <a href="https://spapas.github.io/tag/error.html">error</a>,    <a href="https://spapas.github.io/tag/spring.html">spring</a>,    <a href="https://spapas.github.io/tag/spring-boot.html">spring-boot</a>,    <a href="https://spapas.github.io/tag/java.html">java</a>,    <a href="https://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="https://spapas.github.io/tag/profiles.html">profiles</a>,    <a href="https://spapas.github.io/tag/settings.html">settings</a>,    <a href="https://spapas.github.io/tag/properties.html">properties</a>,    <a href="https://spapas.github.io/tag/yaml.html">yaml</a>,    <a href="https://spapas.github.io/tag/configuration.html">configuration</a>,    <a href="https://spapas.github.io/tag/deploy.html">deploy</a>,    <a href="https://spapas.github.io/tag/initd.html">init.d</a>,    <a href="https://spapas.github.io/tag/react-redux.html">react-redux</a>,    <a href="https://spapas.github.io/tag/redux-thunk.html">redux-thunk</a>,    <a href="https://spapas.github.io/tag/redux-form.html">redux-form</a>,    <a href="https://spapas.github.io/tag/react-router.html">react-router</a>,    <a href="https://spapas.github.io/tag/react-router-redux.html">react-router-redux</a>,    <a href="https://spapas.github.io/tag/react-notification.html">react-notification</a>,    <a href="https://spapas.github.io/tag/history.html">history</a>,    <a href="https://spapas.github.io/tag/babel.html">babel</a>,    <a href="https://spapas.github.io/tag/babelify.html">babelify</a>,    <a href="https://spapas.github.io/tag/browserify.html">browserify</a>,    <a href="https://spapas.github.io/tag/watchify.html">watchify</a>,    <a href="https://spapas.github.io/tag/uglify.html">uglify</a>,    <a href="https://spapas.github.io/tag/boilerplate.html">boilerplate</a>,    <a href="https://spapas.github.io/tag/tutorial.html">tutorial</a>,    <a href="https://spapas.github.io/tag/introduction.html">introduction</a>,    <a href="https://spapas.github.io/tag/fixed-data-tables.html">fixed-data-tables</a>,    <a href="https://spapas.github.io/tag/fixeddatatable.html">FixedDataTable</a>,    <a href="https://spapas.github.io/tag/reportlab.html">reportlab</a>,    <a href="https://spapas.github.io/tag/xhtml2pdf.html">xhtml2pdf</a>,    <a href="https://spapas.github.io/tag/node.html">node</a>,    <a href="https://spapas.github.io/tag/npm.html">npm</a>,    <a href="https://spapas.github.io/tag/generic.html">generic</a>,    <a href="https://spapas.github.io/tag/tables.html">tables</a>,    <a href="https://spapas.github.io/tag/flux.html">flux</a>,    <a href="https://spapas.github.io/tag/jobs.html">jobs</a>,    <a href="https://spapas.github.io/tag/asynchronous.html">asynchronous</a>,    <a href="https://spapas.github.io/tag/scheduling.html">scheduling</a>,    <a href="https://spapas.github.io/tag/redis.html">redis</a>,    <a href="https://spapas.github.io/tag/pusher.html">pusher</a>,    <a href="https://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="https://spapas.github.io/tag/css.html">css</a>,    <a href="https://spapas.github.io/tag/design.html">design</a>,    <a href="https://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>,    <a href="https://spapas.github.io/tag/less.html">less</a>,    <a href="https://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="https://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="https://spapas.github.io/tag/security.html">security</a>,    <a href="https://spapas.github.io/tag/google.html">google</a>,    <a href="https://spapas.github.io/tag/flask.html">flask</a>,    <a href="https://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="https://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="https://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="https://spapas.github.io/tag/git.html">git</a>,    <a href="https://spapas.github.io/tag/github.html">github</a>,    <a href="https://spapas.github.io/tag/branching.html">branching</a>,    <a href="https://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="https://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="https://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="https://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="https://spapas.github.io/tag/rst.html">rst</a>  </section>
+
+  <section>
+    <h1>Yearly archives</h1>
+    <a href="https://spapas.github.io/posts/2013/">2013</a>,    <a href="https://spapas.github.io/posts/2014/">2014</a>,    <a href="https://spapas.github.io/posts/2015/">2015</a>,    <a href="https://spapas.github.io/posts/2016/">2016</a>,    <a href="https://spapas.github.io/posts/2017/">2017</a>,    <a href="https://spapas.github.io/posts/2018/">2018</a>,    <a href="https://spapas.github.io/posts/2019/">2019</a>,    <a href="https://spapas.github.io/posts/2020/">2020</a>,    <a href="https://spapas.github.io/posts/2021/">2021</a>,    <a href="https://spapas.github.io/posts/2022/">2022</a>,    <a href="https://spapas.github.io/posts/2023/">2023</a>,    <a href="https://spapas.github.io/posts/2024/">2024</a>  </section>
+
+
+
+  <section>
+    <h1>GitHub Repos</h1>
+    <ul id="gh_repos">
+      <li class="loading">Status updating...</li>
+    </ul>
+      <a href="https://github.com/spapas">@spapas</a> on GitHub
+    <script  src="//code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      $(function(){
+          if (!window.jXHR){
+              var jxhr = document.createElement('script');
+              jxhr.type = 'text/javascript';
+              jxhr.src = 'https://spapas.github.io/theme/js/jXHR.js';
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(jxhr, s);
+          }
+
+          github.showRepos({
+              user: 'spapas',
+              count: 5,
+              skip_forks: true,
+              target: '#gh_repos'
+          });
+      });
+    </script>
+    <script src="https://spapas.github.io/theme/js/github.js" type="text/javascript"> </script>
+  </section>
+
+
+  <section>
+    <a href="https://twitter.com/_serafeim_?ref_src=twsrc%5Etfw" class="twitter-follow-button"
+      data-show-count="false">Follow @_serafeim_</a>
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+  </section>
+
+</aside>    </div>
+  </div>
+  <footer role="contentinfo"><p>
+    Copyright &copy;  2013&ndash;2024  Serafeim Papastefanos &mdash;
+  <span class="credit">Powered by <a href="http://getpelican.com">Pelican</a></span>
+</p></footer>
+  <script src="https://spapas.github.io/theme/js/modernizr-2.0.js"></script>
+  <script src="https://spapas.github.io/theme/js/ender.js"></script>
+  <script src="https://spapas.github.io/theme/js/octopress.js" type="text/javascript"></script>
+  <script src="https://spapas.github.io/theme/js/ads.js"></script>
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-44750952-1', 'auto');
+
+    ga('send', 'pageview');
+    </script>
+
+<script defer data-domain="spapas.github.io" src="https://plausible.hcg.gr/js/script.js"></script>  <script type="text/javascript">
+    var disqus_shortname = 'spapas-github-io';
+    var disqus_identifier = '/2015/09/08/more-complex-react-flux-example/';
+    var disqus_url = 'https://spapas.github.io/2015/09/08/more-complex-react-flux-example/';
+    var disqus_title = 'A (little more) complex react and flux&nbsp;example';
+    (function() {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = "//" + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+     })();
+  </script>
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+</body>
+
+</html>

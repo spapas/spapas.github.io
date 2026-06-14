@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="google-site-verification" content="5_8DTmIiEq4gFvNAfxAD6TsGOgrMAjp8lQFQvfA6zZc" />
+    <title>Token Authentication for django-rest-framework &mdash; /var/</title>
+    <meta name="author" content="Serafeim Papastefanos">
+
+
+    
+<style type="text/css">
+pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: var(--jp-cell-editor-active-background) }
+.highlight { background: var(--jp-cell-editor-background); color: var(--jp-mirror-editor-variable-color) }
+.highlight .c { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment */
+.highlight .err { color: var(--jp-mirror-editor-error-color) } /* Error */
+.highlight .k { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword */
+.highlight .o { color: var(--jp-mirror-editor-operator-color); font-weight: bold } /* Operator */
+.highlight .p { color: var(--jp-mirror-editor-punctuation-color) } /* Punctuation */
+.highlight .ch { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Preproc */
+.highlight .cpf { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Single */
+.highlight .cs { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Special */
+.highlight .kc { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Pseudo */
+.highlight .kr { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Type */
+.highlight .m { color: var(--jp-mirror-editor-number-color) } /* Literal.Number */
+.highlight .s { color: var(--jp-mirror-editor-string-color) } /* Literal.String */
+.highlight .ow { color: var(--jp-mirror-editor-operator-color); font-weight: bold } /* Operator.Word */
+.highlight .pm { color: var(--jp-mirror-editor-punctuation-color) } /* Punctuation.Marker */
+.highlight .w { color: var(--jp-mirror-editor-variable-color) } /* Text.Whitespace */
+.highlight .mb { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Bin */
+.highlight .mf { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Float */
+.highlight .mh { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Hex */
+.highlight .mi { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Integer */
+.highlight .mo { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Oct */
+.highlight .sa { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Affix */
+.highlight .sb { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Backtick */
+.highlight .sc { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Char */
+.highlight .dl { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Delimiter */
+.highlight .sd { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Doc */
+.highlight .s2 { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Double */
+.highlight .se { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Escape */
+.highlight .sh { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Heredoc */
+.highlight .si { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Interpol */
+.highlight .sx { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Other */
+.highlight .sr { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Regex */
+.highlight .s1 { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Single */
+.highlight .ss { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Symbol */
+.highlight .il { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Integer.Long */
+</style>
+
+<style type="text/css">
+/* Overrides of notebook CSS for static HTML export */
+div.entry-content {
+  overflow: visible;
+  padding: 8px;
+}
+.input_area {
+  padding: 0.2em;
+}
+
+a.heading-anchor {
+ white-space: normal;
+}
+
+.rendered_html
+code {
+ font-size: .8em;
+}
+
+pre.ipynb {
+  color: black;
+  background: #f7f7f7;
+  border: none;
+  box-shadow: none;
+  margin-bottom: 0;
+  padding: 0;
+  margin: 0px;
+  font-size: 13px;
+}
+
+/* remove the prompt div from text cells */
+div.text_cell .prompt {
+    display: none;
+}
+
+/* remove horizontal padding from text cells, */
+/* so it aligns with outer body text */
+div.text_cell_render {
+    padding: 0.5em 0em;
+}
+
+img.anim_icon{padding:0; border:0; vertical-align:middle; -webkit-box-shadow:none; -box-shadow:none}
+
+div.collapseheader {
+    width=100%;
+    background-color:#d3d3d3;
+    padding: 2px;
+    cursor: pointer;
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+</style>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true,
+        displayMath: [['$$','$$'], ["\\[","\\]"]]
+    }
+});
+</script>
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+    $("div.collapseheader").click(function () {
+    $header = $(this).children("span").first();
+    $codearea = $(this).children(".input_area");
+    console.log($(this).children());
+    $codearea.slideToggle(500, function () {
+        $header.text(function () {
+            return $codearea.is(":visible") ? "Collapse Code" : "Expand Code";
+        });
+    });
+});
+});
+</script>
+
+
+
+
+
+
+    <!-- http://t.co/dKP3o1e -->
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+    <link href="https://www.spapas.net/favicon.png" rel="icon">
+
+    <link href="https://www.spapas.net/theme/css/main.css" media="screen, projection" rel="stylesheet"
+      type="text/css">
+
+    <link href="https://www.spapas.net/theme/css/extra_style.css" media="screen, projection" rel="stylesheet"
+      type="text/css">
+
+    <link href="https://fonts.googleapis.com/css?family=Fira+Mono|Fira+Sans:400,700&amp;subset=greek" rel="stylesheet">
+
+<style>
+#gHPzseYvFrhZ123 {
+  padding: 5px !important;
+  display: block;
+  margin-bottom: 10px !important;
+  background: #900;
+  color: #fff;
+  border-radius: 5px;
+  font-size: 1.0rem !important;
+}
+</style>
+
+
+  <script>
+    
+      
+  </script>
+
+    <script data-ad-client="ca-pub-7673322832689008" async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
+      onerror="adBlockFunction();"></script>
+  </head>
+
+<body>
+  <header role="banner"><hgroup>
+  <h1><a href="https://www.spapas.net/">/var/</a></h1>
+    <h2>Various programming stuff</h2>
+</hgroup></header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+</ul>
+
+
+<ul class="main-navigation">
+      <li >
+        <a href="https://www.spapas.net/category/ai.html">Ai</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/android.html">Android</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/clojure.html">Clojure</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/css.html">Css</a>
+      </li>
+      <li class="active">
+        <a href="https://www.spapas.net/category/django.html">Django</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/elixir.html">Elixir</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/flask.html">Flask</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/gaming.html">Gaming</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/git.html">Git</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/html.html">Html</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/javascript.html">Javascript</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/networking.html">Networking</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/pelican.html">Pelican</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/postgresql.html">Postgresql</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/python.html">Python</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/spring.html">Spring</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/unix.html">Unix</a>
+      </li>
+      <li >
+        <a href="https://www.spapas.net/category/wagtail.html">Wagtail</a>
+      </li>
+</ul></nav>
+  <div id="main">
+    <div id="content">
+    <div id="gHPzseYvFrhZ123">
+      Hello! If you are using an ad blocker but find something useful here 
+      and want to support me please consider disabling your ad blocker for this site. 
+      <br />
+      <br />
+      Thank you,<br />
+      Serafeim
+      
+    </div>
+<div>
+  <article class="hentry" role="article">
+<header>
+      <h1 class="entry-title">Token Authentication for django-rest-framework</h1>
+    <p class="meta">
+<time datetime="2021-08-25T12:40:00+03:00" pubdate>Wed 25 August 2021</time>    </p>
+</header>
+
+<div class="entry-content"><div class="section" id="introduction">
+<h2>Introduction</h2>
+<p>In a <a class="reference external" href="https://www.spapas.net/2018/03/01/django-rest-auth/">a previous article</a>
+I explained how to authenticate for your django-rest-framework <span class="caps">API</span>
+using the django-rest-auth package.
+Since then I have observed that various things have changed and most importantly that
+the library I used there (django-rest-auth) is not updated anymore and has been
+superseded by another one. Also, some of my information there is contradictory,
+especially the parts that deal with the session authentication and csrf&nbsp;protection.</p>
+<p>Thus I&#8217;ve written this new article that betters describes a recommended
+authentication workflow using tokens. This workflow does not rely on sessions at all.
+Beyond that, is more or less the same as the previous one with some updates
+and clarifications where&nbsp;needed.</p>
+<p>I have also updated the accompanying project of the previous article which
+can be found on <a class="reference external" href="https://github.com/spapas/rest_authenticate">https://github.com/spapas/rest_authenticate</a>.</p>
+<p>Before continuing with the tutorial, let&#8217;s take a look at what we&#8217;ll build&nbsp;here:</p>
+<img alt="Our project" src="/images/rest-auth.gif" style="width: 640px;" />
+<p>This is a single html page (styled with <a class="reference external" href="https://picturepan2.github.io/spectre/">spectre.css</a>) that checks if the user is logged in
+and either displays the login or logout button (using javascript). When you click the login you&#8217;ll get a modal in which you
+can enter your credentials which will be submitted through <span class="caps">REST</span> to the authentication endpoint and
+depending on the response will set a javascript variable (and a corresponding session/local storage key).
+Then you can use the &#8220;Test auth&#8221; button that works only on authenticated users and returns their username.
+Finally, notice that after you log out the &#8220;test auth&#8221; button returns a 403 access&nbsp;denied.</p>
+<p>The javascript client uses token authentication so you can run the client in the same server as the server or
+in a completely different server (if you are using the proper <span class="caps">CORS</span> headers of&nbsp;course).</p>
+</div>
+<div class="section" id="some-theory">
+<h2>Some&nbsp;theory</h2>
+<p>Here I will try to explain a bunch of important&nbsp;concepts:</p>
+<div class="section" id="sessions">
+<h3>Sessions</h3>
+<p>After you log in with Django normally, your authentication information is saved to the <a class="reference external" href="https://docs.djangoproject.com/en/stable/topics/http/sessions/">session</a>.
+The session is a bucket of information
+that the Django application saves about your visit &#8212; to distinguish between different visitors a cookie with a unique
+value named <tt class="docutils literal">sessionid</tt> will be used. So, your web browser will send this cookie with each page request thus allowing Django
+to know which bucket of information is yours (and if you&#8217;ve authenticated know who are you). This is not a Django
+related concept but a general one (supported by most if not all <span class="caps">HTTP</span> frameworks) and is used to add state to an otherwise
+stateless medium (<span class="caps">HTTP</span>).</p>
+<p>Since the <tt class="docutils literal">sessionid</tt> cookie is sent not only with traditional but also with Ajax request it can be used to authenticate
+<span class="caps">REST</span> requests after you&#8217;ve logged in. This is what is used by default in django-rest-framework is a very good solution for
+most use cases: You login to django and you can go ahead and call the <span class="caps">REST</span>
+<span class="caps">API</span> through Ajax; the <tt class="docutils literal">sessionid</tt> cookie will be sent along with the request and you&#8217;ll be authenticated&nbsp;automatically.</p>
+<p>Now, although the session authentication is nice for using in browsers, you may need to access your <span class="caps">API</span> through a desktop
+or a mobile application where, setting the cookies yourself is not the optimal solution. Also, you may have an <span class="caps">SPA</span> that needs
+to access an <span class="caps">API</span> in a different domain; using <a class="reference external" href="https://stackoverflow.com/questions/3342140/cross-domain-cookies">using cookies for this is not easy</a> - if possible at&nbsp;all.</p>
+</div>
+<div class="section" id="csrf-protection">
+<h3><span class="caps">CSRF</span>&nbsp;protection</h3>
+<p>One important thing that you should be aware if you are going to use session authentication for your <span class="caps">API</span> is the
+<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/csrf/"><span class="caps">CSRF</span> protection</a>. This is a mechanism that helps prevent cross-site request forgery (<span class="caps">CSRF</span>) attacks.
+A <span class="caps">CSRF</span> attack works like this: Let&#8217;s suppose that site A is a bank, and has a form with an email and a money amount.
+When the user submits the form via <span class="caps">POST</span> it will send this much money to the entered email using Paypal. Now, site B is
+a malicious site. When the user visits site B, it will automatically generate a <span class="caps">POST</span> request containing the malicious
+user&#8217;s email and the money he wants and submit it to site A. Now, if the user is authenticated with sessions on site A
+then site A will think that this is a valid form submission and will actually process the form as normally and send the
+money to the malicious&nbsp;user!</p>
+<p>As you can understand this is a very serious and easy to exploit attack. To prevent this attack, the <span class="caps">CSRF</span> protection is
+used: In order to submit the form on site A, the request must contain a unique string (the <span class="caps">CSRF</span> token) that is generated
+automatically by site A. Thankfully, site B cannot access this token and thus cannot submit the&nbsp;form.</p>
+<p>The <span class="caps">CSRF</span> situation is only related to sessions. If you are not using sessions then <span class="caps">CSRF</span> protection is not needed because
+there&#8217;s no way for site B to submit the form on site A (for example, with TokenAuthentication, site B cannot access the
+token that site A&nbsp;has).</p>
+<p>However if you <em>are</em> using sessions then you must be extra careful
+to protect your <span class="caps">POST</span> views against <span class="caps">CSRF</span> attacks. Django does this by default so you don&#8217;t need to do anything
+fancy. However, when you actually want to submit a form using an <span class="caps">API</span> with sessions you must be careful to also
+include the <span class="caps">CSRF</span> token as explained in the Django docs about the topic (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/csrf/"><span class="caps">CSRF</span> protection</a>).</p>
+</div>
+<div class="section" id="tokens">
+<h3>Tokens</h3>
+<p>For cases where you can&#8217;t use the session to authenticate, django-rest-framework
+offers a different authentication method called <tt class="docutils literal">TokenAuthentication_</tt>. Using this method, each user of the Django application
+is correlated with a random string (Token) which is passed along with each request at its header thus the Django app can authenticate
+the user using this token. The token is retrieved when the user logs using his credentials and is saved in the&nbsp;browser.</p>
+<p>One thing that may seem strange is that since both the session cookie and a token are
+set through <span class="caps">HTTP</span> Headers why all the fuss about tokens? Why not just use the session cookie and be done with it?
+Well, there are
+various reasons - here&#8217;s a <a class="reference external" href="https://auth0.com/blog/angularjs-authentication-with-cookies-vs-token/">rather extensive article</a> explaining some of them. Some of the reasons are that a token can be valid forever
+while the session is something ephemeral - beyond authorization information, sessions may keep various other data for a web
+application and are expired after some time to save space. Also, since tokens are used for exactly this (authentication) they
+are much easier to use and reason about. Finally, as I&#8217;ve already explained, sharing cookies by multiple sites is not something
+you&#8217;d like to do. Actually, to make things easier for you just follow this rule:
+<strong>If your <span class="caps">API</span> will be run on a different domain  than your client (i.e api.example.com and www.example.com)
+or your client not run on the web (i.e. is a desktop/mobile app) then you must not use session authentication</strong>. Use token
+authentication as proposed here or whatever else you may want that doesn&#8217;t rely on&nbsp;sessions.</p>
+</div>
+<div class="section" id="cors">
+<h3><span class="caps">CORS</span></h3>
+<p>Another thing that must concern the people that will want to use an <span class="caps">API</span> is the <a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS"><span class="caps">CORS</span></a> situation.
+By default cross-origin requests are not allowed, i.e site B cannot issue Ajax requests to site A.
+Each server can be configured to allow cross-origin requests from other servers. This means that
+if you have a server api.example.com that is used as a backend and a server www.example.com that will
+serve your front-end, you can configure api.example.com to allow requests only from&nbsp;www.example.com.</p>
+<p>By default Django does not allow any cross origin requests and you need to use the <a class="reference external" href="https://github.com/adamchainz/django-cors-headers">django-cors-headers</a>
+package to properly configure&nbsp;it.</p>
+<p>Notice that <span class="caps">CORS</span> protection is enforced by the Browser. For example if you have build a mobile app
+and are consuming an <span class="caps">API</span> in api.example.com then <span class="caps">CORS</span> protection does not apply to your http&nbsp;client.</p>
+</div>
+</div>
+<div class="section" id="installation-configuration">
+<h2>Installation <span class="amp">&amp;</span>&nbsp;configuration</h2>
+<p>The project will use <a class="reference external" href="http://www.django-rest-framework.org">django-rest-framework</a>, <a class="reference external" href="https://github.com/iMerica/dj-rest-auth">dj-rest-auth</a> and <a class="reference external" href="https://github.com/adamchainz/django-cors-headers">django-cors-headers</a>.</p>
+<p>To install django-rest-framework and dj-rest-auth just follow <a class="reference external" href="https://dj-rest-auth.readthedocs.io/en/latest/installation.html">the instructions here</a> i.e just add
+<tt class="docutils literal">'rest_framework', 'rest_framework.authtoken'</tt> and <tt class="docutils literal">'dj_rest_auth'</tt> to your <cite>INSTALLED_APPS</cite> in
+<tt class="docutils literal">settings.py</tt> and run&nbsp;migrate.</p>
+<p>To install django-cors-headers follow the <a class="reference external" href="https://github.com/adamchainz/django-cors-headers#setup">the setup instructions</a>: Add <tt class="docutils literal">&quot;corsheaders&quot;</tt> to your <tt class="docutils literal">INSTALLED_APPS</tt> and
+<tt class="docutils literal">&quot;django.middleware.common.CommonMiddleware&quot;</tt> to your <tt class="docutils literal"><span class="caps">MIDDLEWARE</span></tt> in <tt class="docutils literal">settings.py</tt>. Then you can use the
+<tt class="docutils literal">CORS_ALLOWED_ORIGINS</tt> setting to configure which origins are allowed to make requests to your project. Let&#8217;s
+suppose that you are running your project at 127.0.0.1:8000 and you want to allow requests from a client
+running at 127.0.0.1:8001. You can do this by adding the following to your settings.py:
+<tt class="docutils literal">CORS_ALLOWED_ORIGINS = <span class="pre">['http://127.0.0.1:8001',</span> <span class="pre">'http://localhost:8001']</span></tt>. Actually, try running the project
+with and without that setting and see how the javascript client&nbsp;behaves.</p>
+<p>Since I won&#8217;t be adding any other apps to this project (no models are actually needed), I&#8217;ve added
+two directories <tt class="docutils literal">static</tt> and <tt class="docutils literal">templates</tt> to put static files and templates there. This is configured
+by adding the <tt class="docutils literal">'<span class="caps">DIRS</span>'</tt> attribte to <tt class="docutils literal"><span class="caps">TEMPLATES</span></tt>, like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><span class="n">TEMPLATES</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s1">&#39;BACKEND&#39;</span><span class="p">:</span> <span class="s1">&#39;django.template.backends.django.DjangoTemplates&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;DIRS&#39;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">BASE_DIR</span><span class="p">,</span> <span class="s1">&#39;templates&#39;</span><span class="p">),</span>
+        <span class="p">],</span>
+        <span class="o">//</span> <span class="o">...</span>
+</pre></div>
+<p>and adding the <cite>STATICFILES_DIRS</cite> setting:</p>
+<div class="highlight"><pre><span></span><span class="n">STATICFILES_DIRS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">BASE_DIR</span><span class="p">,</span> <span class="s2">&quot;static&quot;</span><span class="p">),</span>
+<span class="p">]</span>
+</pre></div>
+<p>The remaining setting are the default as were created by <tt class="docutils literal"><span class="pre">django-admin</span> startproject</tt>.</p>
+</div>
+<div class="section" id="urls">
+<h2>Urls</h2>
+<p>I have included the the following urls to <tt class="docutils literal">urls.py</tt>:</p>
+<div class="highlight"><pre><span></span><span class="n">urlpatterns</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">path</span><span class="p">(</span><span class="s1">&#39;admin/&#39;</span><span class="p">,</span> <span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">urls</span><span class="p">),</span>
+    <span class="n">path</span><span class="p">(</span><span class="s1">&#39;test_auth/&#39;</span><span class="p">,</span> <span class="n">TestAuthView</span><span class="o">.</span><span class="n">as_view</span><span class="p">(),</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;test_auth&#39;</span><span class="p">,</span> <span class="p">),</span>
+    <span class="n">path</span><span class="p">(</span><span class="s1">&#39;rest-auth/logout/&#39;</span><span class="p">,</span> <span class="n">LogoutViewEx</span><span class="o">.</span><span class="n">as_view</span><span class="p">(),</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;rest_logout&#39;</span><span class="p">,</span> <span class="p">),</span>
+    <span class="n">path</span><span class="p">(</span><span class="s1">&#39;rest-auth/login/&#39;</span><span class="p">,</span> <span class="n">LoginView</span><span class="o">.</span><span class="n">as_view</span><span class="p">(),</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;rest_login&#39;</span><span class="p">,</span> <span class="p">),</span>
+    <span class="n">path</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">HomeTemplateView</span><span class="o">.</span><span class="n">as_view</span><span class="p">(),</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;home&#39;</span><span class="p">,</span> <span class="p">),</span>
+<span class="p">]</span> <span class="o">+</span> <span class="n">static</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">STATIC_URL</span><span class="p">,</span> <span class="n">document_root</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">STATIC_ROOT</span><span class="p">)</span>
+</pre></div>
+<p>These are: The django-admin, a <tt class="docutils literal">test_auth</tt> view (that works only for authenticated users and returns their username),
+a view (<tt class="docutils literal">LogoutViewEx</tt>) that overrides the rest-auth <span class="caps">REST</span> logout-view (I&#8217;ll explain why this is needed in a minute),
+the rest-auth <span class="caps">REST</span> login-view, the home template view (which is the only view implemented) and finally a mapping
+of your static files to the <tt class="docutils literal">STATIC_URL</tt>.</p>
+<p>The <tt class="docutils literal">LoginView</tt> is the default provided by the dj-rest-auth project. One thing to consider is that
+this view will check if the credentials you pass are valid and return a valid token for your user. However,
+it will also optionally login the user using sessions (i.e create a new session and return a sessionid cookie). This
+is configured by the <tt class="docutils literal">REST_SESSION_LOGIN</tt> option which by default is <tt class="docutils literal">True</tt>.</p>
+<p>To test this functionality, try logging in using this login view with a superuser and then visit the django-admin. You
+will see that you are already logged in. Now, logout and add (or change) <tt class="docutils literal">REST_SESSION_LOGIN=False</tt> to your settings.py.
+Login again from the rest view and now if you visit the django-admin you should see that you need to login&nbsp;again.</p>
+<p>Another way to test this is by checking out the response headers of the <tt class="docutils literal"><span class="caps">POST</span></tt> to <tt class="docutils literal"><span class="pre">rest-auth/login/</span></tt> from your
+browser&#8217;s development tools. When you are using <tt class="docutils literal">REST_SESSION_LOGIN=True</tt> (or you haven&#8217;t defined it since by
+default it is true) you&#8217;ll see the following <tt class="docutils literal"><span class="pre">Set-Cookie</span></tt> line:</p>
+<pre class="code literal-block">
+sessionid=pw8rp7l7yy33lk7geuxbczaleh35w9je; expires=Wed, 08 Sep 2021 08:29:40 GMT; HttpOnly; Max-Age=1209600; Path=/; SameSite=Lax
+</pre>
+<p>This cookie won&#8217;t be set if you login again with <tt class="docutils literal">REST_SESSION_LOGIN=False</tt>.</p>
+</div>
+<div class="section" id="the-views">
+<h2>The&nbsp;views</h2>
+<p>I&#8217;ve defined three views in this application - the <tt class="docutils literal">HomeTemplateView</tt>, the <tt class="docutils literal">TestAuthView</tt>
+and the <tt class="docutils literal">LogoutViewEx</tt> view that overrides the normal <tt class="docutils literal">LogoutView</tt> of <tt class="docutils literal"><span class="pre">django-rest-auth</span></tt>.</p>
+<div class="section" id="hometemplateview">
+<h3>HomeTemplateView</h3>
+<p>The <tt class="docutils literal">HomeTemplateView</tt> is
+a simple <tt class="docutils literal">TemplateView</tt> that just
+displays an html page and loads the client side code - we&#8217;ll talk about it later in the front-side section.
+This is more or less similar (without the django-stuff) with the standalone client  page that can be found on
+<tt class="docutils literal">client/index.html</tt>.</p>
+</div>
+<div class="section" id="testauthview">
+<h3>TestAuthView</h3>
+<p>The <tt class="docutils literal">TestAuthView</tt> is implemented like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">TestAuthView</span><span class="p">(</span><span class="n">APIView</span><span class="p">):</span>
+    <span class="n">authentication_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">authentication</span><span class="o">.</span><span class="n">TokenAuthentication</span><span class="p">,)</span>
+    <span class="n">permission_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">permissions</span><span class="o">.</span><span class="n">IsAuthenticated</span><span class="p">,)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="s2">&quot;Hello </span><span class="si">{0}</span><span class="s2">!&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="s2">&quot;Hello </span><span class="si">{0}</span><span class="s2">! Posted!&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">))</span>
+</pre></div>
+<p>This is very simple however I&#8217;d like to make a few comments about the above. First of all you see that
+I&#8217;ve defined both a <tt class="docutils literal">get</tt> and a <tt class="docutils literal">post</tt> method. When you use the token authentication you&#8217;ll see that the
+<tt class="docutils literal">post</tt> method will work without the need to provide a csrf token as already discussed&nbsp;before.</p>
+</div>
+<div class="section" id="authentication-and-permission">
+<h3>Authentication and&nbsp;permission</h3>
+<p>Notice that both <tt class="docutils literal">authentication_classes</tt> and <tt class="docutils literal">permission_classes</tt> are included in the <tt class="docutils literal">TestAuthView</tt>. These options&nbsp;define:</p>
+<ul class="simple">
+<li>which method will be used for authenticating access to the <span class="caps">REST</span> view i.e finding out if the user
+requesting access has logged in and if yes what&#8217;s his username (in our case only <tt class="docutils literal">TokenAuthentication</tt> will be&nbsp;used)</li>
+<li>if the user is authorized (has permission) to call this <span class="caps">REST</span> view (in our case only authenticated users will be&nbsp;allowed)</li>
+</ul>
+<p>The authentication and permission classes can be set globally
+in your <tt class="docutils literal">settings.py</tt> using <tt class="docutils literal"><span class="pre">REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES']</span></tt> and
+<tt class="docutils literal"><span class="pre">REST_FRAMEWORK['DEFAULT_PERMISSION_CLASSES']</span></tt>
+or defined per-class like this. If I wanted to have the same authentication and permission classes defined
+in my <tt class="docutils literal">settings.py</tt> so I wouldn&#8217;t need to set these options per-class I&#8217;d add the following to my <tt class="docutils literal">settings.py</tt>:</p>
+<div class="highlight"><pre><span></span><span class="n">REST_FRAMEWORK</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;DEFAULT_AUTHENTICATION_CLASSES&#39;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="s1">&#39;rest_framework.authentication.TokenAuthentication&#39;</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="s1">&#39;DEFAULT_PERMISSION_CLASSES&#39;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="s1">&#39;rest_framework.permissions.IsAuthenticated&#39;</span><span class="p">,</span>
+    <span class="p">),</span>
+<span class="p">}</span>
+</pre></div>
+<p>Please keep in mind that you haven&#8217;t defined these in your views or your settings, they will have the
+following <a class="reference external" href="http://www.django-rest-framework.org/api-guide/settings/#default_authentication_classes">default</a> <a class="reference external" href="http://www.django-rest-framework.org/api-guide/settings/#default_permission_classes">values</a>:</p>
+<div class="highlight"><pre><span></span><span class="n">REST_FRAMEWORK</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;DEFAULT_AUTHENTICATION_CLASSES&#39;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="s1">&#39;rest_framework.authentication.SessionAuthentication&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;rest_framework.authentication.BasicAuthentication&#39;</span>
+    <span class="p">),</span>
+    <span class="s1">&#39;DEFAULT_PERMISSION_CLASSES&#39;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="s1">&#39;rest_framework.permissions.AllowAny&#39;</span><span class="p">,</span>
+    <span class="p">),</span>
+<span class="p">}</span>
+</pre></div>
+<p>The above mean that if you don&#8217;t define authentication and permission classes anywhere then the <span class="caps">REST</span>
+views will use either session authentication (i.e the user has logged in normally using
+the Django login views as explained before) or <span class="caps">HTTP</span> basic authentication
+(the request provides the credentials in the header using traditional <span class="caps">HTTP</span> Basic authentication)
+and also that all users (logged in or not) will be allowed to call all APIs (this is
+probably not something you&nbsp;want).</p>
+</div>
+<div class="section" id="tokens-1">
+<h3>Tokens</h3>
+<p>The <tt class="docutils literal">TokenAuthentication</tt> that we are using for the <tt class="docutils literal">TestAuthView</tt>
+means that for every request a valid token must be passed (there&#8217;s no concept of state
+in <span class="caps">HTTP</span> so you need to pass it whenever you communicate with the&nbsp;server).</p>
+<p>The tokens are normal object instances of <tt class="docutils literal">rest_framework.authtoken.models.Token</tt>
+and you can take a look at them (or even add one) through the Django admin (auth token - tokens). You can also
+even do whatever you normally would do to an object instance, for&nbsp;example:</p>
+<div class="highlight"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="p">[</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">key</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">Token</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()]</span>
+<span class="p">[(</span><span class="o">&lt;</span><span class="n">User</span><span class="p">:</span> <span class="n">root</span><span class="o">&gt;</span><span class="p">,</span> <span class="s1">&#39;db4dcc1b9d00d1af74fb3cb41e1f9e673208485b&#39;</span><span class="p">)]</span>
+</pre></div>
+<p>To authenticate with a token (using <a class="reference external" href="http://www.django-rest-framework.org/api-guide/authentication/#tokenauthentication">TokenAuthentication</a>), you must add an extra header to your request with the format
+<tt class="docutils literal">Authorization: Token token</tt> for example in the previous case <tt class="docutils literal">root</tt> would add
+<tt class="docutils literal">Authorization: Token db4dcc1b9d00d1af74fb3cb41e1f9e673208485b</tt>. To do this you&#8217;ll need something
+client-side code which we&#8217;ll see in the next&nbsp;section.</p>
+<p>To debug your authentication with <a class="reference external" href="https://curl.haxx.se">curl</a> you can just do something like&nbsp;this:</p>
+<div class="highlight"><pre><span></span>curl<span class="w"> </span>http://127.0.0.1:8000/test_auth/<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;Authorization:Token db4dcc1b9d00d1af74fb3cb41e1f9e673208485b&quot;</span>
+</pre></div>
+<p>Try it with a valid and invalid token and without providing a token at all and see the response each&nbsp;time.</p>
+</div>
+<div class="section" id="dj-rest-auth">
+<h3>dj-rest-auth</h3>
+<p>So, django-rest-framework provides the model (Token) and the mechanism (add the extra Authentication header) for
+authentication with Tokens. What it does not provide is a simple way to create/remove tokens for users: This
+is where the dj-rest-auth project comes to the rescue! Its login and logout <span class="caps">REST</span> views will automatically
+create (and delete) tokens for the users that are logging&nbsp;in.</p>
+<p>As already described above, the login view will also authenticate the user
+using the session when the REST_SESSION_LOGIN is set to True (default) - this means that if a user
+logs in using the login <span class="caps">REST</span> endpoint he&#8217;ll then
+be logged in normally to the site and be able to access non-<span class="caps">REST</span> parts of the site (for example the&nbsp;django-admin).</p>
+<p>Also, if the user logs in through the dj-rest-auth <span class="caps">REST</span> end point and if you have are using <tt class="docutils literal">SessionAuthentication</tt>
+to one of your views then he&#8217;ll be able to authenticate to these views <em>without</em> the need to pass the token (make sure
+you understand&nbsp;why).</p>
+</div>
+<div class="section" id="logoutviewex">
+<h3>LogoutViewEx</h3>
+<p>Finally, let&#8217;s take a look at the <tt class="docutils literal">LogoutViewEx</tt>:</p>
+<div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">LogoutViewEx</span><span class="p">(</span><span class="n">LogoutView</span><span class="p">):</span>
+    <span class="n">authentication_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">authentication</span><span class="o">.</span><span class="n">TokenAuthentication</span><span class="p">,)</span>
+</pre></div>
+<p>This class only defines the authentication_classes attribute. Is this really needed? Well, it depends on
+you project. If you take a look at the source code of
+<tt class="docutils literal">LogoutView</tt> (<a class="reference external" href="https://github.com/iMerica/dj-rest-auth/blob/master/dj_rest_auth/views.py#L131">https://github.com/iMerica/dj-rest-auth/blob/master/dj_rest_auth/views.py#L131</a>)
+you&#8217;ll see that it does not define <tt class="docutils literal">authentication_classes</tt>. This, as we&#8217;ve already discussed, means that it will
+fall-back to whatever you have defined in the settings (or the defaults of&nbsp;django-rest-framework).</p>
+<p>So, if you haven&#8217;t
+defined anything in the settings then you&#8217;ll get the by default the
+<tt class="docutils literal">SessionAuthentication</tt> and <tt class="docutils literal">BasicAuthentication</tt> methods (hint: <em>not</em> the <tt class="docutils literal">TokenAuthentication</tt>).
+This means that you won&#8217;t be able to
+logout when you pass the token (but <em>will</em> be able to logout from the web-app after you login - why?). So to make everything
+crystal and be able to reason better about the behavior I specifically define the <tt class="docutils literal">LogoutViewEx</tt> to use
+the <tt class="docutils literal">TokenAuthentication</tt> to properly log out your user. This of course means that you need to pass
+the token to your logout view also or else there won&#8217;t be any way to associate the request with a user to log&nbsp;out.</p>
+</div>
+</div>
+<div class="section" id="the-client-side-scripts">
+<h2>The client side&nbsp;scripts</h2>
+<p>I&#8217;ve included all client-side code to a <tt class="docutils literal">home.html</tt> template that is loaded
+from the <tt class="docutils literal">HomeTemplateView</tt>. Also, the same code has been included in <tt class="docutils literal">client/index.html</tt>. This is
+a completely standalone javascript client that you can run in a different http server than your Django server,
+for example by running <tt class="docutils literal">py <span class="pre">-3</span> <span class="pre">-m</span>&nbsp; http.server 8001</tt> from the client folder and visiting <a class="reference external" href="http://127.0.0.1:8001">http://127.0.0.1:8001</a>.</p>
+<p>The client-side code has been implemented only with jQuery because I think
+this is the library that most people are familiar with - and is really easy to be understood even if you
+are not familiar with it. It more or less consists of five sections in&nbsp;html:</p>
+<ul class="simple">
+<li>A user-is-logged-in section that displays the username and the logout&nbsp;button</li>
+<li>A user-is-not-logged-in section that displays a message and the login&nbsp;button</li>
+<li>A test-auth section that displays a button for calling the <tt class="docutils literal">TestAuthView</tt> with <span class="caps">GET</span> defined previously and outputs its&nbsp;response</li>
+<li>A test-auth <span class="caps">POST</span> section that displays a button for calling the <tt class="docutils literal">TestAuthView</tt> with <span class="caps">POST</span> defined previously and outputs its&nbsp;response</li>
+<li>The login&nbsp;modal</li>
+</ul>
+<p>Here&#8217;s the html (using spectre.css for&nbsp;styling):</p>
+<div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;container grid-lg&quot;</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">h2</span><span class="p">&gt;</span>Test<span class="p">&lt;/</span><span class="nt">h2</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;columns&quot;</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;non-logged-in&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#39;column col-3&#39;</span><span class="p">&gt;</span>
+        You have to log-in!
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#39;column col-3&#39;</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">button</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;btn btn-primary&quot;</span>  <span class="na">id</span><span class="o">=</span><span class="s">&#39;loginButton&#39;</span><span class="p">&gt;</span>Login<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;columns&quot;</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;logged-in&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#39;column col-3&#39;</span><span class="p">&gt;</span>
+        Welcome <span class="p">&lt;</span><span class="nt">span</span> <span class="na">id</span><span class="o">=</span><span class="s">&#39;span-username&#39;</span><span class="p">&gt;&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>!
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#39;column col-3&#39;</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">button</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;btn btn-primary&quot;</span>  <span class="na">id</span><span class="o">=</span><span class="s">&#39;logoutButton&#39;</span><span class="p">&gt;</span>Logout<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">hr</span> <span class="p">/&gt;</span>
+<span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;columns&quot;</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;test&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#39;column col-3&#39;</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">button</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;btn btn-primary&quot;</span>  <span class="na">id</span><span class="o">=</span><span class="s">&#39;testAuthButton&#39;</span><span class="p">&gt;</span>Test auth<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#39;column col-9&#39;</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">&#39;test-auth-response&#39;</span> <span class="p">&gt;&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">hr</span> <span class="p">/&gt;</span>
+<span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;columns&quot;</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;test&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#39;column col-3&#39;</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">button</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;btn btn-primary&quot;</span>  <span class="na">id</span><span class="o">=</span><span class="s">&#39;testAuthPostButton&#39;</span><span class="p">&gt;</span>Test auth (POST)<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#39;column col-9&#39;</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">&#39;test-auth-post-response&#39;</span> <span class="p">&gt;&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+
+<span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;modal&quot;</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;login-modal&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;#close&quot;</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;modal-overlay close-modal&quot;</span> <span class="na">aria-label</span><span class="o">=</span><span class="s">&quot;Close&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;modal-container&quot;</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;modal-header&quot;</span><span class="p">&gt;</span>
+            <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;#close&quot;</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;btn btn-clear float-right close-modal&quot;</span> <span class="na">aria-label</span><span class="o">=</span><span class="s">&quot;Close&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+            <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;modal-title h5&quot;</span><span class="p">&gt;</span>Please login<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+        <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;modal-body&quot;</span><span class="p">&gt;</span>
+            <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;content&quot;</span><span class="p">&gt;</span>
+                <span class="p">&lt;</span><span class="nt">form</span><span class="p">&gt;</span>
+                    {% csrf_token %}
+                    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;form-group&quot;</span><span class="p">&gt;</span>
+                        <span class="p">&lt;</span><span class="nt">label</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;form-label&quot;</span> <span class="na">for</span><span class="o">=</span><span class="s">&quot;input-username&quot;</span><span class="p">&gt;</span>Username<span class="p">&lt;/</span><span class="nt">label</span><span class="p">&gt;</span>
+                        <span class="p">&lt;</span><span class="nt">input</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;form-input&quot;</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text&quot;</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;input-username&quot;</span> <span class="na">placeholder</span><span class="o">=</span><span class="s">&quot;Name&quot;</span><span class="p">&gt;</span>
+                    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+                    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;form-group&quot;</span><span class="p">&gt;</span>
+                        <span class="p">&lt;</span><span class="nt">label</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;form-label&quot;</span> <span class="na">for</span><span class="o">=</span><span class="s">&quot;input-password&quot;</span><span class="p">&gt;</span>Password<span class="p">&lt;/</span><span class="nt">label</span><span class="p">&gt;</span>
+                        <span class="p">&lt;</span><span class="nt">input</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;form-input&quot;</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;password&quot;</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;input-password&quot;</span> <span class="na">placeholder</span><span class="o">=</span><span class="s">&quot;Password&quot;</span><span class="p">&gt;</span>
+                    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+                    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;form-group&quot;</span><span class="p">&gt;</span>
+                        <span class="p">&lt;</span><span class="nt">label</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;form-checkbox&quot;</span> <span class="na">for</span><span class="o">=</span><span class="s">&quot;input-local-storage&quot;</span><span class="p">&gt;</span>
+                            <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;checkbox&quot;</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;input-local-storage&quot;</span> <span class="p">/&gt;</span> <span class="p">&lt;</span><span class="nt">i</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;form-icon&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">i</span><span class="p">&gt;</span>  Use local storage (remember me)
+                        <span class="p">&lt;/</span><span class="nt">label</span><span class="p">&gt;</span>
+                    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+                <span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+                <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#39;label label-error mt-1 d-invisible&#39;</span> <span class="na">id</span><span class="o">=</span><span class="s">&#39;modal-error&#39;</span><span class="p">&gt;</span>
+                    Unable to login!
+                <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+            <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+        <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;modal-footer&quot;</span><span class="p">&gt;</span>
+
+            <span class="p">&lt;</span><span class="nt">button</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;btn btn-primary&quot;</span> <span class="na">id</span><span class="o">=</span><span class="s">&#39;loginOkButton&#39;</span> <span class="p">&gt;</span>Ok<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+            <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;#close&quot;</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;btn close-modal&quot;</span> <span class="p">&gt;</span>Close<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+        <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</pre></div>
+<p>The html is very simple and I don&#8217;t think I need to explain much  - notice that the <tt class="docutils literal"><span class="pre">#logged-in</span></tt> and <tt class="docutils literal"><span class="pre">#non-logged-in</span></tt>
+sections are mutually exclusive (I use <tt class="docutils literal">$.show()</tt> and <tt class="docutils literal">$.hide()</tt> to show and hide them) but the <tt class="docutils literal">#test</tt> section is always displayed
+so you&#8217;ll be able to call the test <span class="caps">REST</span> <span class="caps">API</span> when you are and are not authenticated. For the modal
+to be displayed you need to add an <tt class="docutils literal">active</tt> class to its <tt class="docutils literal">#modal</tt> container.</p>
+<p>For the javascript, let&#8217;s take a look at some initialization&nbsp;stuff:</p>
+<div class="highlight"><pre><span></span><span class="kd">var</span><span class="w"> </span><span class="nx">g_urls</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="s1">&#39;login&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;{% url &quot;rest_login&quot; %}&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="s1">&#39;logout&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;{% url &quot;rest_logout&quot; %}&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="s1">&#39;test_auth&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;{% url &quot;test_auth&quot; %}&#39;</span><span class="p">,</span>
+<span class="p">};</span>
+<span class="kd">var</span><span class="w"> </span><span class="nx">g_auth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s2">&quot;auth&quot;</span><span class="p">);</span>
+<span class="k">if</span><span class="p">(</span><span class="nx">g_auth</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">g_auth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">sessionStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s2">&quot;auth&quot;</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">if</span><span class="p">(</span><span class="nx">g_auth</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">g_auth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">g_auth</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">g_auth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">var</span><span class="w"> </span><span class="nx">initLogin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">function</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="nx">g_auth</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#non-logged-in&#39;</span><span class="p">).</span><span class="nx">hide</span><span class="p">();</span>
+<span class="w">        </span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#logged-in&#39;</span><span class="p">).</span><span class="nx">show</span><span class="p">();</span>
+<span class="w">        </span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#span-username&#39;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="nx">g_auth</span><span class="p">.</span><span class="nx">username</span><span class="p">);</span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="nx">g_auth</span><span class="p">.</span><span class="nx">remember_me</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="s2">&quot;auth&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">g_auth</span><span class="p">));</span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nx">sessionStorage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="s2">&quot;auth&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">g_auth</span><span class="p">));</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#non-logged-in&#39;</span><span class="p">).</span><span class="nx">show</span><span class="p">();</span>
+<span class="w">        </span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#logged-in&#39;</span><span class="p">).</span><span class="nx">hide</span><span class="p">();</span>
+<span class="w">        </span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#span-username&#39;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">);</span>
+<span class="w">        </span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">removeItem</span><span class="p">(</span><span class="s2">&quot;auth&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="nx">sessionStorage</span><span class="p">.</span><span class="nx">removeItem</span><span class="p">(</span><span class="s2">&quot;auth&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#test-auth-response&#39;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#test-auth-post-response&#39;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">);</span>
+<span class="p">};</span>
+</pre></div>
+<p>First of all, I define a <tt class="docutils literal">g_urls</tt> window/global object that will keep the required <span class="caps">REST</span> <span class="caps">URLS</span> (login/logout and test auth). These
+are retrieved from Django using the <tt class="docutils literal">{% url %}</tt> template tag and are not hard-coded (in the js only client they are hard-coded of course).
+After that, I check to see if the user has authenticated before. Notice that because
+this is client-side code, I need to do that every time the page loads or else the <span class="caps">JS</span> won&#8217;t be initialized properly! The user login
+information is stored to an object named <tt class="docutils literal">g_auth</tt> and contains three attributes: <tt class="docutils literal">username</tt>, <tt class="docutils literal">key</tt> (token) and <tt class="docutils literal">remember_me</tt>.</p>
+<p>To keep the login information I use either a key named <tt class="docutils literal">auth</tt> to either the <tt class="docutils literal">localStorage</tt> or the <tt class="docutils literal">sessionStorage</tt>. The <tt class="docutils literal">sessionStorage</tt> is used to save
+info for the current browser tab (<em>not</em> window) while the <tt class="docutils literal">localStorage</tt> saves info for ever (until somebody deletes it). Thus,
+<tt class="docutils literal">localStorage</tt> can be used for implementing a &#8220;remember me&#8221;&nbsp;functionality.</p>
+<p>The final function we define here, <tt class="docutils literal">initLogin</tt> (which is called a little later) checks to see if there is login information
+and hides/displays the correct things in html. It will also set the local or session storage (depending on remember me&nbsp;value).</p>
+<p>After that, we have some client side code that is inside the <tt class="docutils literal">$()</tt> function which will be called after the page has completely&nbsp;loaded:</p>
+<div class="highlight"><pre><span></span><span class="nx">$</span><span class="p">(</span><span class="kd">function</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">initLogin</span><span class="p">();</span>
+
+<span class="w">    </span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#loginButton&#39;</span><span class="p">).</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#login-modal&#39;</span><span class="p">).</span><span class="nx">addClass</span><span class="p">(</span><span class="s1">&#39;active&#39;</span><span class="p">);</span>
+<span class="w">    </span><span class="p">});</span>
+
+<span class="w">    </span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;.close-modal&#39;</span><span class="p">).</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#login-modal&#39;</span><span class="p">).</span><span class="nx">removeClass</span><span class="p">(</span><span class="s1">&#39;active&#39;</span><span class="p">);</span>
+<span class="w">    </span><span class="p">});</span>
+
+<span class="w">    </span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#testAuthButton&#39;</span><span class="p">).</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span>
+<span class="w">            </span><span class="nx">url</span><span class="o">:</span><span class="w"> </span><span class="nx">g_urls</span><span class="p">.</span><span class="nx">test_auth</span><span class="p">,</span>
+<span class="w">            </span><span class="nx">method</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;GET&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nx">beforeSend</span><span class="o">:</span><span class="w"> </span><span class="kd">function</span><span class="p">(</span><span class="nx">request</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="k">if</span><span class="p">(</span><span class="nx">g_auth</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="nx">request</span><span class="p">.</span><span class="nx">setRequestHeader</span><span class="p">(</span><span class="s2">&quot;Authorization&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Token &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">g_auth</span><span class="p">.</span><span class="nx">key</span><span class="p">);</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}).</span><span class="nx">done</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#test-auth-response&#39;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="s2">&quot;&lt;span class=&#39;label label-success&#39;&gt;Ok! Response: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">data</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}).</span><span class="nx">fail</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#test-auth-response&#39;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="s2">&quot;&lt;span class=&#39;label label-error&#39;&gt;Fail! Response: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">data</span><span class="p">.</span><span class="nx">responseText</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot; (status: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">data</span><span class="p">.</span><span class="nx">status</span><span class="o">+</span><span class="s2">&quot;)&lt;/span&gt;&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="p">});</span>
+<span class="w">    </span><span class="p">});</span>
+
+<span class="w">    </span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#testAuthPostButton&#39;</span><span class="p">).</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// Same as with the GET</span>
+<span class="w">    </span><span class="p">});</span>
+
+<span class="w">    </span><span class="c1">// continuing below ...</span>
+</pre></div>
+<p>The first thing happening here is to call the <tt class="docutils literal">initLogin</tt> function to properly initialize the page and then we add a couple of
+handlers to the click buttons of the <tt class="docutils literal">#loginButton</tt> (which just displays the modal by adding the <tt class="docutils literal">active</tt> class ),
+<tt class="docutils literal"><span class="pre">.close-modal</span></tt> class (there are multiple
+ways to close the modal thus I use a class which just removes that <tt class="docutils literal">active</tt> class) and finally to the <tt class="docutils literal">#testAuthButton</tt>
+and <tt class="docutils literal">#testAuthPostButton#</tt>.
+These
+button will do a <tt class="docutils literal"><span class="caps">GET</span></tt> and <tt class="docutils literal"><span class="caps">POST</span></tt> request to the <tt class="docutils literal">g_urls.test_auth</tt> we defined before. The important thing to notice
+here is that we add
+a <tt class="docutils literal">beforeSend</tt> attribute to the <tt class="docutils literal">$.ajax</tt> request which, if <tt class="docutils literal">g_auth</tt> is defined, adds an <tt class="docutils literal">Authorization</tt> header with the token
+in the form that django-rest-framework <tt class="docutils literal">TokenAuthentication</tt> expects and as we&#8217;ve already discussed&nbsp;above:</p>
+<div class="highlight"><pre><span></span><span class="nx">beforeSend</span><span class="o">:</span><span class="w"> </span><span class="kd">function</span><span class="p">(</span><span class="nx">request</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="nx">g_auth</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">request</span><span class="p">.</span><span class="nx">setRequestHeader</span><span class="p">(</span><span class="s2">&quot;Authorization&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Token &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">g_auth</span><span class="p">.</span><span class="nx">key</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+<p>If this ajax call returns without errors (the <tt class="docutils literal">done</tt> part of the ajax call)
+we just add the <tt class="docutils literal">data</tt> to a green label else if there&#8217;s an error (<tt class="docutils literal">fail</tt> part)
+we add the response text and status to a red label. You can try clicking the buttons and you see that only if you&#8217;ve logged in
+you will succeed in this call. Also, notice that both <span class="caps">GET</span> and <span class="caps">POST</span> requests work normally without the need to also include
+a csrf token (I hope you understand why by&nbsp;now).</p>
+<p>Let&#8217;s now take a look at the <tt class="docutils literal">#loginOkbutton</tt> click handler (inside the&nbsp;modal):</p>
+<div class="highlight"><pre><span></span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#loginOkButton&#39;</span><span class="p">).</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">var</span><span class="w"> </span><span class="nx">username</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#input-username&#39;</span><span class="p">).</span><span class="nx">val</span><span class="p">();</span>
+<span class="w">    </span><span class="kd">var</span><span class="w"> </span><span class="nx">password</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#input-password&#39;</span><span class="p">).</span><span class="nx">val</span><span class="p">();</span>
+<span class="w">    </span><span class="kd">var</span><span class="w"> </span><span class="nx">remember_me</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#input-local-storage&#39;</span><span class="p">).</span><span class="nx">prop</span><span class="p">(</span><span class="s1">&#39;checked&#39;</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="nx">username</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nx">password</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;Will try to login with &quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">username</span><span class="p">,</span><span class="w"> </span><span class="nx">password</span><span class="p">);</span>
+<span class="w">        </span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#modal-error&#39;</span><span class="p">).</span><span class="nx">addClass</span><span class="p">(</span><span class="s1">&#39;d-invisible&#39;</span><span class="p">);</span>
+<span class="w">        </span><span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span>
+<span class="w">            </span><span class="nx">url</span><span class="o">:</span><span class="w"> </span><span class="nx">g_urls</span><span class="p">.</span><span class="nx">login</span><span class="p">,</span>
+<span class="w">            </span><span class="nx">method</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;POST&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nx">data</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="nx">username</span><span class="o">:</span><span class="w"> </span><span class="nx">username</span><span class="p">,</span>
+<span class="w">                </span><span class="nx">password</span><span class="o">:</span><span class="w"> </span><span class="nx">password</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}).</span><span class="nx">done</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;DONE: &quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">username</span><span class="p">,</span><span class="w"> </span><span class="nx">data</span><span class="p">.</span><span class="nx">key</span><span class="p">);</span>
+<span class="w">            </span><span class="nx">g_auth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="nx">username</span><span class="o">:</span><span class="w"> </span><span class="nx">username</span><span class="p">,</span>
+<span class="w">                </span><span class="nx">key</span><span class="o">:</span><span class="w"> </span><span class="nx">data</span><span class="p">.</span><span class="nx">key</span><span class="p">,</span>
+<span class="w">                </span><span class="nx">remember_me</span><span class="o">:</span><span class="w"> </span><span class="nx">remember_me</span>
+<span class="w">            </span><span class="p">};</span>
+<span class="w">            </span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#login-modal&#39;</span><span class="p">).</span><span class="nx">removeClass</span><span class="p">(</span><span class="s1">&#39;active&#39;</span><span class="p">);</span>
+<span class="w">            </span><span class="nx">initLogin</span><span class="p">();</span>
+<span class="w">        </span><span class="p">}).</span><span class="nx">fail</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;FAIL&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">data</span><span class="p">);</span>
+<span class="w">            </span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#modal-error&#39;</span><span class="p">).</span><span class="nx">removeClass</span><span class="p">(</span><span class="s1">&#39;d-invisible&#39;</span><span class="p">);</span>
+<span class="w">        </span><span class="p">});</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#modal-error&#39;</span><span class="p">).</span><span class="nx">removeClass</span><span class="p">(</span><span class="s1">&#39;d-invisible&#39;</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">});</span>
+</pre></div>
+<p>All three user inputs (<tt class="docutils literal">username, password, remember_me</tt>) are read from the form and if both username and
+password have been defined an Ajax request will be done to the <tt class="docutils literal">g_urls.login</tt> url. We pass
+<tt class="docutils literal">username</tt> and <tt class="docutils literal">password</tt> as the request data. Now, if there&#8217;s an
+error (<tt class="docutils literal">fail</tt>) I just display a generic message (by removing it&#8217;s <cite>d-invisible</cite> class) while, if the
+request was Ok I retrieve the <tt class="docutils literal">key</tt> (token) from the response, initialize the <tt class="docutils literal">g_auth</tt> object with the
+<tt class="docutils literal">username</tt>, <tt class="docutils literal">key</tt> and <tt class="docutils literal">remember_me</tt> values and call <tt class="docutils literal">initLogin</tt> to show the correct divs and save
+to the session/local&nbsp;storage.</p>
+<p>Finally, here&#8217;s the code for logout (still inside the <tt class="docutils literal">$(function () {</tt>):</p>
+<div class="highlight"><pre><span></span><span class="w">    </span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#logoutButton&#39;</span><span class="p">).</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;Trying to logout&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span>
+<span class="w">            </span><span class="nx">url</span><span class="o">:</span><span class="w"> </span><span class="nx">g_urls</span><span class="p">.</span><span class="nx">logout</span><span class="p">,</span>
+<span class="w">            </span><span class="nx">method</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;POST&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nx">beforeSend</span><span class="o">:</span><span class="w"> </span><span class="kd">function</span><span class="p">(</span><span class="nx">request</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="nx">request</span><span class="p">.</span><span class="nx">setRequestHeader</span><span class="p">(</span><span class="s2">&quot;Authorization&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Token &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">g_auth</span><span class="p">.</span><span class="nx">key</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}).</span><span class="nx">done</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;DONE: &quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">data</span><span class="p">);</span>
+<span class="w">            </span><span class="nx">g_auth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">            </span><span class="nx">initLogin</span><span class="p">();</span>
+<span class="w">        </span><span class="p">}).</span><span class="nx">fail</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;FAIL: &quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">data</span><span class="p">);</span>
+<span class="w">        </span><span class="p">});</span>
+<span class="w">    </span><span class="p">});</span>
+
+<span class="p">});</span><span class="w"> </span><span class="c1">// End of $(function () {</span>
+</pre></div>
+<p>The code here is very simple - just do a <tt class="docutils literal"><span class="caps">POST</span></tt> to the <tt class="docutils literal">g_urls.logout</tt>  and if everything is ok delete the <tt class="docutils literal">g_auth</tt> values
+and call <tt class="docutils literal">initLogin()</tt> to show the correct divs and remove the <tt class="docutils literal">auth</tt> key from local/session storage. Notice that when
+you <tt class="docutils literal"><span class="caps">POST</span></tt> to the <tt class="docutils literal">logout</tt> <span class="caps">REST</span> end-point, you need to also add the <tt class="docutils literal">Authorization</tt> header with the token or else
+(since we&#8217;ve defined only <tt class="docutils literal">TokenAuthentication</tt> for the <tt class="docutils literal">authentication_classes</tt> for the <tt class="docutils literal">LogoutViewEx</tt> class)
+there won&#8217;t be any way to correlate the request with the user and log him&nbsp;out!</p>
+</div>
+<div class="section" id="conclusion">
+<h2>Conclusion</h2>
+<p>Using the info presented on this article you should be able to properly login and logout to Django using <span class="caps">REST</span> and
+also call <span class="caps">REST</span> end-points using the <tt class="docutils literal">TokenAuthentication</tt>.</p>
+<p>I recommend using the <tt class="docutils literal">curl</tt> utility to try to call the rest
+end point with various parameters to see the response. Also, you change the <tt class="docutils literal">LogoutViewEx</tt> with the
+default django-rest-auth <tt class="docutils literal">LogoutView</tt> and then try logging out through the web-app <em>and</em> through curl and see
+what happens when you try to access the test-auth&nbsp;end-point.</p>
+<p>As a final remark, a couple of thing to&nbsp;note:</p>
+<ul class="simple">
+<li>You can use the <a class="reference external" href="https://github.com/James1345/django-rest-knox">django-rest-knox</a> package to improve the functionality and security of your <span class="caps">REST</span> tokens (by allowing multiple tokens per user, storing them hashed in the database and configuring expiration times for the&nbsp;tokens)</li>
+<li>If you are using Apache and mod_wsgi to run you Django project you need to set the <a class="reference external" href="https://modwsgi.readthedocs.io/en/develop/configuration-directives/WSGIPassAuthorization.html">WSGIPassAuthorization</a> option to <tt class="docutils literal">on</tt> in order to pass the Authorization header to your Django&nbsp;app.</li>
+</ul>
+</div>
+</div>
+    <footer>
+<p class="meta">
+  <span class="byline author vcard">
+    Posted by <span class="fn">
+        Serafeim Papastefanos
+    </span>
+  </span>
+<time datetime="2021-08-25T12:40:00+03:00" pubdate>Wed 25 August 2021</time>  <span class="categories">
+    <a class='category' href='https://www.spapas.net/category/django.html'>django</a>
+  </span>
+  <span class="categories">
+    <a class="category" href="https://www.spapas.net/tag/django.html">django</a>,    <a class="category" href="https://www.spapas.net/tag/dj-rest-auth.html">dj-rest-auth</a>,    <a class="category" href="https://www.spapas.net/tag/rest.html">rest</a>,    <a class="category" href="https://www.spapas.net/tag/django-rest-framework.html">django-rest-framework</a>,    <a class="category" href="https://www.spapas.net/tag/authentication.html">authentication</a>,    <a class="category" href="https://www.spapas.net/tag/python.html">python</a>,    <a class="category" href="https://www.spapas.net/tag/tokens.html">tokens</a>  </span>
+</p><div class="sharing">
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="https://www.spapas.net/2021/08/25/django-token-rest-auth/" data-via="" data-counturl="https://www.spapas.net/2021/08/25/django-token-rest-auth/" >Tweet</a>
+</div>    </footer>
+  </article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript></div>
+  </section>
+</div>
+<aside class="sidebar">
+  
+  <section>
+    <br />
+    <a href='/feeds/all.atom.xml'>Atom</a>
+    |
+    <a href='/feeds/all.rss.xml'>RSS</a>
+  </section>
+
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <!-- Sidebar unit -->
+  <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7673322832689008" data-ad-slot="2720624730"
+    data-ad-format="auto" data-full-width-responsive="true"></ins>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+
+
+  <script async src="https://cse.google.com/cse.js?cx=612920e5ca9da850c"></script>
+  <div class="gcse-search"></div>
+
+  
+  <section>
+    <h1>Support me</h1>
+
+    You can show your appreciation for anything useful you've found here by 
+    buying me a coffee 
+    <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="spapas" data-color="#FFDD00" data-emoji=""  data-font="Lato" data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff" ></script>
+
+    or donating me some bitcoin to this address:
+    <small><pre>bc1qx42vp8napheaewhnx0rk0mttdrdrtvw6czvxhl</pre></small>
+    <svg shape-rendering="crispEdges" height="200" width="200" viewBox="0 0 29 29" class="qrcode">
+      <path fill="#FFFFFF" d="M0,0 h29v29H0z"></path><path fill="#000000" d="M0 0h7v1H0zM9 0h2v1H9zM12 0h1v1H12zM14 0h2v1H14zM18 0h2v1H18zM22,0 h7v1H22zM0 1h1v1H0zM6 1h1v1H6zM8 1h1v1H8zM11 1h1v1H11zM14 1h5v1H14zM22 1h1v1H22zM28,1 h1v1H28zM0 2h1v1H0zM2 2h3v1H2zM6 2h1v1H6zM8 2h4v1H8zM17 2h1v1H17zM22 2h1v1H22zM24 2h3v1H24zM28,2 h1v1H28zM0 3h1v1H0zM2 3h3v1H2zM6 3h1v1H6zM9 3h2v1H9zM14 3h3v1H14zM18 3h1v1H18zM22 3h1v1H22zM24 3h3v1H24zM28,3 h1v1H28zM0 4h1v1H0zM2 4h3v1H2zM6 4h1v1H6zM8 4h1v1H8zM11 4h1v1H11zM13 4h1v1H13zM15 4h2v1H15zM18 4h1v1H18zM22 4h1v1H22zM24 4h3v1H24zM28,4 h1v1H28zM0 5h1v1H0zM6 5h1v1H6zM8 5h2v1H8zM14 5h2v1H14zM19 5h2v1H19zM22 5h1v1H22zM28,5 h1v1H28zM0 6h7v1H0zM8 6h1v1H8zM10 6h1v1H10zM12 6h1v1H12zM14 6h1v1H14zM16 6h1v1H16zM18 6h1v1H18zM20 6h1v1H20zM22,6 h7v1H22zM8 7h2v1H8zM11 7h1v1H11zM15 7h1v1H15zM17 7h2v1H17zM0 8h2v1H0zM3 8h1v1H3zM6 8h2v1H6zM10 8h1v1H10zM12 8h3v1H12zM20 8h1v1H20zM22 8h3v1H22zM26 8h2v1H26zM1 9h1v1H1zM3 9h3v1H3zM8 9h1v1H8zM10 9h1v1H10zM12 9h2v1H12zM16 9h2v1H16zM20 9h1v1H20zM22 9h1v1H22zM25 9h1v1H25zM27,9 h2v1H27zM0 10h1v1H0zM3 10h2v1H3zM6 10h1v1H6zM8 10h3v1H8zM12 10h2v1H12zM16 10h1v1H16zM19 10h1v1H19zM22 10h3v1H22zM27 10h1v1H27zM0 11h1v1H0zM2 11h1v1H2zM4 11h2v1H4zM7 11h1v1H7zM13 11h4v1H13zM18 11h4v1H18zM26 11h2v1H26zM0 12h1v1H0zM2 12h3v1H2zM6 12h1v1H6zM11 12h1v1H11zM13 12h1v1H13zM15 12h3v1H15zM20 12h1v1H20zM22 12h2v1H22zM27,12 h2v1H27zM4 13h1v1H4zM8 13h3v1H8zM12 13h1v1H12zM14 13h1v1H14zM17 13h4v1H17zM25 13h2v1H25zM0 14h1v1H0zM4 14h3v1H4zM8 14h2v1H8zM11 14h3v1H11zM16 14h1v1H16zM21 14h2v1H21zM24,14 h5v1H24zM3 15h3v1H3zM7 15h2v1H7zM10 15h1v1H10zM12 15h2v1H12zM15 15h1v1H15zM17 15h2v1H17zM20 15h2v1H20zM23 15h1v1H23zM1 16h1v1H1zM4 16h1v1H4zM6 16h4v1H6zM16 16h2v1H16zM20 16h1v1H20zM23 16h1v1H23zM25 16h1v1H25zM28,16 h1v1H28zM2 17h1v1H2zM5 17h1v1H5zM7 17h2v1H7zM11 17h3v1H11zM17 17h1v1H17zM22 17h1v1H22zM25 17h1v1H25zM27,17 h2v1H27zM0 18h1v1H0zM3 18h1v1H3zM5 18h4v1H5zM10 18h1v1H10zM12 18h1v1H12zM18 18h1v1H18zM20 18h1v1H20zM22 18h2v1H22zM25,18 h4v1H25zM2 19h3v1H2zM8 19h1v1H8zM16 19h2v1H16zM21 19h1v1H21zM23 19h1v1H23zM25 19h1v1H25zM27 19h1v1H27zM0 20h1v1H0zM2 20h5v1H2zM8 20h2v1H8zM13 20h4v1H13zM19 20h6v1H19zM26 20h1v1H26zM28,20 h1v1H28zM8 21h2v1H8zM12 21h3v1H12zM16 21h1v1H16zM20 21h1v1H20zM24 21h1v1H24zM26,21 h3v1H26zM0 22h7v1H0zM8 22h3v1H8zM17 22h1v1H17zM20 22h1v1H20zM22 22h1v1H22zM24 22h2v1H24zM27 22h1v1H27zM0 23h1v1H0zM6 23h1v1H6zM10 23h2v1H10zM13 23h2v1H13zM19 23h2v1H19zM24,23 h5v1H24zM0 24h1v1H0zM2 24h3v1H2zM6 24h1v1H6zM9 24h2v1H9zM12 24h2v1H12zM17 24h1v1H17zM20 24h6v1H20zM28,24 h1v1H28zM0 25h1v1H0zM2 25h3v1H2zM6 25h1v1H6zM8 25h3v1H8zM12 25h1v1H12zM14 25h1v1H14zM18 25h1v1H18zM22 25h3v1H22zM26 25h1v1H26zM0 26h1v1H0zM2 26h3v1H2zM6 26h1v1H6zM10 26h5v1H10zM16 26h3v1H16zM21 26h1v1H21zM24 26h1v1H24zM26 26h1v1H26zM28,26 h1v1H28zM0 27h1v1H0zM6 27h1v1H6zM8 27h3v1H8zM12 27h4v1H12zM17 27h1v1H17zM20 27h1v1H20zM23 27h2v1H23zM27 27h1v1H27zM0 28h7v1H0zM8 28h3v1H8zM14 28h1v1H14zM16 28h3v1H16zM20 28h1v1H20zM22 28h1v1H22zM24 28h2v1H24zM27 28h1v1H27z"></path>
+    </svg>
+  </section>
+  
+
+  <section>
+    <h1>Subscribe</h1>
+    Do you want to get notified via email when I post new content?
+    <style>
+      .subscribe-button {
+        /* margin: 10px !important; */
+        padding: 10px !important;
+        background-color: black;
+        display: inline-block;
+        color: white !important;
+        text-decoration: none;
+
+        line-height: 36px !important;
+        height: 37px !important;
+        text-decoration: none !important;
+        display: inline-block !important;
+        color: #ffffff !important;
+        background-color: #000000 !important;
+        border-radius: 3px !important;
+        border: 1px solid transparent !important;
+        padding: 1px 9px !important;
+        font-size: 23px !important;
+        letter-spacing: 0.6px !important;
+        box-shadow: 0px 1px 2px rgba(190, 190, 190, 0.5) !important;
+        -webkit-box-shadow: 0px 1px 2px 2px rgba(190, 190, 190, 0.5) !important;
+        margin: 0 auto !important;
+        font-family: 'Cookie', cursive !important;
+        -webkit-box-sizing: border-box !important;
+        box-sizing: border-box !important;
+        -o-transition: 0.3s all linear !important;
+        -webkit-transition: 0.3s all linear !important;
+        -moz-transition: 0.3s all linear !important;
+        -ms-transition: 0.3s all linear !important;
+        transition: 0.3s all linear !important;
+
+      }
+    </style>
+    <a class='subscribe-button' target="_blank" href="http://eepurl.com/dxI3PP">Click here to subscribe!</a>
+  </section>
+
+
+  <section>
+    <h1>Recent Posts</h1>
+    <ul id="recent_posts">
+      <li class="post">
+        <a href="https://www.spapas.net/2024/08/22/multiple-erl-elixir-windows/">Multiple Erlang/Elixir versions in Windows</a>
+      </li>
+      <li class="post">
+        <a href="https://www.spapas.net/2023/11/29/openid-connect-tutorial/">A simple OpenID connect tutorial</a>
+      </li>
+      <li class="post">
+        <a href="https://www.spapas.net/2023/05/23/simple-django-datatables-integration/">Simple Django - DataTables integration</a>
+      </li>
+      <li class="post">
+        <a href="https://www.spapas.net/2023/05/22/ai-auto-subtitling/">AI auto-subtitling</a>
+      </li>
+      <li class="post">
+        <a href="https://www.spapas.net/2023/05/12/disable-your-forms/">HTML form disable after submit</a>
+      </li>
+    </ul>
+  </section>
+  <section>
+
+    <h1>Categories</h1>
+    <ul id="recent_posts">
+      <li><a href="https://www.spapas.net/category/ai.html">ai</a></li>
+      <li><a href="https://www.spapas.net/category/android.html">android</a></li>
+      <li><a href="https://www.spapas.net/category/clojure.html">clojure</a></li>
+      <li><a href="https://www.spapas.net/category/css.html">css</a></li>
+      <li><a href="https://www.spapas.net/category/django.html">django</a></li>
+      <li><a href="https://www.spapas.net/category/elixir.html">elixir</a></li>
+      <li><a href="https://www.spapas.net/category/flask.html">flask</a></li>
+      <li><a href="https://www.spapas.net/category/gaming.html">gaming</a></li>
+      <li><a href="https://www.spapas.net/category/git.html">git</a></li>
+      <li><a href="https://www.spapas.net/category/html.html">html</a></li>
+      <li><a href="https://www.spapas.net/category/javascript.html">javascript</a></li>
+      <li><a href="https://www.spapas.net/category/networking.html">networking</a></li>
+      <li><a href="https://www.spapas.net/category/pelican.html">pelican</a></li>
+      <li><a href="https://www.spapas.net/category/postgresql.html">postgresql</a></li>
+      <li><a href="https://www.spapas.net/category/python.html">python</a></li>
+      <li><a href="https://www.spapas.net/category/spring.html">spring</a></li>
+      <li><a href="https://www.spapas.net/category/unix.html">unix</a></li>
+      <li><a href="https://www.spapas.net/category/wagtail.html">wagtail</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Tags</h1>
+    <a href="https://www.spapas.net/tag/erlang.html">erlang</a>,    <a href="https://www.spapas.net/tag/elixir.html">elixir</a>,    <a href="https://www.spapas.net/tag/windows.html">windows</a>,    <a href="https://www.spapas.net/tag/openid.html">openid</a>,    <a href="https://www.spapas.net/tag/openid-connect.html">openid-connect</a>,    <a href="https://www.spapas.net/tag/oidc.html">oidc</a>,    <a href="https://www.spapas.net/tag/http.html">http</a>,    <a href="https://www.spapas.net/tag/keycloak.html">keycloak</a>,    <a href="https://www.spapas.net/tag/python.html">python</a>,    <a href="https://www.spapas.net/tag/django.html">django</a>,    <a href="https://www.spapas.net/tag/jquery.html">jquery</a>,    <a href="https://www.spapas.net/tag/datatables.html">datatables</a>,    <a href="https://www.spapas.net/tag/ai.html">ai</a>,    <a href="https://www.spapas.net/tag/whisper.html">whisper</a>,    <a href="https://www.spapas.net/tag/whispercpp.html">whisper.cpp</a>,    <a href="https://www.spapas.net/tag/subtitles.html">subtitles</a>,    <a href="https://www.spapas.net/tag/video.html">video</a>,    <a href="https://www.spapas.net/tag/auto-subtitling.html">auto-subtitling</a>,    <a href="https://www.spapas.net/tag/subtitiling.html">subtitiling</a>,    <a href="https://www.spapas.net/tag/transcribe.html">transcribe</a>,    <a href="https://www.spapas.net/tag/html.html">html</a>,    <a href="https://www.spapas.net/tag/javascript.html">javascript</a>,    <a href="https://www.spapas.net/tag/media.html">media</a>,    <a href="https://www.spapas.net/tag/storage.html">storage</a>,    <a href="https://www.spapas.net/tag/unpoly.html">unpoly</a>,    <a href="https://www.spapas.net/tag/access.html">access</a>,    <a href="https://www.spapas.net/tag/database.html">database</a>,    <a href="https://www.spapas.net/tag/accdb.html">accdb</a>,    <a href="https://www.spapas.net/tag/mdb.html">mdb</a>,    <a href="https://www.spapas.net/tag/postgresql.html">postgresql</a>,    <a href="https://www.spapas.net/tag/development.html">development</a>,    <a href="https://www.spapas.net/tag/inlines.html">inlines</a>,    <a href="https://www.spapas.net/tag/clojure.html">clojure</a>,    <a href="https://www.spapas.net/tag/cmd.html">cmd</a>,    <a href="https://www.spapas.net/tag/pdf.html">pdf</a>,    <a href="https://www.spapas.net/tag/wkhtmltopdf.html">wkhtmltopdf</a>,    <a href="https://www.spapas.net/tag/forward-proxy.html">forward-proxy</a>,    <a href="https://www.spapas.net/tag/reverse-proxy.html">reverse-proxy</a>,    <a href="https://www.spapas.net/tag/proxy.html">proxy</a>,    <a href="https://www.spapas.net/tag/networking.html">networking</a>,    <a href="https://www.spapas.net/tag/dj-rest-auth.html">dj-rest-auth</a>,    <a href="https://www.spapas.net/tag/rest.html">rest</a>,    <a href="https://www.spapas.net/tag/django-rest-framework.html">django-rest-framework</a>,    <a href="https://www.spapas.net/tag/authentication.html">authentication</a>,    <a href="https://www.spapas.net/tag/tokens.html">tokens</a>,    <a href="https://www.spapas.net/tag/migrations.html">migrations</a>,    <a href="https://www.spapas.net/tag/foreignkey.html">foreignkey</a>,    <a href="https://www.spapas.net/tag/dark-souls.html">dark-souls</a>,    <a href="https://www.spapas.net/tag/dark-souls-2.html">dark-souls-2</a>,    <a href="https://www.spapas.net/tag/dark-souls-3.html">dark-souls-3</a>,    <a href="https://www.spapas.net/tag/autohotkey.html">autohotkey</a>,    <a href="https://www.spapas.net/tag/matplotlib.html">matplotlib</a>,    <a href="https://www.spapas.net/tag/hashids.html">hashids</a>,    <a href="https://www.spapas.net/tag/wagtail.html">wagtail</a>,    <a href="https://www.spapas.net/tag/osmon.html">osmon</a>,    <a href="https://www.spapas.net/tag/phoenix.html">phoenix</a>,    <a href="https://www.spapas.net/tag/os-monitoring.html">os-monitoring</a>,    <a href="https://www.spapas.net/tag/forms.html">forms</a>,    <a href="https://www.spapas.net/tag/django-crispy-forms.html">django-crispy-forms</a>,    <a href="https://www.spapas.net/tag/django-widget-tweaks.html">django-widget-tweaks</a>,    <a href="https://www.spapas.net/tag/ecto.html">ecto</a>,    <a href="https://www.spapas.net/tag/queries.html">queries</a>,    <a href="https://www.spapas.net/tag/declarative.html">declarative</a>,    <a href="https://www.spapas.net/tag/form.html">form</a>,    <a href="https://www.spapas.net/tag/php.html">php</a>,    <a href="https://www.spapas.net/tag/select2.html">select2</a>,    <a href="https://www.spapas.net/tag/autocompelte.html">autocompelte</a>,    <a href="https://www.spapas.net/tag/ajax.html">ajax</a>,    <a href="https://www.spapas.net/tag/android.html">android</a>,    <a href="https://www.spapas.net/tag/kotlin.html">kotlin</a>,    <a href="https://www.spapas.net/tag/adapter.html">adapter</a>,    <a href="https://www.spapas.net/tag/filter.html">filter</a>,    <a href="https://www.spapas.net/tag/async.html">async</a>,    <a href="https://www.spapas.net/tag/tasks.html">tasks</a>,    <a href="https://www.spapas.net/tag/django-rq.html">django-rq</a>,    <a href="https://www.spapas.net/tag/rq.html">rq</a>,    <a href="https://www.spapas.net/tag/du.html">du</a>,    <a href="https://www.spapas.net/tag/unix.html">unix</a>,    <a href="https://www.spapas.net/tag/linux.html">linux</a>,    <a href="https://www.spapas.net/tag/disk-usage.html">disk-usage</a>,    <a href="https://www.spapas.net/tag/cbv.html">cbv</a>,    <a href="https://www.spapas.net/tag/middleware.html">middleware</a>,    <a href="https://www.spapas.net/tag/class-based-views.html">class-based-views</a>,    <a href="https://www.spapas.net/tag/react.html">react</a>,    <a href="https://www.spapas.net/tag/redux.html">redux</a>,    <a href="https://www.spapas.net/tag/hyperapp.html">hyperapp</a>,    <a href="https://www.spapas.net/tag/immutable.html">immutable</a>,    <a href="https://www.spapas.net/tag/es6.html">es6</a>,    <a href="https://www.spapas.net/tag/youtube.html">youtube</a>,    <a href="https://www.spapas.net/tag/youtube-dl.html">youtube-dl</a>,    <a href="https://www.spapas.net/tag/ffmpeg.html">ffmpeg</a>,    <a href="https://www.spapas.net/tag/django-rest-auth.html">django-rest-auth</a>,    <a href="https://www.spapas.net/tag/python-2.html">python-2</a>,    <a href="https://www.spapas.net/tag/python-3.html">python-3</a>,    <a href="https://www.spapas.net/tag/plpgsql.html">plpgsql</a>,    <a href="https://www.spapas.net/tag/component.html">component</a>,    <a href="https://www.spapas.net/tag/ag-grid.html">ag-grid</a>,    <a href="https://www.spapas.net/tag/grid.html">grid</a>,    <a href="https://www.spapas.net/tag/bash.html">bash</a>,    <a href="https://www.spapas.net/tag/cron.html">cron</a>,    <a href="https://www.spapas.net/tag/pandas.html">pandas</a>,    <a href="https://www.spapas.net/tag/scipy.html">scipy</a>,    <a href="https://www.spapas.net/tag/numpy.html">numpy</a>,    <a href="https://www.spapas.net/tag/pivot.html">pivot</a>,    <a href="https://www.spapas.net/tag/pivot_table.html">pivot_table</a>,    <a href="https://www.spapas.net/tag/ipython.html">ipython</a>,    <a href="https://www.spapas.net/tag/jupyter.html">jupyter</a>,    <a href="https://www.spapas.net/tag/notebook.html">notebook</a>,    <a href="https://www.spapas.net/tag/query.html">query</a>,    <a href="https://www.spapas.net/tag/q.html">q</a>,    <a href="https://www.spapas.net/tag/imgur.html">imgur</a>,    <a href="https://www.spapas.net/tag/console.html">console</a>,    <a href="https://www.spapas.net/tag/research.html">research</a>,    <a href="https://www.spapas.net/tag/debug.html">debug</a>,    <a href="https://www.spapas.net/tag/werkzeug.html">werkzeug</a>,    <a href="https://www.spapas.net/tag/django-extensions.html">django-extensions</a>,    <a href="https://www.spapas.net/tag/404.html">404</a>,    <a href="https://www.spapas.net/tag/error.html">error</a>,    <a href="https://www.spapas.net/tag/spring.html">spring</a>,    <a href="https://www.spapas.net/tag/spring-boot.html">spring-boot</a>,    <a href="https://www.spapas.net/tag/java.html">java</a>,    <a href="https://www.spapas.net/tag/ldap.html">ldap</a>,    <a href="https://www.spapas.net/tag/profiles.html">profiles</a>,    <a href="https://www.spapas.net/tag/settings.html">settings</a>,    <a href="https://www.spapas.net/tag/properties.html">properties</a>,    <a href="https://www.spapas.net/tag/yaml.html">yaml</a>,    <a href="https://www.spapas.net/tag/configuration.html">configuration</a>,    <a href="https://www.spapas.net/tag/deploy.html">deploy</a>,    <a href="https://www.spapas.net/tag/initd.html">init.d</a>,    <a href="https://www.spapas.net/tag/react-redux.html">react-redux</a>,    <a href="https://www.spapas.net/tag/redux-thunk.html">redux-thunk</a>,    <a href="https://www.spapas.net/tag/redux-form.html">redux-form</a>,    <a href="https://www.spapas.net/tag/react-router.html">react-router</a>,    <a href="https://www.spapas.net/tag/react-router-redux.html">react-router-redux</a>,    <a href="https://www.spapas.net/tag/react-notification.html">react-notification</a>,    <a href="https://www.spapas.net/tag/history.html">history</a>,    <a href="https://www.spapas.net/tag/babel.html">babel</a>,    <a href="https://www.spapas.net/tag/babelify.html">babelify</a>,    <a href="https://www.spapas.net/tag/browserify.html">browserify</a>,    <a href="https://www.spapas.net/tag/watchify.html">watchify</a>,    <a href="https://www.spapas.net/tag/uglify.html">uglify</a>,    <a href="https://www.spapas.net/tag/boilerplate.html">boilerplate</a>,    <a href="https://www.spapas.net/tag/tutorial.html">tutorial</a>,    <a href="https://www.spapas.net/tag/introduction.html">introduction</a>,    <a href="https://www.spapas.net/tag/fixed-data-tables.html">fixed-data-tables</a>,    <a href="https://www.spapas.net/tag/fixeddatatable.html">FixedDataTable</a>,    <a href="https://www.spapas.net/tag/reportlab.html">reportlab</a>,    <a href="https://www.spapas.net/tag/xhtml2pdf.html">xhtml2pdf</a>,    <a href="https://www.spapas.net/tag/node.html">node</a>,    <a href="https://www.spapas.net/tag/npm.html">npm</a>,    <a href="https://www.spapas.net/tag/generic.html">generic</a>,    <a href="https://www.spapas.net/tag/tables.html">tables</a>,    <a href="https://www.spapas.net/tag/flux.html">flux</a>,    <a href="https://www.spapas.net/tag/jobs.html">jobs</a>,    <a href="https://www.spapas.net/tag/asynchronous.html">asynchronous</a>,    <a href="https://www.spapas.net/tag/scheduling.html">scheduling</a>,    <a href="https://www.spapas.net/tag/redis.html">redis</a>,    <a href="https://www.spapas.net/tag/pusher.html">pusher</a>,    <a href="https://www.spapas.net/tag/auditing.html">auditing</a>,    <a href="https://www.spapas.net/tag/css.html">css</a>,    <a href="https://www.spapas.net/tag/design.html">design</a>,    <a href="https://www.spapas.net/tag/boostrap-material-design.html">boostrap-material-design</a>,    <a href="https://www.spapas.net/tag/less.html">less</a>,    <a href="https://www.spapas.net/tag/nodejs.html">node.js</a>,    <a href="https://www.spapas.net/tag/gmail.html">gmail</a>,    <a href="https://www.spapas.net/tag/security.html">security</a>,    <a href="https://www.spapas.net/tag/google.html">google</a>,    <a href="https://www.spapas.net/tag/flask.html">flask</a>,    <a href="https://www.spapas.net/tag/mongodb.html">mongodb</a>,    <a href="https://www.spapas.net/tag/heroku.html">heroku</a>,    <a href="https://www.spapas.net/tag/spring-security.html">spring-security</a>,    <a href="https://www.spapas.net/tag/git.html">git</a>,    <a href="https://www.spapas.net/tag/github.html">github</a>,    <a href="https://www.spapas.net/tag/branching.html">branching</a>,    <a href="https://www.spapas.net/tag/static-html.html">static-html</a>,    <a href="https://www.spapas.net/tag/githubio.html">github.io</a>,    <a href="https://www.spapas.net/tag/pelican.html">pelican</a>,    <a href="https://www.spapas.net/tag/github-pages.html">github-pages</a>,    <a href="https://www.spapas.net/tag/rst.html">rst</a>  </section>
+
+  <section>
+    <h1>Yearly archives</h1>
+    <a href="https://www.spapas.net/posts/2013/">2013</a>,    <a href="https://www.spapas.net/posts/2014/">2014</a>,    <a href="https://www.spapas.net/posts/2015/">2015</a>,    <a href="https://www.spapas.net/posts/2016/">2016</a>,    <a href="https://www.spapas.net/posts/2017/">2017</a>,    <a href="https://www.spapas.net/posts/2018/">2018</a>,    <a href="https://www.spapas.net/posts/2019/">2019</a>,    <a href="https://www.spapas.net/posts/2020/">2020</a>,    <a href="https://www.spapas.net/posts/2021/">2021</a>,    <a href="https://www.spapas.net/posts/2022/">2022</a>,    <a href="https://www.spapas.net/posts/2023/">2023</a>,    <a href="https://www.spapas.net/posts/2024/">2024</a>  </section>
+
+
+
+  <section>
+    <h1>GitHub Repos</h1>
+    <ul id="gh_repos">
+      <li class="loading">Status updating...</li>
+    </ul>
+      <a href="https://github.com/spapas">@spapas</a> on GitHub
+    <script  src="//code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      $(function(){
+          if (!window.jXHR){
+              var jxhr = document.createElement('script');
+              jxhr.type = 'text/javascript';
+              jxhr.src = 'https://www.spapas.net/theme/js/jXHR.js';
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(jxhr, s);
+          }
+
+          github.showRepos({
+              user: 'spapas',
+              count: 5,
+              skip_forks: true,
+              target: '#gh_repos'
+          });
+      });
+    </script>
+    <script src="https://www.spapas.net/theme/js/github.js" type="text/javascript"> </script>
+  </section>
+
+
+  <section>
+    <a href="https://twitter.com/_serafeim_?ref_src=twsrc%5Etfw" class="twitter-follow-button"
+      data-show-count="false">Follow @_serafeim_</a>
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+  </section>
+
+</aside>    </div>
+  </div>
+  <footer role="contentinfo"><p>
+    Copyright &copy;  2013&ndash;2024  Serafeim Papastefanos &mdash;
+  <span class="credit">Powered by <a href="http://getpelican.com">Pelican</a></span>
+</p></footer>
+  <script src="https://www.spapas.net/theme/js/modernizr-2.0.js"></script>
+  <script src="https://www.spapas.net/theme/js/ender.js"></script>
+  <script src="https://www.spapas.net/theme/js/octopress.js" type="text/javascript"></script>
+  <script src="https://www.spapas.net/theme/js/ads.js"></script>
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-44750952-1', 'auto');
+
+    ga('send', 'pageview');
+    </script>
+
+<script defer data-domain="spapas.net" src="https://plausible.hcg.gr/js/script.js"></script>  <script type="text/javascript">
+    var disqus_shortname = 'spapas-github-io';
+    var disqus_identifier = '/2021/08/25/django-token-rest-auth/';
+    var disqus_url = 'https://www.spapas.net/2021/08/25/django-token-rest-auth/';
+    var disqus_title = 'Token Authentication for&nbsp;django-rest-framework';
+    (function() {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = "//" + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+     })();
+  </script>
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+</body>
+
+</html>

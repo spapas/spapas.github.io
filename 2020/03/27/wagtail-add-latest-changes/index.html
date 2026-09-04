@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="google-site-verification" content="5_8DTmIiEq4gFvNAfxAD6TsGOgrMAjp8lQFQvfA6zZc" />
+    <title>Adding a latest-changes list to your Wagtail site &mdash; /var/</title>
+    <meta name="author" content="Serafeim Papastefanos">
+
+
+    
+<style type="text/css">
+pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: var(--jp-cell-editor-active-background) }
+.highlight { background: var(--jp-cell-editor-background); color: var(--jp-mirror-editor-variable-color) }
+.highlight .c { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment */
+.highlight .err { color: var(--jp-mirror-editor-error-color) } /* Error */
+.highlight .k { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword */
+.highlight .o { color: var(--jp-mirror-editor-operator-color); font-weight: bold } /* Operator */
+.highlight .p { color: var(--jp-mirror-editor-punctuation-color) } /* Punctuation */
+.highlight .ch { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Preproc */
+.highlight .cpf { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Single */
+.highlight .cs { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Special */
+.highlight .kc { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Pseudo */
+.highlight .kr { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Type */
+.highlight .m { color: var(--jp-mirror-editor-number-color) } /* Literal.Number */
+.highlight .s { color: var(--jp-mirror-editor-string-color) } /* Literal.String */
+.highlight .ow { color: var(--jp-mirror-editor-operator-color); font-weight: bold } /* Operator.Word */
+.highlight .pm { color: var(--jp-mirror-editor-punctuation-color) } /* Punctuation.Marker */
+.highlight .w { color: var(--jp-mirror-editor-variable-color) } /* Text.Whitespace */
+.highlight .mb { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Bin */
+.highlight .mf { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Float */
+.highlight .mh { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Hex */
+.highlight .mi { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Integer */
+.highlight .mo { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Oct */
+.highlight .sa { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Affix */
+.highlight .sb { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Backtick */
+.highlight .sc { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Char */
+.highlight .dl { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Delimiter */
+.highlight .sd { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Doc */
+.highlight .s2 { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Double */
+.highlight .se { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Escape */
+.highlight .sh { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Heredoc */
+.highlight .si { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Interpol */
+.highlight .sx { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Other */
+.highlight .sr { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Regex */
+.highlight .s1 { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Single */
+.highlight .ss { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Symbol */
+.highlight .il { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Integer.Long */
+</style>
+
+<style type="text/css">
+/* Overrides of notebook CSS for static HTML export */
+div.entry-content {
+  overflow: visible;
+  padding: 8px;
+}
+.input_area {
+  padding: 0.2em;
+}
+
+a.heading-anchor {
+ white-space: normal;
+}
+
+.rendered_html
+code {
+ font-size: .8em;
+}
+
+pre.ipynb {
+  color: black;
+  background: #f7f7f7;
+  border: none;
+  box-shadow: none;
+  margin-bottom: 0;
+  padding: 0;
+  margin: 0px;
+  font-size: 13px;
+}
+
+/* remove the prompt div from text cells */
+div.text_cell .prompt {
+    display: none;
+}
+
+/* remove horizontal padding from text cells, */
+/* so it aligns with outer body text */
+div.text_cell_render {
+    padding: 0.5em 0em;
+}
+
+img.anim_icon{padding:0; border:0; vertical-align:middle; -webkit-box-shadow:none; -box-shadow:none}
+
+div.collapseheader {
+    width=100%;
+    background-color:#d3d3d3;
+    padding: 2px;
+    cursor: pointer;
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+</style>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true,
+        displayMath: [['$$','$$'], ["\\[","\\]"]]
+    }
+});
+</script>
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+    $("div.collapseheader").click(function () {
+    $header = $(this).children("span").first();
+    $codearea = $(this).children(".input_area");
+    console.log($(this).children());
+    $codearea.slideToggle(500, function () {
+        $header.text(function () {
+            return $codearea.is(":visible") ? "Collapse Code" : "Expand Code";
+        });
+    });
+});
+});
+</script>
+
+
+
+
+
+
+    <!-- http://t.co/dKP3o1e -->
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+    <link href="https://spapas.github.io/favicon.png" rel="icon">
+
+    <link href="https://spapas.github.io/theme/css/main.css" media="screen, projection" rel="stylesheet"
+      type="text/css">
+
+    <link href="https://spapas.github.io/theme/css/extra_style.css" media="screen, projection" rel="stylesheet"
+      type="text/css">
+
+    <link href="https://fonts.googleapis.com/css?family=Fira+Mono|Fira+Sans:400,700&amp;subset=greek" rel="stylesheet">
+
+<style>
+#gHPzseYvFrhZ123 {
+  padding: 5px !important;
+  display: block;
+  margin-bottom: 10px !important;
+  background: #900;
+  color: #fff;
+  border-radius: 5px;
+  font-size: 1.0rem !important;
+}
+</style>
+
+
+  <script>
+    
+      
+  </script>
+
+    <script data-ad-client="ca-pub-7673322832689008" async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
+      onerror="adBlockFunction();"></script>
+  </head>
+
+<body>
+  <header role="banner"><hgroup>
+  <h1><a href="https://spapas.github.io/">/var/</a></h1>
+    <h2>Various programming stuff</h2>
+</hgroup></header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+</ul>
+
+
+<ul class="main-navigation">
+      <li >
+        <a href="https://spapas.github.io/category/ai.html">Ai</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/android.html">Android</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/clojure.html">Clojure</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/css.html">Css</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/django.html">Django</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/elixir.html">Elixir</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/flask.html">Flask</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/gaming.html">Gaming</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/git.html">Git</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/html.html">Html</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/javascript.html">Javascript</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/networking.html">Networking</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/pelican.html">Pelican</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/postgresql.html">Postgresql</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/python.html">Python</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/spring.html">Spring</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/unix.html">Unix</a>
+      </li>
+      <li class="active">
+        <a href="https://spapas.github.io/category/wagtail.html">Wagtail</a>
+      </li>
+</ul></nav>
+  <div id="main">
+    <div id="content">
+    <div id="gHPzseYvFrhZ123">
+      Hello! If you are using an ad blocker but find something useful here 
+      and want to support me please consider disabling your ad blocker for this site. 
+      <br />
+      <br />
+      Thank you,<br />
+      Serafeim
+      
+    </div>
+<div>
+  <article class="hentry" role="article">
+<header>
+      <h1 class="entry-title">Adding a latest-changes list to your Wagtail site</h1>
+    <p class="meta">
+<time datetime="2020-03-27T14:20:00+02:00" pubdate>Fri 27 March 2020</time>    </p>
+</header>
+
+<div class="entry-content"><p>I think that a very important tool for a new production <a class="reference external" href="https://wagtail.io">Wagtail</a> site is to have a list
+where you&#8217;ll be able to take a look at the latest changes. Most editors are not
+experienced enough when using a new tool so it&#8217;s easy to make bad quality edits. A
+user could take a look at their changes and guide them if something&#8217;s not up to good&nbsp;standards.</p>
+<p>In this article I&#8217;ll present a simple way to add a latest-changes list in your Wagtail site.
+This is working excellent with Wagtail 2.9, I haven&#8217;t tested it with other wagtail versions
+so your milage may vary. In the meantime, I&#8217;ll also introduce a bunch of concepts of Wagtail
+I find&nbsp;interesting.</p>
+<p><strong>Update 08/05/2020</strong> Please notice that this article was originally written for Wagtail 2.8
+projects. However, Wagtail 2.8 didn&#8217;t have an official <span class="caps">API</span> for adding reports thus I had to
+check the source code for some things. Those things since were not part of any <span class="caps">API</span> have
+been changed and are not working in Wagtail&nbsp;2.9.</p>
+<p>Thus I&#8217;ve updated
+the project to use the proper APIs and work with Wagtail 2.9 (and hopefully the next versions).
+If you want to see what&#8217;s changed between the two versions you can take a look at
+<a class="reference external" href="https://github.com/spapas/wagtail-latest-changes/commit/d751cd7978fc99c3b2f10e84c2f9b72c555f0930">this commit</a> from the companion project. You may also want to take a look at the
+<a class="reference external" href="https://docs.wagtail.io/en/stable/advanced_topics/adding_reports.html">adding reports</a> tutorial on the Wagtail&nbsp;docs.</p>
+<div class="section" id="a-starter-project">
+<h2>A starter&nbsp;project</h2>
+<p>Let&#8217;s create a simple wagtail-starter project (this is for windows you should be able to easily follow the same steps in Unix like&nbsp;systems):</p>
+<pre class="code literal-block">
+C:\progr\py3&gt;mkdir wagtail-starter
+C:\progr\py3&gt;cd wagtail-starter
+C:\progr\py3\wagtail-starter&gt;py -3 -m venv venv
+C:\progr\py3\wagtail-starter&gt;venv\Scripts\activate
+(venv) C:\progr\py3\wagtail-starter&gt;pip install wagtail
+(venv) C:\progr\py3\wagtail-starter&gt;wagtail.exe start wagtail_starter
+(venv) C:\progr\py3\wagtail-starter&gt;cd wagtail_starter
+(venv) C:\progr\py3\wagtail-starter\wagtail_starter&gt;python manage.py migrate
+(venv) C:\progr\py3\wagtail-starter\wagtail_starter&gt;python manage.py createsuperuser
+(venv) C:\progr\py3\wagtail-starter\wagtail_starter&gt;python manage.py runserver
+</pre>
+<p>When you&#8217;ve finished all the above you should be able to go to <a class="reference external" href="http://127.0.0.1/">http://127.0.0.1/</a> and see your homepage and then
+visit <a class="reference external" href="http://127.0.0.1/admin/">http://127.0.0.1/admin/</a> and login with your superuser. What we&#8217;d like to do is add a &#8220;Latest changes&#8221;
+link in the &#8220;Reports&#8221; admin section like&nbsp;this:</p>
+<img alt="New menu" src="/images/latest-changes-template.png" style="width: 580px;" />
+</div>
+<div class="section" id="implementing-the-latest-changes-menu">
+<h2>Implementing the latest-changes&nbsp;menu</h2>
+<div class="section" id="start-with-a-new-app">
+<h3>Start with a new&nbsp;app</h3>
+<p>To start the menu implementation I recommend putting everything related to it in a separate django application
+so you can easily re-use it to multiple sites. For this, let&#8217;s create a new django app&nbsp;using:</p>
+<pre class="code literal-block">
+(venv) C:\progr\py3\wagtail-starter\wagtail_starter&gt;python manage.py startapp latest_changes
+</pre>
+<p>And add <tt class="docutils literal">'latest_changes'</tt> to the list of our <tt class="docutils literal">INSTALLED_APPS</tt> at the file <tt class="docutils literal">wagtail_starter\settings\base.py</tt>.</p>
+</div>
+<div class="section" id="add-the-view">
+<h3>Add the&nbsp;view</h3>
+<p>Let&#8217;s add the code for the view that will display the latest changes page. Modify the latest_changes/views.py file like&nbsp;this:</p>
+<pre class="code literal-block">
+from django.shortcuts import render
+from wagtail.admin.views.reports import PageReportView
+from wagtail.core.models import UserPagePermissionsProxy
+from wagtail.core.models import Page
+
+
+class LatestChangesView(PageReportView):
+    template_name = &quot;reports/latest_changes.html&quot;
+    title = &quot;Latest changes&quot;
+    header_icon = &quot;date&quot;
+
+    def get_queryset(self):
+        self.queryset = Page.objects.order_by(&quot;-last_published_at&quot;)
+        return super().get_queryset()
+
+    def dispatch(self, request, *args, **kwargs):
+        if not UserPagePermissionsProxy(request.user).can_remove_locks():
+            return permission_denied(request)
+        return super().dispatch(request, *args, **kwargs)
+</pre>
+<p>As you can see the above code adds a very small view that overrides <tt class="docutils literal">PageReportView</tt> which is used
+also by the locked pages view so most things are already implemented by that view. The only thing we do
+here is to override the <tt class="docutils literal">get_queryset</tt> method to denote which pages we want to display and
+the <tt class="docutils literal">dispatch</tt> to add some permission checks. Here we check that a user <tt class="docutils literal">can_remove_locks</tt> but we
+could do other checks if needed. Finally, notice that we have overriden the template name which we&#8217;ll
+define in a&nbsp;minute.</p>
+<p>Beyond <tt class="docutils literal">PageReportView</tt> that should be used for generating <tt class="docutils literal">Page</tt> reports, you can override
+<tt class="docutils literal">ReportView</tt> which can be used to implement generic&nbsp;reports.</p>
+<p>To properly add that view in our urls.py we can use a wagtail hook named <tt class="docutils literal">register_admin_py</tt>. Wagtail hooks
+are a great way to excend the wagtail admin; to use them, you have to generate a file name <tt class="docutils literal">wagtail_hooks.py</tt>
+in one of your apps. This file will be auto-impoted by wagtail when your app is&nbsp;started.</p>
+<p>Thus, in our case we&#8217;ll add a <tt class="docutils literal">wagtail_hooks.py</tt> file in the <tt class="docutils literal">latest_changes</tt> app with the following&nbsp;code:</p>
+<pre class="code literal-block">
+from django.http import HttpResponse
+from django.conf.urls import url
+from wagtail.core import hooks
+from .views import LatestChangesView
+
+&#64;hooks.register('register_admin_urls')
+def urlconf_time():
+  return [
+    url(r'^latest_changes/$', LatestChangesView.as_view(), name='latest_changes'),
+  ]
+</pre>
+<p>The above just hooks up the <tt class="docutils literal">LatestChangesView</tt> we defined before to the <tt class="docutils literal">/admin/latest_changes/</tt> url.</p>
+<p>If everything&#8217;s ok till now you should be able to visit: <a class="reference external" href="http://127.0.0.1:8000/admin/latest_changes/">http://127.0.0.1:8000/admin/latest_changes/</a> and
+get an error for a missing template - remember that we haven&#8217;t yet defined <tt class="docutils literal">utils/reports/latest_changes.html</tt>.</p>
+</div>
+<div class="section" id="add-the-template">
+<h3>Add the&nbsp;template</h3>
+<p>To add the template we&#8217;ll need to create a folder named <tt class="docutils literal">templates</tt> under our <tt class="docutils literal">latest_changes</tt> app and then
+add a <tt class="docutils literal">reports</tt> folder to it. Finally in that folder add a <tt class="docutils literal">latest_changes.html</tt>. So the full path of
+the <tt class="docutils literal">latest_changes.html</tt> should be: <tt class="docutils literal">wagtail_starter\latest_changes\templates\reports\latest_changes.html</tt>:</p>
+<pre class="code literal-block">
+{% extends 'wagtailadmin/reports/base_page_report.html' %}
+{% load i18n %}
+{% block listing %}
+    {% include &quot;reports/_list_latest.html&quot; %}
+{% endblock %}
+
+{% block no_results %}
+    &lt;p&gt;{% trans &quot;No changes found.&quot; %}&lt;/p&gt;
+{% endblock %}
+</pre>
+<p>I&#8217;ve selected the <tt class="docutils literal">reports</tt> subfolder just to be compatible with what wagtail does, you can just put <tt class="docutils literal">latest_changes.html</tt>  directly
+under <tt class="docutils literal">templates</tt>; don&#8217;t forget to update the <tt class="docutils literal">LatestChangesView</tt> defined before though! This template extends the
+<tt class="docutils literal">base_page_report.html</tt> template that Wagtail provides for page reports. It also includes a
+snippet named <tt class="docutils literal">reports/_list_latest.html&quot; thus you also need to add a ``_list_latest.html</tt> file in the same folder with the
+following&nbsp;contents:</p>
+<pre class="code literal-block">
+{% extends &quot;wagtailadmin/pages/listing/_list_explore.html&quot; %}
+
+{% load i18n wagtailadmin_tags %}
+
+{% block post_parent_page_headers %}
+&lt;tr&gt;
+&lt;th&gt;Title&lt;/th&gt;
+&lt;th&gt;Last update&lt;/th&gt;
+&lt;th&gt;Kind&lt;/th&gt;
+&lt;th&gt;Status&lt;/th&gt;
+&lt;th&gt;Owner / last publish / last edit&lt;/th&gt;
+&lt;/tr&gt;
+{% endblock %}
+
+{% block page_navigation %}
+    &lt;td&gt;
+        {{ page.owner }} / {{ page.live_revision.user }} / {{ page.get_latest_revision.user }}
+    &lt;/td&gt;
+{% endblock %}
+</pre>
+<p>Please notice that my <tt class="docutils literal">_list_latest.html</tt> snippet extends the Wagtail provided <tt class="docutils literal">_list_explore.html</tt> template and
+overrides some things that can be overriden from that file. If you want to do more changes you&#8217;ll need to copy over
+everything and change things as you wish instead of&nbsp;extending.</p>
+<p>Also, keep in mind that because you added a <tt class="docutils literal">templates</tt> folder you&#8217;ll need to restart your django development&nbsp;server.</p>
+<p>Finally, if everything is ok until now you should be able to visit <a class="reference external" href="http://127.0.0.1:8000/admin/latest_changes/">http://127.0.0.1:8000/admin/latest_changes/</a> and see
+your view! It will say &#8220;No changes found&#8221; if you&#8217;ve followed the steps here; just go to Pages - Home from the wagtail
+menu and edit that page (just save it). Now visit <a class="reference external" href="http://127.0.0.1:8000/admin/latest_changes/">http://127.0.0.1:8000/admin/latest_changes/</a> again and behold! Your
+own latest changes&nbsp;view:</p>
+<img alt="The view" src="/images/last_changes_view.png" style="width: 780px;" />
+</div>
+<div class="section" id="displaying-our-menu-item">
+<h3>Displaying our menu&nbsp;item</h3>
+<p>The last piece of the puzzle missing is to actually display a menu item under the Reports menu of wagtail admin. For this
+we are going to use our friends, the wagtail hooks. So, change the wagtail_hooks.py file like this (I&#8217;m also including
+the code from adding the&nbsp;url):</p>
+<pre class="code literal-block">
+from django.http import HttpResponse
+from django.conf.urls import url
+from django.urls import reverse
+from wagtail.admin.menu import MenuItem
+from wagtail.core import hooks
+from wagtail.core.models import UserPagePermissionsProxy
+from .views import LatestChangesView
+
+&#64;hooks.register('register_admin_urls')
+def urlconf_time():
+    return [
+      url(r'^latest_changes/$', LatestChangesView.as_view(), name='latest_changes'),
+    ]
+
+
+class LatestChangesPagesMenuItem(MenuItem):
+    def is_shown(self, request):
+        return UserPagePermissionsProxy(request.user).can_remove_locks()
+
+
+&#64;hooks.register(&quot;register_reports_menu_item&quot;)
+def register_latest_changes_menu_item():
+    return LatestChangesPagesMenuItem(
+        &quot;Latest changes&quot;, reverse(&quot;latest_changes&quot;), classnames=&quot;icon icon-date&quot;, order=100,
+    )
+</pre>
+<p>The above code uses the <tt class="docutils literal">register_reports_menu_item</tt> which is a hook that can be used to add a child
+specifically to the Reports menu item. Notice that it uses the <tt class="docutils literal">LatestChangesPagesMenuItem</tt> which
+is a class that inherits from <tt class="docutils literal">MenuItem</tt>; the only thing that is overriden there is the <tt class="docutils literal">is_shown</tt>
+method so it will have the same permissions as the <tt class="docutils literal">LatestChangesView</tt> we defined above so user
+that will see the menu item will also have permissions to display the view. Here&#8217;s the final menu&nbsp;item:</p>
+<img alt="The menu item" src="/images/latest_changes_menu.png" style="width: 380px;" />
+</div>
+<div class="section" id="conclusion">
+<h3>Conclusion</h3>
+<p>We&#8217;ve seen the steps required to add a latest pages view to your wagtail admin site. I have to admit that
+it is a little work however the nice thing is that this is all self-included in a single application. You can
+just get tha application and copy over it to your wagtail site; after you add that application to INSTALLED_APPS
+you should get the whole functionality without any more modifications to your project. To help you more
+with this I&#8217;ve included the whole code of this project in the <a class="reference external" href="https://github.com/spapas/wagtail-latest-changes">https://github.com/spapas/wagtail-latest-changes</a>&nbsp;repository.</p>
+<p>You can either clone this repository to see the functionality or just copy over the <tt class="docutils literal">latest_changes</tt> folder to
+your wagtail project to include the functionality directly (don&#8217;t forget to fix the <tt class="docutils literal">INSTALLED_APPS</tt> setting)!
+It should work with all Wagtail 2.9 and later&nbsp;projects.</p>
+</div>
+</div>
+</div>
+    <footer>
+<p class="meta">
+  <span class="byline author vcard">
+    Posted by <span class="fn">
+        Serafeim Papastefanos
+    </span>
+  </span>
+<time datetime="2020-03-27T14:20:00+02:00" pubdate>Fri 27 March 2020</time>  <span class="categories">
+    <a class='category' href='https://spapas.github.io/category/wagtail.html'>wagtail</a>
+  </span>
+  <span class="categories">
+    <a class="category" href="https://spapas.github.io/tag/django.html">django</a>,    <a class="category" href="https://spapas.github.io/tag/wagtail.html">wagtail</a>  </span>
+</p><div class="sharing">
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="https://spapas.github.io/2020/03/27/wagtail-add-latest-changes/" data-via="" data-counturl="https://spapas.github.io/2020/03/27/wagtail-add-latest-changes/" >Tweet</a>
+</div>    </footer>
+  </article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript></div>
+  </section>
+</div>
+<aside class="sidebar">
+  
+  <section>
+    <br />
+    <a href='/feeds/all.atom.xml'>Atom</a>
+    |
+    <a href='/feeds/all.rss.xml'>RSS</a>
+  </section>
+
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <!-- Sidebar unit -->
+  <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7673322832689008" data-ad-slot="2720624730"
+    data-ad-format="auto" data-full-width-responsive="true"></ins>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+
+
+  <script async src="https://cse.google.com/cse.js?cx=612920e5ca9da850c"></script>
+  <div class="gcse-search"></div>
+
+  
+  <section>
+    <h1>Support me</h1>
+
+    You can show your appreciation for anything useful you've found here by 
+    buying me a coffee 
+    <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="spapas" data-color="#FFDD00" data-emoji=""  data-font="Lato" data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff" ></script>
+
+    or donating me some bitcoin to this address:
+    <small><pre>bc1qx42vp8napheaewhnx0rk0mttdrdrtvw6czvxhl</pre></small>
+    <svg shape-rendering="crispEdges" height="200" width="200" viewBox="0 0 29 29" class="qrcode">
+      <path fill="#FFFFFF" d="M0,0 h29v29H0z"></path><path fill="#000000" d="M0 0h7v1H0zM9 0h2v1H9zM12 0h1v1H12zM14 0h2v1H14zM18 0h2v1H18zM22,0 h7v1H22zM0 1h1v1H0zM6 1h1v1H6zM8 1h1v1H8zM11 1h1v1H11zM14 1h5v1H14zM22 1h1v1H22zM28,1 h1v1H28zM0 2h1v1H0zM2 2h3v1H2zM6 2h1v1H6zM8 2h4v1H8zM17 2h1v1H17zM22 2h1v1H22zM24 2h3v1H24zM28,2 h1v1H28zM0 3h1v1H0zM2 3h3v1H2zM6 3h1v1H6zM9 3h2v1H9zM14 3h3v1H14zM18 3h1v1H18zM22 3h1v1H22zM24 3h3v1H24zM28,3 h1v1H28zM0 4h1v1H0zM2 4h3v1H2zM6 4h1v1H6zM8 4h1v1H8zM11 4h1v1H11zM13 4h1v1H13zM15 4h2v1H15zM18 4h1v1H18zM22 4h1v1H22zM24 4h3v1H24zM28,4 h1v1H28zM0 5h1v1H0zM6 5h1v1H6zM8 5h2v1H8zM14 5h2v1H14zM19 5h2v1H19zM22 5h1v1H22zM28,5 h1v1H28zM0 6h7v1H0zM8 6h1v1H8zM10 6h1v1H10zM12 6h1v1H12zM14 6h1v1H14zM16 6h1v1H16zM18 6h1v1H18zM20 6h1v1H20zM22,6 h7v1H22zM8 7h2v1H8zM11 7h1v1H11zM15 7h1v1H15zM17 7h2v1H17zM0 8h2v1H0zM3 8h1v1H3zM6 8h2v1H6zM10 8h1v1H10zM12 8h3v1H12zM20 8h1v1H20zM22 8h3v1H22zM26 8h2v1H26zM1 9h1v1H1zM3 9h3v1H3zM8 9h1v1H8zM10 9h1v1H10zM12 9h2v1H12zM16 9h2v1H16zM20 9h1v1H20zM22 9h1v1H22zM25 9h1v1H25zM27,9 h2v1H27zM0 10h1v1H0zM3 10h2v1H3zM6 10h1v1H6zM8 10h3v1H8zM12 10h2v1H12zM16 10h1v1H16zM19 10h1v1H19zM22 10h3v1H22zM27 10h1v1H27zM0 11h1v1H0zM2 11h1v1H2zM4 11h2v1H4zM7 11h1v1H7zM13 11h4v1H13zM18 11h4v1H18zM26 11h2v1H26zM0 12h1v1H0zM2 12h3v1H2zM6 12h1v1H6zM11 12h1v1H11zM13 12h1v1H13zM15 12h3v1H15zM20 12h1v1H20zM22 12h2v1H22zM27,12 h2v1H27zM4 13h1v1H4zM8 13h3v1H8zM12 13h1v1H12zM14 13h1v1H14zM17 13h4v1H17zM25 13h2v1H25zM0 14h1v1H0zM4 14h3v1H4zM8 14h2v1H8zM11 14h3v1H11zM16 14h1v1H16zM21 14h2v1H21zM24,14 h5v1H24zM3 15h3v1H3zM7 15h2v1H7zM10 15h1v1H10zM12 15h2v1H12zM15 15h1v1H15zM17 15h2v1H17zM20 15h2v1H20zM23 15h1v1H23zM1 16h1v1H1zM4 16h1v1H4zM6 16h4v1H6zM16 16h2v1H16zM20 16h1v1H20zM23 16h1v1H23zM25 16h1v1H25zM28,16 h1v1H28zM2 17h1v1H2zM5 17h1v1H5zM7 17h2v1H7zM11 17h3v1H11zM17 17h1v1H17zM22 17h1v1H22zM25 17h1v1H25zM27,17 h2v1H27zM0 18h1v1H0zM3 18h1v1H3zM5 18h4v1H5zM10 18h1v1H10zM12 18h1v1H12zM18 18h1v1H18zM20 18h1v1H20zM22 18h2v1H22zM25,18 h4v1H25zM2 19h3v1H2zM8 19h1v1H8zM16 19h2v1H16zM21 19h1v1H21zM23 19h1v1H23zM25 19h1v1H25zM27 19h1v1H27zM0 20h1v1H0zM2 20h5v1H2zM8 20h2v1H8zM13 20h4v1H13zM19 20h6v1H19zM26 20h1v1H26zM28,20 h1v1H28zM8 21h2v1H8zM12 21h3v1H12zM16 21h1v1H16zM20 21h1v1H20zM24 21h1v1H24zM26,21 h3v1H26zM0 22h7v1H0zM8 22h3v1H8zM17 22h1v1H17zM20 22h1v1H20zM22 22h1v1H22zM24 22h2v1H24zM27 22h1v1H27zM0 23h1v1H0zM6 23h1v1H6zM10 23h2v1H10zM13 23h2v1H13zM19 23h2v1H19zM24,23 h5v1H24zM0 24h1v1H0zM2 24h3v1H2zM6 24h1v1H6zM9 24h2v1H9zM12 24h2v1H12zM17 24h1v1H17zM20 24h6v1H20zM28,24 h1v1H28zM0 25h1v1H0zM2 25h3v1H2zM6 25h1v1H6zM8 25h3v1H8zM12 25h1v1H12zM14 25h1v1H14zM18 25h1v1H18zM22 25h3v1H22zM26 25h1v1H26zM0 26h1v1H0zM2 26h3v1H2zM6 26h1v1H6zM10 26h5v1H10zM16 26h3v1H16zM21 26h1v1H21zM24 26h1v1H24zM26 26h1v1H26zM28,26 h1v1H28zM0 27h1v1H0zM6 27h1v1H6zM8 27h3v1H8zM12 27h4v1H12zM17 27h1v1H17zM20 27h1v1H20zM23 27h2v1H23zM27 27h1v1H27zM0 28h7v1H0zM8 28h3v1H8zM14 28h1v1H14zM16 28h3v1H16zM20 28h1v1H20zM22 28h1v1H22zM24 28h2v1H24zM27 28h1v1H27z"></path>
+    </svg>
+  </section>
+  
+
+  <section>
+    <h1>Subscribe</h1>
+    Do you want to get notified via email when I post new content?
+    <style>
+      .subscribe-button {
+        /* margin: 10px !important; */
+        padding: 10px !important;
+        background-color: black;
+        display: inline-block;
+        color: white !important;
+        text-decoration: none;
+
+        line-height: 36px !important;
+        height: 37px !important;
+        text-decoration: none !important;
+        display: inline-block !important;
+        color: #ffffff !important;
+        background-color: #000000 !important;
+        border-radius: 3px !important;
+        border: 1px solid transparent !important;
+        padding: 1px 9px !important;
+        font-size: 23px !important;
+        letter-spacing: 0.6px !important;
+        box-shadow: 0px 1px 2px rgba(190, 190, 190, 0.5) !important;
+        -webkit-box-shadow: 0px 1px 2px 2px rgba(190, 190, 190, 0.5) !important;
+        margin: 0 auto !important;
+        font-family: 'Cookie', cursive !important;
+        -webkit-box-sizing: border-box !important;
+        box-sizing: border-box !important;
+        -o-transition: 0.3s all linear !important;
+        -webkit-transition: 0.3s all linear !important;
+        -moz-transition: 0.3s all linear !important;
+        -ms-transition: 0.3s all linear !important;
+        transition: 0.3s all linear !important;
+
+      }
+    </style>
+    <a class='subscribe-button' target="_blank" href="http://eepurl.com/dxI3PP">Click here to subscribe!</a>
+  </section>
+
+
+  <section>
+    <h1>Recent Posts</h1>
+    <ul id="recent_posts">
+      <li class="post">
+        <a href="https://spapas.github.io/2024/08/22/multiple-erl-elixir-windows/">Multiple Erlang/Elixir versions in Windows</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/11/29/openid-connect-tutorial/">A simple OpenID connect tutorial</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/05/23/simple-django-datatables-integration/">Simple Django - DataTables integration</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/05/22/ai-auto-subtitling/">AI auto-subtitling</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/05/12/disable-your-forms/">HTML form disable after submit</a>
+      </li>
+    </ul>
+  </section>
+  <section>
+
+    <h1>Categories</h1>
+    <ul id="recent_posts">
+      <li><a href="https://spapas.github.io/category/ai.html">ai</a></li>
+      <li><a href="https://spapas.github.io/category/android.html">android</a></li>
+      <li><a href="https://spapas.github.io/category/clojure.html">clojure</a></li>
+      <li><a href="https://spapas.github.io/category/css.html">css</a></li>
+      <li><a href="https://spapas.github.io/category/django.html">django</a></li>
+      <li><a href="https://spapas.github.io/category/elixir.html">elixir</a></li>
+      <li><a href="https://spapas.github.io/category/flask.html">flask</a></li>
+      <li><a href="https://spapas.github.io/category/gaming.html">gaming</a></li>
+      <li><a href="https://spapas.github.io/category/git.html">git</a></li>
+      <li><a href="https://spapas.github.io/category/html.html">html</a></li>
+      <li><a href="https://spapas.github.io/category/javascript.html">javascript</a></li>
+      <li><a href="https://spapas.github.io/category/networking.html">networking</a></li>
+      <li><a href="https://spapas.github.io/category/pelican.html">pelican</a></li>
+      <li><a href="https://spapas.github.io/category/postgresql.html">postgresql</a></li>
+      <li><a href="https://spapas.github.io/category/python.html">python</a></li>
+      <li><a href="https://spapas.github.io/category/spring.html">spring</a></li>
+      <li><a href="https://spapas.github.io/category/unix.html">unix</a></li>
+      <li><a href="https://spapas.github.io/category/wagtail.html">wagtail</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Tags</h1>
+    <a href="https://spapas.github.io/tag/erlang.html">erlang</a>,    <a href="https://spapas.github.io/tag/elixir.html">elixir</a>,    <a href="https://spapas.github.io/tag/windows.html">windows</a>,    <a href="https://spapas.github.io/tag/openid.html">openid</a>,    <a href="https://spapas.github.io/tag/openid-connect.html">openid-connect</a>,    <a href="https://spapas.github.io/tag/oidc.html">oidc</a>,    <a href="https://spapas.github.io/tag/http.html">http</a>,    <a href="https://spapas.github.io/tag/keycloak.html">keycloak</a>,    <a href="https://spapas.github.io/tag/python.html">python</a>,    <a href="https://spapas.github.io/tag/django.html">django</a>,    <a href="https://spapas.github.io/tag/jquery.html">jquery</a>,    <a href="https://spapas.github.io/tag/datatables.html">datatables</a>,    <a href="https://spapas.github.io/tag/ai.html">ai</a>,    <a href="https://spapas.github.io/tag/whisper.html">whisper</a>,    <a href="https://spapas.github.io/tag/whispercpp.html">whisper.cpp</a>,    <a href="https://spapas.github.io/tag/subtitles.html">subtitles</a>,    <a href="https://spapas.github.io/tag/video.html">video</a>,    <a href="https://spapas.github.io/tag/auto-subtitling.html">auto-subtitling</a>,    <a href="https://spapas.github.io/tag/subtitiling.html">subtitiling</a>,    <a href="https://spapas.github.io/tag/transcribe.html">transcribe</a>,    <a href="https://spapas.github.io/tag/html.html">html</a>,    <a href="https://spapas.github.io/tag/javascript.html">javascript</a>,    <a href="https://spapas.github.io/tag/media.html">media</a>,    <a href="https://spapas.github.io/tag/storage.html">storage</a>,    <a href="https://spapas.github.io/tag/unpoly.html">unpoly</a>,    <a href="https://spapas.github.io/tag/access.html">access</a>,    <a href="https://spapas.github.io/tag/database.html">database</a>,    <a href="https://spapas.github.io/tag/accdb.html">accdb</a>,    <a href="https://spapas.github.io/tag/mdb.html">mdb</a>,    <a href="https://spapas.github.io/tag/postgresql.html">postgresql</a>,    <a href="https://spapas.github.io/tag/development.html">development</a>,    <a href="https://spapas.github.io/tag/inlines.html">inlines</a>,    <a href="https://spapas.github.io/tag/clojure.html">clojure</a>,    <a href="https://spapas.github.io/tag/cmd.html">cmd</a>,    <a href="https://spapas.github.io/tag/pdf.html">pdf</a>,    <a href="https://spapas.github.io/tag/wkhtmltopdf.html">wkhtmltopdf</a>,    <a href="https://spapas.github.io/tag/forward-proxy.html">forward-proxy</a>,    <a href="https://spapas.github.io/tag/reverse-proxy.html">reverse-proxy</a>,    <a href="https://spapas.github.io/tag/proxy.html">proxy</a>,    <a href="https://spapas.github.io/tag/networking.html">networking</a>,    <a href="https://spapas.github.io/tag/dj-rest-auth.html">dj-rest-auth</a>,    <a href="https://spapas.github.io/tag/rest.html">rest</a>,    <a href="https://spapas.github.io/tag/django-rest-framework.html">django-rest-framework</a>,    <a href="https://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="https://spapas.github.io/tag/tokens.html">tokens</a>,    <a href="https://spapas.github.io/tag/migrations.html">migrations</a>,    <a href="https://spapas.github.io/tag/foreignkey.html">foreignkey</a>,    <a href="https://spapas.github.io/tag/dark-souls.html">dark-souls</a>,    <a href="https://spapas.github.io/tag/dark-souls-2.html">dark-souls-2</a>,    <a href="https://spapas.github.io/tag/dark-souls-3.html">dark-souls-3</a>,    <a href="https://spapas.github.io/tag/autohotkey.html">autohotkey</a>,    <a href="https://spapas.github.io/tag/matplotlib.html">matplotlib</a>,    <a href="https://spapas.github.io/tag/hashids.html">hashids</a>,    <a href="https://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="https://spapas.github.io/tag/osmon.html">osmon</a>,    <a href="https://spapas.github.io/tag/phoenix.html">phoenix</a>,    <a href="https://spapas.github.io/tag/os-monitoring.html">os-monitoring</a>,    <a href="https://spapas.github.io/tag/forms.html">forms</a>,    <a href="https://spapas.github.io/tag/django-crispy-forms.html">django-crispy-forms</a>,    <a href="https://spapas.github.io/tag/django-widget-tweaks.html">django-widget-tweaks</a>,    <a href="https://spapas.github.io/tag/ecto.html">ecto</a>,    <a href="https://spapas.github.io/tag/queries.html">queries</a>,    <a href="https://spapas.github.io/tag/declarative.html">declarative</a>,    <a href="https://spapas.github.io/tag/form.html">form</a>,    <a href="https://spapas.github.io/tag/php.html">php</a>,    <a href="https://spapas.github.io/tag/select2.html">select2</a>,    <a href="https://spapas.github.io/tag/autocompelte.html">autocompelte</a>,    <a href="https://spapas.github.io/tag/ajax.html">ajax</a>,    <a href="https://spapas.github.io/tag/android.html">android</a>,    <a href="https://spapas.github.io/tag/kotlin.html">kotlin</a>,    <a href="https://spapas.github.io/tag/adapter.html">adapter</a>,    <a href="https://spapas.github.io/tag/filter.html">filter</a>,    <a href="https://spapas.github.io/tag/async.html">async</a>,    <a href="https://spapas.github.io/tag/tasks.html">tasks</a>,    <a href="https://spapas.github.io/tag/django-rq.html">django-rq</a>,    <a href="https://spapas.github.io/tag/rq.html">rq</a>,    <a href="https://spapas.github.io/tag/du.html">du</a>,    <a href="https://spapas.github.io/tag/unix.html">unix</a>,    <a href="https://spapas.github.io/tag/linux.html">linux</a>,    <a href="https://spapas.github.io/tag/disk-usage.html">disk-usage</a>,    <a href="https://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="https://spapas.github.io/tag/middleware.html">middleware</a>,    <a href="https://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="https://spapas.github.io/tag/react.html">react</a>,    <a href="https://spapas.github.io/tag/redux.html">redux</a>,    <a href="https://spapas.github.io/tag/hyperapp.html">hyperapp</a>,    <a href="https://spapas.github.io/tag/immutable.html">immutable</a>,    <a href="https://spapas.github.io/tag/es6.html">es6</a>,    <a href="https://spapas.github.io/tag/youtube.html">youtube</a>,    <a href="https://spapas.github.io/tag/youtube-dl.html">youtube-dl</a>,    <a href="https://spapas.github.io/tag/ffmpeg.html">ffmpeg</a>,    <a href="https://spapas.github.io/tag/django-rest-auth.html">django-rest-auth</a>,    <a href="https://spapas.github.io/tag/python-2.html">python-2</a>,    <a href="https://spapas.github.io/tag/python-3.html">python-3</a>,    <a href="https://spapas.github.io/tag/plpgsql.html">plpgsql</a>,    <a href="https://spapas.github.io/tag/component.html">component</a>,    <a href="https://spapas.github.io/tag/ag-grid.html">ag-grid</a>,    <a href="https://spapas.github.io/tag/grid.html">grid</a>,    <a href="https://spapas.github.io/tag/bash.html">bash</a>,    <a href="https://spapas.github.io/tag/cron.html">cron</a>,    <a href="https://spapas.github.io/tag/pandas.html">pandas</a>,    <a href="https://spapas.github.io/tag/scipy.html">scipy</a>,    <a href="https://spapas.github.io/tag/numpy.html">numpy</a>,    <a href="https://spapas.github.io/tag/pivot.html">pivot</a>,    <a href="https://spapas.github.io/tag/pivot_table.html">pivot_table</a>,    <a href="https://spapas.github.io/tag/ipython.html">ipython</a>,    <a href="https://spapas.github.io/tag/jupyter.html">jupyter</a>,    <a href="https://spapas.github.io/tag/notebook.html">notebook</a>,    <a href="https://spapas.github.io/tag/query.html">query</a>,    <a href="https://spapas.github.io/tag/q.html">q</a>,    <a href="https://spapas.github.io/tag/imgur.html">imgur</a>,    <a href="https://spapas.github.io/tag/console.html">console</a>,    <a href="https://spapas.github.io/tag/research.html">research</a>,    <a href="https://spapas.github.io/tag/debug.html">debug</a>,    <a href="https://spapas.github.io/tag/werkzeug.html">werkzeug</a>,    <a href="https://spapas.github.io/tag/django-extensions.html">django-extensions</a>,    <a href="https://spapas.github.io/tag/404.html">404</a>,    <a href="https://spapas.github.io/tag/error.html">error</a>,    <a href="https://spapas.github.io/tag/spring.html">spring</a>,    <a href="https://spapas.github.io/tag/spring-boot.html">spring-boot</a>,    <a href="https://spapas.github.io/tag/java.html">java</a>,    <a href="https://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="https://spapas.github.io/tag/profiles.html">profiles</a>,    <a href="https://spapas.github.io/tag/settings.html">settings</a>,    <a href="https://spapas.github.io/tag/properties.html">properties</a>,    <a href="https://spapas.github.io/tag/yaml.html">yaml</a>,    <a href="https://spapas.github.io/tag/configuration.html">configuration</a>,    <a href="https://spapas.github.io/tag/deploy.html">deploy</a>,    <a href="https://spapas.github.io/tag/initd.html">init.d</a>,    <a href="https://spapas.github.io/tag/react-redux.html">react-redux</a>,    <a href="https://spapas.github.io/tag/redux-thunk.html">redux-thunk</a>,    <a href="https://spapas.github.io/tag/redux-form.html">redux-form</a>,    <a href="https://spapas.github.io/tag/react-router.html">react-router</a>,    <a href="https://spapas.github.io/tag/react-router-redux.html">react-router-redux</a>,    <a href="https://spapas.github.io/tag/react-notification.html">react-notification</a>,    <a href="https://spapas.github.io/tag/history.html">history</a>,    <a href="https://spapas.github.io/tag/babel.html">babel</a>,    <a href="https://spapas.github.io/tag/babelify.html">babelify</a>,    <a href="https://spapas.github.io/tag/browserify.html">browserify</a>,    <a href="https://spapas.github.io/tag/watchify.html">watchify</a>,    <a href="https://spapas.github.io/tag/uglify.html">uglify</a>,    <a href="https://spapas.github.io/tag/boilerplate.html">boilerplate</a>,    <a href="https://spapas.github.io/tag/tutorial.html">tutorial</a>,    <a href="https://spapas.github.io/tag/introduction.html">introduction</a>,    <a href="https://spapas.github.io/tag/fixed-data-tables.html">fixed-data-tables</a>,    <a href="https://spapas.github.io/tag/fixeddatatable.html">FixedDataTable</a>,    <a href="https://spapas.github.io/tag/reportlab.html">reportlab</a>,    <a href="https://spapas.github.io/tag/xhtml2pdf.html">xhtml2pdf</a>,    <a href="https://spapas.github.io/tag/node.html">node</a>,    <a href="https://spapas.github.io/tag/npm.html">npm</a>,    <a href="https://spapas.github.io/tag/generic.html">generic</a>,    <a href="https://spapas.github.io/tag/tables.html">tables</a>,    <a href="https://spapas.github.io/tag/flux.html">flux</a>,    <a href="https://spapas.github.io/tag/jobs.html">jobs</a>,    <a href="https://spapas.github.io/tag/asynchronous.html">asynchronous</a>,    <a href="https://spapas.github.io/tag/scheduling.html">scheduling</a>,    <a href="https://spapas.github.io/tag/redis.html">redis</a>,    <a href="https://spapas.github.io/tag/pusher.html">pusher</a>,    <a href="https://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="https://spapas.github.io/tag/css.html">css</a>,    <a href="https://spapas.github.io/tag/design.html">design</a>,    <a href="https://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>,    <a href="https://spapas.github.io/tag/less.html">less</a>,    <a href="https://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="https://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="https://spapas.github.io/tag/security.html">security</a>,    <a href="https://spapas.github.io/tag/google.html">google</a>,    <a href="https://spapas.github.io/tag/flask.html">flask</a>,    <a href="https://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="https://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="https://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="https://spapas.github.io/tag/git.html">git</a>,    <a href="https://spapas.github.io/tag/github.html">github</a>,    <a href="https://spapas.github.io/tag/branching.html">branching</a>,    <a href="https://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="https://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="https://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="https://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="https://spapas.github.io/tag/rst.html">rst</a>  </section>
+
+  <section>
+    <h1>Yearly archives</h1>
+    <a href="https://spapas.github.io/posts/2013/">2013</a>,    <a href="https://spapas.github.io/posts/2014/">2014</a>,    <a href="https://spapas.github.io/posts/2015/">2015</a>,    <a href="https://spapas.github.io/posts/2016/">2016</a>,    <a href="https://spapas.github.io/posts/2017/">2017</a>,    <a href="https://spapas.github.io/posts/2018/">2018</a>,    <a href="https://spapas.github.io/posts/2019/">2019</a>,    <a href="https://spapas.github.io/posts/2020/">2020</a>,    <a href="https://spapas.github.io/posts/2021/">2021</a>,    <a href="https://spapas.github.io/posts/2022/">2022</a>,    <a href="https://spapas.github.io/posts/2023/">2023</a>,    <a href="https://spapas.github.io/posts/2024/">2024</a>  </section>
+
+
+
+  <section>
+    <h1>GitHub Repos</h1>
+    <ul id="gh_repos">
+      <li class="loading">Status updating...</li>
+    </ul>
+      <a href="https://github.com/spapas">@spapas</a> on GitHub
+    <script  src="//code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      $(function(){
+          if (!window.jXHR){
+              var jxhr = document.createElement('script');
+              jxhr.type = 'text/javascript';
+              jxhr.src = 'https://spapas.github.io/theme/js/jXHR.js';
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(jxhr, s);
+          }
+
+          github.showRepos({
+              user: 'spapas',
+              count: 5,
+              skip_forks: true,
+              target: '#gh_repos'
+          });
+      });
+    </script>
+    <script src="https://spapas.github.io/theme/js/github.js" type="text/javascript"> </script>
+  </section>
+
+
+  <section>
+    <a href="https://twitter.com/_serafeim_?ref_src=twsrc%5Etfw" class="twitter-follow-button"
+      data-show-count="false">Follow @_serafeim_</a>
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+  </section>
+
+</aside>    </div>
+  </div>
+  <footer role="contentinfo"><p>
+    Copyright &copy;  2013&ndash;2024  Serafeim Papastefanos &mdash;
+  <span class="credit">Powered by <a href="http://getpelican.com">Pelican</a></span>
+</p></footer>
+  <script src="https://spapas.github.io/theme/js/modernizr-2.0.js"></script>
+  <script src="https://spapas.github.io/theme/js/ender.js"></script>
+  <script src="https://spapas.github.io/theme/js/octopress.js" type="text/javascript"></script>
+  <script src="https://spapas.github.io/theme/js/ads.js"></script>
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-44750952-1', 'auto');
+
+    ga('send', 'pageview');
+    </script>
+
+<script defer data-domain="spapas.github.io" src="https://plausible.hcg.gr/js/script.js"></script>  <script type="text/javascript">
+    var disqus_shortname = 'spapas-github-io';
+    var disqus_identifier = '/2020/03/27/wagtail-add-latest-changes/';
+    var disqus_url = 'https://spapas.github.io/2020/03/27/wagtail-add-latest-changes/';
+    var disqus_title = 'Adding a latest-changes list to your Wagtail&nbsp;site';
+    (function() {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = "//" + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+     })();
+  </script>
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+</body>
+
+</html>

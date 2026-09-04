@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="google-site-verification" content="5_8DTmIiEq4gFvNAfxAD6TsGOgrMAjp8lQFQvfA6zZc" />
+    <title>My essential django package list &mdash; /var/</title>
+    <meta name="author" content="Serafeim Papastefanos">
+
+
+    
+<style type="text/css">
+pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: var(--jp-cell-editor-active-background) }
+.highlight { background: var(--jp-cell-editor-background); color: var(--jp-mirror-editor-variable-color) }
+.highlight .c { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment */
+.highlight .err { color: var(--jp-mirror-editor-error-color) } /* Error */
+.highlight .k { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword */
+.highlight .o { color: var(--jp-mirror-editor-operator-color); font-weight: bold } /* Operator */
+.highlight .p { color: var(--jp-mirror-editor-punctuation-color) } /* Punctuation */
+.highlight .ch { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Preproc */
+.highlight .cpf { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Single */
+.highlight .cs { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Special */
+.highlight .kc { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Pseudo */
+.highlight .kr { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Type */
+.highlight .m { color: var(--jp-mirror-editor-number-color) } /* Literal.Number */
+.highlight .s { color: var(--jp-mirror-editor-string-color) } /* Literal.String */
+.highlight .ow { color: var(--jp-mirror-editor-operator-color); font-weight: bold } /* Operator.Word */
+.highlight .pm { color: var(--jp-mirror-editor-punctuation-color) } /* Punctuation.Marker */
+.highlight .w { color: var(--jp-mirror-editor-variable-color) } /* Text.Whitespace */
+.highlight .mb { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Bin */
+.highlight .mf { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Float */
+.highlight .mh { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Hex */
+.highlight .mi { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Integer */
+.highlight .mo { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Oct */
+.highlight .sa { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Affix */
+.highlight .sb { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Backtick */
+.highlight .sc { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Char */
+.highlight .dl { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Delimiter */
+.highlight .sd { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Doc */
+.highlight .s2 { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Double */
+.highlight .se { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Escape */
+.highlight .sh { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Heredoc */
+.highlight .si { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Interpol */
+.highlight .sx { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Other */
+.highlight .sr { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Regex */
+.highlight .s1 { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Single */
+.highlight .ss { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Symbol */
+.highlight .il { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Integer.Long */
+</style>
+
+<style type="text/css">
+/* Overrides of notebook CSS for static HTML export */
+div.entry-content {
+  overflow: visible;
+  padding: 8px;
+}
+.input_area {
+  padding: 0.2em;
+}
+
+a.heading-anchor {
+ white-space: normal;
+}
+
+.rendered_html
+code {
+ font-size: .8em;
+}
+
+pre.ipynb {
+  color: black;
+  background: #f7f7f7;
+  border: none;
+  box-shadow: none;
+  margin-bottom: 0;
+  padding: 0;
+  margin: 0px;
+  font-size: 13px;
+}
+
+/* remove the prompt div from text cells */
+div.text_cell .prompt {
+    display: none;
+}
+
+/* remove horizontal padding from text cells, */
+/* so it aligns with outer body text */
+div.text_cell_render {
+    padding: 0.5em 0em;
+}
+
+img.anim_icon{padding:0; border:0; vertical-align:middle; -webkit-box-shadow:none; -box-shadow:none}
+
+div.collapseheader {
+    width=100%;
+    background-color:#d3d3d3;
+    padding: 2px;
+    cursor: pointer;
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+</style>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true,
+        displayMath: [['$$','$$'], ["\\[","\\]"]]
+    }
+});
+</script>
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+    $("div.collapseheader").click(function () {
+    $header = $(this).children("span").first();
+    $codearea = $(this).children(".input_area");
+    console.log($(this).children());
+    $codearea.slideToggle(500, function () {
+        $header.text(function () {
+            return $codearea.is(":visible") ? "Collapse Code" : "Expand Code";
+        });
+    });
+});
+});
+</script>
+
+
+
+
+
+
+    <!-- http://t.co/dKP3o1e -->
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+    <link href="https://spapas.github.io/favicon.png" rel="icon">
+
+    <link href="https://spapas.github.io/theme/css/main.css" media="screen, projection" rel="stylesheet"
+      type="text/css">
+
+    <link href="https://spapas.github.io/theme/css/extra_style.css" media="screen, projection" rel="stylesheet"
+      type="text/css">
+
+    <link href="https://fonts.googleapis.com/css?family=Fira+Mono|Fira+Sans:400,700&amp;subset=greek" rel="stylesheet">
+
+<style>
+#gHPzseYvFrhZ123 {
+  padding: 5px !important;
+  display: block;
+  margin-bottom: 10px !important;
+  background: #900;
+  color: #fff;
+  border-radius: 5px;
+  font-size: 1.0rem !important;
+}
+</style>
+
+
+  <script>
+    
+      
+  </script>
+
+    <script data-ad-client="ca-pub-7673322832689008" async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
+      onerror="adBlockFunction();"></script>
+  </head>
+
+<body>
+  <header role="banner"><hgroup>
+  <h1><a href="https://spapas.github.io/">/var/</a></h1>
+    <h2>Various programming stuff</h2>
+</hgroup></header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+</ul>
+
+
+<ul class="main-navigation">
+      <li >
+        <a href="https://spapas.github.io/category/ai.html">Ai</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/android.html">Android</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/clojure.html">Clojure</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/css.html">Css</a>
+      </li>
+      <li class="active">
+        <a href="https://spapas.github.io/category/django.html">Django</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/elixir.html">Elixir</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/flask.html">Flask</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/gaming.html">Gaming</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/git.html">Git</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/html.html">Html</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/javascript.html">Javascript</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/networking.html">Networking</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/pelican.html">Pelican</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/postgresql.html">Postgresql</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/python.html">Python</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/spring.html">Spring</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/unix.html">Unix</a>
+      </li>
+      <li >
+        <a href="https://spapas.github.io/category/wagtail.html">Wagtail</a>
+      </li>
+</ul></nav>
+  <div id="main">
+    <div id="content">
+    <div id="gHPzseYvFrhZ123">
+      Hello! If you are using an ad blocker but find something useful here 
+      and want to support me please consider disabling your ad blocker for this site. 
+      <br />
+      <br />
+      Thank you,<br />
+      Serafeim
+      
+    </div>
+<div>
+  <article class="hentry" role="article">
+<header>
+      <h1 class="entry-title">My essential django package list</h1>
+    <p class="meta">
+<time datetime="2017-10-11T14:20:00+03:00" pubdate>Wed 11 October 2017</time>    </p>
+</header>
+
+<div class="entry-content"><p>In this article I&#8217;d like to present a list of django packages (add-ons) that I use
+in most of my projects. I am using django for more than 5 years as my day to
+day work tool to develop applications for the public sector organization I work for.
+So please keep in mind that these packages are targeted to the &#8220;enterpripse&#8221;
+audience and some things that target public (open access) web apps may be&nbsp;missing.</p>
+<p>Some of these packages are included in
+<a class="reference external" href="https://github.com/spapas/cookiecutter-django-starter">a django cookiecutter</a> I am using to start new projects and also you can find
+example usage of some of these packages in my <a class="reference external" href="https://github.com/spapas/mailer_server">Mailer Server</a> project.
+I&#8217;ll also be happy to answer any
+questions about these, preferably in <a class="reference external" href="https://stackoverflow.com">stackoverflow</a> if the questions are fit for that&nbsp;site.</p>
+<p>Finally, before going to the package list, notice that most of the following are django-related and I won&#8217;t include any
+generic python packages (with the exception of xhtml2pdf which I discuss later). There
+are a bunch of python-generic packages that I usually use (xlrd, xlwt, requests, raven, unidecode,
+database connectors etc) but these won&#8217;t be discussed&nbsp;here.</p>
+<div class="contents topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#packages-i-use-in-all-my-projects" id="toc-entry-1">Packages I use in all my projects</a><ul>
+<li><a class="reference internal" href="#django-tables2" id="toc-entry-2">django-tables2</a></li>
+<li><a class="reference internal" href="#django-filter" id="toc-entry-3">django-filter</a></li>
+<li><a class="reference internal" href="#django-crispy-forms" id="toc-entry-4">django-crispy-forms</a></li>
+<li><a class="reference internal" href="#django-extensions" id="toc-entry-5">django-extensions</a></li>
+<li><a class="reference internal" href="#django-autocomplete-light" id="toc-entry-6">django-autocomplete-light</a></li>
+<li><a class="reference internal" href="#django-reversion" id="toc-entry-7">django-reversion</a></li>
+<li><a class="reference internal" href="#django-compressor" id="toc-entry-8">django-compressor</a></li>
+<li><a class="reference internal" href="#django-debug-toolbar" id="toc-entry-9">django-debug-toolbar</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#packages-i-use-when-i-need-their-functionality" id="toc-entry-10">Packages I use when I need their functionality</a><ul>
+<li><a class="reference internal" href="#xhtml2pdf" id="toc-entry-11">xhtml2pdf</a></li>
+<li><a class="reference internal" href="#django-auth-ldap" id="toc-entry-12">django-auth-ldap</a></li>
+<li><a class="reference internal" href="#django-localflavor" id="toc-entry-13">django-localflavor</a></li>
+<li><a class="reference internal" href="#django-constance" id="toc-entry-14">django-constance</a></li>
+<li><a class="reference internal" href="#django-rq" id="toc-entry-15">django-rq</a></li>
+<li><a class="reference internal" href="#django-rules-light" id="toc-entry-16">django-rules-light</a></li>
+<li><a class="reference internal" href="#django-generic-scaffold" id="toc-entry-17">django-generic-scaffold</a></li>
+<li><a class="reference internal" href="#django-taggit" id="toc-entry-18">django-taggit</a></li>
+<li><a class="reference internal" href="#django-sendfile" id="toc-entry-19">django-sendfile</a></li>
+<li><a class="reference internal" href="#django-reversion-compare" id="toc-entry-20">django-reversion-compare</a></li>
+<li><a class="reference internal" href="#django-simple-history" id="toc-entry-21">django-simple-history</a></li>
+<li><a class="reference internal" href="#django-import-export" id="toc-entry-22">django-import-export</a></li>
+<li><a class="reference internal" href="#django-extra-views" id="toc-entry-23">django-extra-views</a></li>
+<li><a class="reference internal" href="#easy-thumbnails" id="toc-entry-24">easy-thumbnails</a></li>
+<li><a class="reference internal" href="#django-rest-framework" id="toc-entry-25">django-rest-framework</a></li>
+<li><a class="reference internal" href="#django-waffle" id="toc-entry-26">django-waffle</a></li>
+<li><a class="reference internal" href="#django-allauth" id="toc-entry-27">django-allauth</a></li>
+<li><a class="reference internal" href="#django-modeltranslation" id="toc-entry-28">django-modeltranslation</a></li>
+<li><a class="reference internal" href="#django-widget-tweaks" id="toc-entry-29">django-widget-tweaks</a></li>
+<li><a class="reference internal" href="#django-simple-captcha" id="toc-entry-30">django-simple-captcha</a></li>
+<li><a class="reference internal" href="#wagtail" id="toc-entry-31">wagtail</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#conclusion" id="toc-entry-32">Conclusion</a></li>
+</ul>
+</div>
+<div class="section" id="packages-i-use-in-all-my-projects">
+<h2>Packages I use in all my&nbsp;projects</h2>
+<p>These packages are used more or less in all my projects - I just install them when I
+create a new project (or create the project through the cookiecutter I mention&nbsp;above)/</p>
+<div class="section" id="django-tables2">
+<h3>django-tables2</h3>
+<p><a class="reference external" href="https://github.com/bradleyayers/django-tables2">django-tables2</a>, along with django-filter (following) are the two packages
+I always use in my projets. You create a <cite>tables.py</cite> module inside your applications
+where you define a bunch of tables using more or less the same methodology as with
+django-forms: For a <cite>Book</cite> model, Create a <cite>BookTable</cite> class, relate it with the model
+and, if needed override some of the columns it automatically generates. For example you
+can configure a column that will behave as a link to a detail view of the book, a column
+that will behave as a date (with the proper formatting) or even a column that will display
+a custom django template&nbsp;snippet.</p>
+<p>You&#8217;ll then be
+able to configure the data (queryset) of this table and pass it your views context. Finally
+use <tt class="docutils literal">{% render_table table %}</tt> to actually display your table. What
+you&#8217;ll get? The actual html table (with a nice style that can be configured if needed),
+free pagination and free column-header sorting. After you get the hang of it, you&#8217;ll be
+able to add tables for your models in a couple of minutes - this is <span class="caps">DRY</span> for me. It also
+offers some <a class="reference external" href="http://django-tables2.readthedocs.io/en/latest/pages/generic-mixins.html">class based views and mixins</a> for even more <span class="caps">DRY</span> adding tables to your&nbsp;views.</p>
+<p>Finally, please notice that since version 1.8,
+django-tables2 <a class="reference external" href="https://django-tables2.readthedocs.io/en/latest/pages/export.html">supports exporting data</a> using <a class="reference external" href="https://github.com/kennethreitz/tablib">tablib</a>, an old requirement of most users
+of this&nbsp;library.</p>
+</div>
+<div class="section" id="django-filter">
+<h3>django-filter</h3>
+<p><a class="reference external" href="https://github.com/carltongibson/django-filter">django-filter</a> is used to create filters for your data. It plays well with
+django-tables2 but you can use it to create filters for any kind of listing you want. It
+works similar to django-tables2: Create a <tt class="docutils literal">filters.py</tt> module in your application and define
+the a <cite>BookFilter</cite> class there by relating it with the <cite>Book</cite> model, specifying the fields
+of the model you want to filter with and maybe override some of the default options. New versions
+have some great built-in configuration functionality by customizing which method will be used for
+filtering or even adding multiple filter methods - for example you could define your
+<tt class="docutils literal">BookFilter</tt> like&nbsp;this:</p>
+<pre class="code literal-block">
+class BookFilter(django_filters.FilterSet):
+    class Meta:
+        model = Book
+        fields = {
+            'name': ['icontains'],
+            'author__last_name': ['icontains', 'startswith'],
+            'publication_date': ['year', 'month', ],
+        }
+</pre>
+<p>which will give you the following filter form&nbsp;fields:</p>
+<ul class="simple">
+<li>an ilike &#8216;%value%&#8217; for the book&nbsp;name</li>
+<li>an ilike &#8216;%value%&#8217; for the author&nbsp;name</li>
+<li>a like &#8216;value%&#8217; for the author&nbsp;name</li>
+<li>a year(publication_date) = value for the&nbsp;publication_date</li>
+<li>a month(publication_date) = value for the&nbsp;publication_date</li>
+</ul>
+<p>and their (<span class="caps">AND</span>)&nbsp;combinations!</p>
+<p>The <cite>BookFilter</cite> can be used to create a filter form in your template and then in your views
+pass to it the initial queryset along with <cite>request.<span class="caps">GET</span></cite> (which will contain the filter values)
+to return the filtered data (and usually pass it to the table). I&#8217;ve created a sample project that
+uses both django-tables2 and django-filters for you to use: <a class="reference external" href="https://github.com/spapas/django_table_filtering">https://github.com/spapas/django_table_filtering</a>.
+Also, I&#8217;ve written an article which describes a technique for <a class="reference external" href="https://spapas.github.io/2015/10/05/django-dynamic-tables-similar-models/">automatically creating a filter-table view</a>.</p>
+</div>
+<div class="section" id="django-crispy-forms">
+<h3>django-crispy-forms</h3>
+<p>The forms that are created by default by django-forms are very basic and not styled properly.
+To overcome this and have better styles for my forms, I always use <a class="reference external" href="https://github.com/django-crispy-forms/django-crispy-forms">django-crispy-forms</a>. It actually has two modes: Using the crispy template filter and using
+the crispy template tag. Using the crispy template filter is very simple - just take a plain old django form and
+render it in your template like this <cite>{{ form|crispy }}</cite>. If the django-crispy-forms has been configured correctly
+(with the correct template pack) the form you&#8217;ll get will be much nicer than the django-default one. This is completely
+automatic, you don&#8217;t need to do anything&nbsp;else!</p>
+<p>Now, if you have some special requirements from a form, for example
+multi-column rendering, adding tabs, accordions etc then you&#8217;ll need to use the <cite>{% crispy %}</cite> template tag. To use this
+you must create the layout of your form in the form&#8217;s costructor using the FormHelper django-crispy-forms <span class="caps">API</span>. This may seem cumbersome
+at first (why not just create the form&#8217;s layout in the django template) but using a class to define your form&#8217;s layout
+has other advantages, for example all the form layout is in the actual form (not in the template) you can control
+programatically the layout of the form (f.e display some fields only for administrators), you can use inheritance and
+virtual methods to override how a form is rendered&nbsp;etc.</p>
+<p>To help you understand how a <tt class="docutils literal">FormHelper</tt> looks like, here&#8217;s a form that is used to edit an access Card for visitors that
+displays all fields horizontally inside a panel (I am using Bootstrap for all styling and layout&nbsp;purposes):</p>
+<pre class="code literal-block">
+class CardForm(ModelForm):
+    class Meta:
+        model = Card
+        fields = ['card_number', 'card_text', 'enabled']
+
+    def __init__(self, *args, **kwargs):
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.layout = Layout(
+            Fieldset(
+                '',
+                HTML(u&quot;&quot;&quot;&lt;div class=&quot;panel panel-primary&quot;&gt;
+                   &lt;div class=&quot;panel-heading&quot;&gt;
+                       &lt;h3 class=&quot;panel-title&quot;&gt;Add card&lt;/h3&gt;
+                   &lt;/div&gt;
+                   &lt;div class=&quot;panel-body&quot;&gt;&quot;&quot;&quot;),
+                Div(
+                   Div('card_number', css_class='col-md-4'),
+                   Div('card_text', css_class='col-md-4'),
+                   Div('enable',css_class='col-md-4'),
+                   css_class='row'
+                ),
+            ),
+
+            FormActions(
+                Submit('submit', u'Save', css_class='btn btn-success'),
+                HTML(u&quot;&lt;a class='btn btn-primary' href='{% url \&quot;card_list\&quot; %}'&gt;Return&lt;/a&gt;&quot; ),
+            ),
+            HTML(u&quot;&lt;/div&gt;&lt;/div&gt;&quot;),
+        )
+
+        super(CardForm, self).__init__(*args, **kwargs)
+</pre>
+<p>Notice that forms that will be rendered with a <tt class="docutils literal">FormHelper</tt> actually contain their &lt;form&gt; tag (you don&#8217;t need
+to write it yourself like with plain django forms) so you have to define their method (post in this example) and submit&nbsp;button.</p>
+</div>
+<div class="section" id="django-extensions">
+<h3>django-extensions</h3>
+<p><a class="reference external" href="https://github.com/django-extensions/django-extensions">django-extensions</a> is a swiss-army-knife of django tools. I use it <em>always</em> in my projects because of the <cite>runserver_plus</cite>
+and <cite>shell_plus</cite> commands. The first uses the <a class="reference external" href="https://spapas.github.io/2016/06/07/django-werkzeug-debugger/">Werkzeug debugger with django</a> which makes django development an absolute joy
+(open a python shell wherever you want in your code and start writing commands)!
+The second opens a <em>better</em> shell (your models and a bunch of django stuff are auto-imported, a better shall will be used if found&nbsp;etc).</p>
+<p>The
+<cite>runserver_plus</cite> and <cite>shell_plus</cite> alone will be more than enough for me to use this however it adds some more usefull management
+commands like: <cite>admin_generator</cite> to quickly create an admin.py for your app, <cite>graph_models</cite> to generate a graphviz dot file of your models,
+<cite>update_permissions</cite> to synchronize the list of permissions if you have added one to an existing model and <a class="reference external" href="http://django-extensions.readthedocs.io/en/latest/command_extensions.html">many, many others</a>. Take a look
+at them and you&#8217;ll probably find more useful&nbsp;things!</p>
+</div>
+<div class="section" id="django-autocomplete-light">
+<h3>django-autocomplete-light</h3>
+<p><a class="reference external" href="https://github.com/yourlabs/django-autocomplete-light">django-autocomplete-light</a> is the best auto-complete library for django, especially after v3 was released (which greatly reduces the magic and
+uses normal CBVs for configuring the querysets). You will create
+an AutocompleteView for a model (similar to your other class based views) and then automatically use this view through a widget in the admin
+or in your own forms. It is fully configurable (both the results and the selection templates), supports many to many fields, creating new instances
+and even autocompleteing django-taggit tags! If for some reason it seems that it is not working please keep in mind that you need to includ
+jquery <em>and</em> <tt class="docutils literal">{{ form.media }}</tt> to your templates or else the required client side code won&#8217;t be&nbsp;executed.</p>
+<p>I think it is an essential for all cases because dropdowns with lots of choices have a very bad user experience - and the same is true with
+many to many fields (you could use the checkboxes widget to improve their behavior a little but you will have bad behavior when there are many&nbsp;choices).</p>
+</div>
+<div class="section" id="django-reversion">
+<h3>django-reversion</h3>
+<p><a class="reference external" href="https://github.com/etianen/django-reversion">django-reversion</a> is a really important package for my projects. When it is configured properly (by adding a a reversion-middleware), it offers full auditing
+for all changes in the your model instances you select (and properly groups them in case of changes to multiple instances in a simple request).
+It saves a <span class="caps">JSON</span> representation
+of all the versions of an instance in your database. Keep in mind that this may increase your database size  but if you need full auditing
+then is is probably the best way to do it. I have written an article about <a class="reference external" href="https://spapas.github.io/2015/01/21/django-model-auditing/">django model auditing</a> that discusses this package and django-simple-history
+(following)&nbsp;more.</p>
+</div>
+<div class="section" id="django-compressor">
+<h3>django-compressor</h3>
+<p><a class="reference external" href="https://github.com/django-compressor/django-compressor/">django-compressor</a> is package that combines and minifies your css and javascript (both files and line snippets) into static files. There are
+other tools for this but I have never used them since django-compressor satisfies my needs. Although I&#8217;ve
+<a class="reference external" href="https://spapas.github.io/2015/05/27/using-browserify-watchify/">written about browserify</a> and friends from the node-js world I don&#8217;t recommend using such tools in django to combine and minify your
+javascript and css <em>unless</em> you specifically require&nbsp;them.</p>
+<p>It has an online and an offline mode. For the online mode, when a request is done it will check if the compressed file exist and if not it will
+create it. This may lead to problems with permissions if your application server user cannot write to your static folders and also
+your users will see exceptions if for some reason you have included a file that cannot be found. For the
+offline mode, you need to run a management command that will create the static files <em>while deploying</em> the applications - this mode is
+recommended because any missing files problems etc will be resolved while deploying the&nbsp;app.</p>
+</div>
+<div class="section" id="django-debug-toolbar">
+<h3>django-debug-toolbar</h3>
+<p><a class="reference external" href="https://github.com/jazzband/django-debug-toolbar">django-debug-toolbar</a>: This is a well known package for debugging django apps that is always included in the development configuration of my projects.
+It has various panels that help you debug your application but, at least for me, the most helpful is the one that displays you all <span class="caps">SQL</span> queries that
+are executed for a page load. Because of how the django orm is working it will go on and follow all relations something that will lead to
+hundreds of queries. For example, let&#8217;s say that you have simple Book model with a foreign key to an Author model that has N instances in your
+database. If you do a <tt class="docutils literal">Book.objects.all()</tt>
+and want display the author name for each book in a template then you&#8217;ll always do <tt class="docutils literal">N+1</tt> queries to the database! This is really easy to miss because
+in the django you&#8217;ll just do <tt class="docutils literal">{% for book in books <span class="pre">%}{{</span> <span class="pre">book.name}},</span> {{ book.author.name <span class="pre">}}{%</span> endif %}</tt> &#8212; however the <tt class="docutils literal">{{ book.author.name }}</tt> will go
+on and do an extra <span class="caps">SQL</span> query!!! Such cases are easily resolved by using <a class="reference external" href="https://docs.djangoproject.com/en/1.11/ref/models/querysets/#select-related">select_related</a> (and <a class="reference external" href="https://docs.djangoproject.com/en/1.11/ref/models/querysets/#prefetch-related">prefetch_related</a>) but you must be sure to use select_related
+for all your queries (and if you add some extra things to your template you must remember to also add them to your select_related clause for the&nbsp;query).</p>
+<p>So, what I recommend before going to production is to visit all your pages using django-debug-toolbar and take a quick look at the number of <span class="caps">SQL</span>
+queries. If you see something that does not make sense (for example you see more than 10 queries) then you&#8217;ll need to think about the problem I just
+mentioned. Please notice that this, at least for me, is not premature optimization - this is not actually optimization! This is about writing correct
+code. Let&#8217;s suppose that you could not use the django orm anymore and you had to use plain old <span class="caps">SQL</span> queries. Would you write <tt class="docutils literal"><span class="caps">SELECT</span> * <span class="caps">FROM</span> books</tt> and
+then for each row do another <tt class="docutils literal"><span class="caps">SELECT</span> * <span class="caps">FROM</span> authors <span class="caps">WHERE</span> id=?</tt> passing the author of each book <em>or</em> do only <tt class="docutils literal">select * from books b <span class="caps">LEFT</span> <span class="caps">JOIN</span>
+authors a on b.author_id = a.id</tt>?</p>
+</div>
+</div>
+<div class="section" id="packages-i-use-when-i-need-their-functionality">
+<h2>Packages I use when I need their&nbsp;functionality</h2>
+<p>The packages following are also essential to me but only when I need their functionality. I don&#8217;t use them in all my projects
+but, when I need the capabilities they offer then I will use these packages (and not some others). For example, if I need to
+render PDFs in my applications then I will use the xhtml2pdf, if I need to login through <span class="caps">LDAP</span> I will use django-auth-ldap&nbsp;etc.</p>
+<div class="section" id="xhtml2pdf">
+<h3>xhtml2pdf</h3>
+<p><a class="reference external" href="https://github.com/xhtml2pdf/xhtml2pdf">xhtml2pdf</a> is the package I use for creating <span class="caps">PDF</span>&#8217;s with django as I&#8217;ve alreadly discussed in the <a class="reference external" href="https://spapas.github.io/2015/11/27/pdf-in-django/">PDFs in Django</a> article (this is not
+a django-specific package like most others I discuss here but it plays really good with django). You create a
+normal django template, add some styling to it and dump it to html. Notice that there&#8217;s a <a class="reference external" href="https://github.com/chrisglass/django-xhtml2pdf">django-xhtml2pdf</a> project but has not been recently updated
+and after all as you can see in my article it is easy to just call xhtml2pdf directly. The xhtml2pdf library is actually a wrapper around the
+excellent <a class="reference external" href="http://www.reportlab.com">reportlab</a> library which does the low-level pdf&nbsp;output.</p>
+<p>Notice that the xhtml2pdf library had some maintenance problems
+(that&#8217;s why some people are suggesting other <span class="caps">PDF</span> solutions like WeasyPrint) however they seem to have been fixed now. Also,
+I have found out that, at least for my needs (using Windows as my development environment), other soltuons are much inferior to xhtml2pdf.
+I urge you to try xhtml2pdf first and only if you find that it does not cover your needs (and have asked
+me about your problem) try the other&nbsp;solutions.</p>
+</div>
+<div class="section" id="django-auth-ldap">
+<h3>django-auth-ldap</h3>
+<p><a class="reference external" href="https://bitbucket.org/psagers/django-auth-ldap/">django-auth-ldap</a> is the package you&#8217;ll want to use if your organization uses <span class="caps">LDAP</span> (or Active Directory) and you want to use it for
+logging in. Just configure your <span class="caps">LDAP</span> server settings,
+add the ldap authenticator and you&#8217;ll be ready to go. Please notice that this package is a django wrapper of the python-ldap package
+which actually provides the <span class="caps">LDAP</span>&nbsp;connection.</p>
+</div>
+<div class="section" id="django-localflavor">
+<h3>django-localflavor</h3>
+<p><a class="reference external" href="https://github.com/django/django-localflavor">django-localflavor</a> offers useful stuff for various countries, mainly form fields with the correct validation and lists of choices.
+For example, for my country (Greece) you&#8217;ll get a <tt class="docutils literal">GRPhoneNumberField</tt>, a <tt class="docutils literal">GRPostalCodeField</tt> and a <tt class="docutils literal">GRTaxNumberCodeField</tt>. Use it instead of re-implementing
+the&nbsp;behavior.</p>
+</div>
+<div class="section" id="django-constance">
+<h3>django-constance</h3>
+<p><a class="reference external" href="https://github.com/jazzband/django-constance">django-constance</a> is a simple package that enables you to add quick-configurable settings in your application. To change the settings.py file
+you need to edit the source and restart the application - for most installations this is a full re-deployment of the application. Fully
+re-deploying the app just to change a setting is not very good practice (depending on the setting of course but if it is a business setting
+it usually should be done by business users and not by&nbsp;administrators).</p>
+<p>That&#8217;s where django-constance comes to help you. You can define some
+extra settings which can be changed through the django admin and their new value will be available immediately. Also you can configure where
+these settings will be saved. One option is the database but this is not recommended - instead you can use redis so that the settings values will be
+available much&nbsp;quicker!</p>
+</div>
+<div class="section" id="django-rq">
+<h3>django-rq</h3>
+<p><a class="reference external" href="https://github.com/ui/django-rq">django-rq</a> is a django wrapper for the <a class="reference external" href="https://github.com/nvie/rq">rq</a> library. I use it when I need asynchronous tasks (which is on almost all of my projects). More
+info can be found on the two articles I have writtten about django rq (<a class="reference external" href="https://spapas.github.io/2015/01/27/async-tasks-with-django-rq/">asynchronous tasks in django</a> and <a class="reference external" href="https://spapas.github.io/2015/09/01/django-rq-redux/">django-rq redux</a>).</p>
+</div>
+<div class="section" id="django-rules-light">
+<h3>django-rules-light</h3>
+<p>One of the least known packages from those I discuss here, <a class="reference external" href="https://github.com/yourlabs/django-rules-light">django-rules-light</a> is one of the most useful when is needed. This package
+allows you to define complex rules for doing actions on model instances. Each rule is a function that gets the user that wants to do the action
+and the object that the user wants to action on. The function returns True or False to allow or not allow the action. You can then use these in
+both your code to programatically check if the user can do the the action and your templates to decide what buttons and options you will display.
+There are also various helper methods for CBVs that make everything&nbsp;easier.</p>
+<p>To properly understand the value of django-rules-light you need to have some more complex than usual action rules. For example if your actions
+for an object are view / edit and all your users can view and edit their own objects then you don&#8217;t really need this package. However, if your administrators
+can view all objects and your object can be finalized so no changes are allowed unless an administrator tries to change it then you&#8217;ll greatly benefit
+from using&nbsp;it!</p>
+</div>
+<div class="section" id="django-generic-scaffold">
+<h3>django-generic-scaffold</h3>
+<p><a class="reference external" href="https://github.com/spapas/django-generic-scaffold">django-generic-scaffold</a> is a package I have created that can be used to quickly (and DRYly) create <span class="caps">CRUD</span> CBVs for your models. I usually don&#8217;t want to
+give access to the django-admin to non-technical users however sometimes I want to quickly create the required CBVs for them (list, detail, create, edit
+delete). Using django-generic-scaffold you can just create a scaffold which is related with a Model and all the views will be automagically created -
+you only need to link them to your urls.py. The created CBVs are fully configurable by adding extra mixins or even changing the parent class of each <span class="caps">CBV</span>.</p>
+<p>Notice that this package does not create any source files - instead all CBVs are created on-the-fly using <tt class="docutils literal">type</tt>. For example, to create <span class="caps">CRUD</span> CBVs for
+a Book model you&#8217;ll do this in&nbsp;scaffolding.py:</p>
+<pre class="code literal-block">
+class BookCrudManager(CrudManager):
+    model = models.Book
+    prefix = 'books'
+</pre>
+<p>and then in your urls.py you&#8217;ll just append the generated urls to your url&nbsp;list:</p>
+<pre class="code literal-block">
+book_crud = BookCrudManager()
+urlpatterns += book_crud.get_url_patterns()
+</pre>
+<p>Now you can visit the corresponding views (for example /books or /bookscreate - depends on the prefix) to add/view/edit etc your&nbsp;books!</p>
+</div>
+<div class="section" id="django-taggit">
+<h3>django-taggit</h3>
+<p><a class="reference external" href="https://github.com/alex/django-taggit">django-taggit</a> is the library you&#8217;ll want to use if you have to use tags with your models. A tag is a synonym for keyword, i.e adding some
+words/phrases to your instances that are used to categorise and desribe em. The relation between your to-be-tagged-model and your tags is
+many to many. To use it, you just add <cite>tags = TaggableManager()</cite> to your
+model and you are ready to go! Of course it will need some more configuration to be included in django admin and django forms but thankfully,
+autocomplete-lights can be <a class="reference external" href="https://django-autocomplete-light.readthedocs.io/en/master/taggit.html">integrated with django-taggit</a>!</p>
+</div>
+<div class="section" id="django-sendfile">
+<h3>django-sendfile</h3>
+<p><a class="reference external" href="https://github.com/johnsensible/django-sendfile">django-sendfile</a> is a very important - at least to - me library. Sometimes, user uploaded files (media in django) should not be visible to all users
+so you&#8217;ll need to implement some access control through your django app. However, it is important to <em>not</em> serve these media files through your application
+server (uwsi, gunicorn etc) but use a web server (nginx, apache ect) for serving them. This is needed because your application server&#8217;s purpose is
+not serving files from the disk - keep in mind that the application server usually has a specified amount of workers (usually analogous to the number
+of CPUs of your server, for example 4 workers ) - think what will happen if some large media files are server through these workers to users with
+a slow connection! With 4 such concurrent connections your application won&#8217;t be able to serve any other&nbsp;content!</p>
+<p>So this package (along with the support of X-Sendfile from the web servers) helps you fulfill the above requirements:
+It allowes you to check permissions to your media through your django application <em>but</em> then offload the serving of your media files to the web server.
+More info about
+<a class="reference external" href="https://stackoverflow.com/q/7296642/119071">django-sendfile can be found on this <span class="caps">SO</span> answer</a> but with a few words, with django-sendfile you create a view that checks if a file is allowed to be served
+and, if yes, instruct the web server to actually serve that file by appending a specific header to the&nbsp;response.</p>
+</div>
+<div class="section" id="django-reversion-compare">
+<h3>django-reversion-compare</h3>
+<p><a class="reference external" href="https://github.com/jedie/django-reversion-compare">django-reversion-compare</a> is an addon to django-reversion. It allows you to compare two different versions of a model instance
+and highlights their differences using various smart algorithms (so if you have a long text field you won&#8217;t only see that these are different but
+you&#8217;ll also see where exactly they differ, with output similar to the one you get when using&nbsp;diff).</p>
+</div>
+<div class="section" id="django-simple-history">
+<h3>django-simple-history</h3>
+<p><a class="reference external" href="https://github.com/treyhunner/django-simple-history">django-simple-history</a> has similar capabilities with django-reversion - (auditing and keeping versions of models) with a very important
+difference: While django-reversion keeps a <span class="caps">JSON</span> representation of each version in the database (making querying very difficult), django-simple-history
+creates an extra, history table for each model instance you want to track and adds each change as a new row to that table. As can be understood this
+will make the history table really huge but has the advantage that you can easily query for old values. I usually use django-reversion unless I know
+that I will need the history&nbsp;querying.</p>
+</div>
+<div class="section" id="django-import-export">
+<h3>django-import-export</h3>
+<p><a class="reference external" href="https://github.com/django-import-export/django-import-export">django-import-export</a> can be used to enchance your models with mass import and export capabilities (from example from/to <span class="caps">CSV</span>).
+You will add an ModelResource class that describes (and configures) how your Model should be imported/exported. The ModelResource class can
+then be easily used in your views and, more importantly, it is integrated to the django-admin. I have to confess that I have not used django-import-export
+for <em>importing</em> data because I prefer implementing my own views for that (to have better control over the whole process and because the data
+I usually need to import does not usually map 1 to 1 with a model but I need to create more model instances etc). However I am using the export
+capabilities of django-import-export in various projects with great success, especially the admin integration which easily fulfills the exporting
+data capabilities of most&nbsp;users.</p>
+</div>
+<div class="section" id="django-extra-views">
+<h3>django-extra-views</h3>
+<p>Beyond django-forms, django supports a feature called <a class="reference external" href="https://docs.djangoproject.com/en/1.11/topics/forms/formsets/">Formsets</a> which allows you to add/edit multiple object instances in
+a single view (by displaying all instances one after the other). The classic request/response cycle of django is preserved in Formsets, so
+your form instances will be submitted all together when you submit the form. The logic extension to the Formset is the <a class="reference external" href="https://docs.djangoproject.com/en/1.11/topics/forms/modelforms/#model-formsets">ModelFormset</a> i.e each form
+in a Formset is a ModelForm and <a class="reference external" href="https://docs.djangoproject.com/en/1.11/topics/forms/modelforms/#inline-formsets">InlineFormSet</a> where you have a Parent model that has a bunch of children and you are editing the Parent <em>and</em>
+its children in a single Form. For example, you have a School and a Student model where each Student has a ForeignKey to School. The usual case
+would be to edit the Student model and select her school (through a drop down or even-better if you use django-autocomplete-light through a proper
+autocompelte widget). However, you may for some reason want to edit the School and display (and edit) the list of its Students &#8212; that&#8217;s where you&#8217;ll
+use an&nbsp;InlineFormSet!</p>
+<p>The above features (Formsets, Modelformsets and Inlineformsets) are not supported natively by django CBVs &#8212; that&#8217;s where <a class="reference external" href="https://github.com/AndrewIngram/django-extra-views">django-extra-views</a> comes
+to the foreground. You can use the corresponding CBVs of django-extra-views to support the multiple-form workflows described above. Using these CBVs
+are more or less similar to using the good-old django&nbsp;FormView.</p>
+</div>
+<div class="section" id="easy-thumbnails">
+<h3>easy-thumbnails</h3>
+<p><a class="reference external" href="https://github.com/SmileyChris/easy-thumbnails">easy-thumbnails</a> is a great library if you want to support thumbnails. Actually, thumbnails is not 100% correct - this package can be used to
+generate and manage various versions of your original images, for example you may have a small version of the image that will be used as a thumbnail,
+a larger version that will be used in a gallery-carousel view and an even larger version (but not the original one which could be huge) that will be used when
+the user clicks on the gallery to view a larger version of the image. To do that you define the image configurations you support in your settings.py and then
+you have access
+to your thumbnails both in your templates and in your views. Notice that a specific thumbnail congfiguration for an image will be created only once since
+the generated images are saved so each thumbnail will be generated on the first request it contains it and will be reused in the following such&nbsp;requests.</p>
+</div>
+<div class="section" id="django-rest-framework">
+<h3>django-rest-framework</h3>
+<p><a class="reference external" href="https://github.com/encode/django-rest-framework">django-rest-framework</a> is definitely the best package for creating web APIs with django. I don&#8217;t recommend using it if you want to create a quick <span class="caps">JSON</span> search
+<span class="caps">API</span> (take a look at <a class="reference external" href="https://spapas.github.io/2014/09/15/django-non-html-responses/">django non-<span class="caps">HTML</span> responses</a>) but if you want to go the <span class="caps">SPA</span> way or if you want to create multiple APIs for various models then
+this is the way to go. Integrating it to your project will need some effort (that&#8217;s why I don&#8217;t recommend it for quick and dirty APIs) because you&#8217;ll
+need to create a serializers.py which will define the serializers (more or less the fields) for the models you&#8217;ll want to expose through your <span class="caps">API</span> and
+then create the views (or the viewsets which are families of views for example list, detail, delete, update, create) and add them to your urls.py. You&#8217;ll
+also need to configure authentication, authorization and probably filtering and pagination. This may seem like a lot of work but the result are
+excellent - you&#8217;ll get a full <span class="caps">REST</span> <span class="caps">API</span> supporting create, list, detail, update, delete for any complex configuration of your models.
+You can take a look at a sample application in my <a class="reference external" href="https://github.com/spapas/react-tutorial">React tutorial</a> repository (yes this is a repository that has a tutorial for React and
+friends but the back-end is in django and&nbsp;django-rest-framework).</p>
+<p>django-rest-framework integrates nicely with django-filter (mentioned above) to re-use the filters you have created for your model listings
+in your <span class="caps">REST</span> APIs - <span class="caps">DRY</span> at its&nbsp;best!</p>
+</div>
+<div class="section" id="django-waffle">
+<h3>django-waffle</h3>
+<p><a class="reference external" href="https://github.com/jsocol/django-waffle">django-waffle</a> is described as a feature flipper. What does this mean? Let&#8217;s say that you want to control at will when a specific view will be enabled
+- this is the library you&#8217;ll want to use. Or you have developed a new feature and you want to give access to it only on a subset of users for a pilot run of
+the feature - once again you should use django flipper. It offers a nice admin interface where you can configure the flags that will be used for the various
+feature enabling/disabling (and if they are active or not) and various template tags and functions that you can use to test if the features should be activated
+or&nbsp;not.</p>
+</div>
+<div class="section" id="django-allauth">
+<h3>django-allauth</h3>
+<p><a class="reference external" href="https://github.com/pennersr/django-allauth">django-allauth</a> should be used in two cases: When you want a <em>better</em> user registration workflow than the default (non-existant) one or you want
+to integrate your application with an external OAuth provider (i.e allow your users to login through their facebook, google, twitter, github etc accounts). I
+have mainly used this package for the first case and I can confirm that it works great and you can create as complex flows as you want (for example, in
+one of my projects I have the following user registration-activation flow: A user registers using a custom form and using his email as username, he receives
+an email with a confirmation link,
+after he has confirmed his email he receivs a custom message to wait for his account activation and the administrators of the application are notified,
+the administrators enable the new user&#8217;s account after checking some things and only then he&#8217;ll be able to log-in). One thing that must be noticed about
+django-allauth is that it (in my opition) does not have very good documentation but there are lots of answers about <a class="reference external" href="https://stackoverflow.com/questions/tagged/django-allauth">django-allauth in stackoverflow</a> and the source code
+is very clear so you can always use the source as documentation for this&nbsp;package.</p>
+</div>
+<div class="section" id="django-modeltranslation">
+<h3>django-modeltranslation</h3>
+<p>The <a class="reference external" href="https://github.com/deschler/django-modeltranslation">django-modeltranslation</a> library is the library I recommend for when you want to have translations to your models. To use it
+you add a translation.py file where you declare the models and their fields that should be translated. The, depending on which languages you have configured
+in your settings.py after you run makemigrations and migrate you&#8217;ll see that django-modeltranslation will have included extra fields to the database, each one
+with the corresponding language name (for example if you have added a field <tt class="docutils literal">name</tt> to the translations and have english and greek as language,
+django-modeltranslation will add the fields <tt class="docutils literal">name_en</tt> and <tt class="docutils literal">name_el</tt> to your table). You can the edit the i18n fields (using forms or the django admin) and
+depending on the current language of your site when you use <tt class="docutils literal">name</tt> you&#8217;ll get either <tt class="docutils literal">name_el</tt> or <tt class="docutils literal">name_en</tt>.</p>
+</div>
+<div class="section" id="django-widget-tweaks">
+<h3>django-widget-tweaks</h3>
+<p>If for some reason you don&#8217;t want to do django-crispy-forms, or you have a form in which you want to do a specific layout change but without
+fully implementing the FormHelper then you can actually render the form in <span class="caps">HTML</span> and output the fields one by one. One thing that cannot
+be done though is passing custom options to the rendered form field. When you do a <tt class="docutils literal">{{ form.field }}</tt> to your template django will render
+the form field using its default options - yes this can be overriden using <a class="reference external" href="https://docs.djangoproject.com/en/1.11/ref/forms/widgets/#base-widget-classes">custom widgets</a> but I don&#8217;t recommend it for example if you only
+want to add a class to the rendered <tt class="docutils literal">&lt;input&gt;</tt>!</p>
+<p>Instead, you can use <a class="reference external" href="https://github.com/jazzband/django-widget-tweaks">django-widget-tweaks</a> to pass some specific class names or attributes to
+the rendered form fields - so if you use <tt class="docutils literal">{{ <span class="pre">form.field|add_class:&quot;myclass&quot;</span> }}</tt> the rendered <tt class="docutils literal">&lt;input&gt;</tt> will have a <tt class="docutils literal">myclass</tt> css&nbsp;class.</p>
+</div>
+<div class="section" id="django-simple-captcha">
+<h3>django-simple-captcha</h3>
+<p>Use <a class="reference external" href="https://github.com/mbi/django-simple-captcha">django-simple-captcha</a> to add (configurable) captchas to your django forms. This is a very simple package that does not have any requirements
+beyond the Pillow library for the captcha image generator. The generated captchas are simple images with some added noise so it won&#8217;t integrate
+<a class="reference external" href="https://www.google.com/recaptcha/intro/">reCAPTCHA</a> with which you may be more familiar. I deliberatly propose this package for captchas so you won&#8217;t need to integrate with Google&nbsp;services.</p>
+</div>
+<div class="section" id="wagtail">
+<h3>wagtail</h3>
+<p><a class="reference external" href="https://github.com/wagtail/wagtail">wagtail</a> is a great django <span class="caps">CMS</span>. I use it when I need to create a <span class="caps">CMS</span> or I need to add <span class="caps">CMS</span> like capabilities to a project. It has many
+capabilities, too many to be listed here. I urge you to try it if you need a <span class="caps">CMS</span>!</p>
+</div>
+</div>
+<div class="section" id="conclusion">
+<h2>Conclusion</h2>
+<p>The above packages should cover most of your django needs. I have listed only packages with good documentation,
+that have been recently updated
+and work with new django versions and should be fairly easy to integrate with your projects. If you need anything more or want to take a general
+look at some of the packages that have are availablie I recommend starting
+with the <a class="reference external" href="https://djangopackages.org">django packages</a>&nbsp;site.</p>
+<p>One important thing to notice here is that some of the above packages are not really complex and their functionality can be re-implemented
+by you in a couple of hours. For example, you could replicate the functionality of django-constance by adding a config dict and
+a couple of methods (and template tags) of storing and retrieving the keys of that dict with redis. Or add some custom clean methods to your
+forms instead of using the form fields from django-localflavor. Also, some of these packages have similar functionality and can be used (along
+with a little custom code) to replicate the functionality of other packages, for exmaple instead of using django-waffle you could use
+django-constance to configure if the features should be enabled or disabled and django-rules-light to control if the users have access to the feature.
+Also, you could probably use django-waffle for access control, i.e allow only admins to access a specific&nbsp;views.</p>
+<p>Please don&#8217;t do this. This violates <span class="caps">DRY</span> and violates being disciplined.
+Each package has its purpose and being <span class="caps">DRY</span> means that you use it for its purpose, <em>not</em> re-implementing it and <em>not</em> re-using it for other purposes.
+When somebody (or you after some months) sees that package in requirements or INSTALLED_APPS he will conclude that you are using it for
+its intented purpose and thank you because you have saved him some time - please don&#8217;t make him waste his time by needing to read your source code to understand
+any smart tricks or reinventing the&nbsp;wheel.</p>
+</div>
+</div>
+    <footer>
+<p class="meta">
+  <span class="byline author vcard">
+    Posted by <span class="fn">
+        Serafeim Papastefanos
+    </span>
+  </span>
+<time datetime="2017-10-11T14:20:00+03:00" pubdate>Wed 11 October 2017</time>  <span class="categories">
+    <a class='category' href='https://spapas.github.io/category/django.html'>django</a>
+  </span>
+  <span class="categories">
+    <a class="category" href="https://spapas.github.io/tag/django.html">django</a>,    <a class="category" href="https://spapas.github.io/tag/python.html">python</a>  </span>
+</p><div class="sharing">
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="https://spapas.github.io/2017/10/11/essential-django-packages/" data-via="" data-counturl="https://spapas.github.io/2017/10/11/essential-django-packages/" >Tweet</a>
+</div>    </footer>
+  </article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript></div>
+  </section>
+</div>
+<aside class="sidebar">
+  
+  <section>
+    <br />
+    <a href='/feeds/all.atom.xml'>Atom</a>
+    |
+    <a href='/feeds/all.rss.xml'>RSS</a>
+  </section>
+
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <!-- Sidebar unit -->
+  <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7673322832689008" data-ad-slot="2720624730"
+    data-ad-format="auto" data-full-width-responsive="true"></ins>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+
+
+  <script async src="https://cse.google.com/cse.js?cx=612920e5ca9da850c"></script>
+  <div class="gcse-search"></div>
+
+  
+  <section>
+    <h1>Support me</h1>
+
+    You can show your appreciation for anything useful you've found here by 
+    buying me a coffee 
+    <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="spapas" data-color="#FFDD00" data-emoji=""  data-font="Lato" data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff" ></script>
+
+    or donating me some bitcoin to this address:
+    <small><pre>bc1qx42vp8napheaewhnx0rk0mttdrdrtvw6czvxhl</pre></small>
+    <svg shape-rendering="crispEdges" height="200" width="200" viewBox="0 0 29 29" class="qrcode">
+      <path fill="#FFFFFF" d="M0,0 h29v29H0z"></path><path fill="#000000" d="M0 0h7v1H0zM9 0h2v1H9zM12 0h1v1H12zM14 0h2v1H14zM18 0h2v1H18zM22,0 h7v1H22zM0 1h1v1H0zM6 1h1v1H6zM8 1h1v1H8zM11 1h1v1H11zM14 1h5v1H14zM22 1h1v1H22zM28,1 h1v1H28zM0 2h1v1H0zM2 2h3v1H2zM6 2h1v1H6zM8 2h4v1H8zM17 2h1v1H17zM22 2h1v1H22zM24 2h3v1H24zM28,2 h1v1H28zM0 3h1v1H0zM2 3h3v1H2zM6 3h1v1H6zM9 3h2v1H9zM14 3h3v1H14zM18 3h1v1H18zM22 3h1v1H22zM24 3h3v1H24zM28,3 h1v1H28zM0 4h1v1H0zM2 4h3v1H2zM6 4h1v1H6zM8 4h1v1H8zM11 4h1v1H11zM13 4h1v1H13zM15 4h2v1H15zM18 4h1v1H18zM22 4h1v1H22zM24 4h3v1H24zM28,4 h1v1H28zM0 5h1v1H0zM6 5h1v1H6zM8 5h2v1H8zM14 5h2v1H14zM19 5h2v1H19zM22 5h1v1H22zM28,5 h1v1H28zM0 6h7v1H0zM8 6h1v1H8zM10 6h1v1H10zM12 6h1v1H12zM14 6h1v1H14zM16 6h1v1H16zM18 6h1v1H18zM20 6h1v1H20zM22,6 h7v1H22zM8 7h2v1H8zM11 7h1v1H11zM15 7h1v1H15zM17 7h2v1H17zM0 8h2v1H0zM3 8h1v1H3zM6 8h2v1H6zM10 8h1v1H10zM12 8h3v1H12zM20 8h1v1H20zM22 8h3v1H22zM26 8h2v1H26zM1 9h1v1H1zM3 9h3v1H3zM8 9h1v1H8zM10 9h1v1H10zM12 9h2v1H12zM16 9h2v1H16zM20 9h1v1H20zM22 9h1v1H22zM25 9h1v1H25zM27,9 h2v1H27zM0 10h1v1H0zM3 10h2v1H3zM6 10h1v1H6zM8 10h3v1H8zM12 10h2v1H12zM16 10h1v1H16zM19 10h1v1H19zM22 10h3v1H22zM27 10h1v1H27zM0 11h1v1H0zM2 11h1v1H2zM4 11h2v1H4zM7 11h1v1H7zM13 11h4v1H13zM18 11h4v1H18zM26 11h2v1H26zM0 12h1v1H0zM2 12h3v1H2zM6 12h1v1H6zM11 12h1v1H11zM13 12h1v1H13zM15 12h3v1H15zM20 12h1v1H20zM22 12h2v1H22zM27,12 h2v1H27zM4 13h1v1H4zM8 13h3v1H8zM12 13h1v1H12zM14 13h1v1H14zM17 13h4v1H17zM25 13h2v1H25zM0 14h1v1H0zM4 14h3v1H4zM8 14h2v1H8zM11 14h3v1H11zM16 14h1v1H16zM21 14h2v1H21zM24,14 h5v1H24zM3 15h3v1H3zM7 15h2v1H7zM10 15h1v1H10zM12 15h2v1H12zM15 15h1v1H15zM17 15h2v1H17zM20 15h2v1H20zM23 15h1v1H23zM1 16h1v1H1zM4 16h1v1H4zM6 16h4v1H6zM16 16h2v1H16zM20 16h1v1H20zM23 16h1v1H23zM25 16h1v1H25zM28,16 h1v1H28zM2 17h1v1H2zM5 17h1v1H5zM7 17h2v1H7zM11 17h3v1H11zM17 17h1v1H17zM22 17h1v1H22zM25 17h1v1H25zM27,17 h2v1H27zM0 18h1v1H0zM3 18h1v1H3zM5 18h4v1H5zM10 18h1v1H10zM12 18h1v1H12zM18 18h1v1H18zM20 18h1v1H20zM22 18h2v1H22zM25,18 h4v1H25zM2 19h3v1H2zM8 19h1v1H8zM16 19h2v1H16zM21 19h1v1H21zM23 19h1v1H23zM25 19h1v1H25zM27 19h1v1H27zM0 20h1v1H0zM2 20h5v1H2zM8 20h2v1H8zM13 20h4v1H13zM19 20h6v1H19zM26 20h1v1H26zM28,20 h1v1H28zM8 21h2v1H8zM12 21h3v1H12zM16 21h1v1H16zM20 21h1v1H20zM24 21h1v1H24zM26,21 h3v1H26zM0 22h7v1H0zM8 22h3v1H8zM17 22h1v1H17zM20 22h1v1H20zM22 22h1v1H22zM24 22h2v1H24zM27 22h1v1H27zM0 23h1v1H0zM6 23h1v1H6zM10 23h2v1H10zM13 23h2v1H13zM19 23h2v1H19zM24,23 h5v1H24zM0 24h1v1H0zM2 24h3v1H2zM6 24h1v1H6zM9 24h2v1H9zM12 24h2v1H12zM17 24h1v1H17zM20 24h6v1H20zM28,24 h1v1H28zM0 25h1v1H0zM2 25h3v1H2zM6 25h1v1H6zM8 25h3v1H8zM12 25h1v1H12zM14 25h1v1H14zM18 25h1v1H18zM22 25h3v1H22zM26 25h1v1H26zM0 26h1v1H0zM2 26h3v1H2zM6 26h1v1H6zM10 26h5v1H10zM16 26h3v1H16zM21 26h1v1H21zM24 26h1v1H24zM26 26h1v1H26zM28,26 h1v1H28zM0 27h1v1H0zM6 27h1v1H6zM8 27h3v1H8zM12 27h4v1H12zM17 27h1v1H17zM20 27h1v1H20zM23 27h2v1H23zM27 27h1v1H27zM0 28h7v1H0zM8 28h3v1H8zM14 28h1v1H14zM16 28h3v1H16zM20 28h1v1H20zM22 28h1v1H22zM24 28h2v1H24zM27 28h1v1H27z"></path>
+    </svg>
+  </section>
+  
+
+  <section>
+    <h1>Subscribe</h1>
+    Do you want to get notified via email when I post new content?
+    <style>
+      .subscribe-button {
+        /* margin: 10px !important; */
+        padding: 10px !important;
+        background-color: black;
+        display: inline-block;
+        color: white !important;
+        text-decoration: none;
+
+        line-height: 36px !important;
+        height: 37px !important;
+        text-decoration: none !important;
+        display: inline-block !important;
+        color: #ffffff !important;
+        background-color: #000000 !important;
+        border-radius: 3px !important;
+        border: 1px solid transparent !important;
+        padding: 1px 9px !important;
+        font-size: 23px !important;
+        letter-spacing: 0.6px !important;
+        box-shadow: 0px 1px 2px rgba(190, 190, 190, 0.5) !important;
+        -webkit-box-shadow: 0px 1px 2px 2px rgba(190, 190, 190, 0.5) !important;
+        margin: 0 auto !important;
+        font-family: 'Cookie', cursive !important;
+        -webkit-box-sizing: border-box !important;
+        box-sizing: border-box !important;
+        -o-transition: 0.3s all linear !important;
+        -webkit-transition: 0.3s all linear !important;
+        -moz-transition: 0.3s all linear !important;
+        -ms-transition: 0.3s all linear !important;
+        transition: 0.3s all linear !important;
+
+      }
+    </style>
+    <a class='subscribe-button' target="_blank" href="http://eepurl.com/dxI3PP">Click here to subscribe!</a>
+  </section>
+
+
+  <section>
+    <h1>Recent Posts</h1>
+    <ul id="recent_posts">
+      <li class="post">
+        <a href="https://spapas.github.io/2024/08/22/multiple-erl-elixir-windows/">Multiple Erlang/Elixir versions in Windows</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/11/29/openid-connect-tutorial/">A simple OpenID connect tutorial</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/05/23/simple-django-datatables-integration/">Simple Django - DataTables integration</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/05/22/ai-auto-subtitling/">AI auto-subtitling</a>
+      </li>
+      <li class="post">
+        <a href="https://spapas.github.io/2023/05/12/disable-your-forms/">HTML form disable after submit</a>
+      </li>
+    </ul>
+  </section>
+  <section>
+
+    <h1>Categories</h1>
+    <ul id="recent_posts">
+      <li><a href="https://spapas.github.io/category/ai.html">ai</a></li>
+      <li><a href="https://spapas.github.io/category/android.html">android</a></li>
+      <li><a href="https://spapas.github.io/category/clojure.html">clojure</a></li>
+      <li><a href="https://spapas.github.io/category/css.html">css</a></li>
+      <li><a href="https://spapas.github.io/category/django.html">django</a></li>
+      <li><a href="https://spapas.github.io/category/elixir.html">elixir</a></li>
+      <li><a href="https://spapas.github.io/category/flask.html">flask</a></li>
+      <li><a href="https://spapas.github.io/category/gaming.html">gaming</a></li>
+      <li><a href="https://spapas.github.io/category/git.html">git</a></li>
+      <li><a href="https://spapas.github.io/category/html.html">html</a></li>
+      <li><a href="https://spapas.github.io/category/javascript.html">javascript</a></li>
+      <li><a href="https://spapas.github.io/category/networking.html">networking</a></li>
+      <li><a href="https://spapas.github.io/category/pelican.html">pelican</a></li>
+      <li><a href="https://spapas.github.io/category/postgresql.html">postgresql</a></li>
+      <li><a href="https://spapas.github.io/category/python.html">python</a></li>
+      <li><a href="https://spapas.github.io/category/spring.html">spring</a></li>
+      <li><a href="https://spapas.github.io/category/unix.html">unix</a></li>
+      <li><a href="https://spapas.github.io/category/wagtail.html">wagtail</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Tags</h1>
+    <a href="https://spapas.github.io/tag/erlang.html">erlang</a>,    <a href="https://spapas.github.io/tag/elixir.html">elixir</a>,    <a href="https://spapas.github.io/tag/windows.html">windows</a>,    <a href="https://spapas.github.io/tag/openid.html">openid</a>,    <a href="https://spapas.github.io/tag/openid-connect.html">openid-connect</a>,    <a href="https://spapas.github.io/tag/oidc.html">oidc</a>,    <a href="https://spapas.github.io/tag/http.html">http</a>,    <a href="https://spapas.github.io/tag/keycloak.html">keycloak</a>,    <a href="https://spapas.github.io/tag/python.html">python</a>,    <a href="https://spapas.github.io/tag/django.html">django</a>,    <a href="https://spapas.github.io/tag/jquery.html">jquery</a>,    <a href="https://spapas.github.io/tag/datatables.html">datatables</a>,    <a href="https://spapas.github.io/tag/ai.html">ai</a>,    <a href="https://spapas.github.io/tag/whisper.html">whisper</a>,    <a href="https://spapas.github.io/tag/whispercpp.html">whisper.cpp</a>,    <a href="https://spapas.github.io/tag/subtitles.html">subtitles</a>,    <a href="https://spapas.github.io/tag/video.html">video</a>,    <a href="https://spapas.github.io/tag/auto-subtitling.html">auto-subtitling</a>,    <a href="https://spapas.github.io/tag/subtitiling.html">subtitiling</a>,    <a href="https://spapas.github.io/tag/transcribe.html">transcribe</a>,    <a href="https://spapas.github.io/tag/html.html">html</a>,    <a href="https://spapas.github.io/tag/javascript.html">javascript</a>,    <a href="https://spapas.github.io/tag/media.html">media</a>,    <a href="https://spapas.github.io/tag/storage.html">storage</a>,    <a href="https://spapas.github.io/tag/unpoly.html">unpoly</a>,    <a href="https://spapas.github.io/tag/access.html">access</a>,    <a href="https://spapas.github.io/tag/database.html">database</a>,    <a href="https://spapas.github.io/tag/accdb.html">accdb</a>,    <a href="https://spapas.github.io/tag/mdb.html">mdb</a>,    <a href="https://spapas.github.io/tag/postgresql.html">postgresql</a>,    <a href="https://spapas.github.io/tag/development.html">development</a>,    <a href="https://spapas.github.io/tag/inlines.html">inlines</a>,    <a href="https://spapas.github.io/tag/clojure.html">clojure</a>,    <a href="https://spapas.github.io/tag/cmd.html">cmd</a>,    <a href="https://spapas.github.io/tag/pdf.html">pdf</a>,    <a href="https://spapas.github.io/tag/wkhtmltopdf.html">wkhtmltopdf</a>,    <a href="https://spapas.github.io/tag/forward-proxy.html">forward-proxy</a>,    <a href="https://spapas.github.io/tag/reverse-proxy.html">reverse-proxy</a>,    <a href="https://spapas.github.io/tag/proxy.html">proxy</a>,    <a href="https://spapas.github.io/tag/networking.html">networking</a>,    <a href="https://spapas.github.io/tag/dj-rest-auth.html">dj-rest-auth</a>,    <a href="https://spapas.github.io/tag/rest.html">rest</a>,    <a href="https://spapas.github.io/tag/django-rest-framework.html">django-rest-framework</a>,    <a href="https://spapas.github.io/tag/authentication.html">authentication</a>,    <a href="https://spapas.github.io/tag/tokens.html">tokens</a>,    <a href="https://spapas.github.io/tag/migrations.html">migrations</a>,    <a href="https://spapas.github.io/tag/foreignkey.html">foreignkey</a>,    <a href="https://spapas.github.io/tag/dark-souls.html">dark-souls</a>,    <a href="https://spapas.github.io/tag/dark-souls-2.html">dark-souls-2</a>,    <a href="https://spapas.github.io/tag/dark-souls-3.html">dark-souls-3</a>,    <a href="https://spapas.github.io/tag/autohotkey.html">autohotkey</a>,    <a href="https://spapas.github.io/tag/matplotlib.html">matplotlib</a>,    <a href="https://spapas.github.io/tag/hashids.html">hashids</a>,    <a href="https://spapas.github.io/tag/wagtail.html">wagtail</a>,    <a href="https://spapas.github.io/tag/osmon.html">osmon</a>,    <a href="https://spapas.github.io/tag/phoenix.html">phoenix</a>,    <a href="https://spapas.github.io/tag/os-monitoring.html">os-monitoring</a>,    <a href="https://spapas.github.io/tag/forms.html">forms</a>,    <a href="https://spapas.github.io/tag/django-crispy-forms.html">django-crispy-forms</a>,    <a href="https://spapas.github.io/tag/django-widget-tweaks.html">django-widget-tweaks</a>,    <a href="https://spapas.github.io/tag/ecto.html">ecto</a>,    <a href="https://spapas.github.io/tag/queries.html">queries</a>,    <a href="https://spapas.github.io/tag/declarative.html">declarative</a>,    <a href="https://spapas.github.io/tag/form.html">form</a>,    <a href="https://spapas.github.io/tag/php.html">php</a>,    <a href="https://spapas.github.io/tag/select2.html">select2</a>,    <a href="https://spapas.github.io/tag/autocompelte.html">autocompelte</a>,    <a href="https://spapas.github.io/tag/ajax.html">ajax</a>,    <a href="https://spapas.github.io/tag/android.html">android</a>,    <a href="https://spapas.github.io/tag/kotlin.html">kotlin</a>,    <a href="https://spapas.github.io/tag/adapter.html">adapter</a>,    <a href="https://spapas.github.io/tag/filter.html">filter</a>,    <a href="https://spapas.github.io/tag/async.html">async</a>,    <a href="https://spapas.github.io/tag/tasks.html">tasks</a>,    <a href="https://spapas.github.io/tag/django-rq.html">django-rq</a>,    <a href="https://spapas.github.io/tag/rq.html">rq</a>,    <a href="https://spapas.github.io/tag/du.html">du</a>,    <a href="https://spapas.github.io/tag/unix.html">unix</a>,    <a href="https://spapas.github.io/tag/linux.html">linux</a>,    <a href="https://spapas.github.io/tag/disk-usage.html">disk-usage</a>,    <a href="https://spapas.github.io/tag/cbv.html">cbv</a>,    <a href="https://spapas.github.io/tag/middleware.html">middleware</a>,    <a href="https://spapas.github.io/tag/class-based-views.html">class-based-views</a>,    <a href="https://spapas.github.io/tag/react.html">react</a>,    <a href="https://spapas.github.io/tag/redux.html">redux</a>,    <a href="https://spapas.github.io/tag/hyperapp.html">hyperapp</a>,    <a href="https://spapas.github.io/tag/immutable.html">immutable</a>,    <a href="https://spapas.github.io/tag/es6.html">es6</a>,    <a href="https://spapas.github.io/tag/youtube.html">youtube</a>,    <a href="https://spapas.github.io/tag/youtube-dl.html">youtube-dl</a>,    <a href="https://spapas.github.io/tag/ffmpeg.html">ffmpeg</a>,    <a href="https://spapas.github.io/tag/django-rest-auth.html">django-rest-auth</a>,    <a href="https://spapas.github.io/tag/python-2.html">python-2</a>,    <a href="https://spapas.github.io/tag/python-3.html">python-3</a>,    <a href="https://spapas.github.io/tag/plpgsql.html">plpgsql</a>,    <a href="https://spapas.github.io/tag/component.html">component</a>,    <a href="https://spapas.github.io/tag/ag-grid.html">ag-grid</a>,    <a href="https://spapas.github.io/tag/grid.html">grid</a>,    <a href="https://spapas.github.io/tag/bash.html">bash</a>,    <a href="https://spapas.github.io/tag/cron.html">cron</a>,    <a href="https://spapas.github.io/tag/pandas.html">pandas</a>,    <a href="https://spapas.github.io/tag/scipy.html">scipy</a>,    <a href="https://spapas.github.io/tag/numpy.html">numpy</a>,    <a href="https://spapas.github.io/tag/pivot.html">pivot</a>,    <a href="https://spapas.github.io/tag/pivot_table.html">pivot_table</a>,    <a href="https://spapas.github.io/tag/ipython.html">ipython</a>,    <a href="https://spapas.github.io/tag/jupyter.html">jupyter</a>,    <a href="https://spapas.github.io/tag/notebook.html">notebook</a>,    <a href="https://spapas.github.io/tag/query.html">query</a>,    <a href="https://spapas.github.io/tag/q.html">q</a>,    <a href="https://spapas.github.io/tag/imgur.html">imgur</a>,    <a href="https://spapas.github.io/tag/console.html">console</a>,    <a href="https://spapas.github.io/tag/research.html">research</a>,    <a href="https://spapas.github.io/tag/debug.html">debug</a>,    <a href="https://spapas.github.io/tag/werkzeug.html">werkzeug</a>,    <a href="https://spapas.github.io/tag/django-extensions.html">django-extensions</a>,    <a href="https://spapas.github.io/tag/404.html">404</a>,    <a href="https://spapas.github.io/tag/error.html">error</a>,    <a href="https://spapas.github.io/tag/spring.html">spring</a>,    <a href="https://spapas.github.io/tag/spring-boot.html">spring-boot</a>,    <a href="https://spapas.github.io/tag/java.html">java</a>,    <a href="https://spapas.github.io/tag/ldap.html">ldap</a>,    <a href="https://spapas.github.io/tag/profiles.html">profiles</a>,    <a href="https://spapas.github.io/tag/settings.html">settings</a>,    <a href="https://spapas.github.io/tag/properties.html">properties</a>,    <a href="https://spapas.github.io/tag/yaml.html">yaml</a>,    <a href="https://spapas.github.io/tag/configuration.html">configuration</a>,    <a href="https://spapas.github.io/tag/deploy.html">deploy</a>,    <a href="https://spapas.github.io/tag/initd.html">init.d</a>,    <a href="https://spapas.github.io/tag/react-redux.html">react-redux</a>,    <a href="https://spapas.github.io/tag/redux-thunk.html">redux-thunk</a>,    <a href="https://spapas.github.io/tag/redux-form.html">redux-form</a>,    <a href="https://spapas.github.io/tag/react-router.html">react-router</a>,    <a href="https://spapas.github.io/tag/react-router-redux.html">react-router-redux</a>,    <a href="https://spapas.github.io/tag/react-notification.html">react-notification</a>,    <a href="https://spapas.github.io/tag/history.html">history</a>,    <a href="https://spapas.github.io/tag/babel.html">babel</a>,    <a href="https://spapas.github.io/tag/babelify.html">babelify</a>,    <a href="https://spapas.github.io/tag/browserify.html">browserify</a>,    <a href="https://spapas.github.io/tag/watchify.html">watchify</a>,    <a href="https://spapas.github.io/tag/uglify.html">uglify</a>,    <a href="https://spapas.github.io/tag/boilerplate.html">boilerplate</a>,    <a href="https://spapas.github.io/tag/tutorial.html">tutorial</a>,    <a href="https://spapas.github.io/tag/introduction.html">introduction</a>,    <a href="https://spapas.github.io/tag/fixed-data-tables.html">fixed-data-tables</a>,    <a href="https://spapas.github.io/tag/fixeddatatable.html">FixedDataTable</a>,    <a href="https://spapas.github.io/tag/reportlab.html">reportlab</a>,    <a href="https://spapas.github.io/tag/xhtml2pdf.html">xhtml2pdf</a>,    <a href="https://spapas.github.io/tag/node.html">node</a>,    <a href="https://spapas.github.io/tag/npm.html">npm</a>,    <a href="https://spapas.github.io/tag/generic.html">generic</a>,    <a href="https://spapas.github.io/tag/tables.html">tables</a>,    <a href="https://spapas.github.io/tag/flux.html">flux</a>,    <a href="https://spapas.github.io/tag/jobs.html">jobs</a>,    <a href="https://spapas.github.io/tag/asynchronous.html">asynchronous</a>,    <a href="https://spapas.github.io/tag/scheduling.html">scheduling</a>,    <a href="https://spapas.github.io/tag/redis.html">redis</a>,    <a href="https://spapas.github.io/tag/pusher.html">pusher</a>,    <a href="https://spapas.github.io/tag/auditing.html">auditing</a>,    <a href="https://spapas.github.io/tag/css.html">css</a>,    <a href="https://spapas.github.io/tag/design.html">design</a>,    <a href="https://spapas.github.io/tag/boostrap-material-design.html">boostrap-material-design</a>,    <a href="https://spapas.github.io/tag/less.html">less</a>,    <a href="https://spapas.github.io/tag/nodejs.html">node.js</a>,    <a href="https://spapas.github.io/tag/gmail.html">gmail</a>,    <a href="https://spapas.github.io/tag/security.html">security</a>,    <a href="https://spapas.github.io/tag/google.html">google</a>,    <a href="https://spapas.github.io/tag/flask.html">flask</a>,    <a href="https://spapas.github.io/tag/mongodb.html">mongodb</a>,    <a href="https://spapas.github.io/tag/heroku.html">heroku</a>,    <a href="https://spapas.github.io/tag/spring-security.html">spring-security</a>,    <a href="https://spapas.github.io/tag/git.html">git</a>,    <a href="https://spapas.github.io/tag/github.html">github</a>,    <a href="https://spapas.github.io/tag/branching.html">branching</a>,    <a href="https://spapas.github.io/tag/static-html.html">static-html</a>,    <a href="https://spapas.github.io/tag/githubio.html">github.io</a>,    <a href="https://spapas.github.io/tag/pelican.html">pelican</a>,    <a href="https://spapas.github.io/tag/github-pages.html">github-pages</a>,    <a href="https://spapas.github.io/tag/rst.html">rst</a>  </section>
+
+  <section>
+    <h1>Yearly archives</h1>
+    <a href="https://spapas.github.io/posts/2013/">2013</a>,    <a href="https://spapas.github.io/posts/2014/">2014</a>,    <a href="https://spapas.github.io/posts/2015/">2015</a>,    <a href="https://spapas.github.io/posts/2016/">2016</a>,    <a href="https://spapas.github.io/posts/2017/">2017</a>,    <a href="https://spapas.github.io/posts/2018/">2018</a>,    <a href="https://spapas.github.io/posts/2019/">2019</a>,    <a href="https://spapas.github.io/posts/2020/">2020</a>,    <a href="https://spapas.github.io/posts/2021/">2021</a>,    <a href="https://spapas.github.io/posts/2022/">2022</a>,    <a href="https://spapas.github.io/posts/2023/">2023</a>,    <a href="https://spapas.github.io/posts/2024/">2024</a>  </section>
+
+
+
+  <section>
+    <h1>GitHub Repos</h1>
+    <ul id="gh_repos">
+      <li class="loading">Status updating...</li>
+    </ul>
+      <a href="https://github.com/spapas">@spapas</a> on GitHub
+    <script  src="//code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      $(function(){
+          if (!window.jXHR){
+              var jxhr = document.createElement('script');
+              jxhr.type = 'text/javascript';
+              jxhr.src = 'https://spapas.github.io/theme/js/jXHR.js';
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(jxhr, s);
+          }
+
+          github.showRepos({
+              user: 'spapas',
+              count: 5,
+              skip_forks: true,
+              target: '#gh_repos'
+          });
+      });
+    </script>
+    <script src="https://spapas.github.io/theme/js/github.js" type="text/javascript"> </script>
+  </section>
+
+
+  <section>
+    <a href="https://twitter.com/_serafeim_?ref_src=twsrc%5Etfw" class="twitter-follow-button"
+      data-show-count="false">Follow @_serafeim_</a>
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+  </section>
+
+</aside>    </div>
+  </div>
+  <footer role="contentinfo"><p>
+    Copyright &copy;  2013&ndash;2024  Serafeim Papastefanos &mdash;
+  <span class="credit">Powered by <a href="http://getpelican.com">Pelican</a></span>
+</p></footer>
+  <script src="https://spapas.github.io/theme/js/modernizr-2.0.js"></script>
+  <script src="https://spapas.github.io/theme/js/ender.js"></script>
+  <script src="https://spapas.github.io/theme/js/octopress.js" type="text/javascript"></script>
+  <script src="https://spapas.github.io/theme/js/ads.js"></script>
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-44750952-1', 'auto');
+
+    ga('send', 'pageview');
+    </script>
+
+<script defer data-domain="spapas.github.io" src="https://plausible.hcg.gr/js/script.js"></script>  <script type="text/javascript">
+    var disqus_shortname = 'spapas-github-io';
+    var disqus_identifier = '/2017/10/11/essential-django-packages/';
+    var disqus_url = 'https://spapas.github.io/2017/10/11/essential-django-packages/';
+    var disqus_title = 'My essential django package&nbsp;list';
+    (function() {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = "//" + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+     })();
+  </script>
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+</body>
+
+</html>
